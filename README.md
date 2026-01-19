@@ -34,4 +34,12 @@ Later we should decide on the journal.
 
 Knowledge:
 
-Argumentation support/attack between experiments and simulations.
+Argumentation support/attack between experiments and simulations
+
+- We will consider the provenance of models, and results. method, exchange-correlation, LDA, GGA, PBE, PW91.
+- We need to identify the similarity between the results of two models. See matbench discovery. There are several metrics: CPS, Acc, F1, DAF,... Metrics.
+
+MLIP -> MTP -> levels (the levels to be learned can be specified; it is possible to start learning from a lower level and continue with the higher levels, which are more expensive for computation).
+Rcut and levels can be considered in the knowledge graph. It is measured in Amstrong (e.g., 5-6 °A).
+
+Moment tensor potentials (MTP) are the parameters of the models.
