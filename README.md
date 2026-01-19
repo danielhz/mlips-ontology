@@ -25,6 +25,7 @@ Scope: domain ontology papers describe a novel ontology for a specific realm of 
 Review criteria: will consider the novelty, significance, and soundness of the required elements (just listed above).
 
 Check:  NFDI NatWek.de
+https://ise-fizkarlsruhe.github.io/mwo/docs/intro/
 
 Later we should decide on the journal.
 - Semantic Web
