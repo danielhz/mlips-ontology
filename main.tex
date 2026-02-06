@@ -82,15 +82,25 @@
 \item Experiment: uncertainty possible.
 \end{enumerate}
 
-\section{Description of the Ontology\daniel{We should add the ontology name here}}
+\section{Description of MLIPO}
 
-We next describe the proposed ontology. To make this description pedagogical, we describe the proposed ontology with a sequence of paragraph pairs, where the first paragraph introduces the concepts in an intuitive way, and the second paragraph formalizes what is described in the first one.
+We next describe the proposed ontology, \OurOntology. To make this description pedagogical, we describe the proposed ontology with a sequence of paragraph pairs, where the first paragraph introduces the concepts in an intuitive way, and the second paragraph formalizes what is described in the first one.
 
-\paragraph{P1.} Materials science simulations use a 3-dimensional box, called a \emph{simulation cell}, whose size usually ranges from 1 to 100 \AA{} and contains from Y1 to Y2 atoms. A simulation starts from a simulation cell $s_0$ in time $t_0$ and applies classical dynamics to calculate the atom states in the next time $t_1 = t_0 + \Delta$, namely the simulation cell $s_1$. To obtain the energies and forces needed for the classical dynamics, different methods can be used. The most precise one is based on Quantum Mechanics. However, because Quantum Mechanics are is resource intensive, \emph{Machine Learning Interatomic Potentials (MLIPs)} are used as a efficient and accurate approximation. There are several methods to compute MLIPs. One of them is MTP. For example, Jung et al.~\cite{DARUS-3239_2023} published several MTP models.
+\paragraph{D1.} Materials science simulations use a 3-dimensional box, called a \emph{simulation cell}, whose size usually ranges from 1 to 100 \AA{} and containing about 500 atoms. A simulation starts from a simulation cell $s_0$ in time $t_0$ and applies classical dynamics to calculate the atom states in the next time $t_1 = t_0 + \Delta$, namely the simulation cell $s_1$. To obtain the system energy and forces over the atoms needed for the classical dynamics, different methods can be used. The most precise one is based on Quantum Mechanics. However, because Quantum Mechanics are is resource intensive, \emph{Machine Learning Interatomic Potentials (MLIPs)} are used as a efficient and accurate approximation. There are several methods to compute MLIPs. One of them is MTP. For example, Jung et al.~\cite{DARUS-3239_2023} published several MTP models.
 
-\paragraph{O1.}
-The core concept of the ontology is the $\MLIP$ class, which is the aforementioned \emph{machine-learned model} to calculate energies and forces in a simulation cell. $\MTP$ is a subclass of class $\MLIP$. A $\Simulation$ is associated to multiple simulation cells $\SimulationCell$ with the property $\hasState$. The properties $\initialState$ and $\finalState$ are two sub-properties of $\hasState$ to indicate the initial and final state of a simulation.
+\paragraph{F1.}
+The core concept of the ontology are the $\MLIP$ and the $\Simulation$ classes, which are the aforementioned \emph{machine-learned model} and simulation. $\MTP$ is a subclass of class $\MLIP$ that we will use recurrently along this description.
 
+A $\Simulation$ is associated to a set of states with the property $\hasState$. Each of these states is defined by an instance of the class $\SimulationCell$. The properties $\initialState$ and $\finalState$ are two sub-properties of $\hasState$ to indicate the initial and final state of a simulation. The predicate $\pointInTime$ indicates the time of each simulation cell of a simulation. Each simulation cell is associated to the following simulation cell with the predicate $\nextState$ (except the last one).
+
+A $\Simulation$ can use multiple methods to compute the next state of each state. We use the properties $\energyModel$ and $\forcesModel$ to indicate the models used to compute the energy and forces of the current simulation cell. The range of these properties can be Quantum M
+echanics, or an $\MLIP$ model (e.g., the $\MTP$ model $m_1$ depicted in Figure~\ref{fig:mlip-simulation}).
+
+\begin{figure}
+  to do
+  \caption{Diagram of MLIPs and Simulations.}
+  \label{fig:mlip-simulation}
+\end{figure}
 
 %%%%%%%%%%% The bibliography starts:
 
