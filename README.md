@@ -1,5 +1,12 @@
 This project describes the ontology for the MLIPs knowledge graph. We plan to submit the manuscript to a conference. In particular, a possible venue can be the International Conference on Formal Ontology in Information Systems (FOIS), which will be on 21–25 September 2026, in Vitória, ES, Brazil (https://foisconference.org/). A suitable track is the one of domain-specific ontologies.
 
+# Related files
+
+- The git repositories of this paper are:
+  - https://www.overleaf.com/project/6960e955a0acb8116e689737
+  - https://github.tik.uni-stuttgart.de/ac140459/fois-2026-mlips-ontology (mirror)
+- The ontology git repository is https://github.tik.uni-stuttgart.de/ac140459/mlips
+
 # Important dates
 
 - Mandatory abstract submission: 16 March 2026 (strict)
