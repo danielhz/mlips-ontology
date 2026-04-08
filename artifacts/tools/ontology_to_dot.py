@@ -26,7 +26,7 @@ except ImportError:
     sys.exit(1)
 
 
-MLIPS = Namespace("https://kg.degu.cl/ontology/mlips#")
+MLIPS = Namespace("https://kg.ki.uni-stuttgart.de/_ontology/mlips#")
 
 # ── Styling ──────────────────────────────────────────────────────────────────
 
