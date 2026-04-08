@@ -1,0 +1,335 @@
+@prefix mlips:   <https://kg.degu.cl/ontology/mlips#> .
+@prefix mlips-sh: <https://kg.degu.cl/ontology/mlips/shapes#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+@prefix qudt:    <http://qudt.org/schema/qudt/> .
+
+# =============================================================================
+# Algorithm Module Shapes
+# =============================================================================
+
+mlips-sh:MLIPAlgorithmShape a sh:NodeShape ;
+    sh:targetClass mlips:MLIPAlgorithm ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Algorithm name" ;
+        sh:description "Human-readable name of the MLIP algorithm." ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasHyperparameter ;
+        sh:minCount 1 ;
+        sh:class mlips:Hyperparameter ;
+        sh:name "Hyperparameters" ;
+        sh:description "Hyperparameters accepted by this algorithm." ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasImplementation ;
+        sh:class mlips:Implementation ;
+        sh:name "Implementations" ;
+        sh:description "Software implementations of this algorithm." ;
+    ] ;
+    sh:property [
+        sh:path mlips:supportsSimulation ;
+        sh:class mlips:SimulationType ;
+        sh:name "Supported simulation types" ;
+    ] ;
+    sh:property [
+        sh:path owl:sameAs ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Wikidata link" ;
+        sh:description "Link to corresponding Wikidata item." ;
+    ] .
+
+mlips-sh:HyperparameterShape a sh:NodeShape ;
+    sh:targetClass mlips:Hyperparameter ;
+    sh:property [
+        sh:path mlips:hyperparameterName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Parameter name" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hyperparameterDatatype ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Datatype" ;
+        sh:in ( "float" "int" "string" "bool" ) ;
+    ] ;
+    sh:property [
+        sh:path mlips:defaultValue ;
+        sh:maxCount 1 ;
+        sh:name "Default value" ;
+    ] ;
+    sh:property [
+        sh:path mlips:minValue ;
+        sh:maxCount 1 ;
+        sh:name "Minimum value" ;
+    ] ;
+    sh:property [
+        sh:path mlips:maxValue ;
+        sh:maxCount 1 ;
+        sh:name "Maximum value" ;
+    ] .
+
+mlips-sh:HyperparameterSettingShape a sh:NodeShape ;
+    sh:targetClass mlips:HyperparameterSetting ;
+    sh:property [
+        sh:path mlips:forHyperparameter ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:Hyperparameter ;
+        sh:name "For hyperparameter" ;
+    ] .
+
+mlips-sh:ImplementationShape a sh:NodeShape ;
+    sh:targetClass mlips:Implementation ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Implementation name" ;
+    ] ;
+    sh:property [
+        sh:path mlips:implementedIn ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:Library ;
+        sh:name "Library" ;
+    ] ;
+    sh:property [
+        sh:path mlips:version ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Version" ;
+    ] .
+
+mlips-sh:LibraryShape a sh:NodeShape ;
+    sh:targetClass mlips:Library ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Library name" ;
+    ] .
+
+mlips-sh:SimulationTypeShape a sh:NodeShape ;
+    sh:targetClass mlips:SimulationType ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Simulation type name" ;
+    ] .
+
+# =============================================================================
+# Training Data Module Shapes
+# =============================================================================
+
+mlips-sh:TrainingDatasetShape a sh:NodeShape ;
+    sh:targetClass mlips:TrainingDataset ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Dataset name" ;
+    ] ;
+    sh:property [
+        sh:path mlips:numConfigurations ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minExclusive 0 ;
+        sh:name "Number of configurations" ;
+    ] ;
+    sh:property [
+        sh:path mlips:coversMaterial ;
+        sh:minCount 1 ;
+        sh:class mlips:MaterialSystem ;
+        sh:name "Material systems" ;
+    ] ;
+    sh:property [
+        sh:path mlips:coversProperty ;
+        sh:minCount 1 ;
+        sh:class mlips:CoveredProperty ;
+        sh:name "Covered properties" ;
+        sh:description "Physical properties included (Energy, Forces, Stresses, Virials)." ;
+    ] ;
+    sh:property [
+        sh:path mlips:datasetProvenance ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:DatasetProvenance ;
+        sh:name "Provenance" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasDFTCalculation ;
+        sh:class mlips:DFTCalculation ;
+        sh:name "DFT calculations" ;
+    ] .
+
+mlips-sh:DFTSettingsShape a sh:NodeShape ;
+    sh:targetClass mlips:DFTSettings ;
+    sh:property [
+        sh:path mlips:xcFunctional ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "XC functional" ;
+        sh:in ( "PBE" "LDA" "SCAN" "PBEsol" "r2SCAN" "HSE06" "PW91" "RPBE" ) ;
+    ] ;
+    sh:property [
+        sh:path mlips:energyCutoff ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:double ;
+        sh:minExclusive 0.0 ;
+        sh:name "Energy cutoff (eV)" ;
+    ] ;
+    sh:property [
+        sh:path mlips:kPointMesh ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "K-point mesh" ;
+    ] ;
+    sh:property [
+        sh:path mlips:pseudopotentialType ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Pseudopotential type" ;
+        sh:in ( "PAW" "ultrasoft" "norm-conserving" ) ;
+    ] ;
+    sh:property [
+        sh:path mlips:usedDFTCode ;
+        sh:maxCount 1 ;
+        sh:class mlips:Library ;
+        sh:name "DFT code" ;
+    ] .
+
+mlips-sh:MaterialSystemShape a sh:NodeShape ;
+    sh:targetClass mlips:MaterialSystem ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Material name" ;
+    ] ;
+    sh:property [
+        sh:path mlips:chemicalFormula ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Chemical formula" ;
+    ] ;
+    sh:property [
+        sh:path mlips:materialClass ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Material class" ;
+        sh:in ( "element" "binary alloy" "ternary compound" "quaternary compound"
+                "high-entropy alloy" "oxide" "nitride" "carbide" ) ;
+    ] ;
+    sh:property [
+        sh:path mlips:microstructuralFeature ;
+        sh:datatype xsd:string ;
+        sh:name "Microstructural features" ;
+    ] ;
+    sh:property [
+        sh:path owl:sameAs ;
+        sh:nodeKind sh:IRI ;
+        sh:name "Wikidata link" ;
+    ] .
+
+# =============================================================================
+# Benchmark Module Shapes
+# =============================================================================
+
+mlips-sh:BenchmarkStudyShape a sh:NodeShape ;
+    sh:targetClass mlips:BenchmarkStudy ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Study name" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasResult ;
+        sh:minCount 1 ;
+        sh:class mlips:BenchmarkResult ;
+        sh:name "Results" ;
+    ] .
+
+mlips-sh:BenchmarkResultShape a sh:NodeShape ;
+    sh:targetClass mlips:BenchmarkResult ;
+    sh:property [
+        sh:path mlips:usesAlgorithm ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:MLIPAlgorithm ;
+        sh:name "Algorithm" ;
+    ] ;
+    sh:property [
+        sh:path mlips:targetMaterial ;
+        sh:minCount 1 ;
+        sh:class mlips:MaterialSystem ;
+        sh:name "Target material" ;
+    ] ;
+    sh:property [
+        sh:path mlips:usesTrainingData ;
+        sh:class mlips:TrainingDataset ;
+        sh:name "Training data" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasAccuracyMetric ;
+        sh:minCount 1 ;
+        sh:class mlips:AccuracyMetric ;
+        sh:name "Accuracy metrics" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasHyperparameterSetting ;
+        sh:class mlips:HyperparameterSetting ;
+        sh:name "Hyperparameter settings" ;
+    ] ;
+    sh:property [
+        sh:path mlips:reportedIn ;
+        sh:maxCount 1 ;
+        sh:class schema:ScholarlyArticle ;
+        sh:name "Source publication" ;
+    ] .
+
+mlips-sh:AccuracyMetricShape a sh:NodeShape ;
+    sh:targetClass mlips:AccuracyMetric ;
+    sh:property [
+        sh:path mlips:metricType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:MetricType ;
+        sh:name "Metric type" ;
+    ] ;
+    sh:property [
+        sh:path mlips:metricProperty ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class mlips:MetricProperty ;
+        sh:name "Measured property" ;
+    ] ;
+    sh:property [
+        sh:path mlips:metricValue ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:double ;
+        sh:name "Value" ;
+    ] ;
+    sh:property [
+        sh:path mlips:hasUnit ;
+        sh:maxCount 1 ;
+        sh:class qudt:Unit ;
+        sh:name "Unit" ;
+    ] .

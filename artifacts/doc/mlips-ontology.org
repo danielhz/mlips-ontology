@@ -1,0 +1,500 @@
+#+TITLE: MLIPs Ontology Documentation
+#+AUTHOR: Daniel Hernandez
+#+DATE: 2026
+#+OPTIONS: toc:3 num:t
+
+* Introduction
+
+The MLIPs Ontology is an OWL 2 DL ontology for describing Machine Learning Interatomic Potentials. It captures the metadata needed to systematically compare, reproduce, and build upon MLIP studies: algorithm families with their hyperparameters, training datasets with DFT provenance, and published benchmarks with accuracy metrics.
+
+The ontology namespace is:
+
+#+begin_example
+https://kg.degu.cl/ontology/mlips#
+#+end_example
+
+Preferred prefix: =mlips:=
+
+** Design Principles
+
+1. *Alignment with existing ontologies.* The ontology reuses classes and properties from ML-Schema, PROV-O, MDO, CMSO/ASMO, QUDT, and Schema.org where appropriate.
+2. *Modularity.* Three independent modules (Algorithm, Training Data, Benchmark) can be used separately.
+3. *Extensibility.* New algorithm families and hyperparameters can be added without modifying existing definitions.
+4. *Linked Data integration.* Entities link to Wikidata via =owl:sameAs=.
+
+** External Ontologies Used
+
+| Prefix      | Namespace                                       | Purpose                        |
+|-------------+-------------------------------------------------+--------------------------------|
+| =mlschema:= | =http://www.w3.org/ns/mls#=                     | ML algorithm, dataset, hyperparam |
+| =prov:=     | =http://www.w3.org/ns/prov#=                     | Provenance (Entity, Activity)  |
+| =mdo:=      | =https://w3id.org/mdo/core/=                     | Materials Design Ontology      |
+| =cmso:=     | =https://purls.helmholtz-metadaten.de/cmso/=     | Atomic structure descriptions  |
+| =asmo:=     | =https://purls.helmholtz-metadaten.de/asmo/=     | Simulation method descriptions |
+| =qudt:=     | =http://qudt.org/schema/qudt/=                   | Units and quantities           |
+| =schema:=   | =https://schema.org/=                            | ScholarlyArticle               |
+| =foaf:=     | =http://xmlns.com/foaf/0.1/=                     | Agent (for authors)            |
+
+* Algorithm Module
+
+The Algorithm module models MLIP algorithm families, their hyperparameter spaces, software implementations, and supported simulation types.
+
+** Classes
+
+*** =mlips:MLIPAlgorithm=
+
+#+begin_example
+SubClassOf(mlschema:Algorithm)
+#+end_example
+
+An MLIP algorithm family. Each instance represents an algorithm architecture (e.g., MACE, ACE, HDNNP), not a specific trained model. The distinction is important: MACE is an algorithm; a MACE model trained on a specific dataset with specific hyperparameters is a =mlips:BenchmarkResult=.
+
+*Properties:*
+- =rdfs:label= :: Human-readable name (e.g., "MACE", "ACE")
+- =mlips:hasHyperparameter= :: Links to =mlips:Hyperparameter= instances defining the hyperparameter space
+- =mlips:hasImplementation= :: Links to =mlips:Implementation= instances
+- =mlips:supportsSimulation= :: Links to =mlips:SimulationType= instances
+- =owl:sameAs= :: Link to Wikidata item (e.g., =wd:Q...= for MACE)
+
+*** =mlips:Hyperparameter=
+
+#+begin_example
+SubClassOf(mlschema:HyperParameter)
+#+end_example
+
+A hyperparameter accepted by an MLIP algorithm. This class describes the /parameter definition/ (name, type, range, default), not a specific value assignment. Specific values are captured by =mlips:HyperparameterSetting=.
+
+*Properties:*
+- =mlips:hyperparameterName= :: =xsd:string= --- parameter name (e.g., "cutoff_radius")
+- =mlips:hyperparameterDatatype= :: =xsd:string= --- expected type ("float", "int", "string")
+- =mlips:defaultValue= :: Default value
+- =mlips:minValue= :: Minimum allowed value
+- =mlips:maxValue= :: Maximum allowed value
+
+*** =mlips:HyperparameterSetting=
+
+A concrete value assigned to a hyperparameter in a specific context (training run, benchmark). Links to =mlips:Hyperparameter= via =mlips:forHyperparameter=.
+
+*Properties:*
+- =mlips:forHyperparameter= :: Links to the =mlips:Hyperparameter= being configured
+- =mlips:settingValue= :: The concrete value
+- Specific typed properties: =mlips:cutoffRadius= (=xsd:double=), =mlips:numLayers= (=xsd:integer=), =mlips:learningRate= (=xsd:double=), =mlips:numRadialBasis= (=xsd:integer=), =mlips:numAngularBasis= (=xsd:integer=)
+
+*** =mlips:Implementation=
+
+#+begin_example
+SubClassOf(mlschema:Implementation)
+#+end_example
+
+A software implementation of an algorithm in a specific library.
+
+*Properties:*
+- =mlips:implementedIn= :: Links to =mlips:Library=
+- =mlips:version= :: =xsd:string= --- version identifier
+- =rdfs:label= :: Human-readable name
+
+*** =mlips:Library=
+
+A software library or tool (e.g., ASE, LAMMPS, VASP, GPAW, the MACE Python package).
+
+*** =mlips:SimulationType=
+
+A type of atomistic simulation. Intended instances include:
+- Molecular dynamics (MD)
+- Monte Carlo
+- Geometry optimization
+- Phonon calculations
+- Thermodynamic integration
+- Nudged elastic band (NEB)
+
+** Example: MACE Algorithm
+
+#+begin_src turtle
+@prefix mlips: <https://kg.degu.cl/ontology/mlips#> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+
+mlips:mace-algorithm a mlips:MLIPAlgorithm ;
+    rdfs:label "MACE" ;
+    rdfs:comment "Higher Order Equivariant Message Passing Neural Networks" ;
+    owl:sameAs wd:Q118362578 ;
+    mlips:hasHyperparameter mlips:mace-cutoff-radius,
+                            mlips:mace-num-layers,
+                            mlips:mace-learning-rate,
+                            mlips:mace-num-radial-basis ;
+    mlips:hasImplementation mlips:mace-impl-v03 ;
+    mlips:supportsSimulation mlips:sim-md,
+                              mlips:sim-geometry-opt,
+                              mlips:sim-phonon .
+
+mlips:mace-cutoff-radius a mlips:Hyperparameter ;
+    mlips:hyperparameterName "cutoff_radius" ;
+    mlips:hyperparameterDatatype "float" ;
+    mlips:defaultValue "5.0"^^xsd:double ;
+    mlips:minValue "2.0"^^xsd:double ;
+    mlips:maxValue "10.0"^^xsd:double .
+
+mlips:mace-num-layers a mlips:Hyperparameter ;
+    mlips:hyperparameterName "num_interactions" ;
+    mlips:hyperparameterDatatype "int" ;
+    mlips:defaultValue "2"^^xsd:integer .
+
+mlips:mace-learning-rate a mlips:Hyperparameter ;
+    mlips:hyperparameterName "learning_rate" ;
+    mlips:hyperparameterDatatype "float" ;
+    mlips:defaultValue "0.01"^^xsd:double .
+
+mlips:mace-num-radial-basis a mlips:Hyperparameter ;
+    mlips:hyperparameterName "num_radial_basis" ;
+    mlips:hyperparameterDatatype "int" ;
+    mlips:defaultValue "8"^^xsd:integer .
+
+mlips:mace-impl-v03 a mlips:Implementation ;
+    rdfs:label "MACE v0.3" ;
+    mlips:implementedIn mlips:lib-mace-python ;
+    mlips:version "0.3.0" .
+
+mlips:lib-mace-python a mlips:Library ;
+    rdfs:label "MACE (Python package)" .
+
+mlips:sim-md a mlips:SimulationType ;
+    rdfs:label "Molecular dynamics" .
+
+mlips:sim-geometry-opt a mlips:SimulationType ;
+    rdfs:label "Geometry optimization" .
+
+mlips:sim-phonon a mlips:SimulationType ;
+    rdfs:label "Phonon calculations" .
+#+end_src
+
+* Training Data Module
+
+The Training Data module describes the datasets used to train MLIP models: which materials they cover, the DFT code and settings used for reference calculations, the number of configurations, and the provenance.
+
+** Classes
+
+*** =mlips:TrainingDataset=
+
+#+begin_example
+SubClassOf(mlschema:Dataset)
+SubClassOf(prov:Entity)
+#+end_example
+
+A dataset of atomic configurations used for MLIP training. The dual subclassing enables both ML workflow compatibility (via ML-Schema) and provenance tracking (via PROV-O).
+
+*Properties:*
+- =mlips:numConfigurations= :: =xsd:integer= --- number of atomic configurations
+- =mlips:coversMaterial= :: Links to =mlips:MaterialSystem=
+- =mlips:coversProperty= :: Links to =mlips:CoveredProperty= (Energy, Forces, Stresses, Virials)
+- =mlips:datasetProvenance= :: Links to =mlips:DatasetProvenance= (Published, InHouse, Augmented)
+- =mlips:hasDFTCalculation= :: Links to =mlips:DFTCalculation=
+- =mlips:hasConfiguration= :: Links to =mlips:AtomicConfiguration=
+- =prov:wasDerivedFrom= :: For augmented datasets, links to source datasets
+
+*** =mlips:DFTCalculation=
+
+A density functional theory calculation that produced reference data.
+
+*Properties:*
+- =mlips:hasDFTSettings= :: Links to =mlips:DFTSettings=
+
+*** =mlips:DFTSettings=
+
+Settings of a DFT calculation. These settings critically affect the quality and applicability of the training data.
+
+*Properties:*
+- =mlips:xcFunctional= :: =xsd:string= --- exchange-correlation functional (PBE, LDA, SCAN, PBEsol, r2SCAN, etc.)
+- =mlips:kPointMesh= :: =xsd:string= --- k-point mesh specification (e.g., "4x4x4", "Gamma")
+- =mlips:energyCutoff= :: =xsd:double= --- plane-wave energy cutoff in eV
+- =mlips:pseudopotentialType= :: =xsd:string= --- pseudopotential type (PAW, ultrasoft, norm-conserving)
+- =mlips:usedDFTCode= :: Links to =mlips:Library= (VASP, GPAW, Quantum ESPRESSO, etc.)
+
+*** =mlips:MaterialSystem=
+
+A material system studied in a dataset.
+
+*Properties:*
+- =mlips:chemicalFormula= :: =xsd:string= --- e.g., "Ti", "TiAl", "Fe3C"
+- =mlips:materialClass= :: =xsd:string= --- element, binary alloy, ternary compound, HEA, etc.
+- =mlips:microstructuralFeature= :: =xsd:string= --- point defect, dislocation, surface, grain boundary, etc.
+- =owl:sameAs= :: Link to Wikidata item for the chemical element or compound
+
+*** =mlips:AtomicConfiguration=
+
+A single atomic configuration in a training dataset. Aligned with =cmso:AtomicStructure=.
+
+*** =mlips:DatasetProvenance=
+
+Provenance type. Defined individuals: =mlips:Published=, =mlips:InHouse=, =mlips:Augmented=.
+
+*** =mlips:CoveredProperty=
+
+Physical property covered by the dataset. Defined individuals: =mlips:Energy=, =mlips:Forces=, =mlips:Stresses=, =mlips:Virials=.
+
+** Example: Ti-Al Training Dataset
+
+#+begin_src turtle
+@prefix mlips: <https://kg.degu.cl/ontology/mlips#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+
+mlips:tial-dataset-2024 a mlips:TrainingDataset ;
+    rdfs:label "Ti-Al DFT dataset (2024)" ;
+    mlips:numConfigurations 15000 ;
+    mlips:coversMaterial mlips:mat-tial ;
+    mlips:coversProperty mlips:Energy, mlips:Forces, mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation mlips:tial-dft-calc .
+
+mlips:mat-tial a mlips:MaterialSystem ;
+    rdfs:label "Ti-Al" ;
+    mlips:chemicalFormula "TiAl" ;
+    mlips:materialClass "binary alloy" ;
+    mlips:microstructuralFeature "point defect" ;
+    owl:sameAs wd:Q425339 .
+
+mlips:tial-dft-calc a mlips:DFTCalculation ;
+    mlips:hasDFTSettings mlips:tial-dft-settings .
+
+mlips:tial-dft-settings a mlips:DFTSettings ;
+    mlips:xcFunctional "PBE" ;
+    mlips:kPointMesh "4x4x4" ;
+    mlips:energyCutoff 500.0 ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:usedDFTCode mlips:lib-vasp .
+
+mlips:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" ;
+    owl:sameAs wd:Q253024 .
+#+end_src
+
+* Benchmark Module
+
+The Benchmark module links published studies to the algorithms, materials, training data, and accuracy metrics they report.
+
+** Classes
+
+*** =mlips:BenchmarkStudy=
+
+#+begin_example
+SubClassOf(prov:Activity)
+#+end_example
+
+A published study reporting MLIP evaluation results. Links to =schema:ScholarlyArticle= for bibliographic metadata.
+
+*** =mlips:BenchmarkResult=
+
+A single evaluation result. This is the central entity connecting an algorithm, material, training data, hyperparameter settings, and reported accuracy.
+
+*Properties:*
+- =mlips:usesAlgorithm= :: Links to =mlips:MLIPAlgorithm=
+- =mlips:usesTrainingData= :: Links to =mlips:TrainingDataset=
+- =mlips:targetMaterial= :: Links to =mlips:MaterialSystem=
+- =mlips:hasAccuracyMetric= :: Links to =mlips:AccuracyMetric=
+- =mlips:hasHyperparameterSetting= :: Links to =mlips:HyperparameterSetting=
+- =mlips:reportedIn= :: Links to =schema:ScholarlyArticle=
+
+*** =mlips:AccuracyMetric=
+
+An accuracy measure reported in a benchmark.
+
+*Properties:*
+- =mlips:metricType= :: Links to =mlips:MetricType= (RMSE, MAE, R²)
+- =mlips:metricProperty= :: Links to =mlips:MetricProperty= (Energy, Force, Stress)
+- =mlips:metricValue= :: =xsd:double= --- the reported value
+- =mlips:hasUnit= :: Links to =qudt:Unit=
+
+*** =mlips:MetricType=
+
+Defined individuals: =mlips:RMSE=, =mlips:MAE=, =mlips:R2=.
+
+*** =mlips:MetricProperty=
+
+Defined individuals: =mlips:EnergyProperty=, =mlips:ForceProperty=, =mlips:StressProperty=.
+
+** Example: MACE Benchmark on Ti-Al
+
+#+begin_src turtle
+@prefix mlips:  <https://kg.degu.cl/ontology/mlips#> .
+@prefix schema: <https://schema.org/> .
+@prefix qudt:   <http://qudt.org/schema/qudt/> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+
+mlips:study-smith2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Smith et al. (2025) - MACE for Ti-Al" ;
+    mlips:hasResult mlips:result-mace-tial-smith2025 .
+
+mlips:result-mace-tial-smith2025 a mlips:BenchmarkResult ;
+    mlips:usesAlgorithm mlips:mace-algorithm ;
+    mlips:usesTrainingData mlips:tial-dataset-2024 ;
+    mlips:targetMaterial mlips:mat-tial ;
+    mlips:hasAccuracyMetric mlips:metric-energy-rmse-smith2025,
+                            mlips:metric-force-mae-smith2025 ;
+    mlips:hasHyperparameterSetting mlips:setting-cutoff-smith2025,
+                                    mlips:setting-layers-smith2025 ;
+    mlips:reportedIn mlips:article-smith2025 .
+
+mlips:setting-cutoff-smith2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:mace-cutoff-radius ;
+    mlips:cutoffRadius 5.0 .
+
+mlips:setting-layers-smith2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:mace-num-layers ;
+    mlips:numLayers 2 .
+
+mlips:metric-energy-rmse-smith2025 a mlips:AccuracyMetric ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.2 ;
+    mlips:hasUnit unit:MilliEV-PER-ATOM .
+
+mlips:metric-force-mae-smith2025 a mlips:AccuracyMetric ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 42.0 ;
+    mlips:hasUnit unit:MilliEV-PER-ANGSTROM .
+
+mlips:article-smith2025 a schema:ScholarlyArticle ;
+    schema:name "MACE-based interatomic potentials for Ti-Al alloys" ;
+    schema:datePublished "2025" .
+#+end_src
+
+* Competency Questions as SPARQL Queries
+
+The following SPARQL queries demonstrate how each competency question is answered by the ontology.
+
+** CQ1: Which MLIP algorithms exist, and what hyperparameters does each accept?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?algo ?algoName ?hp ?hpName ?dtype ?default WHERE {
+    ?algo a mlips:MLIPAlgorithm ;
+          rdfs:label ?algoName ;
+          mlips:hasHyperparameter ?hp .
+    ?hp mlips:hyperparameterName ?hpName .
+    OPTIONAL { ?hp mlips:hyperparameterDatatype ?dtype }
+    OPTIONAL { ?hp mlips:defaultValue ?default }
+}
+ORDER BY ?algoName ?hpName
+#+end_src
+
+** CQ2: Which libraries implement a given algorithm?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?algo ?algoName ?impl ?version ?lib ?libName WHERE {
+    ?algo a mlips:MLIPAlgorithm ;
+          rdfs:label ?algoName ;
+          mlips:hasImplementation ?impl .
+    ?impl mlips:version ?version ;
+          mlips:implementedIn ?lib .
+    ?lib rdfs:label ?libName .
+}
+#+end_src
+
+** CQ3: For a given material, which training datasets are available and what DFT settings were used?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?ds ?dsName ?numConf ?xc ?cutoff ?kpoints ?code WHERE {
+    ?ds a mlips:TrainingDataset ;
+        rdfs:label ?dsName ;
+        mlips:coversMaterial ?mat ;
+        mlips:numConfigurations ?numConf ;
+        mlips:hasDFTCalculation/mlips:hasDFTSettings ?settings .
+    ?mat mlips:chemicalFormula "TiAl" .
+    ?settings mlips:xcFunctional ?xc .
+    OPTIONAL { ?settings mlips:energyCutoff ?cutoff }
+    OPTIONAL { ?settings mlips:kPointMesh ?kpoints }
+    OPTIONAL { ?settings mlips:usedDFTCode/rdfs:label ?code }
+}
+#+end_src
+
+** CQ4: What is the provenance of a training dataset?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+PREFIX prov:  <http://www.w3.org/ns/prov#>
+
+SELECT ?ds ?dsName ?provenance ?sourceDs WHERE {
+    ?ds a mlips:TrainingDataset ;
+        rdfs:label ?dsName ;
+        mlips:datasetProvenance ?provenance .
+    OPTIONAL { ?ds prov:wasDerivedFrom ?sourceDs }
+}
+#+end_src
+
+** CQ5: How many configurations and what properties does a dataset cover?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?ds ?dsName ?numConf (GROUP_CONCAT(?propLabel; separator=", ") AS ?properties) WHERE {
+    ?ds a mlips:TrainingDataset ;
+        rdfs:label ?dsName ;
+        mlips:numConfigurations ?numConf ;
+        mlips:coversProperty ?prop .
+    ?prop rdfs:label ?propLabel .
+}
+GROUP BY ?ds ?dsName ?numConf
+#+end_src
+
+** CQ6: Which studies have benchmarked a given algorithm on a given material?
+
+#+begin_src sparql
+PREFIX mlips:  <https://kg.degu.cl/ontology/mlips#>
+PREFIX schema: <https://schema.org/>
+
+SELECT ?study ?articleTitle ?metricTypeName ?metricPropName ?value WHERE {
+    ?study a mlips:BenchmarkStudy ;
+           mlips:hasResult ?result .
+    ?result mlips:usesAlgorithm/rdfs:label "MACE" ;
+            mlips:targetMaterial/mlips:chemicalFormula "TiAl" ;
+            mlips:hasAccuracyMetric ?metric ;
+            mlips:reportedIn ?article .
+    ?article schema:name ?articleTitle .
+    ?metric mlips:metricType/rdfs:label ?metricTypeName ;
+            mlips:metricProperty/rdfs:label ?metricPropName ;
+            mlips:metricValue ?value .
+}
+#+end_src
+
+** CQ7: For a given material and property, which algorithm/hyperparameter combinations perform well?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?algoName ?metricValue ?hpName ?hpValue WHERE {
+    ?result mlips:targetMaterial/mlips:chemicalFormula "TiAl" ;
+            mlips:usesAlgorithm/rdfs:label ?algoName ;
+            mlips:hasAccuracyMetric ?metric ;
+            mlips:hasHyperparameterSetting ?setting .
+    ?metric mlips:metricType mlips:RMSE ;
+            mlips:metricProperty mlips:EnergyProperty ;
+            mlips:metricValue ?metricValue .
+    ?setting mlips:forHyperparameter/mlips:hyperparameterName ?hpName ;
+             mlips:settingValue ?hpValue .
+}
+ORDER BY ?metricValue
+#+end_src
+
+** CQ8: Which simulation types have been performed with a given MLIP?
+
+#+begin_src sparql
+PREFIX mlips: <https://kg.degu.cl/ontology/mlips#>
+
+SELECT ?algoName ?simType WHERE {
+    ?algo a mlips:MLIPAlgorithm ;
+          rdfs:label ?algoName ;
+          mlips:supportsSimulation/rdfs:label ?simType .
+}
+ORDER BY ?algoName
+#+end_src
+
+* Version History
+
+| Version | Date | Changes                          |
+|---------+------+----------------------------------|
+| 0.1.0   | 2026 | Initial version with three modules |

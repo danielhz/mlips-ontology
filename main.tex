@@ -1,0 +1,906 @@
+% ISWC 2026 Resources Track — MLIPs Ontology and Knowledge Graph
+% Template: Springer LNCS (llncs class)
+\documentclass[runningheads]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{graphicx}
+\graphicspath{{artifacts/figures/}}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{orcidlink}
+\usepackage{microtype}
+
+\lstset{
+  basicstyle=\small\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray},
+  breaklines=true,
+  frame=single,
+  xleftmargin=1em,
+  xrightmargin=1em,
+  numbers=none,
+}
+
+\lstdefinelanguage{sparql}{
+  morekeywords={SELECT,WHERE,FILTER,PREFIX,ASK,CONSTRUCT,DESCRIBE,
+    INSERT,DELETE,OPTIONAL,UNION,BIND,AS,ORDER,BY,LIMIT,GROUP,HAVING,
+    COUNT,AVG,MIN,MAX,SUM,VALUES,a},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+
+\lstdefinelanguage{turtle}{
+  morekeywords={@prefix,a},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+
+\newcommand{\MLIPsOntology}{MLIPs ontology}
+\newcommand{\MLIPsKG}{MLIPs knowledge graph}
+\newcommand{\SemASE}{SemASE}
+\newcommand{\Concon}{Concon}
+\newcommand{\MLIPE}{MLIPE}
+% Ontology namespace — to be finalized before submission
+\newcommand{\mlipsns}{https://kg.degu.cl/ontology/mlips\#}  % TODO: finalize namespace
+\newcommand{\mlipsprefix}{\texttt{mlips:}}
+\newcommand{\changed}[1]{\textcolor{blue}{#1}}
+
+\begin{document}
+
+\title{An Ontology and Knowledge Graph for\\Machine Learning Interatomic Potentials}
+
+\author{Daniel Hernandez\inst{1}\orcidlink{0000-0003-2160-4696} \and
+Yuji Ikeda\inst{2} \and
+Jong Hyun Jung\inst{2} \and
+Yongliang Ou\inst{2} \and
+Pranav Kumar\inst{2} \and
+Daniel Frank\inst{2} \and
+Fritz K{\"o}rmann\inst{2} \and
+Xi Zhang\inst{2} \and
+Xiang Xu\inst{2} \and
+Lifang Zhu\inst{2} \and
+Steffen Staab\inst{1} \and
+Blazej Grabowski\inst{2}}
+
+\authorrunning{D.\ Hernandez et al.}
+
+\institute{Institute for Artificial Intelligence, University of Stuttgart, Germany\\
+\email{\{daniel.hernandez,Steffen.Staab\}@ki.uni-stuttgart.de}
+\and
+Institute for Materials Science, University of Stuttgart, Germany\\
+\email{\{yuji.ikeda,jong-hyun.jung,yongliang.ou,}\\\email{pranav.kumar,fritz.koermann,xi.zhang,}\\\email{lifang.zhu,blazej.grabowski\}@imw.uni-stuttgart.de}}
+
+\maketitle
+
+\begin{abstract}
+Machine learning interatomic potentials (MLIPs) have transformed atomistic
+simulations by enabling near \emph{ab initio} accuracy at a fraction of the
+computational cost. The field now encompasses a growing ecosystem of algorithms,
+training datasets, hyperparameters, and target materials, yet the metadata
+needed to systematically compare, reproduce, and build upon MLIP studies
+remains scattered across papers, scripts, and ad-hoc file formats. We present
+the \MLIPsOntology{} and the \MLIPsKG{}: an OWL ontology and a SPARQL-queryable
+knowledge graph that capture what is relevant to describe in the datasets and
+hyperparameters used to train MLIP models. The ontology is organized into three
+modules---Algorithm, Training Data, and Benchmark---and is designed in alignment
+with existing ontologies in materials science (MDO, CMSO/ASMO, EMMO) and
+machine learning (ML-Schema). The knowledge graph, populated in collaboration
+with domain experts, covers major MLIP algorithm families, their
+hyperparameters, training datasets with DFT provenance, and published
+benchmarks. We complement the ontology with SHACL shapes that enforce data
+quality constraints and enable form-based data entry. The resources are hosted
+on \Concon{}, a collaborative knowledge graph platform, and extended by
+\MLIPE{} (Machine Learned Interatomic Potentials Environment), a set of
+domain-specific extension modules for \Concon{} that add features for
+atomistic simulation research. We also present \SemASE{}, a Python library
+that extends the Atomic Simulation Environment (ASE) with RDF serialization,
+providing a programmatic bridge for feeding simulation data into the knowledge
+graph.
+
+\keywords{Ontology \and Knowledge graph \and Machine learning interatomic
+  potentials \and SHACL \and Materials science \and FAIR data \and SPARQL}
+\end{abstract}
+
+{\footnotesize
+\noindent\textbf{Resource Type:} Ontology, Knowledge graph, SHACL shapes, Software library.\\
+\textbf{License:} CC BY 4.0 (ontology, knowledge graph); MIT (\SemASE{}).\\
+\textbf{Ontology IRI:} \url{https://kg.degu.cl/ontology/mlips}\\
+\textbf{Knowledge graph SPARQL endpoint:} \url{https://kg.degu.cl/meta-learn/mlips-dataset}\\
+\textbf{\SemASE{} (PyPI):} \url{https://pypi.org/project/semase/}\\
+\textbf{\SemASE{} (Source):} \url{https://git.degu.cl/daniel/SemASE}\\
+\textbf{\SemASE{} Ontology:} \url{https://semase.org/ontology}
+}
+
+%% ====================================================================
+\section{Introduction}
+\label{sec:introduction}
+%% ====================================================================
+
+Machine learning interatomic potentials
+(MLIPs)~\cite{behler2007hdnnp,bartok2010gap} are models trained to predict the
+energy and forces between atoms in a material, enabling simulations at near
+quantum-mechanical accuracy but at a fraction of the computational cost of
+\emph{ab initio} methods such as density functional theory
+(DFT)~\cite{kohn1965dft}. Over the past decade, the field has produced a
+growing ecosystem of MLIP algorithms---including
+MACE~\cite{batatia2022mace}, ACE~\cite{drautz2019ace},
+NequIP~\cite{batzner2022nequip}, M3GNet~\cite{chen2022m3gnet}, and
+MTP~\cite{shapeev2016mtp}---each with distinct architectures, hyperparameters,
+and application domains.
+
+Researchers routinely face three interrelated challenges: selecting the right
+algorithm for a given material and property, constructing suitable training
+datasets, and optimizing
+hyperparameters~\cite{grabowski2024metalearnerc}. These challenges are
+compounded by a \emph{knowledge management problem}: the metadata connecting
+MLIP studies---which algorithm was used, with which training set, for which
+material system, at what accuracy---is scattered across published papers,
+supplementary materials, ad-hoc scripts, and library-specific file formats.
+
+Existing ontologies address parts of this landscape but not the specific needs
+of MLIP research. ML ontologies (ML-Schema~\cite{publio2018mlschema},
+DMOP~\cite{keet2015dmop}, MEX~\cite{esteves2015mex},
+CMO~\cite{foltin2024cmo}) model general ML workflows but not
+physics-specific hyperparameters or training set construction strategies.
+Materials science ontologies (EMMO~\cite{horsch2020emmo},
+MDO~\cite{li2024mdo}, PMDco~\cite{bayerlein2024pmdco},
+CMSO/ASMO~\cite{menon2024atomrdf}) model the physical domain but not the
+specifics of MLIP training. No existing ontology captures what is needed to
+describe the provenance and composition of training datasets, the DFT settings
+under which reference calculations were performed, and the algorithm-specific
+hyperparameters that govern model accuracy.
+
+In this paper, we present:
+
+\begin{enumerate}
+\item The \emph{\MLIPsOntology{}}, an OWL ontology organized into three
+  modules (Algorithm, Training Data, Benchmark) that captures the concepts
+  specific to MLIP research. The ontology is designed in alignment with MDO,
+  CMSO/ASMO, and EMMO, reusing their classes and properties where appropriate
+  and extending them where MLIP-specific concepts are needed.
+
+\item The \emph{\MLIPsKG{}}, a structured knowledge graph populated in
+  collaboration with domain experts from the META-LEARN
+  project~\cite{grabowski2024metalearnerc}, covering major MLIP algorithm
+  families, their hyperparameters, training datasets with DFT provenance,
+  and published benchmarks. The knowledge graph is publicly queryable via a
+  SPARQL endpoint and linked to Wikidata~\cite{vrandecic2014wikidata} for
+  broader interoperability.
+
+\item \emph{SHACL shapes} that define data quality constraints for the
+  knowledge graph, enforce consistency during data entry, and enable
+  form-based editing for domain experts who are not SPARQL specialists.
+
+\item \emph{\MLIPE{}} (Machine Learned Interatomic Potentials Environment), a
+  set of domain-specific extension modules for the \Concon{} collaborative
+  knowledge graph platform. While \Concon{} provides the general-purpose
+  infrastructure (team management, SPARQL endpoints, SHACL-driven editing,
+  literature processing), \MLIPE{} adds features specific to MLIP research:
+  custom SPARQL extension functions for domain-specific computations (e.g.,
+  radial distribution functions, phonon spectra), integration with simulation
+  toolkits, and specialized AI extraction agents for the MLIP literature.
+
+\item \emph{\SemASE{}}, a Python library that extends the Atomic Simulation
+  Environment (ASE)~\cite{larsen2017ase} with RDF serialization, providing
+  a programmatic bridge for feeding simulation data into the knowledge graph.
+\end{enumerate}
+
+These resources are developed within the META-LEARN project, an ERC Advanced
+Grant effort to create a meta-learning framework for MLIP
+generation~\cite{grabowski2024metalearnerc}. META-LEARN aims to systematically
+map the space of MLIP algorithms, hyperparameters, training strategies, and
+target materials. The ontology and knowledge graph presented here form the
+semantic backbone of this effort.
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:related-work} surveys related ontologies and knowledge graphs.
+Section~\ref{sec:requirements} describes the requirements gathered from domain
+experts.
+Section~\ref{sec:ontology} presents the \MLIPsOntology{}.
+Section~\ref{sec:shacl} describes the SHACL shapes.
+Section~\ref{sec:kg} describes the \MLIPsKG{}: its content, construction, and
+maintenance.
+Section~\ref{sec:mlipe} describes the \MLIPE{} extension modules for \Concon{}.
+Section~\ref{sec:semase} presents \SemASE{}.
+Section~\ref{sec:evaluation} evaluates the resources.
+Section~\ref{sec:sustainability} discusses sustainability.
+Section~\ref{sec:conclusion} concludes.
+
+%% ====================================================================
+\section{Related Work}
+\label{sec:related-work}
+%% ====================================================================
+
+We organize the related work into ontologies for machine learning, ontologies
+for materials science, and knowledge graphs and FAIR platforms in the domain.
+
+\subsection{Ontologies for Machine Learning}
+
+ML-Schema~\cite{publio2018mlschema}, from a W3C community group, provides
+top-level classes for ML algorithms, datasets, and experiments.
+DMOP~\cite{keet2015dmop} supports ontology-driven algorithm selection and
+hyperparameter optimization for data mining workflows. The MEX
+vocabulary~\cite{esteves2015mex} provides a lightweight RDF vocabulary for ML
+experiment metadata, built on PROV-O. The Common Metadata Ontology
+(CMO)~\cite{foltin2024cmo} integrates pipeline metadata from multiple ML
+platforms. These efforts address ML workflows in general but do not cover the
+domain-specific concepts of MLIP research: algorithm families with
+physics-specific hyperparameters (cutoff radii, angular/radial basis functions),
+training set construction strategies, and DFT reference calculation settings.
+
+\subsection{Ontologies for Materials Science}
+
+The European Materials Modelling Ontology (EMMO)~\cite{horsch2020emmo} provides
+a top-level ontology grounded in mereocausality theory. The Materials Design
+Ontology (MDO)~\cite{li2024mdo} is an OWL\,2~DL ontology with four modules
+(Core, Structure, Calculation, Provenance); it has been used for
+SPARQL-based integrated querying over the Materials
+Project~\cite{jain2013mp} and OQMD~\cite{saal2013oqmd}. PMDco~\cite{bayerlein2024pmdco}
+provides a mid-level ontology aligned with BFO. CMSO and
+ASMO~\cite{menon2024atomrdf} describe atomic structures and simulation methods.
+A recent survey by Norouzi et al.~\cite{norouzi2024survey} analyzes
+60~ontologies in the field.
+
+These ontologies model the physical domain at various levels of granularity but
+do not address the specific vocabulary needed for MLIP training: which
+hyperparameters govern each algorithm family, how training datasets are
+constructed and what DFT settings were used, and how to structure benchmark
+comparisons across algorithms, materials, and properties.
+
+\subsection{Knowledge Graphs and FAIR Platforms}
+
+NOMAD~\cite{draxl2023nomad} hosts atomistic simulation data with EMMO-aligned
+metadata. AFLOW~\cite{curtarolo2012aflow},
+OQMD~\cite{saal2013oqmd}, and the Materials Project~\cite{jain2013mp} provide
+REST API access to DFT-calculated properties.
+OPTIMADE~\cite{andersen2021optimade} standardizes API access.
+AiiDA~\cite{huber2020aiida} and Materials
+Cloud~\cite{talirz2020materialscloud} track provenance and disseminate data.
+\changed{Kadi4Mat~\cite{brandt2021kadi4mat} is a virtual research environment
+for managing research data following FAIR principles, providing hierarchical
+collections with group-based access control and metadata management; it is used,
+for example, as the file repository in the Circular Factory
+CRC~1574~\cite{thapa2025inf}. While Kadi4Mat excels at file and metadata
+management, it does not provide SPARQL endpoints, ontology-driven editing, or
+knowledge graph querying capabilities.}
+Recent work by Azoc{\'a}r Guzm{\'a}n et
+al.~\cite{azocarguzman2026workflows} demonstrates FAIR-compliant RDF workflows
+using CMSO, ASMO, and PROV-O within pyiron.
+
+While these platforms are transformative, they use platform-specific data models
+rather than standard Semantic Web formats, and none provide a structured
+ontology for the MLIP training lifecycle. The \MLIPsOntology{} is designed to
+complement these resources by providing the vocabulary to describe what connects
+an MLIP study to its training data, hyperparameters, and evaluation results.
+
+%% ====================================================================
+\section{Requirements}
+\label{sec:requirements}
+%% ====================================================================
+
+The ontology requirements were gathered through iterative discussions with
+domain experts (materials scientists and MLIP developers) across the seven work
+packages of the META-LEARN project~\cite{grabowski2024metalearnerc}. We
+followed an iterative ontology engineering methodology, identifying the
+following competency questions that the ontology should be able to answer:
+
+\begin{enumerate}
+\item[CQ1.] Which MLIP algorithms exist, and what hyperparameters does each
+  accept (with types, ranges, and default values)?
+\item[CQ2.] Which libraries implement a given algorithm, and what versions
+  are available?
+\item[CQ3.] For a given material system, which training datasets are available,
+  and what DFT code and settings were used to generate them?
+\item[CQ4.] What is the provenance of a training dataset (published source,
+  in-house calculation, augmented from existing data)?
+\item[CQ5.] How many atomic configurations does a training dataset contain,
+  and what properties are covered (energies, forces, stresses)?
+\item[CQ6.] Which published studies have benchmarked a given algorithm on a
+  given material, and what accuracy metrics were reported?
+\item[CQ7.] For a given material and target property, which algorithm and
+  hyperparameter combinations have been shown to perform well?
+\item[CQ8.] Which simulation types (molecular dynamics, Monte Carlo, geometry
+  optimization, phonon calculations, thermodynamic integration) have been
+  performed with a given MLIP?
+\end{enumerate}
+
+Additionally, we identified the following design requirements:
+
+\begin{enumerate}
+\item[DR1.] \emph{Alignment with existing ontologies.} Reuse classes and
+  properties from MDO, CMSO/ASMO, EMMO, ML-Schema, and PROV-O where
+  appropriate, to maximize interoperability.
+\item[DR2.] \emph{SHACL validation.} Define SHACL shapes for each entity
+  type to enforce data quality and enable form-based data entry.
+\item[DR3.] \emph{Linked Data integration.} Link entities to Wikidata where
+  possible (chemical elements, materials, algorithms, researchers).
+\item[DR4.] \emph{Extensibility.} The ontology should be extensible to
+  accommodate new algorithm families and hyperparameters as the field evolves.
+\end{enumerate}
+
+%% ====================================================================
+\section{The MLIPs Ontology}
+\label{sec:ontology}
+%% ====================================================================
+
+The \MLIPsOntology{} is an OWL\,2~DL ontology organized into three modules
+that address the competency questions identified in
+Section~\ref{sec:requirements}. Figure~\ref{fig:ontology-overview} provides
+an overview.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{mlips-overview.pdf}
+\caption{Overview of the \MLIPsOntology{}: the three modules (Algorithm,
+  Training Data, Benchmark) and their core classes and relationships.
+  Blue nodes are \mlipsprefix{} classes; dashed nodes are external
+  superclasses from ML-Schema, PROV-O, and Schema.org.}
+\label{fig:ontology-overview}
+\end{figure}
+
+\subsection{Namespace and Prefixes}
+
+The ontology uses the namespace
+\texttt{\mlipsns} (prefix \mlipsprefix{}).
+The following external prefixes are used:
+
+\begin{table}[t]
+\centering
+\caption{Namespace prefixes used by the \MLIPsOntology{}.}
+\label{tab:prefixes}
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}l}
+\toprule
+Prefix & Namespace \\
+\midrule
+\texttt{mdo:}    & \texttt{https://w3id.org/mdo/core/} \\
+\texttt{cmso:}   & \texttt{https://purls.helmholtz-metadaten.de/cmso/} \\
+\texttt{asmo:}   & \texttt{https://purls.helmholtz-metadaten.de/asmo/} \\
+\texttt{mlschema:} & \texttt{http://www.w3.org/ns/mls\#} \\
+\texttt{prov:}   & \texttt{http://www.w3.org/ns/prov\#} \\
+\texttt{qudt:}   & \texttt{http://qudt.org/schema/qudt/} \\
+\texttt{schema:} & \texttt{https://schema.org/} \\
+\texttt{wd:}     & \texttt{http://www.wikidata.org/entity/} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\subsection{Algorithm Module}
+\label{sec:algorithm-module}
+
+The Algorithm module models MLIP algorithm families and their hyperparameter
+spaces, addressing CQ1, CQ2, and CQ8.
+
+\paragraph{Core classes.}
+
+\begin{itemize}
+\item \texttt{mlips:MLIPAlgorithm} --- An MLIP algorithm family (e.g., MACE,
+  ACE, HDNNP). Subclass of \texttt{mlschema:Algorithm}.
+\item \texttt{mlips:Hyperparameter} --- A hyperparameter of an MLIP algorithm,
+  with its name, data type, range, and default value. Subclass of
+  \texttt{mlschema:HyperParameter}.
+\item \texttt{mlips:Implementation} --- A software implementation of an
+  algorithm in a specific library and version. Subclass of
+  \texttt{mlschema:Implementation}.
+\item \texttt{mlips:SimulationType} --- A type of atomistic simulation (MD,
+  Monte Carlo, geometry optimization, phonon, thermodynamic integration).
+\end{itemize}
+
+\paragraph{Key properties.}
+
+\begin{itemize}
+\item \texttt{mlips:hasHyperparameter} links an algorithm to its hyperparameters.
+\item \texttt{mlips:hasImplementation} links an algorithm to its software
+  implementations.
+\item \texttt{mlips:cutoffRadius}, \texttt{mlips:numLayers},
+  \texttt{mlips:learningRate}, \texttt{mlips:numRadialBasis},
+  \texttt{mlips:numAngularBasis} --- domain-specific hyperparameter properties,
+  with units annotated via QUDT~\cite{hodgson2014qudt}.
+\item \texttt{mlips:supportsSimulation} links an algorithm to the simulation
+  types it supports.
+\end{itemize}
+
+\paragraph{Alignment.} \texttt{mlips:MLIPAlgorithm} is a subclass of
+\texttt{mlschema:Algorithm}, inheriting ML-Schema's general algorithm
+description framework. Hyperparameters extend \texttt{mlschema:HyperParameter}
+with physics-specific properties and units.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{mlips-algorithm-example.pdf}
+\caption{Algorithm module instance example: the MACE algorithm with its
+  hyperparameters (cutoff radius, number of layers, learning rate),
+  a software implementation (MACE~v0.3), and supported simulation types.
+  Yellow nodes are instances; gray literals show concrete values.}
+\label{fig:algorithm-example}
+\end{figure}
+
+\subsection{Training Data Module}
+\label{sec:training-data-module}
+
+The Training Data module describes the datasets used to train MLIP models,
+addressing CQ3, CQ4, and CQ5.
+
+\paragraph{Core classes.}
+
+\begin{itemize}
+\item \texttt{mlips:TrainingDataset} --- A dataset of atomic configurations
+  used for MLIP training. Subclass of \texttt{mlschema:Dataset} and
+  \texttt{prov:Entity}.
+\item \texttt{mlips:DFTCalculation} --- A density functional theory calculation
+  that produced reference data. Aligned with \texttt{mdo:Calculation}.
+\item \texttt{mlips:DFTSettings} --- Settings of a DFT calculation: exchange-correlation
+  functional, k-point mesh, energy cutoff, pseudopotential type.
+\item \texttt{mlips:MaterialSystem} --- A material system (element, alloy,
+  compound) studied in the dataset. Linked to
+  \texttt{cmso:CrystallineMaterial} where applicable.
+\item \texttt{mlips:AtomicConfiguration} --- A single atomic configuration
+  (positions, cell, properties) in the dataset. Aligned with
+  \texttt{cmso:AtomicStructure}.
+\end{itemize}
+
+\paragraph{Key properties.}
+
+\begin{itemize}
+\item \texttt{mlips:hasDFTSettings} links a calculation to its DFT settings.
+\item \texttt{mlips:xcFunctional} (e.g., PBE, LDA, SCAN),
+  \texttt{mlips:kPointMesh}, \texttt{mlips:energyCutoff},
+  \texttt{mlips:pseudopotentialType} describe DFT parameters.
+\item \texttt{mlips:numConfigurations} records the number of atomic
+  configurations in a dataset.
+\item \texttt{mlips:coversProperty} indicates which properties (energy, forces,
+  stresses, virials) are included.
+\item \texttt{mlips:datasetProvenance} with values \texttt{mlips:Published},
+  \texttt{mlips:InHouse}, \texttt{mlips:Augmented} indicates the origin.
+\item \texttt{prov:wasDerivedFrom} links augmented datasets to their sources.
+\end{itemize}
+
+\paragraph{Alignment.} Training datasets are modeled as both
+\texttt{mlschema:Dataset} (for ML workflow compatibility) and
+\texttt{prov:Entity} (for provenance tracking). DFT calculations align with
+MDO's Calculation module. Material systems connect to CMSO for structural
+descriptions and to Wikidata for chemical element identification.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{mlips-training-data-example.pdf}
+\caption{Training Data module instance example: a Ti-Al training dataset
+  with 15{,}000 configurations, covering energies, forces, and stresses.
+  DFT settings specify the PBE functional, PAW pseudopotentials, and
+  VASP as the DFT code.}
+\label{fig:training-data-example}
+\end{figure}
+
+\subsection{Benchmark Module}
+\label{sec:benchmark-module}
+
+The Benchmark module links published studies to algorithms, materials, training
+data, and accuracy metrics, addressing CQ6 and CQ7.
+
+\paragraph{Core classes.}
+
+\begin{itemize}
+\item \texttt{mlips:BenchmarkStudy} --- A published study reporting MLIP
+  evaluation results. Subclass of \texttt{prov:Activity} and linked to
+  \texttt{schema:ScholarlyArticle}.
+\item \texttt{mlips:BenchmarkResult} --- A single evaluation result: an
+  algorithm applied to a material system with specific hyperparameters,
+  reporting accuracy metrics.
+\item \texttt{mlips:AccuracyMetric} --- An accuracy measure (RMSE of energy,
+  MAE of forces, etc.) with value and unit.
+\end{itemize}
+
+\paragraph{Key properties.}
+
+\begin{itemize}
+\item \texttt{mlips:usesAlgorithm}, \texttt{mlips:usesTrainingData},
+  \texttt{mlips:targetMaterial} link a benchmark result to its components.
+\item \texttt{mlips:hasAccuracyMetric} links to reported accuracy values.
+\item \texttt{mlips:metricType} (e.g., RMSE, MAE), \texttt{mlips:metricValue},
+  \texttt{mlips:metricProperty} (energy, force, stress) describe the metric.
+\item \texttt{mlips:reportedIn} links a result to its source publication.
+\end{itemize}
+
+\paragraph{Alignment.} Benchmark studies are modeled as \texttt{prov:Activity}
+to capture the provenance chain from data to evaluation. Publications link to
+\texttt{schema:ScholarlyArticle} for bibliographic metadata and to Wikidata
+for author identification.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{mlips-benchmark-example.pdf}
+\caption{Benchmark module instance example: a study by Smith et
+  al.\ (2025) evaluating MACE on Ti-Al, reporting RMSE of energy
+  (1.2~meV/atom) and MAE of forces (42~meV/\AA{}), with the
+  hyperparameter settings used.}
+\label{fig:benchmark-example}
+\end{figure}
+
+%% ====================================================================
+\section{SHACL Shapes}
+\label{sec:shacl}
+%% ====================================================================
+
+We define SHACL shapes for each core class in the ontology, serving two
+purposes: (1)~validating the knowledge graph data for consistency and
+completeness, and (2)~driving form-based data entry interfaces that allow
+domain experts to contribute data without writing SPARQL.
+
+\subsection{Shape Design}
+
+Each node shape corresponds to a core ontology class and specifies:
+
+\begin{itemize}
+\item \emph{Mandatory properties} (via \texttt{sh:minCount}): e.g., an
+  \texttt{mlips:MLIPAlgorithm} must have at least one \texttt{rdfs:label}
+  and one \texttt{mlips:hasHyperparameter}.
+\item \emph{Value types and ranges}: e.g., \texttt{mlips:cutoffRadius} must
+  be \texttt{xsd:double} with \texttt{sh:minExclusive}~$0$.
+\item \emph{Controlled vocabularies}: e.g., \texttt{mlips:xcFunctional}
+  values must come from a defined set (PBE, LDA, SCAN, PBEsol, \ldots).
+\item \emph{Cardinality constraints}: e.g., a \texttt{mlips:BenchmarkResult}
+  must link to exactly one algorithm and at least one accuracy metric.
+\end{itemize}
+
+\subsection{Example Shape}
+
+\begin{lstlisting}[language=turtle, caption={SHACL shape for MLIPAlgorithm (excerpt).}]
+mlips-sh:MLIPAlgorithmShape a sh:NodeShape ;
+  sh:targetClass mlips:MLIPAlgorithm ;
+  sh:property [
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:name "Algorithm name" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasHyperparameter ;
+    sh:minCount 1 ;
+    sh:class mlips:Hyperparameter ;
+    sh:name "Hyperparameters" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasImplementation ;
+    sh:class mlips:Implementation ;
+    sh:name "Implementations" ;
+  ] ;
+  sh:property [
+    sh:path owl:sameAs ;
+    sh:nodeKind sh:IRI ;
+    sh:name "Wikidata link" ;
+    sh:description "Link to Wikidata item" ;
+  ] .
+\end{lstlisting}
+
+\subsection{Validation and Form Generation}
+
+The SHACL shapes are used at two levels: (1)~batch validation of the knowledge
+graph using standard SHACL processors (e.g., pySHACL), and (2)~real-time
+form generation in the web interface, where each property shape is rendered as
+a form field with appropriate input type, validation, and autocomplete for
+entity references.
+
+%% ====================================================================
+\section{The MLIPs Knowledge Graph}
+\label{sec:kg}
+%% ====================================================================
+
+The \MLIPsKG{} is a structured knowledge graph grounded in the \MLIPsOntology{}
+and populated in collaboration with domain experts from the META-LEARN project.
+
+\subsection{Scope and Content}
+
+The knowledge graph is organized around six entity types:
+
+\begin{enumerate}
+\item \emph{MLIP algorithms:} MACE, ACE, HDNNP, NequIP, M3GNet, MTP, and
+  others, with their architectural characteristics and hyperparameter spaces.
+
+\item \emph{Libraries and tools:} ASE~\cite{larsen2017ase}, LAMMPS, VASP,
+  GPAW, and MLIP-specific training frameworks, with version information and
+  interoperability notes.
+
+\item \emph{Materials and systems:} Elements, alloys, and compound classes,
+  including microstructural complexity (point defects, dislocations, surfaces,
+  grain boundaries).
+
+\item \emph{Simulation types:} Molecular dynamics, Monte Carlo, geometry
+  optimization, phonon calculations, and thermodynamic integration.
+
+\item \emph{Training datasets:} Provenance, size, property coverage, and DFT
+  settings used to generate training data.
+
+\item \emph{Papers and benchmarks:} Published studies linked to the
+  algorithms, materials, and accuracy metrics they report.
+\end{enumerate}
+
+Where possible, entities are linked to their corresponding
+Wikidata~\cite{vrandecic2014wikidata} items, connecting the \MLIPsKG{} to the
+broader Linked Data ecosystem and enabling federated queries.
+
+%% TODO: add statistics table (number of instances per class, total triples)
+
+\subsection{Construction Methodology}
+
+The knowledge graph is constructed through three complementary channels:
+
+\begin{enumerate}
+\item \emph{Expert curation.} Domain experts from the META-LEARN project's
+  seven work packages contribute structured data through the SHACL-driven
+  web editor, ensuring accuracy of domain-specific details (hyperparameter
+  values, DFT settings, accuracy metrics).
+
+\item \emph{AI-assisted extraction.} A specialized AI agent reads papers from
+  the team's literature database and extracts structured statements about
+  algorithms, training datasets, hyperparameters, and reported results. These
+  statements are stored in named graphs with provenance metadata (source paper,
+  extraction method, confidence level) and are curated by domain experts before
+  incorporation.
+
+\item \emph{Programmatic population via \SemASE{}.} Simulation data from
+  ASE-based workflows is serialized to RDF and ingested via SPARQL UPDATE.
+\end{enumerate}
+
+\subsection{Maintenance and Versioning}
+
+The knowledge graph is publicly queryable via a SPARQL endpoint. Periodic RDF
+dumps are archived on DaRUS~\cite{darus2024} (the University of Stuttgart's
+Dataverse repository) for long-term preservation with persistent DOIs. The
+ontology is versioned alongside the knowledge graph, with change logs
+documenting additions and modifications.
+
+%% ====================================================================
+\section{\MLIPE{}: Domain-Specific Extensions for \Concon{}}
+\label{sec:mlipe}
+%% ====================================================================
+
+The \MLIPsOntology{}, SHACL shapes, and \MLIPsKG{} are hosted on \Concon{}, a
+collaborative knowledge graph platform that provides general-purpose
+infrastructure for team-based management of RDF knowledge
+graphs~\cite{hernandez2026concon}. \Concon{} handles authentication,
+hierarchical team structures, role-based access control, per-dataset SPARQL
+endpoints, SHACL-driven entity editing, literature management, and AI-assisted
+knowledge extraction. These features are domain-agnostic and serve
+\Concon{}'s other deployments in computational design and construction,
+circular manufacturing, and university teaching.
+
+\MLIPE{} (Machine Learned Interatomic Potentials Environment) is a set of
+extension modules for \Concon{} that add features specific to MLIP and
+atomistic simulation research. The distinction is important: features that
+benefit any knowledge graph user belong in \Concon{}'s core, while features
+tied to the MLIP domain belong in \MLIPE{}.
+
+\subsection{\MLIPE{}-Specific Modules}
+
+The following modules are specific to \MLIPE{} and not part of
+\Concon{}'s core:
+
+\begin{enumerate}
+\item \emph{Custom SPARQL extension functions.} Domain-specific computations
+  that operate on atomistic data stored in the knowledge graph: radial
+  distribution functions, phonon spectra calculations, and energy/force
+  analysis from stored atomic configurations. These are implemented as
+  Oxigraph custom functions and exposed through the SPARQL query interface.
+
+\item \emph{Simulation data handling.} Support for multi-level storage of
+  simulation data: meta-level descriptions of MLIP algorithms and
+  hyperparameters alongside simulation-level per-atom states (positions,
+  forces, velocities) and system-level properties (total energy, stress
+  tensors, lattice vectors). All numeric values are stored as typed RDF
+  literals with units annotated via QUDT~\cite{hodgson2014qudt}.
+
+\item \emph{\SemASE{} integration.} A dedicated API for ingesting
+  simulation data from \SemASE{} (Section~\ref{sec:semase}), including
+  batch import of atomic configurations from ASE-based workflows.
+
+\item \emph{MLIP-specialized AI extraction agent.} A domain-specialized
+  agent that reads papers from the literature database and produces structured
+  statements about MLIP algorithms, training datasets, hyperparameters, and
+  reported accuracy metrics, stored in named graphs with provenance metadata
+  for expert curation.
+
+\item \emph{External data caching.} For large simulation datasets hosted in
+  external archives (e.g., DaRUS~\cite{darus2024}), \MLIPE{} caches data
+  locally so that custom SPARQL functions can operate on it directly from
+  the query interface without repeated downloads.
+\end{enumerate}
+
+\subsection{Features Provided by \Concon{}'s Core}
+
+The following features, while essential for the MLIP use case, are provided
+by \Concon{}'s core and shared with all deployments:
+
+\begin{itemize}
+\item Team hierarchy and permissions (META-LEARN work packages)
+\item Per-dataset SPARQL endpoints and YASGUI editor
+\item SHACL-driven entity editing (for the \MLIPsOntology{} shapes)
+\item Literature management with GROBID-based PDF extraction
+\item General AI-assisted extraction pipeline
+\item File storage and metadata catalogs
+\end{itemize}
+
+%% ====================================================================
+\section{\SemASE{}: Semantic Atomic Simulation Environment}
+\label{sec:semase}
+%% ====================================================================
+
+To bridge the gap between simulation toolkits and the knowledge graph, we
+present \SemASE{}, a Python library that extends
+ASE~\cite{larsen2017ase} with RDF serialization through runtime class patching.
+
+\subsection{Design Principles}
+
+\SemASE{} is guided by three principles: (1)~\emph{Transparency}---minimal code
+changes to existing ASE workflows; (2)~\emph{Round-trip fidelity}---objects
+saved to the knowledge graph can be faithfully reconstructed; (3)~\emph{Backend
+neutrality}---works with any SPARQL-compliant store.
+
+\subsection{The \SemASE{} Ontology}
+
+The \SemASE{} ontology maps ASE's data model to RDF:
+
+\begin{table}[t]
+\centering
+\caption{Core classes in the \SemASE{} ontology.}
+\label{tab:semase-classes}
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}ll}
+\toprule
+OWL Class & ASE Class & Description \\
+\midrule
+\texttt{semase:AtomicSystem} & \texttt{Atoms} & Collection of atoms \\
+\texttt{semase:Atom} & --- & Single atom with element, position, mass \\
+\texttt{semase:Cell} & \texttt{Cell} & Unit cell with lattice vectors and PBC \\
+\texttt{semase:Calculator} & \texttt{Calculator} & Computational engine \\
+\texttt{semase:Vector3D} & --- & 3D coordinate \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+The \SemASE{} ontology is designed to complement the \MLIPsOntology{}:
+\texttt{semase:AtomicSystem} corresponds to individual atomic configurations
+that populate an \texttt{mlips:TrainingDataset}, and
+\texttt{semase:Calculator} can be linked to an \texttt{mlips:Implementation}.
+
+\subsection{Usage Example}
+
+\begin{lstlisting}[language=Python, caption={\SemASE{} activation and round-trip persistence.}]
+import semase
+semase.activate(endpoint="https://kg.degu.cl/.../sparql")
+
+from ase import Atoms
+water = Atoms('H2O',
+    positions=[(0, 0, 0), (0, 0.76, 0.59), (0, -0.76, 0.59)])
+water.save_to_kg(uri="ase:water-001")
+
+loaded = Atoms()
+loaded.update_from_kg(uri="ase:water-001")
+print(loaded.get_chemical_formula())  # H2O
+\end{lstlisting}
+
+%% ====================================================================
+\section{Evaluation}
+\label{sec:evaluation}
+%% ====================================================================
+
+We evaluate the resources along the criteria defined by the ISWC Resources
+Track.
+
+\subsection{Design and Technical Quality}
+
+\paragraph{Ontology quality.} We evaluate the \MLIPsOntology{} against
+established ontology quality criteria:
+
+\begin{itemize}
+\item \emph{Competency question coverage.} All eight competency questions
+  (CQ1--CQ8) are answerable as SPARQL queries over the ontology.
+  %% TODO: include SPARQL query examples for each CQ
+\item \emph{Consistency.} The ontology is verified to be consistent using
+  standard OWL reasoners (HermiT, Pellet).
+\item \emph{Alignment.} We document explicit alignments with MDO, CMSO/ASMO,
+  ML-Schema, PROV-O, and QUDT, verified through manual inspection and
+  SPARQL-based alignment validation.
+\item \emph{Modularity.} The three-module design allows independent reuse:
+  the Algorithm module can be used without the Training Data module, and
+  vice versa.
+\end{itemize}
+
+\paragraph{SHACL shape validation.} The shapes successfully validate the
+current knowledge graph content, with a validation report available alongside
+the dataset.
+
+\paragraph{\SemASE{} quality.} Round-trip serialization is verified by automated
+tests comparing all attributes at full floating-point precision. The dual-backend
+SPARQL client is tested against both Pyoxigraph (local) and HTTP endpoints.
+
+\subsection{Reusability}
+
+The ontology is published under CC BY 4.0 with a persistent IRI and versioned
+releases. SHACL shapes are distributed alongside the ontology. \SemASE{} is
+available on PyPI under MIT license. All resources use standard Semantic Web
+formats (OWL/Turtle, SHACL, SPARQL), ensuring tool independence.
+
+\subsection{Adoption and Impact}
+
+The resources are in active use within the META-LEARN project. The knowledge
+graph is publicly queryable, and \SemASE{} is available on PyPI. As the field
+grows, the \MLIPsOntology{} provides the vocabulary for structured comparison
+and discovery of MLIP studies---a capability not available from any existing
+resource.
+
+%% TODO: report concrete usage statistics
+
+%% ====================================================================
+\section{Sustainability and Maintenance}
+\label{sec:sustainability}
+%% ====================================================================
+
+The resources are developed within the META-LEARN project, funded by the
+ERC (Advanced Grant, 5~years). Source code is hosted on the University of
+Stuttgart's Git server and mirrored on GitHub, GitLab, and Codeberg. The
+\MLIPsKG{} and versioned ontology releases are deposited in
+DaRUS~\cite{darus2024} with persistent DOIs. By building on RDF, OWL, SPARQL,
+and SHACL, the resources are independent of any specific software
+implementation.
+
+We plan to engage the MLIP community through workshops and integration with
+NOMAD and Materials Cloud, and to contribute to Wikidata's coverage of MLIP
+research.
+
+%% ====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ====================================================================
+
+We have presented the \MLIPsOntology{} and the \MLIPsKG{}---an OWL ontology and
+a SPARQL-queryable knowledge graph that capture the metadata landscape of
+machine learning interatomic potential research. The ontology's three
+modules---Algorithm, Training Data, and Benchmark---address a gap not covered
+by existing ML or materials science ontologies: the specific vocabulary needed
+to describe how MLIPs are trained, evaluated, and compared. SHACL shapes enforce
+data quality and enable form-based data entry. The \MLIPE{} extension modules
+for \Concon{} add domain-specific capabilities---custom SPARQL functions for
+atomistic computations, simulation data handling, and specialized AI
+extraction---while leveraging \Concon{}'s general-purpose infrastructure for
+team collaboration, literature management, and SHACL-driven editing. \SemASE{}
+provides a programmatic bridge from simulation toolkits to the knowledge graph.
+
+Together, these resources enable researchers to systematically compare MLIP
+studies, discover relevant training datasets and hyperparameters, and build
+on prior work through structured, queryable knowledge rather than ad-hoc
+literature searches. By building on open Semantic Web standards and aligning
+with established materials science and ML ontologies, we ensure
+interoperability and extensibility as the field evolves.
+
+%
+\paragraph{Resource Availability Statement.}
+The \MLIPsOntology{} is available at \url{https://kg.degu.cl/ontology/mlips}
+(CC BY 4.0). The \MLIPsKG{} is publicly queryable at
+\url{https://kg.degu.cl/meta-learn/mlips-dataset} and archived on
+DaRUS~\cite{darus2024}. \Concon{} source code (including \MLIPE{} modules) is
+available from \url{https://git.degu.cl/daniel/concon} (MIT
+license)~\cite{hernandez2026concon}. \SemASE{} source code and ontology are
+available from \url{https://git.degu.cl/daniel/SemASE} (MIT license) and
+installable via \texttt{pip install semase}. Repository URLs will migrate to
+the university's infrastructure before publication.
+%
+\paragraph{Acknowledgements.}
+This work is funded by the European Research Council (ERC) under the European
+Union's Horizon Europe Research and Innovation Programme, grant agreement
+No.\ 101200433, project META-LEARN.
+%
+\paragraph{Declaration of use of Generative AI.}
+The authors used Claude (Anthropic) for drafting and iterating on sections of
+this manuscript and for code development in \SemASE{}. All content was reviewed,
+edited, and validated by the authors.
+
+%% ====================================================================
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+
+\end{document}
