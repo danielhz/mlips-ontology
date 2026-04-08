@@ -104,7 +104,12 @@ def get_subclass_of(g):
 # ── DOT generation ───────────────────────────────────────────────────────────
 
 def generate_overview_dot(g):
-    """High-level overview: modules as clusters, classes as nodes."""
+    """High-level overview: modules as clusters, classes as nodes.
+
+    Layout: Algorithm and Training Data modules sit side-by-side (wrapped
+    in a transparent outer cluster), with the Benchmark module below.
+    Uses TB (top-to-bottom) rankdir with tight margins.
+    """
     algorithm_classes = [
         "MLIPAlgorithm", "Hyperparameter", "HyperparameterSetting",
         "Implementation", "Library", "SimulationType",
@@ -122,49 +127,88 @@ def generate_overview_dot(g):
     props = get_object_properties(g)
     subclasses = get_subclass_of(g)
 
-    lines = [f"digraph mlips_overview {{\n{GRAPH_ATTRS}"]
+    # Hand-curated overview: TB layout, Algorithm and Training Data
+    # side by side, Benchmark below.  Only key relationships shown;
+    # full detail is in the per-module instance figures.
+    lines = [
+        'digraph mlips_overview {',
+        '  rankdir=TB;',
+        '  fontname="Helvetica";',
+        '  fontsize=10;',
+        '  node [fontname="Helvetica", fontsize=8, margin="0.08,0.03"];',
+        '  edge [fontname="Helvetica", fontsize=7];',
+        '  nodesep=0.20;',
+        '  ranksep=0.30;',
+        '  margin=0;',
+        '  pad="0.02";',
+        '  compound=true;',
+        '  newrank=true;',
+    ]
 
-    # Algorithm cluster
+    # ── Algorithm Module (left) ──
     lines.append(f'  subgraph cluster_algorithm {{')
     lines.append(f'    label="Algorithm Module";')
-    lines.append(f'    style=filled; color="{MODULE_COLORS["algorithm"]}";')
+    lines.append(f'    style="filled,rounded"; color="{MODULE_COLORS["algorithm"]}";')
+    lines.append(f'    fontsize=9; labeljust=l;')
     for c in algorithm_classes:
         lines.append(f'    {c} [{CLASS_STYLE}];')
+    # intra-module edges
+    lines.append('    MLIPAlgorithm -> Hyperparameter [label="hasHyperparameter"];')
+    lines.append('    MLIPAlgorithm -> Implementation [label="hasImplementation"];')
+    lines.append('    MLIPAlgorithm -> SimulationType [label="supportsSimulation"];')
+    lines.append('    Implementation -> Library [label="implementedIn"];')
+    lines.append('    HyperparameterSetting -> Hyperparameter [label="forHyperparameter"];')
     lines.append('  }')
 
-    # Training Data cluster
+    # ── Training Data Module (right) ──
     lines.append(f'  subgraph cluster_training {{')
     lines.append(f'    label="Training Data Module";')
-    lines.append(f'    style=filled; color="{MODULE_COLORS["training"]}";')
+    lines.append(f'    style="filled,rounded"; color="{MODULE_COLORS["training"]}";')
+    lines.append(f'    fontsize=9; labeljust=l;')
     for c in training_classes:
         lines.append(f'    {c} [{CLASS_STYLE}];')
+    # intra-module edges
+    lines.append('    TrainingDataset -> MaterialSystem [label="coversMaterial"];')
+    lines.append('    TrainingDataset -> DFTCalculation [label="hasDFTCalculation"];')
+    lines.append('    TrainingDataset -> CoveredProperty [label="coversProperty"];')
+    lines.append('    TrainingDataset -> DatasetProvenance [label="datasetProvenance"];')
+    lines.append('    TrainingDataset -> AtomicConfiguration [label="hasConfiguration"];')
+    lines.append('    DFTCalculation -> DFTSettings [label="hasDFTSettings"];')
     lines.append('  }')
 
-    # Benchmark cluster
+    # Force top modules to same rank
+    lines.append('  { rank=same; MLIPAlgorithm; TrainingDataset; }')
+
+    # ── Benchmark Module (bottom) ──
     lines.append(f'  subgraph cluster_benchmark {{')
     lines.append(f'    label="Benchmark Module";')
-    lines.append(f'    style=filled; color="{MODULE_COLORS["benchmark"]}";')
+    lines.append(f'    style="filled,rounded"; color="{MODULE_COLORS["benchmark"]}";')
+    lines.append(f'    fontsize=9; labeljust=l;')
     for c in benchmark_classes:
         lines.append(f'    {c} [{CLASS_STYLE}];')
+    # intra-module edges
+    lines.append('    BenchmarkStudy -> BenchmarkResult [label="hasResult"];')
+    lines.append('    BenchmarkResult -> AccuracyMetric [label="hasAccuracyMetric"];')
+    lines.append('    AccuracyMetric -> MetricType [label="metricType"];')
+    lines.append('    AccuracyMetric -> MetricProperty [label="metricProperty"];')
     lines.append('  }')
 
-    # External classes
-    external = set()
-    for child, parent in subclasses:
-        external.add(parent)
-    for ext in sorted(external):
-        lines.append(f'  {ext} [{EXTERNAL_STYLE}];')
+    # Invisible edges to enforce vertical ordering:
+    # top modules above benchmark module
+    lines.append('  // Layout: force top row above benchmark')
+    lines.append('  MLIPAlgorithm -> BenchmarkStudy [style=invis];')
+    lines.append('  TrainingDataset -> BenchmarkResult [style=invis];')
 
-    # Subclass edges
-    for child, parent in subclasses:
-        lines.append(
-            f'  {child} -> {parent} '
-            f'[label="rdfs:subClassOf", style=dashed, arrowhead=empty];'
-        )
-
-    # Object property edges
-    for name, domain, range_ in props:
-        lines.append(f'  {domain} -> {range_} [label="{name}"];')
+    # ── Cross-module edges (constraint=false to avoid distorting layout) ──
+    lines.append('  // Cross-module relationships')
+    lines.append('  BenchmarkResult -> MLIPAlgorithm'
+                 ' [label="usesAlgorithm", constraint=false, style=dashed];')
+    lines.append('  BenchmarkResult -> TrainingDataset'
+                 ' [label="usesTrainingData", constraint=false, style=dashed];')
+    lines.append('  BenchmarkResult -> MaterialSystem'
+                 ' [label="targetMaterial", constraint=false, style=dashed];')
+    lines.append('  BenchmarkResult -> HyperparameterSetting'
+                 ' [label="hasHyperparameterSetting", constraint=false, style=dashed];')
 
     lines.append("}")
     return "\n".join(lines)

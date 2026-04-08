@@ -1,23 +1,35 @@
 digraph mlips_overview {
-rankdir=LR;
-fontname="Helvetica";
-fontsize=10;
-node [fontname="Helvetica", fontsize=9];
-edge [fontname="Helvetica", fontsize=8];
-
+  rankdir=TB;
+  fontname="Helvetica";
+  fontsize=10;
+  node [fontname="Helvetica", fontsize=8, margin="0.08,0.03"];
+  edge [fontname="Helvetica", fontsize=7];
+  nodesep=0.20;
+  ranksep=0.30;
+  margin=0;
+  pad="0.02";
+  compound=true;
+  newrank=true;
   subgraph cluster_algorithm {
     label="Algorithm Module";
-    style=filled; color="#c6dbef";
+    style="filled,rounded"; color="#c6dbef";
+    fontsize=9; labeljust=l;
     MLIPAlgorithm [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     Hyperparameter [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     HyperparameterSetting [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     Implementation [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     Library [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     SimulationType [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
+    MLIPAlgorithm -> Hyperparameter [label="hasHyperparameter"];
+    MLIPAlgorithm -> Implementation [label="hasImplementation"];
+    MLIPAlgorithm -> SimulationType [label="supportsSimulation"];
+    Implementation -> Library [label="implementedIn"];
+    HyperparameterSetting -> Hyperparameter [label="forHyperparameter"];
   }
   subgraph cluster_training {
     label="Training Data Module";
-    style=filled; color="#c7e9c0";
+    style="filled,rounded"; color="#c7e9c0";
+    fontsize=9; labeljust=l;
     TrainingDataset [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     DFTCalculation [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     DFTSettings [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
@@ -25,47 +37,34 @@ edge [fontname="Helvetica", fontsize=8];
     AtomicConfiguration [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     DatasetProvenance [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     CoveredProperty [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
+    TrainingDataset -> MaterialSystem [label="coversMaterial"];
+    TrainingDataset -> DFTCalculation [label="hasDFTCalculation"];
+    TrainingDataset -> CoveredProperty [label="coversProperty"];
+    TrainingDataset -> DatasetProvenance [label="datasetProvenance"];
+    TrainingDataset -> AtomicConfiguration [label="hasConfiguration"];
+    DFTCalculation -> DFTSettings [label="hasDFTSettings"];
   }
+  { rank=same; MLIPAlgorithm; TrainingDataset; }
   subgraph cluster_benchmark {
     label="Benchmark Module";
-    style=filled; color="#fdd0a2";
+    style="filled,rounded"; color="#fdd0a2";
+    fontsize=9; labeljust=l;
     BenchmarkStudy [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     BenchmarkResult [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     AccuracyMetric [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     MetricType [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
     MetricProperty [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
+    BenchmarkStudy -> BenchmarkResult [label="hasResult"];
+    BenchmarkResult -> AccuracyMetric [label="hasAccuracyMetric"];
+    AccuracyMetric -> MetricType [label="metricType"];
+    AccuracyMetric -> MetricProperty [label="metricProperty"];
   }
-  Activity [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  Algorithm [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  Dataset [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  Entity [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  HyperParameter [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  Implementation [shape=box, style="rounded,dashed,filled", fillcolor="#e8e8e8"];
-  MLIPAlgorithm -> Algorithm [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  Hyperparameter -> HyperParameter [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  Implementation -> Implementation [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  TrainingDataset -> Dataset [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  TrainingDataset -> Entity [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  BenchmarkStudy -> Activity [label="rdfs:subClassOf", style=dashed, arrowhead=empty];
-  MLIPAlgorithm -> Hyperparameter [label="hasHyperparameter"];
-  MLIPAlgorithm -> Implementation [label="hasImplementation"];
-  Implementation -> Library [label="implementedIn"];
-  MLIPAlgorithm -> SimulationType [label="supportsSimulation"];
-  HyperparameterSetting -> Hyperparameter [label="forHyperparameter"];
-  TrainingDataset -> DFTCalculation [label="hasDFTCalculation"];
-  DFTCalculation -> DFTSettings [label="hasDFTSettings"];
-  TrainingDataset -> MaterialSystem [label="coversMaterial"];
-  TrainingDataset -> AtomicConfiguration [label="hasConfiguration"];
-  TrainingDataset -> DatasetProvenance [label="datasetProvenance"];
-  TrainingDataset -> CoveredProperty [label="coversProperty"];
-  DFTSettings -> Library [label="usedDFTCode"];
-  BenchmarkStudy -> BenchmarkResult [label="hasResult"];
-  BenchmarkResult -> MLIPAlgorithm [label="usesAlgorithm"];
-  BenchmarkResult -> TrainingDataset [label="usesTrainingData"];
-  BenchmarkResult -> MaterialSystem [label="targetMaterial"];
-  BenchmarkResult -> AccuracyMetric [label="hasAccuracyMetric"];
-  BenchmarkResult -> HyperparameterSetting [label="hasHyperparameterSetting"];
-  AccuracyMetric -> MetricType [label="metricType"];
-  AccuracyMetric -> MetricProperty [label="metricProperty"];
-  BenchmarkResult -> ScholarlyArticle [label="reportedIn"];
+  // Layout: force top row above benchmark
+  MLIPAlgorithm -> BenchmarkStudy [style=invis];
+  TrainingDataset -> BenchmarkResult [style=invis];
+  // Cross-module relationships
+  BenchmarkResult -> MLIPAlgorithm [label="usesAlgorithm", constraint=false, style=dashed];
+  BenchmarkResult -> TrainingDataset [label="usesTrainingData", constraint=false, style=dashed];
+  BenchmarkResult -> MaterialSystem [label="targetMaterial", constraint=false, style=dashed];
+  BenchmarkResult -> HyperparameterSetting [label="hasHyperparameterSetting", constraint=false, style=dashed];
 }
