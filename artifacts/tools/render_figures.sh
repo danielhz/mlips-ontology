@@ -44,4 +44,8 @@ for dotfile in "$FIGURES_DIR"/*.dot; do
     fi
 done
 
+# Step 3: Generate TikZ files from DOT (via Graphviz JSON layout)
+echo "==> Generating TikZ files from DOT layouts..."
+python3 "${SCRIPT_DIR}/dot_to_tikz.py" --indir "$FIGURES_DIR" --outdir "$FIGURES_DIR"
+
 echo "==> Done. Figures in: $FIGURES_DIR"
