@@ -1,0 +1,48 @@
+\section{Design Discussion: Training Run and Shortcut Properties}
+\label{sec:appendix-run}
+
+In ML-Schema, the relationship between a trained model and its algorithm is
+mediated by \texttt{mls:Run}, which represents a training execution:
+%
+\begin{align*}
+  \mathsf{mls{:}Algorithm}
+    &\xleftarrow{\mathsf{mls{:}executes}}
+    \mathsf{mls{:}Run}
+    \xrightarrow{\mathsf{mls{:}hasOutput}}
+    \mathsf{mls{:}Model} \\
+  \mathsf{mls{:}Dataset}
+    &\xleftarrow{\mathsf{mls{:}hasInput}}
+    \mathsf{mls{:}Run}
+\end{align*}
+%
+The \texttt{mls:Run} concept captures the full context of a training
+execution---algorithm, input data, output model, hyperparameter settings,
+and potentially runtime metadata (duration, hardware, random seeds).
+
+The \MLIPsOntology{} follows this pattern with $\TrainingRunC$ (a subclass
+of both \texttt{mls:Run} and \texttt{prov:Activity}), which mediates
+between $\MLIPAlgorithmC$, $\TrainingDatasetC$, and $\TrainedModelC$ via
+$\executesR$, $\trainedOnR$, and $\producesR$ respectively. Additionally,
+we provide the shortcut roles $\trainedWithR$ and $\trainedOnR$ directly on
+$\TrainedModelC$, defined as property chains through the run. These
+shortcuts enable direct queries without navigating the run entity, which is
+important because our primary data source---published MLIP
+literature---rarely reports the operational details of training runs
+(hardware, duration, random seeds). In many cases, the $\TrainingRunC$
+entity will carry only its algorithm, dataset, and model links, making the
+shortcut properties the more natural query path.
+
+\paragraph{Critical assessment.}
+The shortcut properties introduce redundancy: the same information is
+accessible both directly on the model and via the run. While the property
+chain axioms guarantee consistency in principle, in practice data entry
+errors could create inconsistencies if shortcuts and run-mediated paths are
+populated independently. We mitigate this through SHACL shapes that
+validate consistency between the two paths.
+
+An alternative design would omit the shortcuts entirely and always require
+navigation through $\TrainingRunC$. This would be cleaner from an ontology
+engineering perspective but would make common queries (``which algorithm
+produced this model?'') unnecessarily verbose, particularly for data
+extracted from publications where the run carries no additional information
+beyond the links already captured by the shortcuts.

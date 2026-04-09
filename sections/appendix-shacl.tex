@@ -1,0 +1,61 @@
+\section{SHACL Shapes}
+\label{sec:shacl}
+
+We define SHACL shapes for each core class in the ontology, serving two
+purposes: (1)~validating the knowledge graph data for consistency and
+completeness, and (2)~driving form-based data entry interfaces that allow
+domain experts to contribute data without writing SPARQL.
+
+\subsection{Shape Design}
+
+Each node shape corresponds to a core ontology class and specifies:
+
+\begin{itemize}
+\item \emph{Mandatory properties} (via \texttt{sh:minCount}): e.g., an
+  $\MLIPAlgorithmC$ must have at least one \texttt{rdfs:label}
+  and one $\hasHyperparameterR$.
+\item \emph{Value types and ranges}: e.g., $\cutoffRadiusR$ must
+  be \texttt{xsd:double} with \texttt{sh:minExclusive}~$0$.
+\item \emph{Controlled vocabularies}: e.g., $\xcFunctionalR$
+  values must come from a defined set (PBE, LDA, SCAN, PBEsol, \ldots).
+\item \emph{Cardinality constraints}: e.g., a $\BenchmarkResultC$
+  must link to exactly one algorithm and at least one accuracy metric.
+\end{itemize}
+
+\subsection{Example Shape}
+
+\begin{lstlisting}[language=turtle, caption={SHACL shape for MLIPAlgorithm (excerpt).}]
+mlips-sh:MLIPAlgorithmShape a sh:NodeShape ;
+  sh:targetClass mlips:MLIPAlgorithm ;
+  sh:property [
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:name "Algorithm name" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasHyperparameter ;
+    sh:minCount 1 ;
+    sh:class mlips:Hyperparameter ;
+    sh:name "Hyperparameters" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasImplementation ;
+    sh:class mlips:Implementation ;
+    sh:name "Implementations" ;
+  ] ;
+  sh:property [
+    sh:path owl:sameAs ;
+    sh:nodeKind sh:IRI ;
+    sh:name "Wikidata link" ;
+    sh:description "Link to Wikidata item" ;
+  ] .
+\end{lstlisting}
+
+\subsection{Validation and Form Generation}
+
+The SHACL shapes are used at two levels: (1)~batch validation of the knowledge
+graph using standard SHACL processors (e.g., pySHACL), and (2)~real-time
+form generation in the web interface, where each property shape is rendered as
+a form field with appropriate input type, validation, and autocomplete for
+entity references.

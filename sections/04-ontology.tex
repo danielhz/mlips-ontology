@@ -1,0 +1,269 @@
+\section{The MLIPs Ontology}
+\label{sec:ontology}
+%% ====================================================================
+
+The \MLIPsOntology{} is an OWL\,2~DL ontology organized into three modules
+that address the competency questions identified in
+Section~\ref{sec:requirements}. Figure~\ref{fig:ontology-overview} provides
+an overview. The ontology uses the namespace \texttt{\mlipsns} (prefix
+\mlipsprefix{}); Table~\ref{tab:prefixes} lists the external prefixes used.
+In the following, we omit the \mlipsprefix{} prefix for concepts and
+properties of the \MLIPsOntology{}.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-overview.tex}}
+\caption{Overview of the \MLIPsOntology{}: the three modules (Algorithm,
+  Training Data, Benchmark) and their core classes and relationships.
+  Solid nodes are \mlipsprefix{} classes; dashed nodes are external
+  superclasses from ML-Schema, PROV-O, and Schema.org.}
+\label{fig:ontology-overview}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Namespace prefixes used by the \MLIPsOntology{}.}
+\label{tab:prefixes}
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}l}
+\toprule
+Prefix & Namespace \\
+\midrule
+\texttt{mlips:}  & \texttt{\mlipsns} \\
+\texttt{mdo:}    & \texttt{https://w3id.org/mdo/core/} \\
+\texttt{cmso:}   & \texttt{https://purls.helmholtz-metadaten.de/cmso/} \\
+\texttt{asmo:}   & \texttt{https://purls.helmholtz-metadaten.de/asmo/} \\
+\texttt{mls:}    & \texttt{http://www.w3.org/ns/mls\#} \\
+\texttt{prov:}   & \texttt{http://www.w3.org/ns/prov\#} \\
+\texttt{qudt:}   & \texttt{http://qudt.org/schema/qudt/} \\
+\texttt{schema:} & \texttt{https://schema.org/} \\
+\texttt{wd:}     & \texttt{http://www.wikidata.org/entity/} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\subsection{Algorithm Module}
+\label{sec:algorithm-module}
+
+The Algorithm module models MLIP algorithm families and their hyperparameter
+spaces, addressing CQ1, CQ2, and CQ8.
+
+\paragraph{Core classes.}
+The central concept is $\MLIPAlgorithmC$, representing an MLIP algorithm
+family (e.g., MACE, ACE, HDNNP)---the architecture itself, not a specific
+trained model. Each algorithm declares the $\HyperparameterC$ instances it
+accepts (cutoff radius, number of layers, learning rate, etc.), with their
+names, data types, ranges, and default values. A $\TrainingRunC$ represents
+a concrete training execution: it $\executesR$ an $\MLIPAlgorithmC$, takes
+a $\TrainingDatasetC$ as input ($\trainedOnR$), and $\producesR$ a
+$\TrainedModelC$---the learned parameters (weights) that can be used for
+prediction. This design follows ML-Schema's activity-based pattern, where
+the run mediates between algorithm, data, and model. An $\ImplementationC$
+captures a software realization of an algorithm in a specific $\LibraryC$
+and version. Finally, $\SimulationTypeC$ represents the kinds of atomistic
+simulation an algorithm supports (molecular dynamics, Monte Carlo, geometry
+optimization, phonon calculations, thermodynamic integration).
+Figure~\ref{fig:algorithm-detail} shows the full class diagram for this
+module.
+
+\paragraph{Core properties.}
+The role $\hasHyperparameterR$ links an algorithm to the hyperparameters it
+accepts, while $\hasImplementationR$ links it to its software
+implementations and $\supportsSimulationR$ to supported simulation types.
+A $\TrainingRunC$ is connected to its algorithm via $\executesR$, to its
+input data via $\trainedOnR$, and to the resulting model via $\producesR$.
+For convenience, a $\TrainedModelC$ also carries the shortcut roles
+$\trainedWithR$ and $\trainedOnR$ (derivable as property chains through the
+run), enabling direct queries without navigating the run entity.
+Domain-specific datatype properties---$\cutoffRadiusR$, $\numLayersR$,
+$\learningRateR$, $\numRadialBasisR$, and $\numAngularBasisR$---record
+concrete hyperparameter values, with units annotated via
+QUDT~\cite{hodgson2014qudt}. The role $\implementedInR$ connects an
+implementation to its library.
+
+\paragraph{Alignment.}
+$\MLIPAlgorithmC$ is a subclass of \texttt{mls:Algorithm}, inheriting
+ML-Schema's general algorithm description framework. $\TrainingRunC$ is a
+subclass of both \texttt{mls:Run} and \texttt{prov:Activity}, aligning with
+ML-Schema's training lifecycle and PROV-O's activity-based provenance model.
+$\TrainedModelC$ is a subclass of \texttt{mls:Model}. $\HyperparameterC$
+extends \texttt{mls:HyperParameter} with physics-specific properties and
+units, and $\ImplementationC$ extends \texttt{mls:Implementation}.
+
+\paragraph{Axioms.}
+Every MLIP algorithm must declare at least one hyperparameter and be linked
+to at least one simulation type it supports. Every implementation must
+specify the library it belongs to. Every training run must execute exactly
+one algorithm, use exactly one training dataset, and produce exactly one
+model:
+\begin{align*}
+  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \\
+  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \\
+  \ImplementationC &\sqsub \existsR{implementedIn}{Library} \\
+  \TrainingRunC &\sqsub \exactR{1}{executes}{MLIPAlgorithm} \\
+  \TrainingRunC &\sqsub \exactR{1}{trainedOn}{TrainingDataset} \\
+  \TrainingRunC &\sqsub \exactR{1}{produces}{TrainedModel}
+\end{align*}
+The shortcut roles on $\TrainedModelC$ are defined as property chains
+through the training run:
+\begin{align*}
+  \trainedWithR &\equiv \producesR^{-} \circ \executesR \\
+  \trainedOnR &\equiv \producesR^{-} \circ \trainedOnR
+\end{align*}
+The roles $\hasHyperparameterR$, $\hasImplementationR$, and
+$\supportsSimulationR$ have $\MLIPAlgorithmC$ as their domain:
+\begin{align*}
+  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \\
+  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \\
+  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC
+\end{align*}
+
+\begin{figure}[t]
+\centering
+%% TODO: create detailed Algorithm module class diagram
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}%
+  Algorithm module detail diagram (to be created)%
+  \vspace{2cm}}}
+\caption{Detailed view of the Algorithm module, showing the full class
+  hierarchy including $\TrainingRunC$ as mediator between
+  $\MLIPAlgorithmC$, $\TrainingDatasetC$, and $\TrainedModelC$.}
+\label{fig:algorithm-detail}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-algorithm-example.tex}}
+\caption{Algorithm module instance example: the MACE algorithm with its
+  hyperparameters (cutoff radius, number of layers, learning rate),
+  a software implementation (MACE~v0.3), and supported simulation types.
+  Yellow nodes are instances; gray literals show concrete values.}
+\label{fig:algorithm-example}
+\end{figure}
+
+\subsection{Training Data Module}
+\label{sec:training-data-module}
+
+The Training Data module describes the datasets used to train MLIP models,
+addressing CQ3, CQ4, and CQ5.
+
+\paragraph{Core classes.}
+A $\TrainingDatasetC$ is a collection of atomic configurations used for MLIP
+training. Each dataset covers one or more $\MaterialSystemC$ instances
+(elements, alloys, compounds), and its reference data is produced by one or
+more $\DFTCalculationC$ instances, each governed by a $\DFTSettingsC$ that
+records the exchange-correlation functional ($\xcFunctionalR$, e.g., PBE,
+LDA, SCAN), k-point mesh ($\kPointMeshR$), energy cutoff
+($\energyCutoffR$), and pseudopotential type ($\pseudopotentialTypeR$).
+Individual $\AtomicConfigurationC$ instances represent the atomic positions,
+cell parameters, and computed properties within a dataset.
+
+\paragraph{Core properties.}
+The role $\hasDFTSettingsR$ links a calculation to its settings.
+$\numConfigurationsR$ records the number of atomic configurations in a
+dataset. $\coversPropertyR$ indicates which physical properties (energy,
+forces, stresses, virials) are included. $\datasetProvenanceR$ classifies
+the dataset origin as $\dlConcept{Published}$, $\dlConcept{InHouse}$, or
+$\dlConcept{Augmented}$; augmented datasets are additionally linked to their
+sources via \texttt{prov:wasDerivedFrom}.
+
+\paragraph{Alignment.}
+$\TrainingDatasetC$ is modeled as a subclass of both \texttt{mls:Dataset}
+(for ML workflow compatibility) and \texttt{prov:Entity} (for provenance
+tracking). $\DFTCalculationC$ aligns with \texttt{mdo:Calculation}.
+$\MaterialSystemC$ connects to \texttt{cmso:CrystallineMaterial} where
+applicable, and $\AtomicConfigurationC$ aligns with
+\texttt{cmso:AtomicStructure}. Material systems link to Wikidata for
+chemical element identification.
+
+\paragraph{Axioms.}
+Every training dataset must cover at least one material system, declare at
+least one covered property, specify its provenance, and include at least one
+atomic configuration. Every DFT calculation must be associated with its
+settings:
+\begin{align*}
+  \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem} \\
+  \TrainingDatasetC &\sqsub \existsR{coversProperty}{\top} \\
+  \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{\top} \\
+  \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration} \\
+  \DFTCalculationC &\sqsub \existsR{hasDFTSettings}{DFTSettings}
+\end{align*}
+The provenance classification is exhaustive and disjoint, ensuring every
+dataset has exactly one origin type:
+\begin{align*}
+  \dlConcept{Published} \sqcup \dlConcept{InHouse} \sqcup \dlConcept{Augmented}
+  &= \top_{\dlConcept{DatasetProvenance}}
+\end{align*}
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-training-data-example.tex}}
+\caption{Training Data module instance example: a Ti-Al training dataset
+  with 15{,}000 configurations, covering energies, forces, and stresses.
+  DFT settings specify the PBE functional, PAW pseudopotentials, and
+  VASP as the DFT code.}
+\label{fig:training-data-example}
+\end{figure}
+
+\subsection{Benchmark Module}
+\label{sec:benchmark-module}
+
+The Benchmark module links published studies to trained models, materials,
+and accuracy metrics, addressing CQ6 and CQ7.
+
+\paragraph{Core classes.}
+A $\BenchmarkStudyC$ represents a published study reporting MLIP evaluation
+results. Each study contains one or more $\BenchmarkResultC$ instances, each
+capturing a single evaluation: a $\TrainedModelC$ applied to a material
+system. Since a trained model already encodes the algorithm, training data,
+and hyperparameter settings (via the Algorithm module), the benchmark result
+need only reference the model and the test conditions. Results report
+$\AccuracyMetricC$ instances (e.g., RMSE of energy, MAE of forces), each
+characterized by a $\MetricTypeC$ (RMSE, MAE, R$^2$), a $\MetricPropertyC$
+(energy, force, stress), and a numeric value with unit.
+
+\paragraph{Core properties.}
+The role $\evaluatesModelR$ links a benchmark result to the trained model
+being evaluated, while $\targetMaterialR$ specifies the material system used
+for testing. $\hasAccuracyMetricR$ connects to the reported accuracy values.
+Each $\AccuracyMetricC$ is described by $\metricTypeR$, $\metricPropertyR$,
+and $\metricValueR$. The role $\reportedInR$ links a result to its source
+publication.
+
+\paragraph{Alignment.}
+$\BenchmarkStudyC$ is modeled as a subclass of \texttt{prov:Activity},
+capturing the provenance chain from data to evaluation. Publications link to
+\texttt{schema:ScholarlyArticle} for bibliographic metadata and to Wikidata
+for author identification.
+
+\paragraph{Axioms.}
+The Benchmark module is the integration point of the ontology: every
+benchmark result must evaluate exactly one trained model, specify at least
+one target material system, and report at least one accuracy metric. Every
+study must contain at least one result:
+\begin{align*}
+  \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \\
+  \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel} \\
+  \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \\
+  \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric}
+\end{align*}
+Each accuracy metric must specify its type and the property being measured:
+\begin{align*}
+  \AccuracyMetricC &\sqsub \exactR{1}{metricType}{MetricType} \\
+  \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty}
+\end{align*}
+These axioms ensure that benchmark data is always complete enough to support
+structured comparison across studies (CQ6, CQ7). Note that through
+$\TrainedModelC$, every benchmark result is transitively linked to the
+algorithm ($\trainedWithR$) and training data ($\trainedOnR$) used, without
+redundantly encoding this information.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-benchmark-example.tex}}
+\caption{Benchmark module instance example: a study by Smith et
+  al.\ (2025) evaluating MACE on Ti-Al, reporting RMSE of energy
+  (1.2~meV/atom) and MAE of forces (42~meV/\AA{}), with the
+  hyperparameter settings used.}
+\label{fig:benchmark-example}
+\end{figure}
+
+%% ====================================================================

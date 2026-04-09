@@ -1,0 +1,95 @@
+\section{Introduction}
+\label{sec:introduction}
+%% ====================================================================
+
+Machine learning interatomic potentials
+(MLIPs)~\cite{behler2007hdnnp,bartok2010gap} are models trained to predict the
+energy and forces between atoms in a material, enabling simulations at near
+quantum-mechanical accuracy but at a fraction of the computational cost of
+\emph{ab initio} methods such as density functional theory
+(DFT)~\cite{kohn1965dft}. Over the past decade, the field has produced a
+growing ecosystem of MLIP algorithms---including
+MACE~\cite{batatia2022mace}, ACE~\cite{drautz2019ace},
+NequIP~\cite{batzner2022nequip}, M3GNet~\cite{chen2022m3gnet}, and
+MTP~\cite{shapeev2016mtp}---each with distinct architectures, hyperparameters,
+and application domains.
+
+Researchers routinely face three interrelated challenges: selecting the right
+algorithm for a given material and property, constructing suitable training
+datasets, and optimizing
+hyperparameters~\cite{grabowski2024metalearnerc}. These challenges are
+compounded by a \emph{knowledge management problem}: the metadata connecting
+MLIP studies---which algorithm was used, with which training set, for which
+material system, at what accuracy---is scattered across published papers,
+supplementary materials, ad-hoc scripts, and library-specific file formats.
+
+Existing ontologies address parts of this landscape but not the specific needs
+of MLIP research. ML ontologies (ML-Schema~\cite{publio2018mlschema},
+DMOP~\cite{keet2015dmop}, MEX~\cite{esteves2015mex},
+CMO~\cite{foltin2024cmo}) model general ML workflows but not
+physics-specific hyperparameters or training set construction strategies.
+Materials science ontologies (EMMO~\cite{horsch2020emmo},
+MDO~\cite{li2024mdo}, PMDco~\cite{bayerlein2024pmdco},
+CMSO/ASMO~\cite{menon2024atomrdf}) model the physical domain but not the
+specifics of MLIP training. No existing ontology captures what is needed to
+describe the provenance and composition of training datasets, the DFT settings
+under which reference calculations were performed, and the algorithm-specific
+hyperparameters that govern model accuracy.
+
+In this paper, we present:
+
+\begin{enumerate}
+\item The \emph{\MLIPsOntology{}}, an OWL ontology organized into three
+  modules (Algorithm, Training Data, Benchmark) that captures the concepts
+  specific to MLIP research. The ontology is designed in alignment with MDO,
+  CMSO/ASMO, and EMMO, reusing their classes and properties where appropriate
+  and extending them where MLIP-specific concepts are needed.
+
+\item The \emph{\MLIPsKG{}}, a structured knowledge graph populated in
+  collaboration with domain experts from the META-LEARN
+  project~\cite{grabowski2024metalearnerc}, covering major MLIP algorithm
+  families, their hyperparameters, training datasets with DFT provenance,
+  and published benchmarks. The knowledge graph is publicly queryable via a
+  SPARQL endpoint and linked to Wikidata~\cite{vrandecic2014wikidata} for
+  broader interoperability.
+
+\item \emph{SHACL shapes} that define data quality constraints for the
+  knowledge graph, enforce consistency during data entry, and enable
+  form-based editing for domain experts who are not SPARQL specialists.
+
+\item \emph{\MLIPE{}} (Machine Learned Interatomic Potentials Environment), a
+  set of domain-specific extension modules for the \Concon{} collaborative
+  knowledge graph platform. While \Concon{} provides the general-purpose
+  infrastructure (team management, SPARQL endpoints, SHACL-driven editing,
+  literature processing), \MLIPE{} adds features specific to MLIP research:
+  custom SPARQL extension functions for domain-specific computations (e.g.,
+  radial distribution functions, phonon spectra), integration with simulation
+  toolkits, and specialized AI extraction agents for the MLIP literature.
+
+\item \emph{\SemASE{}}, a Python library that extends the Atomic Simulation
+  Environment (ASE)~\cite{larsen2017ase} with RDF serialization, providing
+  a programmatic bridge for feeding simulation data into the knowledge graph.
+\end{enumerate}
+
+These resources are developed within the META-LEARN project, an ERC Advanced
+Grant effort to create a meta-learning framework for MLIP
+generation~\cite{grabowski2024metalearnerc}. META-LEARN aims to systematically
+map the space of MLIP algorithms, hyperparameters, training strategies, and
+target materials. The ontology and knowledge graph presented here form the
+semantic backbone of this effort.
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:related-work} surveys related ontologies and knowledge graphs.
+Section~\ref{sec:requirements} describes the requirements gathered from domain
+experts.
+Section~\ref{sec:ontology} presents the \MLIPsOntology{}.
+Section~\ref{sec:shacl} describes the SHACL shapes.
+Section~\ref{sec:kg} describes the \MLIPsKG{}: its content, construction, and
+maintenance.
+Section~\ref{sec:mlipe} describes the \MLIPE{} extension modules for \Concon{}.
+Section~\ref{sec:semase} presents \SemASE{}.
+Section~\ref{sec:evaluation} evaluates the resources.
+Section~\ref{sec:sustainability} discusses sustainability.
+Section~\ref{sec:conclusion} concludes.
+
+%% ====================================================================
