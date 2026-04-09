@@ -45,6 +45,7 @@
   \node[class] (Implementation) at (1.85,7.50) {$\ImplementationC$};
   \node[class] (Library) at (1.85,9.80) {$\LibraryC$};
   \node[class] (SimulationType) at (5.75,7.50) {$\SimulationTypeC$};
+  \node[class] (TrainedModel) at (5.75,9.80) {$\TrainedModelC$};
   % Training Data module nodes
   \node[class] (TrainingDataset) at (20.92,5.10) {$\TrainingDatasetC$};
   \node[class] (DFTCalculation) at (20.92,7.50) {$\DFTCalculationC$};
@@ -65,6 +66,7 @@
   \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsAlgorithm) at (-1.50,5.10) {mls:Algorithm};
   \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsHyperParameter) at (-2.00,3.25) {mls:HyperParameter};
   \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsImplementation) at (-1.96,7.50) {mls:Implementation};
+  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsModel) at (-1.76,9.80) {mls:Model};
   % Right of Training Data Module (left edges aligned)
   \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsDataset) at (27.73,5.10) {mls:Dataset};
   \node[extclass, minimum height=0.7cm, text depth=0pt] (provEntity) at (27.68,3.80) {prov:Entity};
@@ -74,6 +76,7 @@
   \draw[subclassedge] (MLIPAlgorithm) -- (mlsAlgorithm);
   \draw[subclassedge] (Hyperparameter) -- (mlsHyperParameter);
   \draw[subclassedge] (Implementation) -- (mlsImplementation);
+  \draw[subclassedge] (TrainedModel) -- (mlsModel);
   \draw[subclassedge] (TrainingDataset) -- (mlsDataset);
   \draw[subclassedge] (TrainingDataset) to[out=-20, in=160] (provEntity);
   \draw[subclassedge] (BenchmarkStudy) to[out=-30, in=180] (provActivity);
@@ -86,6 +89,8 @@
   \node[edgelabel] at (5.16,6.30) {$\supportsSimulationR$};
   \draw[edge] (HyperparameterSetting) -- node[edgelabel, pos=0.5] {$\dlRole{forHyperparameter}$} (Hyperparameter);
   \draw[edge] (Implementation) -- node[edgelabel, pos=0.5] {$\implementedInR$} (Library);
+  \draw[edge] (TrainedModel) -- node[edgelabel, pos=0.5, left=-2pt] {$\trainedWithR$} (MLIPAlgorithm);
+  \draw[edge] (TrainedModel) -- node[edgelabel, pos=0.5] {$\trainedOnR$} (TrainingDataset);
   \draw[edge] (TrainingDataset) -- (DFTCalculation);
   \draw[edge] (TrainingDataset) -- (MaterialSystem);
   \draw[edge] (TrainingDataset) -- (CoveredProperty);
@@ -98,9 +103,7 @@
   \node[edgelabel] at (22.67,5.90) {$\coversPropertyR$};
   \draw[edge] (DFTCalculation) -- node[edgelabel, pos=0.5] {$\hasDFTSettingsR$} (DFTSettings);
   \draw[edge] (BenchmarkStudy) -- node[edgelabel, pos=0.5] {$\hasResultR$} (BenchmarkResult);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\usesAlgorithmR$} (MLIPAlgorithm);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\dlRole{hasHyperparameterSetting}$} (HyperparameterSetting);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\usesTrainingDataR$} (TrainingDataset);
+  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\evaluatesModelR$} (TrainedModel);
   \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\targetMaterialR$} (MaterialSystem);
   \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\hasAccuracyMetricR$} (AccuracyMetric);
   \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {$\metricTypeR$} (MetricType);

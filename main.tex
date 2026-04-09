@@ -114,6 +114,11 @@
 \newcommand{\reportedInR}{\dlRole{reportedIn}}
 \newcommand{\hasResultR}{\dlRole{hasResult}}
 \newcommand{\implementedInR}{\dlRole{implementedIn}}
+\newcommand{\TrainedModelC}{\dlConcept{TrainedModel}}
+\newcommand{\trainedWithR}{\dlRole{trainedWith}}
+\newcommand{\trainedOnR}{\dlRole{trainedOn}}
+\newcommand{\producesModelR}{\dlRole{producesModel}}
+\newcommand{\evaluatesModelR}{\dlRole{evaluatesModel}}
 \newcommand{\changed}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
@@ -457,20 +462,26 @@ spaces, addressing CQ1, CQ2, and CQ8.
 
 \paragraph{Core classes.}
 The central concept is $\MLIPAlgorithmC$, representing an MLIP algorithm
-family (e.g., MACE, ACE, HDNNP)---not a specific trained model, but the
-architecture itself. Each algorithm declares the $\HyperparameterC$
-instances it accepts (cutoff radius, number of layers, learning rate, etc.),
-with their names, data types, ranges, and default values. An
-$\ImplementationC$ captures a concrete software realization of an algorithm
-in a specific $\LibraryC$ and version. Finally, $\SimulationTypeC$
-represents the kinds of atomistic simulation an algorithm supports
-(molecular dynamics, Monte Carlo, geometry optimization, phonon
-calculations, thermodynamic integration).
+family (e.g., MACE, ACE, HDNNP)---the architecture itself, not a specific
+trained model. Each algorithm declares the $\HyperparameterC$ instances it
+accepts (cutoff radius, number of layers, learning rate, etc.), with their
+names, data types, ranges, and default values. A $\TrainedModelC$ is the
+concrete artifact produced by training an algorithm on a specific dataset
+with specific hyperparameter settings---it represents the learned
+parameters (weights) that can be used for prediction. An
+$\ImplementationC$ captures a software realization of an algorithm in a
+specific $\LibraryC$ and version. Finally, $\SimulationTypeC$ represents
+the kinds of atomistic simulation an algorithm supports (molecular dynamics,
+Monte Carlo, geometry optimization, phonon calculations, thermodynamic
+integration).
 
 \paragraph{Core properties.}
 The role $\hasHyperparameterR$ links an algorithm to the hyperparameters it
 accepts, while $\hasImplementationR$ links it to its software
 implementations and $\supportsSimulationR$ to supported simulation types.
+A trained model is linked to its algorithm via $\trainedWithR$, to its
+training data via $\trainedOnR$, and carries the concrete hyperparameter
+settings used during training.
 Domain-specific datatype properties---$\cutoffRadiusR$, $\numLayersR$,
 $\learningRateR$, $\numRadialBasisR$, and $\numAngularBasisR$---record
 concrete hyperparameter values, with units annotated via
@@ -479,19 +490,23 @@ implementation to its library.
 
 \paragraph{Alignment.}
 $\MLIPAlgorithmC$ is a subclass of \texttt{mls:Algorithm}, inheriting
-ML-Schema's general algorithm description framework. $\HyperparameterC$
-extends \texttt{mls:HyperParameter} with physics-specific properties and
-units, and $\ImplementationC$ extends \texttt{mls:Implementation}.
+ML-Schema's general algorithm description framework. $\TrainedModelC$ is a
+subclass of \texttt{mls:Model}, connecting to ML-Schema's model lifecycle.
+$\HyperparameterC$ extends \texttt{mls:HyperParameter} with
+physics-specific properties and units, and $\ImplementationC$ extends
+\texttt{mls:Implementation}.
 
 \paragraph{Axioms.}
 Every MLIP algorithm must declare at least one hyperparameter and be linked
 to at least one simulation type it supports. Every implementation must
-specify the library it belongs to. These constraints are captured by the
-following axioms:
+specify the library it belongs to. Every trained model must reference
+exactly one algorithm and exactly one training dataset:
 \begin{align*}
   \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \\
   \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \\
-  \ImplementationC &\sqsub \existsR{implementedIn}{Library}
+  \ImplementationC &\sqsub \existsR{implementedIn}{Library} \\
+  \TrainedModelC &\sqsub \exactR{1}{trainedWith}{MLIPAlgorithm} \\
+  \TrainedModelC &\sqsub \exactR{1}{trainedOn}{TrainingDataset}
 \end{align*}
 The roles $\hasHyperparameterR$, $\hasImplementationR$, and
 $\supportsSimulationR$ have $\MLIPAlgorithmC$ as their domain, ensuring
@@ -579,25 +594,27 @@ dataset has exactly one origin type:
 \subsection{Benchmark Module}
 \label{sec:benchmark-module}
 
-The Benchmark module links published studies to algorithms, materials, training
-data, and accuracy metrics, addressing CQ6 and CQ7.
+The Benchmark module links published studies to trained models, materials,
+and accuracy metrics, addressing CQ6 and CQ7.
 
 \paragraph{Core classes.}
 A $\BenchmarkStudyC$ represents a published study reporting MLIP evaluation
 results. Each study contains one or more $\BenchmarkResultC$ instances, each
-capturing a single evaluation: an algorithm applied to a material system with
-specific hyperparameters. Results report $\AccuracyMetricC$ instances
-(e.g., RMSE of energy, MAE of forces), each characterized by a
-$\MetricTypeC$ (RMSE, MAE, R$^2$), a $\MetricPropertyC$ (energy, force,
-stress), and a numeric value with unit.
+capturing a single evaluation: a $\TrainedModelC$ applied to a material
+system. Since a trained model already encodes the algorithm, training data,
+and hyperparameter settings (via the Algorithm module), the benchmark result
+need only reference the model and the test conditions. Results report
+$\AccuracyMetricC$ instances (e.g., RMSE of energy, MAE of forces), each
+characterized by a $\MetricTypeC$ (RMSE, MAE, R$^2$), a $\MetricPropertyC$
+(energy, force, stress), and a numeric value with unit.
 
 \paragraph{Core properties.}
-The roles $\usesAlgorithmR$, $\usesTrainingDataR$, and $\targetMaterialR$
-link a benchmark result to the algorithm, training data, and material system
-it evaluates. $\hasAccuracyMetricR$ connects to the reported accuracy
-values. Each $\AccuracyMetricC$ is described by $\metricTypeR$,
-$\metricPropertyR$, and $\metricValueR$. The role $\reportedInR$ links a
-result to its source publication.
+The role $\evaluatesModelR$ links a benchmark result to the trained model
+being evaluated, while $\targetMaterialR$ specifies the material system used
+for testing. $\hasAccuracyMetricR$ connects to the reported accuracy values.
+Each $\AccuracyMetricC$ is described by $\metricTypeR$, $\metricPropertyR$,
+and $\metricValueR$. The role $\reportedInR$ links a result to its source
+publication.
 
 \paragraph{Alignment.}
 $\BenchmarkStudyC$ is modeled as a subclass of \texttt{prov:Activity},
@@ -607,12 +624,12 @@ for author identification.
 
 \paragraph{Axioms.}
 The Benchmark module is the integration point of the ontology: every
-benchmark result must reference exactly one algorithm and at least one
-material system, and must report at least one accuracy metric. Every study
-must contain at least one result:
+benchmark result must evaluate exactly one trained model, specify at least
+one target material system, and report at least one accuracy metric. Every
+study must contain at least one result:
 \begin{align*}
   \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \\
-  \BenchmarkResultC &\sqsub \exactR{1}{usesAlgorithm}{MLIPAlgorithm} \\
+  \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel} \\
   \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \\
   \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric}
 \end{align*}
@@ -622,7 +639,10 @@ Each accuracy metric must specify its type and the property being measured:
   \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty}
 \end{align*}
 These axioms ensure that benchmark data is always complete enough to support
-structured comparison across studies (CQ6, CQ7).
+structured comparison across studies (CQ6, CQ7). Note that through
+$\TrainedModelC$, every benchmark result is transitively linked to the
+algorithm ($\trainedWithR$) and training data ($\trainedOnR$) used, without
+redundantly encoding this information.
 
 \begin{figure}[t]
 \centering
