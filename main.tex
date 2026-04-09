@@ -64,6 +64,12 @@
 \newcommand{\dlConcept}[1]{\ensuremath{\mathrm{#1}}}
 \newcommand{\dlRole}[1]{\ensuremath{\mathrm{#1}}}
 
+% DL syntax shortcuts
+\newcommand{\sqsub}{\sqsubseteq}
+\newcommand{\existsR}[2]{\exists\, \mathrm{#1}.\mathrm{#2}}
+\newcommand{\forallR}[2]{\forall\, \mathrm{#1}.\mathrm{#2}}
+\newcommand{\exactR}[3]{(\mathord{=}#1\;\mathrm{#2}.\mathrm{#3})}
+
 % MLIPs ontology concepts
 \newcommand{\MLIPAlgorithmC}{\dlConcept{MLIPAlgorithm}}
 \newcommand{\HyperparameterC}{\dlConcept{Hyperparameter}}
@@ -106,6 +112,8 @@
 \newcommand{\metricValueR}{\dlRole{metricValue}}
 \newcommand{\metricPropertyR}{\dlRole{metricProperty}}
 \newcommand{\reportedInR}{\dlRole{reportedIn}}
+\newcommand{\hasResultR}{\dlRole{hasResult}}
+\newcommand{\implementedInR}{\dlRole{implementedIn}}
 \newcommand{\changed}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
@@ -448,38 +456,51 @@ The Algorithm module models MLIP algorithm families and their hyperparameter
 spaces, addressing CQ1, CQ2, and CQ8.
 
 \paragraph{Core classes.}
-
-\begin{itemize}
-\item $\MLIPAlgorithmC$ --- An MLIP algorithm family (e.g., MACE,
-  ACE, HDNNP). Subclass of \texttt{mls:Algorithm}.
-\item $\HyperparameterC$ --- A hyperparameter of an MLIP algorithm,
-  with its name, data type, range, and default value. Subclass of
-  \texttt{mls:HyperParameter}.
-\item $\ImplementationC$ --- A software implementation of an
-  algorithm in a specific library and version. Subclass of
-  \texttt{mls:Implementation}.
-\item $\SimulationTypeC$ --- A type of atomistic simulation (MD,
-  Monte Carlo, geometry optimization, phonon, thermodynamic integration).
-\end{itemize}
+The central concept is $\MLIPAlgorithmC$, representing an MLIP algorithm
+family (e.g., MACE, ACE, HDNNP)---not a specific trained model, but the
+architecture itself. Each algorithm declares the $\HyperparameterC$
+instances it accepts (cutoff radius, number of layers, learning rate, etc.),
+with their names, data types, ranges, and default values. An
+$\ImplementationC$ captures a concrete software realization of an algorithm
+in a specific $\LibraryC$ and version. Finally, $\SimulationTypeC$
+represents the kinds of atomistic simulation an algorithm supports
+(molecular dynamics, Monte Carlo, geometry optimization, phonon
+calculations, thermodynamic integration).
 
 \paragraph{Core properties.}
+The role $\hasHyperparameterR$ links an algorithm to the hyperparameters it
+accepts, while $\hasImplementationR$ links it to its software
+implementations and $\supportsSimulationR$ to supported simulation types.
+Domain-specific datatype properties---$\cutoffRadiusR$, $\numLayersR$,
+$\learningRateR$, $\numRadialBasisR$, and $\numAngularBasisR$---record
+concrete hyperparameter values, with units annotated via
+QUDT~\cite{hodgson2014qudt}. The role $\implementedInR$ connects an
+implementation to its library.
 
-\begin{itemize}
-\item $\hasHyperparameterR$ links an algorithm to its hyperparameters.
-\item $\hasImplementationR$ links an algorithm to its software
-  implementations.
-\item $\cutoffRadiusR$, $\numLayersR$,
-  $\learningRateR$, $\numRadialBasisR$,
-  $\numAngularBasisR$ --- domain-specific hyperparameter properties,
-  with units annotated via QUDT~\cite{hodgson2014qudt}.
-\item $\supportsSimulationR$ links an algorithm to the simulation
-  types it supports.
-\end{itemize}
+\paragraph{Alignment.}
+$\MLIPAlgorithmC$ is a subclass of \texttt{mls:Algorithm}, inheriting
+ML-Schema's general algorithm description framework. $\HyperparameterC$
+extends \texttt{mls:HyperParameter} with physics-specific properties and
+units, and $\ImplementationC$ extends \texttt{mls:Implementation}.
 
-\paragraph{Alignment.} $\MLIPAlgorithmC$ is a subclass of
-\texttt{mls:Algorithm}, inheriting ML-Schema's general algorithm
-description framework. $\HyperparameterC$ extends \texttt{mls:HyperParameter}
-with physics-specific properties and units.
+\paragraph{Axioms.}
+Every MLIP algorithm must declare at least one hyperparameter and be linked
+to at least one simulation type it supports. Every implementation must
+specify the library it belongs to. These constraints are captured by the
+following axioms:
+\begin{align*}
+  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \\
+  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \\
+  \ImplementationC &\sqsub \existsR{implementedIn}{Library}
+\end{align*}
+The roles $\hasHyperparameterR$, $\hasImplementationR$, and
+$\supportsSimulationR$ have $\MLIPAlgorithmC$ as their domain, ensuring
+that only algorithms can bear these relationships:
+\begin{align*}
+  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \\
+  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \\
+  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC
+\end{align*}
 
 \begin{figure}[t]
 \centering
@@ -498,44 +519,52 @@ The Training Data module describes the datasets used to train MLIP models,
 addressing CQ3, CQ4, and CQ5.
 
 \paragraph{Core classes.}
-
-\begin{itemize}
-\item $\TrainingDatasetC$ --- A dataset of atomic configurations
-  used for MLIP training. Subclass of \texttt{mls:Dataset} and
-  \texttt{prov:Entity}.
-\item $\DFTCalculationC$ --- A density functional theory calculation
-  that produced reference data. Aligned with \texttt{mdo:Calculation}.
-\item $\DFTSettingsC$ --- Settings of a DFT calculation: exchange-correlation
-  functional, k-point mesh, energy cutoff, pseudopotential type.
-\item $\MaterialSystemC$ --- A material system (element, alloy,
-  compound) studied in the dataset. Linked to
-  \texttt{cmso:CrystallineMaterial} where applicable.
-\item $\AtomicConfigurationC$ --- A single atomic configuration
-  (positions, cell, properties) in the dataset. Aligned with
-  \texttt{cmso:AtomicStructure}.
-\end{itemize}
+A $\TrainingDatasetC$ is a collection of atomic configurations used for MLIP
+training. Each dataset covers one or more $\MaterialSystemC$ instances
+(elements, alloys, compounds), and its reference data is produced by one or
+more $\DFTCalculationC$ instances, each governed by a $\DFTSettingsC$ that
+records the exchange-correlation functional ($\xcFunctionalR$, e.g., PBE,
+LDA, SCAN), k-point mesh ($\kPointMeshR$), energy cutoff
+($\energyCutoffR$), and pseudopotential type ($\pseudopotentialTypeR$).
+Individual $\AtomicConfigurationC$ instances represent the atomic positions,
+cell parameters, and computed properties within a dataset.
 
 \paragraph{Core properties.}
+The role $\hasDFTSettingsR$ links a calculation to its settings.
+$\numConfigurationsR$ records the number of atomic configurations in a
+dataset. $\coversPropertyR$ indicates which physical properties (energy,
+forces, stresses, virials) are included. $\datasetProvenanceR$ classifies
+the dataset origin as $\dlConcept{Published}$, $\dlConcept{InHouse}$, or
+$\dlConcept{Augmented}$; augmented datasets are additionally linked to their
+sources via \texttt{prov:wasDerivedFrom}.
 
-\begin{itemize}
-\item $\hasDFTSettingsR$ links a calculation to its DFT settings.
-\item $\xcFunctionalR$ (e.g., PBE, LDA, SCAN),
-  $\kPointMeshR$, $\energyCutoffR$,
-  $\pseudopotentialTypeR$ describe DFT parameters.
-\item $\numConfigurationsR$ records the number of atomic
-  configurations in a dataset.
-\item $\coversPropertyR$ indicates which properties (energy, forces,
-  stresses, virials) are included.
-\item $\datasetProvenanceR$ with values $\dlConcept{Published}$,
-  $\dlConcept{InHouse}$, $\dlConcept{Augmented}$ indicates the origin.
-\item \texttt{prov:wasDerivedFrom} links augmented datasets to their sources.
-\end{itemize}
+\paragraph{Alignment.}
+$\TrainingDatasetC$ is modeled as a subclass of both \texttt{mls:Dataset}
+(for ML workflow compatibility) and \texttt{prov:Entity} (for provenance
+tracking). $\DFTCalculationC$ aligns with \texttt{mdo:Calculation}.
+$\MaterialSystemC$ connects to \texttt{cmso:CrystallineMaterial} where
+applicable, and $\AtomicConfigurationC$ aligns with
+\texttt{cmso:AtomicStructure}. Material systems link to Wikidata for
+chemical element identification.
 
-\paragraph{Alignment.} Training datasets are modeled as both
-\texttt{mls:Dataset} (for ML workflow compatibility) and
-\texttt{prov:Entity} (for provenance tracking). DFT calculations align with
-MDO's Calculation module. Material systems connect to CMSO for structural
-descriptions and to Wikidata for chemical element identification.
+\paragraph{Axioms.}
+Every training dataset must cover at least one material system, declare at
+least one covered property, specify its provenance, and include at least one
+atomic configuration. Every DFT calculation must be associated with its
+settings:
+\begin{align*}
+  \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem} \\
+  \TrainingDatasetC &\sqsub \existsR{coversProperty}{\top} \\
+  \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{\top} \\
+  \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration} \\
+  \DFTCalculationC &\sqsub \existsR{hasDFTSettings}{DFTSettings}
+\end{align*}
+The provenance classification is exhaustive and disjoint, ensuring every
+dataset has exactly one origin type:
+\begin{align*}
+  \dlConcept{Published} \sqcup \dlConcept{InHouse} \sqcup \dlConcept{Augmented}
+  &= \top_{\dlConcept{DatasetProvenance}}
+\end{align*}
 
 \begin{figure}[t]
 \centering
@@ -554,33 +583,46 @@ The Benchmark module links published studies to algorithms, materials, training
 data, and accuracy metrics, addressing CQ6 and CQ7.
 
 \paragraph{Core classes.}
-
-\begin{itemize}
-\item $\BenchmarkStudyC$ --- A published study reporting MLIP
-  evaluation results. Subclass of \texttt{prov:Activity} and linked to
-  \texttt{schema:ScholarlyArticle}.
-\item $\BenchmarkResultC$ --- A single evaluation result: an
-  algorithm applied to a material system with specific hyperparameters,
-  reporting accuracy metrics.
-\item $\AccuracyMetricC$ --- An accuracy measure (RMSE of energy,
-  MAE of forces, etc.) with value and unit.
-\end{itemize}
+A $\BenchmarkStudyC$ represents a published study reporting MLIP evaluation
+results. Each study contains one or more $\BenchmarkResultC$ instances, each
+capturing a single evaluation: an algorithm applied to a material system with
+specific hyperparameters. Results report $\AccuracyMetricC$ instances
+(e.g., RMSE of energy, MAE of forces), each characterized by a
+$\MetricTypeC$ (RMSE, MAE, R$^2$), a $\MetricPropertyC$ (energy, force,
+stress), and a numeric value with unit.
 
 \paragraph{Core properties.}
+The roles $\usesAlgorithmR$, $\usesTrainingDataR$, and $\targetMaterialR$
+link a benchmark result to the algorithm, training data, and material system
+it evaluates. $\hasAccuracyMetricR$ connects to the reported accuracy
+values. Each $\AccuracyMetricC$ is described by $\metricTypeR$,
+$\metricPropertyR$, and $\metricValueR$. The role $\reportedInR$ links a
+result to its source publication.
 
-\begin{itemize}
-\item $\usesAlgorithmR$, $\usesTrainingDataR$,
-  $\targetMaterialR$ link a benchmark result to its components.
-\item $\hasAccuracyMetricR$ links to reported accuracy values.
-\item $\metricTypeR$ (e.g., RMSE, MAE), $\metricValueR$,
-  $\metricPropertyR$ (energy, force, stress) describe the metric.
-\item $\reportedInR$ links a result to its source publication.
-\end{itemize}
-
-\paragraph{Alignment.} Benchmark studies are modeled as \texttt{prov:Activity}
-to capture the provenance chain from data to evaluation. Publications link to
+\paragraph{Alignment.}
+$\BenchmarkStudyC$ is modeled as a subclass of \texttt{prov:Activity},
+capturing the provenance chain from data to evaluation. Publications link to
 \texttt{schema:ScholarlyArticle} for bibliographic metadata and to Wikidata
 for author identification.
+
+\paragraph{Axioms.}
+The Benchmark module is the integration point of the ontology: every
+benchmark result must reference exactly one algorithm and at least one
+material system, and must report at least one accuracy metric. Every study
+must contain at least one result:
+\begin{align*}
+  \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \\
+  \BenchmarkResultC &\sqsub \exactR{1}{usesAlgorithm}{MLIPAlgorithm} \\
+  \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \\
+  \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric}
+\end{align*}
+Each accuracy metric must specify its type and the property being measured:
+\begin{align*}
+  \AccuracyMetricC &\sqsub \exactR{1}{metricType}{MetricType} \\
+  \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty}
+\end{align*}
+These axioms ensure that benchmark data is always complete enough to support
+structured comparison across studies (CQ6, CQ7).
 
 \begin{figure}[t]
 \centering
