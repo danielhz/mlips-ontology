@@ -71,6 +71,54 @@ mlips:Library a owl:Class ;
     rdfs:comment """A software library or tool used in MLIP research
 (e.g., ASE, LAMMPS, VASP, GPAW)."""@en .
 
+mlips:TrainingRun a owl:Class ;
+    rdfs:subClassOf mlschema:Run, prov:Activity ;
+    rdfs:label "Training Run"@en ;
+    rdfs:comment """A concrete training execution: it executes an algorithm
+on a training dataset and produces a trained model."""@en .
+
+mlips:TrainedModel a owl:Class ;
+    rdfs:subClassOf mlschema:Model ;
+    rdfs:label "Trained Model"@en ;
+    rdfs:comment """The concrete artifact produced by training an algorithm
+on a specific dataset with specific hyperparameter settings---the learned
+parameters (weights) that can be used for prediction."""@en .
+
+# --- Existential and cardinality axioms (Algorithm Module) -------------------
+
+mlips:MLIPAlgorithm rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:hasHyperparameter ;
+    owl:someValuesFrom mlips:Hyperparameter
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:supportsSimulation ;
+    owl:someValuesFrom mlips:SimulationType
+] .
+
+mlips:Implementation rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:implementedIn ;
+    owl:someValuesFrom mlips:Library
+] .
+
+mlips:TrainingRun rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:executes ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:MLIPAlgorithm
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:runsOn ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:TrainingDataset
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:produces ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:TrainedModel
+] .
+
 # --- Object properties -------------------------------------------------------
 
 mlips:hasHyperparameter a owl:ObjectProperty ;
@@ -102,6 +150,44 @@ mlips:forHyperparameter a owl:ObjectProperty ;
     rdfs:range mlips:Hyperparameter ;
     rdfs:label "for hyperparameter"@en ;
     rdfs:comment "Links a setting to the hyperparameter it configures."@en .
+
+mlips:executes a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:range mlips:MLIPAlgorithm ;
+    rdfs:label "executes"@en ;
+    rdfs:comment "Links a training run to the algorithm it executes."@en .
+
+mlips:produces a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:range mlips:TrainedModel ;
+    rdfs:label "produces"@en ;
+    rdfs:comment "Links a training run to the trained model it produces."@en .
+
+mlips:trainedWith a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainedModel ;
+    rdfs:range mlips:MLIPAlgorithm ;
+    rdfs:label "trained with"@en ;
+    rdfs:comment "Shortcut: links a trained model directly to its algorithm."@en ;
+    owl:propertyChainAxiom ( [ owl:inverseOf mlips:produces ] mlips:executes ) .
+
+mlips:trainedOn a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainedModel ;
+    rdfs:range mlips:TrainingDataset ;
+    rdfs:label "trained on"@en ;
+    rdfs:comment "Shortcut: links a trained model directly to its training dataset."@en ;
+    owl:propertyChainAxiom ( [ owl:inverseOf mlips:produces ] mlips:runsOn ) .
+
+mlips:runsOn a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:range mlips:TrainingDataset ;
+    rdfs:label "runs on"@en ;
+    rdfs:comment "Links a training run to the training dataset it uses."@en .
+
+mlips:evaluatesModel a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:range mlips:TrainedModel ;
+    rdfs:label "evaluates model"@en ;
+    rdfs:comment "Links a benchmark result to the trained model being evaluated."@en .
 
 # --- Datatype properties (Algorithm module) -----------------------------------
 
@@ -235,6 +321,32 @@ mlips:Stresses a mlips:CoveredProperty ;
 mlips:Virials a mlips:CoveredProperty ;
     rdfs:label "Virials"@en .
 
+# --- Existential axioms (Training Data Module) -------------------------------
+
+mlips:TrainingDataset rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:coversMaterial ;
+    owl:someValuesFrom mlips:MaterialSystem
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:coversProperty ;
+    owl:someValuesFrom mlips:CoveredProperty
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:datasetProvenance ;
+    owl:someValuesFrom mlips:DatasetProvenance
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:hasConfiguration ;
+    owl:someValuesFrom mlips:AtomicConfiguration
+] .
+
+mlips:DFTCalculation rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:hasDFTSettings ;
+    owl:someValuesFrom mlips:DFTSettings
+] .
+
 # --- Object properties -------------------------------------------------------
 
 mlips:hasDFTCalculation a owl:ObjectProperty ;
@@ -367,13 +479,48 @@ mlips:R2 a mlips:MetricType ;
 # --- Individuals (metric properties) -----------------------------------------
 
 mlips:EnergyProperty a mlips:MetricProperty ;
-    rdfs:label "Energy"@en .
+    rdfs:label "Energy (metric property)"@en .
 
 mlips:ForceProperty a mlips:MetricProperty ;
     rdfs:label "Force"@en .
 
 mlips:StressProperty a mlips:MetricProperty ;
     rdfs:label "Stress"@en .
+
+# --- Existential and cardinality axioms (Benchmark Module) -------------------
+
+mlips:BenchmarkStudy rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:hasResult ;
+    owl:someValuesFrom mlips:BenchmarkResult
+] .
+
+mlips:BenchmarkResult rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:evaluatesModel ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:TrainedModel
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:targetMaterial ;
+    owl:someValuesFrom mlips:MaterialSystem
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:hasAccuracyMetric ;
+    owl:someValuesFrom mlips:AccuracyMetric
+] .
+
+mlips:AccuracyMetric rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty mlips:metricType ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:MetricType
+] , [
+    a owl:Restriction ;
+    owl:onProperty mlips:metricProperty ;
+    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+    owl:onClass mlips:MetricProperty
+] .
 
 # --- Object properties -------------------------------------------------------
 
