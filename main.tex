@@ -1009,117 +1009,6 @@ edited, and validated by the authors.
 
 \appendix
 
-\section{Design Discussion: Training Run and Shortcut Properties}
-\label{sec:appendix-run}
-
-In ML-Schema, the relationship between a trained model and its algorithm is
-mediated by \texttt{mls:Run}, which represents a training execution:
-%
-\begin{align*}
-  \mathsf{mls{:}Algorithm}
-    &\xleftarrow{\mathsf{mls{:}executes}}
-    \mathsf{mls{:}Run}
-    \xrightarrow{\mathsf{mls{:}hasOutput}}
-    \mathsf{mls{:}Model} \\
-  \mathsf{mls{:}Dataset}
-    &\xleftarrow{\mathsf{mls{:}hasInput}}
-    \mathsf{mls{:}Run}
-\end{align*}
-%
-The \texttt{mls:Run} concept captures the full context of a training
-execution---algorithm, input data, output model, hyperparameter settings,
-and potentially runtime metadata (duration, hardware, random seeds).
-
-The \MLIPsOntology{} follows this pattern with $\TrainingRunC$ (a subclass
-of both \texttt{mls:Run} and \texttt{prov:Activity}), which mediates
-between $\MLIPAlgorithmC$, $\TrainingDatasetC$, and $\TrainedModelC$ via
-$\executesR$, $\trainedOnR$, and $\producesR$ respectively. Additionally,
-we provide the shortcut roles $\trainedWithR$ and $\trainedOnR$ directly on
-$\TrainedModelC$, defined as property chains through the run. These
-shortcuts enable direct queries without navigating the run entity, which is
-important because our primary data source---published MLIP
-literature---rarely reports the operational details of training runs
-(hardware, duration, random seeds). In many cases, the $\TrainingRunC$
-entity will carry only its algorithm, dataset, and model links, making the
-shortcut properties the more natural query path.
-
-\paragraph{Critical assessment.}
-The shortcut properties introduce redundancy: the same information is
-accessible both directly on the model and via the run. While the property
-chain axioms guarantee consistency in principle, in practice data entry
-errors could create inconsistencies if shortcuts and run-mediated paths are
-populated independently. We mitigate this through SHACL shapes that
-validate consistency between the two paths.
-
-An alternative design would omit the shortcuts entirely and always require
-navigation through $\TrainingRunC$. This would be cleaner from an ontology
-engineering perspective but would make common queries (``which algorithm
-produced this model?'') unnecessarily verbose, particularly for data
-extracted from publications where the run carries no additional information
-beyond the links already captured by the shortcuts.
-
-\section{SHACL Shapes}
-\label{sec:shacl}
-
-We define SHACL shapes for each core class in the ontology, serving two
-purposes: (1)~validating the knowledge graph data for consistency and
-completeness, and (2)~driving form-based data entry interfaces that allow
-domain experts to contribute data without writing SPARQL.
-
-\subsection{Shape Design}
-
-Each node shape corresponds to a core ontology class and specifies:
-
-\begin{itemize}
-\item \emph{Mandatory properties} (via \texttt{sh:minCount}): e.g., an
-  $\MLIPAlgorithmC$ must have at least one \texttt{rdfs:label}
-  and one $\hasHyperparameterR$.
-\item \emph{Value types and ranges}: e.g., $\cutoffRadiusR$ must
-  be \texttt{xsd:double} with \texttt{sh:minExclusive}~$0$.
-\item \emph{Controlled vocabularies}: e.g., $\xcFunctionalR$
-  values must come from a defined set (PBE, LDA, SCAN, PBEsol, \ldots).
-\item \emph{Cardinality constraints}: e.g., a $\BenchmarkResultC$
-  must link to exactly one algorithm and at least one accuracy metric.
-\end{itemize}
-
-\subsection{Example Shape}
-
-\begin{lstlisting}[language=turtle, caption={SHACL shape for MLIPAlgorithm (excerpt).}]
-mlips-sh:MLIPAlgorithmShape a sh:NodeShape ;
-  sh:targetClass mlips:MLIPAlgorithm ;
-  sh:property [
-    sh:path rdfs:label ;
-    sh:minCount 1 ;
-    sh:datatype xsd:string ;
-    sh:name "Algorithm name" ;
-  ] ;
-  sh:property [
-    sh:path mlips:hasHyperparameter ;
-    sh:minCount 1 ;
-    sh:class mlips:Hyperparameter ;
-    sh:name "Hyperparameters" ;
-  ] ;
-  sh:property [
-    sh:path mlips:hasImplementation ;
-    sh:class mlips:Implementation ;
-    sh:name "Implementations" ;
-  ] ;
-  sh:property [
-    sh:path owl:sameAs ;
-    sh:nodeKind sh:IRI ;
-    sh:name "Wikidata link" ;
-    sh:description "Link to Wikidata item" ;
-  ] .
-\end{lstlisting}
-
-\subsection{Validation and Form Generation}
-
-The SHACL shapes are used at two levels: (1)~batch validation of the knowledge
-graph using standard SHACL processors (e.g., pySHACL), and (2)~real-time
-form generation in the web interface, where each property shape is rendered as
-a form field with appropriate input type, validation, and autocomplete for
-entity references.
-
 \section{Axiom Catalog}
 \label{sec:axiom-catalog}
 
@@ -1360,5 +1249,116 @@ provenance tracking.
 hyperparameter ``cutoff radius''. \emph{Discussion:} This axiom is
 straightforward but raises the question of whether settings should also be
 existentially dependent on a $\TrainingRunC$ or $\TrainedModelC$.
+
+\section{Design Discussion: Training Run and Shortcut Properties}
+\label{sec:appendix-run}
+
+In ML-Schema, the relationship between a trained model and its algorithm is
+mediated by \texttt{mls:Run}, which represents a training execution:
+%
+\begin{align*}
+  \mathsf{mls{:}Algorithm}
+    &\xleftarrow{\mathsf{mls{:}executes}}
+    \mathsf{mls{:}Run}
+    \xrightarrow{\mathsf{mls{:}hasOutput}}
+    \mathsf{mls{:}Model} \\
+  \mathsf{mls{:}Dataset}
+    &\xleftarrow{\mathsf{mls{:}hasInput}}
+    \mathsf{mls{:}Run}
+\end{align*}
+%
+The \texttt{mls:Run} concept captures the full context of a training
+execution---algorithm, input data, output model, hyperparameter settings,
+and potentially runtime metadata (duration, hardware, random seeds).
+
+The \MLIPsOntology{} follows this pattern with $\TrainingRunC$ (a subclass
+of both \texttt{mls:Run} and \texttt{prov:Activity}), which mediates
+between $\MLIPAlgorithmC$, $\TrainingDatasetC$, and $\TrainedModelC$ via
+$\executesR$, $\trainedOnR$, and $\producesR$ respectively. Additionally,
+we provide the shortcut roles $\trainedWithR$ and $\trainedOnR$ directly on
+$\TrainedModelC$, defined as property chains through the run. These
+shortcuts enable direct queries without navigating the run entity, which is
+important because our primary data source---published MLIP
+literature---rarely reports the operational details of training runs
+(hardware, duration, random seeds). In many cases, the $\TrainingRunC$
+entity will carry only its algorithm, dataset, and model links, making the
+shortcut properties the more natural query path.
+
+\paragraph{Critical assessment.}
+The shortcut properties introduce redundancy: the same information is
+accessible both directly on the model and via the run. While the property
+chain axioms guarantee consistency in principle, in practice data entry
+errors could create inconsistencies if shortcuts and run-mediated paths are
+populated independently. We mitigate this through SHACL shapes that
+validate consistency between the two paths.
+
+An alternative design would omit the shortcuts entirely and always require
+navigation through $\TrainingRunC$. This would be cleaner from an ontology
+engineering perspective but would make common queries (``which algorithm
+produced this model?'') unnecessarily verbose, particularly for data
+extracted from publications where the run carries no additional information
+beyond the links already captured by the shortcuts.
+
+\section{SHACL Shapes}
+\label{sec:shacl}
+
+We define SHACL shapes for each core class in the ontology, serving two
+purposes: (1)~validating the knowledge graph data for consistency and
+completeness, and (2)~driving form-based data entry interfaces that allow
+domain experts to contribute data without writing SPARQL.
+
+\subsection{Shape Design}
+
+Each node shape corresponds to a core ontology class and specifies:
+
+\begin{itemize}
+\item \emph{Mandatory properties} (via \texttt{sh:minCount}): e.g., an
+  $\MLIPAlgorithmC$ must have at least one \texttt{rdfs:label}
+  and one $\hasHyperparameterR$.
+\item \emph{Value types and ranges}: e.g., $\cutoffRadiusR$ must
+  be \texttt{xsd:double} with \texttt{sh:minExclusive}~$0$.
+\item \emph{Controlled vocabularies}: e.g., $\xcFunctionalR$
+  values must come from a defined set (PBE, LDA, SCAN, PBEsol, \ldots).
+\item \emph{Cardinality constraints}: e.g., a $\BenchmarkResultC$
+  must link to exactly one algorithm and at least one accuracy metric.
+\end{itemize}
+
+\subsection{Example Shape}
+
+\begin{lstlisting}[language=turtle, caption={SHACL shape for MLIPAlgorithm (excerpt).}]
+mlips-sh:MLIPAlgorithmShape a sh:NodeShape ;
+  sh:targetClass mlips:MLIPAlgorithm ;
+  sh:property [
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:name "Algorithm name" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasHyperparameter ;
+    sh:minCount 1 ;
+    sh:class mlips:Hyperparameter ;
+    sh:name "Hyperparameters" ;
+  ] ;
+  sh:property [
+    sh:path mlips:hasImplementation ;
+    sh:class mlips:Implementation ;
+    sh:name "Implementations" ;
+  ] ;
+  sh:property [
+    sh:path owl:sameAs ;
+    sh:nodeKind sh:IRI ;
+    sh:name "Wikidata link" ;
+    sh:description "Link to Wikidata item" ;
+  ] .
+\end{lstlisting}
+
+\subsection{Validation and Form Generation}
+
+The SHACL shapes are used at two levels: (1)~batch validation of the knowledge
+graph using standard SHACL processors (e.g., pySHACL), and (2)~real-time
+form generation in the web interface, where each property shape is rendered as
+a form field with appropriate input type, validation, and autocomplete for
+entity references.
 
 \end{document}
