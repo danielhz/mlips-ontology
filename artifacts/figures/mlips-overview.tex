@@ -85,12 +85,18 @@
   \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {$\hasHyperparameterR$} (Hyperparameter);
   \draw[edge] (MLIPAlgorithm) -- (Implementation);
   \draw[edge] (MLIPAlgorithm) -- (SimulationType);
-  \node[edgelabel] at (2.46,6.30) {$\hasImplementationR$};
-  \node[edgelabel] at (5.16,6.30) {$\supportsSimulationR$};
+  \node[edgelabel] at (1.80,6.30) {$\hasImplementationR$};
+  \node[edgelabel] at (5.80,6.30) {$\supportsSimulationR$};
   \draw[edge] (HyperparameterSetting) -- node[edgelabel, pos=0.5] {$\dlRole{forHyperparameter}$} (Hyperparameter);
   \draw[edge] (Implementation) -- node[edgelabel, pos=0.5] {$\implementedInR$} (Library);
-  \draw[edge] (TrainedModel) -- node[edgelabel, pos=0.5, left=-2pt] {$\trainedWithR$} (MLIPAlgorithm);
-  \draw[edge] (TrainedModel) -- node[edgelabel, pos=0.5] {$\trainedOnR$} (TrainingDataset);
+  \draw[edge] (TrainedModel) to[out=-150, in=90] (MLIPAlgorithm);
+  \node[edgelabel] at (4.50,8.65) {$\trainedWithR$};
+  \draw[->, >=stealth, thick]
+    (TrainedModel.east) .. controls (8.50,9.80) and (8.00,8.08) .. (9.50,8.08)
+    -- (14.50,8.08)
+    .. controls (16.00,8.08) and (16.50,5.10) .. (18.00,5.10)
+    -- (TrainingDataset.west);
+  \node[edgelabel] at (13.85,8.08) {$\trainedOnR$};
   \draw[edge] (TrainingDataset) -- (DFTCalculation);
   \draw[edge] (TrainingDataset) -- (MaterialSystem);
   \draw[edge] (TrainingDataset) -- (CoveredProperty);
@@ -103,10 +109,12 @@
   \node[edgelabel] at (22.67,5.90) {$\coversPropertyR$};
   \draw[edge] (DFTCalculation) -- node[edgelabel, pos=0.5] {$\hasDFTSettingsR$} (DFTSettings);
   \draw[edge] (BenchmarkStudy) -- node[edgelabel, pos=0.5] {$\hasResultR$} (BenchmarkResult);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\evaluatesModelR$} (TrainedModel);
+  \draw[edge] (BenchmarkResult) to[out=150, in=-30] (TrainedModel);
+  \node[edgelabel] at (8.60,7.50) {$\evaluatesModelR$};
   \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\targetMaterialR$} (MaterialSystem);
   \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\hasAccuracyMetricR$} (AccuracyMetric);
   \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {$\metricTypeR$} (MetricType);
   \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {$\metricPropertyR$} (MetricProperty);
+
 
 \end{tikzpicture}
