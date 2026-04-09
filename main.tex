@@ -1036,4 +1036,71 @@ edited, and validated by the authors.
 \bibliographystyle{splncs04}
 \bibliography{references}
 
+\appendix
+
+\section{Design Discussion: Direct Model Links vs.\ Training Run}
+\label{sec:appendix-run}
+
+A notable deviation from ML-Schema concerns how trained models relate to
+their algorithms and training data. In ML-Schema, this relationship is
+mediated by \texttt{mls:Run}, which represents a training execution:
+%
+\begin{align*}
+  \mathsf{mls{:}Algorithm}
+    &\xleftarrow{\mathsf{mls{:}executes}}
+    \mathsf{mls{:}Run}
+    \xrightarrow{\mathsf{mls{:}hasOutput}}
+    \mathsf{mls{:}Model} \\
+  \mathsf{mls{:}Dataset}
+    &\xleftarrow{\mathsf{mls{:}hasInput}}
+    \mathsf{mls{:}Run}
+\end{align*}
+%
+The \texttt{mls:Run} concept captures the full context of a training
+execution---algorithm, input data, output model, hyperparameter settings,
+and potentially runtime metadata (duration, hardware, random seeds).
+
+In the \MLIPsOntology{}, we instead link a $\TrainedModelC$ directly to its
+algorithm and training data:
+%
+\begin{align*}
+  \mathsf{MLIPAlgorithm}
+    &\xleftarrow{\mathsf{trainedWith}}
+    \mathsf{TrainedModel}
+    \xrightarrow{\mathsf{trainedOn}}
+    \mathsf{TrainingDataset}
+\end{align*}
+
+\paragraph{Rationale.}
+Our primary data source is the published MLIP literature, where papers
+report which algorithm was trained on which dataset, but rarely provide the
+operational details of the training run (hardware configuration, wall-clock
+time, random seeds, software version used for training). Introducing a
+\texttt{Run} concept in this context would create entities that are almost
+always incomplete---most of their properties would remain unknown. The
+direct-link pattern keeps the graph lean and every triple verifiable against
+the source publication.
+
+\paragraph{Critical assessment.}
+This simplification has a cost. First, it makes it impossible to
+distinguish two training runs that used the same algorithm and dataset but
+different random seeds or training schedules---a distinction that matters
+for reproducibility studies. Second, it conflates provenance metadata
+(who ran the training, when, on which hardware) with the model entity
+itself, whereas PROV-O's activity-based model would separate these
+concerns more cleanly. Third, if the knowledge graph grows to include
+models trained in-house (rather than extracted from publications), the
+absence of a Run concept will become a limitation: users will want to
+record training duration, convergence criteria, and software versions.
+
+We consider this an acceptable trade-off for the current scope of the
+knowledge graph, which focuses on systematizing published benchmark data.
+Should the scope extend to tracking in-house training workflows, we
+recommend introducing a $\dlConcept{TrainingRun}$ concept as a subclass of
+both \texttt{mls:Run} and \texttt{prov:Activity}, with
+$\dlRole{produced}$ linking to $\TrainedModelC$. The existing
+$\trainedWithR$ and $\trainedOnR$ roles could then be derived as shortcut
+properties (property chains) through the run, preserving backward
+compatibility with data already in the graph.
+
 \end{document}
