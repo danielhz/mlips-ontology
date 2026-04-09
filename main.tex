@@ -59,6 +59,53 @@
 % Ontology namespace — to be finalized before submission
 \newcommand{\mlipsns}{https://kg.ki.uni-stuttgart.de/\_ontology/mlips/}
 \newcommand{\mlipsprefix}{\texttt{mlips:}}
+
+% DL-style notation for ontology concepts and roles
+\newcommand{\dlConcept}[1]{\ensuremath{\mathrm{#1}}}
+\newcommand{\dlRole}[1]{\ensuremath{\mathrm{#1}}}
+
+% MLIPs ontology concepts
+\newcommand{\MLIPAlgorithmC}{\dlConcept{MLIPAlgorithm}}
+\newcommand{\HyperparameterC}{\dlConcept{Hyperparameter}}
+\newcommand{\ImplementationC}{\dlConcept{Implementation}}
+\newcommand{\SimulationTypeC}{\dlConcept{SimulationType}}
+\newcommand{\TrainingDatasetC}{\dlConcept{TrainingDataset}}
+\newcommand{\DFTCalculationC}{\dlConcept{DFTCalculation}}
+\newcommand{\DFTSettingsC}{\dlConcept{DFTSettings}}
+\newcommand{\MaterialSystemC}{\dlConcept{MaterialSystem}}
+\newcommand{\AtomicConfigurationC}{\dlConcept{AtomicConfiguration}}
+\newcommand{\BenchmarkStudyC}{\dlConcept{BenchmarkStudy}}
+\newcommand{\BenchmarkResultC}{\dlConcept{BenchmarkResult}}
+\newcommand{\AccuracyMetricC}{\dlConcept{AccuracyMetric}}
+\newcommand{\MetricTypeC}{\dlConcept{MetricType}}
+\newcommand{\MetricPropertyC}{\dlConcept{MetricProperty}}
+\newcommand{\LibraryC}{\dlConcept{Library}}
+
+% MLIPs ontology roles (object and datatype properties)
+\newcommand{\hasHyperparameterR}{\dlRole{hasHyperparameter}}
+\newcommand{\hasImplementationR}{\dlRole{hasImplementation}}
+\newcommand{\supportsSimulationR}{\dlRole{supportsSimulation}}
+\newcommand{\cutoffRadiusR}{\dlRole{cutoffRadius}}
+\newcommand{\numLayersR}{\dlRole{numLayers}}
+\newcommand{\learningRateR}{\dlRole{learningRate}}
+\newcommand{\numRadialBasisR}{\dlRole{numRadialBasis}}
+\newcommand{\numAngularBasisR}{\dlRole{numAngularBasis}}
+\newcommand{\hasDFTSettingsR}{\dlRole{hasDFTSettings}}
+\newcommand{\xcFunctionalR}{\dlRole{xcFunctional}}
+\newcommand{\kPointMeshR}{\dlRole{kPointMesh}}
+\newcommand{\energyCutoffR}{\dlRole{energyCutoff}}
+\newcommand{\pseudopotentialTypeR}{\dlRole{pseudopotentialType}}
+\newcommand{\numConfigurationsR}{\dlRole{numConfigurations}}
+\newcommand{\coversPropertyR}{\dlRole{coversProperty}}
+\newcommand{\datasetProvenanceR}{\dlRole{datasetProvenance}}
+\newcommand{\usesAlgorithmR}{\dlRole{usesAlgorithm}}
+\newcommand{\usesTrainingDataR}{\dlRole{usesTrainingData}}
+\newcommand{\targetMaterialR}{\dlRole{targetMaterial}}
+\newcommand{\hasAccuracyMetricR}{\dlRole{hasAccuracyMetric}}
+\newcommand{\metricTypeR}{\dlRole{metricType}}
+\newcommand{\metricValueR}{\dlRole{metricValue}}
+\newcommand{\metricPropertyR}{\dlRole{metricProperty}}
+\newcommand{\reportedInR}{\dlRole{reportedIn}}
 \newcommand{\changed}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
@@ -358,23 +405,20 @@ Additionally, we identified the following design requirements:
 The \MLIPsOntology{} is an OWL\,2~DL ontology organized into three modules
 that address the competency questions identified in
 Section~\ref{sec:requirements}. Figure~\ref{fig:ontology-overview} provides
-an overview.
+an overview. The ontology uses the namespace \texttt{\mlipsns} (prefix
+\mlipsprefix{}); Table~\ref{tab:prefixes} lists the external prefixes used.
+In the following, we omit the \mlipsprefix{} prefix for concepts and
+properties of the \MLIPsOntology{}.
 
 \begin{figure}[t]
 \centering
 \resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-overview.tex}}
 \caption{Overview of the \MLIPsOntology{}: the three modules (Algorithm,
   Training Data, Benchmark) and their core classes and relationships.
-  Blue nodes are \mlipsprefix{} classes; dashed nodes are external
+  Solid nodes are \mlipsprefix{} classes; dashed nodes are external
   superclasses from ML-Schema, PROV-O, and Schema.org.}
 \label{fig:ontology-overview}
 \end{figure}
-
-\subsection{Namespace and Prefixes}
-
-The ontology uses the namespace
-\texttt{\mlipsns} (prefix \mlipsprefix{}).
-The following external prefixes are used:
 
 \begin{table}[t]
 \centering
@@ -384,10 +428,11 @@ The following external prefixes are used:
 \toprule
 Prefix & Namespace \\
 \midrule
+\texttt{mlips:}  & \texttt{\mlipsns} \\
 \texttt{mdo:}    & \texttt{https://w3id.org/mdo/core/} \\
 \texttt{cmso:}   & \texttt{https://purls.helmholtz-metadaten.de/cmso/} \\
 \texttt{asmo:}   & \texttt{https://purls.helmholtz-metadaten.de/asmo/} \\
-\texttt{mlschema:} & \texttt{http://www.w3.org/ns/mls\#} \\
+\texttt{mls:}    & \texttt{http://www.w3.org/ns/mls\#} \\
 \texttt{prov:}   & \texttt{http://www.w3.org/ns/prov\#} \\
 \texttt{qudt:}   & \texttt{http://qudt.org/schema/qudt/} \\
 \texttt{schema:} & \texttt{https://schema.org/} \\
@@ -405,35 +450,35 @@ spaces, addressing CQ1, CQ2, and CQ8.
 \paragraph{Core classes.}
 
 \begin{itemize}
-\item \texttt{mlips:MLIPAlgorithm} --- An MLIP algorithm family (e.g., MACE,
-  ACE, HDNNP). Subclass of \texttt{mlschema:Algorithm}.
-\item \texttt{mlips:Hyperparameter} --- A hyperparameter of an MLIP algorithm,
+\item $\MLIPAlgorithmC$ --- An MLIP algorithm family (e.g., MACE,
+  ACE, HDNNP). Subclass of \texttt{mls:Algorithm}.
+\item $\HyperparameterC$ --- A hyperparameter of an MLIP algorithm,
   with its name, data type, range, and default value. Subclass of
-  \texttt{mlschema:HyperParameter}.
-\item \texttt{mlips:Implementation} --- A software implementation of an
+  \texttt{mls:HyperParameter}.
+\item $\ImplementationC$ --- A software implementation of an
   algorithm in a specific library and version. Subclass of
-  \texttt{mlschema:Implementation}.
-\item \texttt{mlips:SimulationType} --- A type of atomistic simulation (MD,
+  \texttt{mls:Implementation}.
+\item $\SimulationTypeC$ --- A type of atomistic simulation (MD,
   Monte Carlo, geometry optimization, phonon, thermodynamic integration).
 \end{itemize}
 
 \paragraph{Core properties.}
 
 \begin{itemize}
-\item \texttt{mlips:hasHyperparameter} links an algorithm to its hyperparameters.
-\item \texttt{mlips:hasImplementation} links an algorithm to its software
+\item $\hasHyperparameterR$ links an algorithm to its hyperparameters.
+\item $\hasImplementationR$ links an algorithm to its software
   implementations.
-\item \texttt{mlips:cutoffRadius}, \texttt{mlips:numLayers},
-  \texttt{mlips:learningRate}, \texttt{mlips:numRadialBasis},
-  \texttt{mlips:numAngularBasis} --- domain-specific hyperparameter properties,
+\item $\cutoffRadiusR$, $\numLayersR$,
+  $\learningRateR$, $\numRadialBasisR$,
+  $\numAngularBasisR$ --- domain-specific hyperparameter properties,
   with units annotated via QUDT~\cite{hodgson2014qudt}.
-\item \texttt{mlips:supportsSimulation} links an algorithm to the simulation
+\item $\supportsSimulationR$ links an algorithm to the simulation
   types it supports.
 \end{itemize}
 
-\paragraph{Alignment.} \texttt{mlips:MLIPAlgorithm} is a subclass of
-\texttt{mlschema:Algorithm}, inheriting ML-Schema's general algorithm
-description framework. Hyperparameters extend \texttt{mlschema:HyperParameter}
+\paragraph{Alignment.} $\MLIPAlgorithmC$ is a subclass of
+\texttt{mls:Algorithm}, inheriting ML-Schema's general algorithm
+description framework. $\HyperparameterC$ extends \texttt{mls:HyperParameter}
 with physics-specific properties and units.
 
 \begin{figure}[t]
@@ -455,17 +500,17 @@ addressing CQ3, CQ4, and CQ5.
 \paragraph{Core classes.}
 
 \begin{itemize}
-\item \texttt{mlips:TrainingDataset} --- A dataset of atomic configurations
-  used for MLIP training. Subclass of \texttt{mlschema:Dataset} and
+\item $\TrainingDatasetC$ --- A dataset of atomic configurations
+  used for MLIP training. Subclass of \texttt{mls:Dataset} and
   \texttt{prov:Entity}.
-\item \texttt{mlips:DFTCalculation} --- A density functional theory calculation
+\item $\DFTCalculationC$ --- A density functional theory calculation
   that produced reference data. Aligned with \texttt{mdo:Calculation}.
-\item \texttt{mlips:DFTSettings} --- Settings of a DFT calculation: exchange-correlation
+\item $\DFTSettingsC$ --- Settings of a DFT calculation: exchange-correlation
   functional, k-point mesh, energy cutoff, pseudopotential type.
-\item \texttt{mlips:MaterialSystem} --- A material system (element, alloy,
+\item $\MaterialSystemC$ --- A material system (element, alloy,
   compound) studied in the dataset. Linked to
   \texttt{cmso:CrystallineMaterial} where applicable.
-\item \texttt{mlips:AtomicConfiguration} --- A single atomic configuration
+\item $\AtomicConfigurationC$ --- A single atomic configuration
   (positions, cell, properties) in the dataset. Aligned with
   \texttt{cmso:AtomicStructure}.
 \end{itemize}
@@ -473,21 +518,21 @@ addressing CQ3, CQ4, and CQ5.
 \paragraph{Core properties.}
 
 \begin{itemize}
-\item \texttt{mlips:hasDFTSettings} links a calculation to its DFT settings.
-\item \texttt{mlips:xcFunctional} (e.g., PBE, LDA, SCAN),
-  \texttt{mlips:kPointMesh}, \texttt{mlips:energyCutoff},
-  \texttt{mlips:pseudopotentialType} describe DFT parameters.
-\item \texttt{mlips:numConfigurations} records the number of atomic
+\item $\hasDFTSettingsR$ links a calculation to its DFT settings.
+\item $\xcFunctionalR$ (e.g., PBE, LDA, SCAN),
+  $\kPointMeshR$, $\energyCutoffR$,
+  $\pseudopotentialTypeR$ describe DFT parameters.
+\item $\numConfigurationsR$ records the number of atomic
   configurations in a dataset.
-\item \texttt{mlips:coversProperty} indicates which properties (energy, forces,
+\item $\coversPropertyR$ indicates which properties (energy, forces,
   stresses, virials) are included.
-\item \texttt{mlips:datasetProvenance} with values \texttt{mlips:Published},
-  \texttt{mlips:InHouse}, \texttt{mlips:Augmented} indicates the origin.
+\item $\datasetProvenanceR$ with values $\dlConcept{Published}$,
+  $\dlConcept{InHouse}$, $\dlConcept{Augmented}$ indicates the origin.
 \item \texttt{prov:wasDerivedFrom} links augmented datasets to their sources.
 \end{itemize}
 
 \paragraph{Alignment.} Training datasets are modeled as both
-\texttt{mlschema:Dataset} (for ML workflow compatibility) and
+\texttt{mls:Dataset} (for ML workflow compatibility) and
 \texttt{prov:Entity} (for provenance tracking). DFT calculations align with
 MDO's Calculation module. Material systems connect to CMSO for structural
 descriptions and to Wikidata for chemical element identification.
@@ -511,25 +556,25 @@ data, and accuracy metrics, addressing CQ6 and CQ7.
 \paragraph{Core classes.}
 
 \begin{itemize}
-\item \texttt{mlips:BenchmarkStudy} --- A published study reporting MLIP
+\item $\BenchmarkStudyC$ --- A published study reporting MLIP
   evaluation results. Subclass of \texttt{prov:Activity} and linked to
   \texttt{schema:ScholarlyArticle}.
-\item \texttt{mlips:BenchmarkResult} --- A single evaluation result: an
+\item $\BenchmarkResultC$ --- A single evaluation result: an
   algorithm applied to a material system with specific hyperparameters,
   reporting accuracy metrics.
-\item \texttt{mlips:AccuracyMetric} --- An accuracy measure (RMSE of energy,
+\item $\AccuracyMetricC$ --- An accuracy measure (RMSE of energy,
   MAE of forces, etc.) with value and unit.
 \end{itemize}
 
 \paragraph{Core properties.}
 
 \begin{itemize}
-\item \texttt{mlips:usesAlgorithm}, \texttt{mlips:usesTrainingData},
-  \texttt{mlips:targetMaterial} link a benchmark result to its components.
-\item \texttt{mlips:hasAccuracyMetric} links to reported accuracy values.
-\item \texttt{mlips:metricType} (e.g., RMSE, MAE), \texttt{mlips:metricValue},
-  \texttt{mlips:metricProperty} (energy, force, stress) describe the metric.
-\item \texttt{mlips:reportedIn} links a result to its source publication.
+\item $\usesAlgorithmR$, $\usesTrainingDataR$,
+  $\targetMaterialR$ link a benchmark result to its components.
+\item $\hasAccuracyMetricR$ links to reported accuracy values.
+\item $\metricTypeR$ (e.g., RMSE, MAE), $\metricValueR$,
+  $\metricPropertyR$ (energy, force, stress) describe the metric.
+\item $\reportedInR$ links a result to its source publication.
 \end{itemize}
 
 \paragraph{Alignment.} Benchmark studies are modeled as \texttt{prov:Activity}
@@ -563,13 +608,13 @@ Each node shape corresponds to a core ontology class and specifies:
 
 \begin{itemize}
 \item \emph{Mandatory properties} (via \texttt{sh:minCount}): e.g., an
-  \texttt{mlips:MLIPAlgorithm} must have at least one \texttt{rdfs:label}
-  and one \texttt{mlips:hasHyperparameter}.
-\item \emph{Value types and ranges}: e.g., \texttt{mlips:cutoffRadius} must
+  $\MLIPAlgorithmC$ must have at least one \texttt{rdfs:label}
+  and one $\hasHyperparameterR$.
+\item \emph{Value types and ranges}: e.g., $\cutoffRadiusR$ must
   be \texttt{xsd:double} with \texttt{sh:minExclusive}~$0$.
-\item \emph{Controlled vocabularies}: e.g., \texttt{mlips:xcFunctional}
+\item \emph{Controlled vocabularies}: e.g., $\xcFunctionalR$
   values must come from a defined set (PBE, LDA, SCAN, PBEsol, \ldots).
-\item \emph{Cardinality constraints}: e.g., a \texttt{mlips:BenchmarkResult}
+\item \emph{Cardinality constraints}: e.g., a $\BenchmarkResultC$
   must link to exactly one algorithm and at least one accuracy metric.
 \end{itemize}
 
@@ -789,8 +834,8 @@ OWL Class & ASE Class & Description \\
 
 The \SemASE{} ontology is designed to complement the \MLIPsOntology{}:
 \texttt{semase:AtomicSystem} corresponds to individual atomic configurations
-that populate an \texttt{mlips:TrainingDataset}, and
-\texttt{semase:Calculator} can be linked to an \texttt{mlips:Implementation}.
+that populate a $\TrainingDatasetC$, and
+\texttt{semase:Calculator} can be linked to an $\ImplementationC$.
 
 \subsection{Usage Example}
 
