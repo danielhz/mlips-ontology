@@ -174,7 +174,7 @@ def generate_class_section(g, cls_uri, all_obj_props, all_dt_props):
     lines.append("")
 
     if axioms:
-        refs = ", ".join(f"({t})" for t in axioms)
+        refs = ", ".join(f"\\eqref{{ax:{t[1:]}}}" for t in axioms)
         lines.append(f"\\paragraph{{Related axioms.}} {refs}.")
         lines.append("")
 
@@ -221,7 +221,7 @@ def generate_property_section(g, prop_uri, prop_type="object"):
     lines.append("")
 
     if axioms:
-        refs = ", ".join(f"({t})" for t in axioms)
+        refs = ", ".join(f"\\eqref{{ax:{t[1:]}}}" for t in axioms)
         lines.append(f"\\paragraph{{Related axioms.}} {refs}.")
         lines.append("")
 
