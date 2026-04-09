@@ -8,99 +8,99 @@ illustrating its effect.
 \subsection{Algorithm Module}
 
 \subsubsection{Every algorithm has at least one hyperparameter}
-\begin{align*}
-  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter}
-\end{align*}
+\begin{align}
+  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \axiomtag
+\end{align}
 \emph{Example.} The MACE algorithm declares hyperparameters such as cutoff
 radius and number of layers. An $\MLIPAlgorithmC$ instance without any
 $\hasHyperparameterR$ link would violate this axiom.
 
 \subsubsection{Every algorithm supports at least one simulation type}
-\begin{align*}
-  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType}
-\end{align*}
+\begin{align}
+  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \axiomtag
+\end{align}
 \emph{Example.} MACE supports molecular dynamics and geometry optimization.
 An algorithm that does not declare any supported simulation type is
 incomplete.
 
 \subsubsection{Every implementation specifies its library}
-\begin{align*}
-  \ImplementationC &\sqsub \existsR{implementedIn}{Library}
-\end{align*}
+\begin{align}
+  \ImplementationC &\sqsub \existsR{implementedIn}{Library} \axiomtag
+\end{align}
 \emph{Example.} ``MACE v0.3'' is an implementation in the MACE library.
 An $\ImplementationC$ without an $\implementedInR$ link is invalid.
 
 \subsubsection{Every training run executes exactly one algorithm}
-\begin{align*}
-  \TrainingRunC &\sqsub \exactR{1}{executes}{MLIPAlgorithm}
-\end{align*}
+\begin{align}
+  \TrainingRunC &\sqsub \exactR{1}{executes}{MLIPAlgorithm} \axiomtag
+\end{align}
 \emph{Example.} A training run that produces a MACE model for Ti-Al
 executes the MACE algorithm---not two algorithms simultaneously, and not
 zero.
 
 \subsubsection{Every training run uses exactly one training dataset}
-\begin{align*}
-  \TrainingRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset}
-\end{align*}
+\begin{align}
+  \TrainingRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset} \axiomtag
+\end{align}
 \emph{Example.} The training run uses the Ti-Al DFT dataset with 15{,}000
 configurations. If a run combines multiple datasets, they should be
 represented as a single merged $\TrainingDatasetC$.
 
 \subsubsection{Every training run produces exactly one trained model}
-\begin{align*}
-  \TrainingRunC &\sqsub \exactR{1}{produces}{TrainedModel}
-\end{align*}
+\begin{align}
+  \TrainingRunC &\sqsub \exactR{1}{produces}{TrainedModel} \axiomtag
+\end{align}
 \emph{Example.} The training run produces a single MACE model for Ti-Al.
 If the same run produces checkpoints, only the final model is recorded.
 
 \subsubsection{Every trained model was produced by some training run}
-\begin{align*}
-  \TrainedModelC &\sqsub \existsR{produces^{-}}{TrainingRun}
-\end{align*}
+\begin{align}
+  \TrainedModelC &\sqsub \existsR{produces^{-}}{TrainingRun} \axiomtag
+\end{align}
 \emph{Example.} A $\TrainedModelC$ instance ``MACE-TiAl-v1'' must be
 linked to a $\TrainingRunC$ that produced it. A model cannot exist without
 provenance about how it was trained.
 
 \subsubsection{Every hyperparameter belongs to some algorithm}
-\begin{align*}
-  \HyperparameterC &\sqsub \existsR{hasHyperparameter^{-}}{MLIPAlgorithm}
-\end{align*}
+\begin{align}
+  \HyperparameterC &\sqsub \existsR{hasHyperparameter^{-}}{MLIPAlgorithm} \axiomtag
+\end{align}
 \emph{Example.} The hyperparameter ``cutoff radius'' is defined for the
 MACE algorithm. A $\HyperparameterC$ instance that is not linked to any
 algorithm via $\hasHyperparameterR^{-}$ is an orphan and violates this
 axiom.
 
 \subsubsection{Every implementation belongs to some algorithm}
-\begin{align*}
-  \ImplementationC &\sqsub \existsR{hasImplementation^{-}}{MLIPAlgorithm}
-\end{align*}
+\begin{align}
+  \ImplementationC &\sqsub \existsR{hasImplementation^{-}}{MLIPAlgorithm} \axiomtag
+\end{align}
 \emph{Example.} ``MACE v0.3'' is an implementation of the MACE algorithm.
 An $\ImplementationC$ that is not linked to any $\MLIPAlgorithmC$ via
 $\hasImplementationR^{-}$ is invalid.
 
 \subsubsection{Shortcut: trainedWith is a property chain}
-\begin{align*}
-  \trainedWithR &\equiv \producesR^{-} \circ \executesR
-\end{align*}
+\begin{align}
+  \trainedWithR &\equiv \producesR^{-} \circ \executesR \axiomtag
+\end{align}
 \emph{Example.} If a $\TrainingRunC$ produces model $m$ and executes
 algorithm $a$, then $m$ $\trainedWithR$ $a$ is inferred. This allows
 querying ``which algorithm was used to train this model?'' without
 navigating through the run.
 
 \subsubsection{Shortcut: trainedOn is a property chain}
-\begin{align*}
-  \trainedOnR &\equiv \producesR^{-} \circ \runsOnR
-\end{align*}
+\begin{align}
+  \trainedOnR &\equiv \producesR^{-} \circ \runsOnR \axiomtag
+\end{align}
 \emph{Example.} If a $\TrainingRunC$ produces model $m$ and runs on
 dataset $d$, then $m$ $\trainedOnR$ $d$ is inferred. This allows
 querying ``which dataset was used to train this model?'' directly.
 
 \subsubsection{Domain axioms for algorithm-specific roles}
-\begin{align*}
-  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \\
-  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \\
-  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC
-\end{align*}
+\begin{align}
+  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \axiomtag \\
+  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \axiomtag \\
+  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC \axiomtag
+\end{align}
 \emph{Example.} If an entity has a $\hasHyperparameterR$ link, it must be
 an $\MLIPAlgorithmC$. This prevents, e.g., a $\TrainingDatasetC$ from
 accidentally being assigned hyperparameters.
@@ -108,38 +108,38 @@ accidentally being assigned hyperparameters.
 \subsection{Training Data Module}
 
 \subsubsection{Every dataset covers at least one material system}
-\begin{align*}
-  \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem}
-\end{align*}
+\begin{align}
+  \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem} \axiomtag
+\end{align}
 \emph{Example.} A Ti-Al training dataset covers the Ti-Al material system.
 A dataset without any $\coversMaterialR$ link is incomplete.
 
 \subsubsection{Every dataset covers at least one physical property}
-\begin{align*}
-  \TrainingDatasetC &\sqsub \existsR{coversProperty}{CoveredProperty}
-\end{align*}
+\begin{align}
+  \TrainingDatasetC &\sqsub \existsR{coversProperty}{CoveredProperty} \axiomtag
+\end{align}
 \emph{Example.} The Ti-Al dataset covers energies, forces, and stresses.
 A dataset must declare at least one covered property.
 
 \subsubsection{Every dataset has a provenance classification}
-\begin{align*}
-  \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{DatasetProvenance}
-\end{align*}
+\begin{align}
+  \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{DatasetProvenance} \axiomtag
+\end{align}
 \emph{Example.} The Ti-Al dataset is classified as $\dlConcept{Published}$.
 Every dataset must indicate whether it is published, in-house, or
 augmented.
 
 \subsubsection{Every dataset contains at least one atomic configuration}
-\begin{align*}
-  \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration}
-\end{align*}
+\begin{align}
+  \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration} \axiomtag
+\end{align}
 \emph{Example.} The Ti-Al dataset contains 15{,}000 atomic configurations.
 A dataset without any configurations is empty and invalid.
 
 \subsubsection{Every DFT calculation has settings}
-\begin{align*}
-  \DFTCalculationC &\sqsub \existsR{hasDFTSettings}{DFTSettings}
-\end{align*}
+\begin{align}
+  \DFTCalculationC &\sqsub \existsR{hasDFTSettings}{DFTSettings} \axiomtag
+\end{align}
 \emph{Example.} A DFT calculation specifies PBE as the
 exchange-correlation functional, a 4$\times$4$\times$4 k-point mesh, and
 PAW pseudopotentials. A $\DFTCalculationC$ without $\hasDFTSettingsR$ is
@@ -148,61 +148,61 @@ incomplete.
 \subsection{Benchmark Module}
 
 \subsubsection{Every study contains at least one result}
-\begin{align*}
-  \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult}
-\end{align*}
+\begin{align}
+  \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \axiomtag
+\end{align}
 \emph{Example.} A study by Smith et al.\ (2025) reports evaluation results
 for MACE on Ti-Al. A $\BenchmarkStudyC$ without any $\hasResultR$ link
 contains no data and is invalid.
 
 \subsubsection{Every result evaluates exactly one trained model}
-\begin{align*}
-  \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel}
-\end{align*}
+\begin{align}
+  \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel} \axiomtag
+\end{align}
 \emph{Example.} A benchmark result evaluates the ``MACE-TiAl-v1'' model.
 Each result is tied to exactly one model; comparing two models requires two
 separate $\BenchmarkResultC$ instances.
 
 \subsubsection{Every result targets at least one material system}
-\begin{align*}
-  \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem}
-\end{align*}
+\begin{align}
+  \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \axiomtag
+\end{align}
 \emph{Example.} The benchmark result targets the Ti-Al material system for
 testing. A result must specify what material was used for evaluation.
 
 \subsubsection{Every result reports at least one accuracy metric}
-\begin{align*}
-  \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric}
-\end{align*}
+\begin{align}
+  \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric} \axiomtag
+\end{align}
 \emph{Example.} The result reports RMSE of energy (1.2~meV/atom). A
 benchmark result without any accuracy metric carries no evaluation data.
 
 \subsubsection{Every accuracy metric has exactly one type}
-\begin{align*}
-  \AccuracyMetricC &\sqsub \exactR{1}{metricType}{MetricType}
-\end{align*}
+\begin{align}
+  \AccuracyMetricC &\sqsub \exactR{1}{metricType}{MetricType} \axiomtag
+\end{align}
 \emph{Example.} The metric is of type RMSE. A metric cannot be both RMSE
 and MAE simultaneously, nor can it lack a type.
 
 \subsubsection{Every accuracy metric measures exactly one property}
-\begin{align*}
-  \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty}
-\end{align*}
+\begin{align}
+  \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty} \axiomtag
+\end{align}
 \emph{Example.} The RMSE metric measures energy. A single
 $\AccuracyMetricC$ instance measures one property; separate metrics are
 created for energy, force, and stress.
 
 \subsubsection{Every result belongs to some study}
-\begin{align*}
-  \BenchmarkResultC &\sqsub \existsR{hasResult^{-}}{BenchmarkStudy}
-\end{align*}
+\begin{align}
+  \BenchmarkResultC &\sqsub \existsR{hasResult^{-}}{BenchmarkStudy} \axiomtag
+\end{align}
 \emph{Example.} The benchmark result for MACE on Ti-Al belongs to the
 Smith et al.\ (2025) study. A result cannot exist without a parent study.
 
 \subsubsection{Every accuracy metric belongs to some result}
-\begin{align*}
-  \AccuracyMetricC &\sqsub \existsR{hasAccuracyMetric^{-}}{BenchmarkResult}
-\end{align*}
+\begin{align}
+  \AccuracyMetricC &\sqsub \existsR{hasAccuracyMetric^{-}}{BenchmarkResult} \axiomtag
+\end{align}
 \emph{Example.} The RMSE of energy metric belongs to a specific benchmark
 result. An orphan metric with no parent result is invalid.
 
