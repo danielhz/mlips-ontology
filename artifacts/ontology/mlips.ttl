@@ -1,624 +1,643 @@
-@prefix mlips:    <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
-@prefix dcterms:  <http://purl.org/dc/terms/> .
-@prefix vann:     <http://purl.org/vocab/vann/> .
-@prefix prov:     <http://www.w3.org/ns/prov#> .
-@prefix schema:   <https://schema.org/> .
-@prefix qudt:     <http://qudt.org/schema/qudt/> .
-@prefix unit:     <http://qudt.org/vocab/unit/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
 @prefix mlschema: <http://www.w3.org/ns/mls#> .
-@prefix mdo:      <https://w3id.org/mdo/core/> .
-@prefix cmso:     <https://purls.helmholtz-metadaten.de/cmso/> .
-@prefix asmo:     <https://purls.helmholtz-metadaten.de/asmo/> .
-@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# =============================================================================
-# Ontology metadata
-# =============================================================================
+mlips:AccuracyMetric
+    a owl:Class ;
+    rdfs:comment """An accuracy measure reported in a benchmark
+(e.g., RMSE of energy, MAE of forces)."""@en ;
+    rdfs:label "Accuracy Metric"@en ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onClass mlips:MetricType ;
+        owl:onProperty mlips:metricType ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onClass mlips:MetricProperty ;
+        owl:onProperty mlips:metricProperty ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onProperty [
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:hasAccuracyMetric
+        ] ;
+        owl:someValuesFrom mlips:BenchmarkResult
+    ] .
 
-<https://kg.ki.uni-stuttgart.de/_ontology/mlips> a owl:Ontology ;
-    dcterms:title "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials"@en ;
-    dcterms:description """An OWL ontology capturing the concepts needed to describe
-machine learning interatomic potentials: algorithm families, hyperparameters,
-training datasets with DFT provenance, and published benchmarks."""@en ;
-    dcterms:creator <https://orcid.org/0000-0003-2160-4696> ;
-    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-    dcterms:created "2026"^^xsd:gYear ;
-    vann:preferredNamespacePrefix "mlips" ;
-    vann:preferredNamespaceUri "https://kg.ki.uni-stuttgart.de/_ontology/mlips#" ;
-    owl:versionInfo "0.1.0" .
-
-# =============================================================================
-# Algorithm Module
-# =============================================================================
-
-# --- Classes -----------------------------------------------------------------
-
-mlips:MLIPAlgorithm a owl:Class ;
-    rdfs:subClassOf mlschema:Algorithm ;
-    rdfs:label "MLIP Algorithm"@en ;
-    rdfs:comment """A machine learning interatomic potential algorithm family
-(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP)."""@en .
-
-mlips:Hyperparameter a owl:Class ;
-    rdfs:subClassOf mlschema:HyperParameter ;
-    rdfs:label "Hyperparameter"@en ;
-    rdfs:comment """A hyperparameter of an MLIP algorithm, with its name,
-data type, range, and default value."""@en .
-
-mlips:HyperparameterSetting a owl:Class ;
-    rdfs:label "Hyperparameter Setting"@en ;
-    rdfs:comment """A concrete value assigned to a hyperparameter in a
-specific training run or configuration."""@en .
-
-mlips:Implementation a owl:Class ;
-    rdfs:subClassOf mlschema:Implementation ;
-    rdfs:label "Implementation"@en ;
-    rdfs:comment """A software implementation of an MLIP algorithm in a
-specific library and version."""@en .
-
-mlips:SimulationType a owl:Class ;
-    rdfs:label "Simulation Type"@en ;
-    rdfs:comment """A type of atomistic simulation: molecular dynamics,
-Monte Carlo, geometry optimization, phonon calculations,
-thermodynamic integration, etc."""@en .
-
-mlips:Library a owl:Class ;
-    rdfs:label "Library"@en ;
-    rdfs:comment """A software library or tool used in MLIP research
-(e.g., ASE, LAMMPS, VASP, GPAW)."""@en .
-
-mlips:TrainingRun a owl:Class ;
-    rdfs:subClassOf mlschema:Run, prov:Activity ;
-    rdfs:label "Training Run"@en ;
-    rdfs:comment """A concrete training execution: it executes an algorithm
-on a training dataset and produces a trained model."""@en .
-
-mlips:TrainedModel a owl:Class ;
-    rdfs:subClassOf mlschema:Model ;
-    rdfs:label "Trained Model"@en ;
-    rdfs:comment """The concrete artifact produced by training an algorithm
-on a specific dataset with specific hyperparameter settings---the learned
-parameters (weights) that can be used for prediction."""@en .
-
-# --- Existential and cardinality axioms (Algorithm Module) -------------------
-
-mlips:MLIPAlgorithm rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:hasHyperparameter ;
-    owl:someValuesFrom mlips:Hyperparameter
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:supportsSimulation ;
-    owl:someValuesFrom mlips:SimulationType
-] .
-
-mlips:Implementation rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:implementedIn ;
-    owl:someValuesFrom mlips:Library
-] .
-
-mlips:TrainedModel rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty [ owl:inverseOf mlips:produces ] ;
-    owl:someValuesFrom mlips:TrainingRun
-] .
-
-mlips:Hyperparameter rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty [ owl:inverseOf mlips:hasHyperparameter ] ;
-    owl:someValuesFrom mlips:MLIPAlgorithm
-] .
-
-mlips:Implementation rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty [ owl:inverseOf mlips:hasImplementation ] ;
-    owl:someValuesFrom mlips:MLIPAlgorithm
-] .
-
-mlips:TrainingRun rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:executes ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:MLIPAlgorithm
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:runsOn ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:TrainingDataset
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:produces ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:TrainedModel
-] .
-
-# --- Object properties -------------------------------------------------------
-
-mlips:hasHyperparameter a owl:ObjectProperty ;
-    rdfs:domain mlips:MLIPAlgorithm ;
-    rdfs:range mlips:Hyperparameter ;
-    rdfs:label "has hyperparameter"@en ;
-    rdfs:comment "Links an algorithm to a hyperparameter it accepts."@en .
-
-mlips:hasImplementation a owl:ObjectProperty ;
-    rdfs:domain mlips:MLIPAlgorithm ;
-    rdfs:range mlips:Implementation ;
-    rdfs:label "has implementation"@en ;
-    rdfs:comment "Links an algorithm to a software implementation."@en .
-
-mlips:implementedIn a owl:ObjectProperty ;
-    rdfs:domain mlips:Implementation ;
-    rdfs:range mlips:Library ;
-    rdfs:label "implemented in"@en ;
-    rdfs:comment "Links an implementation to the library that provides it."@en .
-
-mlips:supportsSimulation a owl:ObjectProperty ;
-    rdfs:domain mlips:MLIPAlgorithm ;
-    rdfs:range mlips:SimulationType ;
-    rdfs:label "supports simulation"@en ;
-    rdfs:comment "Links an algorithm to the simulation types it supports."@en .
-
-mlips:forHyperparameter a owl:ObjectProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range mlips:Hyperparameter ;
-    rdfs:label "for hyperparameter"@en ;
-    rdfs:comment "Links a setting to the hyperparameter it configures."@en .
-
-mlips:executes a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingRun ;
-    rdfs:range mlips:MLIPAlgorithm ;
-    rdfs:label "executes"@en ;
-    rdfs:comment "Links a training run to the algorithm it executes."@en .
-
-mlips:produces a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingRun ;
-    rdfs:range mlips:TrainedModel ;
-    rdfs:label "produces"@en ;
-    rdfs:comment "Links a training run to the trained model it produces."@en .
-
-mlips:trainedWith a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainedModel ;
-    rdfs:range mlips:MLIPAlgorithm ;
-    rdfs:label "trained with"@en ;
-    rdfs:comment "Shortcut: links a trained model directly to its algorithm."@en ;
-    owl:propertyChainAxiom ( [ owl:inverseOf mlips:produces ] mlips:executes ) .
-
-mlips:trainedOn a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainedModel ;
-    rdfs:range mlips:TrainingDataset ;
-    rdfs:label "trained on"@en ;
-    rdfs:comment "Shortcut: links a trained model directly to its training dataset."@en ;
-    owl:propertyChainAxiom ( [ owl:inverseOf mlips:produces ] mlips:runsOn ) .
-
-mlips:runsOn a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingRun ;
-    rdfs:range mlips:TrainingDataset ;
-    rdfs:label "runs on"@en ;
-    rdfs:comment "Links a training run to the training dataset it uses."@en .
-
-mlips:evaluatesModel a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:TrainedModel ;
-    rdfs:label "evaluates model"@en ;
-    rdfs:comment "Links a benchmark result to the trained model being evaluated."@en .
-
-# --- Datatype properties (Algorithm module) -----------------------------------
-
-mlips:cutoffRadius a owl:DatatypeProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range xsd:double ;
-    rdfs:label "cutoff radius"@en ;
-    rdfs:comment "Cutoff radius for atomic interactions, in angstroms."@en .
-
-mlips:numLayers a owl:DatatypeProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range xsd:integer ;
-    rdfs:label "number of layers"@en ;
-    rdfs:comment "Number of layers in the neural network architecture."@en .
-
-mlips:learningRate a owl:DatatypeProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range xsd:double ;
-    rdfs:label "learning rate"@en ;
-    rdfs:comment "Learning rate used during model training."@en .
-
-mlips:numRadialBasis a owl:DatatypeProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range xsd:integer ;
-    rdfs:label "number of radial basis functions"@en ;
-    rdfs:comment "Number of radial basis functions in the descriptor."@en .
-
-mlips:numAngularBasis a owl:DatatypeProperty ;
-    rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range xsd:integer ;
-    rdfs:label "number of angular basis functions"@en ;
-    rdfs:comment "Number of angular basis functions in the descriptor."@en .
-
-mlips:hyperparameterName a owl:DatatypeProperty ;
-    rdfs:domain mlips:Hyperparameter ;
-    rdfs:range xsd:string ;
-    rdfs:label "hyperparameter name"@en .
-
-mlips:hyperparameterDatatype a owl:DatatypeProperty ;
-    rdfs:domain mlips:Hyperparameter ;
-    rdfs:range xsd:string ;
-    rdfs:label "hyperparameter datatype"@en ;
-    rdfs:comment "The expected datatype of this hyperparameter (e.g., float, int, string)."@en .
-
-mlips:defaultValue a owl:DatatypeProperty ;
-    rdfs:domain mlips:Hyperparameter ;
-    rdfs:range rdfs:Literal ;
-    rdfs:label "default value"@en .
-
-mlips:minValue a owl:DatatypeProperty ;
-    rdfs:domain mlips:Hyperparameter ;
-    rdfs:range rdfs:Literal ;
-    rdfs:label "minimum value"@en .
-
-mlips:maxValue a owl:DatatypeProperty ;
-    rdfs:domain mlips:Hyperparameter ;
-    rdfs:range rdfs:Literal ;
-    rdfs:label "maximum value"@en .
-
-mlips:version a owl:DatatypeProperty ;
-    rdfs:domain mlips:Implementation ;
-    rdfs:range xsd:string ;
-    rdfs:label "version"@en .
-
-# =============================================================================
-# Training Data Module
-# =============================================================================
-
-# --- Classes -----------------------------------------------------------------
-
-mlips:TrainingDataset a owl:Class ;
-    rdfs:subClassOf mlschema:Dataset, prov:Entity ;
-    rdfs:label "Training Dataset"@en ;
-    rdfs:comment """A dataset of atomic configurations used for MLIP
-training, with provenance, size, property coverage, and DFT settings."""@en .
-
-mlips:DFTCalculation a owl:Class ;
-    rdfs:label "DFT Calculation"@en ;
-    rdfs:comment """A density functional theory calculation that produced
-reference data for training."""@en .
-
-mlips:DFTSettings a owl:Class ;
-    rdfs:label "DFT Settings"@en ;
-    rdfs:comment """Settings of a DFT calculation: exchange-correlation
-functional, k-point mesh, energy cutoff, pseudopotential type."""@en .
-
-mlips:MaterialSystem a owl:Class ;
-    rdfs:label "Material System"@en ;
-    rdfs:comment """A material system studied in a dataset: element, alloy,
-compound, or complex microstructure."""@en .
-
-mlips:AtomicConfiguration a owl:Class ;
-    rdfs:label "Atomic Configuration"@en ;
+mlips:AtomicConfiguration
+    a owl:Class ;
     rdfs:comment """A single atomic configuration (positions, cell,
-properties) in a training dataset."""@en .
+properties) in a training dataset."""@en ;
+    rdfs:label "Atomic Configuration"@en .
 
-mlips:DatasetProvenance a owl:Class ;
-    rdfs:label "Dataset Provenance"@en ;
-    rdfs:comment "The provenance type of a training dataset."@en .
+mlips:Augmented
+    a owl:NamedIndividual, mlips:DatasetProvenance ;
+    rdfs:comment "Dataset augmented from existing sources."@en ;
+    rdfs:label "Augmented"@en .
 
-mlips:CoveredProperty a owl:Class ;
-    rdfs:label "Covered Property"@en ;
+mlips:BenchmarkResult
+    a owl:Class ;
+    rdfs:comment """A single evaluation result: an algorithm applied to a
+material system with specific hyperparameters, reporting accuracy metrics."""@en ;
+    rdfs:label "Benchmark Result"@en ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onClass mlips:TrainedModel ;
+        owl:onProperty mlips:evaluatesModel ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:targetMaterial ;
+        owl:someValuesFrom mlips:MaterialSystem
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasAccuracyMetric ;
+        owl:someValuesFrom mlips:AccuracyMetric
+    ], [
+        a owl:Restriction ;
+        owl:onProperty [
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:hasResult
+        ] ;
+        owl:someValuesFrom mlips:BenchmarkStudy
+    ] .
+
+mlips:BenchmarkStudy
+    a owl:Class ;
+    rdfs:comment "A published study reporting MLIP evaluation results."@en ;
+    rdfs:label "Benchmark Study"@en ;
+    rdfs:subClassOf prov:Activity, [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasResult ;
+        owl:someValuesFrom mlips:BenchmarkResult
+    ] .
+
+mlips:CoveredProperty
+    a owl:Class ;
     rdfs:comment """A physical property covered by the training dataset
-(energy, forces, stresses, virials)."""@en .
+(energy, forces, stresses, virials)."""@en ;
+    rdfs:label "Covered Property"@en .
 
-# --- Individuals (provenance types) ------------------------------------------
+mlips:DFTCalculation
+    a owl:Class ;
+    rdfs:comment """A density functional theory calculation that produced
+reference data for training."""@en ;
+    rdfs:label "DFT Calculation"@en ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasDFTSettings ;
+        owl:someValuesFrom mlips:DFTSettings
+    ] .
 
-mlips:Published a mlips:DatasetProvenance ;
-    rdfs:label "Published"@en ;
-    rdfs:comment "Dataset from a published source."@en .
+mlips:DFTSettings
+    a owl:Class ;
+    rdfs:comment """Settings of a DFT calculation: exchange-correlation
+functional, k-point mesh, energy cutoff, pseudopotential type."""@en ;
+    rdfs:label "DFT Settings"@en .
 
-mlips:InHouse a mlips:DatasetProvenance ;
-    rdfs:label "In-house"@en ;
-    rdfs:comment "Dataset generated by in-house calculations."@en .
+mlips:DatasetProvenance
+    a owl:Class ;
+    rdfs:comment "The provenance type of a training dataset."@en ;
+    rdfs:label "Dataset Provenance"@en .
 
-mlips:Augmented a mlips:DatasetProvenance ;
-    rdfs:label "Augmented"@en ;
-    rdfs:comment "Dataset augmented from existing sources."@en .
-
-# --- Individuals (covered properties) ----------------------------------------
-
-mlips:Energy a mlips:CoveredProperty ;
+mlips:Energy
+    a owl:NamedIndividual, mlips:CoveredProperty ;
     rdfs:label "Energy"@en .
 
-mlips:Forces a mlips:CoveredProperty ;
-    rdfs:label "Forces"@en .
-
-mlips:Stresses a mlips:CoveredProperty ;
-    rdfs:label "Stresses"@en .
-
-mlips:Virials a mlips:CoveredProperty ;
-    rdfs:label "Virials"@en .
-
-# --- Existential axioms (Training Data Module) -------------------------------
-
-mlips:TrainingDataset rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:coversMaterial ;
-    owl:someValuesFrom mlips:MaterialSystem
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:coversProperty ;
-    owl:someValuesFrom mlips:CoveredProperty
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:datasetProvenance ;
-    owl:someValuesFrom mlips:DatasetProvenance
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:hasConfiguration ;
-    owl:someValuesFrom mlips:AtomicConfiguration
-] .
-
-mlips:DFTCalculation rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:hasDFTSettings ;
-    owl:someValuesFrom mlips:DFTSettings
-] .
-
-# --- Object properties -------------------------------------------------------
-
-mlips:hasDFTCalculation a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range mlips:DFTCalculation ;
-    rdfs:label "has DFT calculation"@en .
-
-mlips:hasDFTSettings a owl:ObjectProperty ;
-    rdfs:domain mlips:DFTCalculation ;
-    rdfs:range mlips:DFTSettings ;
-    rdfs:label "has DFT settings"@en .
-
-mlips:coversMaterial a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range mlips:MaterialSystem ;
-    rdfs:label "covers material"@en .
-
-mlips:hasConfiguration a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range mlips:AtomicConfiguration ;
-    rdfs:label "has configuration"@en .
-
-mlips:datasetProvenance a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range mlips:DatasetProvenance ;
-    rdfs:label "dataset provenance"@en .
-
-mlips:coversProperty a owl:ObjectProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range mlips:CoveredProperty ;
-    rdfs:label "covers property"@en .
-
-mlips:usedDFTCode a owl:ObjectProperty ;
-    rdfs:domain mlips:DFTSettings ;
-    rdfs:range mlips:Library ;
-    rdfs:label "used DFT code"@en ;
-    rdfs:comment "The DFT software used (e.g., VASP, GPAW)."@en .
-
-# --- Datatype properties (Training Data module) ------------------------------
-
-mlips:numConfigurations a owl:DatatypeProperty ;
-    rdfs:domain mlips:TrainingDataset ;
-    rdfs:range xsd:integer ;
-    rdfs:label "number of configurations"@en .
-
-mlips:xcFunctional a owl:DatatypeProperty ;
-    rdfs:domain mlips:DFTSettings ;
-    rdfs:range xsd:string ;
-    rdfs:label "exchange-correlation functional"@en ;
-    rdfs:comment "E.g., PBE, LDA, SCAN, PBEsol."@en .
-
-mlips:kPointMesh a owl:DatatypeProperty ;
-    rdfs:domain mlips:DFTSettings ;
-    rdfs:range xsd:string ;
-    rdfs:label "k-point mesh"@en ;
-    rdfs:comment "K-point mesh specification (e.g., '4x4x4')."@en .
-
-mlips:energyCutoff a owl:DatatypeProperty ;
-    rdfs:domain mlips:DFTSettings ;
-    rdfs:range xsd:double ;
-    rdfs:label "energy cutoff"@en ;
-    rdfs:comment "Plane-wave energy cutoff in eV."@en .
-
-mlips:pseudopotentialType a owl:DatatypeProperty ;
-    rdfs:domain mlips:DFTSettings ;
-    rdfs:range xsd:string ;
-    rdfs:label "pseudopotential type"@en ;
-    rdfs:comment "E.g., PAW, ultrasoft, norm-conserving."@en .
-
-mlips:chemicalFormula a owl:DatatypeProperty ;
-    rdfs:domain mlips:MaterialSystem ;
-    rdfs:range xsd:string ;
-    rdfs:label "chemical formula"@en .
-
-mlips:materialClass a owl:DatatypeProperty ;
-    rdfs:domain mlips:MaterialSystem ;
-    rdfs:range xsd:string ;
-    rdfs:label "material class"@en ;
-    rdfs:comment "E.g., element, binary alloy, ternary compound, HEA."@en .
-
-mlips:microstructuralFeature a owl:DatatypeProperty ;
-    rdfs:domain mlips:MaterialSystem ;
-    rdfs:range xsd:string ;
-    rdfs:label "microstructural feature"@en ;
-    rdfs:comment "E.g., point defect, dislocation, surface, grain boundary."@en .
-
-# =============================================================================
-# Benchmark Module
-# =============================================================================
-
-# --- Classes -----------------------------------------------------------------
-
-mlips:BenchmarkStudy a owl:Class ;
-    rdfs:subClassOf prov:Activity ;
-    rdfs:label "Benchmark Study"@en ;
-    rdfs:comment """A published study reporting MLIP evaluation results."""@en .
-
-mlips:BenchmarkResult a owl:Class ;
-    rdfs:label "Benchmark Result"@en ;
-    rdfs:comment """A single evaluation result: an algorithm applied to a
-material system with specific hyperparameters, reporting accuracy metrics."""@en .
-
-mlips:AccuracyMetric a owl:Class ;
-    rdfs:label "Accuracy Metric"@en ;
-    rdfs:comment """An accuracy measure reported in a benchmark
-(e.g., RMSE of energy, MAE of forces)."""@en .
-
-mlips:MetricType a owl:Class ;
-    rdfs:label "Metric Type"@en ;
-    rdfs:comment "Type of accuracy metric (RMSE, MAE, R², etc.)."@en .
-
-mlips:MetricProperty a owl:Class ;
-    rdfs:label "Metric Property"@en ;
-    rdfs:comment "The physical property being measured (energy, force, stress)."@en .
-
-# --- Individuals (metric types) ----------------------------------------------
-
-mlips:RMSE a mlips:MetricType ;
-    rdfs:label "RMSE"@en ;
-    rdfs:comment "Root Mean Square Error."@en .
-
-mlips:MAE a mlips:MetricType ;
-    rdfs:label "MAE"@en ;
-    rdfs:comment "Mean Absolute Error."@en .
-
-mlips:R2 a mlips:MetricType ;
-    rdfs:label "R²"@en ;
-    rdfs:comment "Coefficient of determination."@en .
-
-# --- Individuals (metric properties) -----------------------------------------
-
-mlips:EnergyProperty a mlips:MetricProperty ;
+mlips:EnergyProperty
+    a owl:NamedIndividual, mlips:MetricProperty ;
     rdfs:label "Energy (metric property)"@en .
 
-mlips:ForceProperty a mlips:MetricProperty ;
+mlips:ForceProperty
+    a owl:NamedIndividual, mlips:MetricProperty ;
     rdfs:label "Force"@en .
 
-mlips:StressProperty a mlips:MetricProperty ;
+mlips:Forces
+    a owl:NamedIndividual, mlips:CoveredProperty ;
+    rdfs:label "Forces"@en .
+
+mlips:Hyperparameter
+    a owl:Class ;
+    rdfs:comment """A hyperparameter of an MLIP algorithm, with its name,
+data type, range, and default value."""@en ;
+    rdfs:label "Hyperparameter"@en ;
+    rdfs:subClassOf mlschema:HyperParameter, [
+        a owl:Restriction ;
+        owl:onProperty [
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:hasHyperparameter
+        ] ;
+        owl:someValuesFrom mlips:MLIPAlgorithm
+    ] .
+
+mlips:HyperparameterSetting
+    a owl:Class ;
+    rdfs:comment """A concrete value assigned to a hyperparameter in a
+specific training run or configuration."""@en ;
+    rdfs:label "Hyperparameter Setting"@en .
+
+mlips:Implementation
+    a owl:Class ;
+    rdfs:comment """A software implementation of an MLIP algorithm in a
+specific library and version."""@en ;
+    rdfs:label "Implementation"@en ;
+    rdfs:subClassOf mlschema:Implementation, [
+        a owl:Restriction ;
+        owl:onProperty mlips:implementedIn ;
+        owl:someValuesFrom mlips:Library
+    ], [
+        a owl:Restriction ;
+        owl:onProperty [
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:hasImplementation
+        ] ;
+        owl:someValuesFrom mlips:MLIPAlgorithm
+    ] .
+
+mlips:InHouse
+    a owl:NamedIndividual, mlips:DatasetProvenance ;
+    rdfs:comment "Dataset generated by in-house calculations."@en ;
+    rdfs:label "In-house"@en .
+
+mlips:Library
+    a owl:Class ;
+    rdfs:comment """A software library or tool used in MLIP research
+(e.g., ASE, LAMMPS, VASP, GPAW)."""@en ;
+    rdfs:label "Library"@en .
+
+mlips:MAE
+    a owl:NamedIndividual, mlips:MetricType ;
+    rdfs:comment "Mean Absolute Error."@en ;
+    rdfs:label "MAE"@en .
+
+mlips:MLIPAlgorithm
+    a owl:Class ;
+    rdfs:comment """A machine learning interatomic potential algorithm family
+(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP)."""@en ;
+    rdfs:label "MLIP Algorithm"@en ;
+    rdfs:subClassOf mlschema:Algorithm, [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasHyperparameter ;
+        owl:someValuesFrom mlips:Hyperparameter
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:supportsSimulation ;
+        owl:someValuesFrom mlips:SimulationType
+    ] .
+
+mlips:MaterialSystem
+    a owl:Class ;
+    rdfs:comment """A material system studied in a dataset: element, alloy,
+compound, or complex microstructure."""@en ;
+    rdfs:label "Material System"@en .
+
+mlips:MetricProperty
+    a owl:Class ;
+    rdfs:comment "The physical property being measured (energy, force, stress)."@en ;
+    rdfs:label "Metric Property"@en .
+
+mlips:MetricType
+    a owl:Class ;
+    rdfs:comment "Type of accuracy metric (RMSE, MAE, R², etc.)."@en ;
+    rdfs:label "Metric Type"@en .
+
+mlips:Published
+    a owl:NamedIndividual, mlips:DatasetProvenance ;
+    rdfs:comment "Dataset from a published source."@en ;
+    rdfs:label "Published"@en .
+
+mlips:R2
+    a owl:NamedIndividual, mlips:MetricType ;
+    rdfs:comment "Coefficient of determination."@en ;
+    rdfs:label "R²"@en .
+
+mlips:RMSE
+    a owl:NamedIndividual, mlips:MetricType ;
+    rdfs:comment "Root Mean Square Error."@en ;
+    rdfs:label "RMSE"@en .
+
+mlips:SimulationType
+    a owl:Class ;
+    rdfs:comment """A type of atomistic simulation: molecular dynamics,
+Monte Carlo, geometry optimization, phonon calculations,
+thermodynamic integration, etc."""@en ;
+    rdfs:label "Simulation Type"@en .
+
+mlips:StressProperty
+    a owl:NamedIndividual, mlips:MetricProperty ;
     rdfs:label "Stress"@en .
 
-# --- Existential and cardinality axioms (Benchmark Module) -------------------
+mlips:Stresses
+    a owl:NamedIndividual, mlips:CoveredProperty ;
+    rdfs:label "Stresses"@en .
 
-mlips:BenchmarkStudy rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:hasResult ;
-    owl:someValuesFrom mlips:BenchmarkResult
-] .
+mlips:TrainedModel
+    a owl:Class ;
+    rdfs:comment """The concrete artifact produced by training an algorithm
+on a specific dataset with specific hyperparameter settings---the learned
+parameters (weights) that can be used for prediction."""@en ;
+    rdfs:label "Trained Model"@en ;
+    rdfs:subClassOf mlschema:Model, [
+        a owl:Restriction ;
+        owl:onProperty [
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:produces
+        ] ;
+        owl:someValuesFrom mlips:TrainingRun
+    ] .
 
-mlips:BenchmarkResult rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:evaluatesModel ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:TrainedModel
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:targetMaterial ;
-    owl:someValuesFrom mlips:MaterialSystem
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:hasAccuracyMetric ;
-    owl:someValuesFrom mlips:AccuracyMetric
-] .
+mlips:TrainingDataset
+    a owl:Class ;
+    rdfs:comment """A dataset of atomic configurations used for MLIP
+training, with provenance, size, property coverage, and DFT settings."""@en ;
+    rdfs:label "Training Dataset"@en ;
+    rdfs:subClassOf mlschema:Dataset, prov:Entity, [
+        a owl:Restriction ;
+        owl:onProperty mlips:coversMaterial ;
+        owl:someValuesFrom mlips:MaterialSystem
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:coversProperty ;
+        owl:someValuesFrom mlips:CoveredProperty
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:datasetProvenance ;
+        owl:someValuesFrom mlips:DatasetProvenance
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasConfiguration ;
+        owl:someValuesFrom mlips:AtomicConfiguration
+    ] .
 
-mlips:AccuracyMetric rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty mlips:metricType ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:MetricType
-] , [
-    a owl:Restriction ;
-    owl:onProperty mlips:metricProperty ;
-    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-    owl:onClass mlips:MetricProperty
-] , [
-    a owl:Restriction ;
-    owl:onProperty [ owl:inverseOf mlips:hasAccuracyMetric ] ;
-    owl:someValuesFrom mlips:BenchmarkResult
-] .
+mlips:TrainingRun
+    a owl:Class ;
+    rdfs:comment """A concrete training execution: it executes an algorithm
+on a training dataset and produces a trained model."""@en ;
+    rdfs:label "Training Run"@en ;
+    rdfs:subClassOf mlschema:Run, prov:Activity, [
+        a owl:Restriction ;
+        owl:onClass mlips:MLIPAlgorithm ;
+        owl:onProperty mlips:executes ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onClass mlips:TrainingDataset ;
+        owl:onProperty mlips:runsOn ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onClass mlips:TrainedModel ;
+        owl:onProperty mlips:produces ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ] .
 
-mlips:BenchmarkResult rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty [ owl:inverseOf mlips:hasResult ] ;
-    owl:someValuesFrom mlips:BenchmarkStudy
-] .
+mlips:Virials
+    a owl:NamedIndividual, mlips:CoveredProperty ;
+    rdfs:label "Virials"@en .
 
-# --- Object properties -------------------------------------------------------
+mlips:chemicalFormula
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:MaterialSystem ;
+    rdfs:label "chemical formula"@en ;
+    rdfs:range xsd:string .
 
-mlips:hasResult a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkStudy ;
-    rdfs:range mlips:BenchmarkResult ;
-    rdfs:label "has result"@en .
+mlips:coversMaterial
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "covers material"@en ;
+    rdfs:range mlips:MaterialSystem .
 
-mlips:usesAlgorithm a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:MLIPAlgorithm ;
-    rdfs:label "uses algorithm"@en .
+mlips:coversProperty
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "covers property"@en ;
+    rdfs:range mlips:CoveredProperty .
 
-mlips:usesTrainingData a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:TrainingDataset ;
-    rdfs:label "uses training data"@en .
-
-mlips:targetMaterial a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:MaterialSystem ;
-    rdfs:label "target material"@en .
-
-mlips:hasAccuracyMetric a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:AccuracyMetric ;
-    rdfs:label "has accuracy metric"@en .
-
-mlips:hasHyperparameterSetting a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range mlips:HyperparameterSetting ;
-    rdfs:label "has hyperparameter setting"@en .
-
-mlips:metricType a owl:ObjectProperty ;
-    rdfs:domain mlips:AccuracyMetric ;
-    rdfs:range mlips:MetricType ;
-    rdfs:label "metric type"@en .
-
-mlips:metricProperty a owl:ObjectProperty ;
-    rdfs:domain mlips:AccuracyMetric ;
-    rdfs:range mlips:MetricProperty ;
-    rdfs:label "metric property"@en .
-
-mlips:reportedIn a owl:ObjectProperty ;
-    rdfs:domain mlips:BenchmarkResult ;
-    rdfs:range schema:ScholarlyArticle ;
-    rdfs:label "reported in"@en .
-
-# --- Datatype properties (Benchmark module) ----------------------------------
-
-mlips:metricValue a owl:DatatypeProperty ;
-    rdfs:domain mlips:AccuracyMetric ;
-    rdfs:range xsd:double ;
-    rdfs:label "metric value"@en .
-
-mlips:settingValue a owl:DatatypeProperty ;
+mlips:cutoffRadius
+    a owl:DatatypeProperty ;
+    rdfs:comment "Cutoff radius for atomic interactions, in angstroms."@en ;
     rdfs:domain mlips:HyperparameterSetting ;
-    rdfs:range rdfs:Literal ;
-    rdfs:label "setting value"@en .
+    rdfs:label "cutoff radius"@en ;
+    rdfs:range xsd:double .
 
-# =============================================================================
-# Cross-module linking properties
-# =============================================================================
+mlips:datasetProvenance
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "dataset provenance"@en ;
+    rdfs:range mlips:DatasetProvenance .
 
-mlips:hasUnit a owl:ObjectProperty ;
-    rdfs:range qudt:Unit ;
+mlips:defaultValue
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:Hyperparameter ;
+    rdfs:label "default value"@en ;
+    rdfs:range rdfs:Literal .
+
+mlips:energyCutoff
+    a owl:DatatypeProperty ;
+    rdfs:comment "Plane-wave energy cutoff in eV."@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "energy cutoff"@en ;
+    rdfs:range xsd:double .
+
+mlips:evaluatesModel
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a benchmark result to the trained model being evaluated."@en ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "evaluates model"@en ;
+    rdfs:range mlips:TrainedModel .
+
+mlips:executes
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a training run to the algorithm it executes."@en ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:label "executes"@en ;
+    rdfs:range mlips:MLIPAlgorithm .
+
+mlips:forHyperparameter
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a setting to the hyperparameter it configures."@en ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "for hyperparameter"@en ;
+    rdfs:range mlips:Hyperparameter .
+
+mlips:hasAccuracyMetric
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "has accuracy metric"@en ;
+    rdfs:range mlips:AccuracyMetric .
+
+mlips:hasConfiguration
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "has configuration"@en ;
+    rdfs:range mlips:AtomicConfiguration .
+
+mlips:hasDFTCalculation
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "has DFT calculation"@en ;
+    rdfs:range mlips:DFTCalculation .
+
+mlips:hasDFTSettings
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:DFTCalculation ;
+    rdfs:label "has DFT settings"@en ;
+    rdfs:range mlips:DFTSettings .
+
+mlips:hasHyperparameter
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an algorithm to a hyperparameter it accepts."@en ;
+    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:label "has hyperparameter"@en ;
+    rdfs:range mlips:Hyperparameter .
+
+mlips:hasHyperparameterSetting
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "has hyperparameter setting"@en ;
+    rdfs:range mlips:HyperparameterSetting .
+
+mlips:hasImplementation
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an algorithm to a software implementation."@en ;
+    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:label "has implementation"@en ;
+    rdfs:range mlips:Implementation .
+
+mlips:hasResult
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkStudy ;
+    rdfs:label "has result"@en ;
+    rdfs:range mlips:BenchmarkResult .
+
+mlips:hasUnit
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a numeric value to its QUDT unit."@en ;
     rdfs:label "has unit"@en ;
-    rdfs:comment "Links a numeric value to its QUDT unit."@en .
+    rdfs:range qudt:Unit .
 
-mlips:sameAsWikidata a owl:ObjectProperty ;
-    rdfs:subPropertyOf owl:sameAs ;
+mlips:hyperparameterDatatype
+    a owl:DatatypeProperty ;
+    rdfs:comment "The expected datatype of this hyperparameter (e.g., float, int, string)."@en ;
+    rdfs:domain mlips:Hyperparameter ;
+    rdfs:label "hyperparameter datatype"@en ;
+    rdfs:range xsd:string .
+
+mlips:hyperparameterName
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:Hyperparameter ;
+    rdfs:label "hyperparameter name"@en ;
+    rdfs:range xsd:string .
+
+mlips:implementedIn
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an implementation to the library that provides it."@en ;
+    rdfs:domain mlips:Implementation ;
+    rdfs:label "implemented in"@en ;
+    rdfs:range mlips:Library .
+
+mlips:kPointMesh
+    a owl:DatatypeProperty ;
+    rdfs:comment "K-point mesh specification (e.g., '4x4x4')."@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "k-point mesh"@en ;
+    rdfs:range xsd:string .
+
+mlips:learningRate
+    a owl:DatatypeProperty ;
+    rdfs:comment "Learning rate used during model training."@en ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "learning rate"@en ;
+    rdfs:range xsd:double .
+
+mlips:materialClass
+    a owl:DatatypeProperty ;
+    rdfs:comment "E.g., element, binary alloy, ternary compound, HEA."@en ;
+    rdfs:domain mlips:MaterialSystem ;
+    rdfs:label "material class"@en ;
+    rdfs:range xsd:string .
+
+mlips:maxValue
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:Hyperparameter ;
+    rdfs:label "maximum value"@en ;
+    rdfs:range rdfs:Literal .
+
+mlips:metricProperty
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:AccuracyMetric ;
+    rdfs:label "metric property"@en ;
+    rdfs:range mlips:MetricProperty .
+
+mlips:metricType
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:AccuracyMetric ;
+    rdfs:label "metric type"@en ;
+    rdfs:range mlips:MetricType .
+
+mlips:metricValue
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:AccuracyMetric ;
+    rdfs:label "metric value"@en ;
+    rdfs:range xsd:double .
+
+mlips:microstructuralFeature
+    a owl:DatatypeProperty ;
+    rdfs:comment "E.g., point defect, dislocation, surface, grain boundary."@en ;
+    rdfs:domain mlips:MaterialSystem ;
+    rdfs:label "microstructural feature"@en ;
+    rdfs:range xsd:string .
+
+mlips:minValue
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:Hyperparameter ;
+    rdfs:label "minimum value"@en ;
+    rdfs:range rdfs:Literal .
+
+mlips:numAngularBasis
+    a owl:DatatypeProperty ;
+    rdfs:comment "Number of angular basis functions in the descriptor."@en ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "number of angular basis functions"@en ;
+    rdfs:range xsd:integer .
+
+mlips:numConfigurations
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "number of configurations"@en ;
+    rdfs:range xsd:integer .
+
+mlips:numLayers
+    a owl:DatatypeProperty ;
+    rdfs:comment "Number of layers in the neural network architecture."@en ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "number of layers"@en ;
+    rdfs:range xsd:integer .
+
+mlips:numRadialBasis
+    a owl:DatatypeProperty ;
+    rdfs:comment "Number of radial basis functions in the descriptor."@en ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "number of radial basis functions"@en ;
+    rdfs:range xsd:integer .
+
+mlips:produces
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a training run to the trained model it produces."@en ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:label "produces"@en ;
+    rdfs:range mlips:TrainedModel .
+
+mlips:pseudopotentialType
+    a owl:DatatypeProperty ;
+    rdfs:comment "E.g., PAW, ultrasoft, norm-conserving."@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "pseudopotential type"@en ;
+    rdfs:range xsd:string .
+
+mlips:reportedIn
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "reported in"@en ;
+    rdfs:range schema:ScholarlyArticle .
+
+mlips:runsOn
+    a owl:ObjectProperty ;
+    rdfs:comment "Links a training run to the training dataset it uses."@en ;
+    rdfs:domain mlips:TrainingRun ;
+    rdfs:label "runs on"@en ;
+    rdfs:range mlips:TrainingDataset .
+
+mlips:sameAsWikidata
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an entity to its corresponding Wikidata item."@en ;
     rdfs:label "same as Wikidata"@en ;
-    rdfs:comment "Links an entity to its corresponding Wikidata item."@en .
+    rdfs:subPropertyOf owl:sameAs .
+
+mlips:settingValue
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:HyperparameterSetting ;
+    rdfs:label "setting value"@en ;
+    rdfs:range rdfs:Literal .
+
+mlips:supportsSimulation
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an algorithm to the simulation types it supports."@en ;
+    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:label "supports simulation"@en ;
+    rdfs:range mlips:SimulationType .
+
+mlips:targetMaterial
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "target material"@en ;
+    rdfs:range mlips:MaterialSystem .
+
+mlips:trainedOn
+    a owl:ObjectProperty ;
+    rdfs:comment "Shortcut: links a trained model directly to its training dataset."@en ;
+    rdfs:domain mlips:TrainedModel ;
+    rdfs:label "trained on"@en ;
+    rdfs:range mlips:TrainingDataset ;
+    owl:propertyChainAxiom ([
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:produces
+        ]
+        mlips:runsOn
+    ) .
+
+mlips:trainedWith
+    a owl:ObjectProperty ;
+    rdfs:comment "Shortcut: links a trained model directly to its algorithm."@en ;
+    rdfs:domain mlips:TrainedModel ;
+    rdfs:label "trained with"@en ;
+    rdfs:range mlips:MLIPAlgorithm ;
+    owl:propertyChainAxiom ([
+            a owl:ObjectProperty ;
+            owl:inverseOf mlips:produces
+        ]
+        mlips:executes
+    ) .
+
+mlips:usedDFTCode
+    a owl:ObjectProperty ;
+    rdfs:comment "The DFT software used (e.g., VASP, GPAW)."@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "used DFT code"@en ;
+    rdfs:range mlips:Library .
+
+mlips:usesAlgorithm
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "uses algorithm"@en ;
+    rdfs:range mlips:MLIPAlgorithm .
+
+mlips:usesTrainingData
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:label "uses training data"@en ;
+    rdfs:range mlips:TrainingDataset .
+
+mlips:version
+    a owl:DatatypeProperty ;
+    rdfs:domain mlips:Implementation ;
+    rdfs:label "version"@en ;
+    rdfs:range xsd:string .
+
+mlips:xcFunctional
+    a owl:DatatypeProperty ;
+    rdfs:comment "E.g., PBE, LDA, SCAN, PBEsol."@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "exchange-correlation functional"@en ;
+    rdfs:range xsd:string .
+
