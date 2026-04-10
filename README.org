@@ -1,0 +1,198 @@
+#+TITLE: An Ontology and Knowledge Graph for Machine Learning Interatomic Potentials
+#+AUTHOR: Daniel Hernandez et al.
+#+DATE: ISWC 2026 Resources Track
+
+* Overview
+
+This repository contains the source files for the ISWC 2026 Resources
+Track paper on the MLIPs ontology and knowledge graph.
+
+The paper presents:
+- The *MLIPs ontology*, an OWL 2 DL ontology for Machine Learning
+  Interatomic Potentials, organized into three modules (Algorithm,
+  Training Data, Benchmark).
+- The *MLIPs knowledge graph*, populated in collaboration with domain
+  experts from the META-LEARN project.
+- *MLIPE*, domain-specific extension modules for the Concon
+  collaborative knowledge graph platform.
+- *SHACL shapes* for data quality validation and form-based data entry.
+
+* Directory structure
+
+| Path                           | Description                                      |
+|--------------------------------+--------------------------------------------------|
+| =paper.tex=                    | Driver file for *submission* (no todo notes)      |
+| =draft.tex=                    | Driver file for *editing* (todo notes + wide margin) |
+| =main.tex=                     | Shared preamble and body (do not compile directly) |
+| =references.bib=               | Bibliography                                     |
+| =sections/=                    | One =.tex= file per section and appendix         |
+| =artifacts/ontology/mlips.xhtml= | *Source of truth* for the ontology (XHTML+RDFa+OWL/XML) |
+| =artifacts/ontology/mlips.ttl= | Generated Turtle file (do not edit)              |
+| =artifacts/ontology/mlips.owl= | Generated OWL/XML file (do not edit)             |
+| =artifacts/figures/=           | TikZ figures and generated PDFs                  |
+| =artifacts/examples/=          | Turtle example snippets for the term appendices  |
+| =artifacts/scripts/=           | Python scripts (legacy, replaced by concon-onto) |
+| =Makefile=                     | Build pipeline                                   |
+
+* Building
+
+** Quick start
+
+To build both the submission and the editing PDFs:
+
+#+begin_src sh
+make all        # builds paper.pdf and draft.pdf
+#+end_src
+
+Or build them individually:
+
+#+begin_src sh
+make paper      # submission version (no todo notes)
+make draft      # editing version (with todo notes in wide right margin)
+#+end_src
+
+** Full pipeline
+
+The full pipeline generates the ontology files and LaTeX appendices
+from the XHTML source before compiling the paper:
+
+#+begin_src sh
+make ontology   # mlips.xhtml → mlips.owl → mlips.ttl
+make latex      # mlips.xhtml → appendix-{classes,object-properties,data-properties}.tex
+make paper      # compile submission PDF (runs ontology + latex first)
+make draft      # compile editing PDF (runs ontology + latex first)
+make clean      # remove all generated files
+#+end_src
+
+** Dependencies
+
+- LaTeX distribution with =pdflatex=, =bibtex=, and the =llncs= class
+  (Springer LNCS template)
+- Java (for Saxon-HE XSLT processor): =java -jar ~/bin/saxon-he.jar=
+- [[https://librdf.org/raptor/][rapper]] (Raptor RDF tools): for OWL/XML → Turtle conversion
+- [[https://git.degu.cl/daniel/concon-onto][concon-onto]]: Rust CLI for generating LaTeX appendices from XHTML
+  (at =~/code/software/concon-onto/=)
+
+* Working with Overleaf
+
+Overleaf cannot run the full pipeline (Saxon, rapper, concon-onto).
+To work with Overleaf:
+
+1. *Run the pipeline locally first* to generate all derived files:
+   #+begin_src sh
+   make ontology latex
+   #+end_src
+
+2. *Upload the entire project* to Overleaf, including the generated
+   files (=mlips.ttl=, =mlips.owl=, =appendix-*.tex=).
+
+3. *Set the main document* to either:
+   - =paper.tex= for the submission version
+   - =draft.tex= for the editing version with todo notes
+
+4. *Edit sections* in the =sections/= folder as usual.
+
+5. *Do not edit* the following files on Overleaf (they are generated):
+   - =artifacts/ontology/mlips.ttl=
+   - =artifacts/ontology/mlips.owl=
+   - =sections/appendix-classes.tex=
+   - =sections/appendix-object-properties.tex=
+   - =sections/appendix-data-properties.tex=
+
+6. *To update the ontology*, edit =artifacts/ontology/mlips.xhtml=
+   locally, re-run =make ontology latex=, and re-upload the generated
+   files.
+
+* Working with other LaTeX IDEs
+
+** TeXstudio / TeXmaker / VS Code with LaTeX Workshop
+
+1. Open the project folder.
+2. Set the *main document* to =paper.tex= or =draft.tex=.
+3. Compile with =pdflatex= + =bibtex= (the standard recipe).
+4. The generated files (=appendix-*.tex=, =mlips.ttl=) must already
+   exist.  Run =make ontology latex= in a terminal first if they are
+   missing.
+
+** Emacs with AUCTeX
+
+Add to your =.dir-locals.el=:
+
+#+begin_src emacs-lisp
+((latex-mode
+  . ((TeX-master . "draft")
+     (TeX-command-extra-options . ""))))
+#+end_src
+
+This sets =draft.tex= as the master file (change to ="paper"= for
+submission).  Use =C-c C-c= to compile as usual.
+
+* Todo notes for co-authors
+
+When editing the paper, each co-author has a personal macro for
+adding margin notes:
+
+| Macro                      | Color  | Display name |
+|----------------------------+--------+--------------|
+| =\DanielHernandez{text}=  | Red    | Daniel       |
+| =\YujiIkeda{text}=        | Blue   | Yuji         |
+| =\JongHyunJung{text}=     | Teal   | Jong Hyun    |
+| =\YongliangOu{text}=      | Gold   | Yongliang    |
+| =\PranavKumar{text}=      | Orange | Pranav       |
+| =\DanielFrank{text}=      | Dark   | Daniel F.    |
+| =\FritzKoermann{text}=    | Purple | Fritz        |
+| =\XiZhang{text}=          | Sky    | Xi           |
+| =\XiangXu{text}=          | Green  | Xiang        |
+| =\LifangZhu{text}=        | Coral  | Lifang       |
+| =\SteffenStaab{text}=     | Gray   | Steffen      |
+| =\BlazejGrabowski{text}=  | Navy   | Blazej       |
+
+Notes are *visible only in =draft.pdf=* and *hidden in =paper.pdf=*.
+
+Example usage:
+
+#+begin_src latex
+Some text\DanielHernandez{Please rephrase this paragraph.} that
+continues after the note.
+#+end_src
+
+* Ontology source of truth
+
+The ontology is authored in =artifacts/ontology/mlips.xhtml=, an
+XHTML+RDFa document with embedded OWL/XML code blocks.  This single
+file is both human-readable documentation and machine-readable
+ontology source.
+
+The build pipeline derives everything from this file:
+
+#+begin_src text
+mlips.xhtml
+  ├─→ [Saxon + extract-owl.xsl] → mlips.owl (OWL/XML)
+  │     └─→ [rapper]            → mlips.ttl (Turtle)
+  └─→ [concon-onto latex]       → appendix-{classes,object-properties,data-properties}.tex
+#+end_src
+
+To *modify the ontology*: edit =mlips.xhtml=, then run =make ontology
+latex= to regenerate all derived files.
+
+* DL notation conventions
+
+The paper uses =\mathsf= font for ontology terms:
+
+- Concepts: =$\dlConcept{MLIPAlgorithm}$= → rendered as
+  $\mathsf{MLIPAlgorithm}$
+- Roles: =$\dlRole{hasHyperparameter}$= → rendered as
+  $\mathsf{hasHyperparameter}$
+- External terms: =$\mlsAlgorithmC$= → rendered as
+  $\mathsf{mls{:}Algorithm}$
+
+Named macros exist for all ontology terms (e.g., =\MLIPAlgorithmC=,
+=\hasHyperparameterR=).  See =main.tex= for the full list.
+
+Axioms are numbered (A1)–(A27) and cross-referenced with
+=\eqref{ax:N}=.
+
+* License
+
+- Ontology and knowledge graph: CC BY 4.0
+- Paper source: copyright as per ISWC/Springer LNCS
