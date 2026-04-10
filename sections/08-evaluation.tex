@@ -1,50 +1,217 @@
+%% ====================================================================
 \section{Evaluation}
 \label{sec:evaluation}
 %% ====================================================================
 
-We evaluate the resources along the criteria defined by the ISWC Resources
-Track.
+We evaluate the \MLIPsOntology{} along multiple dimensions: competency
+question coverage via SPARQL queries, consistency verification via OWL
+reasoning, automated pitfall detection, and comparison with existing
+ontologies.
 
-\subsection{Design and Technical Quality}
+\subsection{Competency Question Coverage}
+\label{sec:eval-cq}
 
-\paragraph{Ontology quality.} We evaluate the \MLIPsOntology{} against
-established ontology quality criteria:
+We demonstrate that each competency question (Section~\ref{sec:requirements})
+is answerable as a SPARQL query over the ontology. For each CQ, we provide the
+query template; Appendix~\ref{sec:appendix-dl-queries} additionally presents
+the equivalent description logic formulations.
 
+%% TODO: populate with actual query results once the KG has data
+
+\paragraph{CQ1: Algorithm hyperparameters.}
+Which MLIP algorithms exist, and what hyperparameters does each accept?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?hp ?name ?type ?default WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:hasHyperparameter ?hp .
+  ?hp mlips:hyperparameterName ?name ;
+      mlips:hyperparameterDatatype ?type .
+  OPTIONAL { ?hp mlips:defaultValue ?default }
+}
+\end{lstlisting}
+
+\paragraph{CQ2: Implementations and versions.}
+Which libraries implement a given algorithm?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?impl ?lib ?version WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:hasImplementation ?impl .
+  ?impl mlips:implementedIn ?lib ;
+        mlips:version ?version .
+}
+\end{lstlisting}
+
+\paragraph{CQ3: Training datasets for a material system.}
+For a given material, which training datasets are available and what DFT
+settings were used?
+\begin{lstlisting}[language=sparql]
+SELECT ?ds ?xc ?cutoff ?pseudo WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:coversMaterial ?mat .
+  ?mat mlips:chemicalFormula "TiAl" .
+  ?ds mlips:hasDFTCalculation ?calc .
+  ?calc mlips:hasDFTSettings ?settings .
+  ?settings mlips:xcFunctional ?xc ;
+            mlips:energyCutoff ?cutoff ;
+            mlips:pseudopotentialType ?pseudo .
+}
+\end{lstlisting}
+
+\paragraph{CQ4: Dataset provenance.}
+What is the provenance of a training dataset?
+\begin{lstlisting}[language=sparql]
+SELECT ?ds ?label ?prov WHERE {
+  ?ds a mlips:TrainingDataset ;
+      rdfs:label ?label ;
+      mlips:datasetProvenance ?prov .
+}
+\end{lstlisting}
+
+\paragraph{CQ5: Dataset size and property coverage.}
+How many configurations does a dataset contain, and what properties are
+covered?
+\begin{lstlisting}[language=sparql]
+SELECT ?ds ?nconfig ?prop WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:numConfigurations ?nconfig ;
+      mlips:coversProperty ?prop .
+}
+\end{lstlisting}
+
+\paragraph{CQ6: Published benchmarks for an algorithm and material.}
+Which studies have benchmarked a given algorithm on a given material?
+\begin{lstlisting}[language=sparql]
+SELECT ?study ?result ?metric_type ?prop ?value WHERE {
+  ?study a mlips:BenchmarkStudy ;
+         mlips:hasResult ?result .
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?model mlips:trainedWith ?algo .
+  ?algo rdfs:label "MACE" .
+  ?mat mlips:chemicalFormula "TiAl" .
+  ?metric mlips:metricType ?metric_type ;
+          mlips:metricProperty ?prop ;
+          mlips:metricValue ?value .
+}
+\end{lstlisting}
+
+\paragraph{CQ7: Best-performing algorithm--hyperparameter combinations.}
+For a given material and target property, which combinations perform well?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?value WHERE {
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?model mlips:trainedWith ?algo .
+  ?mat mlips:chemicalFormula "TiAl" .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricProperty mlips:EnergyProperty ;
+          mlips:metricValue ?value .
+} ORDER BY ?value LIMIT 10
+\end{lstlisting}
+
+\paragraph{CQ8: Simulation types supported by an algorithm.}
+Which simulation types have been performed with a given MLIP?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?sim WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:supportsSimulation ?sim .
+}
+\end{lstlisting}
+
+\subsection{Consistency and Classification}
+\label{sec:eval-consistency}
+
+We verify the ontology's logical consistency using the HermiT OWL~2
+reasoner~\cite{glimm2014hermit} via the ROBOT
+tool~\cite{jackson2019robot}:
+
+\begin{lstlisting}[language=bash,caption={Consistency verification.}]
+robot reason --reasoner HermiT -i mlips.ttl
+\end{lstlisting}
+
+The reasoner confirms that:
 \begin{itemize}
-\item \emph{Competency question coverage.} All eight competency questions
-  (CQ1--CQ8) are answerable as SPARQL queries over the ontology.
-  %% TODO: include SPARQL query examples for each CQ
-\item \emph{Consistency.} The ontology is verified to be consistent using
-  standard OWL reasoners (HermiT, Pellet).
-\item \emph{Alignment.} We document explicit alignments with MDO, CMSO/ASMO,
-  ML-Schema, PROV-O, and QUDT, verified through manual inspection and
-  SPARQL-based alignment validation.
-\item \emph{Modularity.} The three-module design allows independent reuse:
-  the Algorithm module can be used without the Training Data module, and
-  vice versa.
+\item The ontology is \emph{consistent}: no contradictions exist among the
+  axioms (A1)--(A27).
+\item No class is \emph{unsatisfiable}: every class can have instances.
+\item The inferred class hierarchy contains no unexpected subsumptions.
 \end{itemize}
 
-\paragraph{SHACL shape validation.} The shapes successfully validate the
-current knowledge graph content, with a validation report available alongside
-the dataset.
+\subsection{Automated Pitfall Detection}
+\label{sec:eval-oops}
 
-\paragraph{\SemASE{} quality.} Round-trip serialization is verified by automated
-tests comparing all attributes at full floating-point precision. The dual-backend
-SPARQL client is tested against both Pyoxigraph (local) and HTTP endpoints.
+We evaluate the ontology using OOPS! (OntOlogy Pitfall
+Scanner)~\cite{poveda2014oops}, which checks for common ontology design
+pitfalls. OOPS! classifies pitfalls into three severity levels: critical,
+important, and minor.
+
+%% TODO: insert OOPS! results once the web service is available
+%% The OOPS! API at https://oops.linkeddata.es/rest is currently
+%% returning server errors. Run manually via the web interface.
+
+\DanielHernandez{Run OOPS! when the web service is back and insert results here.}
+
+\subsection{Comparison with Existing Ontologies}
+\label{sec:eval-comparison}
+
+Table~\ref{tab:comparison} compares the \MLIPsOntology{} with existing
+ontologies from the ML and materials science domains. For each competency
+question, we indicate whether it is answerable ($\bullet$), partially
+answerable ($\circ$), or not answerable (---) using each ontology.
+
+\begin{table}[t]
+\centering
+\caption{Competency question coverage across ontologies. $\bullet$ =
+  answerable, $\circ$ = partially, --- = not answerable.}
+\label{tab:comparison}
+\begin{tabular}{l@{\hspace{6pt}}c@{\hspace{6pt}}c@{\hspace{6pt}}c@{\hspace{6pt}}c@{\hspace{6pt}}c@{\hspace{6pt}}c}
+\toprule
+ & \rotatebox{70}{ML-Schema} & \rotatebox{70}{MDO} & \rotatebox{70}{CMSO/ASMO} & \rotatebox{70}{EMMO} & \rotatebox{70}{PMDco} & \rotatebox{70}{\textbf{MLIPs}} \\
+\midrule
+CQ1: Algo.\ hyperparams     & $\circ$ & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ2: Implementations         & $\circ$ & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ3: Training data + DFT     & ---     & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\bullet$ \\
+CQ4: Dataset provenance       & ---     & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ5: Dataset size + coverage  & ---     & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ6: Published benchmarks     & ---     & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ7: Best combinations        & ---     & ---     & ---     & ---     & ---     & $\bullet$ \\
+CQ8: Simulation types         & ---     & ---     & $\circ$ & $\circ$ & ---     & $\bullet$ \\
+\midrule
+Training run provenance        & $\bullet$ & ---   & ---     & ---     & ---     & $\bullet$ \\
+Crystal structure              & ---     & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\circ$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+ML-Schema partially covers CQ1 and CQ2 through its general
+$\mlsAlgorithmC$ and $\mlsImplementationC$ classes, but lacks
+physics-specific hyperparameters and units. MDO and CMSO/ASMO partially
+cover CQ3 through their calculation and structure modules, but do not model
+MLIP-specific training data provenance or DFT settings at the level of
+detail needed. No existing ontology covers CQ4--CQ7, which require the
+benchmark--algorithm--dataset triangle that is central to the
+\MLIPsOntology{}.
+
+The last two rows show areas where existing ontologies complement ours:
+ML-Schema's $\mlsRunC$ provides richer training run metadata (which we
+align via $\TrainingRunC$), and CMSO provides detailed crystal structure
+descriptions (which we link via $\MaterialSystemC$).
 
 \subsection{Reusability}
 
 The ontology is published under CC BY 4.0 with a persistent IRI and versioned
-releases. SHACL shapes are distributed alongside the ontology. \SemASE{} is
-available on PyPI under MIT license. All resources use standard Semantic Web
-formats (OWL/Turtle, SHACL, SPARQL), ensuring tool independence.
+releases. SHACL shapes are distributed alongside the ontology. All resources
+use standard Semantic Web formats (OWL/Turtle, SHACL, SPARQL), ensuring tool
+independence.
 
 \subsection{Adoption and Impact}
 
 The resources are in active use within the META-LEARN project. The knowledge
-graph is publicly queryable, and \SemASE{} is available on PyPI. As the field
-grows, the \MLIPsOntology{} provides the vocabulary for structured comparison
-and discovery of MLIP studies---a capability not available from any existing
+graph is publicly queryable via a SPARQL endpoint. As the field grows, the
+\MLIPsOntology{} provides the vocabulary for structured comparison and
+discovery of MLIP studies---a capability not available from any existing
 resource.
 
 %% TODO: report concrete usage statistics

@@ -1,0 +1,69 @@
+\section{Description Logic Query Formulations}
+\label{sec:appendix-dl-queries}
+
+This appendix provides description logic formulations for the competency
+questions evaluated in Section~\ref{sec:eval-cq}. Each query is expressed
+as a conjunctive query over the \MLIPsOntology{} T-Box.
+
+\subsection{CQ1: Algorithm hyperparameters}
+
+Retrieve all pairs of algorithms and their hyperparameters:
+\begin{align*}
+  q(x, y) \leftarrow \MLIPAlgorithmC(x) \wedge \hasHyperparameterR(x, y) \wedge \HyperparameterC(y)
+\end{align*}
+
+\subsection{CQ2: Implementations and versions}
+
+Retrieve implementations with their libraries:
+\begin{align*}
+  q(x, y, z) \leftarrow \MLIPAlgorithmC(x) \wedge \hasImplementationR(x, y) \wedge \implementedInR(y, z)
+\end{align*}
+
+\subsection{CQ3: Training datasets for a material system}
+
+Retrieve datasets for a material with their DFT settings:
+\begin{align*}
+  q(d, s) \leftarrow{} & \TrainingDatasetC(d) \wedge \coversMaterialR(d, m) \wedge \\
+    & \dlRole{hasDFTCalculation}(d, c) \wedge \hasDFTSettingsR(c, s)
+\end{align*}
+
+\subsection{CQ4: Dataset provenance}
+
+Retrieve provenance classification of datasets:
+\begin{align*}
+  q(d, p) \leftarrow \TrainingDatasetC(d) \wedge \datasetProvenanceR(d, p)
+\end{align*}
+
+\subsection{CQ5: Dataset size and property coverage}
+
+Retrieve dataset size and covered properties:
+\begin{align*}
+  q(d, n, p) \leftarrow \TrainingDatasetC(d) \wedge \numConfigurationsR(d, n) \wedge \coversPropertyR(d, p)
+\end{align*}
+
+\subsection{CQ6: Published benchmarks}
+
+Retrieve benchmark results for an algorithm on a material, with accuracy
+metrics:
+\begin{align*}
+  q(s, v) \leftarrow{} & \BenchmarkStudyC(s) \wedge \hasResultR(s, r) \wedge \evaluatesModelR(r, m) \wedge \\
+    & \trainedWithR(m, a) \wedge \targetMaterialR(r, t) \wedge \\
+    & \hasAccuracyMetricR(r, c) \wedge \metricValueR(c, v)
+\end{align*}
+
+\subsection{CQ7: Best-performing combinations}
+
+Retrieve algorithm--material pairs ordered by accuracy (instantiated for
+RMSE of energy):
+\begin{align*}
+  q(a, v) \leftarrow{} & \evaluatesModelR(r, m) \wedge \trainedWithR(m, a) \wedge \\
+    & \hasAccuracyMetricR(r, c) \wedge \metricTypeR(c, \dlConcept{RMSE}) \wedge \\
+    & \metricPropertyR(c, \dlConcept{EnergyProperty}) \wedge \metricValueR(c, v)
+\end{align*}
+
+\subsection{CQ8: Simulation types}
+
+Retrieve simulation types supported by each algorithm:
+\begin{align*}
+  q(x, y) \leftarrow \MLIPAlgorithmC(x) \wedge \supportsSimulationR(x, y) \wedge \SimulationTypeC(y)
+\end{align*}
