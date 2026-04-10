@@ -16,10 +16,11 @@ LATEX_SECTIONS = sections/appendix-classes.tex \
 # LaTeX sources
 TEX_SECTIONS = $(wildcard sections/*.tex)
 TEX_FIGURES = $(wildcard artifacts/figures/*.tex)
+COMMON_DEPS = main.tex references.bib $(TEX_SECTIONS) $(TEX_FIGURES) $(LATEX_SECTIONS) $(TTL_FILE)
 
-.PHONY: all clean ontology latex pdf
+.PHONY: all clean ontology latex paper draft
 
-all: pdf
+all: paper draft
 
 # === Ontology pipeline ===
 
@@ -40,16 +41,28 @@ latex: $(LATEX_SECTIONS)
 $(LATEX_SECTIONS) &: $(XHTML_SOURCE) $(CONCON_ONTO)
 	$(CONCON_ONTO) latex --input $(XHTML_SOURCE) --output-dir sections/ --examples-dir artifacts/examples
 
-# === Paper PDF ===
+# === Paper PDF (submission — no todo notes) ===
 
-pdf: main.pdf
+paper: paper.pdf
 
-main.pdf: main.tex references.bib $(TEX_SECTIONS) $(TEX_FIGURES) $(LATEX_SECTIONS) $(TTL_FILE)
-	pdflatex main
-	bibtex main
-	pdflatex main
-	pdflatex main
+paper.pdf: paper.tex $(COMMON_DEPS)
+	pdflatex paper
+	bibtex paper
+	pdflatex paper
+	pdflatex paper
+
+# === Draft PDF (editing — with todo notes and wide margin) ===
+
+draft: draft.pdf
+
+draft.pdf: draft.tex $(COMMON_DEPS)
+	pdflatex draft
+	bibtex draft
+	pdflatex draft
+	pdflatex draft
 
 clean:
+	rm -f paper.aux paper.bbl paper.blg paper.log paper.out paper.pdf
+	rm -f draft.aux draft.bbl draft.blg draft.log draft.out draft.pdf
 	rm -f main.aux main.bbl main.blg main.log main.out main.pdf
 	rm -f $(OWL_FILE)
