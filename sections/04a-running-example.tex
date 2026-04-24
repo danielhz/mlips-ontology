@@ -109,10 +109,25 @@ expressiveness and computational cost:
 \end{itemize}
 %
 These are \emph{not} learned from data---they are chosen by the
-researcher before training. In contrast, the coefficients
-$\fitParams$ are determined by fitting
-Equation~\eqref{eq:mtp-basis} to DFT-computed energies, forces, and
-stresses via linear regression.
+researcher before training.
+
+\paragraph{Learned parameters.}
+In contrast to the hyperparameters, the coefficients
+$\fitParams = \{\xi_\alpha\}$ in Equation~\eqref{eq:mtp-basis} are
+\emph{learned} by fitting to DFT reference data via linear regression.
+The number of coefficients depends on the hyperparameters: a higher
+$\levmax$ includes more basis functions $\basisFunc_\alpha$, and thus
+more parameters to fit. For example, with $\levmax = 16$ and
+$\nRadialBasis = 8$, the MTP has several hundred coefficients.
+
+The ontology captures this distinction clearly: hyperparameters are
+described at the algorithm level ($\MLIPAlgorithmC$ $\to$
+$\HyperparameterC$), while the learned coefficients $\fitParams$ are
+what defines a $\TrainedModelC$---the artifact produced by a
+$\TrainingRunC$ that applies specific $\HyperparameterSettingC$ values
+to a $\TrainingDatasetC$. Two trained models using the same algorithm
+and hyperparameter settings but different training data will have
+different $\fitParams$.
 
 \paragraph{Encoding the algorithm.}
 The MTP algorithm and its hyperparameters map directly to the
@@ -139,6 +154,30 @@ ex:hp-levmax a mlips:Hyperparameter ;
     mlips:hyperparameterDatatype "integer" ;
     mlips:defaultValue "16" .
 \end{lstlisting}
+
+\noindent
+When a researcher trains an MTP with specific hyperparameter values,
+the concrete settings and the resulting model are encoded as:
+%
+\begin{lstlisting}[language=turtle,caption={Hyperparameter settings and the trained model.},label=lst:mtp-learned]
+ex:setting-rcut a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:settingValue "5.0" ;
+    mlips:hasUnit unit:ANGSTROM .
+
+ex:setting-levmax a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-levmax ;
+    mlips:settingValue "16" .
+
+ex:setting-nq a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-nq ;
+    mlips:settingValue "8" .
+\end{lstlisting}
+
+\noindent
+The trained model itself---the fitted coefficients $\fitParams$---is
+an instance of $\TrainedModelC$, linked to the training run that
+produced it (Listing~\ref{lst:mtp-benchmark}).
 
 \paragraph{Training data.}
 The ground truth for training comes from DFT calculations: for a set of
