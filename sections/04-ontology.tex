@@ -7,11 +7,15 @@ that address the competency questions identified in
 Section~\ref{sec:requirements}. We first introduce the ontology through a
 concrete example (Section~\ref{sec:running-example}), then describe each
 module formally (Sections~\ref{sec:algorithm-module}--\ref{sec:benchmark-module}).
-Figure~\ref{fig:ontology-overview} provides an overview. The ontology uses
-the namespace \texttt{\mlipsns} (prefix \mlipsprefix{});
-Table~\ref{tab:prefixes} lists the external prefixes used. In the following,
-we omit the \mlipsprefix{} prefix for concepts and properties of the
-\MLIPsOntology{}.
+Figure~\ref{fig:ontology-overview} provides an overview. The ontology
+includes 27 formal OWL axioms (12 existential restrictions, 6 cardinality
+constraints, 5 inverse existence axioms, 2 property chains, and 2 domain
+axioms) that enforce data completeness and consistency; the full axiom
+catalog with examples is published alongside the ontology at
+\url{\mlipsns}. The ontology uses the namespace \texttt{\mlipsns} (prefix
+\mlipsprefix{}); Table~\ref{tab:prefixes} lists the external prefixes used.
+In the following, we omit the \mlipsprefix{} prefix for concepts and
+properties of the \MLIPsOntology{}.
 
 \input{sections/04a-running-example}
 
@@ -92,32 +96,21 @@ extends $\mlsHyperParameterC$ with physics-specific properties and
 units, and $\ImplementationC$ extends $\mlsImplementationC$.
 
 \paragraph{Axioms.}
-Every MLIP algorithm must declare at least one hyperparameter and be linked
-to at least one simulation type it supports. Every implementation must
-specify the library it belongs to. Every training run must execute exactly
-one algorithm, use exactly one training dataset, and produce exactly one
-model:
-\begin{align*}
-  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \\
-  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \\
-  \ImplementationC &\sqsub \existsR{implementedIn}{Library} \\
-  \TrainingRunC &\sqsub \exactR{1}{executes}{MLIPAlgorithm} \\
-  \TrainingRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset} \\
-  \TrainingRunC &\sqsub \exactR{1}{produces}{TrainedModel}
-\end{align*}
-The shortcut roles on $\TrainedModelC$ are defined as property chains
-through the training run:
+The Algorithm module defines 14 axioms: existential restrictions require
+every algorithm to declare at least one hyperparameter and simulation type;
+cardinality constraints ensure each $\TrainingRunC$ executes exactly one
+algorithm, uses one dataset, and produces one model; domain axioms restrict
+$\hasHyperparameterR$, $\hasImplementationR$, and $\supportsSimulationR$
+to $\MLIPAlgorithmC$. Notably, the shortcut roles on $\TrainedModelC$ are
+defined as property chains through the training run:
+%
 \begin{align*}
   \trainedWithR &\equiv \producesR^{-} \circ \executesR \\
   \trainedOnR &\equiv \producesR^{-} \circ \runsOnR
 \end{align*}
-The roles $\hasHyperparameterR$, $\hasImplementationR$, and
-$\supportsSimulationR$ have $\MLIPAlgorithmC$ as their domain:
-\begin{align*}
-  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \\
-  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \\
-  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC
-\end{align*}
+%
+These allow direct queries (``which algorithm produced this model?'')
+without navigating through the $\TrainingRunC$ entity.
 
 
 
@@ -156,23 +149,12 @@ $\cmsoAtomicStructureC$. Material systems link to Wikidata for
 chemical element identification.
 
 \paragraph{Axioms.}
-Every training dataset must cover at least one material system, declare at
-least one covered property, specify its provenance, and include at least one
-atomic configuration. Every DFT calculation must be associated with its
-settings:
-\begin{align*}
-  \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem} \\
-  \TrainingDatasetC &\sqsub \existsR{coversProperty}{\top} \\
-  \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{\top} \\
-  \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration} \\
-  \DFTCalculationC &\sqsub \existsR{hasDFTSettings}{DFTSettings}
-\end{align*}
-The provenance classification is exhaustive and disjoint, ensuring every
-dataset has exactly one origin type:
-\begin{align*}
-  \dlConcept{Published} \sqcup \dlConcept{InHouse} \sqcup \dlConcept{Augmented}
-  &= \top_{\dlConcept{DatasetProvenance}}
-\end{align*}
+The Training Data module defines 5 existential restrictions: every
+$\TrainingDatasetC$ must cover at least one material system, declare at
+least one covered property, specify its provenance, and include at least
+one atomic configuration; every $\DFTCalculationC$ must have DFT settings.
+The provenance classification ($\dlConcept{Published}$,
+$\dlConcept{InHouse}$, $\dlConcept{Augmented}$) is exhaustive and disjoint.
 
 
 
@@ -208,26 +190,14 @@ $\schemaScholarlyArticleC$ for bibliographic metadata and to Wikidata
 for author identification.
 
 \paragraph{Axioms.}
-The Benchmark module is the integration point of the ontology: every
-benchmark result must evaluate exactly one trained model, specify at least
-one target material system, and report at least one accuracy metric. Every
-study must contain at least one result:
-\begin{align*}
-  \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \\
-  \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel} \\
-  \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \\
-  \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric}
-\end{align*}
-Each accuracy metric must specify its type and the property being measured:
-\begin{align*}
-  \AccuracyMetricC &\sqsub \exactR{1}{metricType}{MetricType} \\
-  \AccuracyMetricC &\sqsub \exactR{1}{metricProperty}{MetricProperty}
-\end{align*}
-These axioms ensure that benchmark data is always complete enough to support
-structured comparison across studies (CQ6, CQ7). Note that through
-$\TrainedModelC$, every benchmark result is transitively linked to the
-algorithm ($\trainedWithR$) and training data ($\trainedOnR$) used, without
-redundantly encoding this information.
+The Benchmark module defines 8 axioms ensuring data completeness: every
+$\BenchmarkStudyC$ must contain at least one result; every
+$\BenchmarkResultC$ must evaluate exactly one $\TrainedModelC$, target at
+least one material system, and report at least one accuracy metric; every
+$\AccuracyMetricC$ must specify exactly one metric type and one measured
+property. Through the property chains on $\TrainedModelC$, every benchmark
+result is transitively linked to the algorithm and training data used,
+enabling cross-module queries (CQ6, CQ7) without redundant encoding.
 
 
 
