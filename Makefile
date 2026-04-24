@@ -1,7 +1,7 @@
 SAXON = java -jar $(HOME)/bin/saxon-he.jar
 RAPPER = rapper
-CONCON_ONTO = $(HOME)/code/software/concon-onto/target/debug/concon-onto
-EXTRACT_XSL = $(HOME)/code/software/concon-onto/xslt/extract-owl.xsl
+CONCON_ONTO = $(HOME)/code/software/concon-onto/code-repo/target/debug/concon-onto
+EXTRACT_XSL = $(HOME)/code/software/concon-onto/code-repo/xslt/extract-owl.xsl
 
 # Source of truth
 XHTML_SOURCE = artifacts/ontology/mlips.xhtml

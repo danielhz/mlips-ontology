@@ -117,6 +117,23 @@ $\Rmin$ (minimum interatomic distance, defining the radial basis domain),
 $\nRadialBasis$ (number of radial basis functions), and
 $\levmax$ (maximum level, controlling model complexity).
 
+To support domain queries such as ``which physical hyperparameters
+does this algorithm accept?'', we classify hyperparameters into three
+non-disjoint subclasses of $\HyperparameterC$: physical (direct physical
+meaning), architectural (model-architecture choice), and training
+(training-procedure parameter).
+These subclasses are \emph{not disjoint}: many MLIP hyperparameters
+straddle categories. For MTP, $\Rcut$ and $\Rmin$ are physical (they bound
+interaction ranges); a pure training hyperparameter is the optimizer's
+learning rate; but $\nRadialBasis$ and $\levmax$ are both architectural
+\emph{and} physical---they control the model size but also determine how
+finely the radial distance and the angular moment expansion (e.g., dipole,
+quadrupole) are resolved. Acknowledging this overlap is a modelling choice
+informed by domain expertise: a strict partition would misrepresent how
+materials scientists actually think about these parameters, while the
+annotation itself enables physics-focused queries that a flat
+$\HyperparameterC$ class cannot answer directly.
+
 \paragraph{Encoding: from trained model to algorithm.}
 The ontology captures this three-level distinction.
 We present the encoding bottom-up, starting from the trained model---the
@@ -172,13 +189,14 @@ ex:MTP a mlips:MLIPAlgorithm ;
     mlips:hasImplementation ex:mlip-package-v1 ;
     mlips:supportsSimulation ex:sim-md, ex:sim-geopt .
 
-ex:hp-rcut a mlips:Hyperparameter ;
+ex:hp-rcut a mlips:Hyperparameter, mlips:PhysicalHyperparameter ;
     mlips:hyperparameterName "R_cut" ;
     mlips:hyperparameterDatatype "float" ;
     mlips:defaultValue "5.0" ;
     mlips:minValue "2.0" ; mlips:maxValue "10.0" .
 
-ex:hp-levmax a mlips:Hyperparameter ;
+ex:hp-levmax a mlips:Hyperparameter,
+    mlips:ArchitecturalHyperparameter, mlips:PhysicalHyperparameter ;
     mlips:hyperparameterName "lev_max" ;
     mlips:hyperparameterDatatype "integer" ;
     mlips:defaultValue "16" .
