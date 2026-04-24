@@ -11,39 +11,21 @@ ontologies.
 \subsection{Competency Question Coverage}
 \label{sec:eval-cq}
 
-We demonstrate that each competency question (Section~\ref{sec:requirements})
-is answerable as a SPARQL query over the ontology. For each CQ, we provide the
-query template; Appendix~\ref{sec:appendix-dl-queries} additionally presents
-the equivalent description logic formulations.
+All eight competency questions (Section~\ref{sec:requirements}) are
+answerable as SPARQL queries over the ontology. The complete set of query
+templates is provided in Appendix~\ref{sec:appendix-sparql}, with
+description logic formulations in Appendix~\ref{sec:appendix-dl-queries}.
+Here we highlight three queries that demonstrate cross-module reasoning
+and the unique capabilities of the \MLIPsOntology{}.
 
 %% TODO: populate with actual query results once the KG has data
 
-\paragraph{CQ1: Algorithm hyperparameters.}
-Which MLIP algorithms exist, and what hyperparameters does each accept?
-\begin{lstlisting}[language=sparql]
-SELECT ?algo ?hp ?name ?type ?default WHERE {
-  ?algo a mlips:MLIPAlgorithm ;
-        mlips:hasHyperparameter ?hp .
-  ?hp mlips:hyperparameterName ?name ;
-      mlips:hyperparameterDatatype ?type .
-  OPTIONAL { ?hp mlips:defaultValue ?default }
-}
-\end{lstlisting}
-
-\paragraph{CQ2: Implementations and versions.}
-Which libraries implement a given algorithm?
-\begin{lstlisting}[language=sparql]
-SELECT ?algo ?impl ?lib ?version WHERE {
-  ?algo a mlips:MLIPAlgorithm ;
-        mlips:hasImplementation ?impl .
-  ?impl mlips:implementedIn ?lib ;
-        mlips:version ?version .
-}
-\end{lstlisting}
-
-\paragraph{CQ3: Training datasets for a material system.}
-For a given material, which training datasets are available and what DFT
-settings were used?
+\paragraph{CQ3: Training datasets with DFT provenance.}
+For a given material system, which training datasets are available and
+what DFT settings were used? This query traverses the Training Data
+module, joining datasets with their DFT calculations and settings---a
+level of detail not available from any existing ontology:
+%
 \begin{lstlisting}[language=sparql]
 SELECT ?ds ?xc ?cutoff ?pseudo WHERE {
   ?ds a mlips:TrainingDataset ;
@@ -57,38 +39,21 @@ SELECT ?ds ?xc ?cutoff ?pseudo WHERE {
 }
 \end{lstlisting}
 
-\paragraph{CQ4: Dataset provenance.}
-What is the provenance of a training dataset?
-\begin{lstlisting}[language=sparql]
-SELECT ?ds ?label ?prov WHERE {
-  ?ds a mlips:TrainingDataset ;
-      rdfs:label ?label ;
-      mlips:datasetProvenance ?prov .
-}
-\end{lstlisting}
-
-\paragraph{CQ5: Dataset size and property coverage.}
-How many configurations does a dataset contain, and what properties are
-covered?
-\begin{lstlisting}[language=sparql]
-SELECT ?ds ?nconfig ?prop WHERE {
-  ?ds a mlips:TrainingDataset ;
-      mlips:numConfigurations ?nconfig ;
-      mlips:coversProperty ?prop .
-}
-\end{lstlisting}
-
 \paragraph{CQ6: Published benchmarks for an algorithm and material.}
-Which studies have benchmarked a given algorithm on a given material?
+Which studies have benchmarked a given algorithm on a given material, and
+what accuracy metrics were reported? This is the query that motivates the
+ontology: it traverses all three modules, linking a benchmark study to the
+trained model's algorithm and the target material system:
+%
 \begin{lstlisting}[language=sparql]
-SELECT ?study ?result ?metric_type ?prop ?value WHERE {
+SELECT ?study ?metric_type ?prop ?value WHERE {
   ?study a mlips:BenchmarkStudy ;
          mlips:hasResult ?result .
   ?result mlips:evaluatesModel ?model ;
           mlips:targetMaterial ?mat ;
           mlips:hasAccuracyMetric ?metric .
   ?model mlips:trainedWith ?algo .
-  ?algo rdfs:label "MACE" .
+  ?algo rdfs:label "MTP" .
   ?mat mlips:chemicalFormula "TiAl" .
   ?metric mlips:metricType ?metric_type ;
           mlips:metricProperty ?prop ;
@@ -97,7 +62,10 @@ SELECT ?study ?result ?metric_type ?prop ?value WHERE {
 \end{lstlisting}
 
 \paragraph{CQ7: Best-performing algorithm--hyperparameter combinations.}
-For a given material and target property, which combinations perform well?
+For a given material and target property, which algorithm--model
+combinations perform best? This analytical query ranks models by
+accuracy, enabling systematic comparison across the literature:
+%
 \begin{lstlisting}[language=sparql]
 SELECT ?algo ?value WHERE {
   ?result mlips:evaluatesModel ?model ;
@@ -111,45 +79,25 @@ SELECT ?algo ?value WHERE {
 } ORDER BY ?value LIMIT 10
 \end{lstlisting}
 
-\paragraph{CQ8: Simulation types supported by an algorithm.}
-Which simulation types have been performed with a given MLIP?
-\begin{lstlisting}[language=sparql]
-SELECT ?algo ?sim WHERE {
-  ?algo a mlips:MLIPAlgorithm ;
-        mlips:supportsSimulation ?sim .
-}
-\end{lstlisting}
-
 \subsection{Consistency and Classification}
 \label{sec:eval-consistency}
 
 We verify the ontology's logical consistency using the HermiT OWL~2
 reasoner~\cite{glimm2014hermit} via the ROBOT
-tool~\cite{jackson2019robot}:
-
-\begin{lstlisting}[language=bash,caption={Consistency verification.}]
-robot reason --reasoner HermiT -i mlips.ttl
-\end{lstlisting}
-
-The reasoner confirms that:
-\begin{itemize}
-\item The ontology is \emph{consistent}: no contradictions exist among the
-  axioms (A1)--(A27).
-\item No class is \emph{unsatisfiable}: every class can have instances.
-\item The inferred class hierarchy contains no unexpected subsumptions.
-\end{itemize}
+tool~\cite{jackson2019robot}. The reasoner confirms that:
+(1)~the ontology is \emph{consistent}---no contradictions exist among the
+axioms (A1)--(A27);
+(2)~no class is \emph{unsatisfiable}---every class can have instances;
+(3)~the inferred class hierarchy contains no unexpected subsumptions.
 
 \subsection{Automated Pitfall Detection}
 \label{sec:eval-oops}
 
 We evaluate the ontology using OOPS! (OntOlogy Pitfall
 Scanner)~\cite{poveda2014oops}, which checks for common ontology design
-pitfalls. OOPS! classifies pitfalls into three severity levels: critical,
-important, and minor.
+pitfalls across three severity levels (critical, important, minor).
 
 %% TODO: insert OOPS! results once the web service is available
-%% The OOPS! API at https://oops.linkeddata.es/rest is currently
-%% returning server errors. Run manually via the web interface.
 
 \DanielHernandez{Run OOPS! when the web service is back and insert results here.}
 
@@ -159,7 +107,7 @@ important, and minor.
 Table~\ref{tab:comparison} compares the \MLIPsOntology{} with existing
 ontologies from the ML and materials science domains. For each competency
 question, we indicate whether it is answerable ($\bullet$), partially
-answerable ($\circ$), or not answerable (---) using each ontology.
+answerable ($\circ$), or not answerable (---).
 
 \begin{table}[t]
 \centering

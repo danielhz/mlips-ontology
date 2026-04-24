@@ -1,0 +1,64 @@
+\section{SPARQL Query Templates for All Competency Questions}
+\label{sec:appendix-sparql}
+
+This appendix provides SPARQL query templates for all eight competency
+questions. CQ3, CQ6, and CQ7 are discussed in the main paper
+(Section~\ref{sec:eval-cq}); the remaining queries are presented here.
+
+\subsection{CQ1: Algorithm hyperparameters}
+
+Which MLIP algorithms exist, and what hyperparameters does each accept?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?hp ?name ?type ?default WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:hasHyperparameter ?hp .
+  ?hp mlips:hyperparameterName ?name ;
+      mlips:hyperparameterDatatype ?type .
+  OPTIONAL { ?hp mlips:defaultValue ?default }
+}
+\end{lstlisting}
+
+\subsection{CQ2: Implementations and versions}
+
+Which libraries implement a given algorithm?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?impl ?lib ?version WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:hasImplementation ?impl .
+  ?impl mlips:implementedIn ?lib ;
+        mlips:version ?version .
+}
+\end{lstlisting}
+
+\subsection{CQ4: Dataset provenance}
+
+What is the provenance of a training dataset?
+\begin{lstlisting}[language=sparql]
+SELECT ?ds ?label ?prov WHERE {
+  ?ds a mlips:TrainingDataset ;
+      rdfs:label ?label ;
+      mlips:datasetProvenance ?prov .
+}
+\end{lstlisting}
+
+\subsection{CQ5: Dataset size and property coverage}
+
+How many configurations does a dataset contain, and what properties are
+covered?
+\begin{lstlisting}[language=sparql]
+SELECT ?ds ?nconfig ?prop WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:numConfigurations ?nconfig ;
+      mlips:coversProperty ?prop .
+}
+\end{lstlisting}
+
+\subsection{CQ8: Simulation types supported by an algorithm}
+
+Which simulation types have been performed with a given MLIP?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?sim WHERE {
+  ?algo a mlips:MLIPAlgorithm ;
+        mlips:supportsSimulation ?sim .
+}
+\end{lstlisting}
