@@ -62,3 +62,24 @@ SELECT ?algo ?sim WHERE {
         mlips:supportsSimulation ?sim .
 }
 \end{lstlisting}
+
+\subsection{CQ9: Efficiency of algorithms and trained models}
+
+For a given target accuracy, which algorithms and trained models are
+most efficient, combining asymptotic complexity (prior knowledge on the
+algorithm) with measured training and inference cost?
+\begin{lstlisting}[language=sparql]
+SELECT ?algo ?inf_complexity ?gpu_hours ?t_inf ?rmse WHERE {
+  ?result a mlips:BenchmarkResult ;
+          mlips:evaluatesModel ?model ;
+          mlips:hasAccuracyMetric ?metric ;
+          mlips:inferenceTimePerAtom ?t_inf .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricValue ?rmse .
+  FILTER(?rmse < 2.0)
+  ?model mlips:trainedWith ?algo .
+  ?algo mlips:inferenceComplexity ?inf_complexity .
+  ?run mlips:produces ?model ;
+       mlips:gpuHours ?gpu_hours .
+} ORDER BY ?t_inf
+\end{lstlisting}
