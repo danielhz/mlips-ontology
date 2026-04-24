@@ -37,15 +37,15 @@ concept of atomic neighborhoods.
   \centering
   %% TODO: create 2D cutoff radius diagram
   \fbox{\parbox{0.9\linewidth}{\centering\vspace{3cm}%
-    2D cross-section showing $R_{\text{cut}}$\\and neighborhood $\neigh{i}$%
+    2D cross-section showing $\Rcut$\\and neighborhood $\neigh{i}$%
     \vspace{3cm}}}
   \caption{The neighborhood $\neigh{i}$ of atom~$i$: all atoms within
-    $R_{\text{cut}}$ contribute to $V(\neigh{i})$. Atoms beyond
-    $R_{\text{cut}}$ (grayed out) are excluded.}
+    $\Rcut$ contribute to $V(\neigh{i})$. Atoms beyond
+    $\Rcut$ (grayed out) are excluded.}
   \label{fig:simulation-cell-cutoff}
 \end{subfigure}
 \caption{(a)~A Ti-Al simulation cell. (b)~The cutoff radius
-  $R_{\text{cut}}$ defines the neighborhood $\neigh{i}$, which
+  $\Rcut$ defines the neighborhood $\neigh{i}$, which
   includes relative positions $\mathbf{r}_{ij}$ and atomic types $z_j$
   of the neighbors.}
 \label{fig:simulation-cell}
@@ -68,11 +68,11 @@ atomic configuration $\text{cfg}$ is decomposed into local contributions:
 \end{equation}
 %
 where $\neigh{i}$ is the \emph{neighborhood} of atom~$i$, defined as
-the set of all atoms within the cutoff radius $R_{\text{cut}}$. The
+the set of all atoms within the cutoff radius $\Rcut$. The
 neighborhood consists of the atomic type $z_i$ of the central atom, and
-for each neighbor $j$ within $R_{\text{cut}}$: the atomic type $z_j$ and
+for each neighbor $j$ within $\Rcut$: the atomic type $z_j$ and
 the relative position vector $\mathbf{r}_{ij} = \mathbf{r}_j -
-\mathbf{r}_i$. Crucially, atoms beyond $R_{\text{cut}}$ do not
+\mathbf{r}_i$. Crucially, atoms beyond $\Rcut$ do not
 contribute to $V(\neigh{i})$---this \emph{locality assumption} is
 what makes the potential computationally efficient.
 
@@ -89,21 +89,21 @@ environment---and $\boldsymbol{\xi} = \{\xi_\alpha\}$ are the
 \emph{parameters to be learned} by fitting to DFT reference data. The
 basis functions $B_\alpha$ are constructed from contractions of moment
 tensors $M_{\mu,\nu}$ involving radial functions $Q^{(\beta)}(|\mathbf{r}_{ij}|)$
-that vanish smoothly at $R_{\text{cut}}$.
+that vanish smoothly at $\Rcut$.
 
 \paragraph{Hyperparameters.}
 The MTP algorithm has several hyperparameters that control the model's
 expressiveness and computational cost:
 %
 \begin{itemize}
-\item $R_{\text{cut}}$ (\emph{cutoff radius}): determines the size of
+\item $\Rcut$ (\emph{cutoff radius}): determines the size of
   atomic neighborhoods. A larger cutoff captures longer-range
   interactions but increases computational cost.
-\item $R_{\text{min}}$ (\emph{minimum distance}): the shortest expected
+\item $\Rmin$ (\emph{minimum distance}): the shortest expected
   interatomic distance, used to define the radial basis domain.
 \item $N_Q$ (\emph{number of radial basis functions}): controls the
   resolution of the radial description.
-\item $\text{lev}_{\text{max}}$ (\emph{maximum level}): determines which
+\item $\levmax$ (\emph{maximum level}): determines which
   basis functions $B_\alpha$ are included, controlling the trade-off
   between accuracy and model size.
 \end{itemize}
@@ -128,8 +128,8 @@ energy cutoff of 520~eV using the VASP code.
 \paragraph{Ontology mapping.}
 This example maps directly onto the \MLIPsOntology{} as follows.
 The MTP algorithm is an instance of $\MLIPAlgorithmC$ with four
-$\HyperparameterC$ instances ($R_{\text{cut}}$, $R_{\text{min}}$, $N_Q$,
-$\text{lev}_{\text{max}}$). The Ti-Al material is a $\MaterialSystemC$.
+$\HyperparameterC$ instances ($\Rcut$, $\Rmin$, $N_Q$,
+$\levmax$). The Ti-Al material is a $\MaterialSystemC$.
 The 15{,}000 configurations form a $\TrainingDatasetC$, linked to a
 $\DFTCalculationC$ with $\DFTSettingsC$ recording the PBE functional and
 PAW pseudopotentials.
@@ -137,8 +137,8 @@ PAW pseudopotentials.
 A $\TrainingRunC$ records the concrete training event: it $\executesR$
 the MTP algorithm, $\runsOnR$ the Ti-Al dataset, and $\producesR$ a
 $\TrainedModelC$---the specific set of coefficients $\boldsymbol{\xi}$
-fitted to this data with $R_{\text{cut}} = 5.0$~\AA{},
-$\text{lev}_{\text{max}} = 16$, and $N_Q = 8$. These concrete
+fitted to this data with $\Rcut = 5.0$~\AA{},
+$\levmax = 16$, and $N_Q = 8$. These concrete
 values are recorded as $\HyperparameterSettingC$ instances.
 
 When the trained model is evaluated on a test set (e.g., computing the
