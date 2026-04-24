@@ -12,12 +12,13 @@ data, to the evaluation of the trained model.
 \paragraph{The simulation problem.}
 Consider a \emph{simulation cell}---a finite region of space containing
 atoms, with periodic boundary conditions that tile the cell infinitely
-in all directions to approximate a bulk material. The cell contains $n$ atoms at positions
-$\relPos_1, \ldots, \relPos_n$ with atomic types
-$\atomType_1, \ldots, \atomType_n$ (where $\atomType_i \in \{\mathrm{Ti}, \mathrm{Al}\}$ for our
-Ti-Al system). The goal of an interatomic potential is to predict the
-total energy $E$ and the forces $\mathbf{F}_i = -\nabla_{\relPos_i} E$
-acting on each atom, given only the atomic positions and types.
+in all directions to approximate a bulk material. The cell contains $n$
+atoms at positions $\relPos_1, \ldots, \relPos_n$ with atomic types
+$\atomType_1, \ldots, \atomType_n$ (where
+$\atomType_i \in \{\mathrm{Ti}, \mathrm{Al}\}$ for our Ti-Al system).
+The goal of an interatomic potential is to predict the total energy $E$
+and the forces $\mathbf{F}_i = -\nabla_{\relPos_i} E$ acting on each
+atom, given only the atomic positions and types.
 Figure~\ref{fig:simulation-cell} illustrates the simulation cell and the
 concept of atomic neighborhoods.
 
@@ -69,97 +70,85 @@ atomic configuration $\config$ is decomposed into local contributions:
 %
 where $\neigh{i}$ is the \emph{neighborhood} of atom~$i$, defined as
 the set of all atoms within the cutoff radius $\Rcut$. The
-neighborhood consists of the atomic type $\atomType_i$ of the central atom, and
-for each neighbor $j$ within $\Rcut$: the atomic type $\atomType_j$ and
-the relative position vector $\relPos_{ij} = \relPos_j -
-\relPos_i$. Crucially, atoms beyond $\Rcut$ do not
-contribute to $\localEnergy(\neigh{i})$---this \emph{locality assumption} is
-what makes the potential computationally efficient.
+neighborhood consists of the atomic type $\atomType_i$ of the central
+atom, and for each neighbor $j$ within $\Rcut$: the atomic type
+$\atomType_j$ and the relative position vector
+$\relPos_{ij} = \relPos_j - \relPos_i$. Crucially, atoms beyond $\Rcut$
+do not contribute to $\localEnergy(\neigh{i})$---this \emph{locality
+assumption} is what makes the potential computationally efficient.
 
-The local energy $\localEnergy(\neigh{i})$ is expressed as a linear combination
-of basis functions:
+The local energy $\localEnergy(\neigh{i})$ is expressed as a linear
+combination of basis functions:
 %
 \begin{equation}\label{eq:mtp-basis}
   \localEnergy(\neigh{i}) = \sum_{\alpha} \xi_\alpha \, \basisFunc_\alpha(\neigh{i}),
 \end{equation}
 %
-where $\basisFunc_\alpha$ are the \emph{moment tensor descriptors}---invariant
-functions of the neighborhood that capture the local atomic
-environment---and $\fitParams = \{\xi_\alpha\}$ are the
+where $\basisFunc_\alpha$ are the \emph{moment tensor
+descriptors}---invariant functions of the neighborhood that capture the
+local atomic environment---and $\fitParams = \{\xi_\alpha\}$ are the
 \emph{parameters to be learned} by fitting to DFT reference data. The
-basis functions $\basisFunc_\alpha$ are constructed from contractions of moment
-tensors $M_{\mu,\nu}$ involving radial functions $\radialBasis^{(\beta)}(|\relPos_{ij}|)$
-that vanish smoothly at $\Rcut$.
+basis functions $\basisFunc_\alpha$ are constructed from contractions of
+moment tensors $M_{\mu,\nu}$ involving radial functions
+$\radialBasis^{(\beta)}(|\relPos_{ij}|)$ that vanish smoothly at
+$\Rcut$.
 
-\paragraph{Hyperparameters.}
-The MTP algorithm has several hyperparameters that control the model's
-expressiveness and computational cost:
+\paragraph{Hyperparameter definitions vs.\ learned parameters.}
+A key distinction in the MLIP workflow---and in the ontology---is between
+\emph{hyperparameter definitions}, \emph{hyperparameter settings}, and
+\emph{learned parameters}:
 %
 \begin{itemize}
-\item $\Rcut$ (\emph{cutoff radius}): determines the size of
-  atomic neighborhoods. A larger cutoff captures longer-range
-  interactions but increases computational cost.
-\item $\Rmin$ (\emph{minimum distance}): the shortest expected
-  interatomic distance, used to define the radial basis domain.
-\item $\nRadialBasis$ (\emph{number of radial basis functions}): controls the
-  resolution of the radial description.
-\item $\levmax$ (\emph{maximum level}): determines which
-  basis functions $\basisFunc_\alpha$ are included, controlling the trade-off
-  between accuracy and model size.
+\item A \emph{hyperparameter definition} declares a parameter that the
+  algorithm accepts: its name, data type, valid range, and default value.
+  For example, MTP defines a hyperparameter ``$\Rcut$'' of type float,
+  with range $[2.0, 10.0]$~\AA{} and default $5.0$~\AA{}. These
+  definitions are properties of the \emph{algorithm}, independent of any
+  specific training.
+\item A \emph{hyperparameter setting} is a concrete value chosen by the
+  researcher for a specific training run: e.g., $\Rcut = 5.0$~\AA{},
+  $\levmax = 16$. These are properties of the \emph{training run}.
+\item The \emph{learned parameters} $\fitParams = \{\xi_\alpha\}$ are
+  determined during training by fitting
+  Equation~\eqref{eq:mtp-basis} to DFT data. The number of parameters
+  depends on the hyperparameter settings (e.g., a higher $\levmax$
+  includes more basis functions and thus more coefficients). These
+  define the \emph{trained model}.
 \end{itemize}
 %
-These are \emph{not} learned from data---they are chosen by the
-researcher before training.
+The MTP algorithm defines four hyperparameters:
+$\Rcut$ (cutoff radius, controlling neighborhood size),
+$\Rmin$ (minimum interatomic distance, defining the radial basis domain),
+$\nRadialBasis$ (number of radial basis functions), and
+$\levmax$ (maximum level, controlling model complexity).
 
-\paragraph{Learned parameters.}
-In contrast to the hyperparameters, the coefficients
-$\fitParams = \{\xi_\alpha\}$ in Equation~\eqref{eq:mtp-basis} are
-\emph{learned} by fitting to DFT reference data via linear regression.
-The number of coefficients depends on the hyperparameters: a higher
-$\levmax$ includes more basis functions $\basisFunc_\alpha$, and thus
-more parameters to fit. For example, with $\levmax = 16$ and
-$\nRadialBasis = 8$, the MTP has several hundred coefficients.
+\paragraph{Encoding: from trained model to algorithm.}
+The ontology captures this three-level distinction.
+We present the encoding bottom-up, starting from the trained model---the
+artifact a researcher has in hand---and tracing back to the algorithm
+definition.
 
-The ontology captures this distinction clearly: hyperparameters are
-described at the algorithm level ($\MLIPAlgorithmC$ $\to$
-$\HyperparameterC$), while the learned coefficients $\fitParams$ are
-what defines a $\TrainedModelC$---the artifact produced by a
-$\TrainingRunC$ that applies specific $\HyperparameterSettingC$ values
-to a $\TrainingDatasetC$. Two trained models using the same algorithm
-and hyperparameter settings but different training data will have
-different $\fitParams$.
-
-\paragraph{Encoding the algorithm.}
-The MTP algorithm and its hyperparameters map directly to the
-\MLIPsOntology{}. The algorithm is an instance of $\MLIPAlgorithmC$, and
-each hyperparameter is an instance of $\HyperparameterC$ with its name,
-data type, and valid range:
+A $\TrainedModelC$ is the concrete result of training: the fitted
+coefficients $\fitParams$. It is linked to a $\TrainingRunC$ that
+records which algorithm was used, with which hyperparameter settings,
+on which dataset:
 %
-\begin{lstlisting}[language=turtle,caption={MTP algorithm and its hyperparameters in RDF.},label=lst:mtp-algorithm]
-ex:MTP a mlips:MLIPAlgorithm ;
-    rdfs:label "Moment Tensor Potential" ;
-    mlips:hasHyperparameter ex:hp-rcut, ex:hp-rmin,
-        ex:hp-nq, ex:hp-levmax ;
-    mlips:supportsSimulation ex:sim-md, ex:sim-geopt .
+\begin{lstlisting}[language=turtle,caption={A trained model and its training run.},label=lst:trained-model]
+ex:model-mtp-TiAl a mlips:TrainedModel ;
+    rdfs:label "MTP for Ti-Al (lev16, rcut5)" .
 
-ex:hp-rcut a mlips:Hyperparameter ;
-    mlips:hyperparameterName "R_cut" ;
-    mlips:hyperparameterDatatype "float" ;
-    mlips:defaultValue "5.0" ;
-    mlips:minValue "2.0" ;
-    mlips:maxValue "10.0" .
-
-ex:hp-levmax a mlips:Hyperparameter ;
-    mlips:hyperparameterName "lev_max" ;
-    mlips:hyperparameterDatatype "integer" ;
-    mlips:defaultValue "16" .
+ex:run-mtp-TiAl a mlips:TrainingRun ;
+    mlips:executes ex:MTP ;
+    mlips:runsOn ex:ds-TiAl ;
+    mlips:produces ex:model-mtp-TiAl .
 \end{lstlisting}
 
 \noindent
-When a researcher trains an MTP with specific hyperparameter values,
-the concrete settings and the resulting model are encoded as:
+The hyperparameter settings used in this training run are instances of
+$\HyperparameterSettingC$, each referencing the hyperparameter
+definition it instantiates:
 %
-\begin{lstlisting}[language=turtle,caption={Hyperparameter settings and the trained model.},label=lst:mtp-learned]
+\begin{lstlisting}[language=turtle,caption={Hyperparameter settings for a specific training run.},label=lst:hp-settings]
 ex:setting-rcut a mlips:HyperparameterSetting ;
     mlips:forHyperparameter ex:hp-rcut ;
     mlips:settingValue "5.0" ;
@@ -175,26 +164,51 @@ ex:setting-nq a mlips:HyperparameterSetting ;
 \end{lstlisting}
 
 \noindent
-The trained model itself---the fitted coefficients $\fitParams$---is
-an instance of $\TrainedModelC$, linked to the training run that
-produced it (Listing~\ref{lst:mtp-benchmark}).
+The hyperparameter \emph{definitions} live at the algorithm level. They
+describe what parameters the algorithm accepts, not what values were
+used in any particular training run. The algorithm also declares which
+simulation types it supports and which software implements it:
+%
+\begin{lstlisting}[language=turtle,caption={MTP algorithm: hyperparameter definitions and implementation.},label=lst:algorithm]
+ex:MTP a mlips:MLIPAlgorithm ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasHyperparameter ex:hp-rcut, ex:hp-rmin,
+        ex:hp-nq, ex:hp-levmax ;
+    mlips:hasImplementation ex:mlip-package-v1 ;
+    mlips:supportsSimulation ex:sim-md, ex:sim-geopt .
+
+ex:hp-rcut a mlips:Hyperparameter ;
+    mlips:hyperparameterName "R_cut" ;
+    mlips:hyperparameterDatatype "float" ;
+    mlips:defaultValue "5.0" ;
+    mlips:minValue "2.0" ; mlips:maxValue "10.0" .
+
+ex:hp-levmax a mlips:Hyperparameter ;
+    mlips:hyperparameterName "lev_max" ;
+    mlips:hyperparameterDatatype "integer" ;
+    mlips:defaultValue "16" .
+
+ex:mlip-package-v1 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-mlip ;
+    mlips:version "1.0.0" .
+
+ex:lib-mlip a mlips:Library ;
+    rdfs:label "MLIP package" .
+\end{lstlisting}
 
 \paragraph{Training data.}
-The ground truth for training comes from DFT calculations: for a set of
-atomic configurations of the Ti-Al system, one computes the total energy,
-forces on each atom, and (optionally) stresses. Each configuration is a
-snapshot of atomic positions in a periodic cell, generated by sampling
-from molecular dynamics trajectories, random perturbations, or active
-learning~\cite{novikov2021mlip}. A typical training dataset for Ti-Al
-might contain 15{,}000 configurations computed with the PBE
-exchange-correlation functional, PAW pseudopotentials, and a plane-wave
-energy cutoff of 520~eV using the VASP code.
-
-\paragraph{Encoding the training data.}
-The training dataset, its material system, and the DFT calculation
-settings are encoded as follows:
+The ground truth for learning $\fitParams$ comes from DFT calculations:
+for a set of atomic configurations of the Ti-Al system, one computes the
+total energy, forces on each atom, and (optionally) stresses. Each
+configuration is a snapshot of atomic positions in a periodic cell,
+generated by sampling from molecular dynamics trajectories, random
+perturbations, or active learning~\cite{novikov2021mlip}. A typical
+training dataset for Ti-Al might contain 15{,}000 configurations
+computed with the PBE exchange-correlation functional, PAW
+pseudopotentials, and a plane-wave energy cutoff of 520~eV using the
+VASP code:
 %
-\begin{lstlisting}[language=turtle,caption={Training dataset and DFT settings in RDF.},label=lst:mtp-training]
+\begin{lstlisting}[language=turtle,caption={Training dataset and DFT settings.},label=lst:training-data]
 ex:ds-TiAl a mlips:TrainingDataset ;
     rdfs:label "Ti-Al DFT dataset" ;
     mlips:coversMaterial ex:mat-TiAl ;
@@ -217,25 +231,11 @@ ex:dft-settings-TiAl a mlips:DFTSettings ;
     mlips:kPointMesh "4x4x4" .
 \end{lstlisting}
 
-\paragraph{Encoding the training run and evaluation.}
-A $\TrainingRunC$ records the concrete training event: it $\executesR$
-the MTP algorithm, $\runsOnR$ the Ti-Al dataset, and $\producesR$ a
-$\TrainedModelC$---the specific set of coefficients $\fitParams$
-fitted to this data. The concrete hyperparameter values used
-($\Rcut = 5.0$~\AA{}, $\levmax = 16$, $\nRadialBasis = 8$) are
-recorded as $\HyperparameterSettingC$ instances. When the trained model
-is evaluated on a test set, the evaluation is captured as a
-$\BenchmarkResultC$:
+\paragraph{Evaluation.}
+When the trained model is evaluated on a test set, the evaluation is
+captured as a $\BenchmarkResultC$ within a $\BenchmarkStudyC$:
 %
-\begin{lstlisting}[language=turtle,caption={Training run, trained model, and benchmark result in RDF.},label=lst:mtp-benchmark]
-ex:run-mtp-TiAl a mlips:TrainingRun ;
-    mlips:executes ex:MTP ;
-    mlips:runsOn ex:ds-TiAl ;
-    mlips:produces ex:model-mtp-TiAl .
-
-ex:model-mtp-TiAl a mlips:TrainedModel ;
-    rdfs:label "MTP for Ti-Al (lev16, rcut5)" .
-
+\begin{lstlisting}[language=turtle,caption={Benchmark study and evaluation result.},label=lst:benchmark]
 ex:study-smith2025 a mlips:BenchmarkStudy ;
     mlips:hasResult ex:result-01 .
 
@@ -250,20 +250,20 @@ ex:metric-rmse-energy a mlips:AccuracyMetric ;
     mlips:metricValue 1.2 .
 \end{lstlisting}
 
-Figure~\ref{fig:mtp-ontology-mapping} shows how these ontology instances
-relate to each other through the ontology's roles.
+Figure~\ref{fig:mtp-ontology-mapping} summarizes how these instances
+relate through the ontology's roles.
 
 \begin{figure}[t]
 \centering
 %% TODO: create instance diagram showing the MTP/Ti-Al example
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}%
-  Instance diagram: MTP algorithm → training run → trained model → benchmark result,\\
-  with hyperparameter settings, DFT calculation, and accuracy metrics.%
+  Instance diagram: trained model → training run → algorithm,\\
+  with hyperparameter definitions vs.\ settings, training data, and benchmark.%
   \vspace{3cm}}}
-\caption{Ontology instance diagram for the running example: training an
-  MTP model for Ti-Al. Yellow nodes are instances; blue nodes are classes
-  from the \MLIPsOntology{}. The diagram shows how the MTP algorithm,
-  training data, trained model, and benchmark results are connected
-  through the ontology's roles.}
+\caption{Ontology instance diagram for the running example. The three
+  levels are visible: the \emph{algorithm} (MTP with hyperparameter
+  definitions), the \emph{training run} (with concrete hyperparameter
+  settings and training data), and the \emph{trained model} (the fitted
+  coefficients $\fitParams$, evaluated in a benchmark).}
 \label{fig:mtp-ontology-mapping}
 \end{figure}
