@@ -114,6 +114,32 @@ $\fitParams$ are determined by fitting
 Equation~\eqref{eq:mtp-basis} to DFT-computed energies, forces, and
 stresses via linear regression.
 
+\paragraph{Encoding the algorithm.}
+The MTP algorithm and its hyperparameters map directly to the
+\MLIPsOntology{}. The algorithm is an instance of $\MLIPAlgorithmC$, and
+each hyperparameter is an instance of $\HyperparameterC$ with its name,
+data type, and valid range:
+%
+\begin{lstlisting}[language=turtle,caption={MTP algorithm and its hyperparameters in RDF.},label=lst:mtp-algorithm]
+ex:MTP a mlips:MLIPAlgorithm ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasHyperparameter ex:hp-rcut, ex:hp-rmin,
+        ex:hp-nq, ex:hp-levmax ;
+    mlips:supportsSimulation ex:sim-md, ex:sim-geopt .
+
+ex:hp-rcut a mlips:Hyperparameter ;
+    mlips:hyperparameterName "R_cut" ;
+    mlips:hyperparameterDatatype "float" ;
+    mlips:defaultValue "5.0" ;
+    mlips:minValue "2.0" ;
+    mlips:maxValue "10.0" .
+
+ex:hp-levmax a mlips:Hyperparameter ;
+    mlips:hyperparameterName "lev_max" ;
+    mlips:hyperparameterDatatype "integer" ;
+    mlips:defaultValue "16" .
+\end{lstlisting}
+
 \paragraph{Training data.}
 The ground truth for training comes from DFT calculations: for a set of
 atomic configurations of the Ti-Al system, one computes the total energy,
@@ -125,27 +151,65 @@ might contain 15{,}000 configurations computed with the PBE
 exchange-correlation functional, PAW pseudopotentials, and a plane-wave
 energy cutoff of 520~eV using the VASP code.
 
-\paragraph{Ontology mapping.}
-This example maps directly onto the \MLIPsOntology{} as follows.
-The MTP algorithm is an instance of $\MLIPAlgorithmC$ with four
-$\HyperparameterC$ instances ($\Rcut$, $\Rmin$, $\nRadialBasis$,
-$\levmax$). The Ti-Al material is a $\MaterialSystemC$.
-The 15{,}000 configurations form a $\TrainingDatasetC$, linked to a
-$\DFTCalculationC$ with $\DFTSettingsC$ recording the PBE functional and
-PAW pseudopotentials.
+\paragraph{Encoding the training data.}
+The training dataset, its material system, and the DFT calculation
+settings are encoded as follows:
+%
+\begin{lstlisting}[language=turtle,caption={Training dataset and DFT settings in RDF.},label=lst:mtp-training]
+ex:ds-TiAl a mlips:TrainingDataset ;
+    rdfs:label "Ti-Al DFT dataset" ;
+    mlips:coversMaterial ex:mat-TiAl ;
+    mlips:coversProperty mlips:Energy, mlips:Forces, mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 15000 ;
+    mlips:hasDFTCalculation ex:dft-TiAl .
 
+ex:mat-TiAl a mlips:MaterialSystem ;
+    mlips:chemicalFormula "TiAl" ;
+    mlips:materialClass "binary alloy" .
+
+ex:dft-TiAl a mlips:DFTCalculation ;
+    mlips:hasDFTSettings ex:dft-settings-TiAl .
+
+ex:dft-settings-TiAl a mlips:DFTSettings ;
+    mlips:xcFunctional "PBE" ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:energyCutoff 520.0 ;
+    mlips:kPointMesh "4x4x4" .
+\end{lstlisting}
+
+\paragraph{Encoding the training run and evaluation.}
 A $\TrainingRunC$ records the concrete training event: it $\executesR$
 the MTP algorithm, $\runsOnR$ the Ti-Al dataset, and $\producesR$ a
 $\TrainedModelC$---the specific set of coefficients $\fitParams$
-fitted to this data with $\Rcut = 5.0$~\AA{},
-$\levmax = 16$, and $\nRadialBasis = 8$. These concrete
-values are recorded as $\HyperparameterSettingC$ instances.
+fitted to this data. The concrete hyperparameter values used
+($\Rcut = 5.0$~\AA{}, $\levmax = 16$, $\nRadialBasis = 8$) are
+recorded as $\HyperparameterSettingC$ instances. When the trained model
+is evaluated on a test set, the evaluation is captured as a
+$\BenchmarkResultC$:
+%
+\begin{lstlisting}[language=turtle,caption={Training run, trained model, and benchmark result in RDF.},label=lst:mtp-benchmark]
+ex:run-mtp-TiAl a mlips:TrainingRun ;
+    mlips:executes ex:MTP ;
+    mlips:runsOn ex:ds-TiAl ;
+    mlips:produces ex:model-mtp-TiAl .
 
-When the trained model is evaluated on a test set (e.g., computing the
-RMSE of predicted energies against DFT reference values), the
-evaluation is captured as a $\BenchmarkResultC$ that $\evaluatesModelR$
-the trained model, $\targetMaterialR$ the Ti-Al system, and reports
-$\AccuracyMetricC$ instances (e.g., RMSE of energy = 1.2~meV/atom).
+ex:model-mtp-TiAl a mlips:TrainedModel ;
+    rdfs:label "MTP for Ti-Al (lev16, rcut5)" .
+
+ex:study-smith2025 a mlips:BenchmarkStudy ;
+    mlips:hasResult ex:result-01 .
+
+ex:result-01 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-TiAl ;
+    mlips:targetMaterial ex:mat-TiAl ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy .
+
+ex:metric-rmse-energy a mlips:AccuracyMetric ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.2 .
+\end{lstlisting}
 
 Figure~\ref{fig:mtp-ontology-mapping} shows how these ontology instances
 relate to each other through the ontology's roles.
