@@ -13,10 +13,10 @@ data, to the evaluation of the trained model.
 Consider a \emph{simulation cell}---a finite region of space containing
 atoms, with periodic boundary conditions that tile the cell infinitely
 in all directions to approximate a bulk material. The cell contains $n$ atoms at positions
-$\mathbf{r}_1, \ldots, \mathbf{r}_n$ with atomic types
-$z_1, \ldots, z_n$ (where $z_i \in \{\text{Ti}, \text{Al}\}$ for our
+$\relPos_1, \ldots, \relPos_n$ with atomic types
+$\atomType_1, \ldots, \atomType_n$ (where $\atomType_i \in \{\text{Ti}, \text{Al}\}$ for our
 Ti-Al system). The goal of an interatomic potential is to predict the
-total energy $E$ and the forces $\mathbf{F}_i = -\nabla_{\mathbf{r}_i} E$
+total energy $E$ and the forces $\mathbf{F}_i = -\nabla_{\relPos_i} E$
 acting on each atom, given only the atomic positions and types.
 Figure~\ref{fig:simulation-cell} illustrates the simulation cell and the
 concept of atomic neighborhoods.
@@ -40,13 +40,13 @@ concept of atomic neighborhoods.
     2D cross-section showing $\Rcut$\\and neighborhood $\neigh{i}$%
     \vspace{3cm}}}
   \caption{The neighborhood $\neigh{i}$ of atom~$i$: all atoms within
-    $\Rcut$ contribute to $V(\neigh{i})$. Atoms beyond
+    $\Rcut$ contribute to $\localEnergy(\neigh{i})$. Atoms beyond
     $\Rcut$ (grayed out) are excluded.}
   \label{fig:simulation-cell-cutoff}
 \end{subfigure}
 \caption{(a)~A Ti-Al simulation cell. (b)~The cutoff radius
   $\Rcut$ defines the neighborhood $\neigh{i}$, which
-  includes relative positions $\mathbf{r}_{ij}$ and atomic types $z_j$
+  includes relative positions $\relPos_{ij}$ and atomic types $\atomType_j$
   of the neighbors.}
 \label{fig:simulation-cell}
 \end{figure}
@@ -61,34 +61,34 @@ of the cost, enabling simulations of millions of atoms.
 
 \paragraph{The MTP algorithm.}
 In the MTP framework~\cite{shapeev2016mtp}, the total energy of an
-atomic configuration $\text{cfg}$ is decomposed into local contributions:
+atomic configuration $\config$ is decomposed into local contributions:
 %
 \begin{equation}\label{eq:mtp-energy}
-  E^{\text{mtp}}(\text{cfg}) = \sum_{i=1}^{n} V(\neigh{i}),
+  \totalEnergy(\config) = \sum_{i=1}^{n} \localEnergy(\neigh{i}),
 \end{equation}
 %
 where $\neigh{i}$ is the \emph{neighborhood} of atom~$i$, defined as
 the set of all atoms within the cutoff radius $\Rcut$. The
-neighborhood consists of the atomic type $z_i$ of the central atom, and
-for each neighbor $j$ within $\Rcut$: the atomic type $z_j$ and
-the relative position vector $\mathbf{r}_{ij} = \mathbf{r}_j -
-\mathbf{r}_i$. Crucially, atoms beyond $\Rcut$ do not
-contribute to $V(\neigh{i})$---this \emph{locality assumption} is
+neighborhood consists of the atomic type $\atomType_i$ of the central atom, and
+for each neighbor $j$ within $\Rcut$: the atomic type $\atomType_j$ and
+the relative position vector $\relPos_{ij} = \relPos_j -
+\relPos_i$. Crucially, atoms beyond $\Rcut$ do not
+contribute to $\localEnergy(\neigh{i})$---this \emph{locality assumption} is
 what makes the potential computationally efficient.
 
-The local energy $V(\neigh{i})$ is expressed as a linear combination
+The local energy $\localEnergy(\neigh{i})$ is expressed as a linear combination
 of basis functions:
 %
 \begin{equation}\label{eq:mtp-basis}
-  V(\neigh{i}) = \sum_{\alpha} \xi_\alpha \, B_\alpha(\neigh{i}),
+  \localEnergy(\neigh{i}) = \sum_{\alpha} \xi_\alpha \, \basisFunc_\alpha(\neigh{i}),
 \end{equation}
 %
-where $B_\alpha$ are the \emph{moment tensor descriptors}---invariant
+where $\basisFunc_\alpha$ are the \emph{moment tensor descriptors}---invariant
 functions of the neighborhood that capture the local atomic
-environment---and $\boldsymbol{\xi} = \{\xi_\alpha\}$ are the
+environment---and $\fitParams = \{\xi_\alpha\}$ are the
 \emph{parameters to be learned} by fitting to DFT reference data. The
-basis functions $B_\alpha$ are constructed from contractions of moment
-tensors $M_{\mu,\nu}$ involving radial functions $Q^{(\beta)}(|\mathbf{r}_{ij}|)$
+basis functions $\basisFunc_\alpha$ are constructed from contractions of moment
+tensors $M_{\mu,\nu}$ involving radial functions $\radialBasis^{(\beta)}(|\relPos_{ij}|)$
 that vanish smoothly at $\Rcut$.
 
 \paragraph{Hyperparameters.}
@@ -101,16 +101,16 @@ expressiveness and computational cost:
   interactions but increases computational cost.
 \item $\Rmin$ (\emph{minimum distance}): the shortest expected
   interatomic distance, used to define the radial basis domain.
-\item $N_Q$ (\emph{number of radial basis functions}): controls the
+\item $\nRadialBasis$ (\emph{number of radial basis functions}): controls the
   resolution of the radial description.
 \item $\levmax$ (\emph{maximum level}): determines which
-  basis functions $B_\alpha$ are included, controlling the trade-off
+  basis functions $\basisFunc_\alpha$ are included, controlling the trade-off
   between accuracy and model size.
 \end{itemize}
 %
 These are \emph{not} learned from data---they are chosen by the
 researcher before training. In contrast, the coefficients
-$\boldsymbol{\xi}$ are determined by fitting
+$\fitParams$ are determined by fitting
 Equation~\eqref{eq:mtp-basis} to DFT-computed energies, forces, and
 stresses via linear regression.
 
@@ -128,7 +128,7 @@ energy cutoff of 520~eV using the VASP code.
 \paragraph{Ontology mapping.}
 This example maps directly onto the \MLIPsOntology{} as follows.
 The MTP algorithm is an instance of $\MLIPAlgorithmC$ with four
-$\HyperparameterC$ instances ($\Rcut$, $\Rmin$, $N_Q$,
+$\HyperparameterC$ instances ($\Rcut$, $\Rmin$, $\nRadialBasis$,
 $\levmax$). The Ti-Al material is a $\MaterialSystemC$.
 The 15{,}000 configurations form a $\TrainingDatasetC$, linked to a
 $\DFTCalculationC$ with $\DFTSettingsC$ recording the PBE functional and
@@ -136,9 +136,9 @@ PAW pseudopotentials.
 
 A $\TrainingRunC$ records the concrete training event: it $\executesR$
 the MTP algorithm, $\runsOnR$ the Ti-Al dataset, and $\producesR$ a
-$\TrainedModelC$---the specific set of coefficients $\boldsymbol{\xi}$
+$\TrainedModelC$---the specific set of coefficients $\fitParams$
 fitted to this data with $\Rcut = 5.0$~\AA{},
-$\levmax = 16$, and $N_Q = 8$. These concrete
+$\levmax = 16$, and $\nRadialBasis = 8$. These concrete
 values are recorded as $\HyperparameterSettingC$ instances.
 
 When the trained model is evaluated on a test set (e.g., computing the
