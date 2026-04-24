@@ -1,0 +1,151 @@
+\subsection{Running Example: Moment Tensor Potentials for Ti-Al}
+\label{sec:running-example}
+
+We introduce the ontology through a concrete example: training a Moment
+Tensor Potential (MTP)~\cite{shapeev2016mtp,novikov2021mlip} for the
+titanium-aluminium (Ti-Al) binary alloy system. This example illustrates
+how the ontology captures the full lifecycle of an MLIP study---from the
+physics of the simulation cell, through the algorithm's hyperparameters
+and training data, to the evaluation of the trained model.
+
+\paragraph{The simulation problem.}
+Consider a simulation cell containing $n$ atoms at positions
+$\mathbf{r}_1, \ldots, \mathbf{r}_n$ with atomic types
+$z_1, \ldots, z_n$ (where $z_i \in \{\text{Ti}, \text{Al}\}$ for our
+Ti-Al system). The goal of an interatomic potential is to predict the
+total energy $E$ and the forces $\mathbf{F}_i = -\nabla_{\mathbf{r}_i} E$
+acting on each atom, given only the atomic positions and types.
+Figure~\ref{fig:simulation-cell} illustrates the simulation cell and the
+concept of atomic neighborhoods.
+
+\begin{figure}[t]
+\centering
+%% TODO: create simulation cell figure with two subfigures
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}%
+  (a) 3D simulation cell with Ti (blue) and Al (orange) atoms.
+  \hspace{1cm}
+  (b) 2D cross-section showing the cutoff radius $R_{\text{cut}}$
+  defining the neighborhood $\mathbf{n}_i$ of atom $i$.%
+  \vspace{3cm}}}
+\caption{(a)~A Ti-Al simulation cell with periodic boundary conditions.
+  (b)~The neighborhood $\mathbf{n}_i$ of a central atom~$i$: all atoms
+  within the cutoff radius $R_{\text{cut}}$ contribute to the local
+  energy $V(\mathbf{n}_i)$. Atoms beyond $R_{\text{cut}}$ (grayed out)
+  are excluded. The neighborhood includes the relative positions
+  $\mathbf{r}_{ij}$ and the atomic types $z_j$ of the neighbors.}
+\label{fig:simulation-cell}
+\end{figure}
+
+In quantum mechanics, the total energy can be computed exactly (within
+the approximations of density functional theory) by solving the
+Kohn--Sham equations~\cite{kohn1965dft}. However, this is
+computationally expensive---scaling as $O(n^3)$ with the number of
+atoms---limiting DFT to systems of a few hundred atoms. Machine learning
+interatomic potentials approximate the DFT energy surface at a fraction
+of the cost, enabling simulations of millions of atoms.
+
+\paragraph{The MTP algorithm.}
+In the MTP framework~\cite{shapeev2016mtp}, the total energy of an
+atomic configuration $\text{cfg}$ is decomposed into local contributions:
+%
+\begin{equation}\label{eq:mtp-energy}
+  E^{\text{mtp}}(\text{cfg}) = \sum_{i=1}^{n} V(\mathbf{n}_i),
+\end{equation}
+%
+where $\mathbf{n}_i$ is the \emph{neighborhood} of atom~$i$, defined as
+the set of all atoms within the cutoff radius $R_{\text{cut}}$. The
+neighborhood consists of the atomic type $z_i$ of the central atom, and
+for each neighbor $j$ within $R_{\text{cut}}$: the atomic type $z_j$ and
+the relative position vector $\mathbf{r}_{ij} = \mathbf{r}_j -
+\mathbf{r}_i$. Crucially, atoms beyond $R_{\text{cut}}$ do not
+contribute to $V(\mathbf{n}_i)$---this \emph{locality assumption} is
+what makes the potential computationally efficient.
+
+The local energy $V(\mathbf{n}_i)$ is expressed as a linear combination
+of basis functions:
+%
+\begin{equation}\label{eq:mtp-basis}
+  V(\mathbf{n}_i) = \sum_{\alpha} \xi_\alpha \, B_\alpha(\mathbf{n}_i),
+\end{equation}
+%
+where $B_\alpha$ are the \emph{moment tensor descriptors}---invariant
+functions of the neighborhood that capture the local atomic
+environment---and $\boldsymbol{\xi} = \{\xi_\alpha\}$ are the
+\emph{parameters to be learned} by fitting to DFT reference data. The
+basis functions $B_\alpha$ are constructed from contractions of moment
+tensors $M_{\mu,\nu}$ involving radial functions $Q^{(\beta)}(|\mathbf{r}_{ij}|)$
+that vanish smoothly at $R_{\text{cut}}$.
+
+\paragraph{Hyperparameters.}
+The MTP algorithm has several hyperparameters that control the model's
+expressiveness and computational cost:
+%
+\begin{itemize}
+\item $R_{\text{cut}}$ (\emph{cutoff radius}): determines the size of
+  atomic neighborhoods. A larger cutoff captures longer-range
+  interactions but increases computational cost.
+\item $R_{\text{min}}$ (\emph{minimum distance}): the shortest expected
+  interatomic distance, used to define the radial basis domain.
+\item $N_Q$ (\emph{number of radial basis functions}): controls the
+  resolution of the radial description.
+\item $\text{lev}_{\text{max}}$ (\emph{maximum level}): determines which
+  basis functions $B_\alpha$ are included, controlling the trade-off
+  between accuracy and model size.
+\end{itemize}
+%
+These are \emph{not} learned from data---they are chosen by the
+researcher before training. In contrast, the coefficients
+$\boldsymbol{\xi}$ are determined by fitting
+Equation~\eqref{eq:mtp-basis} to DFT-computed energies, forces, and
+stresses via linear regression.
+
+\paragraph{Training data.}
+The ground truth for training comes from DFT calculations: for a set of
+atomic configurations of the Ti-Al system, one computes the total energy,
+forces on each atom, and (optionally) stresses. Each configuration is a
+snapshot of atomic positions in a periodic cell, generated by sampling
+from molecular dynamics trajectories, random perturbations, or active
+learning~\cite{novikov2021mlip}. A typical training dataset for Ti-Al
+might contain 15{,}000 configurations computed with the PBE
+exchange-correlation functional, PAW pseudopotentials, and a plane-wave
+energy cutoff of 520~eV using the VASP code.
+
+\paragraph{Ontology mapping.}
+This example maps directly onto the \MLIPsOntology{} as follows.
+The MTP algorithm is an instance of $\MLIPAlgorithmC$ with four
+$\HyperparameterC$ instances ($R_{\text{cut}}$, $R_{\text{min}}$, $N_Q$,
+$\text{lev}_{\text{max}}$). The Ti-Al material is a $\MaterialSystemC$.
+The 15{,}000 configurations form a $\TrainingDatasetC$, linked to a
+$\DFTCalculationC$ with $\DFTSettingsC$ recording the PBE functional and
+PAW pseudopotentials.
+
+A $\TrainingRunC$ records the concrete training event: it $\executesR$
+the MTP algorithm, $\runsOnR$ the Ti-Al dataset, and $\producesR$ a
+$\TrainedModelC$---the specific set of coefficients $\boldsymbol{\xi}$
+fitted to this data with $R_{\text{cut}} = 5.0$~\AA{},
+$\text{lev}_{\text{max}} = 16$, and $N_Q = 8$. These concrete
+values are recorded as $\HyperparameterSettingC$ instances.
+
+When the trained model is evaluated on a test set (e.g., computing the
+RMSE of predicted energies against DFT reference values), the
+evaluation is captured as a $\BenchmarkResultC$ that $\evaluatesModelR$
+the trained model, $\targetMaterialR$ the Ti-Al system, and reports
+$\AccuracyMetricC$ instances (e.g., RMSE of energy = 1.2~meV/atom).
+
+Figure~\ref{fig:mtp-ontology-mapping} shows how these ontology instances
+relate to each other through the ontology's roles.
+
+\begin{figure}[t]
+\centering
+%% TODO: create instance diagram showing the MTP/Ti-Al example
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}%
+  Instance diagram: MTP algorithm → training run → trained model → benchmark result,\\
+  with hyperparameter settings, DFT calculation, and accuracy metrics.%
+  \vspace{3cm}}}
+\caption{Ontology instance diagram for the running example: training an
+  MTP model for Ti-Al. Yellow nodes are instances; blue nodes are classes
+  from the \MLIPsOntology{}. The diagram shows how the MTP algorithm,
+  training data, trained model, and benchmark results are connected
+  through the ontology's roles.}
+\label{fig:mtp-ontology-mapping}
+\end{figure}
