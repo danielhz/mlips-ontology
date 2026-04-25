@@ -1,0 +1,92 @@
+% ALT 1: New bottom row.
+% All four new leaf classes (DatasetProvenance, CoveredProperty,
+% MetricType, MetricProperty) sit on a single new row at y=-0.8.
+% trainedWith shortcut: long arc on the left of the central column.
+\begin{tikzpicture}[
+    x=1cm, y=1cm,
+    every node/.style={font=\footnotesize},
+    methodnode/.style={draw, rounded corners=2pt, fill=algofill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    trainnode/.style={draw, rounded corners=2pt, fill=trainfill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    benchnode/.style={draw, rounded corners=2pt, fill=benchfill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    centerwidth/.style={minimum width=2.5cm},
+    edge/.style={->, >=stealth, thin},
+    crossedge/.style={->, >=stealth, thin, dashed},
+    shortcut/.style={->, >=stealth, thin, dotted},
+    edgelabel/.style={font=\tiny, fill=white, inner sep=0.5pt},
+]
+  \node[methodnode, centerwidth] (Implementation)  at (5, 7.0) {Implementation};
+  \node[methodnode, centerwidth] (MLIPMethod)      at (5, 5.7) {MLIPMethod};
+  \node[methodnode, centerwidth] (MLIPRun)         at (5, 4.4) {MLIPRun};
+  \node[methodnode, centerwidth] (TrainedModel)    at (5, 3.1) {TrainedModel};
+  \node[trainnode,  centerwidth] (MaterialSystem)  at (5, 1.8) {MaterialSystem};
+  \node[trainnode,  centerwidth] (TrainingDataset) at (5, 0.5) {TrainingDataset};
+  \node[methodnode, anchor=west] (Library)              at (-0.1, 7.0) {Library};
+  \node[methodnode, anchor=west] (SimulationType)       at (-0.1, 5.7) {SimulationType};
+  \node[trainnode,  anchor=west] (AtomicConfiguration)  at (-0.1, 1.8) {AtomicConfiguration};
+  \node[methodnode, anchor=east] (HyperparameterSetting) at (16.5, 4.4) {HyperparameterSetting};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (BenchmarkStudy)  at (16.5, 3.1) {BenchmarkStudy};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (BenchmarkResult) at (16.5, 1.8) {BenchmarkResult};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (AccuracyMetric)  at (16.5, 0.5) {AccuracyMetric};
+  \node[methodnode, minimum width=2.5cm] (FunctionalForm) at (9.75, 7.0) {FunctionalForm};
+  \node[methodnode, minimum width=2.5cm] (LossFunction)   at (9.75, 5.7) {LossFunction};
+  \node[methodnode, minimum width=2.5cm] (Hyperparameter) at (9.75, 4.4) {Hyperparameter};
+  \node[trainnode] (DFTCalculation)  at (9.25,  0.5) {DFTCalculation};
+  \node[trainnode] (DFTSettings)     at (12.75, 0.5) {DFTSettings};
+
+  % NEW LEAF NODES — single row at y=-0.8
+  \node[trainnode]  (DatasetProvenance) at (3,    -0.8) {DatasetProvenance};
+  \node[trainnode]  (CoveredProperty)   at (7,    -0.8) {CoveredProperty};
+  \node[benchnode]  (MetricType)        at (12.5, -0.8) {MetricType};
+  \node[benchnode, anchor=east]  (MetricProperty)    at (16.5, -0.8) {MetricProperty};
+
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasFunctionalForm} (FunctionalForm.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasLossFunction} (LossFunction.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasHyperparameter} (Hyperparameter.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasImplementation} (Implementation);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {supportsSimulation} (SimulationType);
+  \draw[edge] (Implementation) -- node[edgelabel] {implementedIn} (Library);
+  \draw[edge] (HyperparameterSetting) -- node[edgelabel] {forHyperparameter} (Hyperparameter.east);
+  \draw[edge] (MLIPRun) -- node[edgelabel] {appliesMethod} (MLIPMethod);
+  \draw[edge] (MLIPRun) -- node[edgelabel] {produces} (TrainedModel.north);
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {hasDFTCalculation} (DFTCalculation);
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {coversMaterial} (MaterialSystem);
+  \draw[edge] ($(TrainingDataset.north west)!2/3!(TrainingDataset.south west)$)
+    to[out=180, in=270] node[edgelabel, pos=0.6] {hasConfiguration} (AtomicConfiguration.south);
+  \draw[edge] (DFTCalculation) -- node[edgelabel] {hasDFTSettings} (DFTSettings);
+  \draw[edge] (BenchmarkStudy) -- node[edgelabel] {hasResult} (BenchmarkResult);
+  \draw[edge] (BenchmarkResult) -- node[edgelabel] {hasAccuracyMetric} (AccuracyMetric);
+
+  % NEW EDGES
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {datasetProvenance} (DatasetProvenance);
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {coversProperty} (CoveredProperty);
+  \draw[edge] (AccuracyMetric) -- node[edgelabel] {metricType} (MetricType);
+  \draw[edge] (AccuracyMetric) -- node[edgelabel] {metricProperty} (MetricProperty);
+
+  \coordinate (runsOnEnd) at ($(TrainingDataset.north west)!1/3!(TrainingDataset.south west)$);
+  \coordinate (runsOnTurn) at ($(runsOnEnd) + (-0.75, 0)$);
+  \draw[crossedge, rounded corners=4pt] (MLIPRun.west) -- (3, 4.4) --
+    node[edgelabel] {runsOn} (runsOnTurn) -- (runsOnEnd);
+  \draw[crossedge, bend right=15] (BenchmarkResult) to
+    node[edgelabel, pos=0.5] {evaluatesModel} (TrainedModel.east);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel] {targetMaterial} (MaterialSystem);
+
+  % HyperparameterSetting incoming: solid from MLIPRun (underlying), dotted
+  % shortcut from TrainedModel. Endpoints split at 1/3 vs 2/3 down its west
+  % side to avoid overlap.
+  \draw[edge, bend left=25] (MLIPRun.east) to
+    node[edgelabel, pos=0.5] {hasHyperparameterSetting}
+    ($(HyperparameterSetting.north west)!1/3!(HyperparameterSetting.south west)$);
+  \draw[shortcut] (TrainedModel.east) to
+    node[edgelabel, pos=0.55] {trainedUsing}
+    ($(HyperparameterSetting.north west)!2/3!(HyperparameterSetting.south west)$);
+
+  % trainedWith shortcut: dotted arc on left of central column.
+  \draw[shortcut, bend left=70, looseness=1.5]
+    (TrainedModel.west) to node[edgelabel, pos=0.5] {trainedWith} (MLIPMethod.west);
+\end{tikzpicture}
