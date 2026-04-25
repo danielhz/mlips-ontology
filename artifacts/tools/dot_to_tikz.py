@@ -97,9 +97,9 @@ CLUSTER_FILL = {
 }
 
 CLUSTER_LABEL = {
-    "cluster_algorithm": "Algorithm Module",
-    "cluster_training": "Training Data Module",
-    "cluster_benchmark": "Benchmark Module",
+    "cluster_algorithm": "Method",
+    "cluster_training": "Training Data",
+    "cluster_benchmark": "Benchmark",
 }
 
 
@@ -117,7 +117,10 @@ def node_style(obj):
     if fill == "#ddeeff":
         return "class"
     if shape == "plaintext":
-        return "literal"
+        # A bare-text node — borderless, transparent — rendered on top
+        # of the cluster's coloured background (used by the overview
+        # figure where modules are identified by colour, not by box).
+        return "modulenode"
     return "class"
 
 
@@ -147,6 +150,7 @@ def generate_tikz(gv_json, figure_name="figure"):
     lines.append(r"    instance/.style={draw, fill=instancefill,")
     lines.append(r"        font=\small, inner sep=3pt, align=center},")
     lines.append(r"    literal/.style={font=\small\color{gray}, inner sep=2pt, align=center},")
+    lines.append(r"    modulenode/.style={font=\small, inner sep=2pt, align=center},")
     lines.append(r"    extclass/.style={draw, dashed, rounded corners=2pt, fill=extfill,")
     lines.append(r"        font=\small, inner sep=3pt, align=center},")
     lines.append(r"    edge/.style={->, >=stealth, thick},")

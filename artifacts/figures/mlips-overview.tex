@@ -1,79 +1,128 @@
-% Auto-generated from Graphviz layout — edit freely
-% Regenerate initial layout: python dot_to_tikz.py
+% Manually-laid-out ontology overview.
+% Module membership is encoded by node fill colour (no cluster boxes):
+%   * Method module        → blue   (\algofill)
+%   * Training Data module → green  (\trainfill)
+%   * Benchmark module     → orange (\benchfill)
+% Cross-module relationships are dashed.
+%
+% Layout invariants:
+%   * Six rows defined by the central column (Implementation, MLIPMethod,
+%     MLIPRun, TrainedModel, MaterialSystem, TrainingDataset).  All
+%     central-column nodes share x = 5, the same minimum width, and a
+%     uniform vertical spacing of 1.3 cm.
+%   * Left column (Library, SimulationType, AtomicConfiguration) shares
+%     west x = 0 (anchor=west) so the gap between them and the central
+%     column scales with each node's natural width — wider labels stay
+%     close to the central column, narrower ones leave room for the
+%     incoming edge label.
+%   * Right column (HyperparameterSetting, BenchmarkStudy,
+%     BenchmarkResult, AccuracyMetric) shares east x = 16.5.
+%   * Nodes that share a row share the same y.
 \begin{tikzpicture}[
     x=1cm, y=1cm,
-    every node/.style={font=\small},
-    class/.style={draw, rounded corners=2pt, fill=classfill,
-        font=\small, inner sep=3pt, align=center},
-    instance/.style={draw, fill=instancefill,
-        font=\small, inner sep=3pt, align=center},
-    literal/.style={font=\small\color{gray}, inner sep=2pt, align=center},
-    extclass/.style={draw, dashed, rounded corners=2pt, fill=extfill,
-        font=\small, inner sep=3pt, align=center},
-    edge/.style={->, >=stealth, thick},
-    crossedge/.style={->, >=stealth, thick, dashed},
-    edgelabel/.style={font=\scriptsize, fill=white, inner sep=1pt},
+    every node/.style={font=\footnotesize},
+    % text height + text depth force every node label to claim the same
+    % vertical metrics regardless of whether the word has descenders ("g")
+    % or only x-height letters ("c"), so all baselines line up.
+    methodnode/.style={draw, rounded corners=2pt, fill=algofill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    trainnode/.style={draw, rounded corners=2pt, fill=trainfill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    benchnode/.style={draw, rounded corners=2pt, fill=benchfill,
+        minimum height=0.55cm, inner sep=3pt, align=center,
+        font=\footnotesize, text height=1.6ex, text depth=0.4ex},
+    % Forces a fixed width on the central-column nodes.
+    centerwidth/.style={minimum width=2.5cm},
+    edge/.style={->, >=stealth, thin},
+    crossedge/.style={->, >=stealth, thin, dashed},
+    edgelabel/.style={font=\tiny, fill=white, inner sep=0.5pt},
 ]
 
 % Color definitions (copy to preamble if not already defined):
-% \definecolor{classfill}{HTML}{DDEEFF}
-% \definecolor{instancefill}{HTML}{FFF4CC}
-% \definecolor{extfill}{HTML}{E8E8E8}
-% \definecolor{algofill}{HTML}{C6DBEF}
-% \definecolor{trainfill}{HTML}{C7E9C0}
-% \definecolor{benchfill}{HTML}{FDD0A2}
+% \definecolor{algofill}{HTML}{A6CEE3}
+% \definecolor{trainfill}{HTML}{B2DF8A}
+% \definecolor{benchfill}{HTML}{FDBF6F}
 
-  % cluster_algorithm
-  \fill[algofill, rounded corners=4pt] (0.28,0.28) rectangle (12.84,7.37);
-  \node[anchor=north west, font=\small\bfseries] at (0.38,0.28) {Algorithm Module};
+  % ─── Central column (defines the rows; six nodes at x = 5) ───────
+  % Uniform vertical spacing: 1.3 cm.  Same minimum width.
+  \node[methodnode, centerwidth] (Implementation)  at (5, 7.0) {Implementation};
+  \node[methodnode, centerwidth] (MLIPMethod)      at (5, 5.7) {MLIPMethod};
+  \node[methodnode, centerwidth] (MLIPRun)         at (5, 4.4) {MLIPRun};
+  \node[methodnode, centerwidth] (TrainedModel)    at (5, 3.1) {TrainedModel};
+  \node[trainnode,  centerwidth] (MaterialSystem)  at (5, 1.8) {MaterialSystem};
+  \node[trainnode,  centerwidth] (TrainingDataset) at (5, 0.5) {TrainingDataset};
 
-  % cluster_training
-  \fill[trainfill, rounded corners=4pt] (25.33,0.28) rectangle (42.12,7.37);
-  \node[anchor=north west, font=\small\bfseries] at (25.43,0.28) {Training Data Module};
+  % ─── Left column (west edges aligned at x = -0.1) ────────────────
+  \node[methodnode, anchor=west] (Library)              at (-0.1, 7.0) {Library};
+  \node[methodnode, anchor=west] (SimulationType)       at (-0.1, 5.7) {SimulationType};
+  \node[trainnode,  anchor=west] (AtomicConfiguration)  at (-0.1, 1.8) {AtomicConfiguration};
 
-  % cluster_benchmark
-  \fill[benchfill, rounded corners=4pt] (12.84,3.14) rectangle (17.85,12.03);
-  \node[anchor=north west, font=\small\bfseries] at (12.94,3.14) {Benchmark Module};
+  % ─── Right column (east edges aligned at x = 16.5; the three
+  %     orange Benchmark nodes share the same minimum width). ──────
+  \node[methodnode, anchor=east] (HyperparameterSetting) at (16.5, 4.4) {HyperparameterSetting};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (BenchmarkStudy)
+    at (16.5, 3.1) {BenchmarkStudy};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (BenchmarkResult)
+    at (16.5, 1.8) {BenchmarkResult};
+  \node[benchnode,  anchor=east, minimum width=2.5cm] (AccuracyMetric)
+    at (16.5, 0.5) {AccuracyMetric};
 
-  % Nodes
-  \node[class] (MLIPAlgorithm) at (8.75,1.55) {MLIPAlgorithm};
-  \node[class] (Hyperparameter) at (2.79,4.41) {Hyperparameter};
-  \node[class] (HyperparameterSetting) at (2.22,1.55) {HyperparameterSetting};
-  \node[class] (Implementation) at (7.16,4.41) {Implementation};
-  \node[class] (Library) at (7.16,6.74) {Library};
-  \node[class] (SimulationType) at (10.34,4.41) {SimulationType};
-  \node[class] (TrainingDataset) at (31.47,1.55) {TrainingDataset};
-  \node[class] (DFTCalculation) at (26.63,4.41) {DFTCalculation};
-  \node[class] (DFTSettings) at (27.34,6.74) {DFTSettings};
-  \node[class] (MaterialSystem) at (29.77,4.41) {MaterialSystem};
-  \node[class] (AtomicConfiguration) at (33.30,4.41) {AtomicConfiguration};
-  \node[class] (DatasetProvenance) at (37.15,4.41) {DatasetProvenance};
-  \node[class] (CoveredProperty) at (40.71,4.41) {CoveredProperty};
-  \node[class] (BenchmarkStudy) at (14.29,4.41) {BenchmarkStudy};
-  \node[class] (BenchmarkResult) at (14.89,6.74) {BenchmarkResult};
-  \node[class] (AccuracyMetric) at (14.89,9.07) {AccuracyMetric};
-  \node[class] (MetricType) at (13.83,11.39) {MetricType};
-  \node[class] (MetricProperty) at (16.58,11.39) {MetricProperty};
+  % ─── Method-module nodes right of the central column.  Same minimum
+  %     width so their west edges line up. ────────────────────────────
+  \node[methodnode, minimum width=2.5cm] (FunctionalForm) at (9.75, 7.0) {FunctionalForm};
+  \node[methodnode, minimum width=2.5cm] (LossFunction)   at (9.75, 5.7) {LossFunction};
+  \node[methodnode, minimum width=2.5cm] (Hyperparameter) at (9.75, 4.4) {Hyperparameter};
 
-  % Edges
-  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {hasHyperparameter} (Hyperparameter);
-  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {hasImplementation} (Implementation);
-  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {supportsSimulation} (SimulationType);
-  \draw[edge] (HyperparameterSetting) -- node[edgelabel, pos=0.5] {forHyperparameter} (Hyperparameter);
-  \draw[edge] (Implementation) -- node[edgelabel, pos=0.5] {implementedIn} (Library);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {hasDFTCalculation} (DFTCalculation);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {coversMaterial} (MaterialSystem);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {hasConfiguration} (AtomicConfiguration);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {datasetProvenance} (DatasetProvenance);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {coversProperty} (CoveredProperty);
-  \draw[edge] (DFTCalculation) -- node[edgelabel, pos=0.5] {hasDFTSettings} (DFTSettings);
-  \draw[edge] (BenchmarkStudy) -- node[edgelabel, pos=0.5] {hasResult} (BenchmarkResult);
-  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {usesAlgorithm} (MLIPAlgorithm);
-  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {hasHyperparameterSetting} (HyperparameterSetting);
-  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {usesTrainingData} (TrainingDataset);
-  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {targetMaterial} (MaterialSystem);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {hasAccuracyMetric} (AccuracyMetric);
-  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {metricType} (MetricType);
-  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {metricProperty} (MetricProperty);
+  % ─── Training-data-module nodes in the bottom row (y = 0.5) ──────
+  \node[trainnode] (DFTCalculation)  at (9.25,  0.5) {DFTCalculation};
+  \node[trainnode] (DFTSettings)     at (12.75, 0.5) {DFTSettings};
+
+  % ─── Method-internal edges.  Incoming arrows on FunctionalForm,
+  %     LossFunction, Hyperparameter, and TrainedModel are anchored to
+  %     the middle of the side they approach. ─────────────────────────
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasFunctionalForm} (FunctionalForm.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasLossFunction} (LossFunction.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasHyperparameter} (Hyperparameter.west);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {hasImplementation} (Implementation);
+  \draw[edge] (MLIPMethod) -- node[edgelabel] {supportsSimulation} (SimulationType);
+  \draw[edge] (Implementation) -- node[edgelabel] {implementedIn} (Library);
+  \draw[edge] (HyperparameterSetting) -- node[edgelabel] {forHyperparameter} (Hyperparameter.east);
+  \draw[edge] (MLIPRun) -- node[edgelabel] {appliesMethod} (MLIPMethod);
+  \draw[edge] (MLIPRun) -- node[edgelabel] {produces} (TrainedModel.north);
+
+  % ─── Training-Data-internal edges ────────────────────────────────
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {hasDFTCalculation} (DFTCalculation);
+  \draw[edge] (TrainingDataset) -- node[edgelabel] {coversMaterial} (MaterialSystem);
+  % hasConfiguration: leaves TrainingDataset at 2/3 down its west side
+  % (so it doesn't collide with runsOn which arrives at 1/3 down the
+  % same side), heading west (out=180), and enters AtomicConfiguration
+  % from the south (in=270, ending pointing N).
+  \draw[edge] ($(TrainingDataset.north west)!2/3!(TrainingDataset.south west)$)
+    to[out=180, in=270]
+    node[edgelabel, pos=0.6] {hasConfiguration} (AtomicConfiguration.south);
+  \draw[edge] (DFTCalculation) -- node[edgelabel] {hasDFTSettings} (DFTSettings);
+
+  % ─── Benchmark-internal edges ────────────────────────────────────
+  \draw[edge] (BenchmarkStudy) -- node[edgelabel] {hasResult} (BenchmarkResult);
+  \draw[edge] (BenchmarkResult) -- node[edgelabel] {hasAccuracyMetric} (AccuracyMetric);
+
+  % ─── Cross-module edges (dashed) ─────────────────────────────────
+  % runsOn: routed as a U-shape with two horizontal end segments and a
+  % vertical middle segment in the corridor between AtomicConfiguration
+  % and the central column.  The horizontal end segments make the
+  % arrow tip orthogonal to TrainingDataset's west side (and the start
+  % orthogonal to MLIPRun's west side too, for symmetry).
+  \coordinate (runsOnEnd)
+    at ($(TrainingDataset.north west)!1/3!(TrainingDataset.south west)$);
+  \coordinate (runsOnTurn) at ($(runsOnEnd) + (-0.75, 0)$);
+  \draw[crossedge, rounded corners=4pt]
+    (MLIPRun.west) -- (3, 4.4) --
+    node[edgelabel] {runsOn}
+    (runsOnTurn) -- (runsOnEnd);
+  \draw[crossedge, bend right=15] (BenchmarkResult) to
+    node[edgelabel, pos=0.5] {evaluatesModel} (TrainedModel.east);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel] {targetMaterial} (MaterialSystem);
 
 \end{tikzpicture}

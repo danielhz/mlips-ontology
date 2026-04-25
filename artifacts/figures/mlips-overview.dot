@@ -1,42 +1,62 @@
+// Overview of the MLIPs ontology — Graphviz layout source.
+// Render: dot -Tpdf mlips-overview.dot or via dot_to_tikz.py
+//
+// Visual conventions:
+//   * Modules are coloured cluster regions (no per-node borders).
+//   * Each node is plaintext on the cluster's coloured background.
+//   * Aspect: roughly 2:1 (wider than tall) — set via the size hint.
+
 digraph mlips_overview {
-  rankdir=TB;
+  rankdir=LR;
+  size="10,5!";
+  ratio=fill;
   fontname="Helvetica";
   fontsize=10;
-  node [fontname="Helvetica", fontsize=8, margin="0.08,0.03"];
+  node [fontname="Helvetica", fontsize=9, shape=plaintext, margin="0.04,0.02"];
   edge [fontname="Helvetica", fontsize=7];
-  nodesep=0.20;
+  nodesep=0.10;
   ranksep=0.30;
   margin=0;
   pad="0.02";
   compound=true;
   newrank=true;
+
   subgraph cluster_algorithm {
-    label="Algorithm Module";
+    label="Method";
     style="filled,rounded"; color="#c6dbef";
-    fontsize=9; labeljust=l;
-    MLIPAlgorithm [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    Hyperparameter [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    HyperparameterSetting [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    Implementation [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    Library [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    SimulationType [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    MLIPAlgorithm -> Hyperparameter [label="hasHyperparameter"];
-    MLIPAlgorithm -> Implementation [label="hasImplementation"];
-    MLIPAlgorithm -> SimulationType [label="supportsSimulation"];
+    fontsize=10; labeljust=l;
+    MLIPMethod;
+    Hyperparameter;
+    HyperparameterSetting;
+    Implementation;
+    Library;
+    SimulationType;
+    FunctionalForm;
+    LossFunction;
+    MLIPRun;
+    TrainedModel;
+    MLIPMethod -> Hyperparameter [label="hasHyperparameter"];
+    MLIPMethod -> Implementation [label="hasImplementation"];
+    MLIPMethod -> SimulationType [label="supportsSimulation"];
+    MLIPMethod -> FunctionalForm [label="hasFunctionalForm"];
+    MLIPMethod -> LossFunction [label="hasLossFunction"];
     Implementation -> Library [label="implementedIn"];
     HyperparameterSetting -> Hyperparameter [label="forHyperparameter"];
+    MLIPRun -> MLIPMethod [label="appliesMethod"];
+    MLIPRun -> TrainedModel [label="produces"];
   }
+
   subgraph cluster_training {
-    label="Training Data Module";
+    label="Training Data";
     style="filled,rounded"; color="#c7e9c0";
-    fontsize=9; labeljust=l;
-    TrainingDataset [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    DFTCalculation [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    DFTSettings [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    MaterialSystem [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    AtomicConfiguration [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    DatasetProvenance [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    CoveredProperty [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
+    fontsize=10; labeljust=l;
+    TrainingDataset;
+    DFTCalculation;
+    DFTSettings;
+    MaterialSystem;
+    AtomicConfiguration;
+    DatasetProvenance;
+    CoveredProperty;
     TrainingDataset -> MaterialSystem [label="coversMaterial"];
     TrainingDataset -> DFTCalculation [label="hasDFTCalculation"];
     TrainingDataset -> CoveredProperty [label="coversProperty"];
@@ -44,27 +64,24 @@ digraph mlips_overview {
     TrainingDataset -> AtomicConfiguration [label="hasConfiguration"];
     DFTCalculation -> DFTSettings [label="hasDFTSettings"];
   }
-  { rank=same; MLIPAlgorithm; TrainingDataset; }
+
   subgraph cluster_benchmark {
-    label="Benchmark Module";
+    label="Benchmark";
     style="filled,rounded"; color="#fdd0a2";
-    fontsize=9; labeljust=l;
-    BenchmarkStudy [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    BenchmarkResult [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    AccuracyMetric [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    MetricType [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
-    MetricProperty [shape=box, style="rounded,filled", fillcolor="#ddeeff"];
+    fontsize=10; labeljust=l;
+    BenchmarkStudy;
+    BenchmarkResult;
+    AccuracyMetric;
+    MetricType;
+    MetricProperty;
     BenchmarkStudy -> BenchmarkResult [label="hasResult"];
     BenchmarkResult -> AccuracyMetric [label="hasAccuracyMetric"];
     AccuracyMetric -> MetricType [label="metricType"];
     AccuracyMetric -> MetricProperty [label="metricProperty"];
   }
-  // Layout: force top row above benchmark
-  MLIPAlgorithm -> BenchmarkStudy [style=invis];
-  TrainingDataset -> BenchmarkResult [style=invis];
-  // Cross-module relationships
-  BenchmarkResult -> MLIPAlgorithm [label="usesAlgorithm", constraint=false, style=dashed];
-  BenchmarkResult -> TrainingDataset [label="usesTrainingData", constraint=false, style=dashed];
-  BenchmarkResult -> MaterialSystem [label="targetMaterial", constraint=false, style=dashed];
-  BenchmarkResult -> HyperparameterSetting [label="hasHyperparameterSetting", constraint=false, style=dashed];
+
+  // Cross-module relationships (dashed)
+  MLIPRun         -> TrainingDataset [label="runsOn",          constraint=false, style=dashed];
+  BenchmarkResult -> TrainedModel    [label="evaluatesModel",  constraint=false, style=dashed];
+  BenchmarkResult -> MaterialSystem  [label="targetMaterial",  constraint=false, style=dashed];
 }
