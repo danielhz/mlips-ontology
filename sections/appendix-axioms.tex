@@ -5,23 +5,57 @@ This appendix enumerates all axioms in the \MLIPsOntology{}, organized by
 module. For each axiom we give the formal statement and a concrete example
 illustrating its effect.
 
-\subsection{Algorithm Module}
+\subsection{Method Module}
 
-\subsubsection{Every algorithm has at least one hyperparameter}
+\subsubsection{Every method has at least one hyperparameter}
 \begin{align}
-  \MLIPAlgorithmC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \axiomtag
+  \MLIPMethodC &\sqsub \existsR{hasHyperparameter}{Hyperparameter} \axiomtag
 \end{align}
-\emph{Example.} The MACE algorithm declares hyperparameters such as cutoff
-radius and number of layers. An $\MLIPAlgorithmC$ instance without any
+\emph{Example.} The MACE method declares hyperparameters such as cutoff
+radius and number of layers. An $\MLIPMethodC$ instance without any
 $\hasHyperparameterR$ link would violate this axiom.
 
-\subsubsection{Every algorithm supports at least one simulation type}
+\subsubsection{Every method supports at least one simulation type}
 \begin{align}
-  \MLIPAlgorithmC &\sqsub \existsR{supportsSimulation}{SimulationType} \axiomtag
+  \MLIPMethodC &\sqsub \existsR{supportsSimulation}{SimulationType} \axiomtag
 \end{align}
 \emph{Example.} MACE supports molecular dynamics and geometry optimization.
-An algorithm that does not declare any supported simulation type is
+A method that does not declare any supported simulation type is
 incomplete.
+
+\subsubsection{Every method has a functional form}
+\begin{align}
+  \MLIPMethodC &\sqsub \existsR{hasFunctionalForm}{FunctionalForm} \axiomtag
+\end{align}
+\emph{Example.} The MTP method has a moment-tensor polynomial functional
+form; MACE has an equivariant message-passing ansatz. A method whose
+functional form is not recorded cannot be reproduced.
+
+\subsubsection{Every method has a loss function}
+\begin{align}
+  \MLIPMethodC &\sqsub \existsR{hasLossFunction}{LossFunction} \axiomtag
+\end{align}
+\emph{Example.} Most MLIP methods use a weighted sum of mean-squared
+errors on energies, forces, and stresses as their loss. A method without
+a recorded loss is underspecified.
+
+\subsubsection{Every method has a training algorithm}
+\begin{align}
+  \MLIPMethodC &\sqsub \existsR{hasTrainingAlgorithm}{\mlsAlgorithmC} \axiomtag
+\end{align}
+\emph{Example.} MTP is typically fitted with L-BFGS; MACE with Adam.
+The training algorithm is recorded as an $\mlsAlgorithmC$ instance, which
+is the sole alignment point between the MLIPs ontology and ML-Schema.
+
+\subsubsection{Methods are disjoint from ML-Schema algorithms}
+\begin{align}
+  \MLIPMethodC \sqcap \mlsAlgorithmC &\sqsub \bot \axiomtag
+\end{align}
+\emph{Example.} MACE is an $\MLIPMethodC$; Adam is an $\mlsAlgorithmC$.
+The two refer to fundamentally different kinds of thing---a named
+functional-form-plus-loss-plus-training-procedure recipe versus a
+parameter-optimisation procedure---and are declared disjoint. The
+$\hasTrainingAlgorithmR$ role links them.
 
 \subsubsection{Every implementation specifies its library}
 \begin{align}
@@ -30,79 +64,78 @@ incomplete.
 \emph{Example.} ``MACE v0.3'' is an implementation in the MACE library.
 An $\ImplementationC$ without an $\implementedInR$ link is invalid.
 
-\subsubsection{Every training run executes exactly one algorithm}
+\subsubsection{Every MLIP run applies exactly one method}
 \begin{align}
-  \TrainingRunC &\sqsub \exactR{1}{executes}{MLIPAlgorithm} \axiomtag
+  \MLIPRunC &\sqsub \exactR{1}{appliesMethod}{MLIPMethod} \axiomtag
 \end{align}
-\emph{Example.} A training run that produces a MACE model for Ti-Al
-executes the MACE algorithm---not two algorithms simultaneously, and not
-zero.
+\emph{Example.} An MLIP run that produces a MACE model for Ti-Al applies
+the MACE method---not two methods simultaneously, and not zero.
 
-\subsubsection{Every training run uses exactly one training dataset}
+\subsubsection{Every MLIP run uses exactly one training dataset}
 \begin{align}
-  \TrainingRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset} \axiomtag
+  \MLIPRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset} \axiomtag
 \end{align}
-\emph{Example.} The training run uses the Ti-Al DFT dataset with 15{,}000
+\emph{Example.} The MLIP run uses the Ti-Al DFT dataset with 15{,}000
 configurations. If a run combines multiple datasets, they should be
 represented as a single merged $\TrainingDatasetC$.
 
-\subsubsection{Every training run produces exactly one trained model}
+\subsubsection{Every MLIP run produces exactly one trained model}
 \begin{align}
-  \TrainingRunC &\sqsub \exactR{1}{produces}{TrainedModel} \axiomtag
+  \MLIPRunC &\sqsub \exactR{1}{produces}{TrainedModel} \axiomtag
 \end{align}
-\emph{Example.} The training run produces a single MACE model for Ti-Al.
+\emph{Example.} The MLIP run produces a single MACE model for Ti-Al.
 If the same run produces checkpoints, only the final model is recorded.
 
-\subsubsection{Every trained model was produced by some training run}
+\subsubsection{Every trained model was produced by some MLIP run}
 \begin{align}
-  \TrainedModelC &\sqsub \existsR{produces^{-}}{TrainingRun} \axiomtag
+  \TrainedModelC &\sqsub \existsR{produces^{-}}{MLIPRun} \axiomtag
 \end{align}
 \emph{Example.} A $\TrainedModelC$ instance ``MACE-TiAl-v1'' must be
-linked to a $\TrainingRunC$ that produced it. A model cannot exist without
+linked to an $\MLIPRunC$ that produced it. A model cannot exist without
 provenance about how it was trained.
 
-\subsubsection{Every hyperparameter belongs to some algorithm}
+\subsubsection{Every hyperparameter belongs to some method}
 \begin{align}
-  \HyperparameterC &\sqsub \existsR{hasHyperparameter^{-}}{MLIPAlgorithm} \axiomtag
+  \HyperparameterC &\sqsub \existsR{hasHyperparameter^{-}}{MLIPMethod} \axiomtag
 \end{align}
 \emph{Example.} The hyperparameter ``cutoff radius'' is defined for the
-MACE algorithm. A $\HyperparameterC$ instance that is not linked to any
-algorithm via $\hasHyperparameterR^{-}$ is an orphan and violates this
+MACE method. A $\HyperparameterC$ instance that is not linked to any
+method via $\hasHyperparameterR^{-}$ is an orphan and violates this
 axiom.
 
-\subsubsection{Every implementation belongs to some algorithm}
+\subsubsection{Every implementation belongs to some method}
 \begin{align}
-  \ImplementationC &\sqsub \existsR{hasImplementation^{-}}{MLIPAlgorithm} \axiomtag
+  \ImplementationC &\sqsub \existsR{hasImplementation^{-}}{MLIPMethod} \axiomtag
 \end{align}
-\emph{Example.} ``MACE v0.3'' is an implementation of the MACE algorithm.
-An $\ImplementationC$ that is not linked to any $\MLIPAlgorithmC$ via
+\emph{Example.} ``MACE v0.3'' is an implementation of the MACE method.
+An $\ImplementationC$ that is not linked to any $\MLIPMethodC$ via
 $\hasImplementationR^{-}$ is invalid.
 
 \subsubsection{Shortcut: trainedWith is a property chain}
 \begin{align}
-  \trainedWithR &\equiv \producesR^{-} \circ \executesR \axiomtag
+  \trainedWithR &\equiv \producesR^{-} \circ \appliesMethodR \axiomtag
 \end{align}
-\emph{Example.} If a $\TrainingRunC$ produces model $m$ and executes
-algorithm $a$, then $m$ $\trainedWithR$ $a$ is inferred. This allows
-querying ``which algorithm was used to train this model?'' without
+\emph{Example.} If an $\MLIPRunC$ produces model $m$ and applies
+method $a$, then $m$ $\trainedWithR$ $a$ is inferred. This allows
+querying ``which method was used to train this model?'' without
 navigating through the run.
 
 \subsubsection{Shortcut: trainedOn is a property chain}
 \begin{align}
   \trainedOnR &\equiv \producesR^{-} \circ \runsOnR \axiomtag
 \end{align}
-\emph{Example.} If a $\TrainingRunC$ produces model $m$ and runs on
+\emph{Example.} If an $\MLIPRunC$ produces model $m$ and runs on
 dataset $d$, then $m$ $\trainedOnR$ $d$ is inferred. This allows
 querying ``which dataset was used to train this model?'' directly.
 
-\subsubsection{Domain axioms for algorithm-specific roles}
+\subsubsection{Domain axioms for method-specific roles}
 \begin{align}
-  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPAlgorithmC \axiomtag \\
-  \existsR{hasImplementation}{\top} &\sqsub \MLIPAlgorithmC \axiomtag \\
-  \existsR{supportsSimulation}{\top} &\sqsub \MLIPAlgorithmC \axiomtag
+  \existsR{hasHyperparameter}{\top} &\sqsub \MLIPMethodC \axiomtag \\
+  \existsR{hasImplementation}{\top} &\sqsub \MLIPMethodC \axiomtag \\
+  \existsR{supportsSimulation}{\top} &\sqsub \MLIPMethodC \axiomtag
 \end{align}
 \emph{Example.} If an entity has a $\hasHyperparameterR$ link, it must be
-an $\MLIPAlgorithmC$. This prevents, e.g., a $\TrainingDatasetC$ from
+an $\MLIPMethodC$. This prevents, e.g., a $\TrainingDatasetC$ from
 accidentally being assigned hyperparameters.
 
 \subsection{Training Data Module}
@@ -237,4 +270,4 @@ provenance tracking.
 \emph{Example.} A setting ``cutoff radius = 5.0~\AA{}'' references the
 hyperparameter ``cutoff radius''. \emph{Discussion:} This axiom is
 straightforward but raises the question of whether settings should also be
-existentially dependent on a $\TrainingRunC$ or $\TrainedModelC$.
+existentially dependent on an $\MLIPRunC$ or $\TrainedModelC$.

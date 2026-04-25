@@ -1,4 +1,4 @@
-\section{Design Discussion: Training Run and Shortcut Properties}
+\section{Design Discussion: MLIP Run and Shortcut Properties}
 \label{sec:appendix-run}
 
 In ML-Schema, the relationship between a trained model and its algorithm is
@@ -15,22 +15,27 @@ mediated by $\mlsRunC$, which represents a training execution:
     \mlsRunC
 \end{align*}
 %
-The $\mlsRunC$ concept captures the full context of a training
-execution---algorithm, input data, output model, hyperparameter settings,
-and potentially runtime metadata (duration, hardware, random seeds).
+The \MLIPsOntology{} follows this activity-mediated pattern but departs
+from ML-Schema in an important way. Because $\MLIPMethodC$ is disjoint
+from $\mlsAlgorithmC$ (see Section~\ref{sec:algorithm-module} and
+Appendix~\ref{sec:appendix-method}), an $\MLIPRunC$ cannot be a subclass
+of $\mlsRunC$: $\mlsRunC$'s $\mlsExecutesR$ property ranges over
+$\mlsAlgorithmC$, whereas an $\MLIPRunC$ applies a method, not an
+algorithm. We therefore make $\MLIPRunC$ a subclass of $\provActivityC$
+only, and introduce a dedicated role $\appliesMethodR$ with range
+$\MLIPMethodC$ in place of $\mlsExecutesR$. An optional
+$\hasTrainingRunR$ links an $\MLIPRunC$ to an underlying $\mlsRunC$
+whenever the training algorithm itself is modelled in ML-Schema.
 
-The \MLIPsOntology{} follows this pattern with $\TrainingRunC$ (a subclass
-of both $\mlsRunC$ and $\provActivityC$), which mediates
-between $\MLIPAlgorithmC$, $\TrainingDatasetC$, and $\TrainedModelC$ via
-$\executesR$, $\runsOnR$, and $\producesR$ respectively. Additionally,
-we provide the shortcut roles $\trainedWithR$ and $\trainedOnR$ directly on
-$\TrainedModelC$, defined as property chains through the run. These
-shortcuts enable direct queries without navigating the run entity, which is
-important because our primary data source---published MLIP
-literature---rarely reports the operational details of training runs
-(hardware, duration, random seeds). In many cases, the $\TrainingRunC$
-entity will carry only its algorithm, dataset, and model links, making the
-shortcut properties the more natural query path.
+On top of this, we provide the shortcut roles $\trainedWithR$ and
+$\trainedOnR$ directly on $\TrainedModelC$, defined as property chains
+through the MLIP run. These shortcuts enable direct queries without
+navigating the run entity, which is important because our primary data
+source---published MLIP literature---rarely reports the operational
+details of training runs (hardware, duration, random seeds). In many
+cases, the $\MLIPRunC$ entity will carry only its method, dataset, and
+model links, making the shortcut properties the more natural query
+path.
 
 \paragraph{Critical assessment.}
 The shortcut properties introduce redundancy: the same information is
@@ -41,8 +46,8 @@ populated independently. We mitigate this through SHACL shapes that
 validate consistency between the two paths.
 
 An alternative design would omit the shortcuts entirely and always require
-navigation through $\TrainingRunC$. This would be cleaner from an ontology
-engineering perspective but would make common queries (``which algorithm
+navigation through $\MLIPRunC$. This would be cleaner from an ontology
+engineering perspective but would make common queries (``which method
 produced this model?'') unnecessarily verbose, particularly for data
 extracted from publications where the run carries no additional information
 beyond the links already captured by the shortcuts.

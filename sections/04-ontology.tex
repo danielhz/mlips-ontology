@@ -22,10 +22,11 @@ properties of the \MLIPsOntology{}.
 \begin{figure}[t]
 \centering
 \resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-overview.tex}}
-\caption{Overview of the \MLIPsOntology{}: the three modules (Algorithm,
+\caption{Overview of the \MLIPsOntology{}: the three modules (Method,
   Training Data, Benchmark) and their core classes and relationships.
   Solid nodes are \mlipsprefix{} classes; dashed nodes are external
-  superclasses from ML-Schema, PROV-O, and Schema.org.}
+  classes from ML-Schema, PROV-O, and Schema.org, reached either by
+  subsumption (hollow triangle) or by object property (arrow).}
 \label{fig:ontology-overview}
 \end{figure}
 
@@ -50,83 +51,93 @@ Prefix & Namespace \\
 \end{tabular*}
 \end{table}
 
-\subsection{Algorithm Module}
+\subsection{Method Module}
 \label{sec:algorithm-module}
 
-The Algorithm module models MLIP algorithms and their hyperparameter
+The Method module models MLIP methods and their hyperparameter
 spaces, addressing CQ1, CQ2, CQ8, and CQ9.
 
 \paragraph{Core classes.}
-The central concept is $\MLIPAlgorithmC$, representing a specific
-MLIP algorithm (e.g., MACE, ACE, HDNNP)---the architecture itself, not a
-trained model. A key defining feature of an MLIP algorithm is
-its \emph{atomic environment descriptor}: the mathematical function that
-maps a local neighborhood (neighbor positions and types) to an invariant
-or equivariant feature vector. Different algorithms use different
-descriptors---moment tensors (MTP), SOAP (GAP), symmetry functions
-(HDNNP), equivariant message passing (MACE, NequIP), atomic cluster
-expansion (ACE)---captured by the $\hasDescriptorR$ role linking
-$\MLIPAlgorithmC$ to instances of $\AtomicEnvironmentDescriptorC$.
-Each algorithm declares the $\HyperparameterC$ instances it
-accepts (cutoff radius, number of layers, learning rate, etc.), with their
-names, data types, ranges, and default values. A $\TrainingRunC$ represents
-a concrete training execution: it $\executesR$ an $\MLIPAlgorithmC$, takes
-a $\TrainingDatasetC$ as input ($\runsOnR$), and $\producesR$ a
-$\TrainedModelC$---the learned parameters (weights) that can be used for
-prediction. This design follows ML-Schema's activity-based pattern, where
-the run mediates between algorithm, data, and trained model. An $\ImplementationC$
-captures a software realization of an algorithm in a specific $\LibraryC$
-and version. Finally, $\SimulationTypeC$ represents the kinds of atomistic
-simulation an algorithm supports (molecular dynamics, Monte Carlo, geometry
-optimization, phonon calculations, thermodynamic integration).
+The central concept is $\MLIPMethodC$, representing a specific
+MLIP method (e.g., MACE, ACE, HDNNP)---the named recipe for turning
+an atomic configuration into an energy, not a trained model. An MLIP
+method bundles three components: a parametrised functional form
+($\FunctionalFormC$) that maps configurations to energies; a loss
+function ($\LossFunctionC$) whose minimisation fixes those
+parameters; and a training algorithm used to perform the minimisation
+(an $\mlsAlgorithmC$, e.g., Adam, L-BFGS). The first two are
+MLIP-specific and live inside the MLIPs ontology; the third is
+delegated to ML-Schema through the $\hasTrainingAlgorithmR$ role,
+which is the sole alignment point between the two vocabularies. A
+key further feature of an MLIP method is its \emph{atomic environment
+descriptor}: the mathematical function that maps a local neighborhood
+(neighbor positions and types) to an invariant or equivariant feature
+vector. Different methods use different descriptors---moment tensors
+(MTP), SOAP (GAP), symmetry functions (HDNNP), equivariant message
+passing (MACE, NequIP), atomic cluster expansion (ACE)---captured by
+the $\hasDescriptorR$ role linking $\MLIPMethodC$ to instances of
+$\AtomicEnvironmentDescriptorC$. Each method declares the
+$\HyperparameterC$ instances it accepts (cutoff radius, number of
+layers, learning rate, etc.), with their names, data types, ranges,
+and default values. An $\MLIPRunC$ represents a concrete fitting
+activity: it $\appliesMethodR$ an $\MLIPMethodC$, takes a
+$\TrainingDatasetC$ as input ($\runsOnR$), and $\producesR$ a
+$\TrainedModelC$---the learned parameters (weights) that can be used
+for prediction. An $\ImplementationC$ captures a software realisation
+of a method in a specific $\LibraryC$ and version. Finally,
+$\SimulationTypeC$ represents the kinds of atomistic simulation a
+method supports (molecular dynamics, Monte Carlo, geometry
+optimisation, phonon calculations, thermodynamic integration).
+
 \paragraph{Core properties.}
-The role $\hasHyperparameterR$ links an algorithm to the hyperparameters it
-accepts, while $\hasImplementationR$ links it to its software
-implementations and $\supportsSimulationR$ to supported simulation types.
-A $\TrainingRunC$ is connected to its algorithm via $\executesR$, to its
-input data via $\runsOnR$, and to the resulting model via $\producesR$.
-For convenience, a $\TrainedModelC$ also carries the shortcut roles
-$\trainedWithR$ and $\trainedOnR$ (derivable as property chains through the
-run), enabling direct queries without navigating the run entity.
+The role $\hasHyperparameterR$ links a method to the hyperparameters
+it accepts, while $\hasImplementationR$ links it to its software
+implementations and $\supportsSimulationR$ to supported simulation
+types. The three component roles $\hasFunctionalFormR$,
+$\hasLossFunctionR$, and $\hasTrainingAlgorithmR$ link a method to
+its functional form, loss function, and training algorithm
+respectively. An $\MLIPRunC$ is connected to its method via
+$\appliesMethodR$, to its input data via $\runsOnR$, and to the
+resulting model via $\producesR$; an optional $\hasTrainingRunR$
+links an $\MLIPRunC$ to an underlying $\mlsRunC$ when the training
+algorithm is itself modelled in ML-Schema. For convenience, a
+$\TrainedModelC$ also carries the shortcut roles $\trainedWithR$ and
+$\trainedOnR$ (derivable as property chains through the run),
+enabling direct queries without navigating the run entity.
 Domain-specific datatype properties---$\cutoffRadiusR$, $\numLayersR$,
 $\learningRateR$, $\numRadialBasisR$, and $\numAngularBasisR$---record
 concrete hyperparameter values, with units annotated via
 QUDT~\cite{hodgson2014qudt}. The role $\implementedInR$ connects an
-implementation to its library.
-Efficiency metadata is split along two dimensions. Prior
-knowledge about an algorithm---its asymptotic complexity and whether it
-supports GPU or parallel execution---is recorded on $\MLIPAlgorithmC$
-via $\dlRole{trainingComplexity}$, $\dlRole{inferenceComplexity}$,
-$\dlRole{supportsGPU}$, and $\dlRole{supportsParallelization}$. Measured
-training cost (wall-clock time, hardware, peak memory, GPU hours) is
-recorded on $\TrainingRunC$, while measured inference cost is recorded
-on the corresponding $\BenchmarkResultC$ (see Benchmark Module).
-
-\paragraph{Alignment.}
-$\MLIPAlgorithmC$ is a subclass of $\mlsAlgorithmC$, inheriting
-ML-Schema's general algorithm description framework. $\TrainingRunC$ is a
-subclass of both $\mlsRunC$ and $\provActivityC$, aligning with
-ML-Schema's training lifecycle and PROV-O's activity-based provenance model.
-$\TrainedModelC$ is a subclass of $\mlsModelC$. $\HyperparameterC$
-extends $\mlsHyperParameterC$ with physics-specific properties and
-units, and $\ImplementationC$ extends $\mlsImplementationC$.
+implementation to its library. Efficiency metadata is split along two
+dimensions. Prior knowledge about a method---its asymptotic complexity
+and whether it supports GPU or parallel execution---is recorded on
+$\MLIPMethodC$ via $\dlRole{trainingComplexity}$,
+$\dlRole{inferenceComplexity}$, $\dlRole{supportsGPU}$, and
+$\dlRole{supportsParallelization}$. Measured training cost
+(wall-clock time, hardware, peak memory, GPU hours) is recorded on
+$\MLIPRunC$, while measured inference cost is recorded on the
+corresponding $\BenchmarkResultC$ (see Benchmark Module).
 
 \paragraph{Axioms.}
-The Algorithm module defines 14 axioms: existential restrictions require
-every algorithm to declare at least one hyperparameter and simulation type;
-cardinality constraints ensure each $\TrainingRunC$ executes exactly one
-algorithm, uses one dataset, and produces one model; domain axioms restrict
-$\hasHyperparameterR$, $\hasImplementationR$, and $\supportsSimulationR$
-to $\MLIPAlgorithmC$. Notably, the shortcut roles on $\TrainedModelC$ are
-defined as property chains through the training run:
+The Method module defines axioms that capture the component structure
+of an MLIP method: existential restrictions require every method to
+declare at least one hyperparameter, at least one simulation type, a
+functional form, a loss function, and a training algorithm.
+Cardinality constraints ensure each $\MLIPRunC$ applies exactly one
+method, uses one dataset, and produces one model. Domain axioms
+restrict $\hasHyperparameterR$, $\hasImplementationR$, and
+$\supportsSimulationR$ to $\MLIPMethodC$. An explicit disjointness
+axiom states $\MLIPMethodC \sqcap \mlsAlgorithmC \sqsubseteq \bot$.
+Notably, the shortcut roles on $\TrainedModelC$ are defined as
+property chains through the MLIP run:
 %
 \begin{align*}
-  \trainedWithR &\equiv \producesR^{-} \circ \executesR \\
+  \trainedWithR &\equiv \producesR^{-} \circ \appliesMethodR \\
   \trainedOnR &\equiv \producesR^{-} \circ \runsOnR
 \end{align*}
 %
-These allow direct queries (``which algorithm produced this model?'')
-without navigating through the $\TrainingRunC$ entity.
+These allow direct queries (``which method produced this model?'')
+without navigating through the $\MLIPRunC$ entity.
 
 
 
@@ -155,15 +166,6 @@ and $\datasetProvenanceR$ classifies the origin
 as $\dlConcept{Published}$, $\dlConcept{InHouse}$, or
 $\dlConcept{Augmented}$. Augmented datasets are linked to
 their sources via PROV-O's \mbox{$\provWasDerivedFromR$}.
-
-\paragraph{Alignment.}
-$\TrainingDatasetC$ is modeled as a subclass of both $\mlsDatasetC$
-(for ML workflow compatibility) and $\provEntityC$ (for provenance
-tracking). $\DFTCalculationC$ aligns with $\mdoCalculationC$.
-$\MaterialSystemC$ connects to $\cmsoCrystallineMaterialC$ where
-applicable, and $\AtomicConfigurationC$ aligns with
-$\cmsoAtomicStructureC$. Material systems link to Wikidata for
-chemical element identification.
 
 \paragraph{Axioms.}
 The Training Data module defines 5 existential restrictions: every
@@ -200,12 +202,6 @@ Each $\AccuracyMetricC$ is described by $\metricTypeR$, $\metricPropertyR$,
 and $\metricValueR$. The role $\reportedInR$ links a result to its source
 publication.
 
-\paragraph{Alignment.}
-$\BenchmarkStudyC$ is modeled as a subclass of $\provActivityC$,
-capturing the provenance chain from data to evaluation. Publications link to
-$\schemaScholarlyArticleC$ for bibliographic metadata and to Wikidata
-for author identification.
-
 \paragraph{Axioms.}
 The Benchmark module defines 8 axioms ensuring data completeness: every
 $\BenchmarkStudyC$ must contain at least one result; every
@@ -215,6 +211,49 @@ $\AccuracyMetricC$ must specify exactly one metric type and one measured
 property. Through the property chains on $\TrainedModelC$, every benchmark
 result is transitively linked to the algorithm and training data used,
 enabling cross-module queries (CQ6, CQ7) without redundant encoding.
+
+
+
+\subsection{Alignment with External Ontologies}
+\label{sec:alignment}
+
+The \MLIPsOntology{} reuses established vocabularies wherever an
+existing class or property already names the concept at hand:
+ML-Schema for the ML workflow, PROV-O for activity-based
+provenance, MDO and CMSO for materials science, schema.org for
+bibliographic metadata, and QUDT for units. Figure~\ref{fig:alignments}
+shows the resulting alignment graph and Equations~\eqref{eq:L1}--%
+\eqref{eq:L18} list the formal axioms; each arc in the figure
+carries the labels of the axioms it represents, and the line width
+of an arc encodes the number of axioms collapsed onto it.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{\input{artifacts/figures/mlips-alignments.tex}}
+\caption{Alignment graph for the \MLIPsOntology{}. Solid blue
+  circles are MLIPs ontology modules; dashed grey circles are
+  external ontologies. Each arc carries the labels of the
+  alignment axioms it represents (cf.\ Eqs.~\eqref{eq:L1}--%
+  \eqref{eq:L18}); arc thickness is proportional to the number of
+  axioms collapsed onto it.}
+\label{fig:alignments}
+\end{figure}
+
+\input{sections/alignment-table}
+
+The single salient design decision is the disjointness in (L11):
+$\MLIPMethodC$ is \emph{not} a subclass of $\mlsAlgorithmC$ but
+disjoint from it, because the two classes name different kinds of
+thing (a named recipe ``functional form + loss function + training
+algorithm'' versus a training procedure such as Adam). The two
+vocabularies meet at a single role, $\hasTrainingAlgorithmR$
+(L12), which links every MLIP method to its underlying ML-Schema
+algorithm. The same disjointness is why $\MLIPRunC$ is a subclass
+of $\provActivityC$ only (L5) and not of $\mlsRunC$; an optional
+$\hasTrainingRunR$ (L13) reaches an $\mlsRunC$ when the training
+procedure is itself modelled in ML-Schema.
+Appendix~\ref{sec:appendix-method} discusses this decision in
+detail.
 
 
 

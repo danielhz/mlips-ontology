@@ -12,7 +12,7 @@
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Hyperparameter">
       <rdfs:label xml:lang="en">Hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">A hyperparameter of an MLIP algorithm, with its name,
+      <rdfs:comment xml:lang="en">A hyperparameter of an MLIP method, with its name,
 data type, range, and default value.</rdfs:comment>
       <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#HyperParameter"/>
       <rdfs:subClassOf>
@@ -22,9 +22,26 @@ data type, range, and default value.</rdfs:comment>
                   <owl:inverseOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasHyperparameter"/>
                </owl:ObjectProperty>
             </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
          </owl:Restriction>
       </rdfs:subClassOf>
+   </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#PhysicalHyperparameter">
+      <rdfs:label xml:lang="en">Physical Hyperparameter</rdfs:label>
+      <rdfs:comment xml:lang="en">A hyperparameter that has a direct physical
+meaning. Not disjoint with ArchitecturalHyperparameter.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Hyperparameter"/>
+   </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ArchitecturalHyperparameter">
+      <rdfs:label xml:lang="en">Architectural Hyperparameter</rdfs:label>
+      <rdfs:comment xml:lang="en">A hyperparameter that specifies the model
+architecture. Not disjoint with PhysicalHyperparameter.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Hyperparameter"/>
+   </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingHyperparameter">
+      <rdfs:label xml:lang="en">Training Hyperparameter</rdfs:label>
+      <rdfs:comment xml:lang="en">A hyperparameter of the training procedure.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Hyperparameter"/>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#HyperparameterSetting">
       <rdfs:label xml:lang="en">Hyperparameter Setting</rdfs:label>
@@ -33,7 +50,7 @@ specific training run or configuration.</rdfs:comment>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Implementation">
       <rdfs:label xml:lang="en">Implementation</rdfs:label>
-      <rdfs:comment xml:lang="en">A software implementation of an MLIP algorithm in a
+      <rdfs:comment xml:lang="en">A software implementation of an MLIP method in a
 specific library and version.</rdfs:comment>
       <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Implementation"/>
       <rdfs:subClassOf>
@@ -49,7 +66,7 @@ specific library and version.</rdfs:comment>
                   <owl:inverseOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasImplementation"/>
                </owl:ObjectProperty>
             </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
          </owl:Restriction>
       </rdfs:subClassOf>
    </owl:Class>
@@ -58,11 +75,12 @@ specific library and version.</rdfs:comment>
       <rdfs:comment xml:lang="en">A software library or tool used in MLIP research
 (e.g., ASE, LAMMPS, VASP, GPAW).</rdfs:comment>
    </owl:Class>
-   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm">
-      <rdfs:label xml:lang="en">MLIP Algorithm</rdfs:label>
-      <rdfs:comment xml:lang="en">A machine learning interatomic potential algorithm family
-(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP).</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod">
+      <rdfs:label xml:lang="en">MLIP Method</rdfs:label>
+      <rdfs:comment xml:lang="en">A machine learning interatomic potential method family
+(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
+a loss function, and a training algorithm. Disjoint from mls:Algorithm.</rdfs:comment>
+      <owl:disjointWith rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
       <rdfs:subClassOf>
          <owl:Restriction>
             <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasHyperparameter"/>
@@ -75,6 +93,32 @@ specific library and version.</rdfs:comment>
             <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#SimulationType"/>
          </owl:Restriction>
       </rdfs:subClassOf>
+      <rdfs:subClassOf>
+         <owl:Restriction>
+            <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasFunctionalForm"/>
+            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#FunctionalForm"/>
+         </owl:Restriction>
+      </rdfs:subClassOf>
+      <rdfs:subClassOf>
+         <owl:Restriction>
+            <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasLossFunction"/>
+            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#LossFunction"/>
+         </owl:Restriction>
+      </rdfs:subClassOf>
+      <rdfs:subClassOf>
+         <owl:Restriction>
+            <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasTrainingAlgorithm"/>
+            <owl:someValuesFrom rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+         </owl:Restriction>
+      </rdfs:subClassOf>
+   </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#FunctionalForm">
+      <rdfs:label xml:lang="en">Functional Form</rdfs:label>
+      <rdfs:comment xml:lang="en">A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values.</rdfs:comment>
+   </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#LossFunction">
+      <rdfs:label xml:lang="en">Loss Function</rdfs:label>
+      <rdfs:comment xml:lang="en">A scalar objective whose minimisation fits the parameters of the functional form.</rdfs:comment>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#SimulationType">
       <rdfs:label xml:lang="en">Simulation Type</rdfs:label>
@@ -84,7 +128,7 @@ thermodynamic integration, etc.</rdfs:comment>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainedModel">
       <rdfs:label xml:lang="en">Trained Model</rdfs:label>
-      <rdfs:comment xml:lang="en">The concrete artifact produced by training an algorithm
+      <rdfs:comment xml:lang="en">The concrete artifact produced by fitting an MLIP method
 on a specific dataset with specific hyperparameter settings---the learned
 parameters (weights) that can be used for prediction.</rdfs:comment>
       <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Model"/>
@@ -95,21 +139,19 @@ parameters (weights) that can be used for prediction.</rdfs:comment>
                   <owl:inverseOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#produces"/>
                </owl:ObjectProperty>
             </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingRun"/>
+            <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
          </owl:Restriction>
       </rdfs:subClassOf>
    </owl:Class>
-   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingRun">
-      <rdfs:label xml:lang="en">Training Run</rdfs:label>
-      <rdfs:comment xml:lang="en">A concrete training execution: it executes an algorithm
-on a training dataset and produces a trained model.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Run"/>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun">
+      <rdfs:label xml:lang="en">MLIP Run</rdfs:label>
+      <rdfs:comment xml:lang="en">A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model.</rdfs:comment>
       <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
       <rdfs:subClassOf>
          <owl:Restriction>
-            <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#executes"/>
+            <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#appliesMethod"/>
             <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+            <owl:onClass rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
          </owl:Restriction>
       </rdfs:subClassOf>
       <rdfs:subClassOf>
@@ -127,17 +169,45 @@ on a training dataset and produces a trained model.</rdfs:comment>
          </owl:Restriction>
       </rdfs:subClassOf>
    </owl:Class>
+   <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor">
+      <rdfs:label xml:lang="en">Atomic Environment Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">A mathematical representation of the local atomic environment used by an MLIP method.</rdfs:comment>
+   </owl:Class>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#evaluatesModel">
       <rdfs:label xml:lang="en">evaluates model</rdfs:label>
       <rdfs:comment xml:lang="en">Links a benchmark result to the trained model being evaluated.</rdfs:comment>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#BenchmarkResult"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainedModel"/>
    </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#executes">
-      <rdfs:label xml:lang="en">executes</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a training run to the algorithm it executes.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingRun"/>
-      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#appliesMethod">
+      <rdfs:label xml:lang="en">applies method</rdfs:label>
+      <rdfs:comment xml:lang="en">Links an MLIP run to the MLIP method it fits.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+   </owl:ObjectProperty>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasFunctionalForm">
+      <rdfs:label xml:lang="en">has functional form</rdfs:label>
+      <rdfs:comment xml:lang="en">Links an MLIP method to its parametrised functional form.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#FunctionalForm"/>
+   </owl:ObjectProperty>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasLossFunction">
+      <rdfs:label xml:lang="en">has loss function</rdfs:label>
+      <rdfs:comment xml:lang="en">Links an MLIP method to the loss function whose minimisation fits its parameters.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#LossFunction"/>
+   </owl:ObjectProperty>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasTrainingAlgorithm">
+      <rdfs:label xml:lang="en">has training algorithm</rdfs:label>
+      <rdfs:comment xml:lang="en">Links an MLIP method to the ML-Schema algorithm used to fit its functional form.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+   </owl:ObjectProperty>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasTrainingRun">
+      <rdfs:label xml:lang="en">has training run</rdfs:label>
+      <rdfs:comment xml:lang="en">Optional link from an MLIP run to an ML-Schema run recording the training algorithm execution.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Run"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#forHyperparameter">
       <rdfs:label xml:lang="en">for hyperparameter</rdfs:label>
@@ -147,14 +217,14 @@ on a training dataset and produces a trained model.</rdfs:comment>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasHyperparameter">
       <rdfs:label xml:lang="en">has hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an algorithm to a hyperparameter it accepts.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+      <rdfs:comment xml:lang="en">Links an MLIP method to a hyperparameter it accepts.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Hyperparameter"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasImplementation">
       <rdfs:label xml:lang="en">has implementation</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an algorithm to a software implementation.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+      <rdfs:comment xml:lang="en">Links an MLIP method to a software implementation.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Implementation"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#implementedIn">
@@ -165,25 +235,25 @@ on a training dataset and produces a trained model.</rdfs:comment>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#produces">
       <rdfs:label xml:lang="en">produces</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a training run to the trained model it produces.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingRun"/>
+      <rdfs:comment xml:lang="en">Links an MLIP run to the trained model it produces.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainedModel"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#runsOn">
       <rdfs:label xml:lang="en">runs on</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a training run to the training dataset it uses.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingRun"/>
+      <rdfs:comment xml:lang="en">Links an MLIP run to the training dataset it uses.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingDataset"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#supportsSimulation">
       <rdfs:label xml:lang="en">supports simulation</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an algorithm to the simulation types it supports.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+      <rdfs:comment xml:lang="en">Links an MLIP method to the simulation types it supports.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#SimulationType"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#trainedOn">
       <rdfs:label xml:lang="en">trained on</rdfs:label>
-      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to its training dataset.</rdfs:comment>
+      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the training dataset it was fitted on.</rdfs:comment>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainedModel"/>
       <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingDataset"/>
       <owl:propertyChainAxiom rdf:parseType="Collection">
@@ -195,16 +265,47 @@ on a training dataset and produces a trained model.</rdfs:comment>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#trainedWith">
       <rdfs:label xml:lang="en">trained with</rdfs:label>
-      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to its algorithm.</rdfs:comment>
+      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the MLIP method it applies.</rdfs:comment>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainedModel"/>
-      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
       <owl:propertyChainAxiom rdf:parseType="Collection">
          <owl:ObjectProperty>
             <owl:inverseOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#produces"/>
          </owl:ObjectProperty>
-         <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#executes"/>
+         <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#appliesMethod"/>
       </owl:propertyChainAxiom>
    </owl:ObjectProperty>
+   <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasDescriptor">
+      <rdfs:label xml:lang="en">has descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Links an MLIP method to the atomic environment descriptor it uses.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+   </owl:ObjectProperty>
+   <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MomentTensorDescriptor">
+      <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+      <rdfs:label xml:lang="en">Moment Tensor Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Invariant moment tensors of the neighborhood; used by MTP.</rdfs:comment>
+   </owl:NamedIndividual>
+   <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#SOAPDescriptor">
+      <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+      <rdfs:label xml:lang="en">SOAP Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Smooth Overlap of Atomic Positions; used by GAP.</rdfs:comment>
+   </owl:NamedIndividual>
+   <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#SymmetryFunctionDescriptor">
+      <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+      <rdfs:label xml:lang="en">Symmetry Function Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Behler-Parrinello symmetry functions; used by HDNNP.</rdfs:comment>
+   </owl:NamedIndividual>
+   <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#EquivariantMessagePassingDescriptor">
+      <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+      <rdfs:label xml:lang="en">Equivariant Message Passing Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Equivariant message-passing representation; used by MACE and NequIP.</rdfs:comment>
+   </owl:NamedIndividual>
+   <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicClusterExpansionDescriptor">
+      <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicEnvironmentDescriptor"/>
+      <rdfs:label xml:lang="en">Atomic Cluster Expansion Descriptor</rdfs:label>
+      <rdfs:comment xml:lang="en">Atomic cluster expansion; used by ACE.</rdfs:comment>
+   </owl:NamedIndividual>
    <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#cutoffRadius">
       <rdfs:label xml:lang="en">cutoff radius</rdfs:label>
       <rdfs:comment xml:lang="en">Cutoff radius for atomic interactions, in angstroms.</rdfs:comment>
@@ -271,10 +372,55 @@ on a training dataset and produces a trained model.</rdfs:comment>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Implementation"/>
       <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
    </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#trainingComplexity">
+      <rdfs:label xml:lang="en">training complexity</rdfs:label>
+      <rdfs:comment xml:lang="en">Asymptotic computational complexity of training.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#inferenceComplexity">
+      <rdfs:label xml:lang="en">inference complexity</rdfs:label>
+      <rdfs:comment xml:lang="en">Asymptotic computational complexity of inference.</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#supportsGPU">
+      <rdfs:label xml:lang="en">supports GPU</rdfs:label>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#supportsParallelization">
+      <rdfs:label xml:lang="en">supports parallelization</rdfs:label>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#trainingDuration">
+      <rdfs:label xml:lang="en">training duration</rdfs:label>
+      <rdfs:comment xml:lang="en">Measured wall-clock training time (hours).</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#trainingHardware">
+      <rdfs:label xml:lang="en">training hardware</rdfs:label>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#peakMemory">
+      <rdfs:label xml:lang="en">peak memory</rdfs:label>
+      <rdfs:comment xml:lang="en">Peak memory during training (GB).</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#gpuHours">
+      <rdfs:label xml:lang="en">GPU hours</rdfs:label>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPRun"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+   </owl:DatatypeProperty>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicConfiguration">
       <rdfs:label xml:lang="en">Atomic Configuration</rdfs:label>
       <rdfs:comment xml:lang="en">A single atomic configuration (positions, cell,
 properties) in a training dataset.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/AtomicStructure"/>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#CoveredProperty">
       <rdfs:label xml:lang="en">Covered Property</rdfs:label>
@@ -285,6 +431,7 @@ properties) in a training dataset.</rdfs:comment>
       <rdfs:label xml:lang="en">DFT Calculation</rdfs:label>
       <rdfs:comment xml:lang="en">A density functional theory calculation that produced
 reference data for training.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
       <rdfs:subClassOf>
          <owl:Restriction>
             <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasDFTSettings"/>
@@ -305,6 +452,7 @@ functional, k-point mesh, energy cutoff, pseudopotential type.</rdfs:comment>
       <rdfs:label xml:lang="en">Material System</rdfs:label>
       <rdfs:comment xml:lang="en">A material system studied in a dataset: element, alloy,
 compound, or complex microstructure.</rdfs:comment>
+      <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial"/>
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingDataset">
       <rdfs:label xml:lang="en">Training Dataset</rdfs:label>
@@ -481,7 +629,7 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
    </owl:Class>
    <owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#BenchmarkResult">
       <rdfs:label xml:lang="en">Benchmark Result</rdfs:label>
-      <rdfs:comment xml:lang="en">A single evaluation result: an algorithm applied to a
+      <rdfs:comment xml:lang="en">A single evaluation result: an MLIP method applied to a
 material system with specific hyperparameters, reporting accuracy metrics.</rdfs:comment>
       <rdfs:subClassOf>
          <owl:Restriction>
@@ -570,7 +718,7 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#usesAlgorithm">
       <rdfs:label xml:lang="en">uses algorithm</rdfs:label>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPAlgorithm"/>
+      <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MLIPMethod"/>
    </owl:ObjectProperty>
    <owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#usesTrainingData">
       <rdfs:label xml:lang="en">uses training data</rdfs:label>
@@ -581,6 +729,17 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
       <rdfs:label xml:lang="en">metric value</rdfs:label>
       <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AccuracyMetric"/>
       <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#inferenceTimePerAtom">
+      <rdfs:label xml:lang="en">inference time per atom</rdfs:label>
+      <rdfs:comment xml:lang="en">Inference time per atom (microseconds).</rdfs:comment>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#BenchmarkResult"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+   </owl:DatatypeProperty>
+   <owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#inferenceHardware">
+      <rdfs:label xml:lang="en">inference hardware</rdfs:label>
+      <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#BenchmarkResult"/>
+      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
    </owl:DatatypeProperty>
    <owl:NamedIndividual rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#EnergyProperty">
       <rdf:type rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#MetricProperty"/>

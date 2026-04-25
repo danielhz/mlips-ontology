@@ -1,7 +1,7 @@
 \section{Object Property Reference}
 \label{sec:object-property-reference}
 
-This appendix describes all 30 object properties defined in the \MLIPsOntology{}.
+This appendix describes all 34 object properties defined in the \MLIPsOntology{}.
 
 \subsection{$\dlRole{evaluatesModel}$}
 \label{sec:term-evaluatesModel}
@@ -17,19 +17,65 @@ Links a benchmark result to the trained model being evaluated.
 
 \paragraph{Related axioms.} \eqref{ax:21}.
 
-\subsection{$\dlRole{executes}$}
-\label{sec:term-executes}
+\subsection{$\dlRole{appliesMethod}$}
+\label{sec:term-appliesMethod}
 
-\textbf{Label:} executes.
-Links a training run to the algorithm it executes.
+\textbf{Label:} applies method.
+Links an MLIP run to the MLIP method it fits.
 
-\textbf{Domain:} $\dlConcept{TrainingRun}$.
-\textbf{Range:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Domain:} $\dlConcept{MLIPRun}$.
+\textbf{Range:} $\dlConcept{MLIPMethod}$.
 
 \paragraph{Example.}
-\InputIfFileExists{artifacts/examples/object-properties/executes.tex}{}{\textit{TODO: add example.}}
+\InputIfFileExists{artifacts/examples/object-properties/appliesMethod.tex}{}{\textit{TODO: add example.}}
 
-\paragraph{Related axioms.} \eqref{ax:4}.
+\subsection{$\dlRole{hasFunctionalForm}$}
+\label{sec:term-hasFunctionalForm}
+
+\textbf{Label:} has functional form.
+Links an MLIP method to its parametrised functional form.
+
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
+\textbf{Range:} $\dlConcept{FunctionalForm}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/object-properties/hasFunctionalForm.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlRole{hasLossFunction}$}
+\label{sec:term-hasLossFunction}
+
+\textbf{Label:} has loss function.
+Links an MLIP method to the loss function whose minimisation fits its parameters.
+
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
+\textbf{Range:} $\dlConcept{LossFunction}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/object-properties/hasLossFunction.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlRole{hasTrainingAlgorithm}$}
+\label{sec:term-hasTrainingAlgorithm}
+
+\textbf{Label:} has training algorithm.
+Links an MLIP method to the ML-Schema algorithm used to fit its functional form by minimising its loss function. This is the alignment point with ML-Schema: while MLIPMethod is disjoint from mls:Algorithm, every MLIP method names the training algorithm (e.g., L-BFGS, Adam, stochastic gradient descent) as an mls:Algorithm instance.
+
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
+\textbf{Range:} \texttt{mlschema:Algorithm}.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/object-properties/hasTrainingAlgorithm.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlRole{hasTrainingRun}$}
+\label{sec:term-hasTrainingRun}
+
+\textbf{Label:} has training run.
+Optional link from an MLIP run to the underlying ML-Schema run that records the execution of the training algorithm. Use when the training algorithm is itself modelled in ML-Schema; omit otherwise.
+
+\textbf{Domain:} $\dlConcept{MLIPRun}$.
+\textbf{Range:} \texttt{mlschema:Run}.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/object-properties/hasTrainingRun.tex}{}{\textit{TODO: add example.}}
 
 \subsection{$\dlRole{forHyperparameter}$}
 \label{sec:term-forHyperparameter}
@@ -47,9 +93,9 @@ Links a setting to the hyperparameter it configures.
 \label{sec:term-hasHyperparameter}
 
 \textbf{Label:} has hyperparameter.
-Links an algorithm to a hyperparameter it accepts.
+Links an MLIP method to a hyperparameter it accepts.
 
-\textbf{Domain:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
 \textbf{Range:} $\dlConcept{Hyperparameter}$.
 
 \paragraph{Example.}
@@ -61,9 +107,9 @@ Links an algorithm to a hyperparameter it accepts.
 \label{sec:term-hasImplementation}
 
 \textbf{Label:} has implementation.
-Links an algorithm to a software implementation.
+Links an MLIP method to a software implementation.
 
-\textbf{Domain:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
 \textbf{Range:} $\dlConcept{Implementation}$.
 
 \paragraph{Example.}
@@ -89,9 +135,9 @@ Links an implementation to the library that provides it.
 \label{sec:term-produces}
 
 \textbf{Label:} produces.
-Links a training run to the trained model it produces.
+Links an MLIP run to the trained model it produces.
 
-\textbf{Domain:} $\dlConcept{TrainingRun}$.
+\textbf{Domain:} $\dlConcept{MLIPRun}$.
 \textbf{Range:} $\dlConcept{TrainedModel}$.
 
 \paragraph{Example.}
@@ -103,9 +149,9 @@ Links a training run to the trained model it produces.
 \label{sec:term-runsOn}
 
 \textbf{Label:} runs on.
-Links a training run to the training dataset it uses.
+Links an MLIP run to the training dataset it uses.
 
-\textbf{Domain:} $\dlConcept{TrainingRun}$.
+\textbf{Domain:} $\dlConcept{MLIPRun}$.
 \textbf{Range:} $\dlConcept{TrainingDataset}$.
 
 \paragraph{Example.}
@@ -117,9 +163,9 @@ Links a training run to the training dataset it uses.
 \label{sec:term-supportsSimulation}
 
 \textbf{Label:} supports simulation.
-Links an algorithm to the simulation types it supports.
+Links an MLIP method to the simulation types it supports.
 
-\textbf{Domain:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
 \textbf{Range:} $\dlConcept{SimulationType}$.
 
 \paragraph{Example.}
@@ -131,7 +177,7 @@ Links an algorithm to the simulation types it supports.
 \label{sec:term-trainedOn}
 
 \textbf{Label:} trained on.
-Shortcut: links a trained model directly to its training dataset.
+Shortcut: links a trained model directly to the training dataset it was fitted on.
 
 \textbf{Domain:} $\dlConcept{TrainedModel}$.
 \textbf{Range:} $\dlConcept{TrainingDataset}$.
@@ -145,10 +191,10 @@ Shortcut: links a trained model directly to its training dataset.
 \label{sec:term-trainedWith}
 
 \textbf{Label:} trained with.
-Shortcut: links a trained model directly to its algorithm.
+Shortcut: links a trained model directly to the MLIP method it applies.
 
 \textbf{Domain:} $\dlConcept{TrainedModel}$.
-\textbf{Range:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Range:} $\dlConcept{MLIPMethod}$.
 
 \paragraph{Example.}
 \InputIfFileExists{artifacts/examples/object-properties/trainedWith.tex}{}{\textit{TODO: add example.}}
@@ -159,9 +205,9 @@ Shortcut: links a trained model directly to its algorithm.
 \label{sec:term-hasDescriptor}
 
 \textbf{Label:} has descriptor.
-Links an MLIP algorithm to the atomic environment descriptor it uses to represent local neighborhoods.
+Links an MLIP method to the atomic environment descriptor it uses to represent local neighborhoods.
 
-\textbf{Domain:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Domain:} $\dlConcept{MLIPMethod}$.
 \textbf{Range:} $\dlConcept{AtomicEnvironmentDescriptor}$.
 
 \paragraph{Example.}
@@ -348,7 +394,7 @@ The DFT software used (e.g., VASP, GPAW).
 \textbf{Label:} uses algorithm.
 
 \textbf{Domain:} $\dlConcept{BenchmarkResult}$.
-\textbf{Range:} $\dlConcept{MLIPAlgorithm}$.
+\textbf{Range:} $\dlConcept{MLIPMethod}$.
 
 \paragraph{Example.}
 \InputIfFileExists{artifacts/examples/object-properties/usesAlgorithm.tex}{}{\textit{TODO: add example.}}

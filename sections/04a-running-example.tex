@@ -6,7 +6,7 @@ Tensor Potential (MTP)~\cite{shapeev2016mtp,novikov2021mlip} for the
 titanium-aluminium (Ti-Al) system, a binary alloy (a metallic material
 composed of two chemical elements). This example illustrates
 how the ontology captures the full lifecycle of an MLIP study---from the
-underlying physics, through the algorithm's hyperparameters and training
+underlying physics, through the method's hyperparameters and training
 data, to the evaluation of the trained model.
 
 \paragraph{The simulation problem.}
@@ -55,7 +55,7 @@ atoms---limiting DFT to systems of a few hundred atoms. Machine learning
 interatomic potentials approximate the DFT energy surface at a fraction
 of the cost, enabling simulations of millions of atoms.
 
-\paragraph{The MTP algorithm.}
+\paragraph{The MTP method.}
 In the MTP framework~\cite{shapeev2016mtp}, the total energy of an
 atomic configuration $\config$ is decomposed into local contributions:
 %
@@ -95,14 +95,14 @@ A key distinction in the MLIP workflow---and in the ontology---is between
 %
 \begin{itemize}
 \item A \emph{hyperparameter definition} declares a parameter that the
-  algorithm accepts: its name, data type, valid range, and default value.
+  method accepts: its name, data type, valid range, and default value.
   For example, MTP defines a hyperparameter ``$\Rcut$'' of type float,
   with range $[2.0, 10.0]$~\AA{} and default $5.0$~\AA{}. These
-  definitions are properties of the \emph{algorithm}, independent of any
+  definitions are properties of the \emph{method}, independent of any
   specific training.
 \item A \emph{hyperparameter setting} is a concrete value chosen by the
-  researcher for a specific training run: e.g., $\Rcut = 5.0$~\AA{},
-  $\levmax = 16$. These are properties of the \emph{training run}.
+  researcher for a specific MLIP run: e.g., $\Rcut = 5.0$~\AA{},
+  $\levmax = 16$. These are properties of the \emph{MLIP run}.
 \item The \emph{learned parameters} $\fitParams = \{\xi_\alpha\}$ are
   determined during training by fitting
   Equation~\eqref{eq:mtp-basis} to DFT data. The number of parameters
@@ -111,14 +111,14 @@ A key distinction in the MLIP workflow---and in the ontology---is between
   define the \emph{trained model}.
 \end{itemize}
 %
-The MTP algorithm defines four hyperparameters:
+The MTP method defines four hyperparameters:
 $\Rcut$ (cutoff radius, controlling neighborhood size),
 $\Rmin$ (minimum interatomic distance, defining the radial basis domain),
 $\nRadialBasis$ (number of radial basis functions), and
 $\levmax$ (maximum level, controlling model complexity).
 
 To support domain queries such as ``which physical hyperparameters
-does this algorithm accept?'', we classify hyperparameters into three
+does this method accept?'', we classify hyperparameters into three
 non-disjoint subclasses of $\HyperparameterC$: physical (direct physical
 meaning), architectural (model-architecture choice), and training
 (training-procedure parameter).
@@ -134,33 +134,33 @@ materials scientists actually think about these parameters, while the
 annotation itself enables physics-focused queries that a flat
 $\HyperparameterC$ class cannot answer directly.
 
-\paragraph{Encoding: from trained model to algorithm.}
+\paragraph{Encoding: from trained model to method.}
 The ontology captures this three-level distinction.
 We present the encoding bottom-up, starting from the trained model---the
-artifact a researcher has in hand---and tracing back to the algorithm
+artifact a researcher has in hand---and tracing back to the method
 definition.
 
 A $\TrainedModelC$ is the concrete result of training: the fitted
-coefficients $\fitParams$. It is linked to a $\TrainingRunC$ that
-records which algorithm was used, with which hyperparameter settings,
+coefficients $\fitParams$. It is linked to an $\MLIPRunC$ that
+records which method was applied, with which hyperparameter settings,
 on which dataset:
 %
-\begin{lstlisting}[language=turtle,caption={A trained model and its training run.},label=lst:trained-model]
+\begin{lstlisting}[language=turtle,caption={A trained model and its MLIP run.},label=lst:trained-model]
 ex:model-mtp-TiAl a mlips:TrainedModel ;
     rdfs:label "MTP for Ti-Al (lev16, rcut5)" .
 
-ex:run-mtp-TiAl a mlips:TrainingRun ;
-    mlips:executes ex:MTP ;
+ex:run-mtp-TiAl a mlips:MLIPRun ;
+    mlips:appliesMethod ex:MTP ;
     mlips:runsOn ex:ds-TiAl ;
     mlips:produces ex:model-mtp-TiAl .
 \end{lstlisting}
 
 \noindent
-The hyperparameter settings for this training run are instances of
+The hyperparameter settings for this MLIP run are instances of
 $\HyperparameterSettingC$, each linking to the hyperparameter
 definition it instantiates:
 %
-\begin{lstlisting}[language=turtle,caption={Hyperparameter settings for a specific training run.},label=lst:hp-settings]
+\begin{lstlisting}[language=turtle,caption={Hyperparameter settings for a specific MLIP run.},label=lst:hp-settings]
 ex:setting-rcut a mlips:HyperparameterSetting ;
     mlips:forHyperparameter ex:hp-rcut ;
     mlips:settingValue "5.0" ;
@@ -176,18 +176,32 @@ ex:setting-nq a mlips:HyperparameterSetting ;
 \end{lstlisting}
 
 \noindent
-The hyperparameter \emph{definitions} live at the algorithm level. They
-describe what parameters the algorithm accepts, not what values were
-used in any particular training run. The algorithm also declares which
-simulation types it supports and which software implements it:
+The hyperparameter \emph{definitions} live at the method level. They
+describe what parameters the method accepts, not what values were
+used in any particular MLIP run. The method also specifies its three
+components (functional form, loss function, training algorithm),
+declares which simulation types it supports, and identifies the
+software that implements it:
 %
-\begin{lstlisting}[language=turtle,caption={MTP algorithm: hyperparameter definitions and implementation.},label=lst:algorithm]
-ex:MTP a mlips:MLIPAlgorithm ;
+\begin{lstlisting}[language=turtle,caption={MTP method: components, hyperparameter definitions, and implementation.},label=lst:algorithm]
+ex:MTP a mlips:MLIPMethod ;
     rdfs:label "Moment Tensor Potential" ;
+    mlips:hasFunctionalForm ex:mtp-functional-form ;
+    mlips:hasLossFunction ex:mtp-loss ;
+    mlips:hasTrainingAlgorithm ex:lbfgs ;
     mlips:hasHyperparameter ex:hp-rcut, ex:hp-rmin,
         ex:hp-nq, ex:hp-levmax ;
     mlips:hasImplementation ex:mlip-package-v1 ;
     mlips:supportsSimulation ex:sim-md, ex:sim-geopt .
+
+ex:mtp-functional-form a mlips:FunctionalForm ;
+    rdfs:label "MTP moment-tensor polynomial" .
+
+ex:mtp-loss a mlips:LossFunction ;
+    rdfs:label "Weighted MSE of energies, forces, stresses" .
+
+ex:lbfgs a mls:Algorithm ;
+    rdfs:label "L-BFGS" .
 
 ex:hp-rcut a mlips:Hyperparameter, mlips:PhysicalHyperparameter ;
     mlips:hyperparameterName "R_cut" ;

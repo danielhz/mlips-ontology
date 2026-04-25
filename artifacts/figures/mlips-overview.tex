@@ -2,19 +2,17 @@
 % Regenerate initial layout: python dot_to_tikz.py
 \begin{tikzpicture}[
     x=1cm, y=1cm,
-    every node/.style={font=\fontsize{12}{14.4}\selectfont},
-    class/.style={draw, rounded corners=5pt, fill=classfill,
-        font=\fontsize{12}{14.4}\selectfont, inner sep=3pt, align=center,
-        minimum height=0.7cm, text depth=0pt},
+    every node/.style={font=\small},
+    class/.style={draw, rounded corners=2pt, fill=classfill,
+        font=\small, inner sep=3pt, align=center},
     instance/.style={draw, fill=instancefill,
-        font=\fontsize{12}{14.4}\selectfont, inner sep=3pt, align=center},
-    literal/.style={font=\fontsize{12}{14.4}\selectfont\color{gray}, inner sep=2pt, align=center},
-    extclass/.style={draw, dashed, rounded corners=5pt, fill=extfill,
-        font=\fontsize{12}{14.4}\selectfont, inner sep=3pt, align=center},
+        font=\small, inner sep=3pt, align=center},
+    literal/.style={font=\small\color{gray}, inner sep=2pt, align=center},
+    extclass/.style={draw, dashed, rounded corners=2pt, fill=extfill,
+        font=\small, inner sep=3pt, align=center},
     edge/.style={->, >=stealth, thick},
-    subclassedge/.style={-{Triangle[open, length=6pt, width=5pt]}, thick},
-    edgelabel/.style={font=\footnotesize, fill=white, inner sep=1pt,
-        minimum height=0.45cm, text depth=0pt},
+    crossedge/.style={->, >=stealth, thick, dashed},
+    edgelabel/.style={font=\scriptsize, fill=white, inner sep=1pt},
 ]
 
 % Color definitions (copy to preamble if not already defined):
@@ -25,96 +23,57 @@
 % \definecolor{trainfill}{HTML}{C7E9C0}
 % \definecolor{benchfill}{HTML}{FDD0A2}
 
-  % Module boxes — uniform padding p=0.40cm, gap g=0.35cm (1em)
-  % cluster_algorithm (0.00 → 7.60)
-  \fill[algofill, rounded corners=4pt] (0.00,0.60) rectangle (7.60,10.50);
-  \node[anchor=north west, font=\fontsize{17}{20}\selectfont\bfseries] at (0.15,0.60) {Algorithm Module};
+  % cluster_algorithm
+  \fill[algofill, rounded corners=4pt] (0.28,0.28) rectangle (12.84,7.37);
+  \node[anchor=north west, font=\small\bfseries] at (0.38,0.28) {Algorithm Module};
 
-  % cluster_benchmark (7.95 → 15.26)
-  \fill[benchfill, rounded corners=4pt] (7.95,0.60) rectangle (15.26,10.50);
-  \node[anchor=north west, font=\fontsize{17}{20}\selectfont\bfseries] at (8.10,0.60) {Benchmark Module};
+  % cluster_training
+  \fill[trainfill, rounded corners=4pt] (25.33,0.28) rectangle (42.12,7.37);
+  \node[anchor=north west, font=\small\bfseries] at (25.43,0.28) {Training Data Module};
 
-  % cluster_training (15.61 → 26.37)
-  \fill[trainfill, rounded corners=4pt] (15.61,0.60) rectangle (26.37,10.50);
-  \node[anchor=north west, font=\fontsize{17}{20}\selectfont\bfseries] at (15.76,0.60) {Training Data Module};
+  % cluster_benchmark
+  \fill[benchfill, rounded corners=4pt] (12.84,3.14) rectangle (17.85,12.03);
+  \node[anchor=north west, font=\small\bfseries] at (12.94,3.14) {Benchmark Module};
 
-  % Algorithm module nodes
-  \node[class] (MLIPAlgorithm) at (3.80,5.10) {$\MLIPAlgorithmC$};
-  \node[class] (Hyperparameter) at (3.80,3.25) {$\HyperparameterC$};
-  \node[class] (HyperparameterSetting) at (3.80,1.40) {$\dlConcept{HyperparameterSetting}$};
-  \node[class] (Implementation) at (1.85,7.50) {$\ImplementationC$};
-  \node[class] (Library) at (1.85,9.80) {$\LibraryC$};
-  \node[class] (SimulationType) at (5.75,7.50) {$\SimulationTypeC$};
-  \node[class] (TrainedModel) at (5.75,9.80) {$\TrainedModelC$};
-  % Training Data module nodes
-  \node[class] (TrainingDataset) at (20.92,5.10) {$\TrainingDatasetC$};
-  \node[class] (DFTCalculation) at (20.92,7.50) {$\DFTCalculationC$};
-  \node[class] (DFTSettings) at (20.92,9.80) {$\DFTSettingsC$};
-  \node[class] (MaterialSystem) at (17.46,7.50) {$\MaterialSystemC$};
-  \node[class] (CoveredProperty) at (24.42,7.50) {$\dlConcept{CoveredProperty}$};
-  \node[class] (AtomicConfiguration) at (18.67,2.76) {$\AtomicConfigurationC$};
-  \node[class] (DatasetProvenance) at (24.17,2.76) {$\dlConcept{DatasetProvenance}$};
-  % Benchmark module nodes
-  \node[class] (BenchmarkStudy) at (11.44,2.76) {$\BenchmarkStudyC$};
-  \node[class] (BenchmarkResult) at (11.44,5.10) {$\BenchmarkResultC$};
-  \node[class] (AccuracyMetric) at (11.44,7.50) {$\AccuracyMetricC$};
-  \node[class] (MetricType) at (9.44,9.80) {$\MetricTypeC$};
-  \node[class] (MetricProperty) at (13.44,9.80) {$\MetricPropertyC$};
-
-  % External superclasses (dashed border, outside module boxes)
-  % Left of Algorithm Module (right edges aligned)
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsAlgorithm) at (-1.50,5.10) {mls:Algorithm};
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsHyperParameter) at (-2.00,3.25) {mls:HyperParameter};
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsImplementation) at (-1.96,7.50) {mls:Implementation};
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsModel) at (-1.17,9.80) {mls:Model};
-  % Right of Training Data Module (left edges aligned)
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (mlsDataset) at (27.73,5.10) {mls:Dataset};
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (provEntity) at (27.68,3.80) {prov:Entity};
-  \node[extclass, minimum height=0.7cm, text depth=0pt] (provActivity) at (27.85,1.40) {prov:Activity};
-
-  % rdfs:subClassOf edges (hollow arrowhead)
-  \draw[subclassedge] (MLIPAlgorithm) -- (mlsAlgorithm);
-  \draw[subclassedge] (Hyperparameter) -- (mlsHyperParameter);
-  \draw[subclassedge] (Implementation) -- (mlsImplementation);
-  \draw[subclassedge] (TrainedModel) to[out=195, in=-15] (mlsModel);
-  \draw[subclassedge] (TrainingDataset) -- (mlsDataset);
-  \draw[subclassedge] (TrainingDataset) to[out=-20, in=160] (provEntity);
-  \draw[subclassedge] (BenchmarkStudy) to[out=-30, in=180] (provActivity);
+  % Nodes
+  \node[class] (MLIPAlgorithm) at (8.75,1.55) {MLIPAlgorithm};
+  \node[class] (Hyperparameter) at (2.79,4.41) {Hyperparameter};
+  \node[class] (HyperparameterSetting) at (2.22,1.55) {HyperparameterSetting};
+  \node[class] (Implementation) at (7.16,4.41) {Implementation};
+  \node[class] (Library) at (7.16,6.74) {Library};
+  \node[class] (SimulationType) at (10.34,4.41) {SimulationType};
+  \node[class] (TrainingDataset) at (31.47,1.55) {TrainingDataset};
+  \node[class] (DFTCalculation) at (26.63,4.41) {DFTCalculation};
+  \node[class] (DFTSettings) at (27.34,6.74) {DFTSettings};
+  \node[class] (MaterialSystem) at (29.77,4.41) {MaterialSystem};
+  \node[class] (AtomicConfiguration) at (33.30,4.41) {AtomicConfiguration};
+  \node[class] (DatasetProvenance) at (37.15,4.41) {DatasetProvenance};
+  \node[class] (CoveredProperty) at (40.71,4.41) {CoveredProperty};
+  \node[class] (BenchmarkStudy) at (14.29,4.41) {BenchmarkStudy};
+  \node[class] (BenchmarkResult) at (14.89,6.74) {BenchmarkResult};
+  \node[class] (AccuracyMetric) at (14.89,9.07) {AccuracyMetric};
+  \node[class] (MetricType) at (13.83,11.39) {MetricType};
+  \node[class] (MetricProperty) at (16.58,11.39) {MetricProperty};
 
   % Edges
-  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {$\hasHyperparameterR$} (Hyperparameter);
-  \draw[edge] (MLIPAlgorithm) -- (Implementation);
-  \draw[edge] (MLIPAlgorithm) -- (SimulationType);
-  \node[edgelabel] at (1.80,6.30) {$\hasImplementationR$};
-  \node[edgelabel] at (5.80,6.30) {$\supportsSimulationR$};
-  \draw[edge] (HyperparameterSetting) -- node[edgelabel, pos=0.5] {$\dlRole{forHyperparameter}$} (Hyperparameter);
-  \draw[edge] (Implementation) -- node[edgelabel, pos=0.5] {$\implementedInR$} (Library);
-  \draw[edge] (TrainedModel) to[out=-150, in=90] (MLIPAlgorithm);
-  \node[edgelabel] at (4.50,8.65) {$\trainedWithR$};
-  \draw[->, >=stealth, thick]
-    (TrainedModel.east) .. controls (8.50,9.80) and (8.00,8.08) .. (9.50,8.08)
-    -- (14.50,8.08)
-    .. controls (16.00,8.08) and (16.50,5.10) .. (18.00,5.10)
-    -- (TrainingDataset.west);
-  \node[edgelabel] at (13.85,8.08) {$\trainedOnR$};
-  \draw[edge] (TrainingDataset) -- (DFTCalculation);
-  \draw[edge] (TrainingDataset) -- (MaterialSystem);
-  \draw[edge] (TrainingDataset) -- (CoveredProperty);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {$\dlRole{hasConfiguration}$} (AtomicConfiguration);
-  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {$\datasetProvenanceR$} (DatasetProvenance);
-  % Edge labels: space between TrainingDataset (5.10) and upper row (7.50)
-  % divided into 3 segments: B=5.90, C=6.70
-  \node[edgelabel] at (20.92,6.70) {$\dlRole{hasDFTCalculation}$};
-  \node[edgelabel] at (19.19,5.90) {$\dlRole{coversMaterial}$};
-  \node[edgelabel] at (22.67,5.90) {$\coversPropertyR$};
-  \draw[edge] (DFTCalculation) -- node[edgelabel, pos=0.5] {$\hasDFTSettingsR$} (DFTSettings);
-  \draw[edge] (BenchmarkStudy) -- node[edgelabel, pos=0.5] {$\hasResultR$} (BenchmarkResult);
-  \draw[edge] (BenchmarkResult) to[out=150, in=-30] (TrainedModel);
-  \node[edgelabel] at (8.60,7.50) {$\evaluatesModelR$};
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\targetMaterialR$} (MaterialSystem);
-  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {$\hasAccuracyMetricR$} (AccuracyMetric);
-  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {$\metricTypeR$} (MetricType);
-  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {$\metricPropertyR$} (MetricProperty);
-
+  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {hasHyperparameter} (Hyperparameter);
+  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {hasImplementation} (Implementation);
+  \draw[edge] (MLIPAlgorithm) -- node[edgelabel, pos=0.5] {supportsSimulation} (SimulationType);
+  \draw[edge] (HyperparameterSetting) -- node[edgelabel, pos=0.5] {forHyperparameter} (Hyperparameter);
+  \draw[edge] (Implementation) -- node[edgelabel, pos=0.5] {implementedIn} (Library);
+  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {hasDFTCalculation} (DFTCalculation);
+  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {coversMaterial} (MaterialSystem);
+  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {hasConfiguration} (AtomicConfiguration);
+  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {datasetProvenance} (DatasetProvenance);
+  \draw[edge] (TrainingDataset) -- node[edgelabel, pos=0.5] {coversProperty} (CoveredProperty);
+  \draw[edge] (DFTCalculation) -- node[edgelabel, pos=0.5] {hasDFTSettings} (DFTSettings);
+  \draw[edge] (BenchmarkStudy) -- node[edgelabel, pos=0.5] {hasResult} (BenchmarkResult);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {usesAlgorithm} (MLIPAlgorithm);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {hasHyperparameterSetting} (HyperparameterSetting);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {usesTrainingData} (TrainingDataset);
+  \draw[crossedge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {targetMaterial} (MaterialSystem);
+  \draw[edge] (BenchmarkResult) -- node[edgelabel, pos=0.5] {hasAccuracyMetric} (AccuracyMetric);
+  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {metricType} (MetricType);
+  \draw[edge] (AccuracyMetric) -- node[edgelabel, pos=0.5] {metricProperty} (MetricProperty);
 
 \end{tikzpicture}

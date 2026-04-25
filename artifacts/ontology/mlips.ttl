@@ -50,11 +50,12 @@ mlips:AtomicConfiguration
     a owl:Class ;
     rdfs:comment """A single atomic configuration (positions, cell,
 properties) in a training dataset."""@en ;
-    rdfs:label "Atomic Configuration"@en .
+    rdfs:label "Atomic Configuration"@en ;
+    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/AtomicStructure> .
 
 mlips:AtomicEnvironmentDescriptor
     a owl:Class ;
-    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP algorithm."@en ;
+    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP method."@en ;
     rdfs:label "Atomic Environment Descriptor"@en .
 
 mlips:Augmented
@@ -64,7 +65,7 @@ mlips:Augmented
 
 mlips:BenchmarkResult
     a owl:Class ;
-    rdfs:comment """A single evaluation result: an algorithm applied to a
+    rdfs:comment """A single evaluation result: an MLIP method applied to a
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:label "Benchmark Result"@en ;
     rdfs:subClassOf [
@@ -110,7 +111,7 @@ mlips:DFTCalculation
     rdfs:comment """A density functional theory calculation that produced
 reference data for training."""@en ;
     rdfs:label "DFT Calculation"@en ;
-    rdfs:subClassOf [
+    rdfs:subClassOf <https://w3id.org/mdo/core/Calculation>, [
         a owl:Restriction ;
         owl:onProperty mlips:hasDFTSettings ;
         owl:someValuesFrom mlips:DFTSettings
@@ -148,9 +149,14 @@ mlips:Forces
     a owl:NamedIndividual, mlips:CoveredProperty ;
     rdfs:label "Forces"@en .
 
+mlips:FunctionalForm
+    a owl:Class ;
+    rdfs:comment "A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values."@en ;
+    rdfs:label "Functional Form"@en .
+
 mlips:Hyperparameter
     a owl:Class ;
-    rdfs:comment """A hyperparameter of an MLIP algorithm, with its name,
+    rdfs:comment """A hyperparameter of an MLIP method, with its name,
 data type, range, and default value."""@en ;
     rdfs:label "Hyperparameter"@en ;
     rdfs:subClassOf mlschema:HyperParameter, [
@@ -159,7 +165,7 @@ data type, range, and default value."""@en ;
             a owl:ObjectProperty ;
             owl:inverseOf mlips:hasHyperparameter
         ] ;
-        owl:someValuesFrom mlips:MLIPAlgorithm
+        owl:someValuesFrom mlips:MLIPMethod
     ] .
 
 mlips:HyperparameterSetting
@@ -170,7 +176,7 @@ specific training run or configuration."""@en ;
 
 mlips:Implementation
     a owl:Class ;
-    rdfs:comment """A software implementation of an MLIP algorithm in a
+    rdfs:comment """A software implementation of an MLIP method in a
 specific library and version."""@en ;
     rdfs:label "Implementation"@en ;
     rdfs:subClassOf mlschema:Implementation, [
@@ -183,7 +189,7 @@ specific library and version."""@en ;
             a owl:ObjectProperty ;
             owl:inverseOf mlips:hasImplementation
         ] ;
-        owl:someValuesFrom mlips:MLIPAlgorithm
+        owl:someValuesFrom mlips:MLIPMethod
     ] .
 
 mlips:InHouse
@@ -197,17 +203,27 @@ mlips:Library
 (e.g., ASE, LAMMPS, VASP, GPAW)."""@en ;
     rdfs:label "Library"@en .
 
+mlips:LossFunction
+    a owl:Class ;
+    rdfs:comment "A scalar objective whose minimisation fits the parameters of the functional form."@en ;
+    rdfs:label "Loss Function"@en .
+
 mlips:MAE
     a owl:NamedIndividual, mlips:MetricType ;
     rdfs:comment "Mean Absolute Error."@en ;
     rdfs:label "MAE"@en .
 
-mlips:MLIPAlgorithm
+mlips:MLIPMethod
     a owl:Class ;
-    rdfs:comment """A machine learning interatomic potential algorithm family
-(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP)."""@en ;
-    rdfs:label "MLIP Algorithm"@en ;
-    rdfs:subClassOf mlschema:Algorithm, [
+    rdfs:comment """A machine learning interatomic potential method family
+(e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
+a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
+    rdfs:label "MLIP Method"@en ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasTrainingAlgorithm ;
+        owl:someValuesFrom mlschema:Algorithm
+    ], [
         a owl:Restriction ;
         owl:onProperty mlips:hasHyperparameter ;
         owl:someValuesFrom mlips:Hyperparameter
@@ -215,13 +231,44 @@ mlips:MLIPAlgorithm
         a owl:Restriction ;
         owl:onProperty mlips:supportsSimulation ;
         owl:someValuesFrom mlips:SimulationType
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasFunctionalForm ;
+        owl:someValuesFrom mlips:FunctionalForm
+    ], [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasLossFunction ;
+        owl:someValuesFrom mlips:LossFunction
+    ] ;
+    owl:disjointWith mlschema:Algorithm .
+
+mlips:MLIPRun
+    a owl:Class ;
+    rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
+    rdfs:label "MLIP Run"@en ;
+    rdfs:subClassOf prov:Activity, [
+        a owl:Restriction ;
+        owl:onClass mlips:MLIPMethod ;
+        owl:onProperty mlips:appliesMethod ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onClass mlips:TrainingDataset ;
+        owl:onProperty mlips:runsOn ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+    ], [
+        a owl:Restriction ;
+        owl:onClass mlips:TrainedModel ;
+        owl:onProperty mlips:produces ;
+        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
     ] .
 
 mlips:MaterialSystem
     a owl:Class ;
     rdfs:comment """A material system studied in a dataset: element, alloy,
 compound, or complex microstructure."""@en ;
-    rdfs:label "Material System"@en .
+    rdfs:label "Material System"@en ;
+    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial> .
 
 mlips:MetricProperty
     a owl:Class ;
@@ -287,7 +334,7 @@ mlips:SymmetryFunctionDescriptor
 
 mlips:TrainedModel
     a owl:Class ;
-    rdfs:comment """The concrete artifact produced by training an algorithm
+    rdfs:comment """The concrete artifact produced by fitting an MLIP method
 on a specific dataset with specific hyperparameter settings---the learned
 parameters (weights) that can be used for prediction."""@en ;
     rdfs:label "Trained Model"@en ;
@@ -297,7 +344,7 @@ parameters (weights) that can be used for prediction."""@en ;
             a owl:ObjectProperty ;
             owl:inverseOf mlips:produces
         ] ;
-        owl:someValuesFrom mlips:TrainingRun
+        owl:someValuesFrom mlips:MLIPRun
     ] .
 
 mlips:TrainingDataset
@@ -329,31 +376,16 @@ mlips:TrainingHyperparameter
     rdfs:label "Training Hyperparameter"@en ;
     rdfs:subClassOf mlips:Hyperparameter .
 
-mlips:TrainingRun
-    a owl:Class ;
-    rdfs:comment """A concrete training execution: it executes an algorithm
-on a training dataset and produces a trained model."""@en ;
-    rdfs:label "Training Run"@en ;
-    rdfs:subClassOf mlschema:Run, prov:Activity, [
-        a owl:Restriction ;
-        owl:onClass mlips:MLIPAlgorithm ;
-        owl:onProperty mlips:executes ;
-        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
-    ], [
-        a owl:Restriction ;
-        owl:onClass mlips:TrainingDataset ;
-        owl:onProperty mlips:runsOn ;
-        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
-    ], [
-        a owl:Restriction ;
-        owl:onClass mlips:TrainedModel ;
-        owl:onProperty mlips:produces ;
-        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
-    ] .
-
 mlips:Virials
     a owl:NamedIndividual, mlips:CoveredProperty ;
     rdfs:label "Virials"@en .
+
+mlips:appliesMethod
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an MLIP run to the MLIP method it fits."@en ;
+    rdfs:domain mlips:MLIPRun ;
+    rdfs:label "applies method"@en ;
+    rdfs:range mlips:MLIPMethod .
 
 mlips:chemicalFormula
     a owl:DatatypeProperty ;
@@ -406,13 +438,6 @@ mlips:evaluatesModel
     rdfs:label "evaluates model"@en ;
     rdfs:range mlips:TrainedModel .
 
-mlips:executes
-    a owl:ObjectProperty ;
-    rdfs:comment "Links a training run to the algorithm it executes."@en ;
-    rdfs:domain mlips:TrainingRun ;
-    rdfs:label "executes"@en ;
-    rdfs:range mlips:MLIPAlgorithm .
-
 mlips:forHyperparameter
     a owl:ObjectProperty ;
     rdfs:comment "Links a setting to the hyperparameter it configures."@en ;
@@ -422,7 +447,7 @@ mlips:forHyperparameter
 
 mlips:gpuHours
     a owl:DatatypeProperty ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "GPU hours"@en ;
     rdfs:range xsd:double .
 
@@ -452,15 +477,22 @@ mlips:hasDFTSettings
 
 mlips:hasDescriptor
     a owl:ObjectProperty ;
-    rdfs:comment "Links an MLIP algorithm to the atomic environment descriptor it uses."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:comment "Links an MLIP method to the atomic environment descriptor it uses."@en ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "has descriptor"@en ;
     rdfs:range mlips:AtomicEnvironmentDescriptor .
 
+mlips:hasFunctionalForm
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an MLIP method to its parametrised functional form."@en ;
+    rdfs:domain mlips:MLIPMethod ;
+    rdfs:label "has functional form"@en ;
+    rdfs:range mlips:FunctionalForm .
+
 mlips:hasHyperparameter
     a owl:ObjectProperty ;
-    rdfs:comment "Links an algorithm to a hyperparameter it accepts."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:comment "Links an MLIP method to a hyperparameter it accepts."@en ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "has hyperparameter"@en ;
     rdfs:range mlips:Hyperparameter .
 
@@ -472,16 +504,37 @@ mlips:hasHyperparameterSetting
 
 mlips:hasImplementation
     a owl:ObjectProperty ;
-    rdfs:comment "Links an algorithm to a software implementation."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:comment "Links an MLIP method to a software implementation."@en ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "has implementation"@en ;
     rdfs:range mlips:Implementation .
+
+mlips:hasLossFunction
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an MLIP method to the loss function whose minimisation fits its parameters."@en ;
+    rdfs:domain mlips:MLIPMethod ;
+    rdfs:label "has loss function"@en ;
+    rdfs:range mlips:LossFunction .
 
 mlips:hasResult
     a owl:ObjectProperty ;
     rdfs:domain mlips:BenchmarkStudy ;
     rdfs:label "has result"@en ;
     rdfs:range mlips:BenchmarkResult .
+
+mlips:hasTrainingAlgorithm
+    a owl:ObjectProperty ;
+    rdfs:comment "Links an MLIP method to the ML-Schema algorithm used to fit its functional form."@en ;
+    rdfs:domain mlips:MLIPMethod ;
+    rdfs:label "has training algorithm"@en ;
+    rdfs:range mlschema:Algorithm .
+
+mlips:hasTrainingRun
+    a owl:ObjectProperty ;
+    rdfs:comment "Optional link from an MLIP run to an ML-Schema run recording the training algorithm execution."@en ;
+    rdfs:domain mlips:MLIPRun ;
+    rdfs:label "has training run"@en ;
+    rdfs:range mlschema:Run .
 
 mlips:hasUnit
     a owl:ObjectProperty ;
@@ -512,7 +565,7 @@ mlips:implementedIn
 mlips:inferenceComplexity
     a owl:DatatypeProperty ;
     rdfs:comment "Asymptotic computational complexity of inference."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "inference complexity"@en ;
     rdfs:range xsd:string .
 
@@ -617,14 +670,14 @@ mlips:numRadialBasis
 mlips:peakMemory
     a owl:DatatypeProperty ;
     rdfs:comment "Peak memory during training (GB)."@en ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "peak memory"@en ;
     rdfs:range xsd:double .
 
 mlips:produces
     a owl:ObjectProperty ;
-    rdfs:comment "Links a training run to the trained model it produces."@en ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:comment "Links an MLIP run to the trained model it produces."@en ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "produces"@en ;
     rdfs:range mlips:TrainedModel .
 
@@ -643,8 +696,8 @@ mlips:reportedIn
 
 mlips:runsOn
     a owl:ObjectProperty ;
-    rdfs:comment "Links a training run to the training dataset it uses."@en ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:comment "Links an MLIP run to the training dataset it uses."@en ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "runs on"@en ;
     rdfs:range mlips:TrainingDataset .
 
@@ -662,20 +715,20 @@ mlips:settingValue
 
 mlips:supportsGPU
     a owl:DatatypeProperty ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "supports GPU"@en ;
     rdfs:range xsd:boolean .
 
 mlips:supportsParallelization
     a owl:DatatypeProperty ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "supports parallelization"@en ;
     rdfs:range xsd:boolean .
 
 mlips:supportsSimulation
     a owl:ObjectProperty ;
-    rdfs:comment "Links an algorithm to the simulation types it supports."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:comment "Links an MLIP method to the simulation types it supports."@en ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "supports simulation"@en ;
     rdfs:range mlips:SimulationType .
 
@@ -687,7 +740,7 @@ mlips:targetMaterial
 
 mlips:trainedOn
     a owl:ObjectProperty ;
-    rdfs:comment "Shortcut: links a trained model directly to its training dataset."@en ;
+    rdfs:comment "Shortcut: links a trained model directly to the training dataset it was fitted on."@en ;
     rdfs:domain mlips:TrainedModel ;
     rdfs:label "trained on"@en ;
     rdfs:range mlips:TrainingDataset ;
@@ -700,34 +753,34 @@ mlips:trainedOn
 
 mlips:trainedWith
     a owl:ObjectProperty ;
-    rdfs:comment "Shortcut: links a trained model directly to its algorithm."@en ;
+    rdfs:comment "Shortcut: links a trained model directly to the MLIP method it applies."@en ;
     rdfs:domain mlips:TrainedModel ;
     rdfs:label "trained with"@en ;
-    rdfs:range mlips:MLIPAlgorithm ;
+    rdfs:range mlips:MLIPMethod ;
     owl:propertyChainAxiom ([
             a owl:ObjectProperty ;
             owl:inverseOf mlips:produces
         ]
-        mlips:executes
+        mlips:appliesMethod
     ) .
 
 mlips:trainingComplexity
     a owl:DatatypeProperty ;
     rdfs:comment "Asymptotic computational complexity of training."@en ;
-    rdfs:domain mlips:MLIPAlgorithm ;
+    rdfs:domain mlips:MLIPMethod ;
     rdfs:label "training complexity"@en ;
     rdfs:range xsd:string .
 
 mlips:trainingDuration
     a owl:DatatypeProperty ;
     rdfs:comment "Measured wall-clock training time (hours)."@en ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "training duration"@en ;
     rdfs:range xsd:double .
 
 mlips:trainingHardware
     a owl:DatatypeProperty ;
-    rdfs:domain mlips:TrainingRun ;
+    rdfs:domain mlips:MLIPRun ;
     rdfs:label "training hardware"@en ;
     rdfs:range xsd:string .
 
@@ -742,7 +795,7 @@ mlips:usesAlgorithm
     a owl:ObjectProperty ;
     rdfs:domain mlips:BenchmarkResult ;
     rdfs:label "uses algorithm"@en ;
-    rdfs:range mlips:MLIPAlgorithm .
+    rdfs:range mlips:MLIPMethod .
 
 mlips:usesTrainingData
     a owl:ObjectProperty ;

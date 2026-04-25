@@ -1,13 +1,13 @@
 \section{Class Reference}
 \label{sec:class-reference}
 
-This appendix describes all 24 classes defined in the \MLIPsOntology{}.
+This appendix describes all 26 classes defined in the \MLIPsOntology{}.
 
 \subsection{$\dlConcept{Hyperparameter}$}
 \label{sec:term-Hyperparameter}
 
 \textbf{Label:} Hyperparameter.
-A hyperparameter of an MLIP algorithm, with its name, data type, range, and default value.
+A hyperparameter of an MLIP method, with its name, data type, range, and default value.
 
 \paragraph{Superclasses.} $\dlConcept{mlschema:HyperParameter}$.
 
@@ -70,7 +70,7 @@ A concrete value assigned to a hyperparameter in a specific training run or conf
 \label{sec:term-Implementation}
 
 \textbf{Label:} Implementation.
-A software implementation of an MLIP algorithm in a specific library and version.
+A software implementation of an MLIP method in a specific library and version.
 
 \paragraph{Superclasses.} $\dlConcept{mlschema:Implementation}$.
 
@@ -94,22 +94,40 @@ A software library or tool used in MLIP research (e.g., ASE, LAMMPS, VASP, GPAW)
 \paragraph{Example.}
 \InputIfFileExists{artifacts/examples/classes/Library.tex}{}{\textit{TODO: add example.}}
 
-\subsection{$\dlConcept{MLIPAlgorithm}$}
-\label{sec:term-MLIPAlgorithm}
+\subsection{$\dlConcept{MLIPMethod}$}
+\label{sec:term-MLIPMethod}
 
-\textbf{Label:} MLIP Algorithm.
-A machine learning interatomic potential algorithm family (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP).
+\textbf{Label:} MLIP Method.
+A machine learning interatomic potential method family (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). An MLIP method specifies a functional form mapping an atomic configuration to an energy, a loss function defined over that form, and a training algorithm used to fit its parameters. MLIPMethod is disjoint from mls:Algorithm: an MLIP method is a named specification of all three components, whereas mls:Algorithm refers to a training/learning procedure (e.g., Adam, L-BFGS).
 
-\paragraph{Superclasses.} $\dlConcept{mlschema:Algorithm}$.
+\paragraph{Outgoing properties.} $\dlRole{hasFunctionalForm}$, $\dlRole{hasLossFunction}$, $\dlRole{hasTrainingAlgorithm}$, $\dlRole{hasHyperparameter}$, $\dlRole{hasImplementation}$, $\dlRole{supportsSimulation}$, $\dlRole{hasDescriptor}$, $\dlRole{trainingComplexity}$, $\dlRole{inferenceComplexity}$, $\dlRole{supportsGPU}$, $\dlRole{supportsParallelization}$.
 
-\paragraph{Outgoing properties.} $\dlRole{hasHyperparameter}$, $\dlRole{hasImplementation}$, $\dlRole{supportsSimulation}$, $\dlRole{hasDescriptor}$, $\dlRole{trainingComplexity}$, $\dlRole{inferenceComplexity}$, $\dlRole{supportsGPU}$, $\dlRole{supportsParallelization}$.
-
-\paragraph{Incoming properties.} $\dlRole{executes}$, $\dlRole{trainedWith}$, $\dlRole{usesAlgorithm}$.
+\paragraph{Incoming properties.} $\dlRole{appliesMethod}$, $\dlRole{trainedWith}$, $\dlRole{usesAlgorithm}$.
 
 \paragraph{Example.}
-\InputIfFileExists{artifacts/examples/classes/MLIPAlgorithm.tex}{}{\textit{TODO: add example.}}
+\InputIfFileExists{artifacts/examples/classes/MLIPMethod.tex}{}{\textit{TODO: add example.}}
 
-\paragraph{Related axioms.} \eqref{ax:1}, \eqref{ax:2}.
+\subsection{$\dlConcept{FunctionalForm}$}
+\label{sec:term-FunctionalForm}
+
+\textbf{Label:} Functional Form.
+A parametrised mapping from an atomic configuration to an energy (and derived quantities such as forces and stresses), specified independently of the values of its parameters. Examples: the MTP moment-tensor polynomial \$E(\textbackslash\{\}text\{cfg\}; \textbackslash\{\}boldsymbol\{\textbackslash\{\}xi\})\$, the MACE message-passing ansatz, the HDNNP sum of atomic neural networks. The functional form is what is being fitted; the trained model records the fitted parameter values.
+
+\paragraph{Incoming properties.} $\dlRole{hasFunctionalForm}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/FunctionalForm.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlConcept{LossFunction}$}
+\label{sec:term-LossFunction}
+
+\textbf{Label:} Loss Function.
+A scalar objective whose minimisation fits the parameters of the functional form. For MLIPs it is typically a weighted sum of mean-squared errors on energies, forces, and stresses, optionally with regularisation terms.
+
+\paragraph{Incoming properties.} $\dlRole{hasLossFunction}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/LossFunction.tex}{}{\textit{TODO: add example.}}
 
 \subsection{$\dlConcept{SimulationType}$}
 \label{sec:term-SimulationType}
@@ -126,7 +144,7 @@ A type of atomistic simulation: molecular dynamics, Monte Carlo, geometry optimi
 \label{sec:term-TrainedModel}
 
 \textbf{Label:} Trained Model.
-The concrete artifact produced by training an algorithm on a specific dataset with specific hyperparameter settings---the learned parameters (weights) that can be used for prediction.
+The concrete artifact produced by fitting an MLIP method on a specific dataset with specific hyperparameter settings---the learned parameters (weights) that can be used for prediction.
 
 \paragraph{Superclasses.} $\dlConcept{mlschema:Model}$.
 
@@ -139,20 +157,18 @@ The concrete artifact produced by training an algorithm on a specific dataset wi
 
 \paragraph{Related axioms.} \eqref{ax:7}.
 
-\subsection{$\dlConcept{TrainingRun}$}
-\label{sec:term-TrainingRun}
+\subsection{$\dlConcept{MLIPRun}$}
+\label{sec:term-MLIPRun}
 
-\textbf{Label:} Training Run.
-A concrete training execution: it executes an algorithm on a training dataset and produces a trained model.
+\textbf{Label:} MLIP Run.
+A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model. MLIPRun is a subclass of prov:Activity but not of mls:Run, because the mls:Run.executes property ranges over mls:Algorithm and mlips:MLIPMethod is disjoint from mls:Algorithm. An optional hasTrainingRun property links an MLIPRun to an underlying mls:Run when the training algorithm is itself modelled in ML-Schema.
 
-\paragraph{Superclasses.} $\dlConcept{mlschema:Run}$, $\dlConcept{prov:Activity}$.
+\paragraph{Superclasses.} $\dlConcept{prov:Activity}$.
 
-\paragraph{Outgoing properties.} $\dlRole{executes}$, $\dlRole{produces}$, $\dlRole{runsOn}$, $\dlRole{trainingDuration}$, $\dlRole{trainingHardware}$, $\dlRole{peakMemory}$, $\dlRole{gpuHours}$.
+\paragraph{Outgoing properties.} $\dlRole{appliesMethod}$, $\dlRole{hasTrainingRun}$, $\dlRole{produces}$, $\dlRole{runsOn}$, $\dlRole{trainingDuration}$, $\dlRole{trainingHardware}$, $\dlRole{peakMemory}$, $\dlRole{gpuHours}$.
 
 \paragraph{Example.}
-\InputIfFileExists{artifacts/examples/classes/TrainingRun.tex}{}{\textit{TODO: add example.}}
-
-\paragraph{Related axioms.} \eqref{ax:4}, \eqref{ax:5}, \eqref{ax:6}.
+\InputIfFileExists{artifacts/examples/classes/MLIPRun.tex}{}{\textit{TODO: add example.}}
 
 \subsection{$\dlConcept{AtomicEnvironmentDescriptor}$}
 \label{sec:term-AtomicEnvironmentDescriptor}
@@ -170,6 +186,8 @@ A mathematical representation of the local atomic environment (neighbor position
 
 \textbf{Label:} Atomic Configuration.
 A single atomic configuration (positions, cell, properties) in a training dataset.
+
+\paragraph{Superclasses.} $\dlConcept{cmso:AtomicStructure}$.
 
 \paragraph{Incoming properties.} $\dlRole{hasConfiguration}$.
 
@@ -192,6 +210,8 @@ A physical property covered by the training dataset (energy, forces, stresses, v
 
 \textbf{Label:} DFT Calculation.
 A density functional theory calculation that produced reference data for training.
+
+\paragraph{Superclasses.} $\dlConcept{mdo:Calculation}$.
 
 \paragraph{Outgoing properties.} $\dlRole{hasDFTSettings}$.
 
@@ -231,6 +251,8 @@ The provenance type of a training dataset.
 
 \textbf{Label:} Material System.
 A material system studied in a dataset: element, alloy, compound, or complex microstructure.
+
+\paragraph{Superclasses.} $\dlConcept{cmso:CrystallineMaterial}$.
 
 \paragraph{Outgoing properties.} $\dlRole{chemicalFormula}$, $\dlRole{materialClass}$, $\dlRole{microstructuralFeature}$.
 
@@ -275,7 +297,7 @@ An accuracy measure reported in a benchmark (e.g., RMSE of energy, MAE of forces
 \label{sec:term-BenchmarkResult}
 
 \textbf{Label:} Benchmark Result.
-A single evaluation result: an algorithm applied to a material system with specific hyperparameters, reporting accuracy metrics.
+A single evaluation result: an MLIP method applied to a material system with specific hyperparameters, reporting accuracy metrics.
 
 \paragraph{Outgoing properties.} $\dlRole{evaluatesModel}$, $\dlRole{hasAccuracyMetric}$, $\dlRole{hasHyperparameterSetting}$, $\dlRole{reportedIn}$, $\dlRole{targetMaterial}$, $\dlRole{usesAlgorithm}$, $\dlRole{usesTrainingData}$, $\dlRole{inferenceTimePerAtom}$, $\dlRole{inferenceHardware}$.
 
