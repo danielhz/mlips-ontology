@@ -1,0 +1,41 @@
+# Q4 -- Reference settings + software code (Library used as code).
+# Three blocks:
+#   (1) calc -> hasReferenceSettings/hasDFTSettings/hasWaveFunctionSettings -> settings
+#   (2) settings node and all its triples
+#   (3) Library node referenced by usedReferenceCode/usedDFTCode
+
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#>
+
+CONSTRUCT { ?s ?p ?o }
+WHERE {
+  {
+    # (1) calc -> settings link
+    ?s a ?calcType .
+    VALUES ?calcType {
+      mlips:DFTCalculation
+      mlips:WaveFunctionCalculation
+      mlips:ReferenceCalculation
+    }
+    ?s ?p ?o .
+    VALUES ?p {
+      mlips:hasReferenceSettings
+      mlips:hasDFTSettings
+      mlips:hasWaveFunctionSettings
+    }
+  } UNION {
+    # (2) settings node, all triples
+    ?s a ?settingsType .
+    VALUES ?settingsType {
+      mlips:DFTSettings
+      mlips:WaveFunctionSettings
+      mlips:ReferenceSettings
+    }
+    ?s ?p ?o .
+  } UNION {
+    # (3) Library node when referenced as the reference code
+    [] ?codeLink ?s .
+    VALUES ?codeLink { mlips:usedReferenceCode mlips:usedDFTCode }
+    ?s ?p ?o .
+  }
+}

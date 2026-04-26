@@ -1,0 +1,36 @@
+# Q9 -- MLIP run + trained model.
+# Captures every MLIPRun's structural edges (method, dataset,
+# hyperparameter setting, model, training-run shortcut) and the
+# TrainedModel's identifying triples (rdf:type, rdfs:label).
+# Compute-cost data properties on both nodes are in Q11.
+
+PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mls:   <http://www.w3.org/ns/mls#>
+PREFIX mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#>
+
+CONSTRUCT { ?s ?p ?o }
+WHERE {
+  {
+    ?s a mlips:MLIPRun .
+    ?s ?p ?o .
+    VALUES ?p {
+      rdf:type
+      rdfs:label
+      mlips:appliesMethod
+      mlips:runsOn
+      mlips:hasHyperparameterSetting
+      mlips:produces
+      mlips:hasTrainingRun
+    }
+  } UNION {
+    ?s a mlips:TrainedModel .
+    ?s ?p ?o .
+    VALUES ?p { rdf:type rdfs:label }
+  } UNION {
+    # mls:Run nodes referenced by MLIPRun via hasTrainingRun.
+    [] a mlips:MLIPRun ;
+       mlips:hasTrainingRun ?s .
+    ?s ?p ?o .
+  }
+}

@@ -1,0 +1,39 @@
+# Q7 -- MLIP method, components, hyperparameter definitions, implementation.
+# Pulls every triple whose subject is one of: MLIPMethod, FunctionalForm,
+# LossFunction, Hyperparameter (with subtypes), Implementation, mls:Algorithm,
+# or a Library that is the target of an Implementation's implementedIn link.
+
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mls:    <http://www.w3.org/ns/mls#>
+PREFIX mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#>
+
+CONSTRUCT { ?s ?p ?o }
+WHERE {
+  {
+    ?s a ?type .
+    VALUES ?type {
+      mlips:MLIPMethod
+      mlips:FunctionalForm
+      mlips:LossFunction
+      mlips:Hyperparameter
+      mlips:PhysicalHyperparameter
+      mlips:ArchitecturalHyperparameter
+      mlips:TrainingHyperparameter
+      mlips:Implementation
+      mls:Algorithm
+    }
+    ?s ?p ?o .
+  } UNION {
+    # Library node when referenced via Implementation->implementedIn.
+    [] a mlips:Implementation ;
+       mlips:implementedIn ?s .
+    ?s ?p ?o .
+  } UNION {
+    # Hyperparameter referenced from a method via hasHyperparameter.
+    # Some papers may not declare ?hp a mlips:Hyperparameter explicitly;
+    # this block still pulls whatever triples the paper does carry.
+    [] a mlips:MLIPMethod ;
+       mlips:hasHyperparameter ?s .
+    ?s ?p ?o .
+  }
+}
