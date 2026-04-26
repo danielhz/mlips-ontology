@@ -152,41 +152,42 @@ The Training Data module describes the datasets used to train MLIP models,
 addressing CQ3, CQ4, and CQ5.
 
 \paragraph{Core classes.}
-A $\TrainingDatasetC$ is a collection of atomic configurations used for MLIP
-training. Each dataset covers one or more $\MaterialSystemC$ instances
-(elements, alloys, compounds), and its reference data is produced by one or
-more $\ReferenceCalculationC$ instances. The two concrete subclasses are
-$\DFTCalculationC$ (governed by $\DFTSettingsC$ with the
-exchange-correlation functional ($\xcFunctionalR$, e.g., PBE, LDA, SCAN),
-k-point mesh ($\kPointMeshR$), energy cutoff ($\energyCutoffR$), and
-pseudopotential type ($\pseudopotentialTypeR$)), and
-$\WaveFunctionCalculationC$ (governed by $\WaveFunctionSettingsC$ with the
-correlation method ($\wfMethodR$, e.g., CCSD(T), MP2, CASPT2), basis set
-($\basisSetR$, e.g., cc-pVTZ), and frozen-core flag ($\frozenCoreR$)).
-The supertype $\ReferenceSettingsC$ carries the cross-family software-code
-slot ($\usedReferenceCodeR$), of which the DFT-specific $\dlRole{usedDFTCode}$
-is a sub-property.
-Individual $\AtomicConfigurationC$ instances represent the atomic positions,
-cell parameters, and computed properties within a dataset.
+A $\TrainingDatasetC$ is a collection of $\AtomicConfigurationC$
+instances covering one or more $\MaterialSystemC$ instances
+(elements, alloys, compounds). Reference data is produced by a
+$\ReferenceCalculationC$ with two concrete subclasses,
+$\DFTCalculationC$ and $\WaveFunctionCalculationC$, each governed by
+its own settings type ($\DFTSettingsC$, $\WaveFunctionSettingsC$);
+method-specific data properties (e.g., $\xcFunctionalR$,
+$\kPointMeshR$ for DFT; $\wfMethodR$, $\basisSetR$ for
+wave-function methods\footnote{Wave-function methods such as
+CCSD(T), MP2, and CASPT2 provide higher accuracy than DFT at greater
+computational cost; we include them in the schema because some MLIPs
+are now trained on CCSD(T) reference data.}) live on each subtype.
+This polymorphism is non-breaking: the existing DFT-specific
+predicates $\hasDFTCalculationR$, $\hasDFTSettingsR$, and
+$\dlRole{usedDFTCode}$ are declared as
+\texttt{rdfs:subPropertyOf} of the new family-agnostic predicates
+$\hasReferenceCalculationR$, $\hasReferenceSettingsR$, and
+$\dlRole{usedReferenceCode}$, so legacy data validates and queries on
+the supertype properties pick up DFT-only data via OWL/RDFS sub-property
+entailment.
+
 \paragraph{Core properties.}
-$\hasReferenceCalculationR$ links a dataset to its reference calculation
-(with $\hasDFTCalculationR$ as the DFT-specific sub-property);
-$\hasReferenceSettingsR$ links a calculation to its settings (with
-$\hasDFTSettingsR$ as the sub-property);
+$\hasReferenceCalculationR$ and $\hasReferenceSettingsR$ are the
+family-agnostic predicates from above;
 $\numConfigurationsR$ records the dataset size;
 $\coversPropertyR$ indicates which physical properties
 (energy, forces, stresses, virials) are included;
-and $\datasetProvenanceR$ classifies the origin
+$\datasetProvenanceR$ classifies the origin
 as $\dlConcept{Published}$, $\dlConcept{InHouse}$, or
-$\dlConcept{Augmented}$. Augmented datasets are linked to
-their sources via PROV-O's \mbox{$\provWasDerivedFromR$}.
-The $\samplingStrategyR$ object property
-($\TrainingDatasetC \to \SamplingStrategyC$, optional and multi-valued)
-records how the configurations were sampled (e.g., chemical sampling
-across compositions, vibrational sampling across thermal snapshots, or
-a combination). $\SamplingStrategyC$ is left as an open extension
-point: concrete strategies are modeled as instances and a controlled
-vocabulary will be developed in future work.
+$\dlConcept{Augmented}$ (augmented datasets reuse PROV-O's
+\mbox{$\provWasDerivedFromR$}); and the optional, multi-valued
+$\samplingStrategyR$ records how configurations were drawn (e.g.,
+chemical, vibrational, or active-learning), with
+$\SamplingStrategyC$ left as an open extension point---concrete
+strategies are modelled as instances and a controlled vocabulary is
+developed in the journal version.
 
 \paragraph{Axioms.}
 The Training Data module defines 5 existential restrictions: every
