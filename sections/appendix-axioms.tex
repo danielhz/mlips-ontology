@@ -68,14 +68,14 @@ An $\ImplementationC$ without an $\implementedInR$ link is invalid.
 \begin{align}
   \MLIPRunC &\sqsub \exactR{1}{appliesMethod}{MLIPMethod} \axiomtag
 \end{align}
-\emph{Example.} An MLIP run that produces a MACE model for Ti-Al applies
-the MACE method---not two methods simultaneously, and not zero.
+\emph{Example.} An MLIP run that produces a C14-MTP for TiCr$_2$-H applies
+the MTP method---not two methods simultaneously, and not zero.
 
 \subsubsection{Every MLIP run uses exactly one training dataset}
 \begin{align}
   \MLIPRunC &\sqsub \exactR{1}{runsOn}{TrainingDataset} \axiomtag
 \end{align}
-\emph{Example.} The MLIP run uses the Ti-Al DFT dataset with 15{,}000
+\emph{Example.} The MLIP run uses the TiCr$_2$-H DFT dataset with 3{,}766
 configurations. If a run combines multiple datasets, they should be
 represented as a single merged $\TrainingDatasetC$.
 
@@ -83,14 +83,14 @@ represented as a single merged $\TrainingDatasetC$.
 \begin{align}
   \MLIPRunC &\sqsub \exactR{1}{produces}{TrainedModel} \axiomtag
 \end{align}
-\emph{Example.} The MLIP run produces a single MACE model for Ti-Al.
+\emph{Example.} The MLIP run produces a single C14-MTP model for TiCr$_2$-H.
 If the same run produces checkpoints, only the final model is recorded.
 
 \subsubsection{Every trained model was produced by some MLIP run}
 \begin{align}
   \TrainedModelC &\sqsub \existsR{produces^{-}}{MLIPRun} \axiomtag
 \end{align}
-\emph{Example.} A $\TrainedModelC$ instance ``MACE-TiAl-v1'' must be
+\emph{Example.} A $\TrainedModelC$ instance ``C14-MTP-TiCr2H-v1'' must be
 linked to an $\MLIPRunC$ that produced it. A model cannot exist without
 provenance about how it was trained.
 
@@ -99,7 +99,7 @@ provenance about how it was trained.
   \HyperparameterC &\sqsub \existsR{hasHyperparameter^{-}}{MLIPMethod} \axiomtag
 \end{align}
 \emph{Example.} The hyperparameter ``cutoff radius'' is defined for the
-MACE method. A $\HyperparameterC$ instance that is not linked to any
+MTP method. A $\HyperparameterC$ instance that is not linked to any
 method via $\hasHyperparameterR^{-}$ is an orphan and violates this
 axiom.
 
@@ -107,7 +107,7 @@ axiom.
 \begin{align}
   \ImplementationC &\sqsub \existsR{hasImplementation^{-}}{MLIPMethod} \axiomtag
 \end{align}
-\emph{Example.} ``MACE v0.3'' is an implementation of the MACE method.
+\emph{Example.} ``MLIP-2 v2.0'' is an implementation of the MTP method.
 An $\ImplementationC$ that is not linked to any $\MLIPMethodC$ via
 $\hasImplementationR^{-}$ is invalid.
 
@@ -154,21 +154,21 @@ accidentally being assigned hyperparameters.
 \begin{align}
   \TrainingDatasetC &\sqsub \existsR{coversMaterial}{MaterialSystem} \axiomtag
 \end{align}
-\emph{Example.} A Ti-Al training dataset covers the Ti-Al material system.
+\emph{Example.} A TiCr$_2$-H training dataset covers the TiCr$_2$ material system.
 A dataset without any $\coversMaterialR$ link is incomplete.
 
 \subsubsection{Every dataset covers at least one physical property}
 \begin{align}
   \TrainingDatasetC &\sqsub \existsR{coversProperty}{CoveredProperty} \axiomtag
 \end{align}
-\emph{Example.} The Ti-Al dataset covers energies, forces, and stresses.
+\emph{Example.} The TiCr$_2$-H dataset covers energies, forces, and stresses.
 A dataset must declare at least one covered property.
 
 \subsubsection{Every dataset has a provenance classification}
 \begin{align}
   \TrainingDatasetC &\sqsub \existsR{datasetProvenance}{DatasetProvenance} \axiomtag
 \end{align}
-\emph{Example.} The Ti-Al dataset is classified as $\dlConcept{Published}$.
+\emph{Example.} The TiCr$_2$-H dataset is classified as $\dlConcept{Published}$.
 Every dataset must indicate whether it is published, in-house, or
 augmented.
 
@@ -176,7 +176,7 @@ augmented.
 \begin{align}
   \TrainingDatasetC &\sqsub \existsR{hasConfiguration}{AtomicConfiguration} \axiomtag
 \end{align}
-\emph{Example.} The Ti-Al dataset contains 15{,}000 atomic configurations.
+\emph{Example.} The TiCr$_2$-H C14 dataset contains 3{,}766 atomic configurations.
 A dataset without any configurations is empty and invalid.
 
 \subsubsection{Every DFT calculation has settings}
@@ -194,15 +194,15 @@ incomplete.
 \begin{align}
   \BenchmarkStudyC &\sqsub \existsR{hasResult}{BenchmarkResult} \axiomtag
 \end{align}
-\emph{Example.} A study by Smith et al.\ (2025) reports evaluation results
-for MACE on Ti-Al. A $\BenchmarkStudyC$ without any $\hasResultR$ link
-contains no data and is invalid.
+\emph{Example.} A study by Kumar et al.\ (2025)~\cite{kumar2025ticr2h}
+reports evaluation results for MTP on TiCr$_2$-H. A $\BenchmarkStudyC$
+without any $\hasResultR$ link contains no data and is invalid.
 
 \subsubsection{Every result evaluates exactly one trained model}
 \begin{align}
   \BenchmarkResultC &\sqsub \exactR{1}{evaluatesModel}{TrainedModel} \axiomtag
 \end{align}
-\emph{Example.} A benchmark result evaluates the ``MACE-TiAl-v1'' model.
+\emph{Example.} A benchmark result evaluates the ``C14-MTP-TiCr2H-v1'' model.
 Each result is tied to exactly one model; comparing two models requires two
 separate $\BenchmarkResultC$ instances.
 
@@ -210,14 +210,14 @@ separate $\BenchmarkResultC$ instances.
 \begin{align}
   \BenchmarkResultC &\sqsub \existsR{targetMaterial}{MaterialSystem} \axiomtag
 \end{align}
-\emph{Example.} The benchmark result targets the Ti-Al material system for
+\emph{Example.} The benchmark result targets the TiCr$_2$ material system for
 testing. A result must specify what material was used for evaluation.
 
 \subsubsection{Every result reports at least one accuracy metric}
 \begin{align}
   \BenchmarkResultC &\sqsub \existsR{hasAccuracyMetric}{AccuracyMetric} \axiomtag
 \end{align}
-\emph{Example.} The result reports RMSE of energy (1.2~meV/atom). A
+\emph{Example.} The result reports RMSE of energy (2.81~meV/atom). A
 benchmark result without any accuracy metric carries no evaluation data.
 
 \subsubsection{Every accuracy metric has exactly one type}
@@ -239,8 +239,8 @@ created for energy, force, and stress.
 \begin{align}
   \BenchmarkResultC &\sqsub \existsR{hasResult^{-}}{BenchmarkStudy} \axiomtag
 \end{align}
-\emph{Example.} The benchmark result for MACE on Ti-Al belongs to the
-Smith et al.\ (2025) study. A result cannot exist without a parent study.
+\emph{Example.} The benchmark result for MTP on TiCr$_2$-H belongs to the
+Kumar et al.\ (2025) study. A result cannot exist without a parent study.
 
 \subsubsection{Every accuracy metric belongs to some result}
 \begin{align}
@@ -267,7 +267,7 @@ too restrictive.
 \begin{align*}
   \AtomicConfigurationC &\sqsub \existsR{hasConfiguration^{-}}{TrainingDataset}
 \end{align*}
-\emph{Example.} An atomic configuration of Ti-Al belongs to the Ti-Al
+\emph{Example.} An atomic configuration of TiCr$_2$-H belongs to the TiCr$_2$-H
 training dataset. \emph{Discussion:} Configurations could belong to
 multiple datasets (e.g., an augmented dataset reuses configurations from a
 published one), which would still satisfy this axiom but complicates
