@@ -1114,12 +1114,13 @@ properties) in a training dataset.</rdfs:comment>
       <h4><span property="rdfs:label">DFT Calculation</span></h4>
       <p property="rdfs:comment">A density functional theory calculation that produced
 reference data for training.</p>
-      <p><strong>Subclass of:</strong> <code>mdo:Calculation</code></p>
+      <p><strong>Subclass of:</strong> <code>mlips:ReferenceCalculation</code>, <code>mdo:Calculation</code></p>
 
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTCalculation">
   <rdfs:label xml:lang="en">DFT Calculation</rdfs:label>
   <rdfs:comment xml:lang="en">A density functional theory calculation that produced
 reference data for training.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceCalculation"/>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
   <rdfs:subClassOf>
     <owl:Restriction>
@@ -1135,11 +1136,13 @@ reference data for training.</rdfs:comment>
       <h4><span property="rdfs:label">DFT Settings</span></h4>
       <p property="rdfs:comment">Settings of a DFT calculation: exchange-correlation
 functional, k-point mesh, energy cutoff, pseudopotential type.</p>
+      <p><strong>Subclass of:</strong> <code>mlips:ReferenceSettings</code></p>
 
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTSettings">
   <rdfs:label xml:lang="en">DFT Settings</rdfs:label>
   <rdfs:comment xml:lang="en">Settings of a DFT calculation: exchange-correlation
 functional, k-point mesh, energy cutoff, pseudopotential type.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1166,6 +1169,48 @@ compound, or complex microstructure.</p>
   <rdfs:comment xml:lang="en">A material system studied in a dataset: element, alloy,
 compound, or complex microstructure.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial"/>
+</owl:Class>]]></code></pre>
+    </section>
+
+    <section id="ReferenceCalculation" class="term class"
+             typeof="owl:Class" about="mlips:ReferenceCalculation">
+      <h4><span property="rdfs:label">Reference Calculation</span></h4>
+      <p property="rdfs:comment">A first-principles calculation that produced
+reference energies, forces, or stresses for MLIP training. Generalisation of
+DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
+CASPT2) and other ab initio approaches.</p>
+      <p><strong>Subclass of:</strong> <code>mdo:Calculation</code></p>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceCalculation">
+  <rdfs:label xml:lang="en">Reference Calculation</rdfs:label>
+  <rdfs:comment xml:lang="en">A first-principles calculation that produced
+reference energies, forces, or stresses for MLIP training. Generalisation of
+DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
+CASPT2) and other ab initio approaches.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceSettings"/>
+      <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>]]></code></pre>
+    </section>
+
+    <section id="ReferenceSettings" class="term class"
+             typeof="owl:Class" about="mlips:ReferenceSettings">
+      <h4><span property="rdfs:label">Reference Settings</span></h4>
+      <p property="rdfs:comment">Settings of a reference calculation, abstracted
+across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
+carry the method-specific parameters; the supertype carries cross-family slots
+such as the software code used.</p>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings">
+  <rdfs:label xml:lang="en">Reference Settings</rdfs:label>
+  <rdfs:comment xml:lang="en">Settings of a reference calculation, abstracted
+across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
+carry the method-specific parameters; the supertype carries cross-family slots
+such as the software code used.</rdfs:comment>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1227,6 +1272,48 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
       <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#AtomicConfiguration"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+</owl:Class>]]></code></pre>
+    </section>
+
+    <section id="WaveFunctionCalculation" class="term class"
+             typeof="owl:Class" about="mlips:WaveFunctionCalculation">
+      <h4><span property="rdfs:label">Wave Function Calculation</span></h4>
+      <p property="rdfs:comment">A wave-function-based reference calculation
+(e.g., Hartree--Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to
+DFTCalculation as a source of reference data, typically more accurate but
+more expensive.</p>
+      <p><strong>Subclass of:</strong> <code>mlips:ReferenceCalculation</code></p>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionCalculation">
+  <rdfs:label xml:lang="en">Wave Function Calculation</rdfs:label>
+  <rdfs:comment xml:lang="en">A wave-function-based reference calculation
+(e.g., Hartree-Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to
+DFTCalculation as a source of reference data, typically more accurate but
+more expensive.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceCalculation"/>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasWaveFunctionSettings"/>
+      <owl:someValuesFrom rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+</owl:Class>]]></code></pre>
+    </section>
+
+    <section id="WaveFunctionSettings" class="term class"
+             typeof="owl:Class" about="mlips:WaveFunctionSettings">
+      <h4><span property="rdfs:label">Wave Function Settings</span></h4>
+      <p property="rdfs:comment">Settings of a wave-function-based reference
+calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
+cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</p>
+      <p><strong>Subclass of:</strong> <code>mlips:ReferenceSettings</code></p>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings">
+  <rdfs:label xml:lang="en">Wave Function Settings</rdfs:label>
+  <rdfs:comment xml:lang="en">Settings of a wave-function-based reference
+calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
+cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings"/>
 </owl:Class>]]></code></pre>
     </section>
   </section>
@@ -1297,6 +1384,7 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
     <section id="hasDFTCalculation" class="term object-property"
              typeof="owl:ObjectProperty" about="mlips:hasDFTCalculation">
       <h4><span property="rdfs:label">has DFT calculation</span></h4>
+      <p><strong>Subproperty of:</strong> <code>mlips:hasReferenceCalculation</code></p>
       <dl>
         <dt>Domain</dt><dd><a href="#TrainingDataset" property="rdfs:domain" resource="mlips:TrainingDataset">TrainingDataset</a></dd>
         <dt>Range</dt><dd><a href="#DFTCalculation" property="rdfs:range" resource="mlips:DFTCalculation">DFTCalculation</a></dd>
@@ -1304,6 +1392,7 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
 
       <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasDFTCalculation">
   <rdfs:label xml:lang="en">has DFT calculation</rdfs:label>
+  <rdfs:subPropertyOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceCalculation"/>
   <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingDataset"/>
   <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTCalculation"/>
 </owl:ObjectProperty>]]></code></pre>
@@ -1312,6 +1401,7 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
     <section id="hasDFTSettings" class="term object-property"
              typeof="owl:ObjectProperty" about="mlips:hasDFTSettings">
       <h4><span property="rdfs:label">has DFT settings</span></h4>
+      <p><strong>Subproperty of:</strong> <code>mlips:hasReferenceSettings</code></p>
       <dl>
         <dt>Domain</dt><dd><a href="#DFTCalculation" property="rdfs:domain" resource="mlips:DFTCalculation">DFTCalculation</a></dd>
         <dt>Range</dt><dd><a href="#DFTSettings" property="rdfs:range" resource="mlips:DFTSettings">DFTSettings</a></dd>
@@ -1319,8 +1409,70 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
 
       <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasDFTSettings">
   <rdfs:label xml:lang="en">has DFT settings</rdfs:label>
+  <rdfs:subPropertyOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceSettings"/>
   <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTCalculation"/>
   <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTSettings"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="hasReferenceCalculation" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:hasReferenceCalculation">
+      <h4><span property="rdfs:label">has reference calculation</span></h4>
+      <p property="rdfs:comment">Links a training dataset to the
+first-principles calculation that produced its reference data.
+Generalises hasDFTCalculation to wave-function and other ab initio
+methods.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#TrainingDataset" property="rdfs:domain" resource="mlips:TrainingDataset">TrainingDataset</a></dd>
+        <dt>Range</dt><dd><a href="#ReferenceCalculation" property="rdfs:range" resource="mlips:ReferenceCalculation">ReferenceCalculation</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceCalculation">
+  <rdfs:label xml:lang="en">has reference calculation</rdfs:label>
+  <rdfs:comment xml:lang="en">Links a training dataset to the
+first-principles calculation that produced its reference data.
+Generalises hasDFTCalculation to wave-function and other ab initio
+methods.</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#TrainingDataset"/>
+  <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceCalculation"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="hasReferenceSettings" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:hasReferenceSettings">
+      <h4><span property="rdfs:label">has reference settings</span></h4>
+      <p property="rdfs:comment">Links a reference calculation to its
+method-specific settings. Generalises hasDFTSettings to wave-function
+and other ab initio methods.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#ReferenceCalculation" property="rdfs:domain" resource="mlips:ReferenceCalculation">ReferenceCalculation</a></dd>
+        <dt>Range</dt><dd><a href="#ReferenceSettings" property="rdfs:range" resource="mlips:ReferenceSettings">ReferenceSettings</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceSettings">
+  <rdfs:label xml:lang="en">has reference settings</rdfs:label>
+  <rdfs:comment xml:lang="en">Links a reference calculation to its
+method-specific settings. Generalises hasDFTSettings to wave-function
+and other ab initio methods.</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceCalculation"/>
+  <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="hasWaveFunctionSettings" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:hasWaveFunctionSettings">
+      <h4><span property="rdfs:label">has wave function settings</span></h4>
+      <p><strong>Subproperty of:</strong> <code>mlips:hasReferenceSettings</code></p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#WaveFunctionCalculation" property="rdfs:domain" resource="mlips:WaveFunctionCalculation">WaveFunctionCalculation</a></dd>
+        <dt>Range</dt><dd><a href="#WaveFunctionSettings" property="rdfs:range" resource="mlips:WaveFunctionSettings">WaveFunctionSettings</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasWaveFunctionSettings">
+  <rdfs:label xml:lang="en">has wave function settings</rdfs:label>
+  <rdfs:subPropertyOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#hasReferenceSettings"/>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionCalculation"/>
+  <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings"/>
 </owl:ObjectProperty>]]></code></pre>
     </section>
 
@@ -1351,6 +1503,7 @@ vibrational).</rdfs:comment>
              typeof="owl:ObjectProperty" about="mlips:usedDFTCode">
       <h4><span property="rdfs:label">used DFT code</span></h4>
       <p property="rdfs:comment">The DFT software used (e.g., VASP, GPAW).</p>
+      <p><strong>Subproperty of:</strong> <code>mlips:usedReferenceCode</code></p>
       <dl>
         <dt>Domain</dt><dd><a href="#DFTSettings" property="rdfs:domain" resource="mlips:DFTSettings">DFTSettings</a></dd>
         <dt>Range</dt><dd><a href="#Library" property="rdfs:range" resource="mlips:Library">Library</a></dd>
@@ -1359,7 +1512,29 @@ vibrational).</rdfs:comment>
       <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#usedDFTCode">
   <rdfs:label xml:lang="en">used DFT code</rdfs:label>
   <rdfs:comment xml:lang="en">The DFT software used (e.g., VASP, GPAW).</rdfs:comment>
+  <rdfs:subPropertyOf rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#usedReferenceCode"/>
   <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTSettings"/>
+  <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Library"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="usedReferenceCode" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:usedReferenceCode">
+      <h4><span property="rdfs:label">used reference code</span></h4>
+      <p property="rdfs:comment">The software code used to perform the
+reference calculation (e.g., VASP, GPAW for DFT; Molpro, PySCF, ORCA
+for wave-function methods). Generalises usedDFTCode.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#ReferenceSettings" property="rdfs:domain" resource="mlips:ReferenceSettings">ReferenceSettings</a></dd>
+        <dt>Range</dt><dd><a href="#Library" property="rdfs:range" resource="mlips:Library">Library</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#usedReferenceCode">
+  <rdfs:label xml:lang="en">used reference code</rdfs:label>
+  <rdfs:comment xml:lang="en">The software code used to perform the
+reference calculation (e.g., VASP, GPAW for DFT; Molpro, PySCF, ORCA
+for wave-function methods). Generalises usedDFTCode.</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#ReferenceSettings"/>
   <rdfs:range rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#Library"/>
 </owl:ObjectProperty>]]></code></pre>
     </section>
@@ -1367,6 +1542,25 @@ vibrational).</rdfs:comment>
 
   <section id="training-datatype-properties">
     <h3>Datatype Properties</h3>
+
+    <section id="basisSet" class="term datatype-property"
+             typeof="owl:DatatypeProperty" about="mlips:basisSet">
+      <h4><span property="rdfs:label">basis set</span></h4>
+      <p property="rdfs:comment">The Gaussian basis set used in a
+wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#WaveFunctionSettings">WaveFunctionSettings</a></dd>
+        <dt>Range</dt><dd><code>xsd:string</code></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#basisSet">
+  <rdfs:label xml:lang="en">basis set</rdfs:label>
+  <rdfs:comment xml:lang="en">The Gaussian basis set used in a
+wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP.</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>]]></code></pre>
+    </section>
 
     <section id="chemicalFormula" class="term datatype-property"
              typeof="owl:DatatypeProperty" about="mlips:chemicalFormula">
@@ -1397,6 +1591,29 @@ vibrational).</rdfs:comment>
   <rdfs:comment xml:lang="en">Plane-wave energy cutoff in eV.</rdfs:comment>
   <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTSettings"/>
   <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+</owl:DatatypeProperty>]]></code></pre>
+    </section>
+
+    <section id="frozenCore" class="term datatype-property"
+             typeof="owl:DatatypeProperty" about="mlips:frozenCore">
+      <h4><span property="rdfs:label">frozen core</span></h4>
+      <p property="rdfs:comment">Whether core electrons are kept frozen
+during the post-Hartree--Fock correlation treatment in a wave-function
+calculation. True for the standard frozen-core approximation; false
+for all-electron correlation.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#WaveFunctionSettings">WaveFunctionSettings</a></dd>
+        <dt>Range</dt><dd><code>xsd:boolean</code></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#frozenCore">
+  <rdfs:label xml:lang="en">frozen core</rdfs:label>
+  <rdfs:comment xml:lang="en">Whether core electrons are kept frozen
+during the post-Hartree-Fock correlation treatment in a wave-function
+calculation. True for the standard frozen-core approximation; false
+for all-electron correlation.</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
 </owl:DatatypeProperty>]]></code></pre>
     </section>
 
@@ -1496,6 +1713,25 @@ vibrational).</rdfs:comment>
   <rdfs:label xml:lang="en">exchange-correlation functional</rdfs:label>
   <rdfs:comment xml:lang="en">E.g., PBE, LDA, SCAN, PBEsol.</rdfs:comment>
   <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#DFTSettings"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+</owl:DatatypeProperty>]]></code></pre>
+    </section>
+
+    <section id="wfMethod" class="term datatype-property"
+             typeof="owl:DatatypeProperty" about="mlips:wfMethod">
+      <h4><span property="rdfs:label">wave-function method</span></h4>
+      <p property="rdfs:comment">Identifier of the wave-function correlation
+method (e.g., HF, MP2, CCSD, CCSD(T), CASPT2, NEVPT2).</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#WaveFunctionSettings">WaveFunctionSettings</a></dd>
+        <dt>Range</dt><dd><code>xsd:string</code></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:DatatypeProperty rdf:about="https://kg.ki.uni-stuttgart.de/_ontology/mlips#wfMethod">
+  <rdfs:label xml:lang="en">wave-function method</rdfs:label>
+  <rdfs:comment xml:lang="en">Identifier of the wave-function correlation
+method (e.g., HF, MP2, CCSD, CCSD(T), CASPT2, NEVPT2).</rdfs:comment>
+  <rdfs:domain rdf:resource="https://kg.ki.uni-stuttgart.de/_ontology/mlips#WaveFunctionSettings"/>
   <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 </owl:DatatypeProperty>]]></code></pre>
     </section>

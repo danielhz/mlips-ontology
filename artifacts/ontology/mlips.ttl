@@ -111,7 +111,7 @@ mlips:DFTCalculation
     rdfs:comment """A density functional theory calculation that produced
 reference data for training."""@en ;
     rdfs:label "DFT Calculation"@en ;
-    rdfs:subClassOf <https://w3id.org/mdo/core/Calculation>, [
+    rdfs:subClassOf mlips:ReferenceCalculation, <https://w3id.org/mdo/core/Calculation>, [
         a owl:Restriction ;
         owl:onProperty mlips:hasDFTSettings ;
         owl:someValuesFrom mlips:DFTSettings
@@ -121,7 +121,8 @@ mlips:DFTSettings
     a owl:Class ;
     rdfs:comment """Settings of a DFT calculation: exchange-correlation
 functional, k-point mesh, energy cutoff, pseudopotential type."""@en ;
-    rdfs:label "DFT Settings"@en .
+    rdfs:label "DFT Settings"@en ;
+    rdfs:subClassOf mlips:ReferenceSettings .
 
 mlips:DatasetProvenance
     a owl:Class ;
@@ -307,6 +308,27 @@ mlips:RMSE
     rdfs:comment "Root Mean Square Error."@en ;
     rdfs:label "RMSE"@en .
 
+mlips:ReferenceCalculation
+    a owl:Class ;
+    rdfs:comment """A first-principles calculation that produced
+reference energies, forces, or stresses for MLIP training. Generalisation of
+DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
+CASPT2) and other ab initio approaches."""@en ;
+    rdfs:label "Reference Calculation"@en ;
+    rdfs:subClassOf <https://w3id.org/mdo/core/Calculation>, [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasReferenceSettings ;
+        owl:someValuesFrom mlips:ReferenceSettings
+    ] .
+
+mlips:ReferenceSettings
+    a owl:Class ;
+    rdfs:comment """Settings of a reference calculation, abstracted
+across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
+carry the method-specific parameters; the supertype carries cross-family slots
+such as the software code used."""@en ;
+    rdfs:label "Reference Settings"@en .
+
 mlips:SOAPDescriptor
     a owl:NamedIndividual, mlips:AtomicEnvironmentDescriptor ;
     rdfs:comment "Smooth Overlap of Atomic Positions; used by GAP."@en ;
@@ -390,12 +412,41 @@ mlips:Virials
     a owl:NamedIndividual, mlips:CoveredProperty ;
     rdfs:label "Virials"@en .
 
+mlips:WaveFunctionCalculation
+    a owl:Class ;
+    rdfs:comment """A wave-function-based reference calculation
+(e.g., Hartree-Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to
+DFTCalculation as a source of reference data, typically more accurate but
+more expensive."""@en ;
+    rdfs:label "Wave Function Calculation"@en ;
+    rdfs:subClassOf mlips:ReferenceCalculation, [
+        a owl:Restriction ;
+        owl:onProperty mlips:hasWaveFunctionSettings ;
+        owl:someValuesFrom mlips:WaveFunctionSettings
+    ] .
+
+mlips:WaveFunctionSettings
+    a owl:Class ;
+    rdfs:comment """Settings of a wave-function-based reference
+calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
+cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment."""@en ;
+    rdfs:label "Wave Function Settings"@en ;
+    rdfs:subClassOf mlips:ReferenceSettings .
+
 mlips:appliesMethod
     a owl:ObjectProperty ;
     rdfs:comment "Links an MLIP run to the MLIP method it fits."@en ;
     rdfs:domain mlips:MLIPRun ;
     rdfs:label "applies method"@en ;
     rdfs:range mlips:MLIPMethod .
+
+mlips:basisSet
+    a owl:DatatypeProperty ;
+    rdfs:comment """The Gaussian basis set used in a
+wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP."""@en ;
+    rdfs:domain mlips:WaveFunctionSettings ;
+    rdfs:label "basis set"@en ;
+    rdfs:range xsd:string .
 
 mlips:chemicalFormula
     a owl:DatatypeProperty ;
@@ -455,6 +506,16 @@ mlips:forHyperparameter
     rdfs:label "for hyperparameter"@en ;
     rdfs:range mlips:Hyperparameter .
 
+mlips:frozenCore
+    a owl:DatatypeProperty ;
+    rdfs:comment """Whether core electrons are kept frozen
+during the post-Hartree-Fock correlation treatment in a wave-function
+calculation. True for the standard frozen-core approximation; false
+for all-electron correlation."""@en ;
+    rdfs:domain mlips:WaveFunctionSettings ;
+    rdfs:label "frozen core"@en ;
+    rdfs:range xsd:boolean .
+
 mlips:gpuHours
     a owl:DatatypeProperty ;
     rdfs:domain mlips:MLIPRun ;
@@ -477,13 +538,15 @@ mlips:hasDFTCalculation
     a owl:ObjectProperty ;
     rdfs:domain mlips:TrainingDataset ;
     rdfs:label "has DFT calculation"@en ;
-    rdfs:range mlips:DFTCalculation .
+    rdfs:range mlips:DFTCalculation ;
+    rdfs:subPropertyOf mlips:hasReferenceCalculation .
 
 mlips:hasDFTSettings
     a owl:ObjectProperty ;
     rdfs:domain mlips:DFTCalculation ;
     rdfs:label "has DFT settings"@en ;
-    rdfs:range mlips:DFTSettings .
+    rdfs:range mlips:DFTSettings ;
+    rdfs:subPropertyOf mlips:hasReferenceSettings .
 
 mlips:hasDescriptor
     a owl:ObjectProperty ;
@@ -527,6 +590,25 @@ mlips:hasLossFunction
     rdfs:label "has loss function"@en ;
     rdfs:range mlips:LossFunction .
 
+mlips:hasReferenceCalculation
+    a owl:ObjectProperty ;
+    rdfs:comment """Links a training dataset to the
+first-principles calculation that produced its reference data.
+Generalises hasDFTCalculation to wave-function and other ab initio
+methods."""@en ;
+    rdfs:domain mlips:TrainingDataset ;
+    rdfs:label "has reference calculation"@en ;
+    rdfs:range mlips:ReferenceCalculation .
+
+mlips:hasReferenceSettings
+    a owl:ObjectProperty ;
+    rdfs:comment """Links a reference calculation to its
+method-specific settings. Generalises hasDFTSettings to wave-function
+and other ab initio methods."""@en ;
+    rdfs:domain mlips:ReferenceCalculation ;
+    rdfs:label "has reference settings"@en ;
+    rdfs:range mlips:ReferenceSettings .
+
 mlips:hasResult
     a owl:ObjectProperty ;
     rdfs:domain mlips:BenchmarkStudy ;
@@ -552,6 +634,13 @@ mlips:hasUnit
     rdfs:comment "Links a numeric value to its QUDT unit."@en ;
     rdfs:label "has unit"@en ;
     rdfs:range qudt:Unit .
+
+mlips:hasWaveFunctionSettings
+    a owl:ObjectProperty ;
+    rdfs:domain mlips:WaveFunctionCalculation ;
+    rdfs:label "has wave function settings"@en ;
+    rdfs:range mlips:WaveFunctionSettings ;
+    rdfs:subPropertyOf mlips:hasReferenceSettings .
 
 mlips:hyperparameterDatatype
     a owl:DatatypeProperty ;
@@ -823,6 +912,16 @@ mlips:usedDFTCode
     rdfs:comment "The DFT software used (e.g., VASP, GPAW)."@en ;
     rdfs:domain mlips:DFTSettings ;
     rdfs:label "used DFT code"@en ;
+    rdfs:range mlips:Library ;
+    rdfs:subPropertyOf mlips:usedReferenceCode .
+
+mlips:usedReferenceCode
+    a owl:ObjectProperty ;
+    rdfs:comment """The software code used to perform the
+reference calculation (e.g., VASP, GPAW for DFT; Molpro, PySCF, ORCA
+for wave-function methods). Generalises usedDFTCode."""@en ;
+    rdfs:domain mlips:ReferenceSettings ;
+    rdfs:label "used reference code"@en ;
     rdfs:range mlips:Library .
 
 mlips:usesAlgorithm
@@ -841,6 +940,14 @@ mlips:version
     a owl:DatatypeProperty ;
     rdfs:domain mlips:Implementation ;
     rdfs:label "version"@en ;
+    rdfs:range xsd:string .
+
+mlips:wfMethod
+    a owl:DatatypeProperty ;
+    rdfs:comment """Identifier of the wave-function correlation
+method (e.g., HF, MP2, CCSD, CCSD(T), CASPT2, NEVPT2)."""@en ;
+    rdfs:domain mlips:WaveFunctionSettings ;
+    rdfs:label "wave-function method"@en ;
     rdfs:range xsd:string .
 
 mlips:xcFunctional

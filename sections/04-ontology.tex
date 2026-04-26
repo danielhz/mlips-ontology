@@ -155,14 +155,24 @@ addressing CQ3, CQ4, and CQ5.
 A $\TrainingDatasetC$ is a collection of atomic configurations used for MLIP
 training. Each dataset covers one or more $\MaterialSystemC$ instances
 (elements, alloys, compounds), and its reference data is produced by one or
-more $\DFTCalculationC$ instances, each governed by a $\DFTSettingsC$ that
-records the exchange-correlation functional ($\xcFunctionalR$, e.g., PBE,
-LDA, SCAN), k-point mesh ($\kPointMeshR$), energy cutoff
-($\energyCutoffR$), and pseudopotential type ($\pseudopotentialTypeR$).
+more $\ReferenceCalculationC$ instances. The two concrete subclasses are
+$\DFTCalculationC$ (governed by $\DFTSettingsC$ with the
+exchange-correlation functional ($\xcFunctionalR$, e.g., PBE, LDA, SCAN),
+k-point mesh ($\kPointMeshR$), energy cutoff ($\energyCutoffR$), and
+pseudopotential type ($\pseudopotentialTypeR$)), and
+$\WaveFunctionCalculationC$ (governed by $\WaveFunctionSettingsC$ with the
+correlation method ($\wfMethodR$, e.g., CCSD(T), MP2, CASPT2), basis set
+($\basisSetR$, e.g., cc-pVTZ), and frozen-core flag ($\frozenCoreR$)).
+The supertype $\ReferenceSettingsC$ carries the cross-family software-code
+slot ($\usedReferenceCodeR$), of which the DFT-specific $\dlRole{usedDFTCode}$
+is a sub-property.
 Individual $\AtomicConfigurationC$ instances represent the atomic positions,
 cell parameters, and computed properties within a dataset.
 \paragraph{Core properties.}
-$\hasDFTSettingsR$ links a calculation to its settings;
+$\hasReferenceCalculationR$ links a dataset to its reference calculation
+(with $\hasDFTCalculationR$ as the DFT-specific sub-property);
+$\hasReferenceSettingsR$ links a calculation to its settings (with
+$\hasDFTSettingsR$ as the sub-property);
 $\numConfigurationsR$ records the dataset size;
 $\coversPropertyR$ indicates which physical properties
 (energy, forces, stresses, virials) are included;

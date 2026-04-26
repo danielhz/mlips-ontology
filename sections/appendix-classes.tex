@@ -1,7 +1,7 @@
 \section{Class Reference}
 \label{sec:class-reference}
 
-This appendix describes all 27 classes defined in the \MLIPsOntology{}.
+This appendix describes all 31 classes defined in the \MLIPsOntology{}.
 
 \subsection{$\dlConcept{Hyperparameter}$}
 \label{sec:term-Hyperparameter}
@@ -89,7 +89,7 @@ A software implementation of an MLIP method in a specific library and version.
 \textbf{Label:} Library.
 A software library or tool used in MLIP research (e.g., ASE, LAMMPS, VASP, GPAW).
 
-\paragraph{Incoming properties.} $\dlRole{implementedIn}$, $\dlRole{usedDFTCode}$.
+\paragraph{Incoming properties.} $\dlRole{implementedIn}$, $\dlRole{usedDFTCode}$, $\dlRole{usedReferenceCode}$.
 
 \paragraph{Example.}
 \InputIfFileExists{artifacts/examples/classes/Library.tex}{}{\textit{TODO: add example.}}
@@ -211,7 +211,7 @@ A physical property covered by the training dataset (energy, forces, stresses, v
 \textbf{Label:} DFT Calculation.
 A density functional theory calculation that produced reference data for training.
 
-\paragraph{Superclasses.} $\dlConcept{mdo:Calculation}$.
+\paragraph{Superclasses.} $\dlConcept{mlips:ReferenceCalculation}$, $\dlConcept{mdo:Calculation}$.
 
 \paragraph{Outgoing properties.} $\dlRole{hasDFTSettings}$.
 
@@ -227,6 +227,8 @@ A density functional theory calculation that produced reference data for trainin
 
 \textbf{Label:} DFT Settings.
 Settings of a DFT calculation: exchange-correlation functional, k-point mesh, energy cutoff, pseudopotential type.
+
+\paragraph{Superclasses.} $\dlConcept{mlips:ReferenceSettings}$.
 
 \paragraph{Outgoing properties.} $\dlRole{usedDFTCode}$, $\dlRole{energyCutoff}$, $\dlRole{kPointMesh}$, $\dlRole{pseudopotentialType}$, $\dlRole{xcFunctional}$.
 
@@ -261,6 +263,34 @@ A material system studied in a dataset: element, alloy, compound, or complex mic
 \paragraph{Example.}
 \InputIfFileExists{artifacts/examples/classes/MaterialSystem.tex}{}{\textit{TODO: add example.}}
 
+\subsection{$\dlConcept{ReferenceCalculation}$}
+\label{sec:term-ReferenceCalculation}
+
+\textbf{Label:} Reference Calculation.
+A first-principles calculation that produced reference energies, forces, or stresses for MLIP training. Generalisation of DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2, CASPT2) and other ab initio approaches.
+
+\paragraph{Superclasses.} $\dlConcept{mdo:Calculation}$.
+
+\paragraph{Outgoing properties.} $\dlRole{hasReferenceSettings}$.
+
+\paragraph{Incoming properties.} $\dlRole{hasReferenceCalculation}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/ReferenceCalculation.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlConcept{ReferenceSettings}$}
+\label{sec:term-ReferenceSettings}
+
+\textbf{Label:} Reference Settings.
+Settings of a reference calculation, abstracted across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings) carry the method-specific parameters; the supertype carries cross-family slots such as the software code used.
+
+\paragraph{Outgoing properties.} $\dlRole{usedReferenceCode}$.
+
+\paragraph{Incoming properties.} $\dlRole{hasReferenceSettings}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/ReferenceSettings.tex}{}{\textit{TODO: add example.}}
+
 \subsection{$\dlConcept{SamplingStrategy}$}
 \label{sec:term-SamplingStrategy}
 
@@ -280,7 +310,7 @@ A dataset of atomic configurations used for MLIP training, with provenance, size
 
 \paragraph{Superclasses.} $\dlConcept{mlschema:Dataset}$, $\dlConcept{prov:Entity}$.
 
-\paragraph{Outgoing properties.} $\dlRole{coversMaterial}$, $\dlRole{coversProperty}$, $\dlRole{datasetProvenance}$, $\dlRole{hasConfiguration}$, $\dlRole{hasDFTCalculation}$, $\dlRole{samplingStrategy}$, $\dlRole{numConfigurations}$.
+\paragraph{Outgoing properties.} $\dlRole{coversMaterial}$, $\dlRole{coversProperty}$, $\dlRole{datasetProvenance}$, $\dlRole{hasConfiguration}$, $\dlRole{hasDFTCalculation}$, $\dlRole{hasReferenceCalculation}$, $\dlRole{samplingStrategy}$, $\dlRole{numConfigurations}$.
 
 \paragraph{Incoming properties.} $\dlRole{runsOn}$, $\dlRole{trainedOn}$, $\dlRole{usesTrainingData}$.
 
@@ -288,6 +318,34 @@ A dataset of atomic configurations used for MLIP training, with provenance, size
 \InputIfFileExists{artifacts/examples/classes/TrainingDataset.tex}{}{\textit{TODO: add example.}}
 
 \paragraph{Related axioms.} \eqref{ax:15}, \eqref{ax:16}, \eqref{ax:17}, \eqref{ax:18}.
+
+\subsection{$\dlConcept{WaveFunctionCalculation}$}
+\label{sec:term-WaveFunctionCalculation}
+
+\textbf{Label:} Wave Function Calculation.
+A wave-function-based reference calculation (e.g., Hartree--Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to DFTCalculation as a source of reference data, typically more accurate but more expensive.
+
+\paragraph{Superclasses.} $\dlConcept{mlips:ReferenceCalculation}$.
+
+\paragraph{Outgoing properties.} $\dlRole{hasWaveFunctionSettings}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/WaveFunctionCalculation.tex}{}{\textit{TODO: add example.}}
+
+\subsection{$\dlConcept{WaveFunctionSettings}$}
+\label{sec:term-WaveFunctionSettings}
+
+\textbf{Label:} Wave Function Settings.
+Settings of a wave-function-based reference calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g., cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.
+
+\paragraph{Superclasses.} $\dlConcept{mlips:ReferenceSettings}$.
+
+\paragraph{Outgoing properties.} $\dlRole{basisSet}$, $\dlRole{frozenCore}$, $\dlRole{wfMethod}$.
+
+\paragraph{Incoming properties.} $\dlRole{hasWaveFunctionSettings}$.
+
+\paragraph{Example.}
+\InputIfFileExists{artifacts/examples/classes/WaveFunctionSettings.tex}{}{\textit{TODO: add example.}}
 
 \subsection{$\dlConcept{AccuracyMetric}$}
 \label{sec:term-AccuracyMetric}
