@@ -1,0 +1,181 @@
+\section{[INTERNAL] Entity Identity Across the Corpus}
+\label{sec:appendix-internal-entity-iris}
+%% ====================================================================
+%% INTERNAL appendix --- visible only when compiling draft.tex.
+%% Captures the design discussion (Daniel + reviewer agent, 2026-04-27)
+%% on how to keep entity IRIs consistent as the corpus grows.
+%% Do NOT include in submission.
+%% ====================================================================
+
+\begin{center}
+\fbox{\parbox{0.92\textwidth}{\centering\small
+\textbf{INTERNAL --- not part of the submission.}\\
+This appendix records design decisions on entity-IRI hygiene
+in the per-paper KG corpus and is included in the
+\texttt{draft.tex} build only.}}
+\end{center}
+
+\bigskip
+
+The corpus is encoded one paper at a time, by an agent that does
+not see other papers' encodings during its session. This pattern
+naturally exposes two failure modes: \emph{splits} (the same
+real-world entity ending up with two distinct IRIs across two
+papers) and \emph{collisions} (the same IRI denoting two distinct
+entities in two papers). This appendix documents the conventions
+we adopt to keep both rare.
+
+\subsection{The two failure modes}
+
+\paragraph{Split: same entity, two IRIs.}
+Two papers both use the PBE exchange--correlation functional, but
+one encoding mints \texttt{ex:xc-pbe-foo2024} and another
+\texttt{ex:pbe-functional-bar2025}. SPARQL exact-match queries see
+two distinct entities; OWL reasoning has no basis to merge them;
+aggregate counts (``how many papers used PBE?'') fragment.
+
+\paragraph{Collision: same IRI, different entities.}
+Two papers both use the local IRI \texttt{ex:dft-settings} but for
+different DFT settings (one means VASP+PBE+400~eV, the other means
+GPAW+SCAN+500~eV). Cross-corpus merges then produce contradictory
+triples on the same subject.
+
+\subsection{Mitigations}
+
+\paragraph{Collision is solved by namespace discipline.}
+Every paper-local IRI carries the paper-id as a suffix:
+\texttt{ex:dft-settings-kumar2025-c15} rather than
+\texttt{ex:dft-settings}. The executor agent already follows this
+convention; we promote it to a hard rule. When the corpus is
+loaded into Concon as one named graph per paper, even an accidental
+collision is contained to a single graph.
+
+\paragraph{Split is solved by a controlled vocabulary plus external
+identifiers.}
+Concepts that recur across papers (XC functionals, pseudopotential
+types, wave-function methods, software packages, MLIP method
+families, common dispersion corrections) are pre-minted as named
+individuals in a shared vocabulary file
+\texttt{artifacts/kg/mlips-vocab.ttl}. The encoding instruction
+becomes ``if PBE is mentioned, use \texttt{mlips:PBE}''---the agent
+selects from a list rather than minting locally. This is the
+pattern already used for $\DatasetProvenanceC$
+(\texttt{mlips:Published}, \texttt{mlips:InHouse}, \dots),
+$\MetricTypeC$ (\texttt{mlips:RMSE}, \texttt{mlips:MAE}), and
+$\SamplingStrategyC$.
+
+External identifiers act as a second layer of alignment:
+$\dlRole{sameAsWikidata}$ for materials, software, and persons;
+DOIs for papers; CAS numbers for chemicals. Where applicable, the
+encoding adds the external identifier as a separate triple, so a
+later cross-corpus alignment pass can merge candidate splits via
+\texttt{owl:sameAs} against the Wikidata IRI even if the local
+IRIs were minted independently.
+
+\subsection{Inclusion criteria for the controlled vocabulary}
+
+\begin{itemize}
+\item \textbf{Belongs in \texttt{mlips-vocab.ttl}:}
+  recurs across multiple MLIP papers, has stable identity outside
+  any paper, will recur as the corpus grows, has or could have an
+  external identifier (Wikidata, DOI). Examples: XC functionals
+  (\texttt{mlips:PBE}, \texttt{mlips:HSE06}); pseudopotential
+  types (\texttt{mlips:PAW}); wave-function methods
+  (\texttt{mlips:CCSDT}); MLIP method families
+  (\texttt{mlips:MTP}, \texttt{mlips:MACEMethod}); software
+  (\texttt{mlips:VASP}, \texttt{mlips:MLIP2}, \texttt{mlips:FHIaims}).
+
+\item \textbf{Stays paper-local:}
+  specific MLIP runs, trained models, hyperparameter settings,
+  training datasets that are themselves paper-specific (the
+  dataset \emph{instance}; if it's a published reusable dataset,
+  link via $\dlRole{sameAsWikidata}$ or a DOI to the canonical
+  one), specific atomic configurations, specific benchmark
+  results.
+
+\item \textbf{Borderline cases.}
+  A reusable published dataset (e.g., MPtrj) gets a vocabulary
+  IRI; each paper's specific subset stays paper-local with
+  \texttt{prov:wasDerivedFrom} pointing at the canonical one. A
+  software version (\texttt{MLIP-2 v2.0.1}) is the software in
+  the vocabulary plus a per-paper \texttt{Implementation} node
+  with the version as a literal.
+\end{itemize}
+
+\subsection{Workflow when a new canonical entity is encountered}
+
+The agent must not be blocked by the vocabulary, and the vocabulary
+must not grow uncontrolled.
+
+\begin{enumerate}
+\item \textbf{Encode locally as a candidate.} The agent mints a
+  paper-local IRI and tags it with the new
+  \texttt{mlips:candidateForVocabulary} object property whose
+  range is the appropriate vocabulary class. Example:
+\begin{lstlisting}[language=turtle]
+ex:xc-rev-pbe-d3-musaelian2023
+    a mlips:XCFunctional ;
+    rdfs:label "revPBE-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+\end{lstlisting}
+  The encoding still passes round-trip; the candidate flag is a
+  separate triple.
+
+\item \textbf{Audit pass} runs after every encoding batch and
+  collects all $\dlRole{candidateForVocabulary}$ triples across
+  the corpus. Output: a review queue.
+
+\item \textbf{Curator decides} per candidate, applying the
+  inclusion criteria above:
+  \begin{itemize}
+  \item \emph{Promote.} Add the IRI to \texttt{mlips-vocab.ttl}
+    with full metadata (label, comment, sameAsWikidata where
+    applicable).
+  \item \emph{Merge.} The candidate is the same as an existing
+    canonical entity, modulo the local label; assert
+    \texttt{owl:sameAs} or rewrite the IRI in the paper's .ttl.
+  \item \emph{Keep paper-local.} The candidate is genuinely
+    paper-specific and was wrongly tagged; remove the
+    candidate flag.
+  \end{itemize}
+
+\item \textbf{Re-encoding pass} (mechanical) rewrites paper-local
+  IRIs to canonical ones if (a) or (b) was chosen. Round-trip
+  check confirms no semantic drift.
+\end{enumerate}
+
+\subsection{Audit queries (sketch)}
+
+Cross-corpus duplicate-detection queries to run as part of the
+review:
+
+\begin{itemize}
+\item Same \texttt{rdfs:label}, same \texttt{rdf:type}, different
+  IRI: likely split.
+\item Same \texttt{mlips:chemicalFormula}, same
+  \texttt{mlips:materialClass}, different IRI: likely split (a
+  material).
+\item Same \texttt{rdfs:label} on a $\LibraryC$ instance,
+  different IRI: software-package split.
+\item Same IRI with conflicting \texttt{rdf:type} or
+  contradictory data property values across paper graphs:
+  collision.
+\end{itemize}
+
+These are 5--10-line SPARQL queries; we add them to
+\texttt{artifacts/kg/audit/} when the controlled vocabulary
+infrastructure lands.
+
+\subsection{Concon implications}
+
+When the corpus moves to Concon, each paper occupies a named graph
+\texttt{<concon://graphs/\textit{paper-id}>}. Cross-graph queries
+treat IRIs as graph-local unless explicitly merged. The MCP
+\texttt{submit\_encoding} tool runs the audit server-side and
+rejects submissions that mint a new IRI for an entity already in
+the controlled vocabulary, returning a hint like ``You used
+\texttt{ex:pbe-functional-foo2024}; the canonical IRI is
+\texttt{mlips:PBE}. Resubmit?''. Vocabulary additions go through a
+curator interface (or admin agent privilege).
+
+%% ====================================================================
