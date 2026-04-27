@@ -129,6 +129,17 @@ mlips:DatasetProvenance
     rdfs:comment "The provenance type of a training dataset."@en ;
     rdfs:label "Dataset Provenance"@en .
 
+mlips:DftBasisSet
+    a owl:Class ;
+    rdfs:comment """The basis set used in a DFT calculation,
+when the code is all-electron or otherwise uses a localised basis (e.g.,
+FHI-aims NAO families, LAPW, Gaussian-type orbitals such as cc-pVDZ
+or 6-31G). Range of mlips:dftBasisSet on DFTSettings. Plane-wave
+codes specify the basis through mlips:energyCutoff instead and leave
+this slot empty. Concrete basis sets are modelled as named individuals;
+an open extension point."""@en ;
+    rdfs:label "DFT Basis Set"@en .
+
 mlips:Energy
     a owl:NamedIndividual, mlips:CoveredProperty ;
     rdfs:label "Energy"@en .
@@ -293,6 +304,15 @@ meaning. Not disjoint with ArchitecturalHyperparameter."""@en ;
     rdfs:label "Physical Hyperparameter"@en ;
     rdfs:subClassOf mlips:Hyperparameter .
 
+mlips:PseudopotentialType
+    a owl:Class ;
+    rdfs:comment """A family of pseudopotentials used in a
+plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
+Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
+leave this slot empty. Concrete pseudopotential families are modelled
+as named individuals; an open extension point."""@en ;
+    rdfs:label "Pseudopotential Type"@en .
+
 mlips:Published
     a owl:NamedIndividual, mlips:DatasetProvenance ;
     rdfs:comment "Dataset from a published source."@en ;
@@ -433,6 +453,24 @@ cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment."""@en ;
     rdfs:label "Wave Function Settings"@en ;
     rdfs:subClassOf mlips:ReferenceSettings .
 
+mlips:WfMethod
+    a owl:Class ;
+    rdfs:comment """A wave-function correlation method used to
+produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
+CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
+Concrete methods are modelled as named individuals; an open
+extension point."""@en ;
+    rdfs:label "Wave Function Method"@en .
+
+mlips:XCFunctional
+    a owl:Class ;
+    rdfs:comment """A density-functional approximation to the
+exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
+PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
+DFTSettings. Concrete functionals are modelled as named individuals;
+an open extension point."""@en ;
+    rdfs:label "Exchange-Correlation Functional"@en .
+
 mlips:appliesMethod
     a owl:ObjectProperty ;
     rdfs:comment "Links an MLIP run to the MLIP method it fits."@en ;
@@ -447,6 +485,16 @@ wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP."""@en ;
     rdfs:domain mlips:WaveFunctionSettings ;
     rdfs:label "basis set"@en ;
     rdfs:range xsd:string .
+
+mlips:candidateForVocabulary
+    a owl:ObjectProperty ;
+    rdfs:comment """Annotates a paper-local instance with the
+controlled-vocabulary class to which it should be considered for
+promotion. Used when an encoded paper introduces an entity that is not
+yet a named individual in mlips-vocab.ttl. The deduplication audit
+collects these candidates; a curator promotes, merges, or leaves them
+paper-local."""@en ;
+    rdfs:label "candidate for vocabulary"@en .
 
 mlips:chemicalFormula
     a owl:DatatypeProperty ;
@@ -484,6 +532,16 @@ mlips:defaultValue
     rdfs:domain mlips:Hyperparameter ;
     rdfs:label "default value"@en ;
     rdfs:range rdfs:Literal .
+
+mlips:dftBasisSet
+    a owl:ObjectProperty ;
+    rdfs:comment """The basis set used by an all-electron or
+localised-basis DFT calculation (FHI-aims NAO, LAPW, Gaussian-type
+orbitals such as cc-pVDZ or 6-31G). Plane-wave codes specify the basis
+through mlips:energyCutoff and leave this slot empty."""@en ;
+    rdfs:domain mlips:DFTSettings ;
+    rdfs:label "DFT basis set"@en ;
+    rdfs:range mlips:DftBasisSet .
 
 mlips:energyCutoff
     a owl:DatatypeProperty ;
@@ -782,11 +840,14 @@ mlips:produces
     rdfs:range mlips:TrainedModel .
 
 mlips:pseudopotentialType
-    a owl:DatatypeProperty ;
-    rdfs:comment "E.g., PAW, ultrasoft, norm-conserving."@en ;
+    a owl:ObjectProperty ;
+    rdfs:comment """The family of pseudopotentials used in a
+plane-wave DFT calculation (PAW, ultrasoft, norm-conserving). All-
+electron codes leave this slot empty and use mlips:dftBasisSet
+instead."""@en ;
     rdfs:domain mlips:DFTSettings ;
     rdfs:label "pseudopotential type"@en ;
-    rdfs:range xsd:string .
+    rdfs:range mlips:PseudopotentialType .
 
 mlips:reportedIn
     a owl:ObjectProperty ;
@@ -943,17 +1004,22 @@ mlips:version
     rdfs:range xsd:string .
 
 mlips:wfMethod
-    a owl:DatatypeProperty ;
-    rdfs:comment """Identifier of the wave-function correlation
-method (e.g., HF, MP2, CCSD, CCSD(T), CASPT2, NEVPT2)."""@en ;
+    a owl:ObjectProperty ;
+    rdfs:comment """The wave-function correlation method used
+to produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
+CASPT2, NEVPT2). Range is WfMethod; concrete methods are named
+individuals in mlips-vocab.ttl."""@en ;
     rdfs:domain mlips:WaveFunctionSettings ;
     rdfs:label "wave-function method"@en ;
-    rdfs:range xsd:string .
+    rdfs:range mlips:WfMethod .
 
 mlips:xcFunctional
-    a owl:DatatypeProperty ;
-    rdfs:comment "E.g., PBE, LDA, SCAN, PBEsol."@en ;
+    a owl:ObjectProperty ;
+    rdfs:comment """The exchange-correlation functional used in
+a DFT calculation (e.g., LDA, PBE, PBE0, HSE06, SCAN, omegaB97X). Range
+is XCFunctional; concrete functionals are named individuals in
+mlips-vocab.ttl."""@en ;
     rdfs:domain mlips:DFTSettings ;
     rdfs:label "exchange-correlation functional"@en ;
-    rdfs:range xsd:string .
+    rdfs:range mlips:XCFunctional .
 

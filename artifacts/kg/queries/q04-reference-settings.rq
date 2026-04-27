@@ -1,8 +1,14 @@
-# Q4 -- Reference settings + software code (Library used as code).
-# Three blocks:
+# Q4 -- Reference settings + software code + reference-method vocabulary IRIs.
+# Four blocks:
 #   (1) calc -> hasReferenceSettings/hasDFTSettings/hasWaveFunctionSettings -> settings
 #   (2) settings node and all its triples
 #   (3) Library node referenced by usedReferenceCode/usedDFTCode
+#   (4) Vocabulary-class instances (XC functional / pseudopotential type /
+#       wave-function method / DFT basis set) referenced from settings.
+#       Captures both starter-vocab IRIs (whose own type/label triples
+#       live in mlips-vocab.ttl, not the per-paper canonical) and
+#       paper-local candidate IRIs (whose type, label, comment, and
+#       candidateForVocabulary flag live in the paper's canonical .ttl).
 
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#>
@@ -36,6 +42,17 @@ WHERE {
     # (3) Library node when referenced as the reference code
     [] ?codeLink ?s .
     VALUES ?codeLink { mlips:usedReferenceCode mlips:usedDFTCode }
+    ?s ?p ?o .
+  } UNION {
+    # (4) Reference-method vocabulary instance (XC functional /
+    # pseudopotential type / wave-function method / DFT basis set).
+    ?s a ?vocabType .
+    VALUES ?vocabType {
+      mlips:XCFunctional
+      mlips:PseudopotentialType
+      mlips:WfMethod
+      mlips:DftBasisSet
+    }
     ?s ?p ?o .
   }
 }
