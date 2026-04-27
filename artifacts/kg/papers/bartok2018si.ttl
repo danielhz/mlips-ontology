@@ -1,0 +1,213 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Bartok, Kermode, Bernstein, Csanyi. Machine learning a general
+#   purpose interatomic potential for silicon.
+#   Phys. Rev. X 8, 041048 (2018). doi:10.1103/PhysRevX.8.041048
+#   arXiv:1805.01568
+#
+# Encoding scope: the single general-purpose Si GAP trained over a
+# diverse 2475-structure database (171,815 atomic environments,
+# M=9000 representatives) covering crystal phases, surfaces, defects,
+# liquid, amorphous, and crack-tip configurations.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-bartok2018si a mlips:BenchmarkStudy ;
+    rdfs:label "Bartok et al. (2018): general-purpose GAP for silicon" ;
+    mlips:reportedIn ex:article-bartok2018si .
+
+ex:article-bartok2018si a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/PhysRevX.8.041048> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Machine learning a general purpose interatomic potential for silicon" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-Si-bartok2018 a mlips:MaterialSystem ;
+    rdfs:label "Silicon (general-purpose: crystal, liquid, amorphous, defective)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Single-element semiconductor; benchmarked on diamond, beta-Sn, simple hexagonal, hex-diamond, bcc, bc8, fcc, hcp, st12, liquid, amorphous, surfaces, point defects, crack tips" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-bartok2018si a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-bartok2018si mlips:hasDFTSettings ex:dft-settings-bartok2018si .
+
+ex:dft-settings-bartok2018si a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-castep ;
+    mlips:xcFunctional "PW91" ;
+    mlips:pseudopotentialType "ultrasoft" ;
+    mlips:energyCutoff 250 ;
+    mlips:kPointMesh "Monkhorst-Pack with 0.03 Ang^-1 spacing (with 0.05 eV electronic smearing); 0.015 Ang^-1 for E(V) testing curves; 0.07 Ang^-1 for amorphous re-optimization" .
+
+ex:lib-castep a mlips:Library ;
+    rdfs:label "CASTEP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-Si-bartok2018 a mlips:TrainingDataset ;
+    rdfs:label "Si general-purpose GAP fitting database (2475 unit cells, 171,815 atomic environments, 531,710 pieces of electronic-structure data)" ;
+    mlips:coversMaterial ex:mat-Si-bartok2018 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2475 ;
+    mlips:hasDFTCalculation ex:dft-bartok2018si .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-Si-bartok2018 mlips:samplingStrategy
+    ex:phase-sampling-bartok2018si ,
+    ex:surface-sampling-bartok2018si ,
+    ex:defect-sampling-bartok2018si ,
+    ex:liquid-sampling-bartok2018si ,
+    ex:amorphous-sampling-bartok2018si ,
+    ex:crack-sampling-bartok2018si ,
+    ex:dislocation-sampling-bartok2018si ,
+    ex:isolated-atom-sampling-bartok2018si .
+
+ex:phase-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Crystal-phase enumeration with strain perturbations" ;
+    rdfs:comment "Configurations covering diamond, beta-Sn, simple hexagonal, hex-diamond, bcc, bc8, fcc, hcp, st12 across a range of unit-cell sizes and lattice strains." .
+
+ex:surface-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Surface enumeration including reconstructions and decohesion paths" ;
+    rdfs:comment "Diamond (001), (110), (111) surfaces with unreconstructed, adatom, and Pandey/DAS reconstructions, plus decohesion separation paths along (100), (110), (111)." .
+
+ex:defect-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Point-defect enumeration" ;
+    rdfs:comment "Vacancy, divacancy, and interstitial (hexagonal, tetrahedral, dumbbell) configurations in diamond Si, sampled by DFT MD around the defect." .
+
+ex:liquid-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Liquid-phase MD sampling" ;
+    rdfs:comment "Snapshots from DFT MD trajectories of molten silicon at high temperature in 64- and 128-atom supercells." .
+
+ex:amorphous-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Amorphous-phase quench sampling" ;
+    rdfs:comment "Configurations from quenched-melt amorphous-Si trajectories in 64- and 216-atom cells." .
+
+ex:crack-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Crack-tip sampling" ;
+    rdfs:comment "Small (110) and (111) crack-tip geometries with bond-breaking environments." .
+
+ex:dislocation-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Screw-dislocation core sampling" ;
+    rdfs:comment "Screw-dislocation core configurations in 144-atom periodic cells." .
+
+ex:isolated-atom-sampling-bartok2018si a mlips:SamplingStrategy ;
+    rdfs:label "Isolated-atom anchor" ;
+    rdfs:comment "A single isolated Si atom is included to anchor the cohesive-energy zero." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasFunctionalForm ex:gap-functional-form ;
+    mlips:hasLossFunction ex:gap-loss-bartok2018si ;
+    mlips:hasTrainingAlgorithm ex:gpr-bartok2018si ;
+    mlips:hasHyperparameter ex:hp-rcut-bartok2018si , ex:hp-sigma-atom , ex:hp-zeta , ex:hp-delta , ex:hp-M , ex:hp-lmax-soap , ex:hp-nmax-soap ;
+    mlips:hasImplementation ex:quip-impl .
+
+ex:gap-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Pair potential (cubic-spline repulsive) plus SOAP-kernel many-body Gaussian-process regression" .
+
+ex:gap-loss-bartok2018si a mlips:LossFunction ;
+    rdfs:label "Regularised least squares on energies, forces, virials with per-class regularisation (sigma_E, sigma_F, sigma_V)" .
+
+ex:gpr-bartok2018si a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian-process regression with CUR-selected representative environments" .
+
+ex:quip-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-quip .
+
+ex:lib-quip a mlips:Library ;
+    rdfs:label "QUIP (Quantum mechanics and Interatomic Potentials) with the GAP plug-in" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-5-bartok2018si a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-bartok2018si ;
+    mlips:settingValue "5.0" .
+
+ex:setting-sigma-atom-05 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-sigma-atom ;
+    mlips:settingValue "0.5" .
+
+ex:setting-zeta-4 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-zeta ;
+    mlips:settingValue "4" .
+
+ex:setting-delta-3 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-delta ;
+    mlips:settingValue "3" .
+
+ex:setting-M-9000 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-M ;
+    mlips:settingValue "9000" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-gap-Si a mlips:MLIPRun ;
+    rdfs:label "GAP training run on the general-purpose Si database" ;
+    mlips:appliesMethod ex:GAP ;
+    mlips:runsOn ex:ds-Si-bartok2018 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-5-bartok2018si , ex:setting-sigma-atom-05 , ex:setting-zeta-4 , ex:setting-delta-3 , ex:setting-M-9000 ;
+    mlips:produces ex:model-gap-Si .
+
+ex:model-gap-Si a mlips:TrainedModel ;
+    rdfs:label "GAP-6 silicon potential" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-bartok2018si mlips:hasResult ex:result-gap-si-forces .
+
+ex:result-gap-si-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-gap-Si ;
+    mlips:targetMaterial ex:mat-Si-bartok2018 ;
+    mlips:hasAccuracyMetric ex:metric-gap-si-forces-median .
+
+ex:metric-gap-si-forces-median a mlips:AccuracyMetric ;
+    rdfs:label "Median absolute force-component error on the testing database (held-out grain boundary, di-interstitials, GSF paths, amorphous)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.025 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Bartok et al. (2018) does not report GAP training duration, GPU
+# hours, training hardware, peak memory, or per-atom inference time.
+# Recorded as a Q12 gap.

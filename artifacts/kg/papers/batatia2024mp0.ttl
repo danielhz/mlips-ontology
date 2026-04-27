@@ -1,0 +1,233 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Batatia, Benner, Chiang, ..., Csanyi (2024). A foundation model for
+#   atomistic materials chemistry. arXiv:2401.00096
+#   (also published as the MACE-MP-0 paper).
+#
+# Encoding scope: MACE-MP-0 (specifically the MACE-MP-0b3 medium-sized
+# release), an equivariant message-passing foundation model trained on
+# the MPtrj dataset and used out-of-the-box across a wide diversity of
+# chemical systems. As with chen2022 and deng2023, this is a universal /
+# foundation potential; we encode the coverage as a single
+# MaterialSystem (mat-MP-universal-batatia2024mp0) and document the
+# protocol limitation in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-batatia2024mp0 a mlips:BenchmarkStudy ;
+    rdfs:label "Batatia et al. (2024): MACE-MP-0 foundation model" ;
+    mlips:reportedIn ex:article-batatia2024mp0 .
+
+ex:article-batatia2024mp0 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arXiv.2401.00096> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "A Foundation Model for Atomistic Materials Chemistry" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-MP-universal-batatia2024mp0 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project Trajectory coverage (foundation-model scope, 89 elements)" ;
+    mlips:chemicalFormula "any" ;
+    mlips:materialClass "Universal inorganic crystal coverage from MPtrj (~150,000 unique Materials Project structures, mainly small periodic unit cells with under 70 atoms in 90% of cases). MACE-MP-0 is demonstrated out-of-the-box on solids, liquids, gases, surfaces, MOFs, and a small protein, well beyond the training distribution" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-batatia2024mp0 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-batatia2024mp0 mlips:hasDFTSettings ex:dft-settings-batatia2024mp0 .
+
+ex:dft-settings-batatia2024mp0 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE (GGA) with Hubbard U on transition-metal oxides containing Co, Cr, Fe, Mn, Mo, Ni, V, W combined with O or F (Materials Project default U-values); no dispersion correction in training" ;
+    mlips:pseudopotentialType "PAW" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-MPtrj-batatia2024mp0 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj subset used for MACE-MP-0: ~1.5M static and structural-relaxation configurations across ~150,000 Materials Project compounds; 90% of unit cells have under 70 atoms" ;
+    mlips:coversMaterial ex:mat-MP-universal-batatia2024mp0 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1500000 ;
+    mlips:hasDFTCalculation ex:dft-batatia2024mp0 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-MPtrj-batatia2024mp0 mlips:samplingStrategy
+    ex:relaxation-trajectory-sampling-batatia2024mp0 ,
+    ex:periodic-table-coverage-sampling-batatia2024mp0 .
+
+ex:relaxation-trajectory-sampling-batatia2024mp0 a mlips:SamplingStrategy ;
+    rdfs:label "Materials Project relaxation-trajectory sampling (re-using the CHGNet-curated MPtrj training set)" ;
+    rdfs:comment "Static and relaxation-trajectory frames from the Materials Project, originally compiled for CHGNet (Deng et al. 2023). MACE-MP-0 inherits the MPtrj curation: deduplicated, energy/force-quality-filtered configurations from ~150k Materials Project structures." .
+
+ex:periodic-table-coverage-sampling-batatia2024mp0 a mlips:SamplingStrategy ;
+    rdfs:label "Periodic-table chemical-space coverage" ;
+    rdfs:comment "MPtrj configurations span 89 elements across binary, ternary, and higher-order inorganic compositions; 90% of structures contain under 70 atoms per unit cell." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:MACE-MP-0 a mlips:MLIPMethod ;
+    rdfs:label "MACE: equivariant higher-order message-passing graph neural network with atomic-cluster-expansion-style many-body messages" ;
+    mlips:hasFunctionalForm ex:mace-functional-form-batatia2024mp0 ;
+    mlips:hasLossFunction ex:mace-huber-loss-batatia2024mp0 ;
+    mlips:hasTrainingAlgorithm ex:amsgrad-batatia2024mp0 ;
+    mlips:hasHyperparameter ex:hp-rcut-batatia2024mp0 , ex:hp-num-layers-batatia2024mp0 ,
+        ex:hp-lmax-batatia2024mp0 , ex:hp-correlation-order-batatia2024mp0 ,
+        ex:hp-num-channels-batatia2024mp0 , ex:hp-num-radial-bessel-batatia2024mp0 ,
+        ex:hp-mlp-hidden-batatia2024mp0 , ex:hp-initial-lr-batatia2024mp0 ,
+        ex:hp-num-epochs-batatia2024mp0 ;
+    mlips:hasImplementation ex:mace-impl-batatia2024mp0 .
+
+ex:mace-functional-form-batatia2024mp0 a mlips:FunctionalForm ;
+    rdfs:label "MACE: equivariant message-passing graph tensor network (e3nn). Two layers of higher-order equivariant messages built from sums of two-body permutation-invariant polynomials in a spherical basis; tensor-decomposition parameterisation; 4-body messages per layer (correlation order 3); ZBL repulsive pair potential at close range with Agnesi distance transform; energy is the sum of per-atom contributions, forces and stresses by auto-differentiation. The MACE-MP-0b3 release is the L=1 (medium-sized) variant in 128x0e + 128x1o irreps." .
+
+ex:mace-huber-loss-batatia2024mp0 a mlips:LossFunction ;
+    rdfs:label "Weighted Huber loss on energy, forces, and stresses with weights (lambda_E, lambda_F, lambda_sigma)=(1, 10, 10) and Huber deltas (delta_E, delta_F, delta_sigma)=(0.01, 0.01, 0.01); the force Huber delta is conditional, decreasing step-wise from 1.0 to 0.1 as the per-atom force magnitude increases from 0 to 300 eV/A" .
+
+ex:amsgrad-batatia2024mp0 a mls:Algorithm ;
+    rdfs:label "AMSGrad variant of Adam (beta_1=0.9, beta_2=0.999, epsilon=1e-8) with EMA learning-rate schedule (decay 0.99999) and gradient clipping (max-norm 100)" .
+
+ex:mace-impl-batatia2024mp0 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-mace-mp ;
+    mlips:version "MACE-MP-0b3" .
+
+ex:lib-mace-mp a mlips:Library ;
+    rdfs:label "mace-mp (MACE training/evaluation code; PyTorch + e3nn)" ;
+    schema:url <https://github.com/ACEsuit/mace-mp> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-6-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-batatia2024mp0 ;
+    mlips:settingValue "6.0" .
+
+ex:setting-num-layers-2-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-layers-batatia2024mp0 ;
+    mlips:settingValue "2" .
+
+ex:setting-lmax-3-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-lmax-batatia2024mp0 ;
+    mlips:settingValue "3" .
+
+ex:setting-correlation-order-3-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-correlation-order-batatia2024mp0 ;
+    mlips:settingValue "3" .
+
+ex:setting-num-channels-128-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-channels-batatia2024mp0 ;
+    mlips:settingValue "128" .
+
+ex:setting-num-radial-bessel-10-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-radial-bessel-batatia2024mp0 ;
+    mlips:settingValue "10" .
+
+ex:setting-mlp-hidden-3x64-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-mlp-hidden-batatia2024mp0 ;
+    mlips:settingValue "3x64 SiLU" .
+
+ex:setting-initial-lr-1e-3-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-initial-lr-batatia2024mp0 ;
+    mlips:settingValue "0.001" .
+
+ex:setting-num-epochs-100-batatia2024mp0 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-epochs-batatia2024mp0 ;
+    mlips:settingValue "100" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mace-mp-0-batatia2024mp0 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0b3 (medium) training run on MPtrj" ;
+    mlips:appliesMethod ex:MACE-MP-0 ;
+    mlips:runsOn ex:ds-MPtrj-batatia2024mp0 ;
+    mlips:hasHyperparameterSetting
+        ex:setting-rcut-6-batatia2024mp0 ,
+        ex:setting-num-layers-2-batatia2024mp0 ,
+        ex:setting-lmax-3-batatia2024mp0 ,
+        ex:setting-correlation-order-3-batatia2024mp0 ,
+        ex:setting-num-channels-128-batatia2024mp0 ,
+        ex:setting-num-radial-bessel-10-batatia2024mp0 ,
+        ex:setting-mlp-hidden-3x64-batatia2024mp0 ,
+        ex:setting-initial-lr-1e-3-batatia2024mp0 ,
+        ex:setting-num-epochs-100-batatia2024mp0 ;
+    mlips:gpuHours 2600 ;
+    mlips:trainingHardware "40-80 NVIDIA H100 GPUs across 10-20 nodes" ;
+    mlips:produces ex:model-mace-mp-0-batatia2024mp0 .
+
+ex:model-mace-mp-0-batatia2024mp0 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0b3 medium foundation model" ;
+    mlips:inferenceHardware "Single NVIDIA A100 80GB GPU: ~ns/day for 1000-atom system; weak scaling to 32,000 atoms on 64 GPUs at 0.1 ns/day" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-batatia2024mp0 mlips:hasResult
+    ex:result-mae-energy-batatia2024mp0 ,
+    ex:result-mae-force-batatia2024mp0 .
+
+ex:result-mae-energy-batatia2024mp0 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mace-mp-0-batatia2024mp0 ;
+    mlips:targetMaterial ex:mat-MP-universal-batatia2024mp0 ;
+    mlips:hasAccuracyMetric ex:metric-mae-energy-batatia2024mp0 .
+
+ex:metric-mae-energy-batatia2024mp0 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom (MPtrj held-out, MACE-MP-0 medium)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 18 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-mae-force-batatia2024mp0 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mace-mp-0-batatia2024mp0 ;
+    mlips:targetMaterial ex:mat-MP-universal-batatia2024mp0 ;
+    mlips:hasAccuracyMetric ex:metric-mae-force-batatia2024mp0 .
+
+ex:metric-mae-force-batatia2024mp0 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on force components (MPtrj held-out, MACE-MP-0 medium)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 39 ;
+    mlips:hasUnit unit:MeV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Captured in Q9 (run) and Q10 (model) where the predicates allow it:
+#   - mlips:gpuHours = 2600
+#   - mlips:trainingHardware = "40-80 NVIDIA H100 GPUs across 10-20 nodes"
+#   - mlips:inferenceHardware = "Single NVIDIA A100 80GB GPU ..."
+# Wall-clock training duration, peak memory, and explicit per-atom
+# inference time are not reported.

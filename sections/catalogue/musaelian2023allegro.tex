@@ -1,0 +1,124 @@
+\subsection{Musaelian et al.\ (2023): Allegro strictly local equivariant MLIP}
+\label{sec:appendix-example-musaelian2023allegro}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Musaelian, Batzner, Johansson, Sun, Owen, Kornbluth, and Kozinsky
+introduce Allegro, a strictly local equivariant deep-learning
+interatomic potential that combines the accuracy of equivariant
+message passing with the parallel scalability of local descriptor
+methods. Published in \emph{Nature Communications} 14, 579 (2023);
+arXiv:2204.05249. The paper reports benchmarks on revised MD17,
+QM9, the 3BPA temperature-transferability set, the Li$_3$PO$_4$
+amorphous phosphate solid electrolyte, and an Ag bulk-crystal
+scaling experiment up to 100 million atoms.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+The canonical encoding pass takes the Li$_3$PO$_4$ amorphous
+phosphate solid electrolyte (192-atom cell) as the headline
+materials/MD application: a class of solid-state electrolytes
+characterised by an intricate dependence of conductivity and
+mechanical properties on the degree of crystallinity.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Reference data are produced from DFT calculations.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+The Li$_3$PO$_4$ reference is generated with VASP using the PBE
+functional, PAW pseudopotentials, a 400~eV plane-wave cutoff, and a
+$\Gamma$-point reciprocal-space mesh, in NVT (Nos\'e--Hoover) at
+2~fs time step.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+The Li$_3$PO$_4$ training set consists of 10{,}000 structures
+sampled randomly from the combined 50{,}000-frame melt + quench
+AIMD dataset, with 1{,}000 validation structures held out. The set
+covers energies and forces.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+A single sampling strategy is in play: AIMD melt-quench sampling.
+The data set comes from a 50~ps AIMD trajectory in the melted state
+at $T=3000$~K, an instant quench to 600~K, then a 50~ps AIMD
+trajectory in the quenched state at $T=600$~K (Vienna ab-initio
+Simulation Package, NVT, Nos\'e--Hoover, 2~fs).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+Allegro is a strictly local equivariant network: each pair $(i,j)$
+within the cutoff carries a scalar latent space $\mathbf{x}^{ij,L}$
+and an equivariant latent space
+$\mathbf{V}^{ij,L}_{n,\ell,p}$, updated layer by layer through
+tensor products with the spherical-harmonic projections of
+neighbour bonds, weighted by the central atom's environment
+embedding. Pair energies $E_{ij}$ are summed to give per-atom
+energies; forces are autodiff-derived. The training algorithm is
+Adam ($\beta_1=0.9$, $\beta_2=0.999$, $\epsilon=10^{-8}$, no weight
+decay) with an on-plateau scheduler (patience 100, decay factor
+0.8). The loss is a weighted MSE on per-atom energies and force
+components ($\lambda_E=\lambda_F=1$ after per-atom normalisation;
+$\lambda_E=1, \lambda_F=1000$ for revMD17). Implementation is the
+\texttt{allegro} PyTorch code
+(\url{https://github.com/mir-group/allegro}), with LAMMPS
+production runs via the \texttt{pair\_allegro} extension.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+The Li$_3$PO$_4$ production model uses 3 layers, 128 features for
+even and odd irreps, $\ell_{\max}=3$, and a 6~\AA{} radial cutoff
+with 8 non-trainable Bessel basis functions and a polynomial
+envelope ($p=6$). The two-body latent MLP is
+$[128, 256, 512, 1024]$ with SiLU non-linearities; the later
+latent MLPs are $[1024, 1024, 1024]$ with SiLU; the embedding
+weight projection is a single linear layer; the output edge-energy
+MLP is a single hidden layer of dimension 128.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+A single training run on 10{,}000 frames produces one Li$_3$PO$_4$
+Allegro model. Training is at \texttt{float32} precision with
+learning rate 0.002 and batch size 5; an EMA with weight 0.99
+tracks the validation model.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+Headline figures on the Li$_3$PO$_4$ quenched-state test set are
+MAE 1.7~meV/atom on energies and 75.7~meV/\AA{} on force
+components. Allegro accurately recovers the AIMD radial
+distribution function and the tetrahedral P--O--O angular
+distribution, and the AIMD-vs.-Allegro Li MSD agree well in the
+quenched state at 600~K.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+Allegro models were trained on a single NVIDIA V100 GPU; specific
+training duration and GPU-hours for the Li$_3$PO$_4$ pass are not
+reported (the paper notes ``a matter of hours or even minutes'').
+For \emph{inference}, the paper reports detailed strong-scaling
+times on the Theta-GPU NVIDIA DGX A100 cluster: a 50.3M-atom
+Li$_3$PO$_4$ run on 128 A100 GPUs achieves 0.013~$\mu$s per atom
+per MD step, and a 100M-atom Ag run on 128 A100 GPUs is reported
+in Table~IV; we encode the Li$_3$PO$_4$ atomic-throughput figure
+as $\dlRole{inferenceTimePerAtom}$ on the trained model.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/musaelian2023allegro/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+Beyond Q11, the following ontology-expressible items are not
+represented in this encoding pass: (i) the four additional
+benchmarks reported in the same paper (revised MD17 with
+PBE/def2-SVP reference, QM9 with DFT/B3LYP/6-31G(2df,p) reference,
+the 3BPA $\omega$B97X/6-31G(d) temperature-transferability set,
+and the Ag scaling test); (ii) detailed strong-scaling figures for
+the 100M-atom Ag dataset; (iii) the 16~kbar / 90\% melting-point /
+2$\times$2$\times$3 $\Gamma$-centred grid / Methfessel--Paxton
+smearing details specific to the Ag DFT settings; (iv) the
+\texttt{allegro}, \texttt{nequip}, \texttt{e3nn}, PyTorch, and
+LAMMPS commit hashes used in the experiments; (v) the per-pair-species
+scaling factors $\sigma_{Z_i,Z_j}$ that are technically
+hyperparameters but are not given specific reported values in the
+paper; (vi) the Li-ion diffusivity recovery (Allegro vs.\ AIMD MSD)
+which is a downstream observable rather than an
+$\AccuracyMetricC$ per the ontology's current vocabulary.

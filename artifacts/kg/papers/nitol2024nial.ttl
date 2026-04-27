@@ -1,0 +1,232 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Wang, Liu, Zhu, Liu, Ma, Chen, Sun, Chen. Efficient moment tensor
+#   machine-learning interatomic potential for accurate description of
+#   defects in Ni-Al alloys. arXiv:2411.01282 (2024/2025).
+#
+# Note on paper-id: this corpus entry is filed under the paper-id
+# "nitol2024nial" by upstream convention; the source paper is by Wang
+# et al. of the Shenyang National Laboratory for Materials Science,
+# not Nitol et al. We retain the paper-id but record the actual
+# bibliographic data faithfully.
+#
+# Encoding scope: a single MTP for the Ni-Al binary system, trained
+# with active learning (on-the-fly during AIMD plus D-optimality
+# cycles) and benchmarked on point and planar defects in fcc Ni and
+# L1_2-Ni3Al. Conventional one-method x one-material-system encoding
+# (cf. kumar2025, qi2023).
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-nitol2024nial a mlips:BenchmarkStudy ;
+    rdfs:label "Wang et al. (2024): efficient MTP for defects in Ni-Al alloys" ;
+    mlips:reportedIn ex:article-nitol2024nial .
+
+ex:article-nitol2024nial a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arXiv.2411.01282> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Efficient Moment Tensor Machine-Learning Interatomic Potential for Accurate Description of Defects in Ni-Al Alloys" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-NiAl-nitol2024nial a mlips:MaterialSystem ;
+    rdfs:label "Ni-Al binary alloy (fcc Ni and L1_2-Ni3Al phases plus their interface and defects)" ;
+    mlips:chemicalFormula "Ni-Al" ;
+    mlips:materialClass "Binary intermetallic; fcc Ni (Fm-3m), L1_2-Ni3Al (Pm-3m), Ni/Ni3Al interface; with vacancies, vacancy clusters, antisites, and generalised stacking-fault (GSF) defects" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-nitol2024nial a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-nitol2024nial mlips:hasDFTSettings ex:dft-settings-nitol2024nial .
+
+ex:dft-settings-nitol2024nial a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE" ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:energyCutoff 400 ;
+    mlips:kPointMesh "Monkhorst-Pack with k-point spacing ~0.2 A^-1; total energies converged to 1 meV/atom; SCF convergence 1e-6 eV; ionic-relaxation force convergence 0.01 eV/A" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-NiAl-nitol2024nial a mlips:TrainingDataset ;
+    rdfs:label "Ni-Al MTP training set: 8450 configurations (6092 from on-the-fly active learning during AIMD + 2358 added through D-optimality active-learning cycles)" ;
+    mlips:coversMaterial ex:mat-NiAl-nitol2024nial ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 8450 ;
+    mlips:hasDFTCalculation ex:dft-nitol2024nial .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-NiAl-nitol2024nial mlips:samplingStrategy
+    ex:on-the-fly-aimd-sampling-nitol2024nial ,
+    ex:d-optimality-active-learning-nitol2024nial ,
+    ex:defect-prototype-sampling-nitol2024nial .
+
+ex:on-the-fly-aimd-sampling-nitol2024nial a mlips:SamplingStrategy ;
+    rdfs:label "On-the-fly active learning during AIMD (kernel-based Bayesian regression in VASP)" ;
+    rdfs:comment "First-pass training-set generation: on-the-fly Bayesian-regression active learning during AIMD heating from 700 to 1600 K at ambient pressure (NPT, Langevin thermostat + Parrinello-Rahman barostat). Yields 6092 reference configurations." .
+
+ex:d-optimality-active-learning-nitol2024nial a mlips:SamplingStrategy ;
+    rdfs:label "D-optimality active learning (Shapeev's generalised D-optimality criterion)" ;
+    rdfs:comment "Second-pass active learning: 200 ps MD trajectories with the current MTP are screened for configurations whose extrapolation grade exceeds 5; selected configurations have their DFT energies, forces, and stresses computed and added to the training set; the MTP is refitted; iterations continue until no configurations exceed the threshold. Adds 2358 configurations." .
+
+ex:defect-prototype-sampling-nitol2024nial a mlips:SamplingStrategy ;
+    rdfs:label "Defect-prototype enumeration" ;
+    rdfs:comment "Initial configurations span fcc Ni, L1_2-Ni3Al, the Ni/Ni3Al interface, GSF supercells of Ni and Ni3Al, plus combinations with vacancies, vacancy clusters, and antisite defects; an independent validation set of 815 configurations was constructed from the same prototypes." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:MTP-nitol2024nial a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential with optimised tensor-contraction scheme (Wang et al. 2024)" ;
+    mlips:hasFunctionalForm ex:mtp-functional-form-nitol2024nial ;
+    mlips:hasLossFunction ex:mtp-loss-1-001-0005-nitol2024nial ;
+    mlips:hasTrainingAlgorithm ex:lbfgs-nitol2024nial ;
+    mlips:hasHyperparameter ex:hp-rcut-nitol2024nial , ex:hp-levmax-nitol2024nial ,
+        ex:hp-num-radial-nitol2024nial , ex:hp-max-body-order-nitol2024nial ,
+        ex:hp-num-linear-params-nitol2024nial ;
+    mlips:hasImplementation ex:mlip-package-nitol2024nial .
+
+ex:mtp-functional-form-nitol2024nial a mlips:FunctionalForm ;
+    rdfs:label "MTP moment-tensor polynomial with genetic-algorithm-optimised tensor contractions; rank of moment tensors limited to 4 (mu <= 3) and the redefined level lev(M_{mu,nu}) = 2*mu + nu + 1 with maximum-level threshold 2653" .
+
+ex:mtp-loss-1-001-0005-nitol2024nial a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energy, forces, and stresses with weights 1 : 0.01 : 0.005" .
+
+ex:lbfgs-nitol2024nial a mls:Algorithm ;
+    rdfs:label "Two-step fitting: (i) initial linear coefficients on a minimal basis followed by linear optimisation on the full basis with shared radial functions; (ii) L-BFGS for 5000 iterations followed by a least-squares linear refinement" .
+
+ex:mlip-package-nitol2024nial a mlips:Implementation ;
+    mlips:implementedIn ex:lib-mlip-nitol2024nial .
+
+ex:lib-mlip-nitol2024nial a mlips:Library ;
+    rdfs:label "MLIP package (Shapeev's MTP fitting code, with custom tensor-contraction extensions)" ;
+    schema:url <https://gitlab.com/ashapeev/mlip-2> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-5_4-nitol2024nial a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-nitol2024nial ;
+    mlips:settingValue "5.4" .
+
+ex:setting-levmax-2653-nitol2024nial a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-levmax-nitol2024nial ;
+    mlips:settingValue "2653" .
+
+ex:setting-num-radial-8-nitol2024nial a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-radial-nitol2024nial ;
+    mlips:settingValue "8" .
+
+ex:setting-max-body-order-5-nitol2024nial a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-max-body-order-nitol2024nial ;
+    mlips:settingValue "5" .
+
+ex:setting-num-linear-params-2653-nitol2024nial a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-linear-params-nitol2024nial ;
+    mlips:settingValue "2653" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mtp-NiAl-nitol2024nial a mlips:MLIPRun ;
+    rdfs:label "MTP training run (2653 basis set, r_cut=5.4 A) on the Ni-Al training set" ;
+    mlips:appliesMethod ex:MTP-nitol2024nial ;
+    mlips:runsOn ex:ds-NiAl-nitol2024nial ;
+    mlips:hasHyperparameterSetting
+        ex:setting-rcut-5_4-nitol2024nial ,
+        ex:setting-levmax-2653-nitol2024nial ,
+        ex:setting-num-radial-8-nitol2024nial ,
+        ex:setting-max-body-order-5-nitol2024nial ,
+        ex:setting-num-linear-params-2653-nitol2024nial ;
+    mlips:trainingHardware "96 CPU cores (Intel Xeon Platinum 9242 @ 2.30 GHz)" ;
+    mlips:produces ex:model-mtp-NiAl-nitol2024nial .
+
+ex:model-mtp-NiAl-nitol2024nial a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP for Ni-Al alloys (2653 basis set, 5.4 A cutoff)" ;
+    mlips:inferenceHardware "96 CPU cores (Intel Xeon Platinum 9242 @ 2.30 GHz): 100,000 MD steps on a 2048-atom Ni3Al supercell take ~241 s" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-nitol2024nial mlips:hasResult
+    ex:result-rmse-energy-nitol2024nial ,
+    ex:result-rmse-force-nitol2024nial ,
+    ex:result-rmse-stress-nitol2024nial .
+
+ex:result-rmse-energy-nitol2024nial a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-NiAl-nitol2024nial ;
+    mlips:targetMaterial ex:mat-NiAl-nitol2024nial ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-nitol2024nial .
+
+ex:metric-rmse-energy-nitol2024nial a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy per atom (Ni-Al validation set, 815 configs)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.64 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-rmse-force-nitol2024nial a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-NiAl-nitol2024nial ;
+    mlips:targetMaterial ex:mat-NiAl-nitol2024nial ;
+    mlips:hasAccuracyMetric ex:metric-rmse-force-nitol2024nial .
+
+ex:metric-rmse-force-nitol2024nial a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on force components (Ni-Al validation set)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.028 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+ex:result-rmse-stress-nitol2024nial a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-NiAl-nitol2024nial ;
+    mlips:targetMaterial ex:mat-NiAl-nitol2024nial ;
+    mlips:hasAccuracyMetric ex:metric-rmse-stress-nitol2024nial .
+
+ex:metric-rmse-stress-nitol2024nial a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on stress components (Ni-Al validation set)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricValue 0.09 ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Captured in Q9 where the predicates allow it:
+#   - mlips:trainingHardware = "96 CPU cores (Intel Xeon Platinum 9242 @ 2.30 GHz)"
+#   - mlips:inferenceHardware on the trained model = same hardware,
+#     with a concrete MD-throughput data point
+# Wall-clock total training duration, GPU hours (none used; CPU run),
+# peak memory, and explicit per-atom inference time are not reported.

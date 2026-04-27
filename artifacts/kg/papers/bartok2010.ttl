@@ -1,0 +1,161 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Bartok, Payne, Kondor, Csanyi. Gaussian Approximation Potentials:
+#   The Accuracy of Quantum Mechanics, without the Electrons.
+#   Phys. Rev. Lett. 104, 136403 (2010).
+#   doi:10.1103/PhysRevLett.104.136403  arXiv:0910.1019
+#
+# Encoding scope: the original GAP method, demonstrated on bulk
+# semiconductors (C, Si, Ge), GaN, and alpha-Fe. We encode silicon
+# (the diamond-cubic lead demonstration system) and document the
+# broader set in Q12. Specific DFT settings beyond the engine
+# (CASTEP) are stated in the Supplementary Information rather than
+# the main letter; only main-letter facts are encoded.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-bartok2010 a mlips:BenchmarkStudy ;
+    rdfs:label "Bartok et al. (2010): GAP for bulk crystals (Si as lead system)" ;
+    mlips:reportedIn ex:article-bartok2010 .
+
+ex:article-bartok2010 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/PhysRevLett.104.136403> ;
+    schema:datePublished "2010"^^xsd:gYear ;
+    schema:name "Gaussian Approximation Potentials: The Accuracy of Quantum Mechanics, without the Electrons" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-Si-bartok2010 a mlips:MaterialSystem ;
+    rdfs:label "Bulk silicon (diamond-cubic phase, lead demonstration system)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental crystalline solid; diamond-cubic phase as the lead demonstration system. The paper also demonstrates GAP on diamond (carbon), germanium, GaN, and alpha-Fe." ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-bartok2010 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-bartok2010 mlips:hasDFTSettings ex:dft-settings-bartok2010 .
+
+ex:dft-settings-bartok2010 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-castep .
+
+ex:lib-castep a mlips:Library ;
+    rdfs:label "CASTEP" ;
+    schema:url <http://www.castep.org> .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-Si-bartok2010 a mlips:TrainingDataset ;
+    rdfs:label "Si GAP training set: random atomic and lattice displacements (up to 0.2 A) of equilibrium unit cells of 2, 8, 16, and 64 atoms" ;
+    mlips:coversMaterial ex:mat-Si-bartok2010 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation ex:dft-bartok2010 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-Si-bartok2010 mlips:samplingStrategy ex:displacement-sampling-bartok2010 .
+
+ex:displacement-sampling-bartok2010 a mlips:SamplingStrategy ;
+    rdfs:label "Random atomic and lattice displacements" ;
+    rdfs:comment "Reference configurations are obtained by randomly displacing the atoms and the lattice vectors from their equilibrium values in 2-, 8-, 16-, and 64-atom cubic unit cells by up to 0.2 A. The model is later extended with random displacements around a diamond vacancy and a graphite-to-diamond transition path." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:GAP-bartok2010 a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential (GAP) with bispectrum descriptors" ;
+    mlips:hasFunctionalForm ex:gap-functional-form-bartok2010 ;
+    mlips:hasLossFunction ex:gap-loss-bartok2010 ;
+    mlips:hasTrainingAlgorithm ex:gpr-bartok2010 ;
+    mlips:hasHyperparameter ex:hp-rcut-bartok2010 , ex:hp-jmax-bartok2010 , ex:hp-Msparse-bartok2010 ;
+    mlips:hasImplementation ex:impl-gap-bartok2010 .
+
+ex:gap-functional-form-bartok2010 a mlips:FunctionalForm ;
+    rdfs:label "Gaussian-process regression on a four-dimensional bispectrum descriptor of the atomic neighbour density inside a smooth cosine cutoff; total energy is the sum over atoms" .
+
+ex:gap-loss-bartok2010 a mlips:LossFunction ;
+    rdfs:label "GP regression with regularised pseudo-covariance on energies and forces (sparse-GP marginal-likelihood objective)" .
+
+ex:gpr-bartok2010 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian-process regression with random selection of M sparse atomic-neighbourhood configurations" .
+
+ex:impl-gap-bartok2010 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-quip-bartok2010 .
+
+ex:lib-quip-bartok2010 a mlips:Library ;
+    rdfs:label "QUIP / GAP suite (libAtoms)" ;
+    schema:url <http://www.libatoms.org> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# Q8 has no HyperparameterSetting instances: the main letter does not
+# tabulate explicit numerical values for r_cut, J_max, or M (these
+# are reported in the SI and are taken to be paper-default).
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-gap-Si-bartok2010 a mlips:MLIPRun ;
+    rdfs:label "GAP training run, bulk silicon" ;
+    mlips:appliesMethod ex:GAP-bartok2010 ;
+    mlips:runsOn ex:ds-Si-bartok2010 ;
+    mlips:produces ex:model-gap-Si-bartok2010 .
+
+ex:model-gap-Si-bartok2010 a mlips:TrainedModel ;
+    rdfs:label "GAP for bulk silicon (diamond-cubic)" ;
+    mlips:inferenceTimePerAtom 0.01 .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-bartok2010 mlips:hasResult ex:result-gap-Si-energy-bartok2010 .
+
+ex:result-gap-Si-energy-bartok2010 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-gap-Si-bartok2010 ;
+    mlips:targetMaterial ex:mat-Si-bartok2010 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-bartok2010 .
+
+ex:metric-rmse-energy-bartok2010 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE on near-bulk Si configurations (paper bound: <1 meV/atom; the same bound holds for diamond and iron)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Captured in Q9 (model) where the predicates allow it:
+#   - mlips:inferenceTimePerAtom = 0.01 (s/atom/timestep, single CPU core)
+# The paper does not report training duration, GPU/CPU hours,
+# training hardware, peak memory, or inference hardware.

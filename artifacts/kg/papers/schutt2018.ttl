@@ -1,0 +1,183 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Schuett, Sauceda, Kindermans, Tkatchenko, Mueller. SchNet -- a deep
+#   learning architecture for molecules and materials.
+#   J. Chem. Phys. 148, 241722 (2018). doi:10.1063/1.5019779
+#   arXiv:1712.06113
+#
+# Encoding scope: SchNet trained on the MD17 benchmark of small organic
+# molecules (combined energy+force training) is taken as the canonical
+# pass; the paper also reports SchNet runs on QM9 and on Materials
+# Project formation energies, plus a downstream PIMD study on
+# C20-fullerene at PBE+vdW(TS). These auxiliary applications are
+# documented as gaps in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-schutt2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Schuett et al. (2018): SchNet on MD17 small organic molecules" ;
+    mlips:reportedIn ex:article-schutt2018 .
+
+ex:article-schutt2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/1.5019779> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "SchNet -- a deep learning architecture for molecules and materials" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-md17-schutt2018 a mlips:MaterialSystem ;
+    rdfs:label "MD17 small organic molecules (benzene, toluene, malonaldehyde, salicylic acid, aspirin, ethanol, uracil, naphthalene)" ;
+    mlips:chemicalFormula "C/H/N/O small organics" ;
+    mlips:materialClass "Molecular: eight small organic molecules used as MD trajectories" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-schutt2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-schutt2018 mlips:hasDFTSettings ex:dft-settings-schutt2018 .
+
+ex:dft-settings-schutt2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-fhi-aims ;
+    mlips:xcFunctional "PBE+vdW(TS)" .
+
+ex:lib-fhi-aims a mlips:Library ;
+    rdfs:label "FHI-aims" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-md17-schutt2018 a mlips:TrainingDataset ;
+    rdfs:label "MD17 reference set, used at N=1000 and N=50000 training sizes" ;
+    mlips:coversMaterial ex:mat-md17-schutt2018 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation ex:dft-schutt2018 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-md17-schutt2018 mlips:samplingStrategy ex:md-sampling-schutt2018 .
+
+ex:md-sampling-schutt2018 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD trajectories" ;
+    rdfs:comment "MD17 configurations are randomly sampled snapshots from DFT MD trajectories of eight small organic molecules." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:SchNet a mlips:MLIPMethod ;
+    rdfs:label "SchNet (continuous-filter convolutional deep neural network)" ;
+    mlips:hasFunctionalForm ex:schnet-functional-form ;
+    mlips:hasLossFunction ex:schnet-loss-energy-force ;
+    mlips:hasTrainingAlgorithm ex:adam ;
+    mlips:hasHyperparameter ex:hp-T , ex:hp-F , ex:hp-rho , ex:hp-rcut ;
+    mlips:hasImplementation ex:schnet-impl .
+
+ex:schnet-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Atom embeddings + interaction blocks with continuous-filter convolutions; per-atom energy via atom-wise dense layers, summed for total energy" .
+
+ex:schnet-loss-energy-force a mlips:LossFunction ;
+    rdfs:label "Combined squared-error loss on energies and forces with trade-off rho=0.01" .
+
+ex:adam a mls:Algorithm ;
+    rdfs:label "ADAM optimizer with mini-batches of 32, exponential learning-rate decay (ratio 0.96 per 100k steps)" .
+
+ex:schnet-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-schnet .
+
+ex:lib-schnet a mlips:Library ;
+    rdfs:label "SchNet reference implementation" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-T-6 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-T ;
+    mlips:settingValue "6" .
+
+ex:setting-F-64 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-F ;
+    mlips:settingValue "64" .
+
+ex:setting-rho-001 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rho ;
+    mlips:settingValue "0.01" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-schnet-md17 a mlips:MLIPRun ;
+    rdfs:label "SchNet training run on MD17 (T=6, F=64, rho=0.01)" ;
+    mlips:appliesMethod ex:SchNet ;
+    mlips:runsOn ex:ds-md17-schutt2018 ;
+    mlips:hasHyperparameterSetting ex:setting-T-6 , ex:setting-F-64 , ex:setting-rho-001 ;
+    mlips:produces ex:model-schnet-md17 .
+
+ex:model-schnet-md17 a mlips:TrainedModel ;
+    rdfs:label "SchNet model trained on MD17 (combined energy+force loss, N=50000)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-schutt2018 mlips:hasResult ex:result-md17-energy , ex:result-md17-forces .
+
+ex:result-md17-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-schnet-md17 ;
+    mlips:targetMaterial ex:mat-md17-schutt2018 ;
+    mlips:hasAccuracyMetric ex:metric-mae-md17-energy .
+
+ex:metric-mae-md17-energy a mlips:AccuracyMetric ;
+    rdfs:label "MAE of total energy on MD17 aspirin (N=50000, energy+forces loss)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 0.12 ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+ex:result-md17-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-schnet-md17 ;
+    mlips:targetMaterial ex:mat-md17-schutt2018 ;
+    mlips:hasAccuracyMetric ex:metric-mae-md17-forces .
+
+ex:metric-mae-md17-forces a mlips:AccuracyMetric ;
+    rdfs:label "MAE of atomic forces on MD17 aspirin (N=50000, energy+forces loss)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.33 ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Schuett et al. (2018) does not report training duration, GPU hours,
+# training hardware, peak memory, or inference time per atom for the
+# canonical MD17 SchNet pass. (For the auxiliary C20-fullerene MD
+# application the paper notes a per-step PES evaluation goes from ~11s
+# on 32 CPU cores to ~10ms on a single NVIDIA GTX1080, but that is for
+# inference of a separately trained C20 model and is recorded as a
+# Q12 gap rather than encoded as an inference metric here.)

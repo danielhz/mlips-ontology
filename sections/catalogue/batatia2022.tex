@@ -1,0 +1,112 @@
+\subsection{Batatia et al.\ (2022): MACE for fast and accurate force fields}
+\label{sec:appendix-example-batatia2022}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Batatia, Kov\'acs, Simm, Ortner, and Cs\'anyi introduce MACE, a
+higher-order equivariant message-passing neural network interatomic
+potential. Published at NeurIPS 2022; arXiv:2206.07697. The headline
+benchmarks are rMD17 small organic molecules, 3BPA temperature
+transferability, and acetylacetone (AcAc) flexibility/reactivity.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+The canonical encoding pass takes the headline rMD17 dataset, a set
+of ten small organic molecules (aspirin, azobenzene, benzene,
+ethanol, malonaldehyde, naphthalene, paracetamol, salicylic acid,
+toluene, uracil) sampled from gas-phase ab initio MD trajectories.
+We model the dataset at the species-set level (C/H/N/O small
+organics) rather than per molecule.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Reference data are produced from DFT calculations.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+For rMD17 the original MD17 trajectories are recomputed at the
+PBE/def2-SVP level of theory with very tight SCF convergence and a
+very dense DFT integration grid. The DFT engine itself is not stated
+in the MACE paper (the rMD17 dataset is consumed as published).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+The rMD17 split used in the paper consists of 950 training and 50
+validation configurations per molecule (1{,}000 total per molecule),
+covering energies and forces. Configurations come from the published
+rMD17 dataset and are reshuffled after each epoch.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+A single sampling strategy is in play: vibrational sampling via
+gas-phase ab initio MD trajectories at 500~K, recomputed at
+PBE/def2-SVP for rMD17.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+MACE is a two-layer equivariant message-passing GNN that uses
+higher body-order (4-body) tensor messages built from a complete
+ACE-style local basis (Bessel radial $\times$ spherical-harmonic
+angular) and tensor-product symmetrisation with generalised
+Clebsch--Gordan coefficients. The training algorithm is the
+AMSGrad variant of Adam ($\beta_1=0.9$, $\beta_2=0.999$,
+$\epsilon=10^{-8}$), with an on-plateau learning-rate scheduler
+(patience 50, decay factor 0.8). The loss is a weighted MSE with
+$\lambda_E=1$ and $\lambda_F=1000$. Implementation is the
+\texttt{mace} PyTorch code (\url{https://github.com/ACEsuit/mace}).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+The rMD17 production model uses two MACE layers, $l_{\max}=3$, 256
+uncoupled feature channels, correlation order $\nu=3$ (4-body
+messages), and a 5~\AA{} radial cutoff with 8 Bessel basis
+functions and a polynomial cutoff envelope ($p=5$). The radial MLP
+is $[64, 64, 64, 1024]$ with SiLU non-linearities, and the readout
+of the second layer is a single-layer MLP with 16 hidden
+dimensions; first-layer readout is linear.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+A single training run per molecule produces one rMD17 MACE model
+(trained at \texttt{float32} precision, learning rate 0.01, batch
+size 5, exponential weight-decay $5\times10^{-7}$ on the $W$
+weights of the higher-order features). Per-atom energy is
+shifted by the per-species training-set average and scaled by the
+RMS of force components.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+Headline accuracy figures on the rMD17 benchmark for aspirin
+(MACE, 1{,}000 train) are MAE 2.2~meV on energies and
+6.6~meV/\AA{} on force components. MACE attains state-of-the-art
+or near state-of-the-art accuracy across the ten rMD17 molecules.
+We encode the aspirin numbers as a single per-molecule benchmark
+result; per-molecule results for the remaining nine molecules are a
+Q12 gap.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+Models were trained on a single NVIDIA A100 GPU; typical training
+time is 2--6~hours per molecule for rMD17 (specific GPU-hours,
+peak memory, and inference-time-per-atom are not reported for the
+rMD17 pass, though the paper does report a ``time latency''
+inference figure for the 3BPA pass: 24.3~ms for a structure with
+$\le 10000$ atoms on an A100).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/batatia2022/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+Beyond the items already flagged, the following ontology-expressible
+information is not represented in this encoding pass: (i) the two
+additional benchmarks reported in the same paper, 3BPA
+(temperature-transferability of a flexible drug-like molecule, with
+$\omega$B97X/6-31G(d) reference) and AcAc (acetylacetone
+flexibility/reactivity at the same level); (ii) per-molecule
+benchmark results for the remaining nine rMD17 molecules; (iii) the
+DFT engine for the rMD17 reference recomputation
+($\dlRole{usedDFTCode}$ on the DFT settings) and the original MD17
+DFT settings beyond the XC functional/basis set; (iv) the MACE
+package version; (v) detailed compute-cost data (GPU-hours, peak
+memory, inference time per atom on rMD17). The paper also reports
+that one MACE training run on 3BPA reaches converged BOTNet
+accuracy in $\sim$30~min on an A100 and a fully converged 3BPA
+model takes $>$1~day; this finer-grained timing is associated
+with 3BPA rather than rMD17 and is not encoded here.

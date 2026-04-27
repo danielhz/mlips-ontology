@@ -1,0 +1,104 @@
+\subsection{Smith et al.\ (2019): ANI-1ccx via DFT$\to$CCSD(T) transfer learning}
+\label{sec:appendix-example-smith2019ccx}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Smith, Nebgen, Zubatyuk, Lubbers, Devereux, Barros, Tretiak, Isayev,
+and Roitberg present ANI-1ccx, a neural network potential pretrained
+on a large DFT dataset (ANI-1x) and fine-tuned by transfer learning
+on a much smaller DLPNO-CCSD(T)/CBS dataset, achieving coupled-cluster
+accuracy on H/C/N/O organic molecules. Published in
+\emph{Nat.\ Commun.} 10, 2903 (2019); arXiv:1903.10405.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+The MLIP covers the H/C/N/O chemical space of small organic molecules
+(drug-like and reaction-relevant species, average ${\sim}15$ atoms per
+molecule, primarily from the GDB-11 universe of $\sim$57k distinct
+species). We model this as one $\MaterialSystemC$ at the
+chemical-space level rather than enumerating individual molecules.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Two reference calculations apply: a wave-function reference (CCSD(T))
+for the headline fine-tuning step, and a DFT reference for the
+pretraining step. This is the corpus' only
+$\dlConcept{WaveFunctionCalculation}$ entry.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+The wave-function reference is DLPNO-CCSD(T)/CBS (the localised
+DLPNO-CCSD(T) method of Neese et al., extrapolated from cc-pVDZ /
+cc-pVTZ), denoted CCSD(T)* in the paper and computed in ORCA. The
+DFT pretraining reference is $\omega$B97X with the 6-31G* Gaussian
+basis (all-electron, $\Gamma$-only, isolated-molecule limit).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+The CCSD(T)*/CBS fine-tuning set has ${\sim}500{,}000$ data points
+covering ${\sim}480{,}000$ molecules; the pretraining ANI-1x corpus
+has 5\,M conformations from $\sim$57k molecules. Energies are
+covered (no forces or stresses). Provenance is \emph{augmented}
+(CCSD(T) labels are added on top of an existing DFT-labelled set).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+Two strategies were combined: query-by-committee active learning
+(ANI's ensemble-disagreement loop drives selection of new molecules
+for CCSD(T)*/CBS computation, growing the dataset to ${\sim}480$k
+molecules) and the diverse-conformer / normal-mode sampling that
+underlies the ANI-1x parent corpus.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+The method is the ANI Behler--Parrinello-style high-dimensional NN
+with ANI atom-centred symmetry functions. Per-element
+fully-connected feed-forward subnetworks operate on the
+symmetry-function inputs; total energy is the sum of per-atom
+contributions. Loss is energy-only MSE on per-molecule total energies
+(no force or stress targets). Optimisation is Adam with exponential
+learning-rate decay; the implementation is TorchANI.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+The main text does not tabulate explicit numerical values for the
+cutoff radius or for the radial/angular symmetry-function index
+counts (Section S1.2 in the Supplementary Information has the
+details). We therefore record no $\HyperparameterSettingC$ instances
+in the canonical encoding; the architectural hyperparameters are
+referenced under $\dlRole{hasHyperparameter}$ only.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+The training run pretrains on the DFT (ANI-1x) corpus and then
+fine-tunes on the CCSD(T)*/CBS corpus, producing the ANI-1ccx
+8-network ensemble.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+Headline accuracies (Table 1 + Fig.\ 2): MAE 1.46\,kcal/mol vs.\
+CCSD(T)*/CBS on the GDB-10to13 atomization-energy benchmark, and
+MAD 2.5\,kcal/mol on the HC7/11 hydrocarbon reaction-energy
+benchmark. The paper additionally reports ISOL6 isomerisation
+energies and the Genentech torsion-profile benchmark; these are not
+encoded as separate $\BenchmarkResultC$ instances.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+The paper notes ${\sim}30$\,minutes per model to train on the
+$500$k-molecule CCSD(T)*/CBS set (the production model is an
+8-network ensemble), but does not report training duration in the
+form the ontology expects, nor GPU hours, training hardware, peak
+memory, or per-atom inference time. Recorded as a Q12 gap.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/smith2019ccx/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+Beyond Q11, the protocol does not capture: the
+\emph{transfer-learning relationship} between the DFT-pretrained and
+CCSD(T)-fine-tuned models (only their union as a single training
+set); the explicit DLPNO-CCSD(T) parameters (PNO thresholds,
+integration-grid specifications) which would refine the
+$\dlConcept{WaveFunctionSettings}$; the ANI-1x parent dataset is
+referenced as a published source but not modelled as a separate
+$\dlConcept{TrainingDataset}$; and the auxiliary ablation runs
+(ANI-1ccx-R, trained only on CCSD(T)*/CBS, no transfer learning)
+are not encoded as separate $\dlConcept{TrainedModel}$ instances.

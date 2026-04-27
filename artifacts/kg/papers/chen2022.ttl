@@ -1,0 +1,220 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Chen, Ong. A Universal Graph Deep Learning Interatomic Potential
+#   for the Periodic Table. Nature Computational Science 2, 718-728
+#   (2022). doi:10.1038/s43588-022-00349-3
+#
+# Encoding scope: M3GNet universal IAP trained on the MPF.2021.2.8
+# subset of the Materials Project relaxation database (89 elements,
+# crystals across the periodic table). This is a "universal /
+# foundation" potential; the protocol's "one paper = one method x
+# one material system" assumption is stretched. We model the entire
+# coverage as a single MaterialSystem (mat-MP-universal); the
+# limitations are documented in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-chen2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Chen and Ong (2022): M3GNet universal graph IAP for the periodic table" ;
+    mlips:reportedIn ex:article-chen2022 .
+
+ex:article-chen2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s43588-022-00349-3> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "A Universal Graph Deep Learning Interatomic Potential for the Periodic Table" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-MP-universal-chen2022 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project crystals (universal coverage, 89 elements)" ;
+    mlips:chemicalFormula "any" ;
+    mlips:materialClass "Universal crystal coverage: 89 elements of the periodic table; 62,783 distinct compounds spanning binaries, ternaries, and quaternaries from the MPF.2021.2.8 subset of the Materials Project relaxation database" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-chen2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-chen2022 mlips:hasDFTSettings ex:dft-settings-chen2022 .
+
+ex:dft-settings-chen2022 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE (GGA) or PBE+U for transition-metal-containing compounds, as set by the Materials Project workflow" ;
+    mlips:pseudopotentialType "PAW" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-MPF-2021-2-8 a mlips:TrainingDataset ;
+    rdfs:label "MPF.2021.2.8: 187,687 ionic steps from 62,783 Materials Project compounds" ;
+    mlips:coversMaterial ex:mat-MP-universal-chen2022 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 187687 ;
+    mlips:hasDFTCalculation ex:dft-chen2022 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-MPF-2021-2-8 mlips:samplingStrategy
+    ex:relaxation-trajectory-sampling-chen2022 ,
+    ex:periodic-table-coverage-sampling-chen2022 .
+
+ex:relaxation-trajectory-sampling-chen2022 a mlips:SamplingStrategy ;
+    rdfs:label "Structural-relaxation trajectory sampling" ;
+    rdfs:comment "Snapshots taken from Materials Project relaxation trajectories: first and middle ionic steps of the first relaxation plus the last step of the second relaxation, for tasks tagged 'GGA Structure Optimization' or 'GGA+U Structure Optimization' as of Feb 8, 2021. Frames with final energy per atom > 50 eV/atom or interatomic distance < 0.5 A were filtered out." .
+
+ex:periodic-table-coverage-sampling-chen2022 a mlips:SamplingStrategy ;
+    rdfs:label "Periodic-table chemical-space coverage" ;
+    rdfs:comment "Compounds drawn from the Materials Project so as to span 89 elements of the periodic table across binary, ternary, and quaternary chemistries; train/val/test split 90/5/5 by material (not by configuration)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:hasFunctionalForm ex:m3gnet-functional-form ;
+    mlips:hasLossFunction ex:m3gnet-huber-loss ;
+    mlips:hasTrainingAlgorithm ex:adam ;
+    mlips:hasHyperparameter ex:hp-rcut-chen2022 , ex:hp-3body-cutoff-chen2022 ,
+        ex:hp-embedding-dim-chen2022 , ex:hp-num-blocks-chen2022 ,
+        ex:hp-num-radial-basis-chen2022 ;
+    mlips:hasImplementation ex:m3gnet-impl-chen2022 .
+
+ex:m3gnet-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Materials graph neural network with explicit three-body angular interactions; energy is a sum of atomic contributions from a gated MLP readout, with forces and stresses obtained by auto-differentiation." .
+
+ex:m3gnet-huber-loss a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta=0.01) on energy, forces, and stresses with weights w_E=1, w_f=1, w_sigma=0.1" .
+
+ex:adam a mls:Algorithm ;
+    rdfs:label "Adam optimiser (initial lr=0.001, cosine decay to 1% over 100 epochs, early stopping on validation metric after 200 epochs)" .
+
+ex:m3gnet-impl-chen2022 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-m3gnet .
+
+ex:lib-m3gnet a mlips:Library ;
+    rdfs:label "m3gnet (TensorFlow)" ;
+    schema:url <https://github.com/materialsvirtuallab/m3gnet> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-5-chen2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-chen2022 ;
+    mlips:settingValue "5.0" .
+
+ex:setting-3body-cutoff-4-chen2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-3body-cutoff-chen2022 ;
+    mlips:settingValue "4.0" .
+
+ex:setting-embedding-dim-64-chen2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-embedding-dim-chen2022 ;
+    mlips:settingValue "64" .
+
+ex:setting-num-blocks-3-chen2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-blocks-chen2022 ;
+    mlips:settingValue "3" .
+
+ex:setting-num-radial-basis-3-chen2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-radial-basis-chen2022 ;
+    mlips:settingValue "3" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-m3gnet-chen2022 a mlips:MLIPRun ;
+    rdfs:label "M3GNet-EFS training run on MPF.2021.2.8" ;
+    mlips:appliesMethod ex:M3GNet ;
+    mlips:runsOn ex:ds-MPF-2021-2-8 ;
+    mlips:hasHyperparameterSetting
+        ex:setting-rcut-5-chen2022 ,
+        ex:setting-3body-cutoff-4-chen2022 ,
+        ex:setting-embedding-dim-64-chen2022 ,
+        ex:setting-num-blocks-3-chen2022 ,
+        ex:setting-num-radial-basis-3-chen2022 ;
+    mlips:produces ex:model-m3gnet-chen2022 .
+
+ex:model-m3gnet-chen2022 a mlips:TrainedModel ;
+    rdfs:label "M3GNet universal IAP (M3GNet-EFS) trained on MPF.2021.2.8" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-chen2022 mlips:hasResult
+    ex:result-mae-energy-chen2022 ,
+    ex:result-mae-force-chen2022 ,
+    ex:result-mae-stress-chen2022 .
+
+ex:result-mae-energy-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
+    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric ex:metric-mae-energy-chen2022 .
+
+ex:metric-mae-energy-chen2022 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom (MPF.2021.2.8 held-out)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 35 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-mae-force-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
+    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric ex:metric-mae-force-chen2022 .
+
+ex:metric-mae-force-chen2022 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on force components (MPF.2021.2.8 held-out)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 72 ;
+    mlips:hasUnit unit:MeV-PER-ANGSTROM .
+
+ex:result-mae-stress-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
+    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric ex:metric-mae-stress-chen2022 .
+
+ex:metric-mae-stress-chen2022 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress components (MPF.2021.2.8 held-out)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricValue 0.41 ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Chen and Ong (2022) does not report total training duration, GPU
+# hours, training hardware, or peak memory for the M3GNet IAP run.
+# Inference cost is reported only as a single example: a 100-step
+# relaxation of K_57Se_34 on one Intel Xeon E5-2620 v4 core takes
+# about 22 seconds, but no per-atom inference time and no inference
+# hardware data property is recorded explicitly. Treated as a gap in
+# Q12.

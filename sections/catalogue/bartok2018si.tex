@@ -1,0 +1,93 @@
+\subsection{Bart\'ok et al.\ (2018): general-purpose GAP for silicon}
+\label{sec:appendix-example-bartok2018si}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Bart\'ok, Kermode, Bernstein, and Cs\'anyi train a single
+general-purpose Gaussian Approximation Potential covering crystalline,
+liquid, amorphous, surface, defect, and crack-tip silicon
+configurations. Published in \emph{Phys.\ Rev.\ X} 8, 041048 (2018);
+arXiv:1805.01568.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+Bulk silicon is encoded as a single $\MaterialSystemC$; the broad
+configurational coverage (diamond, $\beta$-Sn, simple-hexagonal,
+hex-diamond, bcc, bc8, fcc, hcp, st12, liquid, amorphous, surfaces,
+point defects, crack tips) is recorded as
+$\dlRole{materialClass}$ text and as the eight sampling strategies
+in Q6.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Reference data come from DFT calculations.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+DFT is performed with CASTEP using the PW91 functional, ultrasoft
+pseudopotentials, a 250\,eV plane-wave cutoff, and Monkhorst--Pack
+k-point meshes with 0.03\,\AA$^{-1}$ spacing for production (with
+0.05\,eV electronic smearing); 0.015\,\AA$^{-1}$ for $E(V)$ testing
+curves; 0.07\,\AA$^{-1}$ for amorphous re-optimisation.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+The fitting database has 2{,}475 unit cells contributing 171{,}815
+atomic environments and 531{,}710 pieces of electronic-structure data
+(energies, forces, virials). Provenance is \emph{in-house} (the
+database was assembled by the authors specifically for this work).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+Eight strategies were combined: crystal-phase enumeration with strain
+perturbations; surface enumeration including reconstructions and
+decohesion paths; vacancy/divacancy/interstitial point-defect
+enumeration; liquid-phase MD; quenched-melt amorphous trajectories;
+crack-tip geometries with bond breaking; screw-dislocation cores;
+and a single isolated-atom anchor for the cohesive-energy zero.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+The method combines a cubic-spline pair-potential repulsive term with
+a many-body SOAP-kernel Gaussian-process regression. Training uses
+sparse GPR with CUR-selected representative environments. The
+implementation is QUIP with the GAP plug-in.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+Reported settings: SOAP cutoff $r_c=5.0$\,\AA, atomic-Gaussian width
+$\sigma_{\text{atom}}=0.5$\,\AA, kernel polynomial power $\zeta=4$,
+energy-scale parameter $\delta=3$\,eV, and $M=9{,}000$ representative
+environments. Per-class regularisations $\sigma_E$, $\sigma_F$,
+$\sigma_V$ are also tuned but not enumerated as
+$\HyperparameterSettingC$ instances.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+A single GPR fit produces the GAP-6 silicon potential.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+The headline accuracy figure is the median absolute force-component
+error on the held-out testing set (grain-boundary, di-interstitial,
+GSF-path, amorphous configurations): 0.025\,eV/\AA. The paper
+reports many additional per-property and per-phase comparisons (lattice
+constants, elastic moduli, surface energies, defect formation
+energies, EOS curves) but in derived form rather than as separate
+$\BenchmarkResultC$ instances.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+\emph{Not reported.}
+\lstinputlisting[language=turtle]{artifacts/kg/listings/bartok2018si/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+Beyond Q11, the paper does not record explicit values for: the
+per-class force/virial regularisations $\sigma_F$, $\sigma_V$ (only
+their existence and qualitative role); the SOAP $l_{\max}$ and
+$n_{\max}$ basis indices that are referenced under
+$\dlRole{hasHyperparameter}$ but lack
+$\HyperparameterSettingC$ instances; and any $\dlRole{frozenCore}$
+treatment beyond the ultrasoft pseudopotential. The paper also
+sketches several downstream applications (crack tip propagation,
+amorphous-Si melt-quench MD, recrystallisation kinetics) which are
+not encoded as separate $\dlConcept{MLIPRun}$ instances.

@@ -1,0 +1,106 @@
+\subsection{Lysogorskiy et al.\ (2021): PACE applied to Cu and Si}
+\label{sec:appendix-example-lysogorskiy2021ace}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Lysogorskiy, van der Oord, Bochkarev, Menon, Rinaldi, Hammerschmidt,
+Mrovec, Thompson, Cs\'anyi, Ortner, and Drautz introduce PACE, a
+performant C++ implementation of the Atomic Cluster Expansion
+(\cite{drautz2019ace}) released as a LAMMPS pair-style. Production
+parameterisations are presented for fcc copper and diamond silicon.
+Published in \emph{npj Computational Materials} 7, 97 (2021);
+doi:10.1038/s41524-021-00559-9.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+Two single-element systems are encoded as separate
+$\MaterialSystemC$ instances: copper (fcc, with bcc/dhcp/hcp
+polymorphs and surfaces/defects in the reference set) and silicon
+(diamond cubic, with reference data from the GAP-Si general-purpose
+database of Bart\'ok et al.\ 2018).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Both reference datasets come from DFT calculations.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+Cu reference data are produced with FHI-aims at the PBE level
+(small clusters, bulk phases, surfaces and slabs, configurations
+with displaced or missing atoms), partly assembled with the
+\texttt{pyiron} workflow framework. Si reference data are the
+published GAP-Si general-purpose fitting database from CASTEP
+(PW91 inherited from Bart\'ok et al.\ 2018).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+Cu: in-house FHI-aims set covering clusters, bulk polymorphs,
+surfaces, slabs, and defects (configuration count not enumerated in
+the main text). Si: the published Bart\'ok-2018 GAP-Si database of
+2{,}475 configurations covering crystal phases, surfaces, vacancies,
+interstitials, and liquid Si. Cu covers energies+forces; Si
+additionally covers virials.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+Cu: configurational coverage of clusters, polymorphs, surfaces, and
+defective structures. Si: reuse of the published GAP-Si database's
+sampling strategy.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+The method is the Atomic Cluster Expansion of Drautz~2019: per-atom
+property $\varphi_i$ expanded over body-ordered multi-atom basis
+functions, with truncation at body order $\nu_{\max}$ and total
+energy as a sum over per-atom embeddings. The Cu fit uses a
+nonlinear two-density Finnis--Sinclair embedding; the Si fit uses
+a linear embedding at $\nu_{\max}=4$. Implementation: PACE
+(C++ LAMMPS \texttt{pair\_style}).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+Reported settings: Cu cutoff radius $r_c = 7.4$\,\AA; Cu basis size
+$2{,}072$ parameters (756 expansion coefficients per atomic density
+$\times$ 2 densities + 560 radial-function parameters); Si linear
+basis size $6{,}827$ functions at body order $\nu_{\max}=4$.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+Two training runs are encoded: one for PACE-Cu (nonlinear
+Finnis--Sinclair embedding) and one for PACE-Si (linear ACE,
+$\nu_{\max}=4$). Both produce a single $\TrainedModelC$ with a
+recorded per-atom inference time
+($\dlRole{inferenceTimePerAtom}=0.00032$\,s/atom for Cu,
+$0.0008$\,s/atom for Si).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+PACE-Cu attains a final fit error of 2.9\,meV/atom on structures
+within 1\,eV of the ground state (after ground-state fine-tuning),
+with force errors near 15\,meV/\AA{} on higher-energy structures.
+PACE-Si matches GAP-Si accuracy on the Bart\'ok-2018 database with
+energy MAE 1.81\,meV/atom and force MAE 82\,meV/\AA. Three
+$\BenchmarkResultC$ instances cover these.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+The headline claim is computational performance: PACE shifts the
+accuracy/cost Pareto front for ML interatomic potentials. We capture
+the per-atom inference times on the trained models in Q9
+(0.32\,ms/atom for Cu, 0.80\,ms/atom for Si on a single force
+call). Training duration, GPU/CPU hours, training hardware, and
+peak memory are not reported.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/lysogorskiy2021ace/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+The protocol's "one paper $\equiv$ one method $\times$ one material"
+framing is mildly stretched: the paper trains \emph{two} ACE
+parameterisations (Cu and Si) and we encode both within one
+\texttt{lysogorskiy2021ace.ttl} via two $\MaterialSystemC$, two
+$\dlConcept{MLIPRun}$, and two $\TrainedModelC$ instances rather
+than splitting into sibling files. Other unreported items: explicit
+DFT settings on the Cu side beyond engine and functional (energy
+cutoff, k-mesh, pseudopotential / NAO basis); explicit
+$\dlRole{numConfigurations}$ for the Cu reference set; the Pareto
+benchmark is reported as a derived figure rather than an
+$\AccuracyMetricC$ across all five models compared (ACE, EAM,
+SNAP, GTINV, GAP); training-cost metadata.

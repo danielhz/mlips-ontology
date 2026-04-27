@@ -1,0 +1,231 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Deng, Zhong, Jun, Riebesell, Han, Bartel, Ceder. CHGNet: Pretrained
+#   universal neural network potential for charge-informed atomistic
+#   modeling. Nature Machine Intelligence 5, 1031-1041 (2023).
+#   doi:10.1038/s42256-023-00716-3  arXiv:2302.14231
+#
+# Encoding scope: CHGNet, a charge-informed universal MLIP trained on
+# the Materials Project Trajectory Dataset (MPtrj). MPtrj covers 145,923
+# inorganic compounds spanning 94 elements; 1,580,395 atomic
+# configurations with energies, forces, stresses, and magnetic moments.
+# This is a "universal / foundation" potential; we encode the
+# coverage as a single MaterialSystem (mat-MP-universal) and document
+# the scope limitation in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-deng2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Deng et al. (2023): CHGNet charge-informed universal MLIP" ;
+    mlips:reportedIn ex:article-deng2023 .
+
+ex:article-deng2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s42256-023-00716-3> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "CHGNet: Pretrained Universal Neural Network Potential for Charge-Informed Atomistic Modeling" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-MP-universal-deng2023 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project Trajectory Dataset coverage (universal, 94 elements)" ;
+    mlips:chemicalFormula "any" ;
+    mlips:materialClass "Universal inorganic crystal coverage: 94 elements of the periodic table; 145,923 distinct compounds spanning the Materials Project September 2022 release" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-deng2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-deng2023 mlips:hasDFTSettings ex:dft-settings-deng2023 .
+
+ex:dft-settings-deng2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE (GGA) with rotationally-averaged Hubbard U correction (GGA+U) on transition-metal atoms (e.g. U=3.9 eV for Mn); GGA/GGA+U mixing compatibility correction applied across MPtrj" ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:energyCutoff 520 ;
+    mlips:kPointMesh "Reciprocal-space discretisation of 25 k-points per A^-1" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-MPtrj a mlips:TrainingDataset ;
+    rdfs:label "MPtrj: 1,580,395 atomic configurations from 145,923 Materials Project compounds, with energies, forces, stresses, and 7,944,833 site magnetic moments" ;
+    mlips:coversMaterial ex:mat-MP-universal-deng2023 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1580395 ;
+    mlips:hasDFTCalculation ex:dft-deng2023 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-MPtrj mlips:samplingStrategy
+    ex:relaxation-trajectory-sampling-deng2023 ,
+    ex:periodic-table-coverage-sampling-deng2023 ,
+    ex:magmom-decoration-sampling-deng2023 .
+
+ex:relaxation-trajectory-sampling-deng2023 a mlips:SamplingStrategy ;
+    rdfs:label "Materials Project relaxation-trajectory sampling" ;
+    rdfs:comment "All GGA and GGA+U task trajectories under each material-id from the September 2022 Materials Project dump. Tasks were filtered to share calculation settings with the primary task (same +U setting; final-frame energy within 20 meV/atom of the primary task), to drop frames lacking energy/force or with bad SCF convergence, to drop frames with energy >1 eV/atom or <-10 meV/atom relative to the relaxed structure, and to deduplicate via pymatgen StructureMatcher. The cleaned set was split 8:1:1 train/val/test by compound (mp-id)." .
+
+ex:periodic-table-coverage-sampling-deng2023 a mlips:SamplingStrategy ;
+    rdfs:label "Periodic-table chemical-space coverage" ;
+    rdfs:comment "Compounds drawn from the Materials Project so as to span 94 elements of the periodic table; 60+ elements have over 100,000 site occurrences and 76 elements carry magnetic-moment annotations." .
+
+ex:magmom-decoration-sampling-deng2023 a mlips:SamplingStrategy ;
+    rdfs:label "Site-magnetic-moment decoration" ;
+    rdfs:comment "Each MPtrj atomic configuration is decorated with site magnetic moments from the underlying spin-polarised DFT (7,944,833 magmom labels in total), used as auxiliary supervision targets that act as a charge-state regulariser on the latent space." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
+    mlips:hasFunctionalForm ex:chgnet-functional-form ;
+    mlips:hasLossFunction ex:chgnet-huber-loss ;
+    mlips:hasTrainingAlgorithm ex:adam-deng2023 ;
+    mlips:hasHyperparameter ex:hp-rcut-deng2023 , ex:hp-bond-cutoff-deng2023 ,
+        ex:hp-feature-dim-deng2023 , ex:hp-num-conv-layers-deng2023 ,
+        ex:hp-batch-size-deng2023 , ex:hp-initial-lr-deng2023 ;
+    mlips:hasImplementation ex:chgnet-impl-deng2023 .
+
+ex:chgnet-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Two-graph (atom + bond) message-passing neural network with explicit angle features, atom/bond/angle convolution blocks, magmom regularisation of the latent atom features, and energy/force/stress/magmom outputs (forces and stresses by auto-differentiation of total energy)." .
+
+ex:chgnet-huber-loss a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta=0.1) on energy, forces, stresses, and magnetic moments with weights w_E=1, w_f=1, w_sigma=0.1, w_m=0.1" .
+
+ex:adam-deng2023 a mls:Algorithm ;
+    rdfs:label "Adam optimiser with CosineAnnealingLR scheduler (initial lr=1e-3, decays to 1e-5 by epoch 20, learning rate adjusted ten times per epoch)" .
+
+ex:chgnet-impl-deng2023 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-chgnet ;
+    mlips:version "PyTorch 1.12.0" .
+
+ex:lib-chgnet a mlips:Library ;
+    rdfs:label "CHGNet (PyTorch)" ;
+    schema:url <https://github.com/CederGroupHub/chgnet> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-5-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-deng2023 ;
+    mlips:settingValue "5.0" .
+
+ex:setting-bond-cutoff-3-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-bond-cutoff-deng2023 ;
+    mlips:settingValue "3.0" .
+
+ex:setting-feature-dim-64-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-feature-dim-deng2023 ;
+    mlips:settingValue "64" .
+
+ex:setting-num-conv-layers-4-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-num-conv-layers-deng2023 ;
+    mlips:settingValue "4" .
+
+ex:setting-batch-size-40-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-batch-size-deng2023 ;
+    mlips:settingValue "40" .
+
+ex:setting-initial-lr-1e-3-deng2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-initial-lr-deng2023 ;
+    mlips:settingValue "0.001" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-chgnet-deng2023 a mlips:MLIPRun ;
+    rdfs:label "CHGNet (with-magmom) training run on MPtrj" ;
+    mlips:appliesMethod ex:CHGNet ;
+    mlips:runsOn ex:ds-MPtrj ;
+    mlips:hasHyperparameterSetting
+        ex:setting-rcut-5-deng2023 ,
+        ex:setting-bond-cutoff-3-deng2023 ,
+        ex:setting-feature-dim-64-deng2023 ,
+        ex:setting-num-conv-layers-4-deng2023 ,
+        ex:setting-batch-size-40-deng2023 ,
+        ex:setting-initial-lr-1e-3-deng2023 ;
+    mlips:produces ex:model-chgnet-deng2023 .
+
+ex:model-chgnet-deng2023 a mlips:TrainedModel ;
+    rdfs:label "CHGNet pretrained universal MLIP (with magmoms, 400,438 trainable parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-deng2023 mlips:hasResult
+    ex:result-mae-energy-deng2023 ,
+    ex:result-mae-force-deng2023 ,
+    ex:result-mae-stress-deng2023 .
+
+ex:result-mae-energy-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
+    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric ex:metric-mae-energy-deng2023 .
+
+ex:metric-mae-energy-deng2023 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom (MPtrj test split, 157,955 structures from 14,572 materials, with-magmom CHGNet)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 30 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-mae-force-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
+    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric ex:metric-mae-force-deng2023 .
+
+ex:metric-mae-force-deng2023 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on force components (MPtrj test split, with-magmom CHGNet)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 77 ;
+    mlips:hasUnit unit:MeV-PER-ANGSTROM .
+
+ex:result-mae-stress-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
+    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric ex:metric-mae-stress-deng2023 .
+
+ex:metric-mae-stress-deng2023 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress components (MPtrj test split, with-magmom CHGNet)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricValue 0.348 ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Deng et al. (2023) reports no training duration, GPU hours, training
+# hardware, or peak memory for the CHGNet training run, and no
+# inference time per atom or inference hardware on the trained model.
+# Treated as a gap in Q12.

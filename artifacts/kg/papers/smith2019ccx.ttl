@@ -1,0 +1,197 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Smith, Nebgen, Zubatyuk, Lubbers, Devereux, Barros, Tretiak,
+#   Isayev, Roitberg. Approaching coupled cluster accuracy with a
+#   general-purpose neural network potential through transfer
+#   learning. Nat. Commun. 10, 2903 (2019).
+#   doi:10.1038/s41467-019-10827-4  arXiv:1903.10405
+#
+# Encoding scope: ANI-1ccx is the Behler-Parrinello-style ANI HDNNP
+# pretrained on the 5M-conformation ANI-1x DFT corpus and fine-tuned
+# by transfer learning on a ~500k-conformation CCSD(T)*/CBS corpus
+# generated via DLPNO-CCSD(T)/CBS approximation. The reference-data
+# slot of the protocol is filled by the headline (CCSD(T)) wave-
+# function reference; the underlying DFT (omega-B97X / 6-31G*)
+# pre-training corpus is referenced as a second reference
+# calculation linked to the same training dataset. This is the
+# corpus' only WaveFunctionCalculation entry.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-smith2019ccx a mlips:BenchmarkStudy ;
+    rdfs:label "Smith et al. (2019): ANI-1ccx via transfer learning to CCSD(T)" ;
+    mlips:reportedIn ex:article-smith2019ccx .
+
+ex:article-smith2019ccx a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-019-10827-4> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Approaching coupled cluster accuracy with a general-purpose neural network potential through transfer learning" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-organics-HCNO-smith2019ccx a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules in the H/C/N/O chemical space (drug-like and reaction-relevant species, average ~15 atoms per molecule)" ;
+    mlips:chemicalFormula "C_xH_yN_zO_w (organic small molecules)" ;
+    mlips:materialClass "Molecular; small organic molecules over the H/C/N/O chemical space, primarily from the GDB-11 universe (~57k distinct molecules)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:ccsdt-smith2019ccx a mlips:WaveFunctionCalculation .
+ex:dft-smith2019ccx   a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:ccsdt-smith2019ccx mlips:hasWaveFunctionSettings ex:wf-settings-smith2019ccx .
+ex:dft-smith2019ccx   mlips:hasDFTSettings ex:dft-settings-smith2019ccx .
+
+ex:wf-settings-smith2019ccx a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode ex:lib-orca-smith2019ccx ;
+    mlips:wfMethod "DLPNO-CCSD(T)/CBS extrapolation (CCSD(T)* approximation; localised DLPNO-CCSD(T) method of Neese et al.)" ;
+    mlips:basisSet "Complete-basis-set extrapolation from cc-pVDZ / cc-pVTZ via the DLPNO-CCSD(T) protocol" .
+
+ex:dft-settings-smith2019ccx a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-gaussian-smith2019ccx ;
+    mlips:xcFunctional "omegaB97X" ;
+    mlips:pseudopotentialType "All-electron Gaussian basis (no pseudopotential)" ;
+    mlips:kPointMesh "Gamma-only (isolated molecules)" .
+
+ex:lib-orca-smith2019ccx a mlips:Library ;
+    rdfs:label "ORCA (used for DLPNO-CCSD(T) reference)" .
+
+ex:lib-gaussian-smith2019ccx a mlips:Library ;
+    rdfs:label "Gaussian / Psi4 (omegaB97X / 6-31G* DFT pretraining reference)" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-ani1ccx-smith2019ccx a mlips:TrainingDataset ;
+    rdfs:label "ANI-1ccx fine-tuning set: ~500,000 CCSD(T)*/CBS-labelled conformations grown from ~480,000 molecules via active learning, pre-trained model used 5M ANI-1x DFT conformations from ~57k molecules" ;
+    mlips:coversMaterial ex:mat-organics-HCNO-smith2019ccx ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 500000 ;
+    mlips:hasDFTCalculation ex:dft-smith2019ccx ;
+    mlips:hasReferenceCalculation ex:ccsdt-smith2019ccx .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-ani1ccx-smith2019ccx mlips:samplingStrategy
+    ex:active-learning-smith2019ccx , ex:normal-mode-smith2019ccx .
+
+ex:active-learning-smith2019ccx a mlips:SamplingStrategy ;
+    rdfs:label "Active learning (query-by-committee on ensemble disagreement)" ;
+    rdfs:comment "ANI-1ccx is grown via an active-learning loop: ensemble disagreement on candidate conformations selects the next round of molecules for CCSD(T)*/CBS recomputation." .
+
+ex:normal-mode-smith2019ccx a mlips:SamplingStrategy ;
+    rdfs:label "Normal-mode + diverse-conformer sampling of the ANI-1x parent corpus" ;
+    rdfs:comment "Pretraining ANI-1x configurations are sampled by perturbations along normal-mode coordinates and other diverse-conformation strategies (~22M conformations from ~57k molecules underlie the 5M-frame DFT corpus)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:ANI-smith2019ccx a mlips:MLIPMethod ;
+    rdfs:label "ANI (Behler-Parrinello-style HDNN with ANI symmetry functions)" ;
+    mlips:hasFunctionalForm ex:ani-form-smith2019ccx ;
+    mlips:hasLossFunction ex:ani-loss-smith2019ccx ;
+    mlips:hasTrainingAlgorithm ex:adam-smith2019ccx ;
+    mlips:hasHyperparameter ex:hp-cutoff-smith2019ccx ;
+    mlips:hasImplementation ex:torchani-smith2019ccx .
+
+ex:ani-form-smith2019ccx a mlips:FunctionalForm ;
+    rdfs:label "Per-element fully-connected feed-forward subnetwork operating on ANI atom-centred symmetry functions; total energy is a sum of per-atom contributions" .
+
+ex:ani-loss-smith2019ccx a mlips:LossFunction ;
+    rdfs:label "Energy-only MSE on per-molecule total energies (no force or stress targets)" .
+
+ex:adam-smith2019ccx a mls:Algorithm ;
+    rdfs:label "Adam (with exponential learning-rate decay)" .
+
+ex:torchani-smith2019ccx a mlips:Implementation ;
+    mlips:implementedIn ex:lib-torchani-smith2019ccx .
+
+ex:lib-torchani-smith2019ccx a mlips:Library ;
+    rdfs:label "TorchANI / ANI training scripts (Python on PyTorch)" ;
+    schema:url <https://github.com/aiqm/torchani> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# Q8 has no HyperparameterSetting instances: the main text does not
+# tabulate explicit numerical values for the cutoff radius or the
+# symmetry-function index counts (Section S1.2 in the SI provides the
+# details).
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-ani1ccx-smith2019ccx a mlips:MLIPRun ;
+    rdfs:label "ANI-1ccx training: pretrain on DFT (ANI-1x), fine-tune on CCSD(T)*/CBS via transfer learning" ;
+    mlips:appliesMethod ex:ANI-smith2019ccx ;
+    mlips:runsOn ex:ds-ani1ccx-smith2019ccx ;
+    mlips:produces ex:model-ani1ccx-smith2019ccx .
+
+ex:model-ani1ccx-smith2019ccx a mlips:TrainedModel ;
+    rdfs:label "ANI-1ccx (8-network ensemble)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-smith2019ccx mlips:hasResult ex:result-gdb10-smith2019ccx , ex:result-hc7-smith2019ccx .
+
+ex:result-gdb10-smith2019ccx a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-ani1ccx-smith2019ccx ;
+    mlips:targetMaterial ex:mat-organics-HCNO-smith2019ccx ;
+    mlips:hasAccuracyMetric ex:metric-gdb10-mae-smith2019ccx .
+
+ex:metric-gdb10-mae-smith2019ccx a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the GDB-10to13 atomization-energy benchmark vs. CCSD(T)*/CBS (Table 1, ANI-1ccx)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.46 ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+ex:result-hc7-smith2019ccx a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-ani1ccx-smith2019ccx ;
+    mlips:targetMaterial ex:mat-organics-HCNO-smith2019ccx ;
+    mlips:hasAccuracyMetric ex:metric-hc7-mad-smith2019ccx .
+
+ex:metric-hc7-mad-smith2019ccx a mlips:AccuracyMetric ;
+    rdfs:label "MAD on the HC7/11 hydrocarbon reaction-energy benchmark vs. CCSD(T)*/CBS (ANI-1ccx)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 2.5 ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Smith et al. (2019) reports an inference timing aside (training a
+# single ANI model on the 500k-molecule CCSD(T)*/CBS data set takes
+# around 30 minutes per model; the published model is an 8-network
+# ensemble), but the canonical training duration, GPU hours,
+# training hardware, peak memory, and per-atom inference time are
+# not given in the form the ontology expects. Recorded as a Q12 gap.

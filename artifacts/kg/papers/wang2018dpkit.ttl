@@ -1,0 +1,186 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Wang, Zhang, Han, E. DeePMD-kit: A deep learning package for
+#   many-body potential energy representation and molecular dynamics.
+#   Comput. Phys. Commun. 228, 178-184 (2018).
+#   doi:10.1016/j.cpc.2018.03.016
+#   arXiv:1712.03641
+#
+# Encoding scope: this is a software paper documenting the DeePMD-kit
+# package; as such the protocol is exercised on the single liquid-water
+# demonstration example reported in Section IV. The encoded run is the
+# DeePMD model trained on a 64-molecule water AIMD trajectory at
+# PBE0+TS. The full software's multi-system, multi-method capabilities
+# are not captured by the encoding -- this is recorded as the central
+# Q12 gap.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-wang2018dpkit a mlips:BenchmarkStudy ;
+    rdfs:label "Wang et al. (2018): DeePMD-kit software, water demonstration" ;
+    mlips:reportedIn ex:article-wang2018dpkit .
+
+ex:article-wang2018dpkit a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.cpc.2018.03.016> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "DeePMD-kit: A deep learning package for many-body potential energy representation and molecular dynamics" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-water-wang2018 a mlips:MaterialSystem ;
+    rdfs:label "Liquid water (64 H2O molecules, PBC, ~330 K)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid (bulk water under periodic boundary conditions)" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-wang2018dpkit a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-wang2018dpkit mlips:hasDFTSettings ex:dft-settings-wang2018dpkit .
+
+ex:dft-settings-wang2018dpkit a mlips:DFTSettings ;
+    mlips:xcFunctional "PBE0+TS (hybrid PBE0 with Tkatchenko-Scheffler dispersion correction)" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-water-wang2018 a mlips:TrainingDataset ;
+    rdfs:label "Liquid-water reference set: 40000 frames from a 20 ps NVT AIMD trajectory at 330 K of 64 H2O molecules (38000 train + 2000 test)" ;
+    mlips:coversMaterial ex:mat-water-wang2018 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 40000 ;
+    mlips:hasDFTCalculation ex:dft-wang2018dpkit .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-water-wang2018 mlips:samplingStrategy ex:aimd-sampling-wang2018 .
+
+ex:aimd-sampling-wang2018 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (NVT AIMD)" ;
+    rdfs:comment "Configurations are recorded every 0.0005 ps along a 20 ps NVT AIMD trajectory of 64 water molecules at 330 K." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasFunctionalForm ex:deepmd-functional-form ;
+    mlips:hasLossFunction ex:deepmd-loss-wang2018 ;
+    mlips:hasTrainingAlgorithm ex:adam-deepmd ;
+    mlips:hasHyperparameter ex:hp-rcut-deepmd , ex:hp-hidden-deepmd , ex:hp-lr0-deepmd , ex:hp-decay-rate-deepmd , ex:hp-decay-steps-deepmd ;
+    mlips:hasImplementation ex:deepmd-kit-impl .
+
+ex:deepmd-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Per-atom DNN over local-frame radial+angular descriptors (1/R, x/R, y/R, z/R) sorted by chemical species, 5 hidden layers (240, 120, 60, 30, 10) with tanh activations" .
+
+ex:deepmd-loss-wang2018 a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energy and force (no virial), with annealed prefactors (p_e: 0.02 -> 8; p_f: 1000 -> 1; p_v: 0)" .
+
+ex:adam-deepmd a mls:Algorithm ;
+    rdfs:label "Adam stochastic gradient descent with exponentially decaying learning rate (start 1e-3, decay rate 0.95 every 5000 steps)" .
+
+ex:deepmd-kit-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-deepmd-kit ;
+    mlips:version "0.1" .
+
+ex:lib-deepmd-kit a mlips:Library ;
+    rdfs:label "DeePMD-kit (Python/C++ on TensorFlow, with LAMMPS pair_style deepmd and i-PI dp_ipi clients)" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-60-wang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-deepmd ;
+    mlips:settingValue "6.0" .
+
+ex:setting-hidden-deepmd a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-hidden-deepmd ;
+    mlips:settingValue "(240, 120, 60, 30, 10)" .
+
+ex:setting-lr0-deepmd a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-lr0-deepmd ;
+    mlips:settingValue "0.001" .
+
+ex:setting-decay-rate-deepmd a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-decay-rate-deepmd ;
+    mlips:settingValue "0.95" .
+
+ex:setting-decay-steps-deepmd a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-decay-steps-deepmd ;
+    mlips:settingValue "5000" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-deepmd-water a mlips:MLIPRun ;
+    rdfs:label "DeePMD-kit demonstration training run on the liquid-water dataset (10^6 batches, batch size 4)" ;
+    mlips:appliesMethod ex:DeePMD ;
+    mlips:runsOn ex:ds-water-wang2018 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-60-wang2018 , ex:setting-hidden-deepmd , ex:setting-lr0-deepmd , ex:setting-decay-rate-deepmd , ex:setting-decay-steps-deepmd ;
+    mlips:produces ex:model-deepmd-water .
+
+ex:model-deepmd-water a mlips:TrainedModel ;
+    rdfs:label "DeePMD water model (PBE0+TS reference, demonstration of DeePMD-kit)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-wang2018dpkit mlips:hasResult ex:result-deepmd-water-energy , ex:result-deepmd-water-forces .
+
+ex:result-deepmd-water-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-deepmd-water ;
+    mlips:targetMaterial ex:mat-water-wang2018 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-water-energy .
+
+ex:metric-rmse-water-energy a mlips:AccuracyMetric ;
+    rdfs:label "Test-set RMSE on total energy of the 64-water cell (DeePMD vs PBE0+TS DFT)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 0.028 ;
+    mlips:hasUnit unit:EV .
+
+ex:result-deepmd-water-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-deepmd-water ;
+    mlips:targetMaterial ex:mat-water-wang2018 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-water-forces .
+
+ex:metric-rmse-water-forces a mlips:AccuracyMetric ;
+    rdfs:label "Test-set RMSE on atomic force components (DeePMD vs PBE0+TS DFT)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.024 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+ex:run-deepmd-water mlips:trainingDuration "16 hours" ;
+    mlips:trainingHardware "Intel Core i7-3770 CPU with 32 GB RAM, 4 OpenMP threads" .

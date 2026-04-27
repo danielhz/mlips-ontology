@@ -1,0 +1,192 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Qi, Aitken, Pei, Tan, Zuo, Jhon, Quek, Wen, Wu, Ong. Machine
+#   Learning Moment Tensor Potential for Modelling Dislocation and
+#   Fracture in L1_0-TiAl and D0_19-Ti3Al Alloys.
+#   Phys. Rev. Materials 7, 103602 (2023).
+#   doi:10.1103/PhysRevMaterials.7.103602  arXiv:2305.11825
+#
+# Encoding scope: one MTP trained across the Ti-Al binary; benchmarked
+# on the L1_0 (gamma-TiAl) and D0_19 (alpha2-Ti3Al) phases plus other
+# stable Ti-Al polymorphs.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-qi2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Qi et al. (2023): MTP for L1_0-TiAl and D0_19-Ti3Al" ;
+    mlips:reportedIn ex:article-qi2023 .
+
+ex:article-qi2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/PhysRevMaterials.7.103602> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Machine Learning Moment Tensor Potential for Modelling Dislocation and Fracture in L1_0-TiAl and D0_19-Ti3Al Alloys" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-TiAl a mlips:MaterialSystem ;
+    rdfs:label "Ti-Al binary (focus on L1_0 gamma-TiAl and D0_19 alpha2-Ti3Al)" ;
+    mlips:chemicalFormula "Ti-Al" ;
+    mlips:materialClass "Binary intermetallic; benchmarked on L1_0 (P4/mmm) gamma-TiAl and D0_19 (P6_3/mmc) alpha2-Ti3Al phases" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q3520520> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-qi2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-qi2023 mlips:hasDFTSettings ex:dft-settings-qi2023 .
+
+ex:dft-settings-qi2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE" ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:energyCutoff 520 ;
+    mlips:kPointMesh "Monkhorst-Pack with k-point density >= 100/Ang^3 for static; single Gamma point for AIMD" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-TiAl a mlips:TrainingDataset ;
+    rdfs:label "Ti-Al MTP training set (33 polymorphs + 2160 AIMD + 185 surfaces + 580 solid-solutions + 840 strained = 3798 configs)" ;
+    mlips:coversMaterial ex:mat-TiAl ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3798 ;
+    mlips:hasDFTCalculation ex:dft-qi2023 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-TiAl mlips:samplingStrategy
+    ex:polymorph-sampling , ex:aimd-sampling , ex:surface-sampling ,
+    ex:solid-solution-sampling , ex:strain-sampling .
+
+ex:polymorph-sampling a mlips:SamplingStrategy ;
+    rdfs:label "Ground-state polymorph enumeration" ;
+    rdfs:comment "33 ground-state polymorphs of the Ti-Al system retrieved from the Materials Project." .
+
+ex:aimd-sampling a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (NVT AIMD)" ;
+    rdfs:comment "2160 snapshots from NVT AIMD trajectories of 6 stable phases at 300, 1000 and 3000 K, 90/100/110% of ground-state volume; 40 configs per 10 ps run." .
+
+ex:surface-sampling a mlips:SamplingStrategy ;
+    rdfs:label "Surface enumeration" ;
+    rdfs:comment "185 surface structures with Miller indices up to three for the 6 stable Ti-Al phases." .
+
+ex:solid-solution-sampling a mlips:SamplingStrategy ;
+    rdfs:label "Solid-solution chemical sampling" ;
+    rdfs:comment "580 Al_xTi_{1-x} solid-solution structures (x from 12.5 to 87.5 at.% in 12.5% steps), up to 30 enumerations per scenario." .
+
+ex:strain-sampling a mlips:SamplingStrategy ;
+    rdfs:label "Homogeneous strain sampling" ;
+    rdfs:comment "840 strained supercells: +/-10% strain at 1% intervals across 6 strain modes for the 6 stable phases." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasFunctionalForm ex:mtp-functional-form ;
+    mlips:hasLossFunction ex:mtp-loss-100-1-0 ;
+    mlips:hasHyperparameter ex:hp-rcut , ex:hp-levmax ;
+    mlips:hasImplementation ex:mlip-package .
+
+ex:mtp-functional-form a mlips:FunctionalForm ;
+    rdfs:label "MTP moment-tensor polynomial" .
+
+ex:mtp-loss-100-1-0 a mlips:LossFunction ;
+    rdfs:label "Weighted MSE (energy 100, force 1, stress 0)" .
+
+ex:mlip-package a mlips:Implementation ;
+    mlips:implementedIn ex:lib-mlip .
+
+ex:lib-mlip a mlips:Library ;
+    rdfs:label "MLIP package" ;
+    schema:url <https://gitlab.com/ashapeev/mlip-2> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-4_8 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:settingValue "4.8" .
+
+ex:setting-levmax-22 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-levmax ;
+    mlips:settingValue "22" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mtp-TiAl a mlips:MLIPRun ;
+    rdfs:label "MTP training run, Ti-Al binary" ;
+    mlips:appliesMethod ex:MTP ;
+    mlips:runsOn ex:ds-TiAl ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-4_8 , ex:setting-levmax-22 ;
+    mlips:produces ex:model-mtp-TiAl .
+
+ex:model-mtp-TiAl a mlips:TrainedModel ;
+    rdfs:label "Ti-Al MTP (rcut=4.8 Ang, levmax=22)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-qi2023 mlips:hasResult ex:result-mtp-surface , ex:result-mtp-polymorph .
+
+ex:result-mtp-surface a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-TiAl ;
+    mlips:targetMaterial ex:mat-TiAl ;
+    mlips:hasAccuracyMetric ex:metric-mae-surface .
+
+ex:metric-mae-surface a mlips:AccuracyMetric ;
+    rdfs:label "MAE on formation energies of surface structures (vs. DFT)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 8 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-mtp-polymorph a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-TiAl ;
+    mlips:targetMaterial ex:mat-TiAl ;
+    mlips:hasAccuracyMetric ex:metric-mae-polymorph .
+
+ex:metric-mae-polymorph a mlips:AccuracyMetric ;
+    rdfs:label "MAE on formation energies of polymorph structures (vs. DFT)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 18 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Qi et al. (2023) reports no training-cost or inference-cost metadata
+# (no GPU hours, training duration, hardware spec, peak memory, or
+# inference-time-per-atom). Recorded as a gap in Q12 of the subsection.

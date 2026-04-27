@@ -1,0 +1,181 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Batatia, Kovacs, Simm, Ortner, Csanyi. MACE: Higher Order
+#   Equivariant Message Passing Neural Networks for Fast and
+#   Accurate Force Fields. NeurIPS 2022.
+#   arXiv:2206.07697
+#
+# Encoding scope: headline benchmark is the rMD17 organic molecules
+# dataset (the most prominent and widely used). The 3BPA and AcAc
+# benchmarks reported in the same paper are documented as
+# additional results in Q12 of the subsection.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-batatia2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Batatia et al. (2022): MACE equivariant message-passing MLIP" ;
+    mlips:reportedIn ex:article-batatia2022 .
+
+ex:article-batatia2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arXiv.2206.07697> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "MACE: Higher Order Equivariant Message Passing Neural Networks for Fast and Accurate Force Fields" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-rMD17 a mlips:MaterialSystem ;
+    rdfs:label "rMD17 small organic molecules (10 molecules: aspirin, azobenzene, benzene, ethanol, malonaldehyde, naphthalene, paracetamol, salicylic acid, toluene, uracil)" ;
+    mlips:chemicalFormula "C,H,N,O" ;
+    mlips:materialClass "Small organic molecules sampled from gas-phase ab initio MD trajectories" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-batatia2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-batatia2022 mlips:hasDFTSettings ex:dft-settings-batatia2022 .
+
+ex:dft-settings-batatia2022 a mlips:DFTSettings ;
+    mlips:xcFunctional "PBE/def2-SVP (rMD17 reference recomputation)" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-rMD17 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 training split: 950 train + 50 validation per molecule (10 molecules)" ;
+    mlips:coversMaterial ex:mat-rMD17 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation ex:dft-batatia2022 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-rMD17 mlips:samplingStrategy ex:aimd-sampling-batatia2022 .
+
+ex:aimd-sampling-batatia2022 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (gas-phase ab initio MD at 500 K)" ;
+    rdfs:comment "Configurations sampled from long ab initio molecular dynamics trajectories at 500 K, recomputed at PBE/def2-SVP for rMD17." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasFunctionalForm ex:mace-functional-form ;
+    mlips:hasLossFunction ex:mace-loss-1-1000 ;
+    mlips:hasTrainingAlgorithm ex:adam-amsgrad ;
+    mlips:hasHyperparameter ex:hp-rcut , ex:hp-numlayers , ex:hp-lmax , ex:hp-channels , ex:hp-correlation-order ;
+    mlips:hasImplementation ex:mace-impl .
+
+ex:mace-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Two-layer equivariant message-passing network with higher-order (4-body) tensor messages over an O(3)-equivariant atomic cluster expansion basis" .
+
+ex:mace-loss-1-1000 a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energies and force components (lambda_E = 1, lambda_F = 1000)" .
+
+ex:adam-amsgrad a mls:Algorithm ;
+    rdfs:label "Adam (AMSGrad variant), beta1=0.9, beta2=0.999, eps=1e-8" .
+
+ex:mace-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-mace .
+
+ex:lib-mace a mlips:Library ;
+    rdfs:label "mace (PyTorch implementation)" ;
+    schema:url <https://github.com/ACEsuit/mace> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-5 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:settingValue "5.0" .
+
+ex:setting-numlayers-2 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numlayers ;
+    mlips:settingValue "2" .
+
+ex:setting-lmax-3 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-lmax ;
+    mlips:settingValue "3" .
+
+ex:setting-channels-256 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-channels ;
+    mlips:settingValue "256" .
+
+ex:setting-correlation-3 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-correlation-order ;
+    mlips:settingValue "3" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mace-rMD17 a mlips:MLIPRun ;
+    rdfs:label "MACE training run on rMD17 (per-molecule, 1000 configs)" ;
+    mlips:appliesMethod ex:MACE ;
+    mlips:runsOn ex:ds-rMD17 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-5 , ex:setting-numlayers-2 , ex:setting-lmax-3 , ex:setting-channels-256 , ex:setting-correlation-3 ;
+    mlips:produces ex:model-mace-rMD17 .
+
+ex:model-mace-rMD17 a mlips:TrainedModel ;
+    rdfs:label "MACE rMD17 model (L=3, two-layer, 256 channels)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-batatia2022 mlips:hasResult ex:result-mace-rmd17-aspirin-energy , ex:result-mace-rmd17-aspirin-forces .
+
+ex:result-mace-rmd17-aspirin-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mace-rMD17 ;
+    mlips:targetMaterial ex:mat-rMD17 ;
+    mlips:hasAccuracyMetric ex:metric-mae-rmd17-aspirin-energy .
+
+ex:metric-mae-rmd17-aspirin-energy a mlips:AccuracyMetric ;
+    rdfs:label "MAE on aspirin energies, rMD17, 1000 train" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 2.2 ;
+    mlips:hasUnit unit:MilliEV .
+
+ex:result-mace-rmd17-aspirin-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mace-rMD17 ;
+    mlips:targetMaterial ex:mat-rMD17 ;
+    mlips:hasAccuracyMetric ex:metric-mae-rmd17-aspirin-forces .
+
+ex:metric-mae-rmd17-aspirin-forces a mlips:AccuracyMetric ;
+    rdfs:label "MAE on aspirin force components, rMD17, 1000 train" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 6.6 ;
+    mlips:hasUnit unit:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+ex:run-mace-rMD17 mlips:trainingDuration "2-6 hours per molecule on a single NVIDIA A100" ;
+    mlips:trainingHardware "NVIDIA A100 GPU (single GPU)" .

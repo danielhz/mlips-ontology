@@ -1,0 +1,92 @@
+\subsection{Sch\"utt et al.\ (2018): SchNet on MD17 small organic molecules}
+\label{sec:appendix-example-schutt2018}
+
+\paragraph{Q1 -- Bibliographic identification.}
+Sch\"utt, Sauceda, Kindermans, Tkatchenko, and M\"uller introduce
+SchNet, a continuous-filter convolutional deep neural network for
+molecules and materials. Published in \emph{J.\ Chem.\ Phys.} 148,
+241722 (2018); arXiv:1712.06113.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q01-bibliographic.ttl}
+
+\paragraph{Q2 -- Material system.}
+The canonical pass is the MD17 benchmark of eight small organic
+molecules (benzene, toluene, malonaldehyde, salicylic acid, aspirin,
+ethanol, uracil, naphthalene) sampled from gas-phase ab initio MD.
+We model this as one $\MaterialSystemC$ at the chemical-space level
+(C/H/N/O small organics).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q02-material.ttl}
+
+\paragraph{Q3 -- Reference calculation method.}
+Reference data come from DFT calculations.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q03-reference-method-type.ttl}
+
+\paragraph{Q4 -- Reference settings.}
+DFT references are computed with FHI-aims at the PBE+vdW(TS) level
+(MD17 trajectories). The basis set, k-grid, and convergence
+parameters are inherited from the published MD17 benchmark and not
+re-stated in the SchNet paper itself.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q04-reference-settings.ttl}
+
+\paragraph{Q5 -- Training dataset.}
+The MD17 reference set is consumed at $N=1{,}000$ and $N=50{,}000$
+training-set sizes; we record the larger as the canonical
+$\dlRole{numConfigurations}$. Configurations cover energies and
+forces. Provenance is \emph{published} (the dataset is reused as
+released).
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q05-dataset.ttl}
+
+\paragraph{Q6 -- Sampling strategies.}
+A single sampling strategy applies: ab initio MD trajectories of the
+eight molecules, randomly sub-sampled.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q06-sampling.ttl}
+
+\paragraph{Q7 -- MLIP method, components, implementation.}
+SchNet uses atom-type embeddings combined with interaction blocks
+that compute continuous-filter convolutions over neighbour atoms,
+mapped to per-atom energy via atom-wise dense layers and summed for
+the total. The combined energy/force MSE loss balances energy and
+force MAEs through trade-off $\rho=0.01$. Training uses Adam with
+exponential learning-rate decay; the implementation is the SchNet
+reference codebase.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q07-method.ttl}
+
+\paragraph{Q8 -- Hyperparameter settings.}
+Reported settings: $T=6$ interaction layers, $F=64$ feature channels,
+and energy/force loss trade-off $\rho=0.01$. The radial-basis cutoff
+parameter is referenced but not given an explicit numerical setting
+in the canonical pass.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q08-hyperparameter-settings.ttl}
+
+\paragraph{Q9 -- MLIP run and trained model.}
+A single training run with the combined energy+force loss produces
+the production SchNet model. The paper also reports separate
+single-objective runs (energies-only or forces-only); these are
+recorded as Q12 gaps to keep the canonical run unambiguous.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q09-run-and-model.ttl}
+
+\paragraph{Q10 -- Benchmark results.}
+For aspirin at $N=50{,}000$ we record the MAE of total energy
+($0.12$\,kcal/mol) and the MAE of atomic forces
+($0.33$\,kcal/mol/\AA). Per-molecule numbers for the other seven
+species and at the smaller $N=1{,}000$ regime are given in the paper
+and are not enumerated here as separate $\BenchmarkResultC$
+instances.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q10-benchmark-results.ttl}
+
+\paragraph{Q11 -- Computational resources.}
+\emph{Not reported} for the canonical MD17 SchNet training. The paper
+reports a separately trained C$_{20}$-fullerene SchNet inference
+speedup (${\sim}11$\,s on 32 CPU cores vs.\ ${\sim}10$\,ms on a single
+GTX 1080), but for an auxiliary model not encoded here.
+\lstinputlisting[language=turtle]{artifacts/kg/listings/schutt2018/q11-resources.ttl}
+
+\paragraph{Q12 -- Gaps.}
+Beyond Q11, the paper does not report: training duration or GPU
+hours for the canonical MD17 run; training hardware; peak memory.
+SchNet's auxiliary applications (QM9 single-property prediction with
+$N{=}50\text{k}$/$110\text{k}$, Materials Project formation-energy
+regression, and the PIMD/anharmonicity study on C$_{20}$-fullerene at
+PBE+vdW(TS)) are not encoded as separate $\dlConcept{MLIPRun}$
+instances; the ontology can express each as a sibling run, but doing
+so would multiply the canonical-file size without adding new
+ontology coverage.

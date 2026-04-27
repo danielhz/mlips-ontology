@@ -1,0 +1,193 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Musaelian, Batzner, Johansson, Sun, Owen, Kornbluth, Kozinsky.
+#   Learning Local Equivariant Representations for Large-Scale
+#   Atomistic Dynamics. Nature Communications 14, 579 (2023).
+#   doi:10.1038/s41467-023-36329-y  arXiv:2204.05249
+#
+# Encoding scope: Allegro applied to the Li_3PO_4 amorphous phosphate
+# electrolyte (the headline materials/MD application) is taken as the
+# canonical pass. The paper also reports Allegro runs on revised MD17
+# small organic molecules, the QM9 quantum-chemical-properties set,
+# the 3BPA temperature-transferability benchmark, and Ag bulk crystal
+# scaling experiments; these auxiliary applications are documented
+# as gaps in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-musaelian2023allegro a mlips:BenchmarkStudy ;
+    rdfs:label "Musaelian et al. (2023): Allegro strictly local equivariant MLIP on Li3PO4" ;
+    mlips:reportedIn ex:article-musaelian2023allegro .
+
+ex:article-musaelian2023allegro a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-023-36329-y> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Learning Local Equivariant Representations for Large-Scale Atomistic Dynamics" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-Li3PO4 a mlips:MaterialSystem ;
+    rdfs:label "Li3PO4 amorphous phosphate solid electrolyte (192-atom cell)" ;
+    mlips:chemicalFormula "Li3PO4" ;
+    mlips:materialClass "Amorphous Li-ion solid electrolyte (melt-quench, 50 ps melt at 3000 K then quench to 600 K)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-musaelian2023allegro a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-musaelian2023allegro mlips:hasDFTSettings ex:dft-settings-musaelian2023allegro .
+
+ex:dft-settings-musaelian2023allegro a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-vasp ;
+    mlips:xcFunctional "PBE" ;
+    mlips:pseudopotentialType "PAW" ;
+    mlips:energyCutoff 400 ;
+    mlips:kPointMesh "Gamma-point only" .
+
+ex:lib-vasp a mlips:Library ;
+    rdfs:label "VASP" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-Li3PO4 a mlips:TrainingDataset ;
+    rdfs:label "Li3PO4 melt + quench AIMD training set (10000 train + 1000 validation, sampled from a 50000-frame combined melt+quench AIMD trajectory)" ;
+    mlips:coversMaterial ex:mat-Li3PO4 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 10000 ;
+    mlips:hasDFTCalculation ex:dft-musaelian2023allegro .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-Li3PO4 mlips:samplingStrategy ex:meltquench-sampling-musaelian2023allegro .
+
+ex:meltquench-sampling-musaelian2023allegro a mlips:SamplingStrategy ;
+    rdfs:label "AIMD melt-quench sampling (NVT, 2 fs time step, Nose-Hoover thermostat)" ;
+    rdfs:comment "50 ps AIMD at T=3000 K in the melted state, instantly quenched to T=600 K, then 50 ps at T=600 K. Train+validation sampled randomly from the combined 50000-frame trajectory." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasFunctionalForm ex:allegro-functional-form ;
+    mlips:hasLossFunction ex:allegro-loss ;
+    mlips:hasTrainingAlgorithm ex:adam-allegro ;
+    mlips:hasHyperparameter ex:hp-rcut , ex:hp-numlayers , ex:hp-lmax , ex:hp-features , ex:hp-numbasis ;
+    mlips:hasImplementation ex:allegro-impl .
+
+ex:allegro-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Strictly local equivariant tensor-product network on per-pair latent spaces (scalar + equivariant), no inter-atom message passing; pairwise energies E_ij summed over neighbours to give per-atom energies" .
+
+ex:allegro-loss a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energies (per-atom) and force components (lambda_E = 1, lambda_F = 1 after per-atom normalisation; lambda_E = 1, lambda_F = 1000 raw for revMD17)" .
+
+ex:adam-allegro a mls:Algorithm ;
+    rdfs:label "Adam, beta1=0.9, beta2=0.999, eps=1e-8, no weight decay" .
+
+ex:allegro-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-allegro .
+
+ex:lib-allegro a mlips:Library ;
+    rdfs:label "allegro" ;
+    schema:url <https://github.com/mir-group/allegro> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-allegro a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:settingValue "6.0" .
+
+ex:setting-numlayers-allegro a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numlayers ;
+    mlips:settingValue "3" .
+
+ex:setting-lmax-allegro a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-lmax ;
+    mlips:settingValue "3" .
+
+ex:setting-features-allegro a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-features ;
+    mlips:settingValue "128" .
+
+ex:setting-numbasis-allegro a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numbasis ;
+    mlips:settingValue "8" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-allegro-Li3PO4 a mlips:MLIPRun ;
+    rdfs:label "Allegro training run on Li3PO4 melt+quench (3 layers, lmax=3, 128 features)" ;
+    mlips:appliesMethod ex:Allegro ;
+    mlips:runsOn ex:ds-Li3PO4 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-allegro , ex:setting-numlayers-allegro , ex:setting-lmax-allegro , ex:setting-features-allegro , ex:setting-numbasis-allegro ;
+    mlips:produces ex:model-allegro-Li3PO4 .
+
+ex:model-allegro-Li3PO4 a mlips:TrainedModel ;
+    rdfs:label "Allegro Li3PO4 model (3 layers, lmax=3, 128 features)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-musaelian2023allegro mlips:hasResult ex:result-allegro-Li3PO4-energy , ex:result-allegro-Li3PO4-forces .
+
+ex:result-allegro-Li3PO4-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-allegro-Li3PO4 ;
+    mlips:targetMaterial ex:mat-Li3PO4 ;
+    mlips:hasAccuracyMetric ex:metric-mae-Li3PO4-energy .
+
+ex:metric-mae-Li3PO4-energy a mlips:AccuracyMetric ;
+    rdfs:label "MAE on Li3PO4 quenched-state energies" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.7 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-allegro-Li3PO4-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-allegro-Li3PO4 ;
+    mlips:targetMaterial ex:mat-Li3PO4 ;
+    mlips:hasAccuracyMetric ex:metric-mae-Li3PO4-forces .
+
+ex:metric-mae-Li3PO4-forces a mlips:AccuracyMetric ;
+    rdfs:label "MAE on Li3PO4 quenched-state force components" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 75.7 ;
+    mlips:hasUnit unit:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+ex:run-allegro-Li3PO4 mlips:trainingHardware "NVIDIA V100 GPU (single-GPU training)" .
+
+ex:model-allegro-Li3PO4 mlips:inferenceTimePerAtom "0.013 microseconds per atom per MD step on 128 NVIDIA A100 GPUs (50.3M-atom Li3PO4 system, LAMMPS pair_allegro at float32)" ;
+    mlips:inferenceHardware "NVIDIA DGX A100 cluster (Theta-GPU, ALCF), 128 A100 GPUs across 16 nodes" .

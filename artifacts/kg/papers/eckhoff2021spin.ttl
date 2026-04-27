@@ -1,0 +1,200 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Eckhoff, Behler. High-Dimensional Neural Network Potentials for
+#   Magnetic Systems Using Spin-Dependent Atom-Centered Symmetry
+#   Functions. npj Computational Materials 7, 170 (2021).
+#   doi:10.1038/s41524-021-00636-z
+#   arXiv:2104.14439
+#
+# Encoding scope: the magnetic HDNNP (mHDNNP) trained for MnO/Mn_xO
+# using spin-dependent ACSFs. The headline material is rocksalt MnO
+# (and its rhombohedrally distorted AFM-II ground state). The
+# spin-augmentation feature itself is not first-class in the MLIPs
+# ontology; this is documented as a Q12 gap.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-eckhoff2021spin a mlips:BenchmarkStudy ;
+    rdfs:label "Eckhoff & Behler (2021): spin-dependent HDNNP for MnO" ;
+    mlips:reportedIn ex:article-eckhoff2021spin .
+
+ex:article-eckhoff2021spin a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-021-00636-z> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "High-Dimensional Neural Network Potentials for Magnetic Systems Using Spin-Dependent Atom-Centered Symmetry Functions" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-MnO-eckhoff2021 a mlips:MaterialSystem ;
+    rdfs:label "Manganese oxide (MnO and Mn_{0.969}O), rocksalt structure with AFM-II / FM / AFM-I magnetic orders" ;
+    mlips:chemicalFormula "MnO" ;
+    mlips:materialClass "Antiferromagnetic transition-metal oxide; rhombohedrally distorted rock-salt (AFM-II) magnetic ground state with Neel temperature ~116 K (experiment)" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q412356> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-eckhoff2021spin a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-eckhoff2021spin mlips:hasDFTSettings ex:dft-settings-eckhoff2021spin .
+
+ex:dft-settings-eckhoff2021spin a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-fhi-aims-eckhoff2021 ;
+    mlips:xcFunctional "HSE06 (omega = 0.11 a0^-1) screened-hybrid, collinear spin-polarised" ;
+    mlips:pseudopotentialType "All-electron numeric atom-centered orbitals (FHI-aims intermediate basis, excluding auxiliary 5g hydrogenic functions)" ;
+    mlips:kPointMesh "Gamma-centred 2x2x2 (for 2x2x2 MnO supercells, 64 atoms without vacancies)" .
+
+ex:lib-fhi-aims-eckhoff2021 a mlips:Library ;
+    rdfs:label "FHI-aims (Fritz-Haber-Institut ab initio molecular simulations, version 200112.2)" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-MnO-eckhoff2021 a mlips:TrainingDataset ;
+    rdfs:label "mHDNNP MnO/Mn_{0.969}O reference set: 3101 2x2x2 bulk supercells across magnetic states (1387 MnO + 1421 Mn_{0.969}O training; 156 MnO + 137 Mn_{0.969}O test)" ;
+    mlips:coversMaterial ex:mat-MnO-eckhoff2021 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 3101 ;
+    mlips:hasDFTCalculation ex:dft-eckhoff2021spin .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-MnO-eckhoff2021 mlips:samplingStrategy
+    ex:magnetic-state-sampling-eckhoff2021 ,
+    ex:displacement-sampling-eckhoff2021 ,
+    ex:lattice-distortion-sampling-eckhoff2021 ,
+    ex:vacancy-sampling-eckhoff2021 .
+
+ex:magnetic-state-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+    rdfs:label "Magnetic-state enumeration" ;
+    rdfs:comment "Various collinear spin orderings of the rocksalt MnO supercell are computed (FM, AFM-I, AFM-II, and excited orders) so the mHDNNP can resolve their energy differences." .
+
+ex:displacement-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+    rdfs:label "Atomic-displacement perturbations" ;
+    rdfs:comment "Different atomic displacements from the ideal rock-salt lattice positions are generated to span the local PES around each magnetic order." .
+
+ex:lattice-distortion-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+    rdfs:label "Lattice-parameter perturbations" ;
+    rdfs:comment "Distortions of the lattice parameters (volume / shape) are sampled to describe the rhombohedral distortion of the AFM-II order." .
+
+ex:vacancy-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+    rdfs:label "Vacancy-defect sampling" ;
+    rdfs:comment "Mn-vacancy supercells (Mn_{0.969}O) are included to extend the mHDNNP to off-stoichiometric configurations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:mHDNNP a mlips:MLIPMethod ;
+    rdfs:label "Magnetic high-dimensional neural network potential (mHDNNP) with spin-dependent atom-centered symmetry functions" ;
+    mlips:hasFunctionalForm ex:mhdnnp-functional-form ;
+    mlips:hasLossFunction ex:mhdnnp-loss-eckhoff2021 ;
+    mlips:hasTrainingAlgorithm ex:mhdnnp-training-eckhoff2021 ;
+    mlips:hasHyperparameter ex:hp-rcut-eckhoff2021 , ex:hp-Mthresh , ex:hp-hidden-eckhoff2021 ;
+    mlips:hasImplementation ex:runner-impl-eckhoff2021 .
+
+ex:mhdnnp-functional-form a mlips:FunctionalForm ;
+    rdfs:label "Behler-Parrinello HDNNP with per-element feed-forward atomic networks (3 hidden layers of 20/15/10 neurons), inputs are spin-augmented ACSFs (sACSF) using radial M^0/M^+/M^- and angular M^00/M^++/M^--/M^+- spin-augmentation functions" .
+
+ex:mhdnnp-loss-eckhoff2021 a mlips:LossFunction ;
+    rdfs:label "Energy + atomic-force RMSE loss on cohesive energies and force components (90% train / 10% test split)" .
+
+ex:mhdnnp-training-eckhoff2021 a mls:Algorithm ;
+    rdfs:label "Standard HDNNP training (gradient-based weight optimisation in RuNNer)" .
+
+ex:runner-impl-eckhoff2021 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-runner-eckhoff2021 ;
+    mlips:version "1.00 (modified to support sACSFs)" .
+
+ex:lib-runner-eckhoff2021 a mlips:Library ;
+    rdfs:label "RuNNer (with modifications enabling sACSFs); n2p2 used for LAMMPS MD" ;
+    schema:url <http://gitlab.com/TheochemGoettingen/RuNNer> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-105-eckhoff2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-eckhoff2021 ;
+    mlips:settingValue "10.5 a0 (Bohr radii)" .
+
+ex:setting-Mthresh-025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-Mthresh ;
+    mlips:settingValue "0.25" .
+
+ex:setting-hidden-20-15-10 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-hidden-eckhoff2021 ;
+    mlips:settingValue "3 hidden layers x (20, 15, 10) neurons per element" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mhdnnp-MnO a mlips:MLIPRun ;
+    rdfs:label "mHDNNP training run on MnO/Mn_{0.969}O dataset" ;
+    mlips:appliesMethod ex:mHDNNP ;
+    mlips:runsOn ex:ds-MnO-eckhoff2021 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-105-eckhoff2021 , ex:setting-Mthresh-025 , ex:setting-hidden-20-15-10 ;
+    mlips:produces ex:model-mhdnnp-MnO .
+
+ex:model-mhdnnp-MnO a mlips:TrainedModel ;
+    rdfs:label "Magnetic HDNNP for MnO (sACSF + 3-layer feed-forward NN)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-eckhoff2021spin mlips:hasResult ex:result-mhdnnp-energy , ex:result-mhdnnp-forces .
+
+ex:result-mhdnnp-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mhdnnp-MnO ;
+    mlips:targetMaterial ex:mat-MnO-eckhoff2021 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-mhdnnp .
+
+ex:metric-rmse-energy-mhdnnp a mlips:AccuracyMetric ;
+    rdfs:label "Test-set RMSE on cohesive energies (sACSF mHDNNP)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.11 ;
+    mlips:hasUnit unit:MilliEV-PER-ATOM .
+
+ex:result-mhdnnp-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mhdnnp-MnO ;
+    mlips:targetMaterial ex:mat-MnO-eckhoff2021 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-forces-mhdnnp .
+
+ex:metric-rmse-forces-mhdnnp a mlips:AccuracyMetric ;
+    rdfs:label "Test-set RMSE on atomic force components (sACSF mHDNNP)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.066 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Eckhoff & Behler (2021) does not report training duration, GPU
+# hours, training hardware, peak memory, or per-atom inference time
+# for the mHDNNP. Recorded as a Q12 gap.

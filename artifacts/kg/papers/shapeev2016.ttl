@@ -1,0 +1,200 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Shapeev. Moment Tensor Potentials: a class of systematically
+#   improvable interatomic potentials.
+#   Multiscale Model. Simul. 14(3), 1153--1173 (2016);
+#   arXiv:1512.06054.
+#   doi:10.1137/15M1054183
+#
+# Encoding scope: the methodological MTP paper. The numerical
+# experiments fit MTP to the Szlachta-Bartok-Csanyi tungsten DFT
+# database (libatoms.org); we encode tungsten as the lead
+# demonstration system.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-shapeev2016 a mlips:BenchmarkStudy ;
+    rdfs:label "Shapeev (2016): Moment Tensor Potentials, demonstrated on tungsten" ;
+    mlips:reportedIn ex:article-shapeev2016 .
+
+ex:article-shapeev2016 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1137/15M1054183> ;
+    schema:datePublished "2016"^^xsd:gYear ;
+    schema:name "Moment Tensor Potentials: a class of systematically improvable interatomic potentials" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-W-shapeev2016 a mlips:MaterialSystem ;
+    rdfs:label "Tungsten (BCC, demonstration system)" ;
+    mlips:chemicalFormula "W" ;
+    mlips:materialClass "Elemental BCC transition metal; configurations in the Szlachta/Bartok/Csanyi tungsten database (bulk, surfaces, defects, liquid)" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q655> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-shapeev2016 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-shapeev2016 mlips:hasDFTSettings ex:dft-settings-shapeev2016 .
+
+ex:dft-settings-shapeev2016 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-castep-shapeev2016 ;
+    mlips:xcFunctional "PBE (GGA)" ;
+    mlips:pseudopotentialType "Norm-conserving (CASTEP defaults)" ;
+    mlips:kPointMesh "Brillouin-zone meshes converged per-cell; finite-temperature electronic broadening at 1000 K" .
+
+ex:lib-castep-shapeev2016 a mlips:Library ;
+    rdfs:label "CASTEP" ;
+    schema:url <http://www.castep.org> .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-W-shapeev2016 a mlips:TrainingDataset ;
+    rdfs:label "Tungsten DFT database from Szlachta-Bartok-Csanyi (libatoms.org); 9693 configurations, ~150000 atomic environments" ;
+    mlips:coversMaterial ex:mat-W-shapeev2016 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 9693 ;
+    mlips:hasDFTCalculation ex:dft-shapeev2016 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-W-shapeev2016 mlips:samplingStrategy
+    ex:bulk-sampling-shapeev2016 ,
+    ex:defect-sampling-shapeev2016 ,
+    ex:md-sampling-shapeev2016 .
+
+ex:bulk-sampling-shapeev2016 a mlips:SamplingStrategy ;
+    rdfs:label "Bulk and surface enumeration (inherited from libatoms tungsten database)" ;
+    rdfs:comment "Crystalline bulk and surface configurations of tungsten from the Szlachta/Bartok/Csanyi GAP-tungsten database used for training." .
+
+ex:defect-sampling-shapeev2016 a mlips:SamplingStrategy ;
+    rdfs:label "Point-defect and dislocation sampling (inherited from libatoms tungsten database)" ;
+    rdfs:comment "Vacancies, self-interstitials, and screw-dislocation core configurations from the libatoms tungsten database." .
+
+ex:md-sampling-shapeev2016 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (DFT MD snapshots, inherited)" ;
+    rdfs:comment "Finite-temperature DFT MD snapshots from the libatoms tungsten database." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:MTP-shapeev2016 a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential (MTP)" ;
+    mlips:hasFunctionalForm ex:mtp-functional-form-shapeev2016 ;
+    mlips:hasLossFunction ex:mtp-loss-shapeev2016 ;
+    mlips:hasHyperparameter ex:hp-rcut-shapeev2016 , ex:hp-rmin-shapeev2016 , ex:hp-levmax-shapeev2016 , ex:hp-reg-shapeev2016 ;
+    mlips:hasImplementation ex:impl-mtp-shapeev2016 .
+
+ex:mtp-functional-form-shapeev2016 a mlips:FunctionalForm ;
+    rdfs:label "Linear combination of moment-tensor basis functions B_alpha(u): permutation-, rotation-, reflection-invariant polynomials of moment tensors M_{mu,nu}" .
+
+ex:mtp-loss-shapeev2016 a mlips:LossFunction ;
+    rdfs:label "Regularised least squares on energies and forces (l_2 or l_0 regularisation; gamma chosen by 16-fold cross-validation)" .
+
+ex:impl-mtp-shapeev2016 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-quip-shapeev2016 .
+
+ex:lib-quip-shapeev2016 a mlips:Library ;
+    rdfs:label "QUIP (LibAtoms) -- MTP prototype implementation used for the comparison with GAP" ;
+    schema:url <http://www.libatoms.org> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-shapeev2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-shapeev2016 ;
+    mlips:settingValue "4.9" .
+
+ex:setting-rmin-shapeev2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rmin-shapeev2016 ;
+    mlips:settingValue "1.9" .
+
+ex:setting-mtp1-shapeev2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-levmax-shapeev2016 ;
+    mlips:settingValue "MTP_1: deg(B_alpha)+8(#alpha) <= 62, #alpha <= 4, mu <= 5, nu <= 4 (11133 basis functions)" .
+
+ex:setting-mtp2-shapeev2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-levmax-shapeev2016 ;
+    mlips:settingValue "MTP_2: deg(B_alpha)+8(#alpha) <= 52, #alpha <= 5, mu <= 3, nu <= 5; 760 basis functions extracted via l_0 regularisation (N_cap=4)" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-mtp-W-shapeev2016 a mlips:MLIPRun ;
+    rdfs:label "MTP training run, tungsten (production MTP_1)" ;
+    mlips:appliesMethod ex:MTP-shapeev2016 ;
+    mlips:runsOn ex:ds-W-shapeev2016 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-shapeev2016 , ex:setting-rmin-shapeev2016 , ex:setting-mtp1-shapeev2016 , ex:setting-mtp2-shapeev2016 ;
+    mlips:produces ex:model-mtp-W-shapeev2016 .
+
+ex:model-mtp-W-shapeev2016 a mlips:TrainedModel ;
+    rdfs:label "Tungsten MTP (lead model MTP_1; rcut=4.9 A, rmin=1.9 A)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-shapeev2016 mlips:hasResult
+    ex:result-mtp-W-fit-shapeev2016 ,
+    ex:result-mtp-W-cv-shapeev2016 .
+
+ex:result-mtp-W-fit-shapeev2016 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-W-shapeev2016 ;
+    mlips:targetMaterial ex:mat-W-shapeev2016 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-forces-fit-shapeev2016 .
+
+ex:metric-rmse-forces-fit-shapeev2016 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE of MTP_1 on the full training set (vs. DFT-PBE; 2.8% relative)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.0427 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+ex:result-mtp-W-cv-shapeev2016 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-W-shapeev2016 ;
+    mlips:targetMaterial ex:mat-W-shapeev2016 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-forces-cv-shapeev2016 .
+
+ex:metric-rmse-forces-cv-shapeev2016 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE of MTP_1 from 16-fold cross-validation (vs. DFT-PBE; 3.4% relative)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.0511 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+ex:model-mtp-W-shapeev2016 mlips:inferenceTimePerAtom 2.9 ;
+    mlips:inferenceHardware "Single-core Intel i7-2675QM laptop CPU (ms per atom)" .
+
+# Training duration, GPU/CPU hours, training hardware, and peak memory
+# are not reported. The 2.9 ms/atom figure is the mean per-atom CPU
+# time of MTP_1 reported in Table 1 (single-core, i7-2675QM); MTP_2
+# reaches 0.8 ms/atom and GAP 134.2 ms/atom on the same hardware.

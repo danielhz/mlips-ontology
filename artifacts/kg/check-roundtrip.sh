@@ -16,6 +16,15 @@
 
 set -euo pipefail
 
+# Make oxigraph and other cargo-installed binaries available even when
+# the script is invoked without sourcing ~/.cargo/env.
+if [ -d "$HOME/.cargo/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.cargo/bin:"*) ;;
+    *) export PATH="$HOME/.cargo/bin:$PATH" ;;
+  esac
+fi
+
 if [ $# -ne 1 ]; then
   echo "Usage: $0 <paper-id>" >&2
   exit 2

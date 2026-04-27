@@ -1,0 +1,191 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Behler, Parrinello. Generalized Neural-Network Representation of
+#   High-Dimensional Potential-Energy Surfaces.
+#   Phys. Rev. Lett. 98, 146401 (2007).
+#   doi:10.1103/PhysRevLett.98.146401
+#
+# Encoding scope: the original Behler-Parrinello high-dimensional NN
+# potential (HDNNP), demonstrated on bulk silicon.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-behler2007 a mlips:BenchmarkStudy ;
+    rdfs:label "Behler & Parrinello (2007): high-dimensional NN potential for bulk silicon" ;
+    mlips:reportedIn ex:article-behler2007 .
+
+ex:article-behler2007 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/PhysRevLett.98.146401> ;
+    schema:datePublished "2007"^^xsd:gYear ;
+    schema:name "Generalized Neural-Network Representation of High-Dimensional Potential-Energy Surfaces" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-Si-behler2007 a mlips:MaterialSystem ;
+    rdfs:label "Bulk silicon (across solid and liquid phases)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental crystalline solid; covers diamond cubic, high-pressure phases (e.g. beta-tin), and the liquid metallic phase" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-behler2007 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-behler2007 mlips:hasDFTSettings ex:dft-settings-behler2007 .
+
+ex:dft-settings-behler2007 a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-pwscf ;
+    mlips:xcFunctional "LDA" ;
+    mlips:pseudopotentialType "Ultrasoft pseudopotential (Vanderbilt)" ;
+    mlips:energyCutoff 272 ;
+    mlips:kPointMesh "3x3x3 k-point mesh, Fermi smearing 0.1 eV" .
+
+ex:lib-pwscf a mlips:Library ;
+    rdfs:label "PWscf (Quantum ESPRESSO)" ;
+    schema:url <http://www.pwscf.org> .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-Si-behler2007 a mlips:TrainingDataset ;
+    rdfs:label "Bulk-Si HDNNP DFT-LDA dataset (~9000 total: 8200 train + 800 test)" ;
+    mlips:coversMaterial ex:mat-Si-behler2007 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 9000 ;
+    mlips:hasDFTCalculation ex:dft-behler2007 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-Si-behler2007 mlips:samplingStrategy
+    ex:crystal-sampling-behler2007 ,
+    ex:md-sampling-behler2007 ,
+    ex:self-consistent-sampling-behler2007 .
+
+ex:crystal-sampling-behler2007 a mlips:SamplingStrategy ;
+    rdfs:label "Crystal-structure enumeration" ;
+    rdfs:comment "Initial training structures taken from known crystalline silicon structures including high-pressure phases." .
+
+ex:md-sampling-behler2007 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (DFT MD)" ;
+    rdfs:comment "MD snapshots at different pressures and temperatures used to populate the training set." .
+
+ex:self-consistent-sampling-behler2007 a mlips:SamplingStrategy ;
+    rdfs:label "Self-consistent iterative refinement" ;
+    rdfs:comment "Best fits used to drive MD, hybrid Monte Carlo, and metadynamics; representative structures are recalculated with DFT and added to the training set if RMSE exceeds the fit error -- a precursor to active learning." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:HDNNP-behler2007 a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasFunctionalForm ex:hdnnp-functional-form-behler2007 ;
+    mlips:hasLossFunction ex:hdnnp-loss-behler2007 ;
+    mlips:hasHyperparameter ex:hp-rcut-behler2007 , ex:hp-numhidden-behler2007 , ex:hp-numsf-behler2007 ;
+    mlips:hasImplementation ex:impl-hdnnp-behler2007 .
+
+ex:hdnnp-functional-form-behler2007 a mlips:FunctionalForm ;
+    rdfs:label "Sum of per-atom subnet energies E = sum_i E_i with shared-weight feed-forward NN subnets and Behler-Parrinello atom-centred symmetry-function inputs (radial Gaussian and angular triplet sums)" .
+
+ex:hdnnp-loss-behler2007 a mlips:LossFunction ;
+    rdfs:label "Mean squared error on per-configuration total DFT energy" .
+
+ex:impl-hdnnp-behler2007 a mlips:Implementation ;
+    mlips:implementedIn ex:lib-hdnnp-behler2007 .
+
+ex:lib-hdnnp-behler2007 a mlips:Library ;
+    rdfs:label "In-house extension of the Lorenz-Gross-Scheffler neural-network code" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-behler2007 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-behler2007 ;
+    mlips:settingValue "6.0" .
+
+ex:setting-numsf-behler2007 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numsf-behler2007 ;
+    mlips:settingValue "48" .
+
+ex:setting-numhidden-behler2007 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numhidden-behler2007 ;
+    mlips:settingValue "2 hidden layers, ~40 nodes each" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-hdnnp-Si-behler2007 a mlips:MLIPRun ;
+    rdfs:label "HDNNP training run, bulk silicon" ;
+    mlips:appliesMethod ex:HDNNP-behler2007 ;
+    mlips:runsOn ex:ds-Si-behler2007 ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-behler2007 , ex:setting-numsf-behler2007 , ex:setting-numhidden-behler2007 ;
+    mlips:produces ex:model-hdnnp-Si-behler2007 .
+
+ex:model-hdnnp-Si-behler2007 a mlips:TrainedModel ;
+    rdfs:label "Behler-Parrinello HDNNP for bulk silicon" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-behler2007 mlips:hasResult
+    ex:result-hdnnp-Si-energy-behler2007 ,
+    ex:result-hdnnp-Si-forces-behler2007 .
+
+ex:result-hdnnp-Si-energy-behler2007 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-hdnnp-Si-behler2007 ;
+    mlips:targetMaterial ex:mat-Si-behler2007 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-behler2007 .
+
+ex:metric-rmse-energy-behler2007 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE on the held-out test set (vs. DFT-LDA)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 5.5 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-hdnnp-Si-forces-behler2007 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-hdnnp-Si-behler2007 ;
+    mlips:targetMaterial ex:mat-Si-behler2007 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-forces-behler2007 .
+
+ex:metric-rmse-forces-behler2007 a mlips:AccuracyMetric ;
+    rdfs:label "Atomic-force RMSE (vs. DFT-LDA)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.2 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Behler & Parrinello (2007) reports no explicit training-cost metadata
+# (no GPU hours, training duration, hardware spec, peak memory). They
+# do quote a relative inference speed of ~5 orders of magnitude faster
+# than DFT for a 64-atom cell -- a relative figure rather than an
+# inferenceTimePerAtom value, so it is not encoded.

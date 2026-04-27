@@ -1,0 +1,241 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Lysogorskiy, van der Oord, Bochkarev, Menon, Rinaldi,
+#   Hammerschmidt, Mrovec, Thompson, Csanyi, Ortner, Drautz.
+#   Performant implementation of the atomic cluster expansion (PACE)
+#   and application to copper and silicon.
+#   npj Computational Materials 7, 97 (2021).
+#   doi:10.1038/s41524-021-00559-9
+#
+# Encoding scope: PACE is the C++ implementation of the Atomic
+# Cluster Expansion (ACE), released as a LAMMPS pair_style. The
+# paper benchmarks PACE on two single-element production systems:
+# fcc Cu and diamond Si. Both are encoded as MaterialSystem
+# instances with their own MLIPRun + TrainedModel + BenchmarkResult
+# triples, sharing one PACE Implementation node.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-lysogorskiy2021ace a mlips:BenchmarkStudy ;
+    rdfs:label "Lysogorskiy et al. (2021): PACE applied to Cu and Si" ;
+    mlips:reportedIn ex:article-lysogorskiy2021ace .
+
+ex:article-lysogorskiy2021ace a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-021-00559-9> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "Performant implementation of the atomic cluster expansion (PACE) and application to copper and silicon" .
+
+###############################################################################
+# Q2 -- Material systems (two: Cu and Si)
+###############################################################################
+
+ex:mat-Cu-lysogorskiy2021ace a mlips:MaterialSystem ;
+    rdfs:label "Copper (fcc, with bcc/hcp/dhcp polymorphs and surfaces/defects in the reference set)" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "Elemental metal; fcc ground state, validated across fcc/bcc/dhcp/hcp polymorphs, surfaces, and clusters" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q753> .
+
+ex:mat-Si-lysogorskiy2021ace a mlips:MaterialSystem ;
+    rdfs:label "Silicon (diamond cubic, plus surfaces, vacancies, interstitials, and liquid)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental semiconductor; diamond-cubic ground state. Reference data is the GAP general-purpose Si database of Bartok et al. 2018" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-Cu-lysogorskiy2021ace a mlips:DFTCalculation .
+ex:dft-Si-lysogorskiy2021ace a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-Cu-lysogorskiy2021ace mlips:hasDFTSettings ex:dft-settings-Cu-lysogorskiy2021ace .
+ex:dft-Si-lysogorskiy2021ace mlips:hasDFTSettings ex:dft-settings-Si-lysogorskiy2021ace .
+
+ex:dft-settings-Cu-lysogorskiy2021ace a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-fhi-aims-lysogorskiy2021ace ;
+    mlips:xcFunctional "PBE" .
+
+ex:dft-settings-Si-lysogorskiy2021ace a mlips:DFTSettings ;
+    mlips:usedDFTCode ex:lib-castep-lysogorskiy2021ace ;
+    mlips:xcFunctional "PW91 (inherited from the Bartok et al. 2018 GAP-Si reference database)" .
+
+ex:lib-fhi-aims-lysogorskiy2021ace a mlips:Library ;
+    rdfs:label "FHI-aims (used for the Cu reference data)" .
+
+ex:lib-castep-lysogorskiy2021ace a mlips:Library ;
+    rdfs:label "CASTEP (used for the Si reference data, via the GAP-Si database of Bartok et al. 2018)" ;
+    schema:url <http://www.castep.org> .
+
+###############################################################################
+# Q5 -- Training datasets (Cu and Si)
+###############################################################################
+
+ex:ds-Cu-lysogorskiy2021ace a mlips:TrainingDataset ;
+    rdfs:label "PACE-Cu reference data: small clusters, bulk phases, surfaces, slabs, and defective configurations of copper, generated with FHI-aims; assembled in part with the pyiron workflow framework" ;
+    mlips:coversMaterial ex:mat-Cu-lysogorskiy2021ace ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation ex:dft-Cu-lysogorskiy2021ace .
+
+ex:ds-Si-lysogorskiy2021ace a mlips:TrainingDataset ;
+    rdfs:label "PACE-Si reference data: the published Bartok-2018 general-purpose Si GAP fitting database (2475 configurations covering crystal phases, surfaces, vacancies, interstitials, and liquid)" ;
+    mlips:coversMaterial ex:mat-Si-lysogorskiy2021ace ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Virials ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 2475 ;
+    mlips:hasDFTCalculation ex:dft-Si-lysogorskiy2021ace .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-Cu-lysogorskiy2021ace mlips:samplingStrategy ex:cu-sampling-lysogorskiy2021ace .
+ex:ds-Si-lysogorskiy2021ace mlips:samplingStrategy ex:si-sampling-lysogorskiy2021ace .
+
+ex:cu-sampling-lysogorskiy2021ace a mlips:SamplingStrategy ;
+    rdfs:label "Cu reference-set construction (clusters, polymorphs, surfaces, defects)" ;
+    rdfs:comment "The Cu reference data is partly described in Drautz 2019 ref [1] and extended for this work; it includes small clusters, bulk Cu polymorphs, surfaces and slabs, and configurations with slightly displaced or missing atoms. Part of the data was assembled with the pyiron workflow framework." .
+
+ex:si-sampling-lysogorskiy2021ace a mlips:SamplingStrategy ;
+    rdfs:label "Si reference-set reuse from the GAP-Si general-purpose database" ;
+    rdfs:comment "The Si reference data is the published GAP-Si fitting database (Bartok et al. 2018), which covers a wide range of bulk crystal phases, surfaces, vacancies, interstitials, and liquid silicon configurations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:ACE-lysogorskiy2021ace a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE) of Drautz 2019, in the PACE formulation" ;
+    mlips:hasFunctionalForm ex:ace-functional-form-lysogorskiy2021ace ;
+    mlips:hasLossFunction ex:ace-loss-lysogorskiy2021ace ;
+    mlips:hasHyperparameter ex:hp-rcut-lysogorskiy2021ace , ex:hp-bodyorder-lysogorskiy2021ace , ex:hp-nbasis-lysogorskiy2021ace ;
+    mlips:hasImplementation ex:pace-impl-lysogorskiy2021ace .
+
+ex:ace-functional-form-lysogorskiy2021ace a mlips:FunctionalForm ;
+    rdfs:label "Linear (or Finnis-Sinclair-style nonlinear) embedding of body-ordered ACE basis functions; per-atom property phi_i is expanded over multi-atom basis terms with truncation at body order nu_max; total energy is the sum of per-atom embeddings" .
+
+ex:ace-loss-lysogorskiy2021ace a mlips:LossFunction ;
+    rdfs:label "Weighted least-squares on energies and forces (linear regression for Si; nonlinear two-density Finnis-Sinclair embedding optimisation for Cu)" .
+
+ex:pace-impl-lysogorskiy2021ace a mlips:Implementation ;
+    mlips:implementedIn ex:lib-pace-lysogorskiy2021ace ;
+    mlips:version "PACE C++ (LAMMPS pair_style)" .
+
+ex:lib-pace-lysogorskiy2021ace a mlips:Library ;
+    rdfs:label "PACE (Performant Atomic Cluster Expansion C++ implementation, LAMMPS pair_style)" ;
+    schema:url <https://www.lammps.org> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-Cu-lysogorskiy2021ace a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut-lysogorskiy2021ace ;
+    mlips:settingValue "7.4 (Cu)" .
+
+ex:setting-bodyorder-Si-lysogorskiy2021ace a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-bodyorder-lysogorskiy2021ace ;
+    mlips:settingValue "4 (Si linear ACE; Cu Finnis-Sinclair embedding uses two atomic densities)" .
+
+ex:setting-nbasis-Cu-lysogorskiy2021ace a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-nbasis-lysogorskiy2021ace ;
+    mlips:settingValue "2072 (Cu: 756 expansion coefficients per atomic density x 2 densities + 560 radial-function parameters)" .
+
+ex:setting-nbasis-Si-lysogorskiy2021ace a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-nbasis-lysogorskiy2021ace ;
+    mlips:settingValue "6827 (Si linear basis functions)" .
+
+###############################################################################
+# Q9 -- MLIP runs + trained models (one per material)
+###############################################################################
+
+ex:run-ace-Cu-lysogorskiy2021ace a mlips:MLIPRun ;
+    rdfs:label "PACE-Cu fitting run (nonlinear two-density Finnis-Sinclair embedding)" ;
+    mlips:appliesMethod ex:ACE-lysogorskiy2021ace ;
+    mlips:runsOn ex:ds-Cu-lysogorskiy2021ace ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-Cu-lysogorskiy2021ace , ex:setting-nbasis-Cu-lysogorskiy2021ace ;
+    mlips:produces ex:model-ace-Cu-lysogorskiy2021ace .
+
+ex:model-ace-Cu-lysogorskiy2021ace a mlips:TrainedModel ;
+    rdfs:label "PACE-Cu (general-purpose ACE for fcc copper)" ;
+    mlips:inferenceTimePerAtom 0.00032 .
+
+ex:run-ace-Si-lysogorskiy2021ace a mlips:MLIPRun ;
+    rdfs:label "PACE-Si fitting run (linear ACE, nu_max=4)" ;
+    mlips:appliesMethod ex:ACE-lysogorskiy2021ace ;
+    mlips:runsOn ex:ds-Si-lysogorskiy2021ace ;
+    mlips:hasHyperparameterSetting ex:setting-bodyorder-Si-lysogorskiy2021ace , ex:setting-nbasis-Si-lysogorskiy2021ace ;
+    mlips:produces ex:model-ace-Si-lysogorskiy2021ace .
+
+ex:model-ace-Si-lysogorskiy2021ace a mlips:TrainedModel ;
+    rdfs:label "PACE-Si (linear ACE matching GAP-Si accuracy)" ;
+    mlips:inferenceTimePerAtom 0.0008 .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-lysogorskiy2021ace mlips:hasResult
+    ex:result-ace-Cu-fit-lysogorskiy2021ace ,
+    ex:result-ace-Si-energy-lysogorskiy2021ace ,
+    ex:result-ace-Si-forces-lysogorskiy2021ace .
+
+ex:result-ace-Cu-fit-lysogorskiy2021ace a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-ace-Cu-lysogorskiy2021ace ;
+    mlips:targetMaterial ex:mat-Cu-lysogorskiy2021ace ;
+    mlips:hasAccuracyMetric ex:metric-ace-Cu-fit-lysogorskiy2021ace .
+
+ex:metric-ace-Cu-fit-lysogorskiy2021ace a mlips:AccuracyMetric ;
+    rdfs:label "Final fit error on Cu reference data within 1 eV of the ground state (after ground-state fine-tuning)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 2.9 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-ace-Si-energy-lysogorskiy2021ace a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-ace-Si-lysogorskiy2021ace ;
+    mlips:targetMaterial ex:mat-Si-lysogorskiy2021ace ;
+    mlips:hasAccuracyMetric ex:metric-ace-Si-energy-lysogorskiy2021ace .
+
+ex:metric-ace-Si-energy-lysogorskiy2021ace a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the Bartok-2018 GAP-Si database (PACE-Si linear ACE)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.81 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:result-ace-Si-forces-lysogorskiy2021ace a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-ace-Si-lysogorskiy2021ace ;
+    mlips:targetMaterial ex:mat-Si-lysogorskiy2021ace ;
+    mlips:hasAccuracyMetric ex:metric-ace-Si-forces-lysogorskiy2021ace .
+
+ex:metric-ace-Si-forces-lysogorskiy2021ace a mlips:AccuracyMetric ;
+    rdfs:label "Force-component error on the Bartok-2018 GAP-Si database (PACE-Si linear ACE)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 82 ;
+    mlips:hasUnit unit:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Captured in Q9 on each TrainedModel via mlips:inferenceTimePerAtom:
+#   - PACE-Cu: 0.32 ms/atom per force call (encoded as 0.00032 s)
+#   - PACE-Si: 0.80 ms/atom per force call (encoded as 0.00080 s)
+# Training duration, GPU/CPU hours, training hardware, and peak
+# memory are not reported.

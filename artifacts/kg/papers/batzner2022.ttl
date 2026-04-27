@@ -1,0 +1,181 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Batzner, Musaelian, Sun, Geiger, Mailoa, Kornbluth, Molinari,
+#   Smidt, Kozinsky. E(3)-Equivariant Graph Neural Networks for
+#   Data-Efficient and Accurate Interatomic Potentials.
+#   Nature Communications 13, 2453 (2022).
+#   doi:10.1038/s41467-022-29939-5  arXiv:2101.03164
+#
+# Encoding scope: NequIP applied to the bulk water and ice phases
+# benchmark (a periodic-boundary extended system) is taken as the
+# canonical pass. The paper also reports NequIP runs on MD17/rMD17
+# small organic molecules, the Molecules@CCSD/CCSD(T) set, formate
+# decomposition on Cu(110), Li_4P_2O_7 amorphous glass, and LiPS
+# superionic conductor; these auxiliary applications are documented
+# as gaps in Q12.
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls:    <http://www.w3.org/ns/mls#> .
+@prefix unit:   <http://qudt.org/vocab/unit/> .
+@prefix mlips:  <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex:     <https://example.org/mlips/kg/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+ex:study-batzner2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Batzner et al. (2022): NequIP E(3)-equivariant GNN MLIP on water and ices" ;
+    mlips:reportedIn ex:article-batzner2022 .
+
+ex:article-batzner2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-022-29939-5> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "E(3)-Equivariant Graph Neural Networks for Data-Efficient and Accurate Interatomic Potentials" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+ex:mat-water-ice a mlips:MaterialSystem ;
+    rdfs:label "Liquid water and three ice phases (Ih at 1bar/273K, 1bar/330K, 2.13kbar/238K)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Hydrogen-bonded molecular liquid and ice polymorphs (PBC); 64 H2O for liquid, 96 H2O for ices" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+ex:dft-batzner2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+ex:dft-batzner2022 mlips:hasDFTSettings ex:dft-settings-batzner2022 .
+
+ex:dft-settings-batzner2022 a mlips:DFTSettings ;
+    mlips:xcFunctional "PBE0-TS (hybrid + Tkatchenko-Scheffler dispersion)" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+ex:ds-water-ice a mlips:TrainingDataset ;
+    rdfs:label "Water + 3 ices joint training set (133 structures sampled from 140000-frame full set)" ;
+    mlips:coversMaterial ex:mat-water-ice ;
+    mlips:coversProperty mlips:Energy , mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 133 ;
+    mlips:hasDFTCalculation ex:dft-batzner2022 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+ex:ds-water-ice mlips:samplingStrategy ex:aimd-sampling-batzner2022 .
+
+ex:aimd-sampling-batzner2022 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (classical and path-integral AIMD) at multiple temperatures and pressures" ;
+    rdfs:comment "133 frames sampled uniformly from a 140000-frame full set spanning liquid water and three ice Ih phases at the PBE0-TS level; the full set is generated from classical AIMD and path-integral AIMD trajectories." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+ex:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasFunctionalForm ex:nequip-functional-form ;
+    mlips:hasLossFunction ex:nequip-loss-energy-force ;
+    mlips:hasTrainingAlgorithm ex:adam-amsgrad-nequip ;
+    mlips:hasHyperparameter ex:hp-rcut , ex:hp-numlayers , ex:hp-lmax , ex:hp-features ;
+    mlips:hasImplementation ex:nequip-impl .
+
+ex:nequip-functional-form a mlips:FunctionalForm ;
+    rdfs:label "E(3)-equivariant graph neural network with tensor-product convolutions over geometric tensors of irreps l=0..lmax (atom embeddings, interaction blocks with self-interaction + convolution + concatenation + nonlinearity, output block)" .
+
+ex:nequip-loss-energy-force a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energies and force components, lambda_E and lambda_F set per system (e.g. 100000:1 for water model c)" .
+
+ex:adam-amsgrad-nequip a mls:Algorithm ;
+    rdfs:label "Adam (AMSGrad variant), beta1=0.9, beta2=0.999, eps=1e-8, no weight decay" .
+
+ex:nequip-impl a mlips:Implementation ;
+    mlips:implementedIn ex:lib-nequip ;
+    mlips:version "0.3.3" .
+
+ex:lib-nequip a mlips:Library ;
+    rdfs:label "nequip" ;
+    schema:url <https://github.com/mir-group/nequip> .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+ex:setting-rcut-6-batzner a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:settingValue "6.0" .
+
+ex:setting-numlayers-6 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-numlayers ;
+    mlips:settingValue "6" .
+
+ex:setting-lmax-2-batzner a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-lmax ;
+    mlips:settingValue "2" .
+
+ex:setting-features-32 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter ex:hp-features ;
+    mlips:settingValue "32" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model
+###############################################################################
+
+ex:run-nequip-water a mlips:MLIPRun ;
+    rdfs:label "NequIP training run on water+ices (133 frames, lmax=2, 6 layers, 32 features)" ;
+    mlips:appliesMethod ex:NequIP ;
+    mlips:runsOn ex:ds-water-ice ;
+    mlips:hasHyperparameterSetting ex:setting-rcut-6-batzner , ex:setting-numlayers-6 , ex:setting-lmax-2-batzner , ex:setting-features-32 ;
+    mlips:produces ex:model-nequip-water .
+
+ex:model-nequip-water a mlips:TrainedModel ;
+    rdfs:label "NequIP water+ices model (lmax=2, 6 interaction blocks, 32 features)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+ex:study-batzner2022 mlips:hasResult ex:result-nequip-water-energy , ex:result-nequip-water-forces .
+
+ex:result-nequip-water-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-nequip-water ;
+    mlips:targetMaterial ex:mat-water-ice ;
+    mlips:hasAccuracyMetric ex:metric-rmse-water-energy .
+
+ex:metric-rmse-water-energy a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on liquid-water energies (model c, lambda_F=100000, lambda_E=1; per-molecule)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 1.7 ;
+    mlips:hasUnit unit:MilliEV .
+
+ex:result-nequip-water-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-nequip-water ;
+    mlips:targetMaterial ex:mat-water-ice ;
+    mlips:hasAccuracyMetric ex:metric-rmse-water-forces .
+
+ex:metric-rmse-water-forces a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on liquid-water force components (model c, lambda_F=100000, lambda_E=1)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 12.2 ;
+    mlips:hasUnit unit:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+ex:run-nequip-water mlips:trainingHardware "NVIDIA Tesla V100 GPU (single-GPU training)" .
