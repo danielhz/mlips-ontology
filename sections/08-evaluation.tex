@@ -3,10 +3,93 @@
 \label{sec:evaluation}
 %% ====================================================================
 
-We evaluate the \MLIPsOntology{} along multiple dimensions: competency
-question coverage via SPARQL queries, consistency verification via OWL
-reasoning, automated pitfall detection, and comparison with existing
-ontologies.
+We evaluate the \MLIPsOntology{} along multiple dimensions: a seeded
+knowledge graph of published MLIP studies, competency question coverage
+via SPARQL queries against that graph, consistency verification via
+OWL reasoning, automated pitfall detection, and comparison with
+existing ontologies.
+
+\subsection{Seeded Knowledge Graph}
+\label{sec:eval-kg}
+
+To exercise the ontology against real data we built a seeded knowledge
+graph by encoding 20 published MLIP studies. The full catalogue---one
+subsection per paper, organised around a 12-question extraction
+protocol with a round-trip check that the encoded Turtle reconstructs
+exactly from the protocol's CONSTRUCT
+queries---is in Appendix~\ref{sec:appendix-paper-catalogue}; the
+detailed worked example for Kumar et al.\ (2025)~\cite{kumar2025ticr2h}
+is in Appendix~\ref{sec:appendix-worked-examples}. The graph contains
+\textbf{2{,}156 triples} across the 20 paper-graph instances and
+\textbf{67} more in the controlled-vocabulary file
+\texttt{mlips-vocab.ttl} (the named individuals for XC functionals,
+pseudopotential types, wave-function methods, and DFT basis sets);
+loaded together with the 685-triple T-Box this is a
+\textbf{2{,}869-triple} graph in total.
+
+\paragraph{Diversity.}
+The corpus deliberately covers multiple axes of variation, summarised
+in Table~\ref{tab:kg-diversity}. Method families span the chronological
+arc of the field (HDNNP from 2007 through MACE-MP-0 in 2024) and the
+architectural spectrum (descriptor + regressor in GAP, MTP, ACE;
+deep-network in HDNNP, ANI, SchNet, DeepMD; equivariant message passing
+in MACE, NequIP, Allegro; universal/foundation models in M3GNet,
+CHGNet, MACE-MP-0). Reference data is predominantly DFT, but one paper
+(\texttt{smith2019ccx}, the ANI-1ccx transfer-learning study) trains
+to CCSD(T) data and exercises the
+$\WaveFunctionCalculationC$/$\WaveFunctionSettingsC$ branch added in
+this work. Materials cover elemental crystals (Si, Cu, Fe, W),
+intermetallics (TiAl, Ti$_3$Al, Ni--Al, Ti--Al--V), Laves phases
+(TiCr$_2$), magnetic oxides (MnO), high-entropy alloys (TaVCrW),
+hydrogen-bonded liquids (water and ice polymorphs), organic molecules,
+and universal coverage of the Materials Project (MACE-MP-0, CHGNet,
+M3GNet).
+
+\begin{table}[t]
+\centering
+\caption{Diversity axes of the seeded knowledge graph.}
+\label{tab:kg-diversity}
+\begin{tabular}{l@{\hspace{8pt}}p{0.65\textwidth}}
+\toprule
+\textbf{Axis} & \textbf{Coverage} \\
+\midrule
+Papers & 20 (incl.\ 1 CCSD(T) study) \\
+Method families & HDNNP, GAP, MTP, ANI, ACE, SchNet, MACE/NequIP/Allegro, M3GNet/CHGNet, DeepMD \\
+Reference method & DFT (19), wave-function (1) \\
+XC functionals (DFT) & PBE (12), PBE0 (2), PW91 (2), HSE06 (1), $\omega$B97X (2), LDA (1); 19/20 studies report; lysogorskiy2021ace reports two (Cu uses PBE, Si uses PW91) \\
+Pseudopotential / basis & PAW (8), ultrasoft (2), norm-conserving (1), all-electron with $\dlConcept{DftBasisSet}$ (3); 6 studies do not report a basis specification \\
+Sampling strategies & vibrational/AIMD, chemical-space, active-learning, random-perturbation, surface enumeration, defect sampling \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Controlled vocabulary and extension.}
+The controlled-vocabulary file declares named individuals such as
+$\dlConcept{mlips{:}PBE}$, $\dlConcept{mlips{:}HSE06}$,
+$\dlConcept{mlips{:}PAW}$, $\dlConcept{mlips{:}DLPNO\_CCSDT}$, and
+$\dlConcept{mlips{:}NAOIntermediate}$. The four classes carrying these
+individuals ($\XCFunctionalC$, $\PseudopotentialTypeC$, $\WfMethodC$,
+$\DftBasisSetC$) are open extension points: when an encoded paper
+reports a value not yet in the vocabulary, the encoder mints a paper-
+local IRI and tags it with the
+$\candidateForVocabularyR$ object property naming the target class.
+The corpus currently contains two such candidates---paper-local IRIs
+for the Gaussian basis sets 6-31G(d) (\texttt{smith2017}) and 6-31G$^*$
+(\texttt{smith2019ccx})---both flagged for promotion review.
+
+\paragraph{Reportable-vs-reported gaps.}
+A first cross-corpus pass already exposes the metadata-gap pattern
+that motivates the ontology's existence. Of the 20 studies:
+\textbf{18} report energy errors as a benchmark accuracy metric and
+\textbf{15} report force errors, but only \textbf{9} report any
+training-cost or inference-cost metadata at all, and the per-
+predicate counts are sparse: training hardware appears in 6,
+inference time per atom in 5, inference hardware in 4, training
+duration in 2, GPU hours in 1, and \textbf{peak memory in zero of the
+20 papers}. The ontology can express each of these for every paper;
+the literature, on average, reports them only intermittently.
+Section~\ref{sec:eval-cq} formalises this observation through
+competency-question SPARQL queries against the seeded graph.
 
 \subsection{Competency Question Coverage}
 \label{sec:eval-cq}
