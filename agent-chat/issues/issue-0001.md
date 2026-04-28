@@ -1,8 +1,9 @@
 # Issue 0001: Wikidata sweep on the controlled vocabulary (`mlips-vocab.ttl`)
 
-**Status:** open
+**Status:** done
 **Assignee:** developer
 **Created:** 2026-04-28
+**Closed:** 2026-04-28
 **Blocks:** none
 **Blocked by:** none
 
@@ -62,3 +63,30 @@ individual is linked".
 - This issue is independent of the per-paper corpus, so the
   developer can work on it in isolation without coordinating
   with the rest of the catalogue.
+
+## Resolution (2026-04-28)
+
+Closed by a single edit to `artifacts/kg/mlips-vocab.ttl`. Coverage:
+10 of 22 named individuals carry `mlips:sameAsWikidata`; the
+remaining 12 carry an explicit "No Wikidata entry as of 2026-04-28."
+`rdfs:comment` so future curators don't waste effort re-checking.
+
+| Class | Linked | Linked QID | Skipped (with comment) |
+|---|---|---|---|
+| `XCFunctional` | LDA | Q898241 | PW91, PBE, PBE0, HSE06, SCAN, omegaB97X, wB97X |
+| `PseudopotentialType` | PAW, Ultrasoft, NormConserving | Q7249488, Q11289206, Q11325789 | (none) |
+| `WfMethod` | HF, MP2, CCSD, CCSDT, CASPT2, NEVPT2 | Q7879841, Q1074890, Q1117940 (×2 — coupled-cluster family covers both), Q25304396, Q3984072 | DLPNO_CCSDT |
+| `DftBasisSet` | (none) | — | NAOIntermediate, NAOTier1, NAOTier2, LAPW |
+
+The DFT-functional sparseness (PBE etc.) is structural: Wikidata
+folds named functionals into the broader `Density functional theory`
+(Q1048589) and `Hybrid functional` (Q3075290) entries rather than
+giving each its own QID. The reviewer's policy ("prefer the concept
+of the entity itself, not its inventor or its primary citation")
+ruled out using those parent entries as fallback links.
+
+Verification: `rapper -i turtle artifacts/kg/mlips-vocab.ttl` parses
+cleanly; round-trip on all 20 paper canonicals still PASS (the
+vocabulary file is not part of the per-paper round-trip set).
+
+Resolved by commit (to be filled in once pushed).

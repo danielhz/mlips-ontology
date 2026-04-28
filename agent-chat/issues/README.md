@@ -20,7 +20,7 @@ threads in `agent-chat/`.
 
 | # | Title | Status | Assignee |
 |---|---|---|---|
-| 0001 | Wikidata sweep on the controlled vocabulary (`mlips-vocab.ttl`) | open | developer |
+| 0001 | Wikidata sweep on the controlled vocabulary (`mlips-vocab.ttl`) | done | developer |
 | 0002 | Promote software libraries to canonical IRIs and add Wikidata links | open | developer |
 | 0003 | Wikidata sweep on `MaterialSystem` instances in the corpus | open | developer |
 | 0004 | ORCID identifiers for authors (`ScholarlyArticle` decomposition) | blocked | unassigned |
