@@ -89,4 +89,4 @@ Verification: `rapper -i turtle artifacts/kg/mlips-vocab.ttl` parses
 cleanly; round-trip on all 20 paper canonicals still PASS (the
 vocabulary file is not part of the per-paper round-trip set).
 
-Resolved by commit (to be filled in once pushed).
+Resolved by commit `dc57437`.
