@@ -1,0 +1,27 @@
+@base <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex: <https://example.org/mlips/kg/> .
+ex:active-learning-sampling-gubaev2023
+    a mlips:SamplingStrategy ;
+    rdfs:comment "Iterative dataset growth: an MD trajectory using the current MTP is mined for configurations whose extrapolation grade exceeds a threshold; selected configurations are re-computed with DFT and added to the training data, then the MTP is retrained. The same configurations are reused for the GM-NN comparison." ;
+    rdfs:label "Active learning (MaxVol extrapolation grade)" .
+ex:deformed-binary-sampling-gubaev2023
+    a mlips:SamplingStrategy ;
+    rdfs:comment "432-atom B2/B2 deformed quaternary structures constructed by joining strained binary halves (TaV +3.7%, CrW -1.28%, TaCr +0.27%, VW -0.14%, TaW +4.06%, VCr -4.71%) along [100], used as a test set for the phase-segregated quaternary." ;
+    rdfs:label "Deformed-binary phase-segregation sampling" .
+ex:ds-TaVCrW
+    mlips:samplingStrategy ex:active-learning-sampling-gubaev2023, ex:deformed-binary-sampling-gubaev2023, ex:enumlib-sampling-gubaev2023, ex:vib-sampling-gubaev2023 .
+ex:enumlib-sampling-gubaev2023
+    a mlips:SamplingStrategy ;
+    rdfs:comment "0 K configurations in 2-8 atom supercells generated with the enumlib library; non-repetitive symmetries are enumerated and 2500 binary structures are sampled (plus ternaries, plus equiatomic and off-equiatomic quaternaries)." ;
+    rdfs:label "0 K small-supercell enumeration (enumlib)" .
+ex:vib-sampling-gubaev2023
+    a mlips:SamplingStrategy ;
+    rdfs:comment "1031 unrelaxed snapshots from DFT MD at 2500 K (close to the melting point), spanning the disordered TaVCrW phase and its compositional subsystems." ;
+    rdfs:label "Vibrational sampling (DFT MD at 2500 K)" .

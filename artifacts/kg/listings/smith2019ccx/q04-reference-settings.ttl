@@ -1,0 +1,37 @@
+@base <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex: <https://example.org/mlips/kg/> .
+ex:basis-6-31gstar-smith2019ccx
+    a mlips:DftBasisSet ;
+    rdfs:comment "Pople-style split-valence double-zeta Gaussian basis with d polarisation on heavy atoms (equivalent to 6-31G(d)); molecular all-electron DFT." ;
+    rdfs:label "6-31G*" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+ex:ccsdt-smith2019ccx
+    mlips:hasWaveFunctionSettings ex:wf-settings-smith2019ccx .
+ex:dft-settings-smith2019ccx
+    a mlips:DFTSettings ;
+    rdfs:comment "All-electron Gaussian basis (no pseudopotential)." ;
+    mlips:dftBasisSet ex:basis-6-31gstar-smith2019ccx ;
+    mlips:kPointMesh "Gamma-only (isolated molecules)" ;
+    mlips:usedDFTCode ex:lib-gaussian-smith2019ccx ;
+    mlips:xcFunctional mlips:omegaB97X .
+ex:dft-smith2019ccx
+    mlips:hasDFTSettings ex:dft-settings-smith2019ccx .
+ex:lib-gaussian-smith2019ccx
+    a mlips:Library ;
+    rdfs:label "Gaussian / Psi4 (omegaB97X / 6-31G* DFT pretraining reference)" .
+ex:lib-orca-smith2019ccx
+    a mlips:Library ;
+    rdfs:label "ORCA (used for DLPNO-CCSD(T) reference)" .
+ex:wf-settings-smith2019ccx
+    a mlips:WaveFunctionSettings ;
+    rdfs:comment "CCSD(T)*/CBS approximation: localised DLPNO-CCSD(T) of Neese et al. extrapolated from cc-pVDZ/cc-pVTZ to the complete-basis-set limit." ;
+    mlips:basisSet "cc-pVDZ/cc-pVTZ" ;
+    mlips:usedReferenceCode ex:lib-orca-smith2019ccx ;
+    mlips:wfMethod mlips:DLPNO_CCSDT .

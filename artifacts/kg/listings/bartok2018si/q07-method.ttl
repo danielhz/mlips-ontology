@@ -1,0 +1,32 @@
+@base <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex: <https://example.org/mlips/kg/> .
+ex:GAP
+    a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasFunctionalForm ex:gap-functional-form ;
+    mlips:hasHyperparameter ex:hp-M, ex:hp-delta, ex:hp-lmax-soap, ex:hp-nmax-soap, ex:hp-rcut-bartok2018si, ex:hp-sigma-atom, ex:hp-zeta ;
+    mlips:hasImplementation ex:quip-impl ;
+    mlips:hasLossFunction ex:gap-loss-bartok2018si ;
+    mlips:hasTrainingAlgorithm ex:gpr-bartok2018si .
+ex:gap-functional-form
+    a mlips:FunctionalForm ;
+    rdfs:label "Pair potential (cubic-spline repulsive) plus SOAP-kernel many-body Gaussian-process regression" .
+ex:gap-loss-bartok2018si
+    a mlips:LossFunction ;
+    rdfs:label "Regularised least squares on energies, forces, virials with per-class regularisation (sigma_E, sigma_F, sigma_V)" .
+ex:gpr-bartok2018si
+    a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian-process regression with CUR-selected representative environments" .
+ex:lib-quip
+    a mlips:Library ;
+    rdfs:label "QUIP (Quantum mechanics and Interatomic Potentials) with the GAP plug-in" .
+ex:quip-impl
+    a mlips:Implementation ;
+    mlips:implementedIn ex:lib-quip .

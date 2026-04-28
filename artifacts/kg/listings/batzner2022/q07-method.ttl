@@ -1,0 +1,34 @@
+@base <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://kg.ki.uni-stuttgart.de/_ontology/mlips#> .
+@prefix ex: <https://example.org/mlips/kg/> .
+ex:NequIP
+    a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasFunctionalForm ex:nequip-functional-form ;
+    mlips:hasHyperparameter ex:hp-features, ex:hp-lmax, ex:hp-numlayers, ex:hp-rcut ;
+    mlips:hasImplementation ex:nequip-impl ;
+    mlips:hasLossFunction ex:nequip-loss-energy-force ;
+    mlips:hasTrainingAlgorithm ex:adam-amsgrad-nequip .
+ex:adam-amsgrad-nequip
+    a mls:Algorithm ;
+    rdfs:label "Adam (AMSGrad variant), beta1=0.9, beta2=0.999, eps=1e-8, no weight decay" .
+ex:lib-nequip
+    a mlips:Library ;
+    rdfs:label "nequip" ;
+    schema:url <https://github.com/mir-group/nequip> .
+ex:nequip-functional-form
+    a mlips:FunctionalForm ;
+    rdfs:label "E(3)-equivariant graph neural network with tensor-product convolutions over geometric tensors of irreps l=0..lmax (atom embeddings, interaction blocks with self-interaction + convolution + concatenation + nonlinearity, output block)" .
+ex:nequip-impl
+    a mlips:Implementation ;
+    mlips:implementedIn ex:lib-nequip ;
+    mlips:version "0.3.3" .
+ex:nequip-loss-energy-force
+    a mlips:LossFunction ;
+    rdfs:label "Weighted MSE on energies and force components, lambda_E and lambda_F set per system (e.g. 100000:1 for water model c)" .
