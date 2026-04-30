@@ -2,14 +2,19 @@
 """Generate LaTeX appendices for ontology terms from mlips.ttl.
 
 Reads the ontology file and produces three .tex files:
-  sections/appendix-classes.tex
-  sections/appendix-object-properties.tex
-  sections/appendix-data-properties.tex
+  <output-dir>/appendix-classes.tex
+  <output-dir>/appendix-object-properties.tex
+  <output-dir>/appendix-data-properties.tex
+
+Default output dir is <repo-root>/sections; override with --output-dir
+to write into a staging location (the dataset repo's Makefile uses
+dist/sections/ for vendoring into the paper repo).
 
 Examples are included via \\InputIfFileExists from artifacts/examples/.
 Skeleton example files are generated for missing terms.
 """
 
+import argparse
 import sys
 from pathlib import Path
 from rdflib import Graph, Namespace, RDF, RDFS, OWL, XSD
@@ -230,9 +235,34 @@ def generate_property_section(g, prop_uri, prop_type="object"):
 
 def main():
     base_dir = Path(__file__).resolve().parent.parent.parent
-    onto_path = base_dir / "artifacts" / "ontology" / "mlips.ttl"
-    sections_dir = base_dir / "sections"
-    examples_dir = base_dir / "artifacts" / "examples"
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output-dir", type=Path, default=base_dir / "sections",
+        help="Directory to write the three .tex files into "
+             "(default: <repo-root>/sections)",
+    )
+    parser.add_argument(
+        "--examples-dir", type=Path, default=base_dir / "artifacts" / "examples",
+        help="Directory containing per-term examples "
+             "(default: <repo-root>/artifacts/examples)",
+    )
+    parser.add_argument(
+        "--ontology", type=Path, default=base_dir / "artifacts" / "ontology" / "mlips.ttl",
+        help="Path to mlips.ttl (default: <repo-root>/artifacts/ontology/mlips.ttl)",
+    )
+    parser.add_argument(
+        "--skip-skeletons", action="store_true",
+        help="Do not create skeleton example files for missing terms "
+             "(set when examples-dir is not writable, e.g., when running "
+             "from the dataset repo against a sibling paper checkout)",
+    )
+    args = parser.parse_args()
+
+    onto_path = args.ontology
+    sections_dir = args.output_dir
+    examples_dir = args.examples_dir
+    sections_dir.mkdir(parents=True, exist_ok=True)
 
     g = Graph()
     g.parse(str(onto_path), format="turtle")
@@ -296,6 +326,9 @@ def main():
         f.write("\n".join(dp_lines))
 
     # Generate skeleton example files for missing ones
+    if args.skip_skeletons:
+        print("Skipping skeleton example generation (--skip-skeletons).")
+        return
     created = 0
     for cls_uri in classes:
         local = local_name(cls_uri)
