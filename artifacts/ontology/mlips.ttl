@@ -14,24 +14,24 @@
 <https://w3id.org/mlips> a owl:Ontology ;
     rdfs:label "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials" ;
     dcterms:contributor [ a schema:Person ;
-            schema:name "Tom Schächtel" ],
-        [ a schema:Person ;
-            schema:name "Wenchuan Liu" ],
-        [ a schema:Person ;
             schema:name "Xin Li" ],
         [ a schema:Person ;
-            schema:name "Xiang Xu" ],
+            schema:name "Xi Zhang" ],
         [ a schema:Person ;
             schema:name "Lifang Zhu" ],
         [ a schema:Person ;
-            schema:name "Xi Zhang" ],
+            schema:name "Xiang Xu" ],
+        [ a schema:Person ;
+            schema:name "Wenchuan Liu" ],
+        [ a schema:Person ;
+            schema:name "Tom Schächtel" ],
         <https://orcid.org/0000-0001-9176-3270>,
         <https://orcid.org/0000-0002-0780-4154>,
         <https://orcid.org/0000-0002-3661-5870>,
         <https://orcid.org/0000-0003-1486-1197>,
         <https://orcid.org/0000-0003-3050-6291> ;
     dcterms:creator <https://orcid.org/0000-0002-2409-975X>,
-        <https://orcid.org/0000-0003-2160-4696>,
+        <https://orcid.org/0000-0002-7896-0875>,
         <https://orcid.org/0000-0003-4281-5665> ;
     dcterms:description "An OWL ontology capturing the concepts needed to describe machine learning interatomic potentials: algorithm families, hyperparameters, training datasets with DFT provenance, and published benchmarks." ;
     dcterms:issued "2026-04-10"^^xsd:date ;
@@ -479,11 +479,11 @@ mlips-vocab.ttl."""@en ;
 <https://orcid.org/0000-0002-3661-5870> a schema:Person ;
     schema:name "Pranav Kumar" .
 
+<https://orcid.org/0000-0002-7896-0875> a schema:Person ;
+    schema:name "Daniel Hernández" .
+
 <https://orcid.org/0000-0003-1486-1197> a schema:Person ;
     schema:name "Yongliang Ou" .
-
-<https://orcid.org/0000-0003-2160-4696> a schema:Person ;
-    schema:name "Daniel Hernández" .
 
 <https://orcid.org/0000-0003-3050-6291> a schema:Person ;
     schema:name "Fritz Körmann" .
@@ -765,16 +765,16 @@ mlips1:AccuracyMetric a owl:Class ;
     rdfs:comment """An accuracy measure reported in a benchmark
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass mlips1:MetricProperty ;
+            owl:onProperty mlips1:metricProperty ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
             owl:onProperty [ a owl:ObjectProperty ;
                     owl:inverseOf mlips1:hasAccuracyMetric ] ;
             owl:someValuesFrom mlips1:BenchmarkResult ],
         [ a owl:Restriction ;
             owl:onClass mlips1:MetricType ;
             owl:onProperty mlips1:metricType ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
-            owl:onClass mlips1:MetricProperty ;
-            owl:onProperty mlips1:metricProperty ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ] .
 
 mlips1:DatasetProvenance a owl:Class ;
@@ -850,12 +850,12 @@ mlips1:MLIPRun a owl:Class ;
     rdfs:label "MLIP Run"@en ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips1:TrainedModel ;
-            owl:onProperty mlips1:produces ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips1:MLIPMethod ;
             owl:onProperty mlips1:appliesMethod ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips1:TrainedModel ;
+            owl:onProperty mlips1:produces ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onClass mlips1:TrainingDataset ;
@@ -868,19 +868,19 @@ mlips1:BenchmarkResult a owl:Class ;
     rdfs:comment """A single evaluation result: an MLIP method applied to a
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty [ a owl:ObjectProperty ;
-                    owl:inverseOf mlips1:hasResult ] ;
-            owl:someValuesFrom mlips1:BenchmarkStudy ],
+            owl:onClass mlips1:TrainedModel ;
+            owl:onProperty mlips1:evaluatesModel ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:hasAccuracyMetric ;
             owl:someValuesFrom mlips1:AccuracyMetric ],
         [ a owl:Restriction ;
-            owl:onProperty mlips1:targetMaterial ;
-            owl:someValuesFrom mlips1:MaterialSystem ],
+            owl:onProperty [ a owl:ObjectProperty ;
+                    owl:inverseOf mlips1:hasResult ] ;
+            owl:someValuesFrom mlips1:BenchmarkStudy ],
         [ a owl:Restriction ;
-            owl:onClass mlips1:TrainedModel ;
-            owl:onProperty mlips1:evaluatesModel ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ] .
+            owl:onProperty mlips1:targetMaterial ;
+            owl:someValuesFrom mlips1:MaterialSystem ] .
 
 mlips1:Hyperparameter a owl:Class ;
     rdfs:label "Hyperparameter"@en ;
@@ -897,14 +897,14 @@ mlips1:TrainingDataset a owl:Class ;
     rdfs:comment """A dataset of atomic configurations used for MLIP
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips1:hasConfiguration ;
+            owl:someValuesFrom mlips1:AtomicConfiguration ],
+        [ a owl:Restriction ;
             owl:onProperty mlips1:coversMaterial ;
             owl:someValuesFrom mlips1:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:coversProperty ;
             owl:someValuesFrom mlips1:CoveredProperty ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips1:hasConfiguration ;
-            owl:someValuesFrom mlips1:AtomicConfiguration ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:datasetProvenance ;
             owl:someValuesFrom mlips1:DatasetProvenance ],
@@ -917,19 +917,19 @@ mlips1:MLIPMethod a owl:Class ;
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips1:hasTrainingAlgorithm ;
-            owl:someValuesFrom mls:Algorithm ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips1:hasFunctionalForm ;
-            owl:someValuesFrom mlips1:FunctionalForm ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips1:hasLossFunction ;
-            owl:someValuesFrom mlips1:LossFunction ],
+            owl:onProperty mlips1:supportsSimulation ;
+            owl:someValuesFrom mlips1:SimulationType ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:hasHyperparameter ;
             owl:someValuesFrom mlips1:Hyperparameter ],
         [ a owl:Restriction ;
-            owl:onProperty mlips1:supportsSimulation ;
-            owl:someValuesFrom mlips1:SimulationType ] ;
+            owl:onProperty mlips1:hasLossFunction ;
+            owl:someValuesFrom mlips1:LossFunction ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips1:hasFunctionalForm ;
+            owl:someValuesFrom mlips1:FunctionalForm ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips1:hasTrainingAlgorithm ;
+            owl:someValuesFrom mls:Algorithm ] ;
     owl:disjointWith mls:Algorithm .
 
