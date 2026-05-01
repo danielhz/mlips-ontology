@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Merge the RDFa annotations from the ontology XHTML into the OWL/TTL
-files that Saxon's extract-owl.xsl produced.
+"""Merge the RDFa annotations from the ontology XHTML source into
+the OWL/TTL files that Saxon's extract-owl.xsl produced.
 
 The XSLT only pulls the embedded <pre class="owl-xml"> CDATA blocks
 (per-term axioms), so the ontology-header metadata that lives as RDFa
@@ -10,7 +10,7 @@ otherwise lost from the OWL/TTL serialisation.
 
 This script:
   1. Parses mlips.owl (Saxon output) into an rdflib Graph.
-  2. Parses mlips.xhtml with pyRdfa, extracts the RDFa triples.
+  2. Parses mlips.source.xhtml with pyRdfa, extracts the RDFa triples.
   3. Filters the RDFa triples to the "ontology header CBD" -- the
      ontology subject's triples plus blank-node and external-IRI
      subjects reachable from it (publisher chain, schema:Person
@@ -20,7 +20,7 @@ This script:
 
 Usage:
     python3 artifacts/scripts/merge_rdfa_into_owl.py
-        [--xhtml artifacts/ontology/mlips.xhtml]
+        [--xhtml artifacts/ontology/mlips.source.xhtml]
         [--owl   artifacts/ontology/mlips.owl]
         [--ttl   artifacts/ontology/mlips.ttl]
 """
@@ -85,7 +85,7 @@ def cbd(graph: rdflib.Graph, subject) -> rdflib.Graph:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     base = Path(__file__).resolve().parent.parent / "ontology"
-    parser.add_argument("--xhtml", type=Path, default=base / "mlips.xhtml")
+    parser.add_argument("--xhtml", type=Path, default=base / "mlips.source.xhtml")
     parser.add_argument("--owl",   type=Path, default=base / "mlips.owl")
     parser.add_argument("--ttl",   type=Path, default=base / "mlips.ttl")
     args = parser.parse_args()
