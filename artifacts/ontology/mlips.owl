@@ -1,973 +1,1219 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/"
-         xmlns:mlips="https://w3id.org/mlips#"
-         xmlns:mlschema="http://www.w3.org/ns/mls#"
-         xmlns:owl="http://www.w3.org/2002/07/owl#"
-         xmlns:prov="http://www.w3.org/ns/prov#"
-         xmlns:qudt="http://qudt.org/schema/qudt/"
-         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-         xmlns:schema="https://schema.org/"
-         xmlns:vann="http://purl.org/vocab/vann/"
-         xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
-   <owl:Class rdf:about="https://w3id.org/mlips#Hyperparameter">
-      <rdfs:label xml:lang="en">Hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">A hyperparameter of an MLIP method, with its name,
-data type, range, and default value.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#HyperParameter"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty>
-               <owl:ObjectProperty>
-                  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
-               </owl:ObjectProperty>
-            </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#PhysicalHyperparameter">
-      <rdfs:label xml:lang="en">Physical Hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">A hyperparameter that has a direct physical
-meaning. Not disjoint with ArchitecturalHyperparameter.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#ArchitecturalHyperparameter">
-      <rdfs:label xml:lang="en">Architectural Hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">A hyperparameter that specifies the model
-architecture. Not disjoint with PhysicalHyperparameter.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#TrainingHyperparameter">
-      <rdfs:label xml:lang="en">Training Hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">A hyperparameter of the training procedure.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#HyperparameterSetting">
-      <rdfs:label xml:lang="en">Hyperparameter Setting</rdfs:label>
-      <rdfs:comment xml:lang="en">A concrete value assigned to a hyperparameter in a
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+   xmlns:dcterms="http://purl.org/dc/terms/"
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:schema="https://schema.org/"
+   xmlns:vann="http://purl.org/vocab/vann/"
+>
+  <rdf:Description rdf:about="https://w3id.org/mlips">
+    <owl:versionIRI rdf:resource="https://w3id.org/mlips/0.1.0"/>
+    <dcterms:contributor rdf:nodeID="Ne71c21829c5c4a05b60d2585a925d534"/>
+    <dcterms:contributor rdf:nodeID="N0dc79a58302348728be13c27034c33d9"/>
+    <dcterms:contributor rdf:resource="https://orcid.org/0000-0002-3661-5870"/>
+    <dcterms:contributor rdf:nodeID="N3525bb99d08d472d92fce05afcf7c335"/>
+    <dcterms:contributor rdf:resource="https://orcid.org/0000-0002-0780-4154"/>
+    <dcterms:contributor rdf:nodeID="Nfa147ea2e85245309d172fe4329f4bba"/>
+    <dcterms:contributor rdf:resource="https://orcid.org/0000-0001-9176-3270"/>
+    <dcterms:contributor rdf:nodeID="N50cac164cb0a4e3d9e361e02aa253a8a"/>
+    <dcterms:contributor rdf:resource="https://orcid.org/0000-0003-3050-6291"/>
+    <dcterms:contributor rdf:nodeID="Nb8323accf9264254853597880a527faa"/>
+    <dcterms:contributor rdf:resource="https://orcid.org/0000-0003-1486-1197"/>
+    <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-05-01</dcterms:modified>
+    <owl:imports rdf:resource="http://www.w3.org/ns/mls"/>
+    <owl:imports rdf:resource="http://www.w3.org/ns/prov-o"/>
+    <dcterms:creator rdf:resource="https://orcid.org/0000-0003-2160-4696"/>
+    <dcterms:creator rdf:resource="https://orcid.org/0000-0002-2409-975X"/>
+    <dcterms:creator rdf:resource="https://orcid.org/0000-0003-4281-5665"/>
+    <rdfs:comment>An OWL ontology capturing the concepts needed to describe machine learning interatomic potentials: algorithm families, hyperparameters, training datasets with DFT provenance, and published benchmarks.</rdfs:comment>
+    <dcterms:description>An OWL ontology capturing the concepts needed to describe machine learning interatomic potentials: algorithm families, hyperparameters, training datasets with DFT provenance, and published benchmarks.</dcterms:description>
+    <vann:preferredNamespacePrefix>mlips</vann:preferredNamespacePrefix>
+    <vann:preferredNamespaceUri>https://w3id.org/mlips#</vann:preferredNamespaceUri>
+    <dcterms:publisher rdf:resource="http://www.wikidata.org/entity/Q131785081"/>
+    <rdfs:label>MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials</rdfs:label>
+    <rdfs:seeAlso rdf:resource="http://qudt.org/schema/qudt/"/>
+    <rdfs:seeAlso rdf:resource="https://schema.org/"/>
+    <rdfs:seeAlso rdf:resource="https://w3id.org/mdo/core/"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <owl:versionInfo>0.1.0</owl:versionInfo>
+    <dcterms:title>MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials</dcterms:title>
+    <dcterms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+    <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-04-10</dcterms:issued>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasTrainingAlgorithm">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has training algorithm</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to the ML-Schema algorithm used to fit its functional form.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N472dcf425c094ca7a7deb9f1fba71599">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:nodeID="N88119c3fea1b4981b81ff1ec8aab3d88"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasReferenceSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has reference settings</rdfs:label>
+    <rdfs:comment xml:lang="en">Links a reference calculation to its
+method-specific settings. Generalises hasDFTSettings to wave-function
+and other ab initio methods.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#coversMaterial">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">covers material</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N34cec788f8b84b82b98fcc17b63ae730">
+    <rdf:first rdf:resource="https://w3id.org/mlips#hasHyperparameterSetting"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#BenchmarkStudy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Benchmark Study</rdfs:label>
+    <rdfs:comment xml:lang="en">A published study reporting MLIP evaluation results.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+    <rdfs:subClassOf rdf:nodeID="Nb8c7268ec72f4e93be8e2ea676cbf7ef"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#sameAsWikidata">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">same as Wikidata</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an entity to its corresponding Wikidata item.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#sameAs"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MLIPRun">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">MLIP Run</rdfs:label>
+    <rdfs:comment xml:lang="en">A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+    <rdfs:subClassOf rdf:nodeID="N7079c95165d6419c8704aeabbf4a67f3"/>
+    <rdfs:subClassOf rdf:nodeID="Nfc8ea85e1bed431fa851d0e728787a5f"/>
+    <rdfs:subClassOf rdf:nodeID="N3995fa8b59c2423aad0e6afb6460dea9"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#RMSE">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
+    <rdfs:label xml:lang="en">RMSE</rdfs:label>
+    <rdfs:comment xml:lang="en">Root Mean Square Error.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N347fd039121e4e4a901ec55db0033aa6">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasWaveFunctionSettings"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#reportedIn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">reported in</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://schema.org/ScholarlyArticle"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne9ef569c9f7f4a2c8147d44b70895fed">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:nodeID="Na3b982e72f0b405aaa84084a1b1dc177"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#numRadialBasis">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">number of radial basis functions</rdfs:label>
+    <rdfs:comment xml:lang="en">Number of radial basis functions in the descriptor.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainingComplexity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">training complexity</rdfs:label>
+    <rdfs:comment xml:lang="en">Asymptotic computational complexity of training.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#TrainingDataset">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Training Dataset</rdfs:label>
+    <rdfs:comment xml:lang="en">A dataset of atomic configurations used for MLIP
+training, with provenance, size, property coverage, and DFT settings.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Dataset"/>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+    <rdfs:subClassOf rdf:nodeID="N0a4fb5b54d2d447e982bbc4554b14a9a"/>
+    <rdfs:subClassOf rdf:nodeID="N26eb1b9513194cd9a17125af102f8821"/>
+    <rdfs:subClassOf rdf:nodeID="Ne5be29e4641e41b3be1364964772cb56"/>
+    <rdfs:subClassOf rdf:nodeID="N8bc4c0e347524580be368900ed045434"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#usedDFTCode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">used DFT code</rdfs:label>
+    <rdfs:comment xml:lang="en">The DFT software used (e.g., VASP, GPAW).</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#usedReferenceCode"/>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#produces">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">produces</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP run to the trained model it produces.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasReferenceCalculation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has reference calculation</rdfs:label>
+    <rdfs:comment xml:lang="en">Links a training dataset to the
+first-principles calculation that produced its reference data.
+Generalises hasDFTCalculation to wave-function and other ab initio
+methods.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#materialClass">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">material class</rdfs:label>
+    <rdfs:comment xml:lang="en">E.g., element, binary alloy, ternary compound, HEA.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#BenchmarkResult">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Benchmark Result</rdfs:label>
+    <rdfs:comment xml:lang="en">A single evaluation result: an MLIP method applied to a
+material system with specific hyperparameters, reporting accuracy metrics.</rdfs:comment>
+    <rdfs:subClassOf rdf:nodeID="Naa67293aeac246dcb379ba9c6be6a9b3"/>
+    <rdfs:subClassOf rdf:nodeID="Na4fdd413d3554e0ea5829db9938e0ceb"/>
+    <rdfs:subClassOf rdf:nodeID="N9d4e77d0707347fead0652052b6831fd"/>
+    <rdfs:subClassOf rdf:nodeID="N472dcf425c094ca7a7deb9f1fba71599"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N7079c95165d6419c8704aeabbf4a67f3">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#appliesMethod"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Stresses">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+    <rdfs:label xml:lang="en">Stresses</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MAE">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
+    <rdfs:label xml:lang="en">MAE</rdfs:label>
+    <rdfs:comment xml:lang="en">Mean Absolute Error.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasImplementation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has implementation</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to a software implementation.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Implementation"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nf9f32e39f50b4f2aae42ccf1aae60c68">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#implementedIn"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#Library"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#AtomicClusterExpansionDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+    <rdfs:label xml:lang="en">Atomic Cluster Expansion Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Atomic cluster expansion; used by ACE.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Published">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
+    <rdfs:label xml:lang="en">Published</rdfs:label>
+    <rdfs:comment xml:lang="en">Dataset from a published source.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasHyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to a hyperparameter it accepts.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#candidateForVocabulary">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">candidate for vocabulary</rdfs:label>
+    <rdfs:comment xml:lang="en">Annotates a paper-local instance with the
+controlled-vocabulary class to which it should be considered for
+promotion. Used when an encoded paper introduces an entity that is not
+yet a named individual in mlips-vocab.ttl. The deduplication audit
+collects these candidates; a curator promotes, merges, or leaves them
+paper-local.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9b1b435325e143ae8de786b43dbed174">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#HyperparameterSetting">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Hyperparameter Setting</rdfs:label>
+    <rdfs:comment xml:lang="en">A concrete value assigned to a hyperparameter in a
 specific training run or configuration.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#Implementation">
-      <rdfs:label xml:lang="en">Implementation</rdfs:label>
-      <rdfs:comment xml:lang="en">A software implementation of an MLIP method in a
-specific library and version.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Implementation"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#implementedIn"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#Library"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty>
-               <owl:ObjectProperty>
-                  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasImplementation"/>
-               </owl:ObjectProperty>
-            </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#Library">
-      <rdfs:label xml:lang="en">Library</rdfs:label>
-      <rdfs:comment xml:lang="en">A software library or tool used in MLIP research
-(e.g., ASE, LAMMPS, VASP, GPAW).</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#MLIPMethod">
-      <rdfs:label xml:lang="en">MLIP Method</rdfs:label>
-      <rdfs:comment xml:lang="en">A machine learning interatomic potential method family
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#appliesMethod">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">applies method</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP run to the MLIP method it fits.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N50cac164cb0a4e3d9e361e02aa253a8a">
+    <schema:name>Xin Li</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#usedReferenceCode">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">used reference code</rdfs:label>
+    <rdfs:comment xml:lang="en">The software code used to perform the
+reference calculation (e.g., VASP, GPAW for DFT; Molpro, PySCF, ORCA
+for wave-function methods). Generalises usedDFTCode.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MetricType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Metric Type</rdfs:label>
+    <rdfs:comment xml:lang="en">Type of accuracy metric (RMSE, MAE, R², etc.).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#datasetProvenance">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">dataset provenance</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#microstructuralFeature">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">microstructural feature</rdfs:label>
+    <rdfs:comment xml:lang="en">E.g., point defect, dislocation, surface, grain boundary.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#metricType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">metric type</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MetricType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#StressProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
+    <rdfs:label xml:lang="en">Stress</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#EquivariantMessagePassingDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+    <rdfs:label xml:lang="en">Equivariant Message Passing Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Equivariant message-passing representation; used by MACE and NequIP.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MLIPMethod">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">MLIP Method</rdfs:label>
+    <rdfs:comment xml:lang="en">A machine learning interatomic potential method family
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
 a loss function, and a training algorithm. Disjoint from mls:Algorithm.</rdfs:comment>
-      <owl:disjointWith rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#supportsSimulation"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#SimulationType"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasFunctionalForm"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#FunctionalForm"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasLossFunction"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#LossFunction"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasTrainingAlgorithm"/>
-            <owl:someValuesFrom rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#FunctionalForm">
-      <rdfs:label xml:lang="en">Functional Form</rdfs:label>
-      <rdfs:comment xml:lang="en">A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#LossFunction">
-      <rdfs:label xml:lang="en">Loss Function</rdfs:label>
-      <rdfs:comment xml:lang="en">A scalar objective whose minimisation fits the parameters of the functional form.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#SimulationType">
-      <rdfs:label xml:lang="en">Simulation Type</rdfs:label>
-      <rdfs:comment xml:lang="en">A type of atomistic simulation: molecular dynamics,
-Monte Carlo, geometry optimization, phonon calculations,
-thermodynamic integration, etc.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#TrainedModel">
-      <rdfs:label xml:lang="en">Trained Model</rdfs:label>
-      <rdfs:comment xml:lang="en">The concrete artifact produced by fitting an MLIP method
+    <owl:disjointWith rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+    <rdfs:subClassOf rdf:nodeID="Ne437e519e9494c9b9566ac56c4eb153e"/>
+    <rdfs:subClassOf rdf:nodeID="Nfa331a862c5b4316878df95eb38e2b49"/>
+    <rdfs:subClassOf rdf:nodeID="N953d5e2259974945b48c5b8d1d5af0c8"/>
+    <rdfs:subClassOf rdf:nodeID="Nd69d26581ca243af9aeca543189eb3b7"/>
+    <rdfs:subClassOf rdf:nodeID="N8745c82d243b4703b2b60a811a351ac9"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#minValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">minimum value</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#learningRate">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">learning rate</rdfs:label>
+    <rdfs:comment xml:lang="en">Learning rate used during model training.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Virials">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+    <rdfs:label xml:lang="en">Virials</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0a4fb5b54d2d447e982bbc4554b14a9a">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#coversMaterial"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#SymmetryFunctionDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+    <rdfs:label xml:lang="en">Symmetry Function Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Behler-Parrinello symmetry functions; used by HDNNP.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#ReferenceCalculation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Reference Calculation</rdfs:label>
+    <rdfs:comment xml:lang="en">A first-principles calculation that produced
+reference energies, forces, or stresses for MLIP training. Generalisation of
+DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
+CASPT2) and other ab initio approaches.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
+    <rdfs:subClassOf rdf:nodeID="N9b1b435325e143ae8de786b43dbed174"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N33123f076f884429a64d5f7ca2db1ca4">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:nodeID="Nc057793812c84453837c969c6ca54acd"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#energyCutoff">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">energy cutoff</rdfs:label>
+    <rdfs:comment xml:lang="en">Plane-wave energy cutoff in eV.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#cutoffRadius">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">cutoff radius</rdfs:label>
+    <rdfs:comment xml:lang="en">Cutoff radius for atomic interactions, in angstroms.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na4fdd413d3554e0ea5829db9938e0ceb">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#targetMaterial"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#XCFunctional">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Exchange-Correlation Functional</rdfs:label>
+    <rdfs:comment xml:lang="en">A density-functional approximation to the
+exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
+PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
+DFTSettings. Concrete functionals are modelled as named individuals;
+an open extension point.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#samplingStrategy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">sampling strategy</rdfs:label>
+    <rdfs:comment xml:lang="en">Records the sampling strategy or strategies
+used to construct a training dataset. Optional and multi-valued: a
+dataset may combine several sampling strategies (e.g., chemical and
+vibrational).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#SamplingStrategy"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N953d5e2259974945b48c5b8d1d5af0c8">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasFunctionalForm"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#FunctionalForm"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N0dc79a58302348728be13c27034c33d9">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Tom Schächtel</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#gpuHours">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">GPU hours</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#AtomicEnvironmentDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Atomic Environment Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">A mathematical representation of the local atomic environment used by an MLIP method.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0003-3050-6291">
+    <schema:name>Fritz Körmann</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasLossFunction">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has loss function</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to the loss function whose minimisation fits its parameters.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#LossFunction"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#forHyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">for hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">Links a setting to the hyperparameter it configures.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasResult">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has result</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#version">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">version</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Implementation"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0001-9176-3270">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Yuji Ikeda</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Library">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Library</rdfs:label>
+    <rdfs:comment xml:lang="en">A software library or tool used in MLIP research
+(e.g., ASE, LAMMPS, VASP, GPAW).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N26eb1b9513194cd9a17125af102f8821">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#coversProperty"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainingDuration">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">training duration</rdfs:label>
+    <rdfs:comment xml:lang="en">Measured wall-clock training time (hours).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hyperparameterDatatype">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">hyperparameter datatype</rdfs:label>
+    <rdfs:comment xml:lang="en">The expected datatype of this hyperparameter (e.g., float, int, string).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#peakMemory">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">peak memory</rdfs:label>
+    <rdfs:comment xml:lang="en">Peak memory during training (GB).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#dftBasisSet">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">DFT basis set</rdfs:label>
+    <rdfs:comment xml:lang="en">The basis set used by an all-electron or
+localised-basis DFT calculation (FHI-aims NAO, LAPW, Gaussian-type
+orbitals such as cc-pVDZ or 6-31G). Plane-wave codes specify the basis
+through mlips:energyCutoff and leave this slot empty.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#DftBasisSet"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N8463efd65d5641c89521180ca66151c9">
+    <rdf:first rdf:nodeID="N544c7f4294c041939a3a80e619a11a75"/>
+    <rdf:rest rdf:nodeID="N06488a3ac12a4847b6d67b229e7d1456"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne71c21829c5c4a05b60d2585a925d534">
+    <schema:name>Lifang Zhu</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#FunctionalForm">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Functional Form</rdfs:label>
+    <rdfs:comment xml:lang="en">A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Energy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+    <rdfs:label xml:lang="en">Energy</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#maxValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">maximum value</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#AccuracyMetric">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Accuracy Metric</rdfs:label>
+    <rdfs:comment xml:lang="en">An accuracy measure reported in a benchmark
+(e.g., RMSE of energy, MAE of forces).</rdfs:comment>
+    <rdfs:subClassOf rdf:nodeID="N94208d15da6e49949eba0c387d12d5fc"/>
+    <rdfs:subClassOf rdf:nodeID="Nc7c238ff2ca24ac1a67ff0692da7d121"/>
+    <rdfs:subClassOf rdf:nodeID="N33123f076f884429a64d5f7ca2db1ca4"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#TrainingHyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Training Hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">A hyperparameter of the training procedure.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N96a32cbc11fe4dcc88a63bda03ea1952">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne437e519e9494c9b9566ac56c4eb153e">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0003-1486-1197">
+    <schema:name>Yongliang Ou</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#supportsGPU">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">supports GPU</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#kPointMesh">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">k-point mesh</rdfs:label>
+    <rdfs:comment xml:lang="en">K-point mesh specification (e.g., '4x4x4').</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#InHouse">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
+    <rdfs:label xml:lang="en">In-house</rdfs:label>
+    <rdfs:comment xml:lang="en">Dataset generated by in-house calculations.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasTrainingRun">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has training run</rdfs:label>
+    <rdfs:comment xml:lang="en">Optional link from an MLIP run to an ML-Schema run recording the training algorithm execution.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Run"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainedOn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">trained on</rdfs:label>
+    <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the training dataset it was fitted on.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <owl:propertyChainAxiom rdf:nodeID="N8463efd65d5641c89521180ca66151c9"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#runsOn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">runs on</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP run to the training dataset it uses.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#inferenceComplexity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">inference complexity</rdfs:label>
+    <rdfs:comment xml:lang="en">Asymptotic computational complexity of inference.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#pseudopotentialType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">pseudopotential type</rdfs:label>
+    <rdfs:comment xml:lang="en">The family of pseudopotentials used in a
+plane-wave DFT calculation (PAW, ultrasoft, norm-conserving). All-
+electron codes leave this slot empty and use mlips:dftBasisSet
+instead.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#PseudopotentialType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#coversProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">covers property</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#frozenCore">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">frozen core</rdfs:label>
+    <rdfs:comment xml:lang="en">Whether core electrons are kept frozen
+during the post-Hartree-Fock correlation treatment in a wave-function
+calculation. True for the standard frozen-core approximation; false
+for all-electron correlation.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd564f029b681456b97f41cf3361bab46">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:nodeID="Nd82ea0089772432c8d4a14820dbda154"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to the atomic environment descriptor it uses.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Implementation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Implementation</rdfs:label>
+    <rdfs:comment xml:lang="en">A software implementation of an MLIP method in a
+specific library and version.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Implementation"/>
+    <rdfs:subClassOf rdf:nodeID="Nf9f32e39f50b4f2aae42ccf1aae60c68"/>
+    <rdfs:subClassOf rdf:nodeID="Nd564f029b681456b97f41cf3361bab46"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#PhysicalHyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Physical Hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">A hyperparameter that has a direct physical
+meaning. Not disjoint with ArchitecturalHyperparameter.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#AtomicConfiguration">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Atomic Configuration</rdfs:label>
+    <rdfs:comment xml:lang="en">A single atomic configuration (positions, cell,
+properties) in a training dataset.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/AtomicStructure"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#LossFunction">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Loss Function</rdfs:label>
+    <rdfs:comment xml:lang="en">A scalar objective whose minimisation fits the parameters of the functional form.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.wikidata.org/entity/Q122453">
+    <schema:name>University of Stuttgart</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Organization"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nb8c7268ec72f4e93be8e2ea676cbf7ef">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasResult"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasHyperparameterSetting">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has hyperparameter setting</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP run to a concrete hyperparameter setting used in that run.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N118e7502ea2546e68c43884c8f1cddfd">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:nodeID="N7c0f50de765a4043ade439faa820c1ca"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#defaultValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">default value</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#supportsParallelization">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">supports parallelization</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MetricProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Metric Property</rdfs:label>
+    <rdfs:comment xml:lang="en">The physical property being measured (energy, force, stress).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0002-2409-975X">
+    <schema:name>Jong Hyun Jung</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#wfMethod">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">wave-function method</rdfs:label>
+    <rdfs:comment xml:lang="en">The wave-function correlation method used
+to produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
+CASPT2, NEVPT2). Range is WfMethod; concrete methods are named
+individuals in mlips-vocab.ttl.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#WfMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasWaveFunctionSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has wave function settings</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionCalculation"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nb8323accf9264254853597880a527faa">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Xiang Xu</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#R2">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
+    <rdfs:label xml:lang="en">R²</rdfs:label>
+    <rdfs:comment xml:lang="en">Coefficient of determination.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#ForceProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
+    <rdfs:label xml:lang="en">Force</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#implementedIn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">implemented in</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an implementation to the library that provides it.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Implementation"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0002-0780-4154">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Steffen Staab</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#ArchitecturalHyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Architectural Hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">A hyperparameter that specifies the model
+architecture. Not disjoint with PhysicalHyperparameter.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd7fe40fabbb7476db9eba5ebe73816e1">
+    <rdf:first rdf:nodeID="N4d15cf1e07b94c88a794fa8afb57347c"/>
+    <rdf:rest rdf:nodeID="Nb99df5427bf84d3da6830285181e101e"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasDFTSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has DFT settings</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTCalculation"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasAccuracyMetric">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has accuracy metric</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Augmented">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
+    <rdfs:label xml:lang="en">Augmented</rdfs:label>
+    <rdfs:comment xml:lang="en">Dataset augmented from existing sources.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#SOAPDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+    <rdfs:label xml:lang="en">SOAP Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Smooth Overlap of Atomic Positions; used by GAP.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Hyperparameter">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Hyperparameter</rdfs:label>
+    <rdfs:comment xml:lang="en">A hyperparameter of an MLIP method, with its name,
+data type, range, and default value.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#HyperParameter"/>
+    <rdfs:subClassOf rdf:nodeID="N118e7502ea2546e68c43884c8f1cddfd"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3525bb99d08d472d92fce05afcf7c335">
+    <schema:name>Wenchuan Liu</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MaterialSystem">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Material System</rdfs:label>
+    <rdfs:comment xml:lang="en">A material system studied in a dataset: element, alloy,
+compound, or complex microstructure.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#SamplingStrategy">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Sampling Strategy</rdfs:label>
+    <rdfs:comment xml:lang="en">A strategy used to sample the atomic
+configurations in a training dataset (e.g., chemical sampling across
+compositions, vibrational sampling across thermal snapshots, or a
+combination). Concrete sampling strategies are modeled as instances and
+will be developed in future work; this class is left open as an
+extension point.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#TrainedModel">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Trained Model</rdfs:label>
+    <rdfs:comment xml:lang="en">The concrete artifact produced by fitting an MLIP method
 on a specific dataset with specific hyperparameter settings---the learned
 parameters (weights) that can be used for prediction.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Model"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty>
-               <owl:ObjectProperty>
-                  <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
-               </owl:ObjectProperty>
-            </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#MLIPRun">
-      <rdfs:label xml:lang="en">MLIP Run</rdfs:label>
-      <rdfs:comment xml:lang="en">A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#appliesMethod"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#runsOn"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#produces"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#AtomicEnvironmentDescriptor">
-      <rdfs:label xml:lang="en">Atomic Environment Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">A mathematical representation of the local atomic environment used by an MLIP method.</rdfs:comment>
-   </owl:Class>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#evaluatesModel">
-      <rdfs:label xml:lang="en">evaluates model</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a benchmark result to the trained model being evaluated.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#appliesMethod">
-      <rdfs:label xml:lang="en">applies method</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP run to the MLIP method it fits.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasFunctionalForm">
-      <rdfs:label xml:lang="en">has functional form</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to its parametrised functional form.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#FunctionalForm"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasLossFunction">
-      <rdfs:label xml:lang="en">has loss function</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to the loss function whose minimisation fits its parameters.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#LossFunction"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasTrainingAlgorithm">
-      <rdfs:label xml:lang="en">has training algorithm</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to the ML-Schema algorithm used to fit its functional form.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasTrainingRun">
-      <rdfs:label xml:lang="en">has training run</rdfs:label>
-      <rdfs:comment xml:lang="en">Optional link from an MLIP run to an ML-Schema run recording the training algorithm execution.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="http://www.w3.org/ns/mls#Run"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#forHyperparameter">
-      <rdfs:label xml:lang="en">for hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a setting to the hyperparameter it configures.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasHyperparameter">
-      <rdfs:label xml:lang="en">has hyperparameter</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to a hyperparameter it accepts.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasImplementation">
-      <rdfs:label xml:lang="en">has implementation</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to a software implementation.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Implementation"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#implementedIn">
-      <rdfs:label xml:lang="en">implemented in</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an implementation to the library that provides it.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Implementation"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#produces">
-      <rdfs:label xml:lang="en">produces</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP run to the trained model it produces.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#runsOn">
-      <rdfs:label xml:lang="en">runs on</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP run to the training dataset it uses.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#supportsSimulation">
-      <rdfs:label xml:lang="en">supports simulation</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to the simulation types it supports.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#SimulationType"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#trainedOn">
-      <rdfs:label xml:lang="en">trained on</rdfs:label>
-      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the training dataset it was fitted on.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <owl:propertyChainAxiom rdf:parseType="Collection">
-         <owl:ObjectProperty>
-            <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
-         </owl:ObjectProperty>
-         <owl:ObjectProperty rdf:about="https://w3id.org/mlips#runsOn"/>
-      </owl:propertyChainAxiom>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#trainedWith">
-      <rdfs:label xml:lang="en">trained with</rdfs:label>
-      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the MLIP method it applies.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <owl:propertyChainAxiom rdf:parseType="Collection">
-         <owl:ObjectProperty>
-            <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
-         </owl:ObjectProperty>
-         <owl:ObjectProperty rdf:about="https://w3id.org/mlips#appliesMethod"/>
-      </owl:propertyChainAxiom>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#trainedUsing">
-      <rdfs:label xml:lang="en">trained using</rdfs:label>
-      <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to a hyperparameter setting used during the MLIP run that produced it.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <owl:propertyChainAxiom rdf:parseType="Collection">
-         <owl:ObjectProperty>
-            <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
-         </owl:ObjectProperty>
-         <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasHyperparameterSetting"/>
-      </owl:propertyChainAxiom>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasDescriptor">
-      <rdfs:label xml:lang="en">has descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP method to the atomic environment descriptor it uses.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-   </owl:ObjectProperty>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#MomentTensorDescriptor">
-      <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-      <rdfs:label xml:lang="en">Moment Tensor Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Invariant moment tensors of the neighborhood; used by MTP.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#SOAPDescriptor">
-      <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-      <rdfs:label xml:lang="en">SOAP Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Smooth Overlap of Atomic Positions; used by GAP.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#SymmetryFunctionDescriptor">
-      <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-      <rdfs:label xml:lang="en">Symmetry Function Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Behler-Parrinello symmetry functions; used by HDNNP.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#EquivariantMessagePassingDescriptor">
-      <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-      <rdfs:label xml:lang="en">Equivariant Message Passing Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Equivariant message-passing representation; used by MACE and NequIP.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#AtomicClusterExpansionDescriptor">
-      <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
-      <rdfs:label xml:lang="en">Atomic Cluster Expansion Descriptor</rdfs:label>
-      <rdfs:comment xml:lang="en">Atomic cluster expansion; used by ACE.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#cutoffRadius">
-      <rdfs:label xml:lang="en">cutoff radius</rdfs:label>
-      <rdfs:comment xml:lang="en">Cutoff radius for atomic interactions, in angstroms.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#defaultValue">
-      <rdfs:label xml:lang="en">default value</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#hyperparameterDatatype">
-      <rdfs:label xml:lang="en">hyperparameter datatype</rdfs:label>
-      <rdfs:comment xml:lang="en">The expected datatype of this hyperparameter (e.g., float, int, string).</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#hyperparameterName">
-      <rdfs:label xml:lang="en">hyperparameter name</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#learningRate">
-      <rdfs:label xml:lang="en">learning rate</rdfs:label>
-      <rdfs:comment xml:lang="en">Learning rate used during model training.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#maxValue">
-      <rdfs:label xml:lang="en">maximum value</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#minValue">
-      <rdfs:label xml:lang="en">minimum value</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#numAngularBasis">
-      <rdfs:label xml:lang="en">number of angular basis functions</rdfs:label>
-      <rdfs:comment xml:lang="en">Number of angular basis functions in the descriptor.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#numLayers">
-      <rdfs:label xml:lang="en">number of layers</rdfs:label>
-      <rdfs:comment xml:lang="en">Number of layers in the neural network architecture.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#numRadialBasis">
-      <rdfs:label xml:lang="en">number of radial basis functions</rdfs:label>
-      <rdfs:comment xml:lang="en">Number of radial basis functions in the descriptor.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#settingValue">
-      <rdfs:label xml:lang="en">setting value</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#version">
-      <rdfs:label xml:lang="en">version</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#Implementation"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#trainingComplexity">
-      <rdfs:label xml:lang="en">training complexity</rdfs:label>
-      <rdfs:comment xml:lang="en">Asymptotic computational complexity of training.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#inferenceComplexity">
-      <rdfs:label xml:lang="en">inference complexity</rdfs:label>
-      <rdfs:comment xml:lang="en">Asymptotic computational complexity of inference.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#supportsGPU">
-      <rdfs:label xml:lang="en">supports GPU</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#supportsParallelization">
-      <rdfs:label xml:lang="en">supports parallelization</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#trainingDuration">
-      <rdfs:label xml:lang="en">training duration</rdfs:label>
-      <rdfs:comment xml:lang="en">Measured wall-clock training time (hours).</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#trainingHardware">
-      <rdfs:label xml:lang="en">training hardware</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#peakMemory">
-      <rdfs:label xml:lang="en">peak memory</rdfs:label>
-      <rdfs:comment xml:lang="en">Peak memory during training (GB).</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#gpuHours">
-      <rdfs:label xml:lang="en">GPU hours</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:Class rdf:about="https://w3id.org/mlips#AtomicConfiguration">
-      <rdfs:label xml:lang="en">Atomic Configuration</rdfs:label>
-      <rdfs:comment xml:lang="en">A single atomic configuration (positions, cell,
-properties) in a training dataset.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/AtomicStructure"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#CoveredProperty">
-      <rdfs:label xml:lang="en">Covered Property</rdfs:label>
-      <rdfs:comment xml:lang="en">A physical property covered by the training dataset
-(energy, forces, stresses, virials).</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#DFTCalculation">
-      <rdfs:label xml:lang="en">DFT Calculation</rdfs:label>
-      <rdfs:comment xml:lang="en">A density functional theory calculation that produced
-reference data for training.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasDFTSettings"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#DFTSettings">
-      <rdfs:label xml:lang="en">DFT Settings</rdfs:label>
-      <rdfs:comment xml:lang="en">Settings of a DFT calculation: exchange-correlation
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Model"/>
+    <rdfs:subClassOf rdf:nodeID="Ne9ef569c9f7f4a2c8147d44b70895fed"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainedUsing">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">trained using</rdfs:label>
+    <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to a hyperparameter setting used during the MLIP run that produced it.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <owl:propertyChainAxiom rdf:nodeID="N169028df1ef74d2585c766f4a2949b42"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#settingValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">setting value</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#SimulationType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Simulation Type</rdfs:label>
+    <rdfs:comment xml:lang="en">A type of atomistic simulation: molecular dynamics,
+Monte Carlo, geometry optimization, phonon calculations,
+thermodynamic integration, etc.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc057793812c84453837c969c6ca54acd">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N8bc4c0e347524580be368900ed045434">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasConfiguration"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#AtomicConfiguration"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0002-3661-5870">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Pranav Kumar</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainingHardware">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">training hardware</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N4d15cf1e07b94c88a794fa8afb57347c">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#WaveFunctionSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Wave Function Settings</rdfs:label>
+    <rdfs:comment xml:lang="en">Settings of a wave-function-based reference
+calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
+cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#metricProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">metric property</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MetricProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#EnergyProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
+    <rdfs:label xml:lang="en">Energy (metric property)</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasConfiguration">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has configuration</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#AtomicConfiguration"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#DFTSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">DFT Settings</rdfs:label>
+    <rdfs:comment xml:lang="en">Settings of a DFT calculation: exchange-correlation
 functional, k-point mesh, energy cutoff, pseudopotential type.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#DatasetProvenance">
-      <rdfs:label xml:lang="en">Dataset Provenance</rdfs:label>
-      <rdfs:comment xml:lang="en">The provenance type of a training dataset.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#DftBasisSet">
-      <rdfs:label xml:lang="en">DFT Basis Set</rdfs:label>
-      <rdfs:comment xml:lang="en">The basis set used in a DFT calculation,
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#ReferenceSettings">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Reference Settings</rdfs:label>
+    <rdfs:comment xml:lang="en">Settings of a reference calculation, abstracted
+across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
+carry the method-specific parameters; the supertype carries cross-family slots
+such as the software code used.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfa147ea2e85245309d172fe4329f4bba">
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+    <schema:name>Xi Zhang</schema:name>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Naa67293aeac246dcb379ba9c6be6a9b3">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#evaluatesModel"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0003-4281-5665">
+    <schema:name>Blazej Grabowski</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#evaluatesModel">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">evaluates model</rdfs:label>
+    <rdfs:comment xml:lang="en">Links a benchmark result to the trained model being evaluated.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N8745c82d243b4703b2b60a811a351ac9">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasTrainingAlgorithm"/>
+    <owl:someValuesFrom rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasFunctionalForm">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has functional form</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to its parametrised functional form.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#FunctionalForm"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#CoveredProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Covered Property</rdfs:label>
+    <rdfs:comment xml:lang="en">A physical property covered by the training dataset
+(energy, forces, stresses, virials).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#xcFunctional">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">exchange-correlation functional</rdfs:label>
+    <rdfs:comment xml:lang="en">The exchange-correlation functional used in
+a DFT calculation (e.g., LDA, PBE, PBE0, HSE06, SCAN, omegaB97X). Range
+is XCFunctional; concrete functionals are named individuals in
+mlips-vocab.ttl.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#XCFunctional"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#supportsSimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">supports simulation</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an MLIP method to the simulation types it supports.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#SimulationType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasDFTCalculation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has DFT calculation</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceCalculation"/>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#DFTCalculation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#WfMethod">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Wave Function Method</rdfs:label>
+    <rdfs:comment xml:lang="en">A wave-function correlation method used to
+produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
+CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
+Concrete methods are modelled as named individuals; an open
+extension point.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nc7c238ff2ca24ac1a67ff0692da7d121">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#metricProperty"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#MetricProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N169028df1ef74d2585c766f4a2949b42">
+    <rdf:first rdf:nodeID="N96a32cbc11fe4dcc88a63bda03ea1952"/>
+    <rdf:rest rdf:nodeID="N34cec788f8b84b82b98fcc17b63ae730"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#trainedWith">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">trained with</rdfs:label>
+    <rdfs:comment xml:lang="en">Shortcut: links a trained model directly to the MLIP method it applies.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+    <owl:propertyChainAxiom rdf:nodeID="Nd7fe40fabbb7476db9eba5ebe73816e1"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#inferenceHardware">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">inference hardware</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hasUnit">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">has unit</rdfs:label>
+    <rdfs:comment xml:lang="en">Links a numeric value to its QUDT unit.</rdfs:comment>
+    <rdfs:range rdf:resource="http://qudt.org/schema/qudt/Unit"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N3995fa8b59c2423aad0e6afb6460dea9">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#produces"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#basisSet">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">basis set</rdfs:label>
+    <rdfs:comment xml:lang="en">The Gaussian basis set used in a
+wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#WaveFunctionCalculation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Wave Function Calculation</rdfs:label>
+    <rdfs:comment xml:lang="en">A wave-function-based reference calculation
+(e.g., Hartree-Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to
+DFTCalculation as a source of reference data, typically more accurate but
+more expensive.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
+    <rdfs:subClassOf rdf:nodeID="N347fd039121e4e4a901ec55db0033aa6"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N9d4e77d0707347fead0652052b6831fd">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfa331a862c5b4316878df95eb38e2b49">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#supportsSimulation"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#SimulationType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#numConfigurations">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">number of configurations</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#MomentTensorDescriptor">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+    <rdfs:label xml:lang="en">Moment Tensor Descriptor</rdfs:label>
+    <rdfs:comment xml:lang="en">Invariant moment tensors of the neighborhood; used by MTP.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#hyperparameterName">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">hyperparameter name</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nfc8ea85e1bed431fa851d0e728787a5f">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#runsOn"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N544c7f4294c041939a3a80e619a11a75">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#numAngularBasis">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">number of angular basis functions</rdfs:label>
+    <rdfs:comment xml:lang="en">Number of angular basis functions in the descriptor.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#inferenceTimePerAtom">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">inference time per atom</rdfs:label>
+    <rdfs:comment xml:lang="en">Inference time per atom (microseconds).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#numLayers">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">number of layers</rdfs:label>
+    <rdfs:comment xml:lang="en">Number of layers in the neural network architecture.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Ne5be29e4641e41b3be1364964772cb56">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#datasetProvenance"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#chemicalFormula">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">chemical formula</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#PseudopotentialType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Pseudopotential Type</rdfs:label>
+    <rdfs:comment xml:lang="en">A family of pseudopotentials used in a
+plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
+Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
+leave this slot empty. Concrete pseudopotential families are modelled
+as named individuals; an open extension point.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#DFTCalculation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">DFT Calculation</rdfs:label>
+    <rdfs:comment xml:lang="en">A density functional theory calculation that produced
+reference data for training.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
+    <rdfs:subClassOf rdf:nodeID="N6681c33de05e489fac3d7fdb4cd6c14f"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd69d26581ca243af9aeca543189eb3b7">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasLossFunction"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#LossFunction"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://orcid.org/0000-0003-2160-4696">
+    <schema:name>Daniel Hernández</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nb99df5427bf84d3da6830285181e101e">
+    <rdf:first rdf:resource="https://w3id.org/mlips#appliesMethod"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#usesTrainingData">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">uses training data</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#metricValue">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">metric value</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.wikidata.org/entity/Q131785081">
+    <schema:parentOrganization rdf:resource="http://www.wikidata.org/entity/Q122453"/>
+    <schema:name>Institute for Artificial Intelligence (KI)</schema:name>
+    <rdf:type rdf:resource="https://schema.org/Organization"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#DatasetProvenance">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Dataset Provenance</rdfs:label>
+    <rdfs:comment xml:lang="en">The provenance type of a training dataset.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#Forces">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+    <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
+    <rdfs:label xml:lang="en">Forces</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N88119c3fea1b4981b81ff1ec8aab3d88">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasResult"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N7c0f50de765a4043ade439faa820c1ca">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N6681c33de05e489fac3d7fdb4cd6c14f">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#hasDFTSettings"/>
+    <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#DFTSettings"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#targetMaterial">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">target material</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N94208d15da6e49949eba0c387d12d5fc">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Restriction"/>
+    <owl:onProperty rdf:resource="https://w3id.org/mlips#metricType"/>
+    <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+    <owl:onClass rdf:resource="https://w3id.org/mlips#MetricType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#usesAlgorithm">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">uses algorithm</rdfs:label>
+    <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+    <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Na3b982e72f0b405aaa84084a1b1dc177">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="N06488a3ac12a4847b6d67b229e7d1456">
+    <rdf:first rdf:resource="https://w3id.org/mlips#runsOn"/>
+    <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/mlips#DftBasisSet">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">DFT Basis Set</rdfs:label>
+    <rdfs:comment xml:lang="en">The basis set used in a DFT calculation,
 when the code is all-electron or otherwise uses a localised basis (e.g.,
 FHI-aims NAO families, LAPW, Gaussian-type orbitals such as cc-pVDZ
 or 6-31G). Range of mlips:dftBasisSet on DFTSettings. Plane-wave
 codes specify the basis through mlips:energyCutoff instead and leave
 this slot empty. Concrete basis sets are modelled as named individuals;
 an open extension point.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#MaterialSystem">
-      <rdfs:label xml:lang="en">Material System</rdfs:label>
-      <rdfs:comment xml:lang="en">A material system studied in a dataset: element, alloy,
-compound, or complex microstructure.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#PseudopotentialType">
-      <rdfs:label xml:lang="en">Pseudopotential Type</rdfs:label>
-      <rdfs:comment xml:lang="en">A family of pseudopotentials used in a
-plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
-Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
-leave this slot empty. Concrete pseudopotential families are modelled
-as named individuals; an open extension point.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#ReferenceCalculation">
-      <rdfs:label xml:lang="en">Reference Calculation</rdfs:label>
-      <rdfs:comment xml:lang="en">A first-principles calculation that produced
-reference energies, forces, or stresses for MLIP training. Generalisation of
-DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
-CASPT2) and other ab initio approaches.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#ReferenceSettings">
-      <rdfs:label xml:lang="en">Reference Settings</rdfs:label>
-      <rdfs:comment xml:lang="en">Settings of a reference calculation, abstracted
-across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
-carry the method-specific parameters; the supertype carries cross-family slots
-such as the software code used.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#SamplingStrategy">
-      <rdfs:label xml:lang="en">Sampling Strategy</rdfs:label>
-      <rdfs:comment xml:lang="en">A strategy used to sample the atomic
-configurations in a training dataset (e.g., chemical sampling across
-compositions, vibrational sampling across thermal snapshots, or a
-combination). Concrete sampling strategies are modeled as instances and
-will be developed in future work; this class is left open as an
-extension point.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#TrainingDataset">
-      <rdfs:label xml:lang="en">Training Dataset</rdfs:label>
-      <rdfs:comment xml:lang="en">A dataset of atomic configurations used for MLIP
-training, with provenance, size, property coverage, and DFT settings.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#Dataset"/>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#coversMaterial"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#coversProperty"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#datasetProvenance"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasConfiguration"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#AtomicConfiguration"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#WaveFunctionCalculation">
-      <rdfs:label xml:lang="en">Wave Function Calculation</rdfs:label>
-      <rdfs:comment xml:lang="en">A wave-function-based reference calculation
-(e.g., Hartree-Fock, MP2, CCSD, CCSD(T), CASPT2). An alternative to
-DFTCalculation as a source of reference data, typically more accurate but
-more expensive.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasWaveFunctionSettings"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#WaveFunctionSettings">
-      <rdfs:label xml:lang="en">Wave Function Settings</rdfs:label>
-      <rdfs:comment xml:lang="en">Settings of a wave-function-based reference
-calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
-cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#WfMethod">
-      <rdfs:label xml:lang="en">Wave Function Method</rdfs:label>
-      <rdfs:comment xml:lang="en">A wave-function correlation method used to
-produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
-CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
-Concrete methods are modelled as named individuals; an open
-extension point.</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#XCFunctional">
-      <rdfs:label xml:lang="en">Exchange-Correlation Functional</rdfs:label>
-      <rdfs:comment xml:lang="en">A density-functional approximation to the
-exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
-PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
-DFTSettings. Concrete functionals are modelled as named individuals;
-an open extension point.</rdfs:comment>
-   </owl:Class>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#candidateForVocabulary">
-      <rdfs:label xml:lang="en">candidate for vocabulary</rdfs:label>
-      <rdfs:comment xml:lang="en">Annotates a paper-local instance with the
-controlled-vocabulary class to which it should be considered for
-promotion. Used when an encoded paper introduces an entity that is not
-yet a named individual in mlips-vocab.ttl. The deduplication audit
-collects these candidates; a curator promotes, merges, or leaves them
-paper-local.</rdfs:comment>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#coversMaterial">
-      <rdfs:label xml:lang="en">covers material</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#coversProperty">
-      <rdfs:label xml:lang="en">covers property</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#datasetProvenance">
-      <rdfs:label xml:lang="en">dataset provenance</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#dftBasisSet">
-      <rdfs:label xml:lang="en">DFT basis set</rdfs:label>
-      <rdfs:comment xml:lang="en">The basis set used by an all-electron or
-localised-basis DFT calculation (FHI-aims NAO, LAPW, Gaussian-type
-orbitals such as cc-pVDZ or 6-31G). Plane-wave codes specify the basis
-through mlips:energyCutoff and leave this slot empty.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#DftBasisSet"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasConfiguration">
-      <rdfs:label xml:lang="en">has configuration</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#AtomicConfiguration"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasDFTCalculation">
-      <rdfs:label xml:lang="en">has DFT calculation</rdfs:label>
-      <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceCalculation"/>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#DFTCalculation"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasDFTSettings">
-      <rdfs:label xml:lang="en">has DFT settings</rdfs:label>
-      <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTCalculation"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasReferenceCalculation">
-      <rdfs:label xml:lang="en">has reference calculation</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a training dataset to the
-first-principles calculation that produced its reference data.
-Generalises hasDFTCalculation to wave-function and other ab initio
-methods.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasReferenceSettings">
-      <rdfs:label xml:lang="en">has reference settings</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a reference calculation to its
-method-specific settings. Generalises hasDFTSettings to wave-function
-and other ab initio methods.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasWaveFunctionSettings">
-      <rdfs:label xml:lang="en">has wave function settings</rdfs:label>
-      <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#hasReferenceSettings"/>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionCalculation"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#pseudopotentialType">
-      <rdfs:label xml:lang="en">pseudopotential type</rdfs:label>
-      <rdfs:comment xml:lang="en">The family of pseudopotentials used in a
-plane-wave DFT calculation (PAW, ultrasoft, norm-conserving). All-
-electron codes leave this slot empty and use mlips:dftBasisSet
-instead.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#PseudopotentialType"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#samplingStrategy">
-      <rdfs:label xml:lang="en">sampling strategy</rdfs:label>
-      <rdfs:comment xml:lang="en">Records the sampling strategy or strategies
-used to construct a training dataset. Optional and multi-valued: a
-dataset may combine several sampling strategies (e.g., chemical and
-vibrational).</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#SamplingStrategy"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#usedDFTCode">
-      <rdfs:label xml:lang="en">used DFT code</rdfs:label>
-      <rdfs:comment xml:lang="en">The DFT software used (e.g., VASP, GPAW).</rdfs:comment>
-      <rdfs:subPropertyOf rdf:resource="https://w3id.org/mlips#usedReferenceCode"/>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#usedReferenceCode">
-      <rdfs:label xml:lang="en">used reference code</rdfs:label>
-      <rdfs:comment xml:lang="en">The software code used to perform the
-reference calculation (e.g., VASP, GPAW for DFT; Molpro, PySCF, ORCA
-for wave-function methods). Generalises usedDFTCode.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#Library"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#wfMethod">
-      <rdfs:label xml:lang="en">wave-function method</rdfs:label>
-      <rdfs:comment xml:lang="en">The wave-function correlation method used
-to produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
-CASPT2, NEVPT2). Range is WfMethod; concrete methods are named
-individuals in mlips-vocab.ttl.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#WfMethod"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#xcFunctional">
-      <rdfs:label xml:lang="en">exchange-correlation functional</rdfs:label>
-      <rdfs:comment xml:lang="en">The exchange-correlation functional used in
-a DFT calculation (e.g., LDA, PBE, PBE0, HSE06, SCAN, omegaB97X). Range
-is XCFunctional; concrete functionals are named individuals in
-mlips-vocab.ttl.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#XCFunctional"/>
-   </owl:ObjectProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#basisSet">
-      <rdfs:label xml:lang="en">basis set</rdfs:label>
-      <rdfs:comment xml:lang="en">The Gaussian basis set used in a
-wave-function calculation, e.g., cc-pVTZ, aug-cc-pVDZ, def2-TZVP.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#chemicalFormula">
-      <rdfs:label xml:lang="en">chemical formula</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#energyCutoff">
-      <rdfs:label xml:lang="en">energy cutoff</rdfs:label>
-      <rdfs:comment xml:lang="en">Plane-wave energy cutoff in eV.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#frozenCore">
-      <rdfs:label xml:lang="en">frozen core</rdfs:label>
-      <rdfs:comment xml:lang="en">Whether core electrons are kept frozen
-during the post-Hartree-Fock correlation treatment in a wave-function
-calculation. True for the standard frozen-core approximation; false
-for all-electron correlation.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#kPointMesh">
-      <rdfs:label xml:lang="en">k-point mesh</rdfs:label>
-      <rdfs:comment xml:lang="en">K-point mesh specification (e.g., '4x4x4').</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#DFTSettings"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#materialClass">
-      <rdfs:label xml:lang="en">material class</rdfs:label>
-      <rdfs:comment xml:lang="en">E.g., element, binary alloy, ternary compound, HEA.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#microstructuralFeature">
-      <rdfs:label xml:lang="en">microstructural feature</rdfs:label>
-      <rdfs:comment xml:lang="en">E.g., point defect, dislocation, surface, grain boundary.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#numConfigurations">
-      <rdfs:label xml:lang="en">number of configurations</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-   </owl:DatatypeProperty>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Augmented">
-      <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
-      <rdfs:label xml:lang="en">Augmented</rdfs:label>
-      <rdfs:comment xml:lang="en">Dataset augmented from existing sources.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Energy">
-      <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-      <rdfs:label xml:lang="en">Energy</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Forces">
-      <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-      <rdfs:label xml:lang="en">Forces</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#InHouse">
-      <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
-      <rdfs:label xml:lang="en">In-house</rdfs:label>
-      <rdfs:comment xml:lang="en">Dataset generated by in-house calculations.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Published">
-      <rdf:type rdf:resource="https://w3id.org/mlips#DatasetProvenance"/>
-      <rdfs:label xml:lang="en">Published</rdfs:label>
-      <rdfs:comment xml:lang="en">Dataset from a published source.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Stresses">
-      <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-      <rdfs:label xml:lang="en">Stresses</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#Virials">
-      <rdf:type rdf:resource="https://w3id.org/mlips#CoveredProperty"/>
-      <rdfs:label xml:lang="en">Virials</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:Class rdf:about="https://w3id.org/mlips#AccuracyMetric">
-      <rdfs:label xml:lang="en">Accuracy Metric</rdfs:label>
-      <rdfs:comment xml:lang="en">An accuracy measure reported in a benchmark
-(e.g., RMSE of energy, MAE of forces).</rdfs:comment>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#metricType"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#MetricType"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#metricProperty"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#MetricProperty"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty>
-               <owl:ObjectProperty>
-                  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
-               </owl:ObjectProperty>
-            </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#BenchmarkResult">
-      <rdfs:label xml:lang="en">Benchmark Result</rdfs:label>
-      <rdfs:comment xml:lang="en">A single evaluation result: an MLIP method applied to a
-material system with specific hyperparameters, reporting accuracy metrics.</rdfs:comment>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#evaluatesModel"/>
-            <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-            <owl:onClass rdf:resource="https://w3id.org/mlips#TrainedModel"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#targetMaterial"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty>
-               <owl:ObjectProperty>
-                  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasResult"/>
-               </owl:ObjectProperty>
-            </owl:onProperty>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#BenchmarkStudy">
-      <rdfs:label xml:lang="en">Benchmark Study</rdfs:label>
-      <rdfs:comment xml:lang="en">A published study reporting MLIP evaluation results.</rdfs:comment>
-      <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
-      <rdfs:subClassOf>
-         <owl:Restriction>
-            <owl:onProperty rdf:resource="https://w3id.org/mlips#hasResult"/>
-            <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-         </owl:Restriction>
-      </rdfs:subClassOf>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#MetricProperty">
-      <rdfs:label xml:lang="en">Metric Property</rdfs:label>
-      <rdfs:comment xml:lang="en">The physical property being measured (energy, force, stress).</rdfs:comment>
-   </owl:Class>
-   <owl:Class rdf:about="https://w3id.org/mlips#MetricType">
-      <rdfs:label xml:lang="en">Metric Type</rdfs:label>
-      <rdfs:comment xml:lang="en">Type of accuracy metric (RMSE, MAE, R², etc.).</rdfs:comment>
-   </owl:Class>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasAccuracyMetric">
-      <rdfs:label xml:lang="en">has accuracy metric</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasHyperparameterSetting">
-      <rdfs:label xml:lang="en">has hyperparameter setting</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an MLIP run to a concrete hyperparameter setting used in that run.</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasResult">
-      <rdfs:label xml:lang="en">has result</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#metricProperty">
-      <rdfs:label xml:lang="en">metric property</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MetricProperty"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#metricType">
-      <rdfs:label xml:lang="en">metric type</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MetricType"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#reportedIn">
-      <rdfs:label xml:lang="en">reported in</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://schema.org/ScholarlyArticle"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#targetMaterial">
-      <rdfs:label xml:lang="en">target material</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MaterialSystem"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#usesAlgorithm">
-      <rdfs:label xml:lang="en">uses algorithm</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#usesTrainingData">
-      <rdfs:label xml:lang="en">uses training data</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
-   </owl:ObjectProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#metricValue">
-      <rdfs:label xml:lang="en">metric value</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#inferenceTimePerAtom">
-      <rdfs:label xml:lang="en">inference time per atom</rdfs:label>
-      <rdfs:comment xml:lang="en">Inference time per atom (microseconds).</rdfs:comment>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-   </owl:DatatypeProperty>
-   <owl:DatatypeProperty rdf:about="https://w3id.org/mlips#inferenceHardware">
-      <rdfs:label xml:lang="en">inference hardware</rdfs:label>
-      <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
-      <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-   </owl:DatatypeProperty>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#EnergyProperty">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
-      <rdfs:label xml:lang="en">Energy (metric property)</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#ForceProperty">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
-      <rdfs:label xml:lang="en">Force</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#MAE">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
-      <rdfs:label xml:lang="en">MAE</rdfs:label>
-      <rdfs:comment xml:lang="en">Mean Absolute Error.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#R2">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
-      <rdfs:label xml:lang="en">R²</rdfs:label>
-      <rdfs:comment xml:lang="en">Coefficient of determination.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#RMSE">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricType"/>
-      <rdfs:label xml:lang="en">RMSE</rdfs:label>
-      <rdfs:comment xml:lang="en">Root Mean Square Error.</rdfs:comment>
-   </owl:NamedIndividual>
-   <owl:NamedIndividual rdf:about="https://w3id.org/mlips#StressProperty">
-      <rdf:type rdf:resource="https://w3id.org/mlips#MetricProperty"/>
-      <rdfs:label xml:lang="en">Stress</rdfs:label>
-   </owl:NamedIndividual>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#hasUnit">
-      <rdfs:label xml:lang="en">has unit</rdfs:label>
-      <rdfs:comment xml:lang="en">Links a numeric value to its QUDT unit.</rdfs:comment>
-      <rdfs:range rdf:resource="http://qudt.org/schema/qudt/Unit"/>
-   </owl:ObjectProperty>
-   <owl:ObjectProperty rdf:about="https://w3id.org/mlips#sameAsWikidata">
-      <rdfs:label xml:lang="en">same as Wikidata</rdfs:label>
-      <rdfs:comment xml:lang="en">Links an entity to its corresponding Wikidata item.</rdfs:comment>
-      <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#sameAs"/>
-   </owl:ObjectProperty>
+  </rdf:Description>
+  <rdf:Description rdf:nodeID="Nd82ea0089772432c8d4a14820dbda154">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasImplementation"/>
+  </rdf:Description>
 </rdf:RDF>

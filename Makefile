@@ -37,16 +37,30 @@ release: ontology roundtrip-check listings term-appendices figures
 	@echo "  make sync-from-dataset DATASET_PATH=$$(pwd)"
 
 # === Ontology pipeline (XHTML -> OWL -> TTL) ===
+#
+# Three-step build:
+#   1. Saxon's extract-owl.xsl pulls term axioms out of the
+#      <pre class="owl-xml"> CDATA blocks in the XHTML.
+#   2. rapper converts the resulting RDF/XML to Turtle.
+#   3. merge_rdfa_into_owl.py adds the ontology-header annotations
+#      that live as RDFa in the XHTML body (dcterms:title,
+#      dcterms:license, owl:versionIRI, vann:preferredNamespace*,
+#      owl:imports, dcterms:creator/contributor, dcterms:publisher,
+#      etc.) which the XSLT does not extract.
+#
+# Step 3 rewrites both .ttl and .owl from the merged graph, so the
+# two serialisations stay in sync.
 
 ontology: $(TTL_FILE)
 
 $(OWL_FILE): $(XHTML_SOURCE)
 	$(SAXON) -s:$(XHTML_SOURCE) -xsl:$(EXTRACT_XSL) -o:$(OWL_FILE)
-	@echo "Generated $(OWL_FILE)"
+	@echo "Generated $(OWL_FILE) (term axioms only)"
 
-$(TTL_FILE): $(OWL_FILE)
+$(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py
 	$(RAPPER) -i rdfxml -o turtle $(OWL_FILE) > $(TTL_FILE) 2>/dev/null
-	@echo "Generated $(TTL_FILE)"
+	python3 artifacts/scripts/merge_rdfa_into_owl.py
+	@echo "Merged RDFa header annotations into $(TTL_FILE) and $(OWL_FILE)"
 
 # === Round-trip check on every paper ===
 
