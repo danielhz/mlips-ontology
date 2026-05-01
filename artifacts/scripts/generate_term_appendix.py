@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 from rdflib import Graph, Namespace, RDF, RDFS, OWL, XSD
 
-MLIPS = Namespace("https://kg.ki.uni-stuttgart.de/_ontology/mlips#")
+MLIPS = Namespace("https://w3id.org/mlips#")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 MLS = Namespace("http://www.w3.org/ns/mls#")
 SCHEMA = Namespace("https://schema.org/")
