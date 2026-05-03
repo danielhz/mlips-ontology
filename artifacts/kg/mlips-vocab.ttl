@@ -24,6 +24,7 @@
 
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix mlips:  <https://w3id.org/mlips#> .
 
 ###############################################################################
@@ -268,3 +269,120 @@ mlips:PACE a mlips:Library ;
     rdfs:label "PACE" ;
     rdfs:comment "Performant Atomic Cluster Expansion C++ implementation; LAMMPS pair_style for the ACE method (Drautz 2019)." ;
     rdfs:comment "No Wikidata entry as of 2026-04-28." .
+
+###############################################################################
+# Hyperparameters (mlips:Hyperparameter)
+#
+# Canonical type-level hyperparameter individuals. Each carries the
+# mlips:hyperparameterName / mlips:hyperparameterDatatype metadata
+# that competency question CQ1 reaches for, plus optional defaults
+# and physical bounds. Per-paper HyperparameterSetting instances
+# point at these via mlips:forHyperparameter; per-paper MLIPMethod
+# instances reference them via mlips:hasHyperparameter.
+#
+# An IRI such as mlips:cutoffRadius is also a DatatypeProperty in
+# the schema (with range xsd:double, used to attach a numeric value
+# directly to a HyperparameterSetting node). OWL 2 punning lets the
+# same IRI carry both the property and the type-level Hyperparameter
+# individual without conflict; CQ1 only consults the individual side
+# (?hp a mlips:Hyperparameter ; mlips:hyperparameterName ...).
+###############################################################################
+
+mlips:cutoffRadius a mlips:Hyperparameter ;
+    rdfs:label "cutoff radius" ;
+    rdfs:comment "Distance beyond which atoms are not considered neighbours of a given centre. Universal across descriptor- and graph-based MLIPs; usually denoted r_cut." ;
+    mlips:hyperparameterName "cutoff_radius" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:minValue "0.0"^^xsd:double ;
+    mlips:maxValue "12.0"^^xsd:double .
+
+mlips:angularCutoff a mlips:Hyperparameter ;
+    rdfs:label "angular cutoff" ;
+    rdfs:comment "Secondary, typically smaller cutoff governing the angular / 3-body / bond-graph component of the descriptor (e.g. ANI angular AEV cutoff, M3GNet 3-body cutoff, CHGNet bond-graph cutoff)." ;
+    mlips:hyperparameterName "angular_cutoff" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:minValue "0.0"^^xsd:double ;
+    mlips:maxValue "8.0"^^xsd:double .
+
+mlips:minInteratomicDistance a mlips:Hyperparameter ;
+    rdfs:label "minimum interatomic distance" ;
+    rdfs:comment "Lower bound on the radial-basis support; configurations with closer pairs are flagged as out-of-domain. Common in MTP encodings (r_min)." ;
+    mlips:hyperparameterName "r_min" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:minValue "0.0"^^xsd:double ;
+    mlips:maxValue "5.0"^^xsd:double .
+
+mlips:momentLevel a mlips:Hyperparameter ;
+    rdfs:label "MTP moment level" ;
+    rdfs:comment "Maximum-level threshold lev_max controlling the size of the level-truncated MTP basis. MTP-specific: not directly comparable to the body-order or angular-basis count of other families." ;
+    mlips:hyperparameterName "lev_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "0"^^xsd:integer .
+
+mlips:bodyOrder a mlips:Hyperparameter ;
+    rdfs:label "body order" ;
+    rdfs:comment "Maximum body order / correlation order of the descriptor's many-body basis (ACE, MACE). Body order 2 = pair, 3 = triplet, etc." ;
+    mlips:hyperparameterName "body_order" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "2"^^xsd:integer ;
+    mlips:maxValue "8"^^xsd:integer .
+
+mlips:numLayers a mlips:Hyperparameter ;
+    rdfs:label "number of layers" ;
+    rdfs:comment "Number of message-passing / interaction layers in a graph-neural-network MLIP. SchNet's T, MACE / NequIP / Allegro layer counts, M3GNet / CHGNet block counts." ;
+    mlips:hyperparameterName "num_layers" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer ;
+    mlips:maxValue "12"^^xsd:integer .
+
+mlips:numFeatures a mlips:Hyperparameter ;
+    rdfs:label "number of features" ;
+    rdfs:comment "Width of the per-atom feature vector / hidden state in graph-network MLIPs. Goes by 'channels', 'embedding dim', 'feature size', SchNet's F." ;
+    mlips:hyperparameterName "num_features" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer .
+
+mlips:numRadialBasis a mlips:Hyperparameter ;
+    rdfs:label "number of radial basis functions" ;
+    rdfs:comment "Number of radial basis functions used to expand the radial dependence of the descriptor (Bessel basis in MACE, n_max in SOAP, etc.)." ;
+    mlips:hyperparameterName "num_radial_basis" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer .
+
+mlips:numAngularBasis a mlips:Hyperparameter ;
+    rdfs:label "number of angular basis functions" ;
+    rdfs:comment "Maximum spherical-harmonic order l_max controlling the angular component of the descriptor (SOAP, MACE, NequIP, Allegro)." ;
+    mlips:hyperparameterName "l_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "0"^^xsd:integer ;
+    mlips:maxValue "10"^^xsd:integer .
+
+mlips:learningRate a mlips:Hyperparameter ;
+    rdfs:label "learning rate" ;
+    rdfs:comment "Initial learning rate for the gradient-based optimiser (Adam, AdamW, AMSGrad). The corpus-wide median is around 1e-3." ;
+    mlips:hyperparameterName "learning_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:defaultValue "0.001"^^xsd:double ;
+    mlips:minValue "0.0"^^xsd:double ;
+    mlips:maxValue "1.0"^^xsd:double .
+
+mlips:batchSize a mlips:Hyperparameter ;
+    rdfs:label "batch size" ;
+    rdfs:comment "Number of training examples per stochastic gradient step." ;
+    mlips:hyperparameterName "batch_size" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer .
+
+mlips:numEpochs a mlips:Hyperparameter ;
+    rdfs:label "number of epochs" ;
+    rdfs:comment "Number of full passes over the training set." ;
+    mlips:hyperparameterName "num_epochs" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer .
+
+mlips:numSparseConfigs a mlips:Hyperparameter ;
+    rdfs:label "number of sparse configurations" ;
+    rdfs:comment "Sparse-Gaussian-process inducing-set size (M / Msparse) controlling the cost of GAP regression." ;
+    mlips:hyperparameterName "num_sparse_configs" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:minValue "1"^^xsd:integer .

@@ -127,7 +127,7 @@ ex:GAP a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:gap-functional-form ;
     mlips:hasLossFunction ex:gap-loss-bartok2018si ;
     mlips:hasTrainingAlgorithm ex:gpr-bartok2018si ;
-    mlips:hasHyperparameter ex:hp-rcut-bartok2018si , ex:hp-sigma-atom , ex:hp-zeta , ex:hp-delta , ex:hp-M , ex:hp-lmax-soap , ex:hp-nmax-soap ;
+    mlips:hasHyperparameter mlips:cutoffRadius , ex:hp-sigma-atom , ex:hp-zeta , ex:hp-delta , mlips:numSparseConfigs , mlips:numAngularBasis , mlips:numRadialBasis ;
     mlips:hasImplementation ex:quip-impl .
 
 ex:gap-functional-form a mlips:FunctionalForm ;
@@ -147,7 +147,7 @@ ex:quip-impl a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-5-bartok2018si a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-bartok2018si ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "5.0" .
 
 ex:setting-sigma-atom-05 a mlips:HyperparameterSetting ;
@@ -163,7 +163,7 @@ ex:setting-delta-3 a mlips:HyperparameterSetting ;
     mlips:settingValue "3" .
 
 ex:setting-M-9000 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-M ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
     mlips:settingValue "9000" .
 
 ###############################################################################
@@ -205,3 +205,26 @@ ex:metric-gap-si-forces-median a mlips:AccuracyMetric ;
 # Bartok et al. (2018) does not report GAP training duration, GPU
 # hours, training hardware, peak memory, or per-atom inference time.
 # Recorded as a Q12 gap.
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-delta a mlips:Hyperparameter ;
+    rdfs:label "SOAP / Huber delta" ;
+    mlips:hyperparameterName "delta" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-sigma-atom a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width" ;
+    mlips:hyperparameterName "sigma_atom" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-zeta a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel polynomial power" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

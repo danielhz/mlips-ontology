@@ -92,7 +92,7 @@ ex:DeePMD a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:deepmd-functional-form ;
     mlips:hasLossFunction ex:deepmd-loss-wang2018 ;
     mlips:hasTrainingAlgorithm ex:adam-deepmd ;
-    mlips:hasHyperparameter ex:hp-rcut-deepmd , ex:hp-hidden-deepmd , ex:hp-lr0-deepmd , ex:hp-decay-rate-deepmd , ex:hp-decay-steps-deepmd ;
+    mlips:hasHyperparameter mlips:cutoffRadius , ex:hp-hidden-deepmd , mlips:learningRate , ex:hp-decay-rate-deepmd , ex:hp-decay-steps-deepmd ;
     mlips:hasImplementation ex:deepmd-kit-impl .
 
 ex:deepmd-functional-form a mlips:FunctionalForm ;
@@ -113,7 +113,7 @@ ex:deepmd-kit-impl a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-60-wang2018 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-deepmd ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "6.0" .
 
 ex:setting-hidden-deepmd a mlips:HyperparameterSetting ;
@@ -121,7 +121,7 @@ ex:setting-hidden-deepmd a mlips:HyperparameterSetting ;
     mlips:settingValue "(240, 120, 60, 30, 10)" .
 
 ex:setting-lr0-deepmd a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-lr0-deepmd ;
+    mlips:forHyperparameter mlips:learningRate ;
     mlips:settingValue "0.001" .
 
 ex:setting-decay-rate-deepmd a mlips:HyperparameterSetting ;
@@ -182,3 +182,26 @@ ex:metric-rmse-water-forces a mlips:AccuracyMetric ;
 
 ex:run-deepmd-water mlips:trainingDuration "16 hours" ;
     mlips:trainingHardware "Intel Core i7-3770 CPU with 32 GB RAM, 4 OpenMP threads" .
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-decay-rate-deepmd a mlips:Hyperparameter ;
+    rdfs:label "DeePMD learning-rate decay rate" ;
+    mlips:hyperparameterName "decay_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-decay-steps-deepmd a mlips:Hyperparameter ;
+    rdfs:label "DeePMD learning-rate decay steps" ;
+    mlips:hyperparameterName "decay_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-hidden-deepmd a mlips:Hyperparameter ;
+    rdfs:label "DeePMD per-atom hidden layer architecture" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

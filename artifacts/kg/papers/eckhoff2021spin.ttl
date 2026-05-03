@@ -109,7 +109,7 @@ ex:mHDNNP a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:mhdnnp-functional-form ;
     mlips:hasLossFunction ex:mhdnnp-loss-eckhoff2021 ;
     mlips:hasTrainingAlgorithm ex:mhdnnp-training-eckhoff2021 ;
-    mlips:hasHyperparameter ex:hp-rcut-eckhoff2021 , ex:hp-Mthresh , ex:hp-hidden-eckhoff2021 ;
+    mlips:hasHyperparameter mlips:cutoffRadius , ex:hp-Mthresh , ex:hp-hidden-eckhoff2021 ;
     mlips:hasImplementation ex:runner-impl-eckhoff2021 .
 
 ex:mhdnnp-functional-form a mlips:FunctionalForm ;
@@ -130,7 +130,7 @@ ex:runner-impl-eckhoff2021 a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-105-eckhoff2021 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-eckhoff2021 ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "10.5 a0 (Bohr radii)" .
 
 ex:setting-Mthresh-025 a mlips:HyperparameterSetting ;
@@ -192,3 +192,20 @@ ex:metric-rmse-forces-mhdnnp a mlips:AccuracyMetric ;
 # Eckhoff & Behler (2021) does not report training duration, GPU
 # hours, training hardware, peak memory, or per-atom inference time
 # for the mHDNNP. Recorded as a Q12 gap.
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-Mthresh a mlips:Hyperparameter ;
+    rdfs:label "HDNNP ACSF amplitude threshold" ;
+    mlips:hyperparameterName "M_thresh" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-hidden-eckhoff2021 a mlips:Hyperparameter ;
+    rdfs:label "HDNNP per-element hidden layer architecture" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

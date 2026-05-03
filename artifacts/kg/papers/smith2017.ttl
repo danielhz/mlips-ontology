@@ -102,7 +102,7 @@ ex:ANI-smith2017 a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:ani-functional-form-smith2017 ;
     mlips:hasLossFunction ex:ani-loss-smith2017 ;
     mlips:hasTrainingAlgorithm ex:adam-smith2017 ;
-    mlips:hasHyperparameter ex:hp-rcut-rad-smith2017 , ex:hp-rcut-ang-smith2017 , ex:hp-aev-smith2017 , ex:hp-arch-smith2017 , ex:hp-lr-smith2017 ;
+    mlips:hasHyperparameter mlips:cutoffRadius , mlips:angularCutoff , ex:hp-aev-smith2017 , ex:hp-arch-smith2017 , mlips:learningRate ;
     mlips:hasImplementation ex:impl-neurochem-smith2017 .
 
 ex:ani-functional-form-smith2017 a mlips:FunctionalForm ;
@@ -122,11 +122,11 @@ ex:impl-neurochem-smith2017 a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-rad-smith2017 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-rad-smith2017 ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "4.6" .
 
 ex:setting-rcut-ang-smith2017 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-ang-smith2017 ;
+    mlips:forHyperparameter mlips:angularCutoff ;
     mlips:settingValue "3.1" .
 
 ex:setting-aev-smith2017 a mlips:HyperparameterSetting ;
@@ -138,7 +138,7 @@ ex:setting-arch-smith2017 a mlips:HyperparameterSetting ;
     mlips:settingValue "Per-atom-type pyramidal NN 768:128:128:64:1 (Gaussian activations, linear output); 124033 parameters per element" .
 
 ex:setting-lr-smith2017 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-lr-smith2017 ;
+    mlips:forHyperparameter mlips:learningRate ;
     mlips:settingValue "Initial learning rate 1e-3 (mini-batch size 1024 molecules; 100-epoch validation patience)" .
 
 ###############################################################################
@@ -209,3 +209,20 @@ ex:metric-rmse-gdb10-smith2017 a mlips:AccuracyMetric ;
 # inference-time-per-atom. They state qualitatively that NeuroChem
 # accelerates training, testing, and inference on GPUs via CUBLAS.
 # Recorded as a gap in Q12 of the subsection.
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-aev-smith2017 a mlips:Hyperparameter ;
+    rdfs:label "ANI atomic environment vector size" ;
+    mlips:hyperparameterName "aev_size" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+ex:hp-arch-smith2017 a mlips:Hyperparameter ;
+    rdfs:label "ANI per-element NN architecture" ;
+    mlips:hyperparameterName "ani_architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

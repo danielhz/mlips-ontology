@@ -92,7 +92,7 @@ ex:SchNet a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:schnet-functional-form ;
     mlips:hasLossFunction ex:schnet-loss-energy-force ;
     mlips:hasTrainingAlgorithm ex:adam ;
-    mlips:hasHyperparameter ex:hp-T , ex:hp-F , ex:hp-rho , ex:hp-rcut ;
+    mlips:hasHyperparameter mlips:numLayers , mlips:numFeatures , ex:hp-rho , mlips:cutoffRadius ;
     mlips:hasImplementation ex:schnet-impl .
 
 ex:schnet-functional-form a mlips:FunctionalForm ;
@@ -112,11 +112,11 @@ ex:schnet-impl a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-T-6 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-T ;
+    mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "6" .
 
 ex:setting-F-64 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-F ;
+    mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "64" .
 
 ex:setting-rho-001 a mlips:HyperparameterSetting ;
@@ -178,3 +178,14 @@ ex:metric-mae-md17-forces a mlips:AccuracyMetric ;
 # on 32 CPU cores to ~10ms on a single NVIDIA GTX1080, but that is for
 # inference of a separately trained C20 model and is recorded as a
 # Q12 gap rather than encoded as an inference metric here.)
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-rho a mlips:Hyperparameter ;
+    rdfs:label "SchNet energy/force loss trade-off" ;
+    mlips:hyperparameterName "rho" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

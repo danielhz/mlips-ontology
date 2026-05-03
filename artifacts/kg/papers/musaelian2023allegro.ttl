@@ -94,7 +94,7 @@ ex:Allegro a mlips:MLIPMethod ;
     mlips:hasFunctionalForm ex:allegro-functional-form ;
     mlips:hasLossFunction ex:allegro-loss ;
     mlips:hasTrainingAlgorithm ex:adam-allegro ;
-    mlips:hasHyperparameter ex:hp-rcut , ex:hp-numlayers , ex:hp-lmax , ex:hp-features , ex:hp-numbasis ;
+    mlips:hasHyperparameter mlips:cutoffRadius , mlips:numLayers , mlips:numAngularBasis , mlips:numFeatures , ex:hp-numbasis ;
     mlips:hasImplementation ex:allegro-impl .
 
 ex:allegro-functional-form a mlips:FunctionalForm ;
@@ -114,19 +114,19 @@ ex:allegro-impl a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-allegro a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "6.0" .
 
 ex:setting-numlayers-allegro a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-numlayers ;
+    mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "3" .
 
 ex:setting-lmax-allegro a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-lmax ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
     mlips:settingValue "3" .
 
 ex:setting-features-allegro a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-features ;
+    mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "128" .
 
 ex:setting-numbasis-allegro a mlips:HyperparameterSetting ;
@@ -185,3 +185,14 @@ ex:run-allegro-Li3PO4 mlips:trainingHardware "NVIDIA V100 GPU (single-GPU traini
 
 ex:model-allegro-Li3PO4 mlips:inferenceTimePerAtom "0.013 microseconds per atom per MD step on 128 NVIDIA A100 GPUs (50.3M-atom Li3PO4 system, LAMMPS pair_allegro at float32)" ;
     mlips:inferenceHardware "NVIDIA DGX A100 cluster (Theta-GPU, ALCF), 128 A100 GPUs across 16 nodes" .
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-numbasis a mlips:Hyperparameter ;
+    rdfs:label "Allegro tensor-product basis count" ;
+    mlips:hyperparameterName "num_basis_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .

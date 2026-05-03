@@ -102,7 +102,7 @@ ex:MTP-shapeev2016 a mlips:MLIPMethod ;
     rdfs:label "Moment Tensor Potential (MTP)" ;
     mlips:hasFunctionalForm ex:mtp-functional-form-shapeev2016 ;
     mlips:hasLossFunction ex:mtp-loss-shapeev2016 ;
-    mlips:hasHyperparameter ex:hp-rcut-shapeev2016 , ex:hp-rmin-shapeev2016 , ex:hp-levmax-shapeev2016 , ex:hp-reg-shapeev2016 ;
+    mlips:hasHyperparameter mlips:cutoffRadius , mlips:minInteratomicDistance , mlips:momentLevel , ex:hp-reg-shapeev2016 ;
     mlips:hasImplementation ex:impl-mtp-shapeev2016 .
 
 ex:mtp-functional-form-shapeev2016 a mlips:FunctionalForm ;
@@ -119,19 +119,19 @@ ex:impl-mtp-shapeev2016 a mlips:Implementation ;
 ###############################################################################
 
 ex:setting-rcut-shapeev2016 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rcut-shapeev2016 ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "4.9" .
 
 ex:setting-rmin-shapeev2016 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rmin-shapeev2016 ;
+    mlips:forHyperparameter mlips:minInteratomicDistance ;
     mlips:settingValue "1.9" .
 
 ex:setting-mtp1-shapeev2016 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-levmax-shapeev2016 ;
+    mlips:forHyperparameter mlips:momentLevel ;
     mlips:settingValue "MTP_1: deg(B_alpha)+8(#alpha) <= 62, #alpha <= 4, mu <= 5, nu <= 4 (11133 basis functions)" .
 
 ex:setting-mtp2-shapeev2016 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-levmax-shapeev2016 ;
+    mlips:forHyperparameter mlips:momentLevel ;
     mlips:settingValue "MTP_2: deg(B_alpha)+8(#alpha) <= 52, #alpha <= 5, mu <= 3, nu <= 5; 760 basis functions extracted via l_0 regularisation (N_cap=4)" .
 
 ###############################################################################
@@ -191,3 +191,14 @@ ex:model-mtp-W-shapeev2016 mlips:inferenceTimePerAtom 2.9 ;
 # are not reported. The 2.9 ms/atom figure is the mean per-atom CPU
 # time of MTP_1 reported in Table 1 (single-core, i7-2675QM); MTP_2
 # reaches 0.8 ms/atom and GAP 134.2 ms/atom on the same hardware.
+
+# Paper-local hyperparameters tagged for the candidate-vocabulary
+# audit (issue-0007). These appear in only this paper or are family-specific;
+# a future curator may promote them into mlips-vocab.ttl when a
+# second paper uses the same parameter.
+
+ex:hp-reg-shapeev2016 a mlips:Hyperparameter ;
+    rdfs:label "MTP regularisation parameter" ;
+    mlips:hyperparameterName "regularisation" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
