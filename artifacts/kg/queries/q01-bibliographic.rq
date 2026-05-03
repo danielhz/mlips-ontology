@@ -1,6 +1,12 @@
 # Q1 -- Bibliographic identification.
-# Captures the BenchmarkStudy node (type, label, link to article) and
-# the ScholarlyArticle node (all triples).
+# Captures: the BenchmarkStudy node (type, label, link to article);
+# the ScholarlyArticle node (all triples, including any schema:author
+# edges); the schema:Person nodes attached via schema:author and
+# their bibliographic triples (schema:name, schema:givenName,
+# schema:familyName, schema:identifier for ORCID, schema:affiliation
+# for institutional links); and the schema:Organization nodes
+# attached via schema:affiliation (schema:name, schema:identifier
+# for ROR).
 # The hasResult edge from BenchmarkStudy lives in Q10.
 
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -16,6 +22,12 @@ WHERE {
     VALUES ?p { rdf:type rdfs:label mlips:reportedIn }
   } UNION {
     ?s a schema:ScholarlyArticle .
+    ?s ?p ?o .
+  } UNION {
+    ?s a schema:Person .
+    ?s ?p ?o .
+  } UNION {
+    ?s a schema:Organization .
     ?s ?p ?o .
   }
 }

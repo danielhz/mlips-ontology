@@ -333,3 +333,91 @@ mlips-sh:AccuracyMetricShape a sh:NodeShape ;
         sh:class qudt:Unit ;
         sh:name "Unit" ;
     ] .
+
+###############################################################################
+# Bibliographic shapes (schema:ScholarlyArticle, schema:Person,
+# schema:Organization).
+#
+# These three shapes describe the decomposed bibliographic encoding
+# expected on every ScholarlyArticle in the corpus: a paper has one
+# title (schema:name) and one or more authors as schema:Person nodes;
+# each Person carries a name and optionally an ORCID identifier and
+# an affiliation; each affiliation is a schema:Organization node
+# carrying a name and optionally a ROR identifier. The cardinalities
+# are intentionally lenient (min 0) during the corpus-wide author /
+# affiliation sweep documented in agent-chat/issues/issue-0004.md
+# and issue-0005.md; once the sweep lands, schema:author and the
+# Person:schema:name minCounts are expected to tighten to 1.
+###############################################################################
+
+mlips-sh:ScholarlyArticleShape a sh:NodeShape ;
+    sh:targetClass schema:ScholarlyArticle ;
+    sh:property [
+        sh:path schema:name ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Title" ;
+    ] ;
+    sh:property [
+        sh:path schema:datePublished ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:gYear ;
+        sh:name "Publication year" ;
+    ] ;
+    sh:property [
+        sh:path schema:sameAs ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:name "DOI / external identifier" ;
+    ] ;
+    sh:property [
+        sh:path schema:author ;
+        sh:class schema:Person ;
+        sh:name "Authors" ;
+    ] .
+
+mlips-sh:PersonShape a sh:NodeShape ;
+    sh:targetClass schema:Person ;
+    sh:property [
+        sh:path schema:name ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Display name" ;
+    ] ;
+    sh:property [
+        sh:path schema:givenName ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Given name" ;
+    ] ;
+    sh:property [
+        sh:path schema:familyName ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Family name" ;
+    ] ;
+    sh:property [
+        sh:path schema:identifier ;
+        sh:nodeKind sh:IRI ;
+        sh:name "ORCID (preferred) or other identifier" ;
+    ] ;
+    sh:property [
+        sh:path schema:affiliation ;
+        sh:class schema:Organization ;
+        sh:name "Affiliated organisation(s)" ;
+    ] .
+
+mlips-sh:OrganizationShape a sh:NodeShape ;
+    sh:targetClass schema:Organization ;
+    sh:property [
+        sh:path schema:name ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Display name" ;
+    ] ;
+    sh:property [
+        sh:path schema:identifier ;
+        sh:nodeKind sh:IRI ;
+        sh:name "ROR (preferred) or other identifier" ;
+    ] .
