@@ -268,12 +268,22 @@ mlips-sh:BenchmarkStudyShape a sh:NodeShape ;
 
 mlips-sh:BenchmarkResultShape a sh:NodeShape ;
     sh:targetClass mlips:BenchmarkResult ;
+    # The result links to a TrainedModel via mlips:evaluatesModel; the
+    # method (MLIPMethod) and training data (TrainingDataset) used by
+    # that model are reachable transitively through the MLIPRun that
+    # produced it (?run produces ?model, ?run appliesMethod ?algo,
+    # ?run trainedOn ?dataset). The previous shape required separate
+    # mlips:usesAlgorithm and mlips:usesTrainingData properties which
+    # neither the prose nor the encoded data populate; that
+    # disagreement is removed here. Hyperparameter settings live on
+    # MLIPRun, not on BenchmarkResult, so are also out of scope for
+    # this shape.
     sh:property [
-        sh:path mlips:usesAlgorithm ;
+        sh:path mlips:evaluatesModel ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
-        sh:class mlips:MLIPAlgorithm ;
-        sh:name "Algorithm" ;
+        sh:class mlips:TrainedModel ;
+        sh:name "Evaluated model" ;
     ] ;
     sh:property [
         sh:path mlips:targetMaterial ;
@@ -282,20 +292,10 @@ mlips-sh:BenchmarkResultShape a sh:NodeShape ;
         sh:name "Target material" ;
     ] ;
     sh:property [
-        sh:path mlips:usesTrainingData ;
-        sh:class mlips:TrainingDataset ;
-        sh:name "Training data" ;
-    ] ;
-    sh:property [
         sh:path mlips:hasAccuracyMetric ;
         sh:minCount 1 ;
         sh:class mlips:AccuracyMetric ;
         sh:name "Accuracy metrics" ;
-    ] ;
-    sh:property [
-        sh:path mlips:hasHyperparameterSetting ;
-        sh:class mlips:HyperparameterSetting ;
-        sh:name "Hyperparameter settings" ;
     ] ;
     sh:property [
         sh:path mlips:reportedIn ;
