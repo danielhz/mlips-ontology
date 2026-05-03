@@ -1,0 +1,21 @@
+PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ7: For a given material and target property, how do different
+# method/hyperparameter combinations rank by accuracy?
+# (Generalised: groups by material + property, ranks by RMSE.)
+#
+# Same property-chain note as cq06.rq: traverses the asserted
+# ?run appliesMethod ?algo + ?run produces ?model edges instead
+# of relying on the inferred trainedWith chain.
+
+SELECT ?mat ?prop ?algo ?value WHERE {
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricProperty ?prop ;
+          mlips:metricValue ?value .
+} ORDER BY ?mat ?prop ?value

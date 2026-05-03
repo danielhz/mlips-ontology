@@ -1,0 +1,30 @@
+PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ9: For a given target accuracy, which methods and trained
+# models are most efficient? Combines asymptotic complexity (prior
+# knowledge attached to the method) with measured training and
+# inference cost (empirical data on the run).
+#
+# Same property-chain note as cq06/cq07: traverses ?run
+# appliesMethod ?algo + ?run produces ?model on the asserted edges
+# rather than the inferred trainedWith chain.
+#
+# Many fields are OPTIONAL: the seeded corpus reports
+# inferenceTimePerAtom and gpuHours sparsely (a longstanding
+# metadata gap in the source literature, see §5.1), so only the
+# papers that report compute cost contribute rows.
+
+SELECT ?algo ?inf_complexity ?gpu_hours ?t_inf ?rmse WHERE {
+  ?result a mlips:BenchmarkResult ;
+          mlips:evaluatesModel ?model ;
+          mlips:hasAccuracyMetric ?metric .
+  ?model mlips:inferenceTimePerAtom ?t_inf .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricValue ?rmse .
+  FILTER(?rmse < 2.0)
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  OPTIONAL { ?algo mlips:inferenceComplexity ?inf_complexity }
+  OPTIONAL { ?run mlips:gpuHours ?gpu_hours }
+} ORDER BY ?t_inf

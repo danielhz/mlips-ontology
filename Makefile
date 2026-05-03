@@ -106,6 +106,21 @@ $(LATEX_SECTIONS) &: $(TTL_FILE)
 figures: $(TTL_FILE)
 	./artifacts/tools/render_figures.sh
 
+# === OOPS! ontology pitfall scan (local, no web service) ===
+#
+# Bootstraps Apache Maven and the OOPS! source from
+# github.com/oeg-upm/OOPS into ~/.cache/mlips-oops/, builds the
+# OOPS! JAR, and runs it against artifacts/ontology/mlips.owl.
+# Output: dist/oops-summary.tsv (per-pitfall counts) and
+# dist/oops-report.txt (full log).
+#
+# OOPS! 0.3.0-SNAPSHOT only ports a subset of the published pitfall
+# catalogue (P02-P08 in current revision); the full ~40-pitfall
+# catalogue is only available via the public web UI.
+
+oops: $(OWL_FILE)
+	./artifacts/tools/oops-run.sh
+
 # === Clean ===
 
 clean:

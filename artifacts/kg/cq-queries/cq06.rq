@@ -1,0 +1,27 @@
+PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ6: Which published studies have benchmarked a given method on
+# a given material property, and what accuracy metrics were
+# reported? (Generalised: every method on every material; the
+# inline version in §8.1 of the paper hardcodes MTP and TiCr2 as
+# an example.)
+#
+# The schema declares trainedWith := appliesMethod ∘ produces^-1
+# (a property chain). Without an OWL reasoner, queries that use
+# trainedWith directly return 0 rows; this query traverses the
+# asserted MLIPRun edge (?run appliesMethod ?algo, ?run produces
+# ?model) so it works against a plain SPARQL endpoint.
+
+SELECT ?study ?algo ?mat ?metric_type ?prop ?value WHERE {
+  ?study a mlips:BenchmarkStudy ;
+         mlips:hasResult ?result .
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  ?metric mlips:metricType ?metric_type ;
+          mlips:metricProperty ?prop ;
+          mlips:metricValue ?value .
+}

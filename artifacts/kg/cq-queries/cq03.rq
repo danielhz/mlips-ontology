@@ -1,0 +1,15 @@
+PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ3: For a given material system, which training datasets are
+# available, and what DFT code and settings were used?
+# (Generalised: returns rows for every material, not just TiCr2.)
+
+SELECT ?ds ?mat ?xc ?cutoff ?pseudo WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:coversMaterial ?mat ;
+      mlips:hasDFTCalculation ?calc .
+  ?calc mlips:hasDFTSettings ?settings .
+  ?settings mlips:xcFunctional ?xc .
+  OPTIONAL { ?settings mlips:energyCutoff ?cutoff }
+  OPTIONAL { ?settings mlips:pseudopotentialType ?pseudo }
+}
