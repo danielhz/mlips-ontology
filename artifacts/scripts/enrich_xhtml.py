@@ -139,7 +139,11 @@ TERM_CLASS_RE = re.compile(
     re.DOTALL,
 )
 ONTOLOGY_METADATA_END_RE = re.compile(
-    r'(</section>)\s*\n\s*(<section id="algorithm-module">)',
+    # Match the close of <section id="ontology-metadata">, regardless
+    # of what follows. The TOC is inserted directly after this close,
+    # so the visualization section (if present) lives between the TOC
+    # and the first module section.
+    r'(<section id="ontology-metadata">.*?\n</section>)',
     re.DOTALL,
 )
 
@@ -225,12 +229,12 @@ def enrich(source_text: str) -> str:
     outgoing, incoming = extract_domain_range(source_text)
 
     # 1. Inject TOC right after the </section> that closes the
-    #    ontology-metadata block. We detect that boundary by the
-    #    transition from </section> to the first <section
-    #    id="...-module"> in the body.
+    #    ontology-metadata block. The visualization section, if
+    #    present in the source, sits below the TOC and before the
+    #    first module section.
     toc = build_toc(source_text)
     enriched = ONTOLOGY_METADATA_END_RE.sub(
-        lambda m: f"{m.group(1)}\n\n{toc}\n{m.group(2)}",
+        lambda m: f"{m.group(1)}\n\n{toc}",
         source_text, count=1,
     )
 

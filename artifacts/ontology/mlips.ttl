@@ -14,15 +14,15 @@
 <https://w3id.org/mlips> a owl:Ontology ;
     rdfs:label "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials" ;
     dcterms:contributor [ a schema:Person ;
-            schema:name "Xiang Xu" ],
+            schema:name "Lifang Zhu" ],
+        [ a schema:Person ;
+            schema:name "Xin Li" ],
         [ a schema:Person ;
             schema:name "Xi Zhang" ],
         [ a schema:Person ;
             schema:name "Wenchuan Liu" ],
         [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
-        [ a schema:Person ;
-            schema:name "Xin Li" ],
+            schema:name "Xiang Xu" ],
         [ a schema:Person ;
             schema:name "Tom Schächtel" ],
         <https://orcid.org/0000-0001-9176-3270>,
@@ -728,12 +728,12 @@ mlips1:Implementation a owl:Class ;
     rdfs:comment """A software implementation of an MLIP method in a
 specific library and version."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips1:implementedIn ;
+            owl:someValuesFrom mlips1:Library ],
+        [ a owl:Restriction ;
             owl:onProperty [ a owl:ObjectProperty ;
                     owl:inverseOf mlips1:hasImplementation ] ;
             owl:someValuesFrom mlips1:MLIPMethod ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips1:implementedIn ;
-            owl:someValuesFrom mlips1:Library ],
         mls:Implementation .
 
 mlips1:hasReferenceSettings a owl:ObjectProperty ;
@@ -868,19 +868,19 @@ mlips1:BenchmarkResult a owl:Class ;
     rdfs:comment """A single evaluation result: an MLIP method applied to a
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips1:targetMaterial ;
-            owl:someValuesFrom mlips1:MaterialSystem ],
-        [ a owl:Restriction ;
-            owl:onClass mlips1:TrainedModel ;
-            owl:onProperty mlips1:evaluatesModel ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+            owl:onProperty mlips1:hasAccuracyMetric ;
+            owl:someValuesFrom mlips1:AccuracyMetric ],
         [ a owl:Restriction ;
             owl:onProperty [ a owl:ObjectProperty ;
                     owl:inverseOf mlips1:hasResult ] ;
             owl:someValuesFrom mlips1:BenchmarkStudy ],
         [ a owl:Restriction ;
-            owl:onProperty mlips1:hasAccuracyMetric ;
-            owl:someValuesFrom mlips1:AccuracyMetric ] .
+            owl:onProperty mlips1:targetMaterial ;
+            owl:someValuesFrom mlips1:MaterialSystem ],
+        [ a owl:Restriction ;
+            owl:onClass mlips1:TrainedModel ;
+            owl:onProperty mlips1:evaluatesModel ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ] .
 
 mlips1:Hyperparameter a owl:Class ;
     rdfs:label "Hyperparameter"@en ;
@@ -900,14 +900,14 @@ training, with provenance, size, property coverage, and DFT settings."""@en ;
             owl:onProperty mlips1:coversProperty ;
             owl:someValuesFrom mlips1:CoveredProperty ],
         [ a owl:Restriction ;
+            owl:onProperty mlips1:datasetProvenance ;
+            owl:someValuesFrom mlips1:DatasetProvenance ],
+        [ a owl:Restriction ;
             owl:onProperty mlips1:coversMaterial ;
             owl:someValuesFrom mlips1:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:hasConfiguration ;
             owl:someValuesFrom mlips1:AtomicConfiguration ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips1:datasetProvenance ;
-            owl:someValuesFrom mlips1:DatasetProvenance ],
         mls:Dataset,
         prov:Entity .
 
@@ -917,19 +917,19 @@ mlips1:MLIPMethod a owl:Class ;
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips1:supportsSimulation ;
-            owl:someValuesFrom mlips1:SimulationType ],
+            owl:onProperty mlips1:hasHyperparameter ;
+            owl:someValuesFrom mlips1:Hyperparameter ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:hasLossFunction ;
             owl:someValuesFrom mlips1:LossFunction ],
         [ a owl:Restriction ;
-            owl:onProperty mlips1:hasFunctionalForm ;
-            owl:someValuesFrom mlips1:FunctionalForm ],
+            owl:onProperty mlips1:supportsSimulation ;
+            owl:someValuesFrom mlips1:SimulationType ],
         [ a owl:Restriction ;
             owl:onProperty mlips1:hasTrainingAlgorithm ;
             owl:someValuesFrom mls:Algorithm ],
         [ a owl:Restriction ;
-            owl:onProperty mlips1:hasHyperparameter ;
-            owl:someValuesFrom mlips1:Hyperparameter ] ;
+            owl:onProperty mlips1:hasFunctionalForm ;
+            owl:someValuesFrom mlips1:FunctionalForm ] ;
     owl:disjointWith mls:Algorithm .
 

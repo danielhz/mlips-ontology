@@ -6,6 +6,7 @@ use axum::{
     routing::get,
 };
 use std::path::PathBuf;
+use tower_http::cors::{Any, CorsLayer};
 
 const ARTIFACTS_DIR: &str = "artifacts/ontology";
 
@@ -144,10 +145,20 @@ async fn main() {
     let port = std::env::var("PORT").unwrap_or_else(|_| "3006".to_string());
     let addr = format!("0.0.0.0:{port}");
 
+    // Permissive CORS: the ontology is public Linked Open Data, and
+    // browser-based tools such as WebVOWL (hosted at service.tib.eu)
+    // need to fetch our serialisations cross-origin. Allow any origin
+    // for GET/HEAD; do not echo credentials.
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let app = Router::new()
         .route("/", get(index))
         .route("/{id}/", get(serve_ontology))
-        .route("/{id}/{file}", get(serve_static));
+        .route("/{id}/{file}", get(serve_static))
+        .layer(cors);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     println!("Listening on {addr}");
