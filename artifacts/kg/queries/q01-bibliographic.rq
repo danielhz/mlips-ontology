@@ -7,6 +7,16 @@
 # for institutional links); and the schema:Organization nodes
 # attached via schema:affiliation (schema:name, schema:identifier
 # for ROR).
+#
+# After issue-0009 introduced cross-paper Person identity collapse
+# (the alphabetically-first paper that mentions an ORCID owns the
+# `?p a schema:Person` declaration; later papers reference the same
+# ORCID via schema:author without re-typing), Q1 also walks
+# schema:author from any local ScholarlyArticle and pulls every
+# triple on the resulting subject -- this captures affiliation
+# triples that live in non-owner papers and whose subject is no
+# longer typed locally as schema:Person.
+#
 # The hasResult edge from BenchmarkStudy lives in Q10.
 
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -28,6 +38,10 @@ WHERE {
     ?s ?p ?o .
   } UNION {
     ?s a schema:Organization .
+    ?s ?p ?o .
+  } UNION {
+    [] a schema:ScholarlyArticle ;
+       schema:author ?s .
     ?s ?p ?o .
   }
 }
