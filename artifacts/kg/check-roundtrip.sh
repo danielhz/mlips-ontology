@@ -60,13 +60,24 @@ for q in "$QUERY_DIR"/q*.rq; do
   cat "$out_nt" >> "$UNION_NT"
 done
 
+# --- Unicode normalisation -------------------------------------------------
+# rapper's N-triples output escapes non-ASCII characters as \uXXXX, while
+# oxigraph emits them as raw UTF-8. Both forms are valid N-triples, but a
+# byte-level diff sees them as different. Normalise both sides by decoding
+# \uXXXX escapes back to UTF-8 before sorting, so cross-corpus literals
+# with umlauts or other non-ASCII characters compare equal.
+UNESCAPE_PY='import re, sys
+for line in sys.stdin:
+    sys.stdout.write(re.sub(r"\\u([0-9A-Fa-f]{4})", lambda m: chr(int(m.group(1), 16)), line))'
+
 # --- Step 2: canonicalise the union (N-triples, sorted, deduped) -----------
 UNION_CANON="$WORK_DIR/union.canon"
-sort -u "$UNION_NT" > "$UNION_CANON"
+python3 -c "$UNESCAPE_PY" < "$UNION_NT" | sort -u > "$UNION_CANON"
 
 # --- Step 3: canonicalise the source .ttl ---------------------------------
 SOURCE_CANON="$WORK_DIR/source.canon"
 rapper -i turtle -o ntriples "$PAPER_TTL" 2>/dev/null \
+  | python3 -c "$UNESCAPE_PY" \
   | sort -u > "$SOURCE_CANON"
 
 # --- Step 4: diff ----------------------------------------------------------
