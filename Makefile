@@ -26,7 +26,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release ontology roundtrip-check listings term-appendices figures clean
+.PHONY: all release ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute clean
 
 all: release
 
@@ -65,8 +65,13 @@ $(XHTML_PUBLISH): $(XHTML_SOURCE) artifacts/scripts/enrich_xhtml.py
 	  --source $(XHTML_SOURCE) --output $(XHTML_PUBLISH)
 	@echo "Enriched $(XHTML_PUBLISH) (TOC + outgoing/incoming property lists)"
 
-$(OWL_FILE): $(XHTML_SOURCE)
-	$(SAXON) -s:$(XHTML_SOURCE) -xsl:$(EXTRACT_XSL) -o:$(OWL_FILE)
+$(OWL_FILE): $(XHTML_SOURCE) artifacts/scripts/extract_owl.py
+	@if [ -f "$(EXTRACT_XSL)" ]; then \
+	  $(SAXON) -s:$(XHTML_SOURCE) -xsl:$(EXTRACT_XSL) -o:$(OWL_FILE) ; \
+	else \
+	  echo "Saxon XSL not found at $(EXTRACT_XSL); using Python fallback" ; \
+	  python3 artifacts/scripts/extract_owl.py ; \
+	fi
 	@echo "Generated $(OWL_FILE) (term axioms only)"
 
 $(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py
@@ -81,13 +86,25 @@ roundtrip-check:
 	  echo "==> $$p" ; \
 	  ./artifacts/kg/check-roundtrip.sh "$$p" || exit 1 ; \
 	done
-	@echo "All $(words $(PAPERS)) papers round-trip cleanly."
+	@echo "All $(words $(PAPERS)) papers round-trip cleanly (canonical, Q1-Q11)."
+
+roundtrip-check-computed: compute
+	@for p in $(PAPERS); do \
+	  echo "==> $$p" ; \
+	  ./artifacts/kg/check-roundtrip.sh --computed "$$p" || exit 1 ; \
+	done
+	@echo "All $(words $(PAPERS)) papers round-trip cleanly (computed, Q1-Q13)."
 
 # === Per-paper Turtle-fragment listings ===
 
 listings:
 	@for p in $(PAPERS); do \
 	  ./artifacts/kg/build-listings.sh "$$p" ; \
+	done
+
+listings-computed: compute
+	@for p in $(PAPERS); do \
+	  ./artifacts/kg/build-listings.sh --computed "$$p" ; \
 	done
 
 # === LaTeX term appendices into dist/sections/ ===
@@ -105,6 +122,22 @@ $(LATEX_SECTIONS) &: $(TTL_FILE)
 
 figures: $(TTL_FILE)
 	./artifacts/tools/render_figures.sh
+
+# === Computed-TTL pipeline (per-paper materialisation) ===
+#
+# For each paper, materialise the canonical paper.ttl plus the
+# rdfs:label and inverse-role triples emitted by the two CONSTRUCTs
+# under artifacts/kg/computed/. Output:
+#   dist/artifacts/kg/papers/<paper-id>-computed.ttl
+# These are not tracked (see .gitignore *-computed.ttl) and are
+# regenerated on every `make compute`. The computed listings are
+# what the paper appendix sources from (see paper-repo
+# build-listings).
+
+compute: $(TTL_FILE)
+	@for p in $(PAPERS); do \
+	  ./artifacts/kg/build-computed.sh "$$p" ; \
+	done
 
 # === OOPS! ontology pitfall scan (local, no web service) ===
 #

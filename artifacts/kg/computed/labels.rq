@@ -1,0 +1,74 @@
+# Computed labels for reified-relation instances.
+#
+# Emits an rdfs:label for every instance of HyperparameterSetting,
+# BenchmarkResult, and AccuracyMetric. The label template joins the
+# relata so the IRI fragment alone does not need to be parsed by a
+# reader of the listing.
+#
+# Templates (per appendix-meta-categories.tex, §"Computed labels"):
+#   HyperparameterSetting:
+#     "<hpLabel> = <value> [<unit>] for <carrierLabel>"
+#   BenchmarkResult:
+#     "<modelLabel> on <materialLabel> in <studyLabel>"
+#   AccuracyMetric:
+#     "<metricTypeLabel> of <metricPropertyLabel> = <value> [<unit>]"
+#
+# Sources from the canonical TTL (paper KG + ontology + vocab).
+# Inverses (isSettingOf, isResultOf, ...) are reached via their
+# canonical forwards (hasHyperparameterSetting, hasResult, ...).
+
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mlips: <https://w3id.org/mlips#>
+
+CONSTRUCT { ?s rdfs:label ?label }
+WHERE {
+  {
+    # HyperparameterSetting: "<hpLabel> = <value> [<unit>] for <carrierLabel>"
+    ?s a mlips:HyperparameterSetting ;
+       mlips:forHyperparameter ?hp ;
+       mlips:settingValue ?val .
+    ?hp rdfs:label ?hpLabel .
+    ?carrier mlips:hasHyperparameterSetting ?s ;
+             rdfs:label ?carrierLabel .
+    OPTIONAL {
+      ?s mlips:hasUnit ?unit .
+      OPTIONAL { ?unit rdfs:label ?unitLabel . }
+      BIND(COALESCE(?unitLabel, STRAFTER(STR(?unit), "/unit/"), STR(?unit)) AS ?unitText)
+    }
+    BIND(IF(BOUND(?unitText),
+            CONCAT(STR(?hpLabel), " = ", STR(?val), " [", STR(?unitText), "] for ", STR(?carrierLabel)),
+            CONCAT(STR(?hpLabel), " = ", STR(?val), " for ", STR(?carrierLabel)))
+         AS ?label)
+  }
+  UNION
+  {
+    # BenchmarkResult: "<modelLabel> on <materialLabel> in <studyLabel>"
+    ?s a mlips:BenchmarkResult ;
+       mlips:evaluatesModel ?model ;
+       mlips:targetMaterial ?material .
+    ?model rdfs:label ?modelLabel .
+    ?material rdfs:label ?materialLabel .
+    ?study mlips:hasResult ?s ;
+           rdfs:label ?studyLabel .
+    BIND(CONCAT(STR(?modelLabel), " on ", STR(?materialLabel), " in ", STR(?studyLabel)) AS ?label)
+  }
+  UNION
+  {
+    # AccuracyMetric: "<metricTypeLabel> of <metricPropertyLabel> = <value> [<unit>]"
+    ?s a mlips:AccuracyMetric ;
+       mlips:metricType ?mt ;
+       mlips:metricProperty ?mp ;
+       mlips:metricValue ?val .
+    ?mt rdfs:label ?mtLabel .
+    ?mp rdfs:label ?mpLabel .
+    OPTIONAL {
+      ?s mlips:hasUnit ?unit .
+      OPTIONAL { ?unit rdfs:label ?unitLabel . }
+      BIND(COALESCE(?unitLabel, STRAFTER(STR(?unit), "/unit/"), STR(?unit)) AS ?unitText)
+    }
+    BIND(IF(BOUND(?unitText),
+            CONCAT(STR(?mtLabel), " of ", STR(?mpLabel), " = ", STR(?val), " [", STR(?unitText), "]"),
+            CONCAT(STR(?mtLabel), " of ", STR(?mpLabel), " = ", STR(?val)))
+         AS ?label)
+  }
+}

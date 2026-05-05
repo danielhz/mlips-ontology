@@ -1,0 +1,23 @@
+# Q13 -- Computed labels on reified-relation instances.
+# Captures rdfs:label triples on instances of HyperparameterSetting,
+# BenchmarkResult, and AccuracyMetric (the three reified-relation
+# classes for which artifacts/kg/computed/labels.rq materialises a
+# label). Overlaps with Q8 and Q10 (which capture all triples on
+# their respective reified-relation subjects) but is kept as a
+# separate partition so the computed-mode round-trip is structurally
+# documented: Q12 covers inverse triples, Q13 covers computed labels.
+
+PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mlips: <https://w3id.org/mlips#>
+
+CONSTRUCT { ?s rdfs:label ?l }
+WHERE {
+  VALUES ?cls {
+    mlips:HyperparameterSetting
+    mlips:BenchmarkResult
+    mlips:AccuracyMetric
+  }
+  ?s a ?cls ;
+     rdfs:label ?l .
+}

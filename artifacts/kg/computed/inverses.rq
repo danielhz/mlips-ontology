@@ -1,0 +1,26 @@
+# Computed inverse-role triples.
+#
+# For each of the eight (forward, named-inverse) pairs declared in the
+# schema, emit the inverse triple for every forward triple in the
+# canonical paper KG.
+#
+# This complements the schema-side owl:inverseOf declaration: a
+# materialisation step that gives query authors a named predicate to
+# walk "backwards" along, instead of a SPARQL property-path workaround.
+
+PREFIX mlips: <https://w3id.org/mlips#>
+
+CONSTRUCT { ?o ?inv ?s }
+WHERE {
+  VALUES (?fwd ?inv) {
+    (mlips:hasHyperparameter        mlips:isHyperparameterOf)
+    (mlips:hasImplementation        mlips:isImplementationOf)
+    (mlips:hasResult                mlips:isResultOf)
+    (mlips:hasAccuracyMetric        mlips:isMetricOf)
+    (mlips:hasHyperparameterSetting mlips:isSettingOf)
+    (mlips:produces                 mlips:isProducedBy)
+    (mlips:runsOn                   mlips:wasRunBy)
+    (mlips:evaluatesModel           mlips:isEvaluatedIn)
+  }
+  ?s ?fwd ?o .
+}
