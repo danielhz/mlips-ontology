@@ -6,9 +6,16 @@
 # This file is the gold standard for the round-trip check: the union
 # of the 11 CONSTRUCT queries against this file must reproduce it.
 #
-# Encoding scope: C15 (cubic) phase artefacts. Kumar et al. also train
-# a separate C14 (hexagonal) potential; that pass would live in a
-# sibling file kumar2025-c14.ttl.
+# Encoding scope: both the C15 (cubic) and C14 (hexagonal) phase
+# artefacts. Kumar et al. train a separate MTP per phase; both
+# chains -- training dataset, MLIPRun, TrainedModel, BenchmarkResult,
+# and energy/force RMSE -- live in this single file. The C15 chain
+# uses the historical IRI prefix (ex:mat-TiCr2, ex:ds-TiCr2H-c15,
+# ...); the C14 chain uses the parallel pattern with a -c14 suffix
+# (ex:mat-TiCr2-c14, ex:ds-TiCr2H-c14, ...). The structured-phase
+# concept (mlips:CrystalMaterial with hasSpaceGroupNumber) is
+# deferred to SWJ-04; this encoding keeps the existing
+# materialClass-as-string convention.
 
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
@@ -70,11 +77,18 @@ ex:mat-TiCr2 a mlips:MaterialSystem ;
     mlips:materialClass "Laves phase, C15 cubic (Fd-3m)" ;
     mlips:sameAsWikidata <http://www.wikidata.org/entity/Q15724720> .
 
+ex:mat-TiCr2-c14 a mlips:MaterialSystem ;
+    rdfs:label "TiCr2 (C14 Laves phase)" ;
+    mlips:chemicalFormula "TiCr2" ;
+    mlips:materialClass "Laves phase, C14 hexagonal (P63/mmc)" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q15724720> .
+
 ###############################################################################
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
 ex:dft-TiCr2H-c15 a mlips:DFTCalculation .
+ex:dft-TiCr2H-c14 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
@@ -89,6 +103,15 @@ ex:dft-settings-TiCr2H-c15 a mlips:DFTSettings ;
     mlips:energyCutoff "400"^^xsd:double ;
     mlips:kPointMesh "4x4x4 Gamma-centred" .
 
+ex:dft-TiCr2H-c14 mlips:hasDFTSettings ex:dft-settings-TiCr2H-c14 .
+
+ex:dft-settings-TiCr2H-c14 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    mlips:kPointMesh "4x4x4 Gamma-centred (2x2x1 supercell)" .
+
 ###############################################################################
 # Q5 -- Training dataset characterisation
 ###############################################################################
@@ -101,11 +124,22 @@ ex:ds-TiCr2H-c15 a mlips:TrainingDataset ;
     mlips:numConfigurations 1019 ;
     mlips:hasDFTCalculation ex:dft-TiCr2H-c15 .
 
+ex:ds-TiCr2H-c14 a mlips:TrainingDataset ;
+    rdfs:label "TiCr2-Hx training set, C14 phase, step 1" ;
+    mlips:coversMaterial ex:mat-TiCr2-c14 ;
+    mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3766 ;
+    mlips:hasDFTCalculation ex:dft-TiCr2H-c14 .
+
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
 ex:ds-TiCr2H-c15 mlips:samplingStrategy
+    ex:chem-sampling , ex:vib-sampling , ex:active-learning-sampling .
+
+ex:ds-TiCr2H-c14 mlips:samplingStrategy
     ex:chem-sampling , ex:vib-sampling , ex:active-learning-sampling .
 
 ex:chem-sampling a mlips:SamplingStrategy ;
@@ -167,22 +201,62 @@ ex:run-mtp-TiCr2H-c15 a mlips:MLIPRun ;
 ex:model-mtp-TiCr2H-c15 a mlips:TrainedModel ;
     rdfs:label "C15-MTP for TiCr2-H" .
 
+ex:run-mtp-TiCr2H-c14 a mlips:MLIPRun ;
+    rdfs:label "MTP training run, C14 phase" ;
+    mlips:appliesMethod ex:MTP ;
+    mlips:runsOn ex:ds-TiCr2H-c14 ;
+    mlips:hasHyperparameterSetting ex:setting-levmax-16 ;
+    mlips:produces ex:model-mtp-TiCr2H-c14 .
+
+ex:model-mtp-TiCr2H-c14 a mlips:TrainedModel ;
+    rdfs:label "C14-MTP for TiCr2-H" .
+
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-kumar2025 mlips:hasResult ex:result-mtp-ticr2h-c15 .
+ex:study-kumar2025 mlips:hasResult ex:result-mtp-ticr2h-c15 , ex:result-mtp-ticr2h-c14 .
 
 ex:result-mtp-ticr2h-c15 a mlips:BenchmarkResult ;
     mlips:evaluatesModel ex:model-mtp-TiCr2H-c15 ;
     mlips:targetMaterial ex:mat-TiCr2 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-energy-c15 .
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-c15 , ex:metric-rmse-forces-c15 .
 
 ex:metric-rmse-energy-c15 a mlips:AccuracyMetric ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue 3.17 ;
     mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:metric-rmse-forces-c15 a mlips:AccuracyMetric ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.134 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+ex:result-mtp-ticr2h-c14 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel ex:model-mtp-TiCr2H-c14 ;
+    mlips:targetMaterial ex:mat-TiCr2-c14 ;
+    mlips:hasAccuracyMetric ex:metric-rmse-energy-c14 , ex:metric-rmse-forces-c14 .
+
+ex:metric-rmse-energy-c14 a mlips:AccuracyMetric ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue 2.81 ;
+    mlips:hasUnit unit:MeV-PER-ATOM .
+
+ex:metric-rmse-forces-c14 a mlips:AccuracyMetric ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue 0.1 ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+# NB: the metricValue is reported as 0.100 eV/Angstrom in Kumar 2025
+# Fig. 7d (3 sig figs). We write the bare-decimal `0.1` here because
+# oxigraph normalises trailing zeros while rapper does not, breaking
+# the bit-exact round-trip. issue-0015 will re-type all numeric
+# literals as xsd:double, which is more idiomatic and decouples
+# precision-display from the round-trip canonical form.
 
 ###############################################################################
 # Q11 -- Computational resources
