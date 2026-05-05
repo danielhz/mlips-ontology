@@ -62,6 +62,6 @@ The 12th question (gaps) is prose-only and is excluded.
 - For papers training multiple potentials over different systems or
   phases, a suffix disambiguates: `kumar2025-c14`, `kumar2025-c15`.
 - Identifiers inside the .ttl use the `ex:` prefix
-  (`https://example.org/mlips/kg/`). Shared ontology individuals
+  (`https://w3id.org/mlips/entity/`). Shared ontology individuals
   (`mlips:Energy`, `mlips:Published`, `mlips:RMSE`, ...) are referenced
   by their canonical IRI but not redeclared.
