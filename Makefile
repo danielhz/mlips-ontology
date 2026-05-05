@@ -26,7 +26,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute clean
+.PHONY: all release ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason clean
 
 all: release
 
@@ -138,6 +138,36 @@ compute: $(TTL_FILE)
 	@for p in $(PAPERS); do \
 	  ./artifacts/kg/build-computed.sh "$$p" ; \
 	done
+
+# === Reasoner consistency check (ELK + HermiT via ROBOT) ===
+#
+# Runs both reasoners over mlips.owl and reports any unsatisfiable
+# classes. ELK is fast and covers OWL 2 EL (which most of the
+# ontology lives in); HermiT covers full OWL 2 DL and catches the
+# axioms ELK can't reason about (existence axioms with non-EL
+# fillers, cardinality restrictions, etc.). A green run is one of
+# the gates listed in issue-0010 AC#6.
+#
+# Requires ROBOT (ontodev/robot, https://robot.obolibrary.org/).
+# Drop robot.jar + the wrapper into ~/bin or anywhere on PATH.
+
+ROBOT ?= robot
+
+reason: $(OWL_FILE)
+	@echo "==> ELK consistency"
+	@if $(ROBOT) --input $(OWL_FILE) reason --reasoner ELK 2>&1 \
+	     | grep -iE 'incon|unsat|error' ; then \
+	  echo "ELK: FAIL" ; exit 1 ; \
+	else \
+	  echo "ELK: consistent, no unsatisfiable classes" ; \
+	fi
+	@echo "==> HermiT consistency"
+	@if $(ROBOT) --input $(OWL_FILE) reason --reasoner hermit 2>&1 \
+	     | grep -iE 'incon|unsat|error' ; then \
+	  echo "HermiT: FAIL" ; exit 1 ; \
+	else \
+	  echo "HermiT: consistent, no unsatisfiable classes" ; \
+	fi
 
 # === OOPS! ontology pitfall scan (local, no web service) ===
 #
