@@ -18,17 +18,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-eckhoff2021spin a mlips:BenchmarkStudy ;
+entity:study-eckhoff2021spin a mlips:BenchmarkStudy ;
     rdfs:label "Eckhoff & Behler (2021): spin-dependent HDNNP for MnO" ;
-    mlips:reportedIn ex:article-eckhoff2021spin .
+    mlips:reportedIn entity:article-eckhoff2021spin .
 
-ex:article-eckhoff2021spin a schema:ScholarlyArticle ;
+entity:article-eckhoff2021spin a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1038/s41524-021-00636-z> ;
     schema:datePublished "2021"^^xsd:gYear ;
     schema:name "High-Dimensional Neural Network Potentials for Magnetic Systems Using Spin-Dependent Atom-Centered Symmetry Functions" ;
@@ -51,7 +51,7 @@ ex:article-eckhoff2021spin a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-MnO-eckhoff2021 a mlips:MaterialSystem ;
+entity:mat-MnO-eckhoff2021 a mlips:MaterialSystem ;
     rdfs:label "Manganese oxide (MnO and Mn_{0.969}O), rocksalt structure with AFM-II / FM / AFM-I magnetic orders" ;
     mlips:chemicalFormula "MnO" ;
     mlips:materialClass "Antiferromagnetic transition-metal oxide; rhombohedrally distorted rock-salt (AFM-II) magnetic ground state with Neel temperature ~116 K (experiment)" ;
@@ -61,15 +61,15 @@ ex:mat-MnO-eckhoff2021 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-eckhoff2021spin a mlips:DFTCalculation .
+entity:dft-eckhoff2021spin a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-eckhoff2021spin mlips:hasDFTSettings ex:dft-settings-eckhoff2021spin .
+entity:dft-eckhoff2021spin mlips:hasDFTSettings entity:dft-settings-eckhoff2021spin .
 
-ex:dft-settings-eckhoff2021spin a mlips:DFTSettings ;
+entity:dft-settings-eckhoff2021spin a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:FHIaims ;
     mlips:xcFunctional mlips:HSE06 ;
     mlips:dftBasisSet mlips:NAOIntermediate ;
@@ -80,37 +80,37 @@ ex:dft-settings-eckhoff2021spin a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-MnO-eckhoff2021 a mlips:TrainingDataset ;
+entity:ds-MnO-eckhoff2021 a mlips:TrainingDataset ;
     rdfs:label "mHDNNP MnO/Mn_{0.969}O reference set: 3101 2x2x2 bulk supercells across magnetic states (1387 MnO + 1421 Mn_{0.969}O training; 156 MnO + 137 Mn_{0.969}O test)" ;
-    mlips:coversMaterial ex:mat-MnO-eckhoff2021 ;
+    mlips:coversMaterial entity:mat-MnO-eckhoff2021 ;
     mlips:coversProperty mlips:Energy , mlips:Forces ;
     mlips:datasetProvenance mlips:InHouse ;
     mlips:numConfigurations 3101 ;
-    mlips:hasDFTCalculation ex:dft-eckhoff2021spin .
+    mlips:hasDFTCalculation entity:dft-eckhoff2021spin .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-MnO-eckhoff2021 mlips:samplingStrategy
-    ex:magnetic-state-sampling-eckhoff2021 ,
-    ex:displacement-sampling-eckhoff2021 ,
-    ex:lattice-distortion-sampling-eckhoff2021 ,
-    ex:vacancy-sampling-eckhoff2021 .
+entity:ds-MnO-eckhoff2021 mlips:samplingStrategy
+    entity:magnetic-state-sampling-eckhoff2021 ,
+    entity:displacement-sampling-eckhoff2021 ,
+    entity:lattice-distortion-sampling-eckhoff2021 ,
+    entity:vacancy-sampling-eckhoff2021 .
 
-ex:magnetic-state-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+entity:magnetic-state-sampling-eckhoff2021 a mlips:SamplingStrategy ;
     rdfs:label "Magnetic-state enumeration" ;
     rdfs:comment "Various collinear spin orderings of the rocksalt MnO supercell are computed (FM, AFM-I, AFM-II, and excited orders) so the mHDNNP can resolve their energy differences." .
 
-ex:displacement-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+entity:displacement-sampling-eckhoff2021 a mlips:SamplingStrategy ;
     rdfs:label "Atomic-displacement perturbations" ;
     rdfs:comment "Different atomic displacements from the ideal rock-salt lattice positions are generated to span the local PES around each magnetic order." .
 
-ex:lattice-distortion-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+entity:lattice-distortion-sampling-eckhoff2021 a mlips:SamplingStrategy ;
     rdfs:label "Lattice-parameter perturbations" ;
     rdfs:comment "Distortions of the lattice parameters (volume / shape) are sampled to describe the rhombohedral distortion of the AFM-II order." .
 
-ex:vacancy-sampling-eckhoff2021 a mlips:SamplingStrategy ;
+entity:vacancy-sampling-eckhoff2021 a mlips:SamplingStrategy ;
     rdfs:label "Vacancy-defect sampling" ;
     rdfs:comment "Mn-vacancy supercells (Mn_{0.969}O) are included to extend the mHDNNP to off-stoichiometric configurations." .
 
@@ -118,24 +118,24 @@ ex:vacancy-sampling-eckhoff2021 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:mHDNNP a mlips:MLIPMethod ;
+entity:mHDNNP a mlips:MLIPMethod ;
     rdfs:label "Magnetic high-dimensional neural network potential (mHDNNP) with spin-dependent atom-centered symmetry functions" ;
-    mlips:hasFunctionalForm ex:mhdnnp-functional-form ;
-    mlips:hasLossFunction ex:mhdnnp-loss-eckhoff2021 ;
-    mlips:hasTrainingAlgorithm ex:mhdnnp-training-eckhoff2021 ;
-    mlips:hasHyperparameter mlips:cutoffRadius , ex:hp-Mthresh , ex:hp-hidden-eckhoff2021 ;
-    mlips:hasImplementation ex:runner-impl-eckhoff2021 .
+    mlips:hasFunctionalForm entity:mhdnnp-functional-form ;
+    mlips:hasLossFunction entity:mhdnnp-loss-eckhoff2021 ;
+    mlips:hasTrainingAlgorithm entity:mhdnnp-training-eckhoff2021 ;
+    mlips:hasHyperparameter mlips:cutoffRadius , entity:hp-Mthresh , entity:hp-hidden-eckhoff2021 ;
+    mlips:hasImplementation entity:runner-impl-eckhoff2021 .
 
-ex:mhdnnp-functional-form a mlips:FunctionalForm ;
+entity:mhdnnp-functional-form a mlips:FunctionalForm ;
     rdfs:label "Behler-Parrinello HDNNP with per-element feed-forward atomic networks (3 hidden layers of 20/15/10 neurons), inputs are spin-augmented ACSFs (sACSF) using radial M^0/M^+/M^- and angular M^00/M^++/M^--/M^+- spin-augmentation functions" .
 
-ex:mhdnnp-loss-eckhoff2021 a mlips:LossFunction ;
+entity:mhdnnp-loss-eckhoff2021 a mlips:LossFunction ;
     rdfs:label "Energy + atomic-force RMSE loss on cohesive energies and force components (90% train / 10% test split)" .
 
-ex:mhdnnp-training-eckhoff2021 a mls:Algorithm ;
+entity:mhdnnp-training-eckhoff2021 a mls:Algorithm ;
     rdfs:label "Standard HDNNP training (gradient-based weight optimisation in RuNNer)" .
 
-ex:runner-impl-eckhoff2021 a mlips:Implementation ;
+entity:runner-impl-eckhoff2021 a mlips:Implementation ;
     mlips:implementedIn mlips:RuNNer ;
     mlips:version "1.00 (modified to support sACSFs)" .
 
@@ -143,56 +143,56 @@ ex:runner-impl-eckhoff2021 a mlips:Implementation ;
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-105-eckhoff2021 a mlips:HyperparameterSetting ;
+entity:setting-rcut-105-eckhoff2021 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "10.5 a0 (Bohr radii)" .
 
-ex:setting-Mthresh-025 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-Mthresh ;
+entity:setting-Mthresh-025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-Mthresh ;
     mlips:settingValue "0.25"^^xsd:double .
 
-ex:setting-hidden-20-15-10 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-hidden-eckhoff2021 ;
+entity:setting-hidden-20-15-10 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-eckhoff2021 ;
     mlips:settingValue "3 hidden layers x (20, 15, 10) neurons per element" .
 
 ###############################################################################
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-mhdnnp-MnO a mlips:MLIPRun ;
+entity:run-mhdnnp-MnO a mlips:MLIPRun ;
     rdfs:label "mHDNNP training run on MnO/Mn_{0.969}O dataset" ;
-    mlips:appliesMethod ex:mHDNNP ;
-    mlips:runsOn ex:ds-MnO-eckhoff2021 ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-105-eckhoff2021 , ex:setting-Mthresh-025 , ex:setting-hidden-20-15-10 ;
-    mlips:produces ex:model-mhdnnp-MnO .
+    mlips:appliesMethod entity:mHDNNP ;
+    mlips:runsOn entity:ds-MnO-eckhoff2021 ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-105-eckhoff2021 , entity:setting-Mthresh-025 , entity:setting-hidden-20-15-10 ;
+    mlips:produces entity:model-mhdnnp-MnO .
 
-ex:model-mhdnnp-MnO a mlips:TrainedModel ;
+entity:model-mhdnnp-MnO a mlips:TrainedModel ;
     rdfs:label "Magnetic HDNNP for MnO (sACSF + 3-layer feed-forward NN)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-eckhoff2021spin mlips:hasResult ex:result-mhdnnp-energy , ex:result-mhdnnp-forces .
+entity:study-eckhoff2021spin mlips:hasResult entity:result-mhdnnp-energy , entity:result-mhdnnp-forces .
 
-ex:result-mhdnnp-energy a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mhdnnp-MnO ;
-    mlips:targetMaterial ex:mat-MnO-eckhoff2021 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-energy-mhdnnp .
+entity:result-mhdnnp-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mhdnnp-MnO ;
+    mlips:targetMaterial entity:mat-MnO-eckhoff2021 ;
+    mlips:hasAccuracyMetric entity:metric-rmse-energy-mhdnnp .
 
-ex:metric-rmse-energy-mhdnnp a mlips:AccuracyMetric ;
+entity:metric-rmse-energy-mhdnnp a mlips:AccuracyMetric ;
     rdfs:label "Test-set RMSE on cohesive energies (sACSF mHDNNP)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "1.11"^^xsd:double ;
     mlips:hasUnit unit:MilliEV-PER-ATOM .
 
-ex:result-mhdnnp-forces a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mhdnnp-MnO ;
-    mlips:targetMaterial ex:mat-MnO-eckhoff2021 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-forces-mhdnnp .
+entity:result-mhdnnp-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mhdnnp-MnO ;
+    mlips:targetMaterial entity:mat-MnO-eckhoff2021 ;
+    mlips:hasAccuracyMetric entity:metric-rmse-forces-mhdnnp .
 
-ex:metric-rmse-forces-mhdnnp a mlips:AccuracyMetric ;
+entity:metric-rmse-forces-mhdnnp a mlips:AccuracyMetric ;
     rdfs:label "Test-set RMSE on atomic force components (sACSF mHDNNP)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:ForceProperty ;
@@ -212,23 +212,23 @@ ex:metric-rmse-forces-mhdnnp a mlips:AccuracyMetric ;
 # a future curator may promote them into mlips-vocab.ttl when a
 # second paper uses the same parameter.
 
-ex:hp-Mthresh a mlips:Hyperparameter ;
+entity:hp-Mthresh a mlips:Hyperparameter ;
     rdfs:label "HDNNP ACSF amplitude threshold" ;
     mlips:hyperparameterName "M_thresh" ;
     mlips:hyperparameterDatatype xsd:double ;
     mlips:candidateForVocabulary mlips:Hyperparameter .
 
-ex:hp-hidden-eckhoff2021 a mlips:Hyperparameter ;
+entity:hp-hidden-eckhoff2021 a mlips:Hyperparameter ;
     rdfs:label "HDNNP per-element hidden layer architecture" ;
     mlips:hyperparameterName "hidden_layers" ;
     mlips:hyperparameterDatatype xsd:string ;
     mlips:candidateForVocabulary mlips:Hyperparameter .
 
 # schema:affiliation links added by issue-0005 sweep.
-<https://orcid.org/0000-0002-5581-789X> schema:affiliation ex:org-UniversityofGottingen-eckhoff2021spin .
-<https://orcid.org/0000-0002-1220-1542> schema:affiliation ex:org-UniversityofGottingen-eckhoff2021spin .
+<https://orcid.org/0000-0002-5581-789X> schema:affiliation entity:org-UniversityofGottingen-eckhoff2021spin .
+<https://orcid.org/0000-0002-1220-1542> schema:affiliation entity:org-UniversityofGottingen-eckhoff2021spin .
 
-ex:org-UniversityofGottingen-eckhoff2021spin a schema:Organization ;
+entity:org-UniversityofGottingen-eckhoff2021spin a schema:Organization ;
     rdfs:label "University of Göttingen" ;
     schema:name "University of Göttingen" ;
     schema:identifier <https://ror.org/01y9bpm73> ;

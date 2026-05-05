@@ -16,23 +16,23 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-qi2023 a mlips:BenchmarkStudy ;
+entity:study-qi2023 a mlips:BenchmarkStudy ;
     rdfs:label "Qi et al. (2023): MTP for L1_0-TiAl and D0_19-Ti3Al" ;
-    mlips:reportedIn ex:article-qi2023 .
+    mlips:reportedIn entity:article-qi2023 .
 
-ex:article-qi2023 a schema:ScholarlyArticle ;
+entity:article-qi2023 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1103/PhysRevMaterials.7.103602> ;
     schema:datePublished "2023"^^xsd:gYear ;
     schema:name "Machine Learning Moment Tensor Potential for Modelling Dislocation and Fracture in L1_0-TiAl and D0_19-Ti3Al Alloys" ;
     schema:author
         <https://orcid.org/0000-0001-5808-9931> ,
-        ex:person-Aitken-qi2023 ,
+        entity:person-Aitken-qi2023 ,
         <https://orcid.org/0000-0001-8711-2854> ,
         <https://orcid.org/0000-0002-5074-4660> ,
         <https://orcid.org/0000-0002-2734-7720> ,
@@ -48,7 +48,7 @@ ex:article-qi2023 a schema:ScholarlyArticle ;
     schema:familyName "Qi" ;
     schema:identifier <https://orcid.org/0000-0001-5808-9931> .
 
-ex:person-Aitken-qi2023 a schema:Person ;
+entity:person-Aitken-qi2023 a schema:Person ;
     schema:name "Z. H. Aitken" ;
     schema:givenName "Z. H." ;
     schema:familyName "Aitken" ;
@@ -104,7 +104,7 @@ ex:person-Aitken-qi2023 a schema:Person ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-TiAl a mlips:MaterialSystem ;
+entity:mat-TiAl a mlips:MaterialSystem ;
     rdfs:label "Ti-Al binary (focus on L1_0 gamma-TiAl and D0_19 alpha2-Ti3Al)" ;
     mlips:chemicalFormula "Ti-Al" ;
     mlips:materialClass "Binary intermetallic; benchmarked on L1_0 (P4/mmm) gamma-TiAl and D0_19 (P6_3/mmc) alpha2-Ti3Al phases" ;
@@ -114,15 +114,15 @@ ex:mat-TiAl a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-qi2023 a mlips:DFTCalculation .
+entity:dft-qi2023 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-qi2023 mlips:hasDFTSettings ex:dft-settings-qi2023 .
+entity:dft-qi2023 mlips:hasDFTSettings entity:dft-settings-qi2023 .
 
-ex:dft-settings-qi2023 a mlips:DFTSettings ;
+entity:dft-settings-qi2023 a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:VASP ;
     mlips:xcFunctional mlips:PBE ;
     mlips:pseudopotentialType mlips:PAW ;
@@ -133,39 +133,39 @@ ex:dft-settings-qi2023 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-TiAl a mlips:TrainingDataset ;
+entity:ds-TiAl a mlips:TrainingDataset ;
     rdfs:label "Ti-Al MTP training set (33 polymorphs + 2160 AIMD + 185 surfaces + 580 solid-solutions + 840 strained = 3798 configs)" ;
-    mlips:coversMaterial ex:mat-TiAl ;
+    mlips:coversMaterial entity:mat-TiAl ;
     mlips:coversProperty mlips:Energy , mlips:Forces ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 3798 ;
-    mlips:hasDFTCalculation ex:dft-qi2023 .
+    mlips:hasDFTCalculation entity:dft-qi2023 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-TiAl mlips:samplingStrategy
-    ex:polymorph-sampling , ex:aimd-sampling , ex:surface-sampling ,
-    ex:solid-solution-sampling , ex:strain-sampling .
+entity:ds-TiAl mlips:samplingStrategy
+    entity:polymorph-sampling , entity:aimd-sampling , entity:surface-sampling ,
+    entity:solid-solution-sampling , entity:strain-sampling .
 
-ex:polymorph-sampling a mlips:SamplingStrategy ;
+entity:polymorph-sampling a mlips:SamplingStrategy ;
     rdfs:label "Ground-state polymorph enumeration" ;
     rdfs:comment "33 ground-state polymorphs of the Ti-Al system retrieved from the Materials Project." .
 
-ex:aimd-sampling a mlips:SamplingStrategy ;
+entity:aimd-sampling a mlips:SamplingStrategy ;
     rdfs:label "Vibrational sampling (NVT AIMD)" ;
     rdfs:comment "2160 snapshots from NVT AIMD trajectories of 6 stable phases at 300, 1000 and 3000 K, 90/100/110% of ground-state volume; 40 configs per 10 ps run." .
 
-ex:surface-sampling a mlips:SamplingStrategy ;
+entity:surface-sampling a mlips:SamplingStrategy ;
     rdfs:label "Surface enumeration" ;
     rdfs:comment "185 surface structures with Miller indices up to three for the 6 stable Ti-Al phases." .
 
-ex:solid-solution-sampling a mlips:SamplingStrategy ;
+entity:solid-solution-sampling a mlips:SamplingStrategy ;
     rdfs:label "Solid-solution chemical sampling" ;
     rdfs:comment "580 Al_xTi_{1-x} solid-solution structures (x from 12.5 to 87.5 at.% in 12.5% steps), up to 30 enumerations per scenario." .
 
-ex:strain-sampling a mlips:SamplingStrategy ;
+entity:strain-sampling a mlips:SamplingStrategy ;
     rdfs:label "Homogeneous strain sampling" ;
     rdfs:comment "840 strained supercells: +/-10% strain at 1% intervals across 6 strain modes for the 6 stable phases." .
 
@@ -173,31 +173,31 @@ ex:strain-sampling a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:MTP a mlips:MLIPMethod ;
+entity:MTP a mlips:MLIPMethod ;
     rdfs:label "Moment Tensor Potential" ;
-    mlips:hasFunctionalForm ex:mtp-functional-form ;
-    mlips:hasLossFunction ex:mtp-loss-100-1-0 ;
+    mlips:hasFunctionalForm entity:mtp-functional-form ;
+    mlips:hasLossFunction entity:mtp-loss-100-1-0 ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:momentLevel ;
-    mlips:hasImplementation ex:mlip-package .
+    mlips:hasImplementation entity:mlip-package .
 
-ex:mtp-functional-form a mlips:FunctionalForm ;
+entity:mtp-functional-form a mlips:FunctionalForm ;
     rdfs:label "MTP moment-tensor polynomial" .
 
-ex:mtp-loss-100-1-0 a mlips:LossFunction ;
+entity:mtp-loss-100-1-0 a mlips:LossFunction ;
     rdfs:label "Weighted MSE (energy 100, force 1, stress 0)" .
 
-ex:mlip-package a mlips:Implementation ;
+entity:mlip-package a mlips:Implementation ;
     mlips:implementedIn mlips:MLIP .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-4_8 a mlips:HyperparameterSetting ;
+entity:setting-rcut-4_8 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "4.8"^^xsd:double .
 
-ex:setting-levmax-22 a mlips:HyperparameterSetting ;
+entity:setting-levmax-22 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:momentLevel ;
     mlips:settingValue "22"^^xsd:integer .
 
@@ -205,40 +205,40 @@ ex:setting-levmax-22 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-mtp-TiAl a mlips:MLIPRun ;
+entity:run-mtp-TiAl a mlips:MLIPRun ;
     rdfs:label "MTP training run, Ti-Al binary" ;
-    mlips:appliesMethod ex:MTP ;
-    mlips:runsOn ex:ds-TiAl ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-4_8 , ex:setting-levmax-22 ;
-    mlips:produces ex:model-mtp-TiAl .
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-TiAl ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-4_8 , entity:setting-levmax-22 ;
+    mlips:produces entity:model-mtp-TiAl .
 
-ex:model-mtp-TiAl a mlips:TrainedModel ;
+entity:model-mtp-TiAl a mlips:TrainedModel ;
     rdfs:label "Ti-Al MTP (rcut=4.8 Ang, levmax=22)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-qi2023 mlips:hasResult ex:result-mtp-surface , ex:result-mtp-polymorph .
+entity:study-qi2023 mlips:hasResult entity:result-mtp-surface , entity:result-mtp-polymorph .
 
-ex:result-mtp-surface a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mtp-TiAl ;
-    mlips:targetMaterial ex:mat-TiAl ;
-    mlips:hasAccuracyMetric ex:metric-mae-surface .
+entity:result-mtp-surface a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-TiAl ;
+    mlips:targetMaterial entity:mat-TiAl ;
+    mlips:hasAccuracyMetric entity:metric-mae-surface .
 
-ex:metric-mae-surface a mlips:AccuracyMetric ;
+entity:metric-mae-surface a mlips:AccuracyMetric ;
     rdfs:label "MAE on formation energies of surface structures (vs. DFT)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "8"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ATOM .
 
-ex:result-mtp-polymorph a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mtp-TiAl ;
-    mlips:targetMaterial ex:mat-TiAl ;
-    mlips:hasAccuracyMetric ex:metric-mae-polymorph .
+entity:result-mtp-polymorph a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-TiAl ;
+    mlips:targetMaterial entity:mat-TiAl ;
+    mlips:hasAccuracyMetric entity:metric-mae-polymorph .
 
-ex:metric-mae-polymorph a mlips:AccuracyMetric ;
+entity:metric-mae-polymorph a mlips:AccuracyMetric ;
     rdfs:label "MAE on formation energies of polymorph structures (vs. DFT)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
@@ -255,8 +255,8 @@ ex:metric-mae-polymorph a mlips:AccuracyMetric ;
 
 # schema:affiliation links added by issue-0005 sweep.
 <https://orcid.org/0000-0001-5808-9931> schema:affiliation mlips:UniversityofCaliforniaSanDiego .
-ex:person-Aitken-qi2023 schema:affiliation mlips:AgencyforScienceTechnologyandResearch .
-ex:person-Aitken-qi2023 schema:affiliation mlips:InstituteofHighPerformanceComputing .
+entity:person-Aitken-qi2023 schema:affiliation mlips:AgencyforScienceTechnologyandResearch .
+entity:person-Aitken-qi2023 schema:affiliation mlips:InstituteofHighPerformanceComputing .
 <https://orcid.org/0000-0001-8711-2854> schema:affiliation mlips:AgencyforScienceTechnologyandResearch .
 <https://orcid.org/0000-0001-8711-2854> schema:affiliation mlips:InstituteofHighPerformanceComputing .
 <https://orcid.org/0000-0002-5074-4660> schema:affiliation mlips:AgencyforScienceTechnologyandResearch .
@@ -266,17 +266,17 @@ ex:person-Aitken-qi2023 schema:affiliation mlips:InstituteofHighPerformanceCompu
 <https://orcid.org/0000-0002-9407-8452> schema:affiliation mlips:InstituteofHighPerformanceComputing .
 <https://orcid.org/0000-0002-8181-9485> schema:affiliation mlips:AgencyforScienceTechnologyandResearch .
 <https://orcid.org/0000-0002-8181-9485> schema:affiliation mlips:InstituteofHighPerformanceComputing .
-<https://orcid.org/0000-0003-1692-2512> schema:affiliation ex:org-UniversityofHongKong-qi2023 .
-<https://orcid.org/0000-0002-4739-1139> schema:affiliation ex:org-CityUniversityofHongKong-qi2023 .
+<https://orcid.org/0000-0003-1692-2512> schema:affiliation entity:org-UniversityofHongKong-qi2023 .
+<https://orcid.org/0000-0002-4739-1139> schema:affiliation entity:org-CityUniversityofHongKong-qi2023 .
 <https://orcid.org/0000-0001-5726-2587> schema:affiliation mlips:UniversityofCaliforniaSanDiego .
 
-ex:org-UniversityofHongKong-qi2023 a schema:Organization ;
+entity:org-UniversityofHongKong-qi2023 a schema:Organization ;
     rdfs:label "University of Hong Kong" ;
     schema:name "University of Hong Kong" ;
     schema:identifier <https://ror.org/02zhqgq86> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-CityUniversityofHongKong-qi2023 a schema:Organization ;
+entity:org-CityUniversityofHongKong-qi2023 a schema:Organization ;
     rdfs:label "City University of Hong Kong" ;
     schema:name "City University of Hong Kong" ;
     schema:identifier <https://ror.org/03q8dnn23> ;

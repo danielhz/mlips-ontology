@@ -18,26 +18,26 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-schutt2018 a mlips:BenchmarkStudy ;
+entity:study-schutt2018 a mlips:BenchmarkStudy ;
     rdfs:label "Schuett et al. (2018): SchNet on MD17 small organic molecules" ;
-    mlips:reportedIn ex:article-schutt2018 .
+    mlips:reportedIn entity:article-schutt2018 .
 
-ex:article-schutt2018 a schema:ScholarlyArticle ;
+entity:article-schutt2018 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1063/1.5019779> ;
     schema:datePublished "2018"^^xsd:gYear ;
     schema:name "SchNet -- a deep learning architecture for molecules and materials" ;
     schema:author
         <https://orcid.org/0000-0001-8342-0964> ,
         <https://orcid.org/0000-0001-6091-3408> ,
-        ex:person-Kindermans-schutt2018 ,
+        entity:person-Kindermans-schutt2018 ,
         <https://orcid.org/0000-0002-1012-4854> ,
-        ex:person-Muller-schutt2018 .
+        entity:person-Muller-schutt2018 .
 
 <https://orcid.org/0000-0001-8342-0964> a schema:Person ;
     schema:name "K. T. Schütt" ;
@@ -50,7 +50,7 @@ ex:article-schutt2018 a schema:ScholarlyArticle ;
     schema:givenName "H. E." ;
     schema:familyName "Sauceda" ;
     schema:identifier <https://orcid.org/0000-0001-6091-3408> .
-ex:person-Kindermans-schutt2018 a schema:Person ;
+entity:person-Kindermans-schutt2018 a schema:Person ;
     schema:name "P.-J. Kindermans" ;
     schema:givenName "P.-J." ;
     schema:familyName "Kindermans" ;
@@ -61,7 +61,7 @@ ex:person-Kindermans-schutt2018 a schema:Person ;
     schema:givenName "A." ;
     schema:familyName "Tkatchenko" ;
     schema:identifier <https://orcid.org/0000-0002-1012-4854> .
-ex:person-Muller-schutt2018 a schema:Person ;
+entity:person-Muller-schutt2018 a schema:Person ;
     schema:name "K.-R. Müller" ;
     schema:givenName "K.-R." ;
     schema:familyName "Müller" ;
@@ -70,7 +70,7 @@ ex:person-Muller-schutt2018 a schema:Person ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-md17-schutt2018 a mlips:MaterialSystem ;
+entity:mat-md17-schutt2018 a mlips:MaterialSystem ;
     rdfs:label "MD17 small organic molecules (benzene, toluene, malonaldehyde, salicylic acid, aspirin, ethanol, uracil, naphthalene)" ;
     mlips:chemicalFormula "C/H/N/O small organics" ;
     mlips:materialClass "Molecular: eight small organic molecules used as MD trajectories" ;
@@ -81,15 +81,15 @@ ex:mat-md17-schutt2018 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-schutt2018 a mlips:DFTCalculation .
+entity:dft-schutt2018 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-schutt2018 mlips:hasDFTSettings ex:dft-settings-schutt2018 .
+entity:dft-schutt2018 mlips:hasDFTSettings entity:dft-settings-schutt2018 .
 
-ex:dft-settings-schutt2018 a mlips:DFTSettings ;
+entity:dft-settings-schutt2018 a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:FHIaims ;
     mlips:xcFunctional mlips:PBE ;
     rdfs:comment "Tkatchenko-Scheffler dispersion correction (PBE+vdW-TS)." .
@@ -98,21 +98,21 @@ ex:dft-settings-schutt2018 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-md17-schutt2018 a mlips:TrainingDataset ;
+entity:ds-md17-schutt2018 a mlips:TrainingDataset ;
     rdfs:label "MD17 reference set, used at N=1000 and N=50000 training sizes" ;
-    mlips:coversMaterial ex:mat-md17-schutt2018 ;
+    mlips:coversMaterial entity:mat-md17-schutt2018 ;
     mlips:coversProperty mlips:Energy , mlips:Forces ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 50000 ;
-    mlips:hasDFTCalculation ex:dft-schutt2018 .
+    mlips:hasDFTCalculation entity:dft-schutt2018 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-md17-schutt2018 mlips:samplingStrategy ex:md-sampling-schutt2018 .
+entity:ds-md17-schutt2018 mlips:samplingStrategy entity:md-sampling-schutt2018 .
 
-ex:md-sampling-schutt2018 a mlips:SamplingStrategy ;
+entity:md-sampling-schutt2018 a mlips:SamplingStrategy ;
     rdfs:label "Ab initio MD trajectories" ;
     rdfs:comment "MD17 configurations are randomly sampled snapshots from DFT MD trajectories of eight small organic molecules." .
 
@@ -120,80 +120,80 @@ ex:md-sampling-schutt2018 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:SchNet a mlips:MLIPMethod ;
+entity:SchNet a mlips:MLIPMethod ;
     rdfs:label "SchNet (continuous-filter convolutional deep neural network)" ;
-    mlips:hasFunctionalForm ex:schnet-functional-form ;
-    mlips:hasLossFunction ex:schnet-loss-energy-force ;
-    mlips:hasTrainingAlgorithm ex:adam ;
-    mlips:hasHyperparameter mlips:numLayers , mlips:numFeatures , ex:hp-rho , mlips:cutoffRadius ;
-    mlips:hasImplementation ex:schnet-impl .
+    mlips:hasFunctionalForm entity:schnet-functional-form ;
+    mlips:hasLossFunction entity:schnet-loss-energy-force ;
+    mlips:hasTrainingAlgorithm entity:adam ;
+    mlips:hasHyperparameter mlips:numLayers , mlips:numFeatures , entity:hp-rho , mlips:cutoffRadius ;
+    mlips:hasImplementation entity:schnet-impl .
 
-ex:schnet-functional-form a mlips:FunctionalForm ;
+entity:schnet-functional-form a mlips:FunctionalForm ;
     rdfs:label "Atom embeddings + interaction blocks with continuous-filter convolutions; per-atom energy via atom-wise dense layers, summed for total energy" .
 
-ex:schnet-loss-energy-force a mlips:LossFunction ;
+entity:schnet-loss-energy-force a mlips:LossFunction ;
     rdfs:label "Combined squared-error loss on energies and forces with trade-off rho=0.01" .
 
-ex:adam a mls:Algorithm ;
+entity:adam a mls:Algorithm ;
     rdfs:label "ADAM optimizer with mini-batches of 32, exponential learning-rate decay (ratio 0.96 per 100k steps)" .
 
-ex:schnet-impl a mlips:Implementation ;
+entity:schnet-impl a mlips:Implementation ;
     mlips:implementedIn mlips:SchNet .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-T-6 a mlips:HyperparameterSetting ;
+entity:setting-T-6 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "6"^^xsd:integer .
 
-ex:setting-F-64 a mlips:HyperparameterSetting ;
+entity:setting-F-64 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "64"^^xsd:integer .
 
-ex:setting-rho-001 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-rho ;
+entity:setting-rho-001 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rho ;
     mlips:settingValue "0.01"^^xsd:double .
 
 ###############################################################################
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-schnet-md17 a mlips:MLIPRun ;
+entity:run-schnet-md17 a mlips:MLIPRun ;
     rdfs:label "SchNet training run on MD17 (T=6, F=64, rho=0.01)" ;
-    mlips:appliesMethod ex:SchNet ;
-    mlips:runsOn ex:ds-md17-schutt2018 ;
-    mlips:hasHyperparameterSetting ex:setting-T-6 , ex:setting-F-64 , ex:setting-rho-001 ;
-    mlips:produces ex:model-schnet-md17 .
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-md17-schutt2018 ;
+    mlips:hasHyperparameterSetting entity:setting-T-6 , entity:setting-F-64 , entity:setting-rho-001 ;
+    mlips:produces entity:model-schnet-md17 .
 
-ex:model-schnet-md17 a mlips:TrainedModel ;
+entity:model-schnet-md17 a mlips:TrainedModel ;
     rdfs:label "SchNet model trained on MD17 (combined energy+force loss, N=50000)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-schutt2018 mlips:hasResult ex:result-md17-energy , ex:result-md17-forces .
+entity:study-schutt2018 mlips:hasResult entity:result-md17-energy , entity:result-md17-forces .
 
-ex:result-md17-energy a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-schnet-md17 ;
-    mlips:targetMaterial ex:mat-md17-schutt2018 ;
-    mlips:hasAccuracyMetric ex:metric-mae-md17-energy .
+entity:result-md17-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-schnet-md17 ;
+    mlips:targetMaterial entity:mat-md17-schutt2018 ;
+    mlips:hasAccuracyMetric entity:metric-mae-md17-energy .
 
-ex:metric-mae-md17-energy a mlips:AccuracyMetric ;
+entity:metric-mae-md17-energy a mlips:AccuracyMetric ;
     rdfs:label "MAE of total energy on MD17 aspirin (N=50000, energy+forces loss)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "0.12"^^xsd:double ;
     mlips:hasUnit unit:KiloCAL-PER-MOL .
 
-ex:result-md17-forces a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-schnet-md17 ;
-    mlips:targetMaterial ex:mat-md17-schutt2018 ;
-    mlips:hasAccuracyMetric ex:metric-mae-md17-forces .
+entity:result-md17-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-schnet-md17 ;
+    mlips:targetMaterial entity:mat-md17-schutt2018 ;
+    mlips:hasAccuracyMetric entity:metric-mae-md17-forces .
 
-ex:metric-mae-md17-forces a mlips:AccuracyMetric ;
+entity:metric-mae-md17-forces a mlips:AccuracyMetric ;
     rdfs:label "MAE of atomic forces on MD17 aspirin (N=50000, energy+forces loss)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:ForceProperty ;
@@ -217,7 +217,7 @@ ex:metric-mae-md17-forces a mlips:AccuracyMetric ;
 # a future curator may promote them into mlips-vocab.ttl when a
 # second paper uses the same parameter.
 
-ex:hp-rho a mlips:Hyperparameter ;
+entity:hp-rho a mlips:Hyperparameter ;
     rdfs:label "SchNet energy/force loss trade-off" ;
     mlips:hyperparameterName "rho" ;
     mlips:hyperparameterDatatype xsd:double ;
@@ -225,32 +225,32 @@ ex:hp-rho a mlips:Hyperparameter ;
 
 # schema:affiliation links added by issue-0005 sweep.
 <https://orcid.org/0000-0001-8342-0964> schema:affiliation mlips:TechnischeUniversitatBerlin .
-<https://orcid.org/0000-0001-6091-3408> schema:affiliation ex:org-FritzHaberInstituteoftheMaxPlanckSociety-schutt2018 .
-ex:person-Kindermans-schutt2018 schema:affiliation mlips:TechnischeUniversitatBerlin .
-<https://orcid.org/0000-0002-1012-4854> schema:affiliation ex:org-UniversityofLuxembourg-schutt2018 .
-ex:person-Muller-schutt2018 schema:affiliation ex:org-KoreaUniversity-schutt2018 .
-ex:person-Muller-schutt2018 schema:affiliation ex:org-MaxPlanckInstituteforInformatics-schutt2018 .
-ex:person-Muller-schutt2018 schema:affiliation mlips:TechnischeUniversitatBerlin .
+<https://orcid.org/0000-0001-6091-3408> schema:affiliation entity:org-FritzHaberInstituteoftheMaxPlanckSociety-schutt2018 .
+entity:person-Kindermans-schutt2018 schema:affiliation mlips:TechnischeUniversitatBerlin .
+<https://orcid.org/0000-0002-1012-4854> schema:affiliation entity:org-UniversityofLuxembourg-schutt2018 .
+entity:person-Muller-schutt2018 schema:affiliation entity:org-KoreaUniversity-schutt2018 .
+entity:person-Muller-schutt2018 schema:affiliation entity:org-MaxPlanckInstituteforInformatics-schutt2018 .
+entity:person-Muller-schutt2018 schema:affiliation mlips:TechnischeUniversitatBerlin .
 
-ex:org-FritzHaberInstituteoftheMaxPlanckSociety-schutt2018 a schema:Organization ;
+entity:org-FritzHaberInstituteoftheMaxPlanckSociety-schutt2018 a schema:Organization ;
     rdfs:label "Fritz Haber Institute of the Max Planck Society" ;
     schema:name "Fritz Haber Institute of the Max Planck Society" ;
     schema:identifier <https://ror.org/03k9qs827> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-UniversityofLuxembourg-schutt2018 a schema:Organization ;
+entity:org-UniversityofLuxembourg-schutt2018 a schema:Organization ;
     rdfs:label "University of Luxembourg" ;
     schema:name "University of Luxembourg" ;
     schema:identifier <https://ror.org/036x5ad56> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-KoreaUniversity-schutt2018 a schema:Organization ;
+entity:org-KoreaUniversity-schutt2018 a schema:Organization ;
     rdfs:label "Korea University" ;
     schema:name "Korea University" ;
     schema:identifier <https://ror.org/047dqcg40> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-MaxPlanckInstituteforInformatics-schutt2018 a schema:Organization ;
+entity:org-MaxPlanckInstituteforInformatics-schutt2018 a schema:Organization ;
     rdfs:label "Max Planck Institute for Informatics" ;
     schema:name "Max Planck Institute for Informatics" ;
     schema:identifier <https://ror.org/01w19ak89> ;

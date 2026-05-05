@@ -15,17 +15,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-smith2017 a mlips:BenchmarkStudy ;
+entity:study-smith2017 a mlips:BenchmarkStudy ;
     rdfs:label "Smith, Isayev, Roitberg (2017): ANI-1 transferable NNP for H/C/N/O organics" ;
-    mlips:reportedIn ex:article-smith2017 .
+    mlips:reportedIn entity:article-smith2017 .
 
-ex:article-smith2017 a schema:ScholarlyArticle ;
+entity:article-smith2017 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1039/C6SC05720A> ;
     schema:datePublished "2017"^^xsd:gYear ;
     schema:name "ANI-1: an extensible neural network potential with DFT accuracy at force field computational cost" ;
@@ -55,7 +55,7 @@ ex:article-smith2017 a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-organic-smith2017 a mlips:MaterialSystem ;
+entity:mat-organic-smith2017 a mlips:MaterialSystem ;
     rdfs:label "Organic molecules (H, C, N, O)" ;
     mlips:chemicalFormula "H,C,N,O molecular space" ;
     mlips:materialClass "Molecular: neutral closed-shell organic molecules in the singlet spin state, configurations drawn from GDB-11 (up to 8 heavy atoms in training; benchmarked on molecules with up to 54 atoms)" ;
@@ -66,22 +66,22 @@ ex:mat-organic-smith2017 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-smith2017 a mlips:DFTCalculation .
+entity:dft-smith2017 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-smith2017 mlips:hasDFTSettings ex:dft-settings-smith2017 .
+entity:dft-smith2017 mlips:hasDFTSettings entity:dft-settings-smith2017 .
 
-ex:dft-settings-smith2017 a mlips:DFTSettings ;
+entity:dft-settings-smith2017 a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:Gaussian ;
     mlips:xcFunctional mlips:omegaB97X ;
-    mlips:dftBasisSet ex:basis-6-31g-d-smith2017 ;
+    mlips:dftBasisSet entity:basis-6-31g-d-smith2017 ;
     mlips:kPointMesh "Molecular calculations (no Brillouin-zone sampling); ultra-fine DFT integration grid" ;
     rdfs:comment "Range-separated hybrid meta-GGA. All-electron Gaussian-type basis (no pseudopotential)." .
 
-ex:basis-6-31g-d-smith2017 a mlips:DftBasisSet ;
+entity:basis-6-31g-d-smith2017 a mlips:DftBasisSet ;
     rdfs:label "6-31G(d)" ;
     rdfs:comment "Pople-style split-valence double-zeta Gaussian basis with d polarisation on heavy atoms; molecular all-electron DFT." ;
     mlips:candidateForVocabulary mlips:DftBasisSet .
@@ -90,27 +90,27 @@ ex:basis-6-31g-d-smith2017 a mlips:DftBasisSet ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-ANI1-smith2017 a mlips:TrainingDataset ;
+entity:ds-ANI1-smith2017 a mlips:TrainingDataset ;
     rdfs:label "ANI-1 dataset: ~17.2 M conformations of ~57951 small molecules from GDB-11 (up to 8 heavy atoms; 80% used for training)" ;
-    mlips:coversMaterial ex:mat-organic-smith2017 ;
+    mlips:coversMaterial entity:mat-organic-smith2017 ;
     mlips:coversProperty mlips:Energy ;
     mlips:datasetProvenance mlips:InHouse ;
     mlips:numConfigurations 17200000 ;
-    mlips:hasDFTCalculation ex:dft-smith2017 .
+    mlips:hasDFTCalculation entity:dft-smith2017 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-ANI1-smith2017 mlips:samplingStrategy
-    ex:gdb-sampling-smith2017 ,
-    ex:nms-sampling-smith2017 .
+entity:ds-ANI1-smith2017 mlips:samplingStrategy
+    entity:gdb-sampling-smith2017 ,
+    entity:nms-sampling-smith2017 .
 
-ex:gdb-sampling-smith2017 a mlips:SamplingStrategy ;
+entity:gdb-sampling-smith2017 a mlips:SamplingStrategy ;
     rdfs:label "Configurational sampling from the GDB-11 chemical database" ;
     rdfs:comment "All molecules with up to 8 heavy atoms (C, N, O; F removed) from GDB-11; SMILES converted to 3D structures using RDKit, then DFT-optimised." .
 
-ex:nms-sampling-smith2017 a mlips:SamplingStrategy ;
+entity:nms-sampling-smith2017 a mlips:SamplingStrategy ;
     rdfs:label "Normal Mode Sampling (NMS)" ;
     rdfs:comment "Per-molecule conformational sampling: equilibrium structure displaced along normal-mode coordinates with random magnitudes drawn from a harmonic-temperature distribution; K = S(3N-6) structures per molecule, with S an empirical constant tuned per GDB subset." .
 
@@ -118,47 +118,47 @@ ex:nms-sampling-smith2017 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:ANI-smith2017 a mlips:MLIPMethod ;
+entity:ANI-smith2017 a mlips:MLIPMethod ;
     rdfs:label "ANI (ANAKIN-ME): atom-type-specific HDNNP using modified Behler-Parrinello atomic environment vectors (AEVs)" ;
-    mlips:hasFunctionalForm ex:ani-functional-form-smith2017 ;
-    mlips:hasLossFunction ex:ani-loss-smith2017 ;
-    mlips:hasTrainingAlgorithm ex:adam-smith2017 ;
-    mlips:hasHyperparameter mlips:cutoffRadius , mlips:angularCutoff , ex:hp-aev-smith2017 , ex:hp-arch-smith2017 , mlips:learningRate ;
-    mlips:hasImplementation ex:impl-neurochem-smith2017 .
+    mlips:hasFunctionalForm entity:ani-functional-form-smith2017 ;
+    mlips:hasLossFunction entity:ani-loss-smith2017 ;
+    mlips:hasTrainingAlgorithm entity:adam-smith2017 ;
+    mlips:hasHyperparameter mlips:cutoffRadius , mlips:angularCutoff , entity:hp-aev-smith2017 , entity:hp-arch-smith2017 , mlips:learningRate ;
+    mlips:hasImplementation entity:impl-neurochem-smith2017 .
 
-ex:ani-functional-form-smith2017 a mlips:FunctionalForm ;
+entity:ani-functional-form-smith2017 a mlips:FunctionalForm ;
     rdfs:label "Total energy = sum over atoms of element-specific feed-forward NN outputs taking modified BP atomic environment vectors as input (radial: shifted Gaussians; angular: shifted-cosine + radial-shell factor; atom-type-differentiated channels)" .
 
-ex:ani-loss-smith2017 a mlips:LossFunction ;
+entity:ani-loss-smith2017 a mlips:LossFunction ;
     rdfs:label "Exponential cost C = tau * exp((1/tau) * sum_j (E^ANI_j - E^DFT_j)^2), tau = 0.5 (robust to outliers)" .
 
-ex:adam-smith2017 a mls:Algorithm ;
+entity:adam-smith2017 a mls:Algorithm ;
     rdfs:label "ADAM (lr=1e-3, beta1=0.9, beta2=0.999, eps=1e-8) with max-norm regularisation (3.0); 6 lr-decay restarts" .
 
-ex:impl-neurochem-smith2017 a mlips:Implementation ;
+entity:impl-neurochem-smith2017 a mlips:Implementation ;
     mlips:implementedIn mlips:NeuroChem .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-rad-smith2017 a mlips:HyperparameterSetting ;
+entity:setting-rcut-rad-smith2017 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "4.6"^^xsd:double .
 
-ex:setting-rcut-ang-smith2017 a mlips:HyperparameterSetting ;
+entity:setting-rcut-ang-smith2017 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:angularCutoff ;
     mlips:settingValue "3.1"^^xsd:double .
 
-ex:setting-aev-smith2017 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-aev-smith2017 ;
+entity:setting-aev-smith2017 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-aev-smith2017 ;
     mlips:settingValue "32 radial shifts, 8 radial + 8 angular shifts -> 768 AEV elements for 4 atom types" .
 
-ex:setting-arch-smith2017 a mlips:HyperparameterSetting ;
-    mlips:forHyperparameter ex:hp-arch-smith2017 ;
+entity:setting-arch-smith2017 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-arch-smith2017 ;
     mlips:settingValue "Per-atom-type pyramidal NN 768:128:128:64:1 (Gaussian activations, linear output); 124033 parameters per element" .
 
-ex:setting-lr-smith2017 a mlips:HyperparameterSetting ;
+entity:setting-lr-smith2017 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:learningRate ;
     mlips:settingValue "Initial learning rate 1e-3 (mini-batch size 1024 molecules; 100-epoch validation patience)" .
 
@@ -166,55 +166,55 @@ ex:setting-lr-smith2017 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-ANI1-smith2017 a mlips:MLIPRun ;
+entity:run-ANI1-smith2017 a mlips:MLIPRun ;
     rdfs:label "ANI-1 training run on the ANI-1 dataset" ;
-    mlips:appliesMethod ex:ANI-smith2017 ;
-    mlips:runsOn ex:ds-ANI1-smith2017 ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-rad-smith2017 , ex:setting-rcut-ang-smith2017 , ex:setting-aev-smith2017 , ex:setting-arch-smith2017 , ex:setting-lr-smith2017 ;
-    mlips:produces ex:model-ANI1-smith2017 .
+    mlips:appliesMethod entity:ANI-smith2017 ;
+    mlips:runsOn entity:ds-ANI1-smith2017 ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-rad-smith2017 , entity:setting-rcut-ang-smith2017 , entity:setting-aev-smith2017 , entity:setting-arch-smith2017 , entity:setting-lr-smith2017 ;
+    mlips:produces entity:model-ANI1-smith2017 .
 
-ex:model-ANI1-smith2017 a mlips:TrainedModel ;
+entity:model-ANI1-smith2017 a mlips:TrainedModel ;
     rdfs:label "ANI-1 potential (H/C/N/O)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-smith2017 mlips:hasResult
-    ex:result-ANI1-train-smith2017 ,
-    ex:result-ANI1-test-smith2017 ,
-    ex:result-ANI1-gdb10-smith2017 .
+entity:study-smith2017 mlips:hasResult
+    entity:result-ANI1-train-smith2017 ,
+    entity:result-ANI1-test-smith2017 ,
+    entity:result-ANI1-gdb10-smith2017 .
 
-ex:result-ANI1-train-smith2017 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-ANI1-smith2017 ;
-    mlips:targetMaterial ex:mat-organic-smith2017 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-train-smith2017 .
+entity:result-ANI1-train-smith2017 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI1-smith2017 ;
+    mlips:targetMaterial entity:mat-organic-smith2017 ;
+    mlips:hasAccuracyMetric entity:metric-rmse-train-smith2017 .
 
-ex:metric-rmse-train-smith2017 a mlips:AccuracyMetric ;
+entity:metric-rmse-train-smith2017 a mlips:AccuracyMetric ;
     rdfs:label "Total-energy RMSE on the ANI-1 training set (vs. wB97X/6-31G(d))" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "1.2"^^xsd:double ;
     mlips:hasUnit unit:KiloCAL-PER-MOL .
 
-ex:result-ANI1-test-smith2017 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-ANI1-smith2017 ;
-    mlips:targetMaterial ex:mat-organic-smith2017 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-test-smith2017 .
+entity:result-ANI1-test-smith2017 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI1-smith2017 ;
+    mlips:targetMaterial entity:mat-organic-smith2017 ;
+    mlips:hasAccuracyMetric entity:metric-rmse-test-smith2017 .
 
-ex:metric-rmse-test-smith2017 a mlips:AccuracyMetric ;
+entity:metric-rmse-test-smith2017 a mlips:AccuracyMetric ;
     rdfs:label "Total-energy RMSE on the ANI-1 held-out test set (vs. wB97X/6-31G(d))" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "1.3"^^xsd:double ;
     mlips:hasUnit unit:KiloCAL-PER-MOL .
 
-ex:result-ANI1-gdb10-smith2017 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-ANI1-smith2017 ;
-    mlips:targetMaterial ex:mat-organic-smith2017 ;
-    mlips:hasAccuracyMetric ex:metric-rmse-gdb10-smith2017 .
+entity:result-ANI1-gdb10-smith2017 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI1-smith2017 ;
+    mlips:targetMaterial entity:mat-organic-smith2017 ;
+    mlips:hasAccuracyMetric entity:metric-rmse-gdb10-smith2017 .
 
-ex:metric-rmse-gdb10-smith2017 a mlips:AccuracyMetric ;
+entity:metric-rmse-gdb10-smith2017 a mlips:AccuracyMetric ;
     rdfs:label "Total-energy RMSE on the GDB-10 transferability test (134 molecules of 10 heavy atoms; molecules outside the training distribution)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
@@ -236,13 +236,13 @@ ex:metric-rmse-gdb10-smith2017 a mlips:AccuracyMetric ;
 # a future curator may promote them into mlips-vocab.ttl when a
 # second paper uses the same parameter.
 
-ex:hp-aev-smith2017 a mlips:Hyperparameter ;
+entity:hp-aev-smith2017 a mlips:Hyperparameter ;
     rdfs:label "ANI atomic environment vector size" ;
     mlips:hyperparameterName "aev_size" ;
     mlips:hyperparameterDatatype xsd:string ;
     mlips:candidateForVocabulary mlips:Hyperparameter .
 
-ex:hp-arch-smith2017 a mlips:Hyperparameter ;
+entity:hp-arch-smith2017 a mlips:Hyperparameter ;
     rdfs:label "ANI per-element NN architecture" ;
     mlips:hyperparameterName "ani_architecture" ;
     mlips:hyperparameterDatatype xsd:string ;
@@ -251,25 +251,25 @@ ex:hp-arch-smith2017 a mlips:Hyperparameter ;
 # schema:affiliation links added by issue-0005 sweep.
 <https://orcid.org/0000-0001-7314-7896> schema:affiliation mlips:UniversityofFlorida .
 <https://orcid.org/0000-0001-7314-7896> schema:affiliation mlips:UniversityofFlorida .
-<https://orcid.org/0000-0001-7581-8497> schema:affiliation ex:org-UniversityofNorthCarolinaatChapelHill-smith2017 .
-<https://orcid.org/0000-0001-7581-8497> schema:affiliation ex:org-CommunitiesInSchoolsofOrangeCounty-smith2017 .
-<https://orcid.org/0000-0001-7581-8497> schema:affiliation ex:org-InstituteofMedicinalPlantDevelopment-smith2017 .
+<https://orcid.org/0000-0001-7581-8497> schema:affiliation entity:org-UniversityofNorthCarolinaatChapelHill-smith2017 .
+<https://orcid.org/0000-0001-7581-8497> schema:affiliation entity:org-CommunitiesInSchoolsofOrangeCounty-smith2017 .
+<https://orcid.org/0000-0001-7581-8497> schema:affiliation entity:org-InstituteofMedicinalPlantDevelopment-smith2017 .
 <https://orcid.org/0000-0003-3963-8784> schema:affiliation mlips:UniversityofFlorida .
 <https://orcid.org/0000-0003-3963-8784> schema:affiliation mlips:UniversityofFlorida .
 
-ex:org-UniversityofNorthCarolinaatChapelHill-smith2017 a schema:Organization ;
+entity:org-UniversityofNorthCarolinaatChapelHill-smith2017 a schema:Organization ;
     rdfs:label "University of North Carolina at Chapel Hill" ;
     schema:name "University of North Carolina at Chapel Hill" ;
     schema:identifier <https://ror.org/0130frc33> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-CommunitiesInSchoolsofOrangeCounty-smith2017 a schema:Organization ;
+entity:org-CommunitiesInSchoolsofOrangeCounty-smith2017 a schema:Organization ;
     rdfs:label "Communities In Schools of Orange County" ;
     schema:name "Communities In Schools of Orange County" ;
     schema:identifier <https://ror.org/00bzst557> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-InstituteofMedicinalPlantDevelopment-smith2017 a schema:Organization ;
+entity:org-InstituteofMedicinalPlantDevelopment-smith2017 a schema:Organization ;
     rdfs:label "Institute of Medicinal Plant Development" ;
     schema:name "Institute of Medicinal Plant Development" ;
     schema:identifier <https://ror.org/052nj8f19> ;

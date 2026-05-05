@@ -18,17 +18,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-chen2022 a mlips:BenchmarkStudy ;
+entity:study-chen2022 a mlips:BenchmarkStudy ;
     rdfs:label "Chen and Ong (2022): M3GNet universal graph IAP for the periodic table" ;
-    mlips:reportedIn ex:article-chen2022 .
+    mlips:reportedIn entity:article-chen2022 .
 
-ex:article-chen2022 a schema:ScholarlyArticle ;
+entity:article-chen2022 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1038/s43588-022-00349-3> ;
     schema:datePublished "2022"^^xsd:gYear ;
     schema:name "A Universal Graph Deep Learning Interatomic Potential for the Periodic Table" ;
@@ -51,7 +51,7 @@ ex:article-chen2022 a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-MP-universal-chen2022 a mlips:MaterialSystem ;
+entity:mat-MP-universal-chen2022 a mlips:MaterialSystem ;
     rdfs:label "Materials Project crystals (universal coverage, 89 elements)" ;
     mlips:chemicalFormula "any" ;
     mlips:materialClass "Universal crystal coverage: 89 elements of the periodic table; 62,783 distinct compounds spanning binaries, ternaries, and quaternaries from the MPF.2021.2.8 subset of the Materials Project relaxation database" ;
@@ -61,15 +61,15 @@ ex:mat-MP-universal-chen2022 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-chen2022 a mlips:DFTCalculation .
+entity:dft-chen2022 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-chen2022 mlips:hasDFTSettings ex:dft-settings-chen2022 .
+entity:dft-chen2022 mlips:hasDFTSettings entity:dft-settings-chen2022 .
 
-ex:dft-settings-chen2022 a mlips:DFTSettings ;
+entity:dft-settings-chen2022 a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:VASP ;
     mlips:xcFunctional mlips:PBE ;
     mlips:pseudopotentialType mlips:PAW ;
@@ -79,27 +79,27 @@ ex:dft-settings-chen2022 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-MPF-2021-2-8 a mlips:TrainingDataset ;
+entity:ds-MPF-2021-2-8 a mlips:TrainingDataset ;
     rdfs:label "MPF.2021.2.8: 187,687 ionic steps from 62,783 Materials Project compounds" ;
-    mlips:coversMaterial ex:mat-MP-universal-chen2022 ;
+    mlips:coversMaterial entity:mat-MP-universal-chen2022 ;
     mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 187687 ;
-    mlips:hasDFTCalculation ex:dft-chen2022 .
+    mlips:hasDFTCalculation entity:dft-chen2022 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-MPF-2021-2-8 mlips:samplingStrategy
-    ex:relaxation-trajectory-sampling-chen2022 ,
-    ex:periodic-table-coverage-sampling-chen2022 .
+entity:ds-MPF-2021-2-8 mlips:samplingStrategy
+    entity:relaxation-trajectory-sampling-chen2022 ,
+    entity:periodic-table-coverage-sampling-chen2022 .
 
-ex:relaxation-trajectory-sampling-chen2022 a mlips:SamplingStrategy ;
+entity:relaxation-trajectory-sampling-chen2022 a mlips:SamplingStrategy ;
     rdfs:label "Structural-relaxation trajectory sampling" ;
     rdfs:comment "Snapshots taken from Materials Project relaxation trajectories: first and middle ionic steps of the first relaxation plus the last step of the second relaxation, for tasks tagged 'GGA Structure Optimization' or 'GGA+U Structure Optimization' as of Feb 8, 2021. Frames with final energy per atom > 50 eV/atom or interatomic distance < 0.5 A were filtered out." .
 
-ex:periodic-table-coverage-sampling-chen2022 a mlips:SamplingStrategy ;
+entity:periodic-table-coverage-sampling-chen2022 a mlips:SamplingStrategy ;
     rdfs:label "Periodic-table chemical-space coverage" ;
     rdfs:comment "Compounds drawn from the Materials Project so as to span 89 elements of the periodic table across binary, ternary, and quaternary chemistries; train/val/test split 90/5/5 by material (not by configuration)." .
 
@@ -107,49 +107,49 @@ ex:periodic-table-coverage-sampling-chen2022 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:M3GNet a mlips:MLIPMethod ;
+entity:M3GNet a mlips:MLIPMethod ;
     rdfs:label "M3GNet: materials graph network with three-body interactions" ;
-    mlips:hasFunctionalForm ex:m3gnet-functional-form ;
-    mlips:hasLossFunction ex:m3gnet-huber-loss ;
-    mlips:hasTrainingAlgorithm ex:adam ;
+    mlips:hasFunctionalForm entity:m3gnet-functional-form ;
+    mlips:hasLossFunction entity:m3gnet-huber-loss ;
+    mlips:hasTrainingAlgorithm entity:adam ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:angularCutoff ,
         mlips:numFeatures , mlips:numLayers ,
         mlips:numRadialBasis ;
-    mlips:hasImplementation ex:m3gnet-impl-chen2022 .
+    mlips:hasImplementation entity:m3gnet-impl-chen2022 .
 
-ex:m3gnet-functional-form a mlips:FunctionalForm ;
+entity:m3gnet-functional-form a mlips:FunctionalForm ;
     rdfs:label "Materials graph neural network with explicit three-body angular interactions; energy is a sum of atomic contributions from a gated MLP readout, with forces and stresses obtained by auto-differentiation." .
 
-ex:m3gnet-huber-loss a mlips:LossFunction ;
+entity:m3gnet-huber-loss a mlips:LossFunction ;
     rdfs:label "Huber loss (delta=0.01) on energy, forces, and stresses with weights w_E=1, w_f=1, w_sigma=0.1" .
 
-ex:adam a mls:Algorithm ;
+entity:adam a mls:Algorithm ;
     rdfs:label "Adam optimiser (initial lr=0.001, cosine decay to 1% over 100 epochs, early stopping on validation metric after 200 epochs)" .
 
-ex:m3gnet-impl-chen2022 a mlips:Implementation ;
+entity:m3gnet-impl-chen2022 a mlips:Implementation ;
     mlips:implementedIn mlips:M3GNet .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-5-chen2022 a mlips:HyperparameterSetting ;
+entity:setting-rcut-5-chen2022 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "5"^^xsd:double .
 
-ex:setting-3body-cutoff-4-chen2022 a mlips:HyperparameterSetting ;
+entity:setting-3body-cutoff-4-chen2022 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:angularCutoff ;
     mlips:settingValue "4"^^xsd:double .
 
-ex:setting-embedding-dim-64-chen2022 a mlips:HyperparameterSetting ;
+entity:setting-embedding-dim-64-chen2022 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "64"^^xsd:integer .
 
-ex:setting-num-blocks-3-chen2022 a mlips:HyperparameterSetting ;
+entity:setting-num-blocks-3-chen2022 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "3"^^xsd:integer .
 
-ex:setting-num-radial-basis-3-chen2022 a mlips:HyperparameterSetting ;
+entity:setting-num-radial-basis-3-chen2022 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numRadialBasis ;
     mlips:settingValue "3"^^xsd:integer .
 
@@ -157,60 +157,60 @@ ex:setting-num-radial-basis-3-chen2022 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-m3gnet-chen2022 a mlips:MLIPRun ;
+entity:run-m3gnet-chen2022 a mlips:MLIPRun ;
     rdfs:label "M3GNet-EFS training run on MPF.2021.2.8" ;
-    mlips:appliesMethod ex:M3GNet ;
-    mlips:runsOn ex:ds-MPF-2021-2-8 ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-MPF-2021-2-8 ;
     mlips:hasHyperparameterSetting
-        ex:setting-rcut-5-chen2022 ,
-        ex:setting-3body-cutoff-4-chen2022 ,
-        ex:setting-embedding-dim-64-chen2022 ,
-        ex:setting-num-blocks-3-chen2022 ,
-        ex:setting-num-radial-basis-3-chen2022 ;
-    mlips:produces ex:model-m3gnet-chen2022 .
+        entity:setting-rcut-5-chen2022 ,
+        entity:setting-3body-cutoff-4-chen2022 ,
+        entity:setting-embedding-dim-64-chen2022 ,
+        entity:setting-num-blocks-3-chen2022 ,
+        entity:setting-num-radial-basis-3-chen2022 ;
+    mlips:produces entity:model-m3gnet-chen2022 .
 
-ex:model-m3gnet-chen2022 a mlips:TrainedModel ;
+entity:model-m3gnet-chen2022 a mlips:TrainedModel ;
     rdfs:label "M3GNet universal IAP (M3GNet-EFS) trained on MPF.2021.2.8" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-chen2022 mlips:hasResult
-    ex:result-mae-energy-chen2022 ,
-    ex:result-mae-force-chen2022 ,
-    ex:result-mae-stress-chen2022 .
+entity:study-chen2022 mlips:hasResult
+    entity:result-mae-energy-chen2022 ,
+    entity:result-mae-force-chen2022 ,
+    entity:result-mae-stress-chen2022 .
 
-ex:result-mae-energy-chen2022 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
-    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
-    mlips:hasAccuracyMetric ex:metric-mae-energy-chen2022 .
+entity:result-mae-energy-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-chen2022 ;
+    mlips:targetMaterial entity:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric entity:metric-mae-energy-chen2022 .
 
-ex:metric-mae-energy-chen2022 a mlips:AccuracyMetric ;
+entity:metric-mae-energy-chen2022 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on energy per atom (MPF.2021.2.8 held-out)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "35"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ATOM .
 
-ex:result-mae-force-chen2022 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
-    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
-    mlips:hasAccuracyMetric ex:metric-mae-force-chen2022 .
+entity:result-mae-force-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-chen2022 ;
+    mlips:targetMaterial entity:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric entity:metric-mae-force-chen2022 .
 
-ex:metric-mae-force-chen2022 a mlips:AccuracyMetric ;
+entity:metric-mae-force-chen2022 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on force components (MPF.2021.2.8 held-out)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:ForceProperty ;
     mlips:metricValue "72"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ANGSTROM .
 
-ex:result-mae-stress-chen2022 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-m3gnet-chen2022 ;
-    mlips:targetMaterial ex:mat-MP-universal-chen2022 ;
-    mlips:hasAccuracyMetric ex:metric-mae-stress-chen2022 .
+entity:result-mae-stress-chen2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-chen2022 ;
+    mlips:targetMaterial entity:mat-MP-universal-chen2022 ;
+    mlips:hasAccuracyMetric entity:metric-mae-stress-chen2022 .
 
-ex:metric-mae-stress-chen2022 a mlips:AccuracyMetric ;
+entity:metric-mae-stress-chen2022 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on stress components (MPF.2021.2.8 held-out)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricValue "0.41"^^xsd:double ;

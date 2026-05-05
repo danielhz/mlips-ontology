@@ -162,7 +162,7 @@ async fn serve_static(Path((id, file)): Path<(String, String)>) -> Response {
 /// one of a few well-known prefixes; otherwise return the full IRI.
 fn short_form(iri: &str) -> String {
     const PREFIXES: &[(&str, &str)] = &[
-        ("https://w3id.org/mlips/entity/", "ex:"),
+        ("https://w3id.org/mlips/entity/", "entity:"),
         ("https://w3id.org/mlips#", "mlips:"),
         ("http://www.w3.org/ns/mls#", "mls:"),
         ("http://www.w3.org/ns/prov#", "prov:"),

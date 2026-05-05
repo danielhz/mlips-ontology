@@ -21,17 +21,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-gubaev2023 a mlips:BenchmarkStudy ;
+entity:study-gubaev2023 a mlips:BenchmarkStudy ;
     rdfs:label "Gubaev et al. (2023): MTP for TaVCrW BCC refractory high-entropy alloy" ;
-    mlips:reportedIn ex:article-gubaev2023 .
+    mlips:reportedIn entity:article-gubaev2023 .
 
-ex:article-gubaev2023 a schema:ScholarlyArticle ;
+entity:article-gubaev2023 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1038/s41524-023-01073-w> ;
     schema:datePublished "2023"^^xsd:gYear ;
     schema:name "Performance of two complementary machine-learned potentials in modelling chemically complex systems" ;
@@ -82,7 +82,7 @@ ex:article-gubaev2023 a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-TaVCrW a mlips:MaterialSystem ;
+entity:mat-TaVCrW a mlips:MaterialSystem ;
     rdfs:label "TaVCrW equiatomic BCC refractory high-entropy alloy (with binary, ternary, and quaternary subsystems)" ;
     mlips:chemicalFormula "TaVCrW" ;
     mlips:materialClass "Refractory high-entropy alloy, BCC (Im-3m), four equiatomic constituents (Ta, V, Cr, W); training set spans 2-, 3-, and 4-component BCC subsystems plus a deformed B2/B2 phase-segregated quaternary used as out-of-distribution test" ;
@@ -93,15 +93,15 @@ ex:mat-TaVCrW a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-TaVCrW a mlips:DFTCalculation .
+entity:dft-TaVCrW a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-TaVCrW mlips:hasDFTSettings ex:dft-settings-TaVCrW .
+entity:dft-TaVCrW mlips:hasDFTSettings entity:dft-settings-TaVCrW .
 
-ex:dft-settings-TaVCrW a mlips:DFTSettings ;
+entity:dft-settings-TaVCrW a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:VASP ;
     mlips:xcFunctional mlips:PBE ;
     mlips:pseudopotentialType mlips:PAW ;
@@ -113,37 +113,37 @@ ex:dft-settings-TaVCrW a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-TaVCrW a mlips:TrainingDataset ;
+entity:ds-TaVCrW a mlips:TrainingDataset ;
     rdfs:label "TaVCrW MTP+GM-NN training+validation set: 6711 DFT configurations (5680 at 0 K = 4491 binary + 595 ternary + 594 quaternary; plus 1031 MD-sampled at 2500 K)" ;
-    mlips:coversMaterial ex:mat-TaVCrW ;
+    mlips:coversMaterial entity:mat-TaVCrW ;
     mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
     mlips:datasetProvenance mlips:InHouse ;
     mlips:numConfigurations 6711 ;
-    mlips:hasDFTCalculation ex:dft-TaVCrW .
+    mlips:hasDFTCalculation entity:dft-TaVCrW .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-TaVCrW mlips:samplingStrategy
-    ex:enumlib-sampling-gubaev2023 ,
-    ex:vib-sampling-gubaev2023 ,
-    ex:active-learning-sampling-gubaev2023 ,
-    ex:deformed-binary-sampling-gubaev2023 .
+entity:ds-TaVCrW mlips:samplingStrategy
+    entity:enumlib-sampling-gubaev2023 ,
+    entity:vib-sampling-gubaev2023 ,
+    entity:active-learning-sampling-gubaev2023 ,
+    entity:deformed-binary-sampling-gubaev2023 .
 
-ex:enumlib-sampling-gubaev2023 a mlips:SamplingStrategy ;
+entity:enumlib-sampling-gubaev2023 a mlips:SamplingStrategy ;
     rdfs:label "0 K small-supercell enumeration (enumlib)" ;
     rdfs:comment "0 K configurations in 2-8 atom supercells generated with the enumlib library; non-repetitive symmetries are enumerated and 2500 binary structures are sampled (plus ternaries, plus equiatomic and off-equiatomic quaternaries)." .
 
-ex:vib-sampling-gubaev2023 a mlips:SamplingStrategy ;
+entity:vib-sampling-gubaev2023 a mlips:SamplingStrategy ;
     rdfs:label "Vibrational sampling (DFT MD at 2500 K)" ;
     rdfs:comment "1031 unrelaxed snapshots from DFT MD at 2500 K (close to the melting point), spanning the disordered TaVCrW phase and its compositional subsystems." .
 
-ex:active-learning-sampling-gubaev2023 a mlips:SamplingStrategy ;
+entity:active-learning-sampling-gubaev2023 a mlips:SamplingStrategy ;
     rdfs:label "Active learning (MaxVol extrapolation grade)" ;
     rdfs:comment "Iterative dataset growth: an MD trajectory using the current MTP is mined for configurations whose extrapolation grade exceeds a threshold; selected configurations are re-computed with DFT and added to the training data, then the MTP is retrained. The same configurations are reused for the GM-NN comparison." .
 
-ex:deformed-binary-sampling-gubaev2023 a mlips:SamplingStrategy ;
+entity:deformed-binary-sampling-gubaev2023 a mlips:SamplingStrategy ;
     rdfs:label "Deformed-binary phase-segregation sampling" ;
     rdfs:comment "432-atom B2/B2 deformed quaternary structures constructed by joining strained binary halves (TaV +3.7%, CrW -1.28%, TaCr +0.27%, VW -0.14%, TaW +4.06%, VCr -4.71%) along [100], used as a test set for the phase-segregated quaternary." .
 
@@ -151,27 +151,27 @@ ex:deformed-binary-sampling-gubaev2023 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:MTP a mlips:MLIPMethod ;
+entity:MTP a mlips:MLIPMethod ;
     rdfs:label "Moment Tensor Potential" ;
-    mlips:hasFunctionalForm ex:mtp-functional-form ;
-    mlips:hasLossFunction ex:mtp-loss-gubaev2023 ;
+    mlips:hasFunctionalForm entity:mtp-functional-form ;
+    mlips:hasLossFunction entity:mtp-loss-gubaev2023 ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:momentLevel ;
-    mlips:hasImplementation ex:mlip-package-gubaev2023 .
+    mlips:hasImplementation entity:mlip-package-gubaev2023 .
 
-ex:mtp-functional-form a mlips:FunctionalForm ;
+entity:mtp-functional-form a mlips:FunctionalForm ;
     rdfs:label "MTP moment-tensor polynomial with level-restricted basis (lev_max controls the radial+angular truncation)" .
 
-ex:mtp-loss-gubaev2023 a mlips:LossFunction ;
+entity:mtp-loss-gubaev2023 a mlips:LossFunction ;
     rdfs:label "Weighted MSE on energies, forces, and stresses with weights w_E=1/N_at, w_f=0.1, w_sigma=0.001" .
 
-ex:mlip-package-gubaev2023 a mlips:Implementation ;
+entity:mlip-package-gubaev2023 a mlips:Implementation ;
     mlips:implementedIn mlips:MLIP .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-50-gubaev2023 a mlips:HyperparameterSetting ;
+entity:setting-rcut-50-gubaev2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "5"^^xsd:double .
 
@@ -179,40 +179,40 @@ ex:setting-rcut-50-gubaev2023 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-mtp-TaVCrW a mlips:MLIPRun ;
+entity:run-mtp-TaVCrW a mlips:MLIPRun ;
     rdfs:label "MTP training run on the TaVCrW HEA dataset (6711 configurations)" ;
-    mlips:appliesMethod ex:MTP ;
-    mlips:runsOn ex:ds-TaVCrW ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-50-gubaev2023 ;
-    mlips:produces ex:model-mtp-TaVCrW .
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-TaVCrW ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-50-gubaev2023 ;
+    mlips:produces entity:model-mtp-TaVCrW .
 
-ex:model-mtp-TaVCrW a mlips:TrainedModel ;
+entity:model-mtp-TaVCrW a mlips:TrainedModel ;
     rdfs:label "TaVCrW MTP" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-gubaev2023 mlips:hasResult ex:result-mtp-energy-gubaev2023 , ex:result-mtp-forces-gubaev2023 .
+entity:study-gubaev2023 mlips:hasResult entity:result-mtp-energy-gubaev2023 , entity:result-mtp-forces-gubaev2023 .
 
-ex:result-mtp-energy-gubaev2023 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mtp-TaVCrW ;
-    mlips:targetMaterial ex:mat-TaVCrW ;
-    mlips:hasAccuracyMetric ex:metric-rmse-energy-gubaev2023 .
+entity:result-mtp-energy-gubaev2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-TaVCrW ;
+    mlips:targetMaterial entity:mat-TaVCrW ;
+    mlips:hasAccuracyMetric entity:metric-rmse-energy-gubaev2023 .
 
-ex:metric-rmse-energy-gubaev2023 a mlips:AccuracyMetric ;
+entity:metric-rmse-energy-gubaev2023 a mlips:AccuracyMetric ;
     rdfs:label "Overall RMSE in predicted energy across in-distribution Ta-V-Cr-W subsystems (Table 1, MTP)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "2.43"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ATOM .
 
-ex:result-mtp-forces-gubaev2023 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mtp-TaVCrW ;
-    mlips:targetMaterial ex:mat-TaVCrW ;
-    mlips:hasAccuracyMetric ex:metric-rmse-forces-gubaev2023 .
+entity:result-mtp-forces-gubaev2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-TaVCrW ;
+    mlips:targetMaterial entity:mat-TaVCrW ;
+    mlips:hasAccuracyMetric entity:metric-rmse-forces-gubaev2023 .
 
-ex:metric-rmse-forces-gubaev2023 a mlips:AccuracyMetric ;
+entity:metric-rmse-forces-gubaev2023 a mlips:AccuracyMetric ;
     rdfs:label "Overall RMSE in predicted atomic forces across in-distribution Ta-V-Cr-W subsystems (Table 1, MTP)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:ForceProperty ;
@@ -233,11 +233,11 @@ ex:metric-rmse-forces-gubaev2023 a mlips:AccuracyMetric ;
 <https://orcid.org/0000-0003-2612-8515> schema:affiliation mlips:UniversityofStuttgart .
 <https://orcid.org/0000-0001-9940-8548> schema:affiliation mlips:UniversityofStuttgart .
 <https://orcid.org/0000-0002-9199-4340> schema:affiliation mlips:UniversityofStuttgart .
-<https://orcid.org/0000-0002-5073-4112> schema:affiliation ex:org-DaresburyLaboratory-gubaev2023 .
+<https://orcid.org/0000-0002-5073-4112> schema:affiliation entity:org-DaresburyLaboratory-gubaev2023 .
 <https://orcid.org/0000-0001-6178-7669> schema:affiliation mlips:UniversityofStuttgart .
 <https://orcid.org/0000-0003-4281-5665> schema:affiliation mlips:UniversityofStuttgart .
 
-ex:org-DaresburyLaboratory-gubaev2023 a schema:Organization ;
+entity:org-DaresburyLaboratory-gubaev2023 a schema:Organization ;
     rdfs:label "Daresbury Laboratory" ;
     schema:name "Daresbury Laboratory" ;
     schema:identifier <https://ror.org/0089bg420> ;

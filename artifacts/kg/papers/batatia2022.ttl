@@ -16,17 +16,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-batatia2022 a mlips:BenchmarkStudy ;
+entity:study-batatia2022 a mlips:BenchmarkStudy ;
     rdfs:label "Batatia et al. (2022): MACE equivariant message-passing MLIP" ;
-    mlips:reportedIn ex:article-batatia2022 .
+    mlips:reportedIn entity:article-batatia2022 .
 
-ex:article-batatia2022 a schema:ScholarlyArticle ;
+entity:article-batatia2022 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.48550/arXiv.2206.07697> ;
     schema:datePublished "2022"^^xsd:gYear ;
     schema:name "MACE: Higher Order Equivariant Message Passing Neural Networks for Fast and Accurate Force Fields" ;
@@ -35,7 +35,7 @@ ex:article-batatia2022 a schema:ScholarlyArticle ;
         <https://orcid.org/0000-0002-0854-2635> ,
         <https://orcid.org/0000-0001-6815-352X> ,
         <https://orcid.org/0000-0003-1498-8120> ,
-        ex:person-Csanyi-batatia2022 .
+        entity:person-Csanyi-batatia2022 .
 
 <https://orcid.org/0000-0001-6915-9851> a schema:Person ;
     schema:name "Ilyes Batatia" ;
@@ -57,7 +57,7 @@ ex:article-batatia2022 a schema:ScholarlyArticle ;
     schema:givenName "Christoph" ;
     schema:familyName "Ortner" ;
     schema:identifier <https://orcid.org/0000-0003-1498-8120> .
-ex:person-Csanyi-batatia2022 a schema:Person ;
+entity:person-Csanyi-batatia2022 a schema:Person ;
     schema:name "Gábor Csányi" ;
     schema:givenName "Gábor" ;
     schema:familyName "Csányi" ;
@@ -66,7 +66,7 @@ ex:person-Csanyi-batatia2022 a schema:Person ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-rMD17 a mlips:MaterialSystem ;
+entity:mat-rMD17 a mlips:MaterialSystem ;
     rdfs:label "rMD17 small organic molecules (10 molecules: aspirin, azobenzene, benzene, ethanol, malonaldehyde, naphthalene, paracetamol, salicylic acid, toluene, uracil)" ;
     mlips:chemicalFormula "C,H,N,O" ;
     mlips:materialClass "Small organic molecules sampled from gas-phase ab initio MD trajectories" ;
@@ -77,15 +77,15 @@ ex:mat-rMD17 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-batatia2022 a mlips:DFTCalculation .
+entity:dft-batatia2022 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-batatia2022 mlips:hasDFTSettings ex:dft-settings-batatia2022 .
+entity:dft-batatia2022 mlips:hasDFTSettings entity:dft-settings-batatia2022 .
 
-ex:dft-settings-batatia2022 a mlips:DFTSettings ;
+entity:dft-settings-batatia2022 a mlips:DFTSettings ;
     mlips:xcFunctional mlips:PBE ;
     rdfs:comment "rMD17 reference recomputation at the PBE/def2-SVP level of theory with very tight SCF convergence and a very dense DFT integration grid; engine not stated in the MACE paper (rMD17 dataset consumed as published)." .
 
@@ -93,21 +93,21 @@ ex:dft-settings-batatia2022 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-rMD17 a mlips:TrainingDataset ;
+entity:ds-rMD17 a mlips:TrainingDataset ;
     rdfs:label "rMD17 training split: 950 train + 50 validation per molecule (10 molecules)" ;
-    mlips:coversMaterial ex:mat-rMD17 ;
+    mlips:coversMaterial entity:mat-rMD17 ;
     mlips:coversProperty mlips:Energy , mlips:Forces ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 1000 ;
-    mlips:hasDFTCalculation ex:dft-batatia2022 .
+    mlips:hasDFTCalculation entity:dft-batatia2022 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-rMD17 mlips:samplingStrategy ex:aimd-sampling-batatia2022 .
+entity:ds-rMD17 mlips:samplingStrategy entity:aimd-sampling-batatia2022 .
 
-ex:aimd-sampling-batatia2022 a mlips:SamplingStrategy ;
+entity:aimd-sampling-batatia2022 a mlips:SamplingStrategy ;
     rdfs:label "Vibrational sampling (gas-phase ab initio MD at 500 K)" ;
     rdfs:comment "Configurations sampled from long ab initio molecular dynamics trajectories at 500 K, recomputed at PBE/def2-SVP for rMD17." .
 
@@ -115,47 +115,47 @@ ex:aimd-sampling-batatia2022 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:MACE a mlips:MLIPMethod ;
+entity:MACE a mlips:MLIPMethod ;
     rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
-    mlips:hasFunctionalForm ex:mace-functional-form ;
-    mlips:hasLossFunction ex:mace-loss-1-1000 ;
-    mlips:hasTrainingAlgorithm ex:adam-amsgrad ;
+    mlips:hasFunctionalForm entity:mace-functional-form ;
+    mlips:hasLossFunction entity:mace-loss-1-1000 ;
+    mlips:hasTrainingAlgorithm entity:adam-amsgrad ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:numLayers , mlips:numAngularBasis , mlips:numFeatures , mlips:bodyOrder ;
-    mlips:hasImplementation ex:mace-impl .
+    mlips:hasImplementation entity:mace-impl .
 
-ex:mace-functional-form a mlips:FunctionalForm ;
+entity:mace-functional-form a mlips:FunctionalForm ;
     rdfs:label "Two-layer equivariant message-passing network with higher-order (4-body) tensor messages over an O(3)-equivariant atomic cluster expansion basis" .
 
-ex:mace-loss-1-1000 a mlips:LossFunction ;
+entity:mace-loss-1-1000 a mlips:LossFunction ;
     rdfs:label "Weighted MSE on energies and force components (lambda_E = 1, lambda_F = 1000)" .
 
-ex:adam-amsgrad a mls:Algorithm ;
+entity:adam-amsgrad a mls:Algorithm ;
     rdfs:label "Adam (AMSGrad variant), beta1=0.9, beta2=0.999, eps=1e-8" .
 
-ex:mace-impl a mlips:Implementation ;
+entity:mace-impl a mlips:Implementation ;
     mlips:implementedIn mlips:MACE .
 
 ###############################################################################
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-5 a mlips:HyperparameterSetting ;
+entity:setting-rcut-5 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "5"^^xsd:double .
 
-ex:setting-numlayers-2 a mlips:HyperparameterSetting ;
+entity:setting-numlayers-2 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "2"^^xsd:integer .
 
-ex:setting-lmax-3 a mlips:HyperparameterSetting ;
+entity:setting-lmax-3 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numAngularBasis ;
     mlips:settingValue "3"^^xsd:integer .
 
-ex:setting-channels-256 a mlips:HyperparameterSetting ;
+entity:setting-channels-256 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "256"^^xsd:integer .
 
-ex:setting-correlation-3 a mlips:HyperparameterSetting ;
+entity:setting-correlation-3 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:bodyOrder ;
     mlips:settingValue "3"^^xsd:integer .
 
@@ -163,40 +163,40 @@ ex:setting-correlation-3 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-mace-rMD17 a mlips:MLIPRun ;
+entity:run-mace-rMD17 a mlips:MLIPRun ;
     rdfs:label "MACE training run on rMD17 (per-molecule, 1000 configs)" ;
-    mlips:appliesMethod ex:MACE ;
-    mlips:runsOn ex:ds-rMD17 ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-5 , ex:setting-numlayers-2 , ex:setting-lmax-3 , ex:setting-channels-256 , ex:setting-correlation-3 ;
-    mlips:produces ex:model-mace-rMD17 .
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-rMD17 ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-5 , entity:setting-numlayers-2 , entity:setting-lmax-3 , entity:setting-channels-256 , entity:setting-correlation-3 ;
+    mlips:produces entity:model-mace-rMD17 .
 
-ex:model-mace-rMD17 a mlips:TrainedModel ;
+entity:model-mace-rMD17 a mlips:TrainedModel ;
     rdfs:label "MACE rMD17 model (L=3, two-layer, 256 channels)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-batatia2022 mlips:hasResult ex:result-mace-rmd17-aspirin-energy , ex:result-mace-rmd17-aspirin-forces .
+entity:study-batatia2022 mlips:hasResult entity:result-mace-rmd17-aspirin-energy , entity:result-mace-rmd17-aspirin-forces .
 
-ex:result-mace-rmd17-aspirin-energy a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mace-rMD17 ;
-    mlips:targetMaterial ex:mat-rMD17 ;
-    mlips:hasAccuracyMetric ex:metric-mae-rmd17-aspirin-energy .
+entity:result-mace-rmd17-aspirin-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-rMD17 ;
+    mlips:targetMaterial entity:mat-rMD17 ;
+    mlips:hasAccuracyMetric entity:metric-mae-rmd17-aspirin-energy .
 
-ex:metric-mae-rmd17-aspirin-energy a mlips:AccuracyMetric ;
+entity:metric-mae-rmd17-aspirin-energy a mlips:AccuracyMetric ;
     rdfs:label "MAE on aspirin energies, rMD17, 1000 train" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "2.2"^^xsd:double ;
     mlips:hasUnit unit:MilliEV .
 
-ex:result-mace-rmd17-aspirin-forces a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-mace-rMD17 ;
-    mlips:targetMaterial ex:mat-rMD17 ;
-    mlips:hasAccuracyMetric ex:metric-mae-rmd17-aspirin-forces .
+entity:result-mace-rmd17-aspirin-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-rMD17 ;
+    mlips:targetMaterial entity:mat-rMD17 ;
+    mlips:hasAccuracyMetric entity:metric-mae-rmd17-aspirin-forces .
 
-ex:metric-mae-rmd17-aspirin-forces a mlips:AccuracyMetric ;
+entity:metric-mae-rmd17-aspirin-forces a mlips:AccuracyMetric ;
     rdfs:label "MAE on aspirin force components, rMD17, 1000 train" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:ForceProperty ;
@@ -207,5 +207,5 @@ ex:metric-mae-rmd17-aspirin-forces a mlips:AccuracyMetric ;
 # Q11 -- Computational resources
 ###############################################################################
 
-ex:run-mace-rMD17 mlips:trainingDuration "2-6 hours per molecule on a single NVIDIA A100" ;
+entity:run-mace-rMD17 mlips:trainingDuration "2-6 hours per molecule on a single NVIDIA A100" ;
     mlips:trainingHardware "NVIDIA A100 GPU (single GPU)" .

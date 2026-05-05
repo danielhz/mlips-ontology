@@ -75,7 +75,7 @@ COMBINED_NT="$WORK_DIR/combined.nt"
 } | sort -u > "$COMBINED_NT"
 
 # Convert back to Turtle for the published artifact. To keep the
-# output abbreviated (mlips:, rdfs:, ex:, ...), prepend the canonical
+# output abbreviated (mlips:, rdfs:, entity:, ...), prepend the canonical
 # paper's @prefix block before the n-triples and let rapper re-emit;
 # rapper accepts a Turtle document whose body is full-IRI triples.
 PREFIX_BLOCK=$(grep '^@prefix' "$PAPER_TTL" || true)

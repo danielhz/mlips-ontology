@@ -20,17 +20,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-batzner2022 a mlips:BenchmarkStudy ;
+entity:study-batzner2022 a mlips:BenchmarkStudy ;
     rdfs:label "Batzner et al. (2022): NequIP E(3)-equivariant GNN MLIP on water and ices" ;
-    mlips:reportedIn ex:article-batzner2022 .
+    mlips:reportedIn entity:article-batzner2022 .
 
-ex:article-batzner2022 a schema:ScholarlyArticle ;
+entity:article-batzner2022 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1038/s41467-022-29939-5> ;
     schema:datePublished "2022"^^xsd:gYear ;
     schema:name "E(3)-Equivariant Graph Neural Networks for Data-Efficient and Accurate Interatomic Potentials" ;
@@ -97,7 +97,7 @@ ex:article-batzner2022 a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-water-ice a mlips:MaterialSystem ;
+entity:mat-water-ice a mlips:MaterialSystem ;
     rdfs:label "Liquid water and three ice phases (Ih at 1bar/273K, 1bar/330K, 2.13kbar/238K)" ;
     mlips:chemicalFormula "H2O" ;
     mlips:materialClass "Hydrogen-bonded molecular liquid and ice polymorphs (PBC); 64 H2O for liquid, 96 H2O for ices" ;
@@ -107,15 +107,15 @@ ex:mat-water-ice a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-batzner2022 a mlips:DFTCalculation .
+entity:dft-batzner2022 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-batzner2022 mlips:hasDFTSettings ex:dft-settings-batzner2022 .
+entity:dft-batzner2022 mlips:hasDFTSettings entity:dft-settings-batzner2022 .
 
-ex:dft-settings-batzner2022 a mlips:DFTSettings ;
+entity:dft-settings-batzner2022 a mlips:DFTSettings ;
     mlips:xcFunctional mlips:PBE0 ;
     rdfs:comment "Hybrid PBE0 with Tkatchenko-Scheffler dispersion correction (PBE0-TS)." .
 
@@ -123,21 +123,21 @@ ex:dft-settings-batzner2022 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-water-ice a mlips:TrainingDataset ;
+entity:ds-water-ice a mlips:TrainingDataset ;
     rdfs:label "Water + 3 ices joint training set (133 structures sampled from 140000-frame full set)" ;
-    mlips:coversMaterial ex:mat-water-ice ;
+    mlips:coversMaterial entity:mat-water-ice ;
     mlips:coversProperty mlips:Energy , mlips:Forces ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 133 ;
-    mlips:hasDFTCalculation ex:dft-batzner2022 .
+    mlips:hasDFTCalculation entity:dft-batzner2022 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-water-ice mlips:samplingStrategy ex:aimd-sampling-batzner2022 .
+entity:ds-water-ice mlips:samplingStrategy entity:aimd-sampling-batzner2022 .
 
-ex:aimd-sampling-batzner2022 a mlips:SamplingStrategy ;
+entity:aimd-sampling-batzner2022 a mlips:SamplingStrategy ;
     rdfs:label "Vibrational sampling (classical and path-integral AIMD) at multiple temperatures and pressures" ;
     rdfs:comment "133 frames sampled uniformly from a 140000-frame full set spanning liquid water and three ice Ih phases at the PBE0-TS level; the full set is generated from classical AIMD and path-integral AIMD trajectories." .
 
@@ -145,24 +145,24 @@ ex:aimd-sampling-batzner2022 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:NequIP a mlips:MLIPMethod ;
+entity:NequIP a mlips:MLIPMethod ;
     rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
-    mlips:hasFunctionalForm ex:nequip-functional-form ;
-    mlips:hasLossFunction ex:nequip-loss-energy-force ;
-    mlips:hasTrainingAlgorithm ex:adam-amsgrad-nequip ;
+    mlips:hasFunctionalForm entity:nequip-functional-form ;
+    mlips:hasLossFunction entity:nequip-loss-energy-force ;
+    mlips:hasTrainingAlgorithm entity:adam-amsgrad-nequip ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:numLayers , mlips:numAngularBasis , mlips:numFeatures ;
-    mlips:hasImplementation ex:nequip-impl .
+    mlips:hasImplementation entity:nequip-impl .
 
-ex:nequip-functional-form a mlips:FunctionalForm ;
+entity:nequip-functional-form a mlips:FunctionalForm ;
     rdfs:label "E(3)-equivariant graph neural network with tensor-product convolutions over geometric tensors of irreps l=0..lmax (atom embeddings, interaction blocks with self-interaction + convolution + concatenation + nonlinearity, output block)" .
 
-ex:nequip-loss-energy-force a mlips:LossFunction ;
+entity:nequip-loss-energy-force a mlips:LossFunction ;
     rdfs:label "Weighted MSE on energies and force components, lambda_E and lambda_F set per system (e.g. 100000:1 for water model c)" .
 
-ex:adam-amsgrad-nequip a mls:Algorithm ;
+entity:adam-amsgrad-nequip a mls:Algorithm ;
     rdfs:label "Adam (AMSGrad variant), beta1=0.9, beta2=0.999, eps=1e-8, no weight decay" .
 
-ex:nequip-impl a mlips:Implementation ;
+entity:nequip-impl a mlips:Implementation ;
     mlips:implementedIn mlips:NequIP ;
     mlips:version "0.3.3" .
 
@@ -170,19 +170,19 @@ ex:nequip-impl a mlips:Implementation ;
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-6-batzner a mlips:HyperparameterSetting ;
+entity:setting-rcut-6-batzner a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "6"^^xsd:double .
 
-ex:setting-numlayers-6 a mlips:HyperparameterSetting ;
+entity:setting-numlayers-6 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "6"^^xsd:integer .
 
-ex:setting-lmax-2-batzner a mlips:HyperparameterSetting ;
+entity:setting-lmax-2-batzner a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numAngularBasis ;
     mlips:settingValue "2"^^xsd:integer .
 
-ex:setting-features-32 a mlips:HyperparameterSetting ;
+entity:setting-features-32 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "32"^^xsd:integer .
 
@@ -190,40 +190,40 @@ ex:setting-features-32 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-nequip-water a mlips:MLIPRun ;
+entity:run-nequip-water a mlips:MLIPRun ;
     rdfs:label "NequIP training run on water+ices (133 frames, lmax=2, 6 layers, 32 features)" ;
-    mlips:appliesMethod ex:NequIP ;
-    mlips:runsOn ex:ds-water-ice ;
-    mlips:hasHyperparameterSetting ex:setting-rcut-6-batzner , ex:setting-numlayers-6 , ex:setting-lmax-2-batzner , ex:setting-features-32 ;
-    mlips:produces ex:model-nequip-water .
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-ice ;
+    mlips:hasHyperparameterSetting entity:setting-rcut-6-batzner , entity:setting-numlayers-6 , entity:setting-lmax-2-batzner , entity:setting-features-32 ;
+    mlips:produces entity:model-nequip-water .
 
-ex:model-nequip-water a mlips:TrainedModel ;
+entity:model-nequip-water a mlips:TrainedModel ;
     rdfs:label "NequIP water+ices model (lmax=2, 6 interaction blocks, 32 features)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-batzner2022 mlips:hasResult ex:result-nequip-water-energy , ex:result-nequip-water-forces .
+entity:study-batzner2022 mlips:hasResult entity:result-nequip-water-energy , entity:result-nequip-water-forces .
 
-ex:result-nequip-water-energy a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-nequip-water ;
-    mlips:targetMaterial ex:mat-water-ice ;
-    mlips:hasAccuracyMetric ex:metric-rmse-water-energy .
+entity:result-nequip-water-energy a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-water ;
+    mlips:targetMaterial entity:mat-water-ice ;
+    mlips:hasAccuracyMetric entity:metric-rmse-water-energy .
 
-ex:metric-rmse-water-energy a mlips:AccuracyMetric ;
+entity:metric-rmse-water-energy a mlips:AccuracyMetric ;
     rdfs:label "RMSE on liquid-water energies (model c, lambda_F=100000, lambda_E=1; per-molecule)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "1.7"^^xsd:double ;
     mlips:hasUnit unit:MilliEV .
 
-ex:result-nequip-water-forces a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-nequip-water ;
-    mlips:targetMaterial ex:mat-water-ice ;
-    mlips:hasAccuracyMetric ex:metric-rmse-water-forces .
+entity:result-nequip-water-forces a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-water ;
+    mlips:targetMaterial entity:mat-water-ice ;
+    mlips:hasAccuracyMetric entity:metric-rmse-water-forces .
 
-ex:metric-rmse-water-forces a mlips:AccuracyMetric ;
+entity:metric-rmse-water-forces a mlips:AccuracyMetric ;
     rdfs:label "RMSE on liquid-water force components (model c, lambda_F=100000, lambda_E=1)" ;
     mlips:metricType mlips:RMSE ;
     mlips:metricProperty mlips:ForceProperty ;
@@ -234,43 +234,43 @@ ex:metric-rmse-water-forces a mlips:AccuracyMetric ;
 # Q11 -- Computational resources
 ###############################################################################
 
-ex:run-nequip-water mlips:trainingHardware "NVIDIA Tesla V100 GPU (single-GPU training)" .
+entity:run-nequip-water mlips:trainingHardware "NVIDIA Tesla V100 GPU (single-GPU training)" .
 
 # schema:affiliation links added by issue-0005 sweep.
 <https://orcid.org/0000-0002-8826-2712> schema:affiliation mlips:HarvardUniversity .
 <https://orcid.org/0000-0003-0475-9236> schema:affiliation mlips:HarvardUniversity .
 <https://orcid.org/0000-0002-7971-5222> schema:affiliation mlips:HarvardUniversity .
-<https://orcid.org/0000-0001-5433-0900> schema:affiliation ex:org-EcolePolytechniqueFederaledeLausanne-batzner2022 .
-<https://orcid.org/0000-0001-5433-0900> schema:affiliation ex:org-MassachusettsInstituteofTechnology-batzner2022 .
+<https://orcid.org/0000-0001-5433-0900> schema:affiliation entity:org-EcolePolytechniqueFederaledeLausanne-batzner2022 .
+<https://orcid.org/0000-0001-5433-0900> schema:affiliation entity:org-MassachusettsInstituteofTechnology-batzner2022 .
 <https://orcid.org/0000-0003-2239-6192> schema:affiliation mlips:RobertBoschUnitedStates .
 <https://orcid.org/0000-0001-6705-8133> schema:affiliation mlips:RobertBoschUnitedStates .
 <https://orcid.org/0000-0002-2913-7030> schema:affiliation mlips:HarvardUniversity .
 <https://orcid.org/0000-0001-5581-5344> schema:affiliation mlips:LawrenceBerkeleyNationalLaboratory .
-<https://orcid.org/0000-0001-5581-5344> schema:affiliation ex:org-ResearchApplicationsUnitedStates-batzner2022 .
-<https://orcid.org/0000-0001-5581-5344> schema:affiliation ex:org-MassachusettsInstituteofTechnology-batzner2022 .
+<https://orcid.org/0000-0001-5581-5344> schema:affiliation entity:org-ResearchApplicationsUnitedStates-batzner2022 .
+<https://orcid.org/0000-0001-5581-5344> schema:affiliation entity:org-MassachusettsInstituteofTechnology-batzner2022 .
 <https://orcid.org/0000-0002-0638-539X> schema:affiliation mlips:HarvardUniversity .
 <https://orcid.org/0000-0002-0638-539X> schema:affiliation mlips:RobertBoschUnitedStates .
-<https://orcid.org/0000-0002-0638-539X> schema:affiliation ex:org-RobertBoschSlovenia-batzner2022 .
+<https://orcid.org/0000-0002-0638-539X> schema:affiliation entity:org-RobertBoschSlovenia-batzner2022 .
 
-ex:org-EcolePolytechniqueFederaledeLausanne-batzner2022 a schema:Organization ;
+entity:org-EcolePolytechniqueFederaledeLausanne-batzner2022 a schema:Organization ;
     rdfs:label "École Polytechnique Fédérale de Lausanne" ;
     schema:name "École Polytechnique Fédérale de Lausanne" ;
     schema:identifier <https://ror.org/02s376052> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-MassachusettsInstituteofTechnology-batzner2022 a schema:Organization ;
+entity:org-MassachusettsInstituteofTechnology-batzner2022 a schema:Organization ;
     rdfs:label "Massachusetts Institute of Technology" ;
     schema:name "Massachusetts Institute of Technology" ;
     schema:identifier <https://ror.org/042nb2s44> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-ResearchApplicationsUnitedStates-batzner2022 a schema:Organization ;
+entity:org-ResearchApplicationsUnitedStates-batzner2022 a schema:Organization ;
     rdfs:label "Research Applications (United States)" ;
     schema:name "Research Applications (United States)" ;
     schema:identifier <https://ror.org/02q2v3574> ;
     rdfs:comment "Paper-local Organization IRI; not promoted to mlips-vocab.ttl (occurs in fewer than 3 papers)." .
 
-ex:org-RobertBoschSlovenia-batzner2022 a schema:Organization ;
+entity:org-RobertBoschSlovenia-batzner2022 a schema:Organization ;
     rdfs:label "Robert Bosch (Slovenia)" ;
     schema:name "Robert Bosch (Slovenia)" ;
     schema:identifier <https://ror.org/03248dr08> ;

@@ -19,17 +19,17 @@
 @prefix mls:    <http://www.w3.org/ns/mls#> .
 @prefix unit:   <http://qudt.org/vocab/unit/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
-@prefix ex:     <https://w3id.org/mlips/entity/> .
+@prefix entity:     <https://w3id.org/mlips/entity/> .
 
 ###############################################################################
 # Q1 -- Bibliographic identification
 ###############################################################################
 
-ex:study-deng2023 a mlips:BenchmarkStudy ;
+entity:study-deng2023 a mlips:BenchmarkStudy ;
     rdfs:label "Deng et al. (2023): CHGNet charge-informed universal MLIP" ;
-    mlips:reportedIn ex:article-deng2023 .
+    mlips:reportedIn entity:article-deng2023 .
 
-ex:article-deng2023 a schema:ScholarlyArticle ;
+entity:article-deng2023 a schema:ScholarlyArticle ;
     schema:sameAs <https://doi.org/10.1038/s42256-023-00716-3> ;
     schema:datePublished "2023"^^xsd:gYear ;
     schema:name "CHGNet: Pretrained Universal Neural Network Potential for Charge-Informed Atomistic Modeling" ;
@@ -79,7 +79,7 @@ ex:article-deng2023 a schema:ScholarlyArticle ;
 # Q2 -- Material system
 ###############################################################################
 
-ex:mat-MP-universal-deng2023 a mlips:MaterialSystem ;
+entity:mat-MP-universal-deng2023 a mlips:MaterialSystem ;
     rdfs:label "Materials Project Trajectory Dataset coverage (universal, 94 elements)" ;
     mlips:chemicalFormula "any" ;
     mlips:materialClass "Universal inorganic crystal coverage: 94 elements of the periodic table; 145,923 distinct compounds spanning the Materials Project September 2022 release" ;
@@ -89,15 +89,15 @@ ex:mat-MP-universal-deng2023 a mlips:MaterialSystem ;
 # Q3 -- Reference calculation method (type only; settings live in Q4)
 ###############################################################################
 
-ex:dft-deng2023 a mlips:DFTCalculation .
+entity:dft-deng2023 a mlips:DFTCalculation .
 
 ###############################################################################
 # Q4 -- Reference settings + software code
 ###############################################################################
 
-ex:dft-deng2023 mlips:hasDFTSettings ex:dft-settings-deng2023 .
+entity:dft-deng2023 mlips:hasDFTSettings entity:dft-settings-deng2023 .
 
-ex:dft-settings-deng2023 a mlips:DFTSettings ;
+entity:dft-settings-deng2023 a mlips:DFTSettings ;
     mlips:usedDFTCode mlips:VASP ;
     mlips:xcFunctional mlips:PBE ;
     mlips:pseudopotentialType mlips:PAW ;
@@ -109,32 +109,32 @@ ex:dft-settings-deng2023 a mlips:DFTSettings ;
 # Q5 -- Training dataset characterisation
 ###############################################################################
 
-ex:ds-MPtrj a mlips:TrainingDataset ;
+entity:ds-MPtrj a mlips:TrainingDataset ;
     rdfs:label "MPtrj: 1,580,395 atomic configurations from 145,923 Materials Project compounds, with energies, forces, stresses, and 7,944,833 site magnetic moments" ;
-    mlips:coversMaterial ex:mat-MP-universal-deng2023 ;
+    mlips:coversMaterial entity:mat-MP-universal-deng2023 ;
     mlips:coversProperty mlips:Energy , mlips:Forces , mlips:Stresses ;
     mlips:datasetProvenance mlips:Published ;
     mlips:numConfigurations 1580395 ;
-    mlips:hasDFTCalculation ex:dft-deng2023 .
+    mlips:hasDFTCalculation entity:dft-deng2023 .
 
 ###############################################################################
 # Q6 -- Sampling strategies
 ###############################################################################
 
-ex:ds-MPtrj mlips:samplingStrategy
-    ex:relaxation-trajectory-sampling-deng2023 ,
-    ex:periodic-table-coverage-sampling-deng2023 ,
-    ex:magmom-decoration-sampling-deng2023 .
+entity:ds-MPtrj mlips:samplingStrategy
+    entity:relaxation-trajectory-sampling-deng2023 ,
+    entity:periodic-table-coverage-sampling-deng2023 ,
+    entity:magmom-decoration-sampling-deng2023 .
 
-ex:relaxation-trajectory-sampling-deng2023 a mlips:SamplingStrategy ;
+entity:relaxation-trajectory-sampling-deng2023 a mlips:SamplingStrategy ;
     rdfs:label "Materials Project relaxation-trajectory sampling" ;
     rdfs:comment "All GGA and GGA+U task trajectories under each material-id from the September 2022 Materials Project dump. Tasks were filtered to share calculation settings with the primary task (same +U setting; final-frame energy within 20 meV/atom of the primary task), to drop frames lacking energy/force or with bad SCF convergence, to drop frames with energy >1 eV/atom or <-10 meV/atom relative to the relaxed structure, and to deduplicate via pymatgen StructureMatcher. The cleaned set was split 8:1:1 train/val/test by compound (mp-id)." .
 
-ex:periodic-table-coverage-sampling-deng2023 a mlips:SamplingStrategy ;
+entity:periodic-table-coverage-sampling-deng2023 a mlips:SamplingStrategy ;
     rdfs:label "Periodic-table chemical-space coverage" ;
     rdfs:comment "Compounds drawn from the Materials Project so as to span 94 elements of the periodic table; 60+ elements have over 100,000 site occurrences and 76 elements carry magnetic-moment annotations." .
 
-ex:magmom-decoration-sampling-deng2023 a mlips:SamplingStrategy ;
+entity:magmom-decoration-sampling-deng2023 a mlips:SamplingStrategy ;
     rdfs:label "Site-magnetic-moment decoration" ;
     rdfs:comment "Each MPtrj atomic configuration is decorated with site magnetic moments from the underlying spin-polarised DFT (7,944,833 magmom labels in total), used as auxiliary supervision targets that act as a charge-state regulariser on the latent space." .
 
@@ -142,26 +142,26 @@ ex:magmom-decoration-sampling-deng2023 a mlips:SamplingStrategy ;
 # Q7 -- MLIP method, components, implementation
 ###############################################################################
 
-ex:CHGNet a mlips:MLIPMethod ;
+entity:CHGNet a mlips:MLIPMethod ;
     rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
-    mlips:hasFunctionalForm ex:chgnet-functional-form ;
-    mlips:hasLossFunction ex:chgnet-huber-loss ;
-    mlips:hasTrainingAlgorithm ex:adam-deng2023 ;
+    mlips:hasFunctionalForm entity:chgnet-functional-form ;
+    mlips:hasLossFunction entity:chgnet-huber-loss ;
+    mlips:hasTrainingAlgorithm entity:adam-deng2023 ;
     mlips:hasHyperparameter mlips:cutoffRadius , mlips:angularCutoff ,
         mlips:numFeatures , mlips:numLayers ,
         mlips:batchSize , mlips:learningRate ;
-    mlips:hasImplementation ex:chgnet-impl-deng2023 .
+    mlips:hasImplementation entity:chgnet-impl-deng2023 .
 
-ex:chgnet-functional-form a mlips:FunctionalForm ;
+entity:chgnet-functional-form a mlips:FunctionalForm ;
     rdfs:label "Two-graph (atom + bond) message-passing neural network with explicit angle features, atom/bond/angle convolution blocks, magmom regularisation of the latent atom features, and energy/force/stress/magmom outputs (forces and stresses by auto-differentiation of total energy)." .
 
-ex:chgnet-huber-loss a mlips:LossFunction ;
+entity:chgnet-huber-loss a mlips:LossFunction ;
     rdfs:label "Huber loss (delta=0.1) on energy, forces, stresses, and magnetic moments with weights w_E=1, w_f=1, w_sigma=0.1, w_m=0.1" .
 
-ex:adam-deng2023 a mls:Algorithm ;
+entity:adam-deng2023 a mls:Algorithm ;
     rdfs:label "Adam optimiser with CosineAnnealingLR scheduler (initial lr=1e-3, decays to 1e-5 by epoch 20, learning rate adjusted ten times per epoch)" .
 
-ex:chgnet-impl-deng2023 a mlips:Implementation ;
+entity:chgnet-impl-deng2023 a mlips:Implementation ;
     mlips:implementedIn mlips:CHGNet ;
     mlips:version "PyTorch 1.12.0" .
 
@@ -169,27 +169,27 @@ ex:chgnet-impl-deng2023 a mlips:Implementation ;
 # Q8 -- Hyperparameter settings
 ###############################################################################
 
-ex:setting-rcut-5-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-rcut-5-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:cutoffRadius ;
     mlips:settingValue "5"^^xsd:double .
 
-ex:setting-bond-cutoff-3-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-bond-cutoff-3-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:angularCutoff ;
     mlips:settingValue "3"^^xsd:double .
 
-ex:setting-feature-dim-64-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-feature-dim-64-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numFeatures ;
     mlips:settingValue "64"^^xsd:integer .
 
-ex:setting-num-conv-layers-4-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-num-conv-layers-4-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:numLayers ;
     mlips:settingValue "4"^^xsd:integer .
 
-ex:setting-batch-size-40-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-batch-size-40-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:batchSize ;
     mlips:settingValue "40"^^xsd:integer .
 
-ex:setting-initial-lr-1e-3-deng2023 a mlips:HyperparameterSetting ;
+entity:setting-initial-lr-1e-3-deng2023 a mlips:HyperparameterSetting ;
     mlips:forHyperparameter mlips:learningRate ;
     mlips:settingValue "0.001"^^xsd:double .
 
@@ -197,61 +197,61 @@ ex:setting-initial-lr-1e-3-deng2023 a mlips:HyperparameterSetting ;
 # Q9 -- MLIP run + trained model
 ###############################################################################
 
-ex:run-chgnet-deng2023 a mlips:MLIPRun ;
+entity:run-chgnet-deng2023 a mlips:MLIPRun ;
     rdfs:label "CHGNet (with-magmom) training run on MPtrj" ;
-    mlips:appliesMethod ex:CHGNet ;
-    mlips:runsOn ex:ds-MPtrj ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-MPtrj ;
     mlips:hasHyperparameterSetting
-        ex:setting-rcut-5-deng2023 ,
-        ex:setting-bond-cutoff-3-deng2023 ,
-        ex:setting-feature-dim-64-deng2023 ,
-        ex:setting-num-conv-layers-4-deng2023 ,
-        ex:setting-batch-size-40-deng2023 ,
-        ex:setting-initial-lr-1e-3-deng2023 ;
-    mlips:produces ex:model-chgnet-deng2023 .
+        entity:setting-rcut-5-deng2023 ,
+        entity:setting-bond-cutoff-3-deng2023 ,
+        entity:setting-feature-dim-64-deng2023 ,
+        entity:setting-num-conv-layers-4-deng2023 ,
+        entity:setting-batch-size-40-deng2023 ,
+        entity:setting-initial-lr-1e-3-deng2023 ;
+    mlips:produces entity:model-chgnet-deng2023 .
 
-ex:model-chgnet-deng2023 a mlips:TrainedModel ;
+entity:model-chgnet-deng2023 a mlips:TrainedModel ;
     rdfs:label "CHGNet pretrained universal MLIP (with magmoms, 400,438 trainable parameters)" .
 
 ###############################################################################
 # Q10 -- Benchmark results
 ###############################################################################
 
-ex:study-deng2023 mlips:hasResult
-    ex:result-mae-energy-deng2023 ,
-    ex:result-mae-force-deng2023 ,
-    ex:result-mae-stress-deng2023 .
+entity:study-deng2023 mlips:hasResult
+    entity:result-mae-energy-deng2023 ,
+    entity:result-mae-force-deng2023 ,
+    entity:result-mae-stress-deng2023 .
 
-ex:result-mae-energy-deng2023 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
-    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
-    mlips:hasAccuracyMetric ex:metric-mae-energy-deng2023 .
+entity:result-mae-energy-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-chgnet-deng2023 ;
+    mlips:targetMaterial entity:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric entity:metric-mae-energy-deng2023 .
 
-ex:metric-mae-energy-deng2023 a mlips:AccuracyMetric ;
+entity:metric-mae-energy-deng2023 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on energy per atom (MPtrj test split, 157,955 structures from 14,572 materials, with-magmom CHGNet)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:EnergyProperty ;
     mlips:metricValue "30"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ATOM .
 
-ex:result-mae-force-deng2023 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
-    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
-    mlips:hasAccuracyMetric ex:metric-mae-force-deng2023 .
+entity:result-mae-force-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-chgnet-deng2023 ;
+    mlips:targetMaterial entity:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric entity:metric-mae-force-deng2023 .
 
-ex:metric-mae-force-deng2023 a mlips:AccuracyMetric ;
+entity:metric-mae-force-deng2023 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on force components (MPtrj test split, with-magmom CHGNet)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricProperty mlips:ForceProperty ;
     mlips:metricValue "77"^^xsd:double ;
     mlips:hasUnit unit:MeV-PER-ANGSTROM .
 
-ex:result-mae-stress-deng2023 a mlips:BenchmarkResult ;
-    mlips:evaluatesModel ex:model-chgnet-deng2023 ;
-    mlips:targetMaterial ex:mat-MP-universal-deng2023 ;
-    mlips:hasAccuracyMetric ex:metric-mae-stress-deng2023 .
+entity:result-mae-stress-deng2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-chgnet-deng2023 ;
+    mlips:targetMaterial entity:mat-MP-universal-deng2023 ;
+    mlips:hasAccuracyMetric entity:metric-mae-stress-deng2023 .
 
-ex:metric-mae-stress-deng2023 a mlips:AccuracyMetric ;
+entity:metric-mae-stress-deng2023 a mlips:AccuracyMetric ;
     rdfs:label "Test MAE on stress components (MPtrj test split, with-magmom CHGNet)" ;
     mlips:metricType mlips:MAE ;
     mlips:metricValue "0.348"^^xsd:double ;
@@ -276,12 +276,12 @@ ex:metric-mae-stress-deng2023 a mlips:AccuracyMetric ;
 <https://orcid.org/0000-0001-5233-3462> schema:affiliation mlips:LawrenceBerkeleyNationalLaboratory .
 <https://orcid.org/0000-0001-5233-3462> schema:affiliation mlips:UniversityofCambridge .
 <https://orcid.org/0000-0002-2995-8381> schema:affiliation mlips:LawrenceBerkeleyNationalLaboratory .
-<https://orcid.org/0000-0002-5198-5036> schema:affiliation ex:org-UniversityofMinnesota-deng2023 .
+<https://orcid.org/0000-0002-5198-5036> schema:affiliation entity:org-UniversityofMinnesota-deng2023 .
 <https://orcid.org/0000-0002-5198-5036> schema:affiliation mlips:UniversityofCaliforniaBerkeley .
 <https://orcid.org/0000-0001-9275-3605> schema:affiliation mlips:LawrenceBerkeleyNationalLaboratory .
 <https://orcid.org/0000-0001-9275-3605> schema:affiliation mlips:UniversityofCaliforniaBerkeley .
 
-ex:org-UniversityofMinnesota-deng2023 a schema:Organization ;
+entity:org-UniversityofMinnesota-deng2023 a schema:Organization ;
     rdfs:label "University of Minnesota" ;
     schema:name "University of Minnesota" ;
     schema:identifier <https://ror.org/017zqws13> ;
