@@ -114,6 +114,7 @@ def main():
     g.bind("mls",      "http://www.w3.org/ns/mls#")
     g.bind("qudt",     "http://qudt.org/schema/qudt/")
     g.bind("mdo",      "https://w3id.org/mdo/core/")
+    g.bind("mdo-calc", "https://w3id.org/mdo/calculation/")
 
     g.serialize(destination=str(args.ttl), format="turtle")
     g.serialize(destination=str(args.owl), format="xml")

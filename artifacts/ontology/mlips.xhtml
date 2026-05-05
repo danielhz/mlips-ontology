@@ -12,6 +12,8 @@
       xmlns:qudt="http://qudt.org/schema/qudt/"
       xmlns:dcterms="http://purl.org/dc/terms/"
       xmlns:vann="http://purl.org/vocab/vann/"
+      xmlns:mdo="https://w3id.org/mdo/core/"
+      xmlns:mdo-calc="https://w3id.org/mdo/calculation/"
       prefix="owl: http://www.w3.org/2002/07/owl#
               rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
               rdfs: http://www.w3.org/2000/01/rdf-schema#
@@ -22,7 +24,9 @@
               schema: https://schema.org/
               qudt: http://qudt.org/schema/qudt/
               dcterms: http://purl.org/dc/terms/
-              vann: http://purl.org/vocab/vann/">
+              vann: http://purl.org/vocab/vann/
+              mdo: https://w3id.org/mdo/core/
+              mdo-calc: https://w3id.org/mdo/calculation/">
 <head>
   <title>MLIPs Ontology</title>
   <meta charset="UTF-8"/>
@@ -234,6 +238,10 @@
         <li><a href="#trainedWith">trained with</a></li>
         <li><a href="#trainedUsing">trained using</a></li>
         <li><a href="#hasDescriptor">has descriptor</a></li>
+        <li><a href="#isHyperparameterOf">is hyperparameter of</a></li>
+        <li><a href="#isImplementationOf">is implementation of</a></li>
+        <li><a href="#isProducedBy">is produced by</a></li>
+        <li><a href="#wasRunBy">was run by</a></li>
       </ul>
       <li><a href="#algorithm-individuals">Individuals</a></li>
       <ul>
@@ -351,6 +359,10 @@
         <li><a href="#targetMaterial">target material</a></li>
         <li><a href="#usesAlgorithm">uses algorithm</a></li>
         <li><a href="#usesTrainingData">uses training data</a></li>
+        <li><a href="#isMetricOf">is metric of</a></li>
+        <li><a href="#isSettingOf">is setting of</a></li>
+        <li><a href="#isResultOf">is result of</a></li>
+        <li><a href="#isEvaluatedIn">is evaluated in</a></li>
       </ul>
       <li><a href="#benchmark-datatype-properties">Datatype Properties</a></li>
       <ul>
@@ -433,7 +445,7 @@ data type, range, and default value.</p>
       <p><strong>Subclass of:</strong> <code>mlschema:HyperParameter</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#defaultValue"><code>mlips:defaultValue</code></a>, <a href="#hyperparameterDatatype"><code>mlips:hyperparameterDatatype</code></a>, <a href="#hyperparameterName"><code>mlips:hyperparameterName</code></a>, <a href="#maxValue"><code>mlips:maxValue</code></a>, <a href="#minValue"><code>mlips:minValue</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#defaultValue"><code>mlips:defaultValue</code></a>, <a href="#hyperparameterDatatype"><code>mlips:hyperparameterDatatype</code></a>, <a href="#hyperparameterName"><code>mlips:hyperparameterName</code></a>, <a href="#isHyperparameterOf"><code>mlips:isHyperparameterOf</code></a>, <a href="#maxValue"><code>mlips:maxValue</code></a>, <a href="#minValue"><code>mlips:minValue</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#forHyperparameter"><code>mlips:forHyperparameter</code></a>, <a href="#hasHyperparameter"><code>mlips:hasHyperparameter</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#Hyperparameter">
@@ -443,14 +455,11 @@ data type, range, and default value.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#HyperParameter"/>
   <rdfs:subClassOf>
     <owl:Restriction>
-      <owl:onProperty>
-        <owl:ObjectProperty>
-          <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
-        </owl:ObjectProperty>
-      </owl:onProperty>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isHyperparameterOf"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -469,6 +478,7 @@ architectural and physical.</p>
   <rdfs:comment xml:lang="en">A hyperparameter that has a direct physical
 meaning. Not disjoint with ArchitecturalHyperparameter.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -485,6 +495,7 @@ maximum moment level, etc.). Not disjoint with PhysicalHyperparameter.</p>
   <rdfs:comment xml:lang="en">A hyperparameter that specifies the model
 architecture. Not disjoint with PhysicalHyperparameter.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -501,6 +512,7 @@ itself.</p>
   <rdfs:label xml:lang="en">Training Hyperparameter</rdfs:label>
   <rdfs:comment xml:lang="en">A hyperparameter of the training procedure.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -512,7 +524,7 @@ specific training run or configuration.</p>
       <p><strong>Subclass of:</strong> <code>mlschema:HyperParameterSetting</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#cutoffRadius"><code>mlips:cutoffRadius</code></a>, <a href="#forHyperparameter"><code>mlips:forHyperparameter</code></a>, <a href="#learningRate"><code>mlips:learningRate</code></a>, <a href="#numAngularBasis"><code>mlips:numAngularBasis</code></a>, <a href="#numLayers"><code>mlips:numLayers</code></a>, <a href="#numRadialBasis"><code>mlips:numRadialBasis</code></a>, <a href="#settingValue"><code>mlips:settingValue</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#cutoffRadius"><code>mlips:cutoffRadius</code></a>, <a href="#forHyperparameter"><code>mlips:forHyperparameter</code></a>, <a href="#isSettingOf"><code>mlips:isSettingOf</code></a>, <a href="#learningRate"><code>mlips:learningRate</code></a>, <a href="#numAngularBasis"><code>mlips:numAngularBasis</code></a>, <a href="#numLayers"><code>mlips:numLayers</code></a>, <a href="#numRadialBasis"><code>mlips:numRadialBasis</code></a>, <a href="#settingValue"><code>mlips:settingValue</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#hasHyperparameterSetting"><code>mlips:hasHyperparameterSetting</code></a>, <a href="#trainedUsing"><code>mlips:trainedUsing</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#HyperparameterSetting">
@@ -520,6 +532,13 @@ specific training run or configuration.</p>
   <rdfs:comment xml:lang="en">A concrete value assigned to a hyperparameter in a
 specific training run or configuration.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/mls#HyperParameterSetting"/>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isSettingOf"/>
+      <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -531,7 +550,7 @@ specific library and version.</p>
       <p><strong>Subclass of:</strong> <code>mlschema:Implementation</code>, <code>schema:SoftwareSourceCode</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#implementedIn"><code>mlips:implementedIn</code></a>, <a href="#version"><code>mlips:version</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#implementedIn"><code>mlips:implementedIn</code></a>, <a href="#isImplementationOf"><code>mlips:isImplementationOf</code></a>, <a href="#version"><code>mlips:version</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#hasImplementation"><code>mlips:hasImplementation</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#Implementation">
@@ -548,14 +567,11 @@ specific library and version.</rdfs:comment>
   </rdfs:subClassOf>
   <rdfs:subClassOf>
     <owl:Restriction>
-      <owl:onProperty>
-        <owl:ObjectProperty>
-          <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasImplementation"/>
-        </owl:ObjectProperty>
-      </owl:onProperty>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isImplementationOf"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#SubordinateSortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -574,6 +590,7 @@ specific library and version.</rdfs:comment>
   <rdfs:comment xml:lang="en">A software library or tool used in MLIP research
 (e.g., ASE, LAMMPS, VASP, GPAW).</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://schema.org/SoftwareApplication"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -591,7 +608,7 @@ training/learning procedure (e.g., Adam, L-BFGS).</p>
 
             <div class="term-properties">
         <p><strong>Outgoing properties:</strong> <a href="#hasDescriptor"><code>mlips:hasDescriptor</code></a>, <a href="#hasFunctionalForm"><code>mlips:hasFunctionalForm</code></a>, <a href="#hasHyperparameter"><code>mlips:hasHyperparameter</code></a>, <a href="#hasImplementation"><code>mlips:hasImplementation</code></a>, <a href="#hasLossFunction"><code>mlips:hasLossFunction</code></a>, <a href="#hasTrainingAlgorithm"><code>mlips:hasTrainingAlgorithm</code></a>, <a href="#inferenceComplexity"><code>mlips:inferenceComplexity</code></a>, <a href="#supportsGPU"><code>mlips:supportsGPU</code></a>, <a href="#supportsParallelization"><code>mlips:supportsParallelization</code></a>, <a href="#supportsSimulation"><code>mlips:supportsSimulation</code></a>, <a href="#trainingComplexity"><code>mlips:trainingComplexity</code></a></p>
-        <p><strong>Incoming properties:</strong> <a href="#appliesMethod"><code>mlips:appliesMethod</code></a>, <a href="#trainedWith"><code>mlips:trainedWith</code></a>, <a href="#usesAlgorithm"><code>mlips:usesAlgorithm</code></a></p>
+        <p><strong>Incoming properties:</strong> <a href="#appliesMethod"><code>mlips:appliesMethod</code></a>, <a href="#isHyperparameterOf"><code>mlips:isHyperparameterOf</code></a>, <a href="#isImplementationOf"><code>mlips:isImplementationOf</code></a>, <a href="#trainedWith"><code>mlips:trainedWith</code></a>, <a href="#usesAlgorithm"><code>mlips:usesAlgorithm</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#MLIPMethod">
   <rdfs:label xml:lang="en">MLIP Method</rdfs:label>
@@ -629,6 +646,7 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm.</rdfs:co
       <owl:someValuesFrom rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -648,6 +666,7 @@ fitted; the trained model records the fitted parameter values.</p>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#FunctionalForm">
   <rdfs:label xml:lang="en">Functional Form</rdfs:label>
   <rdfs:comment xml:lang="en">A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -665,6 +684,7 @@ regularisation terms.</p>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#LossFunction">
   <rdfs:label xml:lang="en">Loss Function</rdfs:label>
   <rdfs:comment xml:lang="en">A scalar objective whose minimisation fits the parameters of the functional form.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -683,6 +703,7 @@ thermodynamic integration, etc.</p>
   <rdfs:comment xml:lang="en">A type of atomistic simulation: molecular dynamics,
 Monte Carlo, geometry optimization, phonon calculations,
 thermodynamic integration, etc.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -695,7 +716,7 @@ parameters (weights) that can be used for prediction.</p>
       <p><strong>Subclass of:</strong> <code>mlschema:Model</code>, <code>prov:Entity</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#trainedOn"><code>mlips:trainedOn</code></a>, <a href="#trainedUsing"><code>mlips:trainedUsing</code></a>, <a href="#trainedWith"><code>mlips:trainedWith</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#isEvaluatedIn"><code>mlips:isEvaluatedIn</code></a>, <a href="#isProducedBy"><code>mlips:isProducedBy</code></a>, <a href="#trainedOn"><code>mlips:trainedOn</code></a>, <a href="#trainedUsing"><code>mlips:trainedUsing</code></a>, <a href="#trainedWith"><code>mlips:trainedWith</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#evaluatesModel"><code>mlips:evaluatesModel</code></a>, <a href="#produces"><code>mlips:produces</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#TrainedModel">
@@ -707,14 +728,11 @@ parameters (weights) that can be used for prediction.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
   <rdfs:subClassOf>
     <owl:Restriction>
-      <owl:onProperty>
-        <owl:ObjectProperty>
-          <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
-        </owl:ObjectProperty>
-      </owl:onProperty>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isProducedBy"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#MLIPRun"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -732,6 +750,7 @@ modelled in ML-Schema.</p>
 
             <div class="term-properties">
         <p><strong>Outgoing properties:</strong> <a href="#appliesMethod"><code>mlips:appliesMethod</code></a>, <a href="#gpuHours"><code>mlips:gpuHours</code></a>, <a href="#hasHyperparameterSetting"><code>mlips:hasHyperparameterSetting</code></a>, <a href="#hasTrainingRun"><code>mlips:hasTrainingRun</code></a>, <a href="#peakMemory"><code>mlips:peakMemory</code></a>, <a href="#produces"><code>mlips:produces</code></a>, <a href="#runsOn"><code>mlips:runsOn</code></a>, <a href="#trainingDuration"><code>mlips:trainingDuration</code></a>, <a href="#trainingHardware"><code>mlips:trainingHardware</code></a></p>
+        <p><strong>Incoming properties:</strong> <a href="#isProducedBy"><code>mlips:isProducedBy</code></a>, <a href="#isSettingOf"><code>mlips:isSettingOf</code></a>, <a href="#wasRunBy"><code>mlips:wasRunBy</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#MLIPRun">
   <rdfs:label xml:lang="en">MLIP Run</rdfs:label>
@@ -758,6 +777,7 @@ modelled in ML-Schema.</p>
       <owl:onClass rdf:resource="https://w3id.org/mlips#TrainedModel"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#SubordinateSortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -776,6 +796,7 @@ message passing (MACE, NequIP), or atomic cluster expansion (ACE).</p>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#AtomicEnvironmentDescriptor">
   <rdfs:label xml:lang="en">Atomic Environment Descriptor</rdfs:label>
   <rdfs:comment xml:lang="en">A mathematical representation of the local atomic environment used by an MLIP method.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
   </section>
@@ -1101,6 +1122,78 @@ environment descriptor it uses to represent local neighborhoods.</p>
   <rdfs:comment xml:lang="en">Links an MLIP method to the atomic environment descriptor it uses.</rdfs:comment>
   <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
   <rdfs:range rdf:resource="https://w3id.org/mlips#AtomicEnvironmentDescriptor"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isHyperparameterOf" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isHyperparameterOf">
+      <h4><span property="rdfs:label">is hyperparameter of</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:hasHyperparameter</code>: links a hyperparameter to the MLIP method that accepts it.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#Hyperparameter" property="rdfs:domain" resource="mlips:Hyperparameter">Hyperparameter</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPMethod" property="rdfs:range" resource="mlips:MLIPMethod">MLIPMethod</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isHyperparameterOf">
+  <rdfs:label xml:lang="en">is hyperparameter of</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:hasHyperparameter.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasHyperparameter"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#Hyperparameter"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isImplementationOf" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isImplementationOf">
+      <h4><span property="rdfs:label">is implementation of</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:hasImplementation</code>: links an implementation back to the MLIP method it realises.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#Implementation" property="rdfs:domain" resource="mlips:Implementation">Implementation</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPMethod" property="rdfs:range" resource="mlips:MLIPMethod">MLIPMethod</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isImplementationOf">
+  <rdfs:label xml:lang="en">is implementation of</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:hasImplementation.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasImplementation"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#Implementation"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isProducedBy" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isProducedBy">
+      <h4><span property="rdfs:label">is produced by</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:produces</code>: links a trained model to the MLIP run that produced it.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#TrainedModel" property="rdfs:domain" resource="mlips:TrainedModel">TrainedModel</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPRun" property="rdfs:range" resource="mlips:MLIPRun">MLIPRun</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isProducedBy">
+  <rdfs:label xml:lang="en">is produced by</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:produces.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#produces"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="wasRunBy" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:wasRunBy">
+      <h4><span property="rdfs:label">was run by</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:runsOn</code>: links a training dataset to the MLIP runs that consumed it.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#TrainingDataset" property="rdfs:domain" resource="mlips:TrainingDataset">TrainingDataset</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPRun" property="rdfs:range" resource="mlips:MLIPRun">MLIPRun</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#wasRunBy">
+  <rdfs:label xml:lang="en">was run by</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:runsOn.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#runsOn"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPRun"/>
 </owl:ObjectProperty>]]></code></pre>
     </section>
   </section>
@@ -1525,6 +1618,7 @@ properties) in a training dataset.</p>
   <rdfs:comment xml:lang="en">A single atomic configuration (positions, cell,
 properties) in a training dataset.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/AtomicStructure"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1541,6 +1635,7 @@ properties) in a training dataset.</rdfs:comment>
   <rdfs:label xml:lang="en">Covered Property</rdfs:label>
   <rdfs:comment xml:lang="en">A physical property covered by the training dataset
 (energy, forces, stresses, virials).</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1549,7 +1644,7 @@ properties) in a training dataset.</rdfs:comment>
       <h4><span property="rdfs:label">DFT Calculation</span></h4>
       <p property="rdfs:comment">A density functional theory calculation that produced
 reference data for training.</p>
-      <p><strong>Subclass of:</strong> <code>mlips:ReferenceCalculation</code>, <code>mdo:Calculation</code></p>
+      <p><strong>Subclass of:</strong> <code>mlips:ReferenceCalculation</code>, <code>mdo-calc:Calculation</code></p>
 
             <div class="term-properties">
         <p><strong>Outgoing properties:</strong> <a href="#hasDFTSettings"><code>mlips:hasDFTSettings</code></a></p>
@@ -1560,13 +1655,14 @@ reference data for training.</p>
   <rdfs:comment xml:lang="en">A density functional theory calculation that produced
 reference data for training.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceCalculation"/>
-  <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
+  <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/calculation/Calculation"/>
   <rdfs:subClassOf>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://w3id.org/mlips#hasDFTSettings"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#DFTSettings"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#SubordinateSortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1586,6 +1682,7 @@ functional, k-point mesh, energy cutoff, pseudopotential type.</p>
   <rdfs:comment xml:lang="en">Settings of a DFT calculation: exchange-correlation
 functional, k-point mesh, energy cutoff, pseudopotential type.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1600,6 +1697,7 @@ functional, k-point mesh, energy cutoff, pseudopotential type.</rdfs:comment>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#DatasetProvenance">
   <rdfs:label xml:lang="en">Dataset Provenance</rdfs:label>
   <rdfs:comment xml:lang="en">The provenance type of a training dataset.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1629,6 +1727,7 @@ or 6-31G). Range of mlips:dftBasisSet on DFTSettings. Plane-wave
 codes specify the basis through mlips:energyCutoff instead and leave
 this slot empty. Concrete basis sets are modelled as named individuals;
 an open extension point.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1649,6 +1748,7 @@ compound, or complex microstructure.</p>
 compound, or complex microstructure.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial"/>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Material"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1672,6 +1772,7 @@ plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
 Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
 leave this slot empty. Concrete pseudopotential families are modelled
 as named individuals; an open extension point.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1682,7 +1783,7 @@ as named individuals; an open extension point.</rdfs:comment>
 reference energies, forces, or stresses for MLIP training. Generalisation of
 DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
 CASPT2) and other ab initio approaches.</p>
-      <p><strong>Subclass of:</strong> <code>mdo:Calculation</code>, <code>prov:Activity</code></p>
+      <p><strong>Subclass of:</strong> <code>mdo-calc:Calculation</code>, <code>prov:Activity</code></p>
 
             <div class="term-properties">
         <p><strong>Outgoing properties:</strong> <a href="#hasReferenceSettings"><code>mlips:hasReferenceSettings</code></a></p>
@@ -1694,7 +1795,7 @@ CASPT2) and other ab initio approaches.</p>
 reference energies, forces, or stresses for MLIP training. Generalisation of
 DFTCalculation that also covers wave-function methods (e.g., CCSD(T), MP2,
 CASPT2) and other ab initio approaches.</rdfs:comment>
-  <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/core/Calculation"/>
+  <rdfs:subClassOf rdf:resource="https://w3id.org/mdo/calculation/Calculation"/>
   <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
   <rdfs:subClassOf>
     <owl:Restriction>
@@ -1702,6 +1803,7 @@ CASPT2) and other ab initio approaches.</rdfs:comment>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#SubordinateSortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1723,6 +1825,7 @@ such as the software code used.</p>
 across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
 carry the method-specific parameters; the supertype carries cross-family slots
 such as the software code used.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1747,6 +1850,7 @@ compositions, vibrational sampling across thermal snapshots, or a
 combination). Concrete sampling strategies are modeled as instances and
 will be developed in future work; this class is left open as an
 extension point.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1758,7 +1862,7 @@ training, with provenance, size, property coverage, and DFT settings.</p>
       <p><strong>Subclass of:</strong> <code>mlschema:Dataset</code>, <code>prov:Entity</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#coversMaterial"><code>mlips:coversMaterial</code></a>, <a href="#coversProperty"><code>mlips:coversProperty</code></a>, <a href="#datasetProvenance"><code>mlips:datasetProvenance</code></a>, <a href="#hasConfiguration"><code>mlips:hasConfiguration</code></a>, <a href="#hasDFTCalculation"><code>mlips:hasDFTCalculation</code></a>, <a href="#hasReferenceCalculation"><code>mlips:hasReferenceCalculation</code></a>, <a href="#numConfigurations"><code>mlips:numConfigurations</code></a>, <a href="#samplingStrategy"><code>mlips:samplingStrategy</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#coversMaterial"><code>mlips:coversMaterial</code></a>, <a href="#coversProperty"><code>mlips:coversProperty</code></a>, <a href="#datasetProvenance"><code>mlips:datasetProvenance</code></a>, <a href="#hasConfiguration"><code>mlips:hasConfiguration</code></a>, <a href="#hasDFTCalculation"><code>mlips:hasDFTCalculation</code></a>, <a href="#hasReferenceCalculation"><code>mlips:hasReferenceCalculation</code></a>, <a href="#numConfigurations"><code>mlips:numConfigurations</code></a>, <a href="#samplingStrategy"><code>mlips:samplingStrategy</code></a>, <a href="#wasRunBy"><code>mlips:wasRunBy</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#runsOn"><code>mlips:runsOn</code></a>, <a href="#trainedOn"><code>mlips:trainedOn</code></a>, <a href="#usesTrainingData"><code>mlips:usesTrainingData</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#TrainingDataset">
@@ -1791,6 +1895,7 @@ training, with provenance, size, property coverage, and DFT settings.</rdfs:comm
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#AtomicConfiguration"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1819,6 +1924,7 @@ more expensive.</rdfs:comment>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#WaveFunctionSettings"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#SubordinateSortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1840,6 +1946,7 @@ cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</p>
 calculation: the method (e.g., CCSD(T), MP2), the basis set (e.g.,
 cc-pVTZ, aug-cc-pVDZ), and frozen-core treatment.</rdfs:comment>
   <rdfs:subClassOf rdf:resource="https://w3id.org/mlips#ReferenceSettings"/>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1862,6 +1969,7 @@ produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
 CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
 Concrete methods are modelled as named individuals; an open
 extension point.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -1884,6 +1992,7 @@ exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
 PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
 DFTSettings. Concrete functionals are modelled as named individuals;
 an open extension point.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
   </section>
@@ -2470,7 +2579,7 @@ for all-electron correlation.</rdfs:comment>
       <p><strong>Subclass of:</strong> <code>qudt:QuantityValue</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#metricProperty"><code>mlips:metricProperty</code></a>, <a href="#metricType"><code>mlips:metricType</code></a>, <a href="#metricValue"><code>mlips:metricValue</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#isMetricOf"><code>mlips:isMetricOf</code></a>, <a href="#metricProperty"><code>mlips:metricProperty</code></a>, <a href="#metricType"><code>mlips:metricType</code></a>, <a href="#metricValue"><code>mlips:metricValue</code></a></p>
         <p><strong>Incoming properties:</strong> <a href="#hasAccuracyMetric"><code>mlips:hasAccuracyMetric</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#AccuracyMetric">
@@ -2494,14 +2603,11 @@ for all-electron correlation.</rdfs:comment>
   </rdfs:subClassOf>
   <rdfs:subClassOf>
     <owl:Restriction>
-      <owl:onProperty>
-        <owl:ObjectProperty>
-          <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
-        </owl:ObjectProperty>
-      </owl:onProperty>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isMetricOf"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -2513,8 +2619,8 @@ material system with specific hyperparameters, reporting accuracy metrics.</p>
       <p><strong>Subclass of:</strong> <code>prov:Entity</code></p>
 
             <div class="term-properties">
-        <p><strong>Outgoing properties:</strong> <a href="#evaluatesModel"><code>mlips:evaluatesModel</code></a>, <a href="#hasAccuracyMetric"><code>mlips:hasAccuracyMetric</code></a>, <a href="#inferenceHardware"><code>mlips:inferenceHardware</code></a>, <a href="#inferenceTimePerAtom"><code>mlips:inferenceTimePerAtom</code></a>, <a href="#reportedIn"><code>mlips:reportedIn</code></a>, <a href="#targetMaterial"><code>mlips:targetMaterial</code></a>, <a href="#usesAlgorithm"><code>mlips:usesAlgorithm</code></a>, <a href="#usesTrainingData"><code>mlips:usesTrainingData</code></a></p>
-        <p><strong>Incoming properties:</strong> <a href="#hasResult"><code>mlips:hasResult</code></a></p>
+        <p><strong>Outgoing properties:</strong> <a href="#evaluatesModel"><code>mlips:evaluatesModel</code></a>, <a href="#hasAccuracyMetric"><code>mlips:hasAccuracyMetric</code></a>, <a href="#inferenceHardware"><code>mlips:inferenceHardware</code></a>, <a href="#inferenceTimePerAtom"><code>mlips:inferenceTimePerAtom</code></a>, <a href="#isResultOf"><code>mlips:isResultOf</code></a>, <a href="#reportedIn"><code>mlips:reportedIn</code></a>, <a href="#targetMaterial"><code>mlips:targetMaterial</code></a>, <a href="#usesAlgorithm"><code>mlips:usesAlgorithm</code></a>, <a href="#usesTrainingData"><code>mlips:usesTrainingData</code></a></p>
+        <p><strong>Incoming properties:</strong> <a href="#hasResult"><code>mlips:hasResult</code></a>, <a href="#isEvaluatedIn"><code>mlips:isEvaluatedIn</code></a>, <a href="#isMetricOf"><code>mlips:isMetricOf</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#BenchmarkResult">
   <rdfs:label xml:lang="en">Benchmark Result</rdfs:label>
@@ -2542,14 +2648,11 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
   </rdfs:subClassOf>
   <rdfs:subClassOf>
     <owl:Restriction>
-      <owl:onProperty>
-        <owl:ObjectProperty>
-          <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasResult"/>
-        </owl:ObjectProperty>
-      </owl:onProperty>
+      <owl:onProperty rdf:resource="https://w3id.org/mlips#isResultOf"/>
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#ReifiedRelation"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -2561,6 +2664,7 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
 
             <div class="term-properties">
         <p><strong>Outgoing properties:</strong> <a href="#hasResult"><code>mlips:hasResult</code></a></p>
+        <p><strong>Incoming properties:</strong> <a href="#isResultOf"><code>mlips:isResultOf</code></a></p>
       </div>
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#BenchmarkStudy">
   <rdfs:label xml:lang="en">Benchmark Study</rdfs:label>
@@ -2572,6 +2676,7 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
       <owl:someValuesFrom rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
     </owl:Restriction>
   </rdfs:subClassOf>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -2586,6 +2691,7 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#MetricProperty">
   <rdfs:label xml:lang="en">Metric Property</rdfs:label>
   <rdfs:comment xml:lang="en">The physical property being measured (energy, force, stress).</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
 
@@ -2600,6 +2706,7 @@ material system with specific hyperparameters, reporting accuracy metrics.</rdfs
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#MetricType">
   <rdfs:label xml:lang="en">Metric Type</rdfs:label>
   <rdfs:comment xml:lang="en">Type of accuracy metric (RMSE, MAE, R², etc.).</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
   </section>
@@ -2745,6 +2852,78 @@ with the method and the training dataset, fully characterises what was fitted in
   <rdfs:label xml:lang="en">uses training data</rdfs:label>
   <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
   <rdfs:range rdf:resource="https://w3id.org/mlips#TrainingDataset"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isMetricOf" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isMetricOf">
+      <h4><span property="rdfs:label">is metric of</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:hasAccuracyMetric</code>: links an accuracy metric to the benchmark result it characterises.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#AccuracyMetric" property="rdfs:domain" resource="mlips:AccuracyMetric">AccuracyMetric</a></dd>
+        <dt>Range</dt><dd><a href="#BenchmarkResult" property="rdfs:range" resource="mlips:BenchmarkResult">BenchmarkResult</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isMetricOf">
+  <rdfs:label xml:lang="en">is metric of</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:hasAccuracyMetric.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasAccuracyMetric"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#AccuracyMetric"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isSettingOf" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isSettingOf">
+      <h4><span property="rdfs:label">is setting of</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:hasHyperparameterSetting</code>: links a hyperparameter setting to the MLIP run it parameterises.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#HyperparameterSetting" property="rdfs:domain" resource="mlips:HyperparameterSetting">HyperparameterSetting</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPRun" property="rdfs:range" resource="mlips:MLIPRun">MLIPRun</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isSettingOf">
+  <rdfs:label xml:lang="en">is setting of</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:hasHyperparameterSetting.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasHyperparameterSetting"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#HyperparameterSetting"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPRun"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isResultOf" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isResultOf">
+      <h4><span property="rdfs:label">is result of</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:hasResult</code>: links a benchmark result to the study that reports it.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#BenchmarkResult" property="rdfs:domain" resource="mlips:BenchmarkResult">BenchmarkResult</a></dd>
+        <dt>Range</dt><dd><a href="#BenchmarkStudy" property="rdfs:range" resource="mlips:BenchmarkStudy">BenchmarkStudy</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isResultOf">
+  <rdfs:label xml:lang="en">is result of</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:hasResult.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#hasResult"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#BenchmarkStudy"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="isEvaluatedIn" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:isEvaluatedIn">
+      <h4><span property="rdfs:label">is evaluated in</span></h4>
+      <p property="rdfs:comment">Inverse of <code>mlips:evaluatesModel</code>: links a trained model to the benchmark results that evaluate it.</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#TrainedModel" property="rdfs:domain" resource="mlips:TrainedModel">TrainedModel</a></dd>
+        <dt>Range</dt><dd><a href="#BenchmarkResult" property="rdfs:range" resource="mlips:BenchmarkResult">BenchmarkResult</a></dd>
+      </dl>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#isEvaluatedIn">
+  <rdfs:label xml:lang="en">is evaluated in</rdfs:label>
+  <rdfs:comment xml:lang="en">Inverse of mlips:evaluatesModel.</rdfs:comment>
+  <owl:inverseOf rdf:resource="https://w3id.org/mlips#evaluatesModel"/>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#TrainedModel"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#BenchmarkResult"/>
 </owl:ObjectProperty>]]></code></pre>
     </section>
   </section>
@@ -2901,6 +3080,7 @@ the classes by their rigidity, identity, unity, and dependence profile.</p>
   <rdfs:label xml:lang="en">Meta-Sort</rdfs:label>
   <rdfs:comment xml:lang="en">An OntoClean-style meta-category used to
 classify classes of the ontology.</rdfs:comment>
+  <mlips:metaSort rdf:resource="https://w3id.org/mlips#Sortal"/>
 </owl:Class>]]></code></pre>
     </section>
   </section>

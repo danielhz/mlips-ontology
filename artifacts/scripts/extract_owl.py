@@ -45,6 +45,7 @@ header = '''<?xml version="1.0" encoding="utf-8"?>
    xmlns:mls="http://www.w3.org/ns/mls#"
    xmlns:prov="http://www.w3.org/ns/prov#"
    xmlns:mdo="https://w3id.org/mdo/core/"
+   xmlns:mdo-calc="https://w3id.org/mdo/calculation/"
    xmlns:qudt="http://qudt.org/schema/qudt/"
    xmlns:mlips="https://w3id.org/mlips#"
 >
