@@ -15,19 +15,7 @@
 <https://w3id.org/mlips> a owl:Ontology ;
     rdfs:label "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials" ;
     dcterms:contributor [ a schema:Person ;
-            schema:name "Xi Zhang" ],
-        [ a schema:Person ;
-            schema:name "Xin Li" ],
-        [ a schema:Person ;
-            schema:name "Tom Schächtel" ],
-        [ a schema:Person ;
             schema:name "Xiang Xu" ],
-        [ a schema:Person ;
-            schema:name "Tom Schächtel" ],
-        [ a schema:Person ;
-            schema:name "Xiang Xu" ],
-        [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
         [ a schema:Person ;
             schema:name "Lifang Zhu" ],
         [ a schema:Person ;
@@ -35,9 +23,21 @@
         [ a schema:Person ;
             schema:name "Wenchuan Liu" ],
         [ a schema:Person ;
-            schema:name "Xi Zhang" ],
+            schema:name "Xiang Xu" ],
         [ a schema:Person ;
             schema:name "Xin Li" ],
+        [ a schema:Person ;
+            schema:name "Xi Zhang" ],
+        [ a schema:Person ;
+            schema:name "Tom Schächtel" ],
+        [ a schema:Person ;
+            schema:name "Xin Li" ],
+        [ a schema:Person ;
+            schema:name "Tom Schächtel" ],
+        [ a schema:Person ;
+            schema:name "Xi Zhang" ],
+        [ a schema:Person ;
+            schema:name "Lifang Zhu" ],
         <https://orcid.org/0000-0001-9176-3270>,
         <https://orcid.org/0000-0002-0780-4154>,
         <https://orcid.org/0000-0002-3661-5870>,
@@ -63,6 +63,14 @@
     owl:versionIRI <https://w3id.org/mlips/0.1.0> ;
     owl:versionInfo "0.1.0" .
 
+mlips:ANIDescriptor a owl:NamedIndividual,
+        mlips:AtomicEnvironmentDescriptor ;
+    rdfs:label "ANI Descriptor"@en ;
+    rdfs:comment """Modified Behler-Parrinello atomic environment vector (AEV)
+used by the ANI family (ANI-1, ANI-1ccx, ANI-2x). Distinct from the
+generic SymmetryFunctionDescriptor in that ANI uses a specific subset
+of radial and angular functions tuned for organic molecules."""@en .
+
 mlips:ArchitecturalHyperparameter a owl:Class ;
     rdfs:label "Architectural Hyperparameter"@en ;
     rdfs:comment """A hyperparameter that specifies the model
@@ -79,6 +87,14 @@ mlips:Augmented a owl:NamedIndividual,
         mlips:DatasetProvenance ;
     rdfs:label "Augmented"@en ;
     rdfs:comment "Dataset augmented from existing sources."@en .
+
+mlips:DeepPotentialDescriptor a owl:NamedIndividual,
+        mlips:AtomicEnvironmentDescriptor ;
+    rdfs:label "Deep Potential Descriptor"@en ;
+    rdfs:comment """Local environment descriptor used by the Deep Potential
+family (DeepMD, DeePMD-kit). Represents each atom's neighborhood as a
+matrix of relative coordinates, optionally embedded through a learnable
+neural network before being passed to the per-atom regressor."""@en .
 
 mlips:Energy a owl:NamedIndividual,
         mlips:CoveredProperty ;
@@ -928,23 +944,18 @@ mlips:AccuracyMetric a owl:Class ;
     rdfs:comment """An accuracy measure reported in a benchmark
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:MetricType ;
-            owl:onProperty mlips:metricType ;
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onProperty mlips:isMetricOf ;
             owl:someValuesFrom mlips:BenchmarkResult ],
         [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
+            owl:onClass mlips:MetricType ;
+            owl:onProperty mlips:metricType ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         qudt:QuantityValue ;
     mlips:metaSort mlips:ReifiedRelation .
-
-mlips:AtomicEnvironmentDescriptor a owl:Class ;
-    rdfs:label "Atomic Environment Descriptor"@en ;
-    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP method."@en ;
-    mlips:metaSort mlips:Sortal .
 
 mlips:CoveredProperty a owl:Class ;
     rdfs:label "Covered Property"@en ;
@@ -965,6 +976,11 @@ mlips:MaterialSystem a owl:Class ;
 compound, or complex microstructure."""@en ;
     rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial>,
         mdo:Material ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:AtomicEnvironmentDescriptor a owl:Class ;
+    rdfs:label "Atomic Environment Descriptor"@en ;
+    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP method."@en ;
     mlips:metaSort mlips:Sortal .
 
 mlips:DFTSettings a owl:Class ;
@@ -1011,17 +1027,17 @@ mlips:TrainingDataset a owl:Class ;
     rdfs:comment """A dataset of atomic configurations used for MLIP
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:datasetProvenance ;
-            owl:someValuesFrom mlips:DatasetProvenance ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:hasConfiguration ;
             owl:someValuesFrom mlips:AtomicConfiguration ],
         [ a owl:Restriction ;
             owl:onProperty mlips:coversProperty ;
             owl:someValuesFrom mlips:CoveredProperty ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:datasetProvenance ;
+            owl:someValuesFrom mlips:DatasetProvenance ],
         mls:Dataset,
         prov:Entity ;
     mlips:metaSort mlips:Sortal .
@@ -1031,18 +1047,18 @@ mlips:BenchmarkResult a owl:Class ;
     rdfs:comment """A single evaluation result: an MLIP method applied to a
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasAccuracyMetric ;
-            owl:someValuesFrom mlips:AccuracyMetric ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:evaluatesModel ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
+            owl:onProperty mlips:hasAccuracyMetric ;
+            owl:someValuesFrom mlips:AccuracyMetric ],
         [ a owl:Restriction ;
             owl:onProperty mlips:targetMaterial ;
             owl:someValuesFrom mlips:MaterialSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1054,12 +1070,12 @@ mlips:MLIPRun a owl:Class ;
             owl:onProperty mlips:appliesMethod ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
-            owl:onClass mlips:TrainedModel ;
-            owl:onProperty mlips:produces ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainingDataset ;
             owl:onProperty mlips:runsOn ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainedModel ;
+            owl:onProperty mlips:produces ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Activity ;
     mlips:metaSort mlips:SubordinateSortal .
@@ -1070,8 +1086,8 @@ mlips:MLIPMethod a owl:Class ;
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasHyperparameter ;
-            owl:someValuesFrom mlips:Hyperparameter ],
+            owl:onProperty mlips:hasFunctionalForm ;
+            owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasLossFunction ;
             owl:someValuesFrom mlips:LossFunction ],
@@ -1079,8 +1095,8 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
             owl:onProperty mlips:supportsSimulation ;
             owl:someValuesFrom mlips:SimulationType ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasFunctionalForm ;
-            owl:someValuesFrom mlips:FunctionalForm ],
+            owl:onProperty mlips:hasHyperparameter ;
+            owl:someValuesFrom mlips:Hyperparameter ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasTrainingAlgorithm ;
             owl:someValuesFrom mls:Algorithm ] ;
