@@ -99,3 +99,179 @@ SELECT ?algo ?sim WHERE {
         mlips:supportsSimulation ?sim .
 }
 """ .
+
+cq:CQ2 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ2" ;
+    rdfs:label "Implementations and library versions per method"@en ;
+    cq:questionText "Which libraries implement a given method, and what versions are available?" ;
+    cq:motivates mlips:MLIPMethod, mlips:Implementation, mlips:Library ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ2: Which libraries implement a given method, and what versions
+# are available?
+
+SELECT ?algo ?impl ?lib ?version WHERE {
+  ?algo a mlips:MLIPMethod ;
+        mlips:hasImplementation ?impl .
+  ?impl mlips:implementedIn ?lib .
+  OPTIONAL { ?impl mlips:version ?version }
+}
+""" .
+
+cq:CQ3 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ3" ;
+    rdfs:label "Training datasets and DFT settings for a material"@en ;
+    cq:questionText "For a given material system, which training datasets are available, and what DFT code and settings were used?" ;
+    cq:motivates mlips:TrainingDataset, mlips:DFTCalculation, mlips:MaterialSystem ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ3: For a given material system, which training datasets are
+# available, and what DFT code and settings were used?
+# (Generalised: returns rows for every material, not just TiCr2.)
+
+SELECT ?ds ?mat ?xc ?cutoff ?pseudo WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:coversMaterial ?mat ;
+      mlips:hasDFTCalculation ?calc .
+  ?calc mlips:hasDFTSettings ?settings .
+  ?settings mlips:xcFunctional ?xc .
+  OPTIONAL { ?settings mlips:energyCutoff ?cutoff }
+  OPTIONAL { ?settings mlips:pseudopotentialType ?pseudo }
+}
+""" .
+
+cq:CQ4 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ4" ;
+    rdfs:label "Provenance of each training dataset"@en ;
+    cq:questionText "What is the provenance of each training dataset (published source, in-house calculation, augmented from existing data)?" ;
+    cq:motivates mlips:TrainingDataset ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# CQ4: What is the provenance of each training dataset (published
+# source, in-house calculation, augmented from existing data)?
+
+SELECT ?ds ?label ?prov WHERE {
+  ?ds a mlips:TrainingDataset ;
+      mlips:datasetProvenance ?prov .
+  OPTIONAL { ?ds rdfs:label ?label }
+}
+""" .
+
+cq:CQ5 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ5" ;
+    rdfs:label "Dataset size, covered properties, and sampling strategy"@en ;
+    cq:questionText "How many configurations does a dataset contain, what properties are covered (energies, forces, stresses), and along which sampling strategy were the configurations drawn?" ;
+    cq:motivates mlips:TrainingDataset ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ5: How many configurations does a dataset contain, what
+# properties are covered (energies, forces, stresses), and along
+# which sampling strategy were the configurations drawn?
+
+SELECT ?ds ?nconfig ?prop ?sampling WHERE {
+  ?ds a mlips:TrainingDataset .
+  OPTIONAL { ?ds mlips:numConfigurations ?nconfig }
+  OPTIONAL { ?ds mlips:coversProperty   ?prop }
+  OPTIONAL { ?ds mlips:samplingStrategy ?sampling }
+}
+""" .
+
+cq:CQ6 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ6" ;
+    rdfs:label "Published benchmarks of a method on a material, with accuracy metrics"@en ;
+    cq:questionText "Which published studies have benchmarked a given method on a given material property, and what accuracy metrics were reported?" ;
+    cq:motivates mlips:BenchmarkStudy, mlips:BenchmarkResult, mlips:AccuracyMetric ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ6: Which published studies have benchmarked a given method on
+# a given material property, and what accuracy metrics were
+# reported? (Generalised: every method on every material; the
+# inline version in §8.1 of the paper hardcodes MTP and TiCr2 as
+# an example.)
+#
+# The schema declares trainedWith := appliesMethod ∘ produces^-1
+# (a property chain). Without an OWL reasoner, queries that use
+# trainedWith directly return 0 rows; this query traverses the
+# asserted MLIPRun edge (?run appliesMethod ?algo, ?run produces
+# ?model) so it works against a plain SPARQL endpoint.
+
+SELECT ?study ?algo ?mat ?metric_type ?prop ?value WHERE {
+  ?study a mlips:BenchmarkStudy ;
+         mlips:hasResult ?result .
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  ?metric mlips:metricType ?metric_type ;
+          mlips:metricProperty ?prop ;
+          mlips:metricValue ?value .
+}
+""" .
+
+cq:CQ7 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ7" ;
+    rdfs:label "Ranking method/hyperparameter combinations by accuracy for a material"@en ;
+    cq:questionText "For a given material and target property, how do different method/hyperparameter combinations rank by accuracy?" ;
+    cq:motivates mlips:BenchmarkResult, mlips:AccuracyMetric, mlips:MLIPMethod ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ7: For a given material and target property, how do different
+# method/hyperparameter combinations rank by accuracy?
+# (Generalised: groups by material + property, ranks by RMSE.)
+#
+# Same property-chain note as cq06.rq: traverses the asserted
+# ?run appliesMethod ?algo + ?run produces ?model edges instead
+# of relying on the inferred trainedWith chain.
+
+SELECT ?mat ?prop ?algo ?value WHERE {
+  ?result mlips:evaluatesModel ?model ;
+          mlips:targetMaterial ?mat ;
+          mlips:hasAccuracyMetric ?metric .
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricProperty ?prop ;
+          mlips:metricValue ?value .
+} ORDER BY ?mat ?prop ?value
+""" .
+
+cq:CQ9 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ9" ;
+    rdfs:label "Method efficiency: inference complexity, GPU hours, inference time"@en ;
+    cq:questionText "For a given target accuracy, which methods and trained models are most efficient (asymptotic complexity plus measured training and inference cost)?" ;
+    cq:motivates mlips:MLIPMethod, mlips:TrainedModel, mlips:MLIPRun ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ9: For a given target accuracy, which methods and trained
+# models are most efficient? Combines asymptotic complexity (prior
+# knowledge attached to the method) with measured training and
+# inference cost (empirical data on the run).
+#
+# Same property-chain note as cq06/cq07: traverses ?run
+# appliesMethod ?algo + ?run produces ?model on the asserted edges
+# rather than the inferred trainedWith chain.
+#
+# Many fields are OPTIONAL: the seeded corpus reports
+# inferenceTimePerAtom and gpuHours sparsely (a longstanding
+# metadata gap in the source literature, see §5.1), so only the
+# papers that report compute cost contribute rows.
+
+SELECT ?algo ?inf_complexity ?gpu_hours ?t_inf ?rmse WHERE {
+  ?result a mlips:BenchmarkResult ;
+          mlips:evaluatesModel ?model ;
+          mlips:hasAccuracyMetric ?metric .
+  ?model mlips:inferenceTimePerAtom ?t_inf .
+  ?metric mlips:metricType mlips:RMSE ;
+          mlips:metricValue ?rmse .
+  FILTER(?rmse < 2.0)
+  ?run a mlips:MLIPRun ;
+       mlips:produces ?model ;
+       mlips:appliesMethod ?algo .
+  OPTIONAL { ?algo mlips:inferenceComplexity ?inf_complexity }
+  OPTIONAL { ?run mlips:gpuHours ?gpu_hours }
+} ORDER BY ?t_inf
+""" .

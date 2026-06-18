@@ -35,7 +35,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl clean
+.PHONY: all release venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
 
 all: release
 
@@ -235,6 +235,23 @@ SHAPES = shapes/mlips-shapes.ttl
 
 shacl: $(TTL_FILE) $(SHAPES) | $(VENV_STAMP)
 	$(PY) -m pyshacl -s $(SHAPES) -f human $(TTL_FILE)
+
+# === Competency-question RDF -> .rq generation ===
+#
+# artifacts/kg/cq.ttl is the source of truth for the nine competency
+# questions; cq-queries/cq<NN>.rq are generated from it (RDF is what
+# concon's doc view renders; the .rq are derived for the round-trip
+# harness and the paper appendix). `make cq` regenerates the .rq;
+# `make cq-check` verifies they are byte-in-sync with cq.ttl (CI/release
+# gate).
+CQ_TTL = artifacts/kg/cq.ttl
+
+cq: $(CQ_TTL) artifacts/scripts/gen_cq_queries.py | $(VENV_STAMP)
+	$(PY) artifacts/scripts/gen_cq_queries.py
+	@echo "Regenerated cq-queries/*.rq from $(CQ_TTL)"
+
+cq-check: $(CQ_TTL) artifacts/scripts/gen_cq_queries.py | $(VENV_STAMP)
+	$(PY) artifacts/scripts/gen_cq_queries.py --check
 
 # === Clean ===
 

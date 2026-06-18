@@ -2,7 +2,15 @@
 
 The nine SPARQL queries that realise the competency questions
 (CQ1--CQ9) listed in §3 of the paper. Each file `cqNN.rq` is a
-ready-to-run SELECT query. The companion script
+ready-to-run SELECT query.
+
+**Source of truth:** these `.rq` files are **generated** from
+`../cq.ttl` (the competency questions as first-class RDF; each
+`cq:CompetencyQuestion` carries its query verbatim in `cq:sparqlQuery`).
+Do not hand-edit them — edit `../cq.ttl` and run `make cq` to
+regenerate; `make cq-check` verifies they are in sync.
+
+The companion script
 `run-all.sh` executes each query against a merged corpus of the
 ontology + vocabulary + 20 paper canonical .ttl files, reports the
 row count and wall-clock time, and produces the table that lands in
