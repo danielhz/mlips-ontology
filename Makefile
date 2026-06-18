@@ -50,14 +50,21 @@ release: ontology roundtrip-check listings term-appendices figures
 #
 # `make` auto-creates a local .venv (gitignored) and installs the
 # pipeline's Python dependencies the first time a Python step runs. The
-# stamp file means this happens once, and again only when requirements.txt
-# changes. Run `make venv` to provision it explicitly.
+# stamp file means this happens once, and again only when the requirements
+# change. Installs from requirements.lock (exact, reproducible) when present,
+# else falls back to requirements.txt. Run `make venv` to provision it.
 venv: $(VENV_STAMP)
 
-$(VENV)/.stamp: requirements.txt
+$(VENV)/.stamp: requirements.txt requirements.lock
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --quiet --upgrade pip
-	$(VENV)/bin/pip install --quiet -r requirements.txt
+	@if [ -f requirements.lock ]; then \
+	  echo "venv: installing pinned deps from requirements.lock" ; \
+	  $(VENV)/bin/pip install --quiet -r requirements.lock ; \
+	else \
+	  echo "venv: requirements.lock absent, installing from requirements.txt" ; \
+	  $(VENV)/bin/pip install --quiet -r requirements.txt ; \
+	fi
 	touch $@
 
 # === Ontology pipeline (XHTML source -> XHTML published + OWL/TTL) ===

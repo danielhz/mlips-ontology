@@ -106,6 +106,32 @@ def main():
     # 3. CBD over the ontology subject.
     header = cbd(rdfa_graph, ONTOLOGY_IRI)
 
+    # 3a. Fail loudly on a missing/incomplete header. pyRdfa has silently
+    # returned zero triples on parser/version drift (the bug the text/html
+    # media_type above fixes); without this guard a future regression would
+    # ship a header-less ontology unnoticed. Require the ontology subject
+    # plus the load-bearing publication metadata, and exit non-zero BEFORE
+    # writing, so a broken extraction never clobbers a good mlips.ttl.
+    DCTERMS = "http://purl.org/dc/terms/"
+    OWL = "http://www.w3.org/2002/07/owl#"
+    required = {
+        "dcterms:title":   URIRef(DCTERMS + "title"),
+        "dcterms:license": URIRef(DCTERMS + "license"),
+        "owl:versionIRI":  URIRef(OWL + "versionIRI"),
+    }
+    missing = [name for name, p in required.items()
+               if (ONTOLOGY_IRI, p, None) not in header]
+    if len(header) == 0 or missing:
+        print(
+            f"ERROR: ontology-header extraction from {args.xhtml} is empty or "
+            f"incomplete (header CBD = {len(header)} triples; missing required "
+            f"{', '.join(missing) if missing else '(none)'}). Refusing to write a "
+            f"header-less ontology. Likely cause: pyRdfa parsed no RDFa -- check "
+            f"the media_type and the pyRdfa3 version.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     # 4. Merge.
     g += header
     n_total = len(g)
