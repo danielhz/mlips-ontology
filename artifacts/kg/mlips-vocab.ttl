@@ -493,3 +493,59 @@ mlips:UniversityofStuttgart a schema:Organization ;
     schema:name "University of Stuttgart" ;
     schema:identifier <https://ror.org/04vnq7t77> ;
     rdfs:comment "ROR-aligned canonical IRI for the institution." .
+
+###############################################################################
+# Simulation types (mlips:SimulationType)
+#
+# Controlled individuals for the kinds of atomistic simulation a trained
+# MLIP method is demonstrated to drive (mlips:supportsSimulation; the target
+# of competency question CQ8). Per-paper canonical .ttl files assert the
+# supportsSimulation triples on the method individual; the IRIs' own
+# type/label/comment triples live HERE, so per-paper round-trip is unaffected.
+#
+# MEMBERSHIP POLICY: a SimulationType is attached to a method only on
+# DEMONSTRATED-IN-CORPUS evidence -- a corpus paper must show that method
+# itself performing that simulation. A bare capability claim ("can be used
+# for MD"), a future-work statement, or a DFT/AIMD run used only to GENERATE
+# training data does NOT qualify. Because methods are shared across papers
+# (e.g. mlips:MTP appears in several), evidence is gathered per paper and the
+# method individual accumulates the UNION of its per-paper types when the
+# corpus is merged.
+#
+# The first five types are those named in the CQ8 question text and in the
+# SimulationType rdfs:comment in the ontology. NudgedElasticBand was added
+# 2026-06-18 because three corpus papers (bartok2018si, batatia2024mp0,
+# nitol2024nial) demonstrate MLIP-driven NEB / CI-NEB minimum-energy-path
+# (migration-barrier) calculations -- a chain-of-states method distinct from
+# single-structure relaxation, so it does not fold into GeometryOptimization.
+###############################################################################
+
+mlips:MolecularDynamics a mlips:SimulationType ;
+    rdfs:label "molecular dynamics" ;
+    rdfs:comment "Time integration of the equations of motion (Newtonian, Langevin, or path-integral) on the MLIP potential-energy surface; covers NVE/NVT/NPT MD and the metadynamics and PIMD variants seen in the corpus." ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q901663> .
+
+mlips:MonteCarlo a mlips:SimulationType ;
+    rdfs:label "Monte Carlo" ;
+    rdfs:comment "Stochastic (Metropolis) sampling of atomic configurations or spin states using the MLIP energy; covers basin-hopping, spin-flip, and (semi-)grand-canonical Monte Carlo." ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q232207> .
+
+mlips:GeometryOptimization a mlips:SimulationType ;
+    rdfs:label "geometry optimization" ;
+    rdfs:comment "Local energy minimisation of atomic positions and/or the simulation cell with respect to MLIP forces and stresses (structural relaxation)." ;
+    rdfs:comment "No dedicated Wikidata concept entry as of 2026-06-18 (only article items); the concept is folded into broader energy-minimisation entries." .
+
+mlips:PhononCalculation a mlips:SimulationType ;
+    rdfs:label "phonon calculation" ;
+    rdfs:comment "Computation of vibrational / phonon properties (dispersions, density of states, normal modes, quasi-harmonic free energies) from MLIP forces, typically by the frozen-phonon / finite-displacement method." ;
+    rdfs:comment "No dedicated Wikidata concept entry for the calculation as of 2026-06-18; the related physical concept is phonon (Q186608)." .
+
+mlips:ThermodynamicIntegration a mlips:SimulationType ;
+    rdfs:label "thermodynamic integration" ;
+    rdfs:comment "Free-energy calculation by integrating a thermodynamic derivative along a coupling parameter (e.g. thermodynamic integration using Langevin dynamics, TILD) on the MLIP surface." ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q7783161> .
+
+mlips:NudgedElasticBand a mlips:SimulationType ;
+    rdfs:label "nudged elastic band" ;
+    rdfs:comment "Chain-of-states minimum-energy-path / transition-barrier search (NEB and climbing-image CI-NEB) on the MLIP surface, e.g. for vacancy- or interstitial-migration barriers. Added 2026-06-18 from corpus evidence." ;
+    rdfs:comment "No dedicated Wikidata concept entry as of 2026-06-18 (only article items such as Q57640824, the Henkelman-Jonsson method paper)." .

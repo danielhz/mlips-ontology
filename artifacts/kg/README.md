@@ -65,3 +65,36 @@ The 12th question (gaps) is prose-only and is excluded.
   (`https://w3id.org/mlips/entity/`). Shared ontology individuals
   (`mlips:Energy`, `mlips:Published`, `mlips:RMSE`, ...) are referenced
   by their canonical IRI but not redeclared.
+
+## Simulation types (`mlips:supportsSimulation`, CQ8)
+
+CQ8 ("which simulation types has each MLIP been used for?") was empty
+until 2026-06-18 because `mlips:supportsSimulation` was defined in the
+ontology but never instantiated, and `mlips-vocab.ttl` had no
+`mlips:SimulationType` individuals. Both gaps are now filled. Modelling
+decisions:
+
+- **Controlled vocabulary.** Six `SimulationType` individuals live in
+  `mlips-vocab.ttl`: `MolecularDynamics`, `MonteCarlo`,
+  `GeometryOptimization`, `PhononCalculation`, `ThermodynamicIntegration`
+  (the five named in the CQ8 text / ontology comment) plus
+  `NudgedElasticBand`, added because three corpus papers demonstrate
+  MLIP-driven NEB / CI-NEB minimum-energy-path calculations — a
+  chain-of-states method distinct from single-structure relaxation.
+- **Evidence anchor = demonstrated-in-corpus.** A type is attached only
+  where a corpus paper shows that method *itself* performing the
+  simulation. Capability claims ("can be used for MD"), future-work
+  statements, and DFT/AIMD runs used only to generate training data do
+  **not** qualify. Each PDF in `../related-work/` was read for this.
+- **Attach to the method, union across papers.** Triples are asserted on
+  the method individual in each per-paper file (so per-paper round-trip
+  is unaffected — Q7 already pulls every predicate of an `MLIPMethod`).
+  Methods shared across papers (notably `entity:MTP`, in gubaev2023 /
+  qi2023 / kumar2025) accumulate the **union** of their per-paper
+  evidence when the corpus is merged.
+
+After this change CQ8 returns 38 rows over 15 methods (was 0); all other
+CQ counts are unchanged. Re-run `cq-queries/run-all.sh` and
+`check-roundtrip.sh <paper-id>` with the `sparql`/`rapper` toolchain to
+confirm (the edits were verified here with an rdflib reimplementation of
+both checks where that toolchain was unavailable).
