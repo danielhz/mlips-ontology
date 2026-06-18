@@ -62,6 +62,16 @@ per-paper files.
 
 ## Licensing of contributions
 
-The ontology and knowledge graph are released under **CC BY 4.0** (see
-`LICENSE`). By contributing, you agree your contributions are provided
-under the same terms. See `GOVERNANCE.md` for the code-licensing note.
+This repository is licensed in two parts (see `GOVERNANCE.md`): the
+**ontology and knowledge graph** (`artifacts/`) under **CC BY 4.0**
+(`LICENSE`), and the **software** (`src/`, `artifacts/scripts/`,
+`tools/`, `Makefile`) under dual **MIT OR Apache-2.0** (`LICENSE-MIT`,
+`LICENSE-APACHE`). By contributing, you agree your contributions to each
+part are provided under that part's license(s).
+
+For software contributions, the standard Rust dual-license clause applies:
+
+> Unless you explicitly state otherwise, any contribution intentionally
+> submitted for inclusion in the work by you, as defined in the
+> Apache-2.0 license, shall be dual licensed as above, without any
+> additional terms or conditions.

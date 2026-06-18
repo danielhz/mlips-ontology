@@ -46,12 +46,14 @@ The XHTML source is authoritative; OWL/TTL are regenerated (see
 validation gates above green. Substantive modelling changes are
 discussed on the issue tracker first.
 
-## Code licensing (note)
+## Licensing
 
-The **ontology and knowledge-graph data** are licensed CC BY 4.0
-(`LICENSE`). The repository also contains build/serving **source code**
-(Python scripts, the Rust onto-server). A permissive code license
-(**Apache-2.0** is the proposed default) applies to that code; the exact
-choice is being finalised by the maintainers and will be recorded in a
-`LICENSE-CODE` file. Until then, the code is provided for use alongside
-the dataset under the same project.
+This repository has **two products under two licenses**:
+
+- **Ontology and knowledge graph** (`artifacts/`) — **CC BY 4.0**
+  (`LICENSE`), matching the `dcterms:license` in the ontology header.
+- **Software** (`src/`, `artifacts/scripts/`, `tools/`, `Makefile`) —
+  dual **MIT OR Apache-2.0** at the user's option (`LICENSE-MIT`,
+  `LICENSE-APACHE`); declared as `license = "MIT OR Apache-2.0"` in
+  `Cargo.toml`. This is the idiomatic Rust-ecosystem choice: the
+  permissive MIT option plus the Apache-2.0 explicit patent grant.
