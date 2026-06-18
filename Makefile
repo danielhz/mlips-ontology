@@ -35,7 +35,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release venv ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl clean
+.PHONY: all release venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl clean
 
 all: release
 
@@ -90,10 +90,17 @@ $(VENV)/.stamp: requirements.txt requirements.lock
 
 ontology: $(XHTML_PUBLISH) $(TTL_FILE)
 
-$(XHTML_PUBLISH): $(XHTML_SOURCE) artifacts/scripts/enrich_xhtml.py | $(VENV_STAMP)
+$(XHTML_PUBLISH): $(XHTML_SOURCE) artifacts/scripts/enrich_xhtml.py artifacts/scripts/check_xml.py | $(VENV_STAMP)
 	$(PY) artifacts/scripts/enrich_xhtml.py \
 	  --source $(XHTML_SOURCE) --output $(XHTML_PUBLISH)
 	@echo "Enriched $(XHTML_PUBLISH) (TOC + outgoing/incoming property lists)"
+	$(PY) artifacts/scripts/check_xml.py $(XHTML_SOURCE) $(XHTML_PUBLISH)
+
+# Standalone XML well-formedness guard (also run inside the ontology
+# build above). The XHTML docs must be valid XML -- HTML-only named
+# entities break browsers serving them as application/xhtml+xml.
+xml-check: $(XHTML_PUBLISH) | $(VENV_STAMP)
+	$(PY) artifacts/scripts/check_xml.py $(XHTML_SOURCE) $(XHTML_PUBLISH)
 
 $(OWL_FILE): $(XHTML_SOURCE) artifacts/scripts/extract_owl.py | $(VENV_STAMP)
 	@if [ -f "$(EXTRACT_XSL)" ]; then \
