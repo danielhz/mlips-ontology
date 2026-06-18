@@ -35,7 +35,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release venv ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason clean
+.PHONY: all release venv ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl clean
 
 all: release
 
@@ -104,10 +104,12 @@ $(OWL_FILE): $(XHTML_SOURCE) artifacts/scripts/extract_owl.py | $(VENV_STAMP)
 	fi
 	@echo "Generated $(OWL_FILE) (term axioms only)"
 
-$(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py | $(VENV_STAMP)
+$(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py artifacts/scripts/extract_modules.py | $(VENV_STAMP)
 	$(RAPPER) -i rdfxml -o turtle $(OWL_FILE) > $(TTL_FILE) 2>/dev/null
 	$(PY) artifacts/scripts/merge_rdfa_into_owl.py --xhtml $(XHTML_SOURCE)
 	@echo "Merged RDFa header annotations into $(TTL_FILE) and $(OWL_FILE)"
+	$(PY) artifacts/scripts/extract_modules.py --xhtml $(XHTML_SOURCE)
+	@echo "Added module annotations (rdfs:isDefinedBy) to $(TTL_FILE) and $(OWL_FILE)"
 
 # === Round-trip check on every paper ===
 
@@ -213,6 +215,19 @@ reason: $(OWL_FILE)
 
 oops: $(OWL_FILE)
 	./artifacts/tools/oops-run.sh
+
+# === SHACL validation (modularity enforcement) ===
+#
+# Validates artifacts/ontology/mlips.ttl against shapes/mlips-shapes.ttl
+# with pyshacl (installed in the build venv). Conforms iff every mlips
+# class/property is assigned to exactly one module (rdfs:isDefinedBy a
+# https://w3id.org/mlips/module/* resource) -- the "enforced modules"
+# R1 asked for. Non-zero exit on a violation.
+
+SHAPES = shapes/mlips-shapes.ttl
+
+shacl: $(TTL_FILE) $(SHAPES) | $(VENV_STAMP)
+	$(PY) -m pyshacl -s $(SHAPES) -f human $(TTL_FILE)
 
 # === Clean ===
 
