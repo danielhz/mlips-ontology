@@ -96,7 +96,12 @@ def main():
     n_axioms = len(g)
 
     # 2. pyRdfa extraction from the XHTML.
-    rdfa_graph = pyRdfa().graph_from_source(str(args.xhtml))
+    # Force the HTML5 parser (media_type="text/html"): with current
+    # pyRdfa3 / rdflib, letting pyRdfa auto-detect (or parsing the file as
+    # XML / application/xhtml+xml) silently yields zero RDFa triples, which
+    # would drop the entire ontology-header block. HTML5 parsing extracts
+    # it correctly.
+    rdfa_graph = pyRdfa(media_type="text/html").graph_from_source(str(args.xhtml))
 
     # 3. CBD over the ontology subject.
     header = cbd(rdfa_graph, ONTOLOGY_IRI)

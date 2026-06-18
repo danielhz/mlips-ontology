@@ -14,6 +14,15 @@ RAPPER      ?= rapper
 CONCON_ONTO ?= $(HOME)/code/software/concon-onto/code-repo/target/debug/concon-onto
 EXTRACT_XSL ?= $(HOME)/code/software/concon-onto/code-repo/xslt/extract-owl.xsl
 
+# Python toolchain. By default the pipeline runs in a local, gitignored
+# .venv that `make` bootstraps from requirements.txt (see the `venv`
+# target), so the Python build deps (rdflib, pyRdfa3) need no global
+# install. To use an existing interpreter instead and skip the venv:
+#   make ontology PY=python3 VENV_STAMP=
+VENV        ?= .venv
+PY          ?= $(VENV)/bin/python3
+VENV_STAMP  ?= $(VENV)/.stamp
+
 XHTML_SOURCE  = artifacts/ontology/mlips.source.xhtml
 XHTML_PUBLISH = artifacts/ontology/mlips.xhtml
 OWL_FILE     = artifacts/ontology/mlips.owl
@@ -26,7 +35,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason clean
+.PHONY: all release venv ontology roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason clean
 
 all: release
 
@@ -36,6 +45,20 @@ release: ontology roundtrip-check listings term-appendices figures
 	@echo
 	@echo "Release ready. From the paper repo, run:"
 	@echo "  make sync-from-dataset DATASET_PATH=$$(pwd)"
+
+# === Python venv bootstrap ===
+#
+# `make` auto-creates a local .venv (gitignored) and installs the
+# pipeline's Python dependencies the first time a Python step runs. The
+# stamp file means this happens once, and again only when requirements.txt
+# changes. Run `make venv` to provision it explicitly.
+venv: $(VENV_STAMP)
+
+$(VENV)/.stamp: requirements.txt
+	python3 -m venv $(VENV)
+	$(VENV)/bin/pip install --quiet --upgrade pip
+	$(VENV)/bin/pip install --quiet -r requirements.txt
+	touch $@
 
 # === Ontology pipeline (XHTML source -> XHTML published + OWL/TTL) ===
 #
@@ -60,23 +83,23 @@ release: ontology roundtrip-check listings term-appendices figures
 
 ontology: $(XHTML_PUBLISH) $(TTL_FILE)
 
-$(XHTML_PUBLISH): $(XHTML_SOURCE) artifacts/scripts/enrich_xhtml.py
-	python3 artifacts/scripts/enrich_xhtml.py \
+$(XHTML_PUBLISH): $(XHTML_SOURCE) artifacts/scripts/enrich_xhtml.py | $(VENV_STAMP)
+	$(PY) artifacts/scripts/enrich_xhtml.py \
 	  --source $(XHTML_SOURCE) --output $(XHTML_PUBLISH)
 	@echo "Enriched $(XHTML_PUBLISH) (TOC + outgoing/incoming property lists)"
 
-$(OWL_FILE): $(XHTML_SOURCE) artifacts/scripts/extract_owl.py
+$(OWL_FILE): $(XHTML_SOURCE) artifacts/scripts/extract_owl.py | $(VENV_STAMP)
 	@if [ -f "$(EXTRACT_XSL)" ]; then \
 	  $(SAXON) -s:$(XHTML_SOURCE) -xsl:$(EXTRACT_XSL) -o:$(OWL_FILE) ; \
 	else \
 	  echo "Saxon XSL not found at $(EXTRACT_XSL); using Python fallback" ; \
-	  python3 artifacts/scripts/extract_owl.py ; \
+	  $(PY) artifacts/scripts/extract_owl.py ; \
 	fi
 	@echo "Generated $(OWL_FILE) (term axioms only)"
 
-$(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py
+$(TTL_FILE): $(OWL_FILE) artifacts/scripts/merge_rdfa_into_owl.py | $(VENV_STAMP)
 	$(RAPPER) -i rdfxml -o turtle $(OWL_FILE) > $(TTL_FILE) 2>/dev/null
-	python3 artifacts/scripts/merge_rdfa_into_owl.py --xhtml $(XHTML_SOURCE)
+	$(PY) artifacts/scripts/merge_rdfa_into_owl.py --xhtml $(XHTML_SOURCE)
 	@echo "Merged RDFa header annotations into $(TTL_FILE) and $(OWL_FILE)"
 
 # === Round-trip check on every paper ===
@@ -111,9 +134,9 @@ listings-computed: compute
 
 term-appendices: $(LATEX_SECTIONS)
 
-$(LATEX_SECTIONS) &: $(TTL_FILE)
+$(LATEX_SECTIONS) &: $(TTL_FILE) | $(VENV_STAMP)
 	@mkdir -p $(DIST_SECTIONS)
-	python3 artifacts/scripts/generate_term_appendix.py \
+	$(PY) artifacts/scripts/generate_term_appendix.py \
 	  --output-dir $(DIST_SECTIONS) \
 	  --ontology $(TTL_FILE) \
 	  --skip-skeletons
