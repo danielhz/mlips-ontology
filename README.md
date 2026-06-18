@@ -109,3 +109,15 @@ make sync-from-dataset DATASET_PATH=/abs/path/to/this/repo
 - `artifacts/doc/mlips-ontology.org` — human-readable schema doc.
 - `artifacts/kg/README.md` — protocol details for the per-paper
   encoding workflow.
+
+## License, citation, and governance
+
+- **License** — the ontology and knowledge graph are released under
+  [CC BY 4.0](LICENSE) (matching the `dcterms:license` in the ontology
+  header). Source-code licensing is noted in [`GOVERNANCE.md`](GOVERNANCE.md).
+- **Citation** — [`CITATION.cff`](CITATION.cff) (GitHub shows a "Cite
+  this repository" button); cite the accompanying ISWC paper via its
+  `preferred-citation`.
+- **Contributing** — [`CONTRIBUTING.md`](CONTRIBUTING.md): filing issues,
+  proposing terms, and the XHTML-source-of-truth → regenerate workflow.
+- **Governance, versioning, maintenance** — [`GOVERNANCE.md`](GOVERNANCE.md).
