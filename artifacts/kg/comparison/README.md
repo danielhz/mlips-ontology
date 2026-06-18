@@ -26,6 +26,7 @@ terms are absent.
 | CMSO/ASMO | Crystallographic + Atomistic Simulation Methods Ontology | <https://purls.helmholtz-metadaten.de/cmso/> |
 | EMMO | European Materials Modelling Ontology | <https://emmo-repo.github.io/> |
 | PMDco | Platform Material Digital ontology | <https://w3id.org/pmd/co/> |
+| Croissant | MLCommons Croissant (dataset metadata, v1.0) | <http://mlcommons.org/croissant/> |
 
 ## Per-CQ analysis
 
@@ -43,6 +44,7 @@ datatype, and (optionally) default and range.
 | CMSO/ASMO   | — | — | — | — | — |
 | EMMO        | — (model concept differs) | — | — | — | — |
 | PMDco       | — | — | — | — | — |
+| Croissant   | — | — | — | — | — |
 
 ### CQ2: Implementations and library versions
 
@@ -56,6 +58,7 @@ with a version literal.
 | CMSO/ASMO | — | similar |
 | EMMO      | — | software not modelled at this granularity |
 | PMDco     | — | similar |
+| Croissant | — | versions the dataset (schema:version), not software libraries implementing a method |
 
 ### CQ3: Training data + DFT settings
 
@@ -70,6 +73,7 @@ energy cutoff, pseudopotential type).
 | CMSO/ASMO | ○ | similar; ASMO has the calculation graph but not the DFT-setting fields |
 | EMMO      | ○ | has top-level Calculation concept |
 | PMDco     | ○ | aligns with EMMO; same level |
+| Croissant | ○ | schema.org Dataset + cr:RecordSet describe the dataset/distribution; no DFT code or settings terms |
 
 ### CQ4: Dataset provenance (published / in-house / augmented)
 
@@ -78,7 +82,8 @@ InHouse, AugmentedFrom).
 
 | Comparator | Verdict | Note |
 |---|---|---|
-| All | — | none of the comparators model this enumeration |
+| ML-Schema, MDO, CMSO/ASMO, EMMO, PMDco | — | none of these model this enumeration |
+| Croissant | ○ | schema.org creator / publisher / citeAs / isBasedOn approximate provenance, but not the Published / InHouse / Augmented categories |
 
 ### CQ5: Dataset size + property coverage + sampling strategy
 
@@ -88,7 +93,8 @@ enumeration.
 
 | Comparator | Verdict | Note |
 |---|---|---|
-| All | — | none model property-coverage at this granularity |
+| ML-Schema, MDO, CMSO/ASMO, EMMO, PMDco | — | none model property-coverage at this granularity |
+| Croissant | ○ | cr:RecordSet / cr:Field / dataType give generic field coverage; no configuration-count property and no sampling-strategy enumeration |
 
 ### CQ6: Published benchmarks
 
@@ -97,7 +103,7 @@ Required: *BenchmarkStudy* + *BenchmarkResult* + link to
 
 | Comparator | Verdict | Note |
 |---|---|---|
-| All | — | the benchmark--method--metric triangle is unique to ours |
+| All (incl. Croissant) | — | the benchmark--method--metric triangle is unique to ours |
 
 ### CQ7: Accuracy ranking across method/hyperparameter combinations
 
@@ -106,7 +112,7 @@ by an accuracy metric.
 
 | Comparator | Verdict | Note |
 |---|---|---|
-| All | — | no comparator declares comparable cross-method benchmark structure |
+| All (incl. Croissant) | — | no comparator declares comparable cross-method benchmark structure |
 
 ### CQ8: Simulation types supported by a method
 
@@ -121,6 +127,17 @@ opt, phonon, thermo. integration); link from *Algorithm* to
 | CMSO/ASMO | ○ | ASMO declares simulation-method classes that approximate this |
 | EMMO      | ○ | similar approximation |
 | PMDco     | — | not modelled |
+| Croissant | — | simulation types not modelled |
+
+### CQ9: Method efficiency (asymptotic complexity + compute cost)
+
+Required: an asymptotic *inferenceComplexity* on the method, plus
+measured *gpuHours* (on the run) and *inferenceTimePerAtom* (on the
+trained model).
+
+| Comparator | Verdict | Note |
+|---|---|---|
+| All (incl. Croissant) | — | no comparator declares compute-cost or asymptotic-complexity vocabulary (cf. the MLIPRun compute-cost note below); Croissant models dataset metadata, not method efficiency |
 
 ### Auxiliary axes (rows below the line in Table 9)
 
