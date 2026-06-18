@@ -1,0 +1,101 @@
+# Competency-question vocabulary + instances (Epic C, C1 design draft).
+#
+# Makes the nine competency questions (CQ1-CQ9, paper §3) first-class
+# RDF instead of bare .rq files, so concon's generic doc view (their
+# Epic B3) can render a competency-question section, and so the .rq
+# files under cq-queries/ can be GENERATED from this file (RDF =
+# source of truth; see Epic C2).
+#
+# DESIGN DECISIONS (for review; coordinate shape with @concon before
+# encoding all nine + wiring the generator):
+#
+#  * Companion vocabulary, NOT folded into the domain ontology. CQs are
+#    metadata *about* the ontology, not MLIP domain concepts, so they
+#    get their own namespace `https://w3id.org/mlips/cq#` (prefix `cq:`)
+#    and their own file. (The w3id sub-path redirect is Daniel's to
+#    mint, like the main namespace.)
+#  * `cq:sparqlQuery` stores the query VERBATIM (PREFIX + the hand-
+#    written comment + SELECT) so generation is byte-exact and the
+#    valuable per-query notes (e.g. the property-chain workaround in
+#    CQ6/CQ7/CQ9) are preserved. `cq:questionText` carries the short
+#    NL question separately for rendering. (Alternative: store body-
+#    only and synthesise the header on generation -- open for @concon.)
+#  * `cq:motivates` links each CQ to the ontology class(es) it
+#    exercises, for cross-linking in the doc view.
+#
+# This draft encodes CQ1 (simple) and CQ8 (the simulation-types fix) as
+# representative examples; the remaining seven follow the same shape
+# once the shape is agreed.
+
+@prefix cq:      <https://w3id.org/mlips/cq#> .
+@prefix mlips:   <https://w3id.org/mlips#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+###############################################################################
+# Vocabulary (schema)
+###############################################################################
+
+cq:CompetencyQuestion a owl:Class ;
+    rdfs:label "Competency Question"@en ;
+    rdfs:comment "A question the MLIPs ontology is designed to answer, paired with a SPARQL realisation and the ontology terms it exercises."@en .
+
+cq:questionText a owl:DatatypeProperty ;
+    rdfs:label "question text"@en ;
+    rdfs:comment "The natural-language competency question."@en ;
+    rdfs:domain cq:CompetencyQuestion ;
+    rdfs:range xsd:string .
+
+cq:sparqlQuery a owl:DatatypeProperty ;
+    rdfs:label "SPARQL query"@en ;
+    rdfs:comment "A SPARQL SELECT query realising the competency question against the dataset. Source of truth for the corresponding cq-queries/<id>.rq file (stored verbatim, including the leading comment)."@en ;
+    rdfs:domain cq:CompetencyQuestion ;
+    rdfs:range xsd:string .
+
+cq:motivates a owl:ObjectProperty ;
+    rdfs:label "motivates"@en ;
+    rdfs:comment "An ontology class that this competency question exercises / motivates."@en ;
+    rdfs:domain cq:CompetencyQuestion ;
+    rdfs:range owl:Class .
+
+###############################################################################
+# Instances (CQ1 and CQ8 shown; CQ2-CQ7, CQ9 to follow after sign-off)
+###############################################################################
+
+cq:CQ1 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ1" ;
+    rdfs:label "Method hyperparameters (name, datatype, default)"@en ;
+    cq:questionText "Which MLIP methods exist, and what hyperparameters does each accept (name, datatype, default value)?" ;
+    cq:motivates mlips:MLIPMethod, mlips:Hyperparameter ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ1: Which MLIP methods exist, and what hyperparameters does each
+# accept (name, datatype, default value)?
+
+SELECT ?algo ?hp ?name ?type ?default WHERE {
+  ?algo a mlips:MLIPMethod ;
+        mlips:hasHyperparameter ?hp .
+  ?hp mlips:hyperparameterName ?name ;
+      mlips:hyperparameterDatatype ?type .
+  OPTIONAL { ?hp mlips:defaultValue ?default }
+}
+""" .
+
+cq:CQ8 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ8" ;
+    rdfs:label "Simulation types performed with each method"@en ;
+    cq:questionText "Which simulation types (molecular dynamics, Monte Carlo, geometry optimisation, phonon calculations, thermodynamic integration) have been performed with a given MLIP?" ;
+    cq:motivates mlips:MLIPMethod, mlips:SimulationType ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+
+# CQ8: Which simulation types (molecular dynamics, Monte Carlo,
+# geometry optimisation, phonon calculations, thermodynamic
+# integration) have been performed with a given MLIP?
+
+SELECT ?algo ?sim WHERE {
+  ?algo a mlips:MLIPMethod ;
+        mlips:supportsSimulation ?sim .
+}
+""" .
