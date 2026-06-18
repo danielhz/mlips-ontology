@@ -1,6 +1,6 @@
 # Comparator Coverage Mapping
 
-Per-cell justification for Table 9 of the paper (§8.4
+Per-cell justification for Table 4 of the paper (§8.4
 "Comparison with Existing Ontologies"). For each
 (CQ, comparator) pair, this file records which classes and
 properties of the comparator a SPARQL query would need in order
@@ -139,7 +139,7 @@ trained model).
 |---|---|---|
 | All (incl. Croissant) | — | no comparator declares compute-cost or asymptotic-complexity vocabulary (cf. the MLIPRun compute-cost note below); Croissant models dataset metadata, not method efficiency |
 
-### Auxiliary axes (rows below the line in Table 9)
+### Auxiliary axes (rows below the line in Table 4)
 
 **Training-run provenance.** ML-Schema's `mls:Run` provides
 training-run context (executes, hasInput, hasOutput) that
