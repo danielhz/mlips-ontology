@@ -40,6 +40,7 @@ import rdflib
 from rdflib import URIRef, Literal, RDF, RDFS, OWL
 import html5lib
 
+DCTERMS = rdflib.Namespace("http://purl.org/dc/terms/")
 MLIPS = "https://w3id.org/mlips#"
 MODULE_BASE = "https://w3id.org/mlips/module/"
 
@@ -65,7 +66,7 @@ def module_map(xhtml_path):
     """
     doc = html5lib.parse(open(xhtml_path, "rb"),
                          treebuilder="etree", namespaceHTMLElements=False)
-    modules, term2module, dupes = {}, {}, []
+    modules, term2module, descriptions, dupes = {}, {}, {}, []
 
     def walk(el, cur):
         sid = el.get("id")
@@ -73,6 +74,9 @@ def module_map(xhtml_path):
             cur = sid[:-len("-module")]
             h2 = el.find(".//h2")
             modules[cur] = (_text(h2).strip() if h2 is not None else cur)
+            desc = el.find(".//p[@class='module-description']")
+            if desc is not None:
+                descriptions[cur] = " ".join(_text(desc).split())
         cls = el.get("class") or ""
         if el.tag in ("pre", "code") and "owl-xml" in cls and cur:
             for iri in TERM_RE.findall(_text(el)):
@@ -85,7 +89,7 @@ def module_map(xhtml_path):
     walk(doc, None)
     if dupes:
         raise SystemExit(f"ERROR: terms mapped to >1 module: {dupes}")
-    return modules, term2module
+    return modules, term2module, descriptions
 
 
 def main():
@@ -96,16 +100,20 @@ def main():
     ap.add_argument("--ttl", type=Path, default=base / "mlips.ttl")
     args = ap.parse_args()
 
-    modules, term2module = module_map(args.xhtml)
+    modules, term2module, descriptions = module_map(args.xhtml)
 
     g = rdflib.Graph()
     g.parse(str(args.ttl), format="turtle")
 
-    # 1. Declare each module as an owl:Ontology with its heading label.
+    # 1. Declare each module as an owl:Ontology with its heading label and,
+    # where the section carries a <p class="module-description"> intro, a
+    # queryable dcterms:description (rendered as the section intro too).
     for name, label in modules.items():
         m = URIRef(MODULE_BASE + name)
         g.add((m, RDF.type, OWL.Ontology))
         g.add((m, RDFS.label, Literal(label, lang="en")))
+        if name in descriptions:
+            g.add((m, DCTERMS.description, Literal(descriptions[name], lang="en")))
 
     # 2. Annotate every term with rdfs:isDefinedBy <module>.
     for term, name in term2module.items():
@@ -134,6 +142,7 @@ def main():
     g.serialize(destination=str(args.owl), format="xml")
 
     print(f"  Modules:           {len(modules)} ({', '.join(sorted(modules))})")
+    print(f"  Descriptions:      {len(descriptions)} dcterms:description triples")
     print(f"  Terms annotated:   {len(term2module)} rdfs:isDefinedBy triples")
     print(f"  Wrote {args.ttl}")
     print(f"  Wrote {args.owl}")

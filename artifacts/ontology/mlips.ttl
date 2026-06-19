@@ -21,17 +21,17 @@
         [ a schema:Person ;
             schema:name "Xi Zhang" ],
         [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
-        [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
+            schema:name "Wenchuan Liu" ],
         [ a schema:Person ;
             schema:name "Xi Zhang" ],
-        [ a schema:Person ;
-            schema:name "Wenchuan Liu" ],
         [ a schema:Person ;
             schema:name "Tom Schächtel" ],
         [ a schema:Person ;
             schema:name "Xiang Xu" ],
+        [ a schema:Person ;
+            schema:name "Lifang Zhu" ],
+        [ a schema:Person ;
+            schema:name "Lifang Zhu" ],
         [ a schema:Person ;
             schema:name "Xiang Xu" ],
         [ a schema:Person ;
@@ -1015,7 +1015,8 @@ mlips:hasResult a owl:ObjectProperty ;
     rdfs:subPropertyOf prov:generated .
 
 <https://w3id.org/mlips/module/cross> a owl:Ontology ;
-    rdfs:label "Cross-Module Properties"@en .
+    rdfs:label "Cross-Module Properties"@en ;
+    dcterms:description "The Cross-Module Properties bridge the three domain modules: they link an MLIP run to the method it applies and the trained model it produces, so that a benchmark result can be traced back through its run to the originating method and training data. In the running example they connect the MTP, its training run on the C14 dataset, and the benchmarked model."@en .
 
 mls:Algorithm a owl:Class ;
     rdfs:label "Algorithm (W3C ML-Schema)"@en ;
@@ -1057,11 +1058,11 @@ mlips:Implementation a owl:Class ;
 specific library and version."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isImplementationOf ;
-            owl:someValuesFrom mlips:MLIPMethod ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:implementedIn ;
             owl:someValuesFrom mlips:Library ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isImplementationOf ;
+            owl:someValuesFrom mlips:MLIPMethod ],
         mls:Implementation,
         schema:SoftwareSourceCode ;
     mlips:metaSort mlips:SubordinateSortal .
@@ -1156,16 +1157,16 @@ mlips:AccuracyMetric a owl:Class ;
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
             owl:onClass mlips:MetricType ;
             owl:onProperty mlips:metricType ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onProperty mlips:isMetricOf ;
             owl:someValuesFrom mlips:BenchmarkResult ],
-        [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         qudt:QuantityValue ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1185,7 +1186,8 @@ OntoClean profile: ~R, -I, -U, +D."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> .
 
 <https://w3id.org/mlips/module/metasort> a owl:Ontology ;
-    rdfs:label "Meta-categorisation Vocabulary"@en .
+    rdfs:label "Meta-categorisation Vocabulary"@en ;
+    dcterms:description "Annotation vocabulary attaching an OntoClean-style meta-category to every class in the ontology. The four meta-categories (Sortal, Subordinate Sortal, Role, Reified Relation) are named individuals of the class MetaSort; the property mlips:metaSort attaches one such individual to each class."@en .
 
 mlips:MaterialSystem a owl:Class ;
     rdfs:label "Material System"@en ;
@@ -1251,8 +1253,8 @@ mlips:TrainingDataset a owl:Class ;
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:datasetProvenance ;
-            owl:someValuesFrom mlips:DatasetProvenance ],
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips:coversProperty ;
             owl:someValuesFrom mlips:CoveredProperty ],
@@ -1260,8 +1262,8 @@ training, with provenance, size, property coverage, and DFT settings."""@en ;
             owl:onProperty mlips:hasConfiguration ;
             owl:someValuesFrom mlips:AtomicConfiguration ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
+            owl:onProperty mlips:datasetProvenance ;
+            owl:someValuesFrom mlips:DatasetProvenance ],
         mls:Dataset,
         prov:Entity ;
     mlips:metaSort mlips:Sortal .
@@ -1272,18 +1274,18 @@ mlips:BenchmarkResult a owl:Class ;
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:TrainedModel ;
-            owl:onProperty mlips:evaluatesModel ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:targetMaterial ;
             owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasAccuracyMetric ;
             owl:someValuesFrom mlips:AccuracyMetric ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainedModel ;
+            owl:onProperty mlips:evaluatesModel ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1292,12 +1294,12 @@ mlips:MLIPRun a owl:Class ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:TrainedModel ;
-            owl:onProperty mlips:produces ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:MLIPMethod ;
             owl:onProperty mlips:appliesMethod ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainedModel ;
+            owl:onProperty mlips:produces ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onClass mlips:TrainingDataset ;
@@ -1323,17 +1325,17 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
             owl:onProperty mlips:hasTrainingAlgorithm ;
             owl:someValuesFrom mls:Algorithm ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasHyperparameter ;
-            owl:someValuesFrom mlips:Hyperparameter ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ],
+            owl:onProperty mlips:hasLossFunction ;
+            owl:someValuesFrom mlips:LossFunction ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasFunctionalForm ;
             owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasLossFunction ;
-            owl:someValuesFrom mlips:LossFunction ] ;
+            owl:onProperty mlips:hasHyperparameter ;
+            owl:someValuesFrom mlips:Hyperparameter ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ] ;
     owl:disjointWith mls:Algorithm ;
     mlips:metaSort mlips:Sortal .
 
@@ -1346,11 +1348,14 @@ OntoClean profile: +R, +I, +U, -D."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> .
 
 <https://w3id.org/mlips/module/benchmark> a owl:Ontology ;
-    rdfs:label "Benchmark Module"@en .
+    rdfs:label "Benchmark Module"@en ;
+    dcterms:description "The Benchmark module describes how a trained potential's accuracy is reported: benchmark studies, the trained model and run they evaluate, the target material, and per-property accuracy metrics. In the running example it records the energy RMSE of 2.81 meV/atom that the MTP achieves on the C14 TiCr2-H phase."@en .
 
 <https://w3id.org/mlips/module/training> a owl:Ontology ;
-    rdfs:label "Training Data Module"@en .
+    rdfs:label "Training Data Module"@en ;
+    dcterms:description "The Training Data module describes the reference data a potential is fitted to: the training datasets, the configurations they contain, the physical properties they cover, the sampling strategy, and the first-principles provenance of the labels. In the running example it captures the 3766-configuration C14 training set, drawn by active learning and labelled with VASP using PAW pseudopotentials and the PBE functional at a 400 eV plane-wave cutoff, covering energies, forces, and stresses."@en .
 
 <https://w3id.org/mlips/module/algorithm> a owl:Ontology ;
-    rdfs:label "Algorithm Module"@en .
+    rdfs:label "Algorithm Module"@en ;
+    dcterms:description "The Algorithm module describes the machine-learning interatomic potential itself: its functional form and atomic-environment descriptor, the hyperparameters that size and bound that descriptor, the loss it is fitted with, and the software that implements it. In the running example it captures the Moment Tensor Potential (MTP) used for TiCr2-H, fitted with the MLIP-2 package, with hyperparameters such as the moment level and the cutoff radius."@en .
 
