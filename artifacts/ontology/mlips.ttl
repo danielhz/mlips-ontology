@@ -17,31 +17,22 @@
         owl:Ontology ;
     rdfs:label "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials" ;
     dcterms:contributor [ a schema:Person ;
-            schema:name "Tom Schächtel" ],
+            schema:name "Xiang Xu" ],
         [ a schema:Person ;
             schema:name "Xi Zhang" ],
         [ a schema:Person ;
-            schema:name "Wenchuan Liu" ],
-        [ a schema:Person ;
             schema:name "Xi Zhang" ],
         [ a schema:Person ;
-            schema:name "Tom Schächtel" ],
-        [ a schema:Person ;
             schema:name "Xiang Xu" ],
-        [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
-        [ a schema:Person ;
-            schema:name "Lifang Zhu" ],
-        [ a schema:Person ;
-            schema:name "Xiang Xu" ],
-        [ a schema:Person ;
-            schema:name "Wenchuan Liu" ],
         <https://orcid.org/0000-0001-9176-3270>,
         <https://orcid.org/0000-0002-0780-4154>,
         <https://orcid.org/0000-0002-3661-5870>,
         <https://orcid.org/0000-0003-1486-1197>,
+        <https://orcid.org/0000-0003-2740-8172>,
         <https://orcid.org/0000-0003-3050-6291>,
-        <https://orcid.org/0009-0003-3860-8388> ;
+        <https://orcid.org/0009-0001-4894-0195>,
+        <https://orcid.org/0009-0003-3860-8388>,
+        <https://orcid.org/0009-0009-9043-2491> ;
     dcterms:creator <https://orcid.org/0000-0002-2409-975X>,
         <https://orcid.org/0000-0002-7896-0875>,
         <https://orcid.org/0000-0003-4281-5665> ;
@@ -668,14 +659,23 @@ its underlying training-run details to ML-Schema."""@en ;
 <https://orcid.org/0000-0003-1486-1197> a schema:Person ;
     schema:name "Yongliang Ou" .
 
+<https://orcid.org/0000-0003-2740-8172> a schema:Person ;
+    schema:name "Lifang Zhu" .
+
 <https://orcid.org/0000-0003-3050-6291> a schema:Person ;
     schema:name "Fritz Körmann" .
 
 <https://orcid.org/0000-0003-4281-5665> a schema:Person ;
     schema:name "Blazej Grabowski" .
 
+<https://orcid.org/0009-0001-4894-0195> a schema:Person ;
+    schema:name "Tom Schächtel" .
+
 <https://orcid.org/0009-0003-3860-8388> a schema:Person ;
     schema:name "Xin Li" .
+
+<https://orcid.org/0009-0009-9043-2491> a schema:Person ;
+    schema:name "Wenchuan Liu" .
 
 schema:ScholarlyArticle a owl:Class ;
     rdfs:label "Scholarly article (schema.org)"@en ;
@@ -1253,14 +1253,14 @@ mlips:TrainingDataset a owl:Class ;
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
+            owl:onProperty mlips:hasConfiguration ;
+            owl:someValuesFrom mlips:AtomicConfiguration ],
         [ a owl:Restriction ;
             owl:onProperty mlips:coversProperty ;
             owl:someValuesFrom mlips:CoveredProperty ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasConfiguration ;
-            owl:someValuesFrom mlips:AtomicConfiguration ],
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips:datasetProvenance ;
             owl:someValuesFrom mlips:DatasetProvenance ],
@@ -1274,14 +1274,14 @@ mlips:BenchmarkResult a owl:Class ;
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:targetMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasAccuracyMetric ;
             owl:someValuesFrom mlips:AccuracyMetric ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
+            owl:onProperty mlips:targetMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:evaluatesModel ;
@@ -1294,16 +1294,16 @@ mlips:MLIPRun a owl:Class ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass mlips:TrainingDataset ;
+            owl:onProperty mlips:runsOn ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
             owl:onClass mlips:MLIPMethod ;
             owl:onProperty mlips:appliesMethod ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:produces ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
-            owl:onClass mlips:TrainingDataset ;
-            owl:onProperty mlips:runsOn ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Activity ;
     mlips:metaSort mlips:SubordinateSortal .
@@ -1325,8 +1325,8 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
             owl:onProperty mlips:hasTrainingAlgorithm ;
             owl:someValuesFrom mls:Algorithm ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasLossFunction ;
-            owl:someValuesFrom mlips:LossFunction ],
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasFunctionalForm ;
             owl:someValuesFrom mlips:FunctionalForm ],
@@ -1334,8 +1334,8 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
             owl:onProperty mlips:hasHyperparameter ;
             owl:someValuesFrom mlips:Hyperparameter ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ] ;
+            owl:onProperty mlips:hasLossFunction ;
+            owl:someValuesFrom mlips:LossFunction ] ;
     owl:disjointWith mls:Algorithm ;
     mlips:metaSort mlips:Sortal .
 
