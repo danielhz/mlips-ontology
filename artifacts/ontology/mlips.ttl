@@ -16,17 +16,11 @@
 <https://w3id.org/mlips> a ns1:Vocabulary,
         owl:Ontology ;
     rdfs:label "MLIPs Ontology: An Ontology for Machine Learning Interatomic Potentials" ;
-    dcterms:contributor [ a schema:Person ;
-            schema:name "Xiang Xu" ],
-        [ a schema:Person ;
-            schema:name "Xi Zhang" ],
-        [ a schema:Person ;
-            schema:name "Xi Zhang" ],
-        [ a schema:Person ;
-            schema:name "Xiang Xu" ],
-        <https://orcid.org/0000-0001-9176-3270>,
+    dcterms:contributor <https://orcid.org/0000-0001-9176-3270>,
         <https://orcid.org/0000-0002-0780-4154>,
         <https://orcid.org/0000-0002-3661-5870>,
+        <https://orcid.org/0000-0002-4399-0580>,
+        <https://orcid.org/0000-0003-0319-8203>,
         <https://orcid.org/0000-0003-1486-1197>,
         <https://orcid.org/0000-0003-2740-8172>,
         <https://orcid.org/0000-0003-3050-6291>,
@@ -653,8 +647,14 @@ its underlying training-run details to ML-Schema."""@en ;
 <https://orcid.org/0000-0002-3661-5870> a schema:Person ;
     schema:name "Pranav Kumar" .
 
+<https://orcid.org/0000-0002-4399-0580> a schema:Person ;
+    schema:name "Xiang Xu" .
+
 <https://orcid.org/0000-0002-7896-0875> a schema:Person ;
     schema:name "Daniel Hernández" .
+
+<https://orcid.org/0000-0003-0319-8203> a schema:Person ;
+    schema:name "Xi Zhang" .
 
 <https://orcid.org/0000-0003-1486-1197> a schema:Person ;
     schema:name "Yongliang Ou" .
@@ -1058,11 +1058,11 @@ mlips:Implementation a owl:Class ;
 specific library and version."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:implementedIn ;
-            owl:someValuesFrom mlips:Library ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:isImplementationOf ;
             owl:someValuesFrom mlips:MLIPMethod ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:implementedIn ;
+            owl:someValuesFrom mlips:Library ],
         mls:Implementation,
         schema:SoftwareSourceCode ;
     mlips:metaSort mlips:SubordinateSortal .
@@ -1157,12 +1157,12 @@ mlips:AccuracyMetric a owl:Class ;
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:MetricType ;
             owl:onProperty mlips:metricType ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onProperty mlips:isMetricOf ;
@@ -1253,20 +1253,27 @@ mlips:TrainingDataset a owl:Class ;
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips:datasetProvenance ;
+            owl:someValuesFrom mlips:DatasetProvenance ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
+        [ a owl:Restriction ;
             owl:onProperty mlips:hasConfiguration ;
             owl:someValuesFrom mlips:AtomicConfiguration ],
         [ a owl:Restriction ;
             owl:onProperty mlips:coversProperty ;
             owl:someValuesFrom mlips:CoveredProperty ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:datasetProvenance ;
-            owl:someValuesFrom mlips:DatasetProvenance ],
         mls:Dataset,
         prov:Entity ;
     mlips:metaSort mlips:Sortal .
+
+schema:Person a owl:Class ;
+    rdfs:label "Person (schema.org)"@en ;
+    rdfs:comment """External: the schema.org Person class. Used to type
+authors and contributors in the ontology metadata header and in per-paper
+canonicals via schema:author."""@en ;
+    rdfs:subClassOf rdfs:Resource .
 
 mlips:BenchmarkResult a owl:Class ;
     rdfs:label "Benchmark Result"@en ;
@@ -1274,18 +1281,18 @@ mlips:BenchmarkResult a owl:Class ;
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
+            owl:onProperty mlips:targetMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasAccuracyMetric ;
             owl:someValuesFrom mlips:AccuracyMetric ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:targetMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:evaluatesModel ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1298,22 +1305,15 @@ mlips:MLIPRun a owl:Class ;
             owl:onProperty mlips:runsOn ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
-            owl:onClass mlips:MLIPMethod ;
-            owl:onProperty mlips:appliesMethod ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:produces ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:MLIPMethod ;
+            owl:onProperty mlips:appliesMethod ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Activity ;
     mlips:metaSort mlips:SubordinateSortal .
-
-schema:Person a owl:Class ;
-    rdfs:label "Person (schema.org)"@en ;
-    rdfs:comment """External: the schema.org Person class. Used to type
-authors and contributors in the ontology metadata header and in per-paper
-canonicals via schema:author."""@en ;
-    rdfs:subClassOf rdfs:Resource .
 
 mlips:MLIPMethod a owl:Class ;
     rdfs:label "MLIP Method"@en ;
@@ -1322,20 +1322,20 @@ mlips:MLIPMethod a owl:Class ;
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasTrainingAlgorithm ;
-            owl:someValuesFrom mls:Algorithm ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ],
+            owl:onProperty mlips:hasLossFunction ;
+            owl:someValuesFrom mlips:LossFunction ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasFunctionalForm ;
             owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
+            owl:onProperty mlips:hasTrainingAlgorithm ;
+            owl:someValuesFrom mls:Algorithm ],
+        [ a owl:Restriction ;
             owl:onProperty mlips:hasHyperparameter ;
             owl:someValuesFrom mlips:Hyperparameter ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasLossFunction ;
-            owl:someValuesFrom mlips:LossFunction ] ;
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ] ;
     owl:disjointWith mls:Algorithm ;
     mlips:metaSort mlips:Sortal .
 
