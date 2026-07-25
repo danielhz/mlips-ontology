@@ -26,6 +26,8 @@
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <https://schema.org/> .
+@prefix qudt:   <http://qudt.org/schema/qudt/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
 @prefix mlips:  <https://w3id.org/mlips#> .
 
 ###############################################################################
@@ -544,3 +546,50 @@ mlips:NudgedElasticBand a mlips:SimulationType ;
     rdfs:label "nudged elastic band" ;
     rdfs:comment "Chain-of-states minimum-energy-path / transition-barrier search (NEB and climbing-image CI-NEB) on the MLIP surface, e.g. for vacancy- or interstitial-migration barriers. Added 2026-06-18 from corpus evidence." ;
     rdfs:comment "No dedicated Wikidata concept entry as of 2026-06-18 (only article items such as Q57640824, the Henkelman-Jonsson method paper)." .
+
+###############################################################################
+# Units
+#
+# The customary units for MLIP accuracy metrics (meV, meV/atom, meV/A,
+# kcal/mol/A) do not exist in QUDT as of 2026-07-25: QUDT has no
+# milli-electronvolt at all and no per-atom energy unit, and the
+# unit:MeV-PER-ATOM / unit:MeV-PER-ANGSTROM / unit:MilliEV /
+# unit:MilliEV-PER-ATOM / unit:MilliEV-PER-ANGSTROM /
+# unit:KiloCAL-PER-MOL-ANGSTROM IRIs previously used in the per-paper
+# files never existed -- and a QUDT-style "MeV" reads as
+# MEGA-electronvolt, a 10^9 mis-scale for milli-eV values. Decision
+# (Daniel, 2026-07-25): keep metric values exactly as the source
+# papers print them and mint the units here, in the mlips namespace,
+# as qudt:Unit instances with QUDT conversion annotations
+# (conversionMultiplier = the SI value of one unit, following QUDT
+# conventions, e.g. unit:EV = 1.602176634e-19, unit:EV-PER-ANGSTROM =
+# 1.602176634e-9, unit:KiloCAL-PER-MOL = 4184 with a per-mole
+# dimension). "Per atom" divides by a dimensionless count.
+###############################################################################
+
+mlips:MilliEV a qudt:Unit ;
+    rdfs:label "millielectronvolt" ;
+    qudt:symbol "meV" ;
+    qudt:hasQuantityKind quantitykind:Energy ;
+    qudt:conversionMultiplier 1.602176634e-22 ;
+    rdfs:comment "10^-3 of QUDT unit:EV. Minted 2026-07-25 because QUDT defines no milli-electronvolt unit." .
+
+mlips:MilliEV-PER-ATOM a qudt:Unit ;
+    rdfs:label "millielectronvolt per atom" ;
+    qudt:symbol "meV/atom" ;
+    qudt:hasQuantityKind quantitykind:Energy ;
+    qudt:conversionMultiplier 1.602176634e-22 ;
+    rdfs:comment "Energy per atom in millielectronvolts, the customary unit for per-atom energy RMSE/MAE of MLIPs. Minted 2026-07-25 because QUDT has no per-atom energy unit; the conversion multiplier is the SI value of 1 meV (1.602176634e-22 J), with the per-atom divisor treated as a dimensionless count." .
+
+mlips:MilliEV-PER-ANGSTROM a qudt:Unit ;
+    rdfs:label "millielectronvolt per angstrom" ;
+    qudt:symbol "meV/Å" ;
+    qudt:hasQuantityKind quantitykind:Force ;
+    qudt:conversionMultiplier 1.602176634e-12 ;
+    rdfs:comment "10^-3 of QUDT unit:EV-PER-ANGSTROM; the customary unit for force-component RMSE/MAE of MLIPs. Minted 2026-07-25 because QUDT defines no milli-electronvolt-per-angstrom unit." .
+
+mlips:KiloCAL-PER-MOL-ANGSTROM a qudt:Unit ;
+    rdfs:label "kilocalorie per mole per angstrom" ;
+    qudt:symbol "kcal/(mol·Å)" ;
+    qudt:conversionMultiplier 4.184e13 ;
+    rdfs:comment "QUDT unit:KiloCAL-PER-MOL divided by the angstrom; the customary force-error unit of the MD17/ANI molecular-benchmark literature. Minted 2026-07-25 because QUDT defines no such unit; the multiplier follows QUDT's per-mole convention (4184 J/mol / 1e-10 m). No standard QUDT quantity kind exists for molar energy per length, so none is asserted." .
