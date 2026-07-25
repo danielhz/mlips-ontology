@@ -7,6 +7,7 @@
 #   make term-appendices  Generate the three term .tex files into dist/.
 #   make figures          Render ontology figures into artifacts/figures/.
 #   make release          ontology + roundtrip-check + listings + term-appendices + figures.
+#   make darus            Package the DaRUS deposit zip into dist/darus/.
 #   make clean            Remove generated outputs (keep canonical sources).
 
 SAXON       ?= java -jar $(HOME)/bin/saxon-he.jar
@@ -35,7 +36,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
+.PHONY: all release darus venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
 
 all: release
 
@@ -161,6 +162,16 @@ $(LATEX_SECTIONS) &: $(TTL_FILE) | $(VENV_STAMP)
 
 figures: $(TTL_FILE)
 	./artifacts/tools/render_figures.sh
+
+# === DaRUS deposit packaging ===
+#
+# One reproducible upload zip (git bundle of main + the release tag,
+# README.md, LICENSE, and a generated CITATION.cff carrying the
+# release commit SHA). The release tag v<version-from-CITATION.cff>
+# must exist and point at HEAD. See artifacts/scripts/package_for_darus.py.
+
+darus:
+	python3 artifacts/scripts/package_for_darus.py
 
 # === Computed-TTL pipeline (per-paper materialisation) ===
 #

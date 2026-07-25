@@ -31,7 +31,8 @@ version-specific landing page.
 
 | SemVer  | DaRUS V | Released   | DOI                                            | Notes |
 |---------|---------|------------|------------------------------------------------|-------|
-| `0.1.0` | V1.0    | 2026-05-?? | `10.18419/darus-NNNN` *(reserved for upload)*  | Initial public release accompanying the ISWC 2026 Resources Track paper. |
+| `0.1.0` | —       | 2026-05-?? | —                                              | Initial public release; superseded by 0.1.1 before the first DaRUS upload, so it has no DaRUS version of its own. |
+| `0.1.1` | V1.0    | 2026-07-25 | `10.18419/darus-5948` *(draft, pending publication)* | Errata release; first version actually deposited at DaRUS (DARUS-5948). |
 
 Each row is updated when a release is cut. New rows append at the
 bottom; the most recent SemVer release is the topmost
@@ -39,7 +40,45 @@ non-pre-release entry.
 
 ## Releases
 
-### 0.1.0 — 2026-05-?? *(pending DaRUS upload)*
+### 0.1.1 — 2026-07-25
+
+Errata release (PATCH): data and annotation corrections since 0.1.0;
+no schema term additions, removals, or semantic changes.
+
+* **Term descriptions (`mlips.source.xhtml`):** the RDFa
+  `rdfs:comment` paragraphs of 10 terms (classes `FunctionalForm`,
+  `DftBasisSet`, `PseudopotentialType`, `WfMethod`, `XCFunctional`;
+  object properties `candidateForVocabulary`, `dftBasisSet`,
+  `pseudopotentialType`, `wfMethod`, `xcFunctional`) carried raw
+  paper-only LaTeX macros that rendered verbatim on the served doc;
+  rewritten to plain text matching the OWL/XML copies
+  (`FunctionalForm`'s formula is now Unicode "E(cfg; ξ)").
+* **Wikidata alignment (KG):** two wrong QIDs fixed —
+  shapeev2016's tungsten material `wd:Q655` ("Chihuahua") →
+  `wd:Q743` (tungsten); qi2023's Ti–Al material `wd:Q3520520`
+  ("The Dave Days Show") → `wd:Q408746` (titanium aluminide).
+* **Units (KG + vocabulary):** the per-paper files used five
+  fabricated QUDT unit IRIs (`unit:MeV-PER-ATOM`,
+  `unit:MeV-PER-ANGSTROM`, `unit:MilliEV`, `unit:MilliEV-PER-ATOM`,
+  `unit:MilliEV-PER-ANGSTROM`, `unit:KiloCAL-PER-MOL-ANGSTROM`) —
+  QUDT defines none of them, and the `MeV-` spellings read as
+  MEGA-electronvolt, a 10⁹ mis-scale for the milli-eV metric
+  values. Replaced by units minted in `mlips-vocab.ttl`
+  (`mlips:MilliEV`, `mlips:MilliEV-PER-ATOM`,
+  `mlips:MilliEV-PER-ANGSTROM`, `mlips:KiloCAL-PER-MOL-ANGSTROM`)
+  as `qudt:Unit` instances with QUDT conversion annotations; all
+  metric values kept exactly as the source papers print them.
+* **Served resource:** the templated `rdfs:label` triples for
+  reified instances moved from the concon-owned `computed` named
+  graph to the consumer-owned `…/graph/labels`
+  (concon ≥ v0.2.0 derives the `computed` graph itself).
+* **Tooling:** the SPARQL execution needed by the round-trip
+  checker, listings, and CQ harness is now self-contained
+  (`artifacts/tools/sparql`: oxigraph fast path with a pure-Python
+  rdflib fallback); reproducible DaRUS packaging added
+  (`make darus`).
+
+### 0.1.0 — 2026-05-?? *(not deposited; superseded by 0.1.1)*
 
 Initial public release.
 
