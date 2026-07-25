@@ -31,8 +31,9 @@ version-specific landing page.
 
 | SemVer  | DaRUS V | Released   | DOI                                            | Notes |
 |---------|---------|------------|------------------------------------------------|-------|
-| `0.1.0` | —       | 2026-05-?? | —                                              | Initial public release; superseded by 0.1.1 before the first DaRUS upload, so it has no DaRUS version of its own. |
-| `0.1.1` | V1.0    | 2026-07-25 | `10.18419/darus-5948` *(draft, pending publication)* | Errata release; first version actually deposited at DaRUS (DARUS-5948). |
+| `0.1.0` | —       | 2026-05-?? | —                                              | Initial public release; superseded before the first DaRUS upload, so it has no DaRUS version of its own. |
+| `0.1.1` | —       | 2026-07-25 | —                                              | Errata release; superseded by 0.1.2 before the first DaRUS upload. |
+| `0.1.2` | V1.0    | 2026-07-25 | `10.18419/darus-5948` *(draft, pending publication)* | Adds codemeta.json; first version actually deposited at DaRUS (DARUS-5948). |
 
 Each row is updated when a release is cut. New rows append at the
 bottom; the most recent SemVer release is the topmost
@@ -40,7 +41,20 @@ non-pre-release entry.
 
 ## Releases
 
-### 0.1.1 — 2026-07-25
+### 0.1.2 — 2026-07-25
+
+Metadata release (PATCH): no schema, KG, or vocabulary changes.
+
+* **Software metadata:** added `codemeta.json` (CodeMeta 2.0,
+  JSON-LD) at the repository root, generated from `CITATION.cff` via
+  `cffconvert` (`make codemeta`; regenerated whenever CITATION.cff
+  changes) and included as a top-level object in the DaRUS deposit.
+* **Packaging:** `make darus` now works from any checkout — including
+  detached-HEAD and submodule checkouts — by assembling the bundle
+  source via `git fetch` from the local repository instead of a
+  `--branch main` clone of the local path.
+
+### 0.1.1 — 2026-07-25 *(not deposited; superseded by 0.1.2)*
 
 Errata release (PATCH): data and annotation corrections since 0.1.0;
 no schema term additions, removals, or semantic changes.

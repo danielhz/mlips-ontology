@@ -7,6 +7,7 @@
 #   make term-appendices  Generate the three term .tex files into dist/.
 #   make figures          Render ontology figures into artifacts/figures/.
 #   make release          ontology + roundtrip-check + listings + term-appendices + figures.
+#   make codemeta         Regenerate codemeta.json from CITATION.cff.
 #   make darus            Package the DaRUS deposit zip into dist/darus/.
 #   make clean            Remove generated outputs (keep canonical sources).
 
@@ -36,7 +37,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
+.PHONY: all release darus codemeta venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
 
 all: release
 
@@ -163,14 +164,25 @@ $(LATEX_SECTIONS) &: $(TTL_FILE) | $(VENV_STAMP)
 figures: $(TTL_FILE)
 	./artifacts/tools/render_figures.sh
 
+# === Software metadata (codemeta.json from CITATION.cff) ===
+#
+# CITATION.cff is the hand-maintained source; codemeta.json is derived
+# via cffconvert and committed. Regenerate after every CITATION.cff edit.
+
+codemeta: codemeta.json
+
+codemeta.json: CITATION.cff artifacts/scripts/gen_codemeta.py | $(VENV_STAMP)
+	$(PY) artifacts/scripts/gen_codemeta.py
+
 # === DaRUS deposit packaging ===
 #
 # One reproducible upload zip (git bundle of main + the release tag,
-# README.md, LICENSE, and a generated CITATION.cff carrying the
-# release commit SHA). The release tag v<version-from-CITATION.cff>
-# must exist and point at HEAD. See artifacts/scripts/package_for_darus.py.
+# README.md, LICENSE, codemeta.json, and a generated CITATION.cff
+# carrying the release commit SHA). The release tag
+# v<version-from-CITATION.cff> must exist and point at HEAD.
+# See artifacts/scripts/package_for_darus.py.
 
-darus:
+darus: codemeta.json
 	python3 artifacts/scripts/package_for_darus.py
 
 # === Computed-TTL pipeline (per-paper materialisation) ===

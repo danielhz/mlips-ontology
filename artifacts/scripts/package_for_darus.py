@@ -8,7 +8,9 @@ zip into a flat object tree, non-recursively):
     tag: code + data + full history in a single file object. Only
     those two refs are bundled (never `--all`; the orphan
     agent-messages branch stays out of the deposit).
-  - README.md, LICENSE -- top-level copies (DaRUS previews text).
+  - README.md, LICENSE, codemeta.json -- top-level copies (DaRUS
+    previews text; codemeta.json is itself generated from
+    CITATION.cff by `make codemeta`).
   - CITATION.cff -- generated deposit artifact, NOT the committed
     file: it additionally carries the release commit SHA (which
     cannot live inside the bundle it identifies) and placeholder
@@ -39,7 +41,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 
 # Deposit manifest: repo files copied verbatim to the zip top level.
-PLAIN_FILES = ["README.md", "LICENSE"]
+PLAIN_FILES = ["README.md", "LICENSE", "codemeta.json"]
 
 ARXIV_PLACEHOLDER = "arXiv:XXXX.XXXXX"
 SWHID_PLACEHOLDER = "swh:1:rev:0000000000000000000000000000000000000000"
@@ -133,30 +135,39 @@ def main():
 
     # 1. The git bundle (main + release tag only; never --all).
     #
-    # Bundled from a throwaway single-branch bare clone that is
-    # force-repacked single-threaded first: pack bytes otherwise
+    # The bundle source is a throwaway bare repository assembled by
+    # `git fetch` from the local repository -- not a clone with
+    # `--branch main`, which fails from detached-HEAD or submodule
+    # checkouts that have no local `main` branch. The `main` ref is
+    # created at the release commit, and the store is force-repacked
+    # (--no-reuse-delta) single-threaded first: pack bytes otherwise
     # depend on the delta layout of the local object store (an
     # incrementally-grown checkout and a fresh clone would produce
-    # different -- though content-identical -- bundles). Repacking
-    # with --no-reuse-delta (-f) and pack.threads=1 makes the pack,
-    # and hence the bundle, deterministic for a given git version.
+    # different -- though content-identical -- bundles). This makes
+    # the pack, and hence the bundle, deterministic for a given git
+    # version regardless of the checkout it is built from.
     bundle = stage / ("mlips-onto-%s.bundle" % tag)
     bundle_src = out_dir / ".bundle-src.git"
     if bundle_src.exists():
         shutil.rmtree(bundle_src)
+
+    def src_git(*a):
+        subprocess.run(
+            ["git", *a], cwd=bundle_src, check=True, capture_output=True
+        )
+
     subprocess.run(
-        ["git", "clone", "--quiet", "--bare", "--no-local",
-         "--branch", "main", "--single-branch", str(REPO), str(bundle_src)],
+        ["git", "init", "--quiet", "--bare", str(bundle_src)],
         check=True, capture_output=True,
     )
-    subprocess.run(
-        ["git", "-c", "pack.threads=1", "repack", "-adfq"],
-        cwd=bundle_src, check=True, capture_output=True,
-    )
-    subprocess.run(
-        ["git", "-c", "pack.threads=1", "bundle", "create", str(bundle), *refs],
-        cwd=bundle_src, check=True, capture_output=True,
-    )
+    src_git("fetch", "--quiet", str(REPO), "HEAD")
+    if tag_sha:
+        src_git("fetch", "--quiet", str(REPO),
+                "+refs/tags/%s:refs/tags/%s" % (tag, tag))
+    src_git("update-ref", "refs/heads/main", sha)
+    src_git("symbolic-ref", "HEAD", "refs/heads/main")
+    src_git("-c", "pack.threads=1", "repack", "-adfq")
+    src_git("-c", "pack.threads=1", "bundle", "create", str(bundle), *refs)
     shutil.rmtree(bundle_src)
 
     # 2. Plain top-level copies.

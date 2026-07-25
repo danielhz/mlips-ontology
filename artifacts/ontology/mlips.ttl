@@ -53,8 +53,8 @@
         mdo: ;
     owl:imports <http://www.w3.org/ns/mls>,
         <http://www.w3.org/ns/prov-o> ;
-    owl:versionIRI <https://w3id.org/mlips/0.1.1> ;
-    owl:versionInfo "0.1.1" .
+    owl:versionIRI <https://w3id.org/mlips/0.1.2> ;
+    owl:versionInfo "0.1.2" .
 
 mlips:ANIDescriptor a owl:NamedIndividual,
         mlips:AtomicEnvironmentDescriptor ;
@@ -1058,11 +1058,11 @@ mlips:Implementation a owl:Class ;
 specific library and version."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isImplementationOf ;
-            owl:someValuesFrom mlips:MLIPMethod ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:implementedIn ;
             owl:someValuesFrom mlips:Library ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isImplementationOf ;
+            owl:someValuesFrom mlips:MLIPMethod ],
         mls:Implementation,
         schema:SoftwareSourceCode ;
     mlips:metaSort mlips:SubordinateSortal .
@@ -1157,16 +1157,16 @@ mlips:AccuracyMetric a owl:Class ;
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+            owl:onProperty mlips:isMetricOf ;
+            owl:someValuesFrom mlips:BenchmarkResult ],
         [ a owl:Restriction ;
             owl:onClass mlips:MetricType ;
             owl:onProperty mlips:metricType ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:isMetricOf ;
-            owl:someValuesFrom mlips:BenchmarkResult ],
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         qudt:QuantityValue ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1253,8 +1253,8 @@ mlips:TrainingDataset a owl:Class ;
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasConfiguration ;
-            owl:someValuesFrom mlips:AtomicConfiguration ],
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
             owl:onProperty mlips:datasetProvenance ;
             owl:someValuesFrom mlips:DatasetProvenance ],
@@ -1262,8 +1262,8 @@ training, with provenance, size, property coverage, and DFT settings."""@en ;
             owl:onProperty mlips:coversProperty ;
             owl:someValuesFrom mlips:CoveredProperty ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
+            owl:onProperty mlips:hasConfiguration ;
+            owl:someValuesFrom mlips:AtomicConfiguration ],
         mls:Dataset,
         prov:Entity ;
     mlips:metaSort mlips:Sortal .
@@ -1281,6 +1281,9 @@ mlips:BenchmarkResult a owl:Class ;
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
+        [ a owl:Restriction ;
             owl:onProperty mlips:targetMaterial ;
             owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
@@ -1290,9 +1293,6 @@ material system with specific hyperparameters, reporting accuracy metrics."""@en
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:evaluatesModel ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1301,12 +1301,12 @@ mlips:MLIPRun a owl:Class ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:TrainingDataset ;
-            owl:onProperty mlips:runsOn ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:produces ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainingDataset ;
+            owl:onProperty mlips:runsOn ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onClass mlips:MLIPMethod ;
@@ -1322,20 +1322,20 @@ mlips:MLIPMethod a owl:Class ;
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasTrainingAlgorithm ;
-            owl:someValuesFrom mls:Algorithm ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:hasFunctionalForm ;
             owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ],
+            owl:onProperty mlips:hasHyperparameter ;
+            owl:someValuesFrom mlips:Hyperparameter ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasLossFunction ;
             owl:someValuesFrom mlips:LossFunction ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasHyperparameter ;
-            owl:someValuesFrom mlips:Hyperparameter ] ;
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:hasTrainingAlgorithm ;
+            owl:someValuesFrom mls:Algorithm ] ;
     owl:disjointWith mls:Algorithm ;
     mlips:metaSort mlips:Sortal .
 
