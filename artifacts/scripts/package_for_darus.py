@@ -130,11 +130,32 @@ def main():
     stage.mkdir(parents=True)
 
     # 1. The git bundle (main + release tag only; never --all).
+    #
+    # Bundled from a throwaway single-branch bare clone that is
+    # force-repacked single-threaded first: pack bytes otherwise
+    # depend on the delta layout of the local object store (an
+    # incrementally-grown checkout and a fresh clone would produce
+    # different -- though content-identical -- bundles). Repacking
+    # with --no-reuse-delta (-f) and pack.threads=1 makes the pack,
+    # and hence the bundle, deterministic for a given git version.
     bundle = stage / ("mlips-onto-%s.bundle" % tag)
+    bundle_src = out_dir / ".bundle-src.git"
+    if bundle_src.exists():
+        shutil.rmtree(bundle_src)
+    subprocess.run(
+        ["git", "clone", "--quiet", "--bare", "--no-local",
+         "--branch", "main", "--single-branch", str(REPO), str(bundle_src)],
+        check=True, capture_output=True,
+    )
+    subprocess.run(
+        ["git", "-c", "pack.threads=1", "repack", "-adfq"],
+        cwd=bundle_src, check=True, capture_output=True,
+    )
     subprocess.run(
         ["git", "-c", "pack.threads=1", "bundle", "create", str(bundle), *refs],
-        cwd=REPO, check=True, capture_output=True,
+        cwd=bundle_src, check=True, capture_output=True,
     )
+    shutil.rmtree(bundle_src)
 
     # 2. Plain top-level copies.
     for name in PLAIN_FILES:
