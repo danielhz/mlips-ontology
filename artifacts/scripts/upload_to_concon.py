@@ -71,7 +71,7 @@ def units():
     onto = REPO / "artifacts" / "ontology"
     kg = REPO / "artifacts" / "kg"
     papers = sorted(glob.glob(str(kg / "papers" / "*.ttl")))
-    computed = sorted(glob.glob(str(REPO / "dist" / "artifacts" / "kg" / "papers" / "*-computed.ttl")))
+    labels = sorted(glob.glob(str(REPO / "dist" / "artifacts" / "kg" / "papers" / "*-labels.ttl")))
 
     def file_bytes(p):
         return Path(p).read_bytes() if Path(p).exists() else None
@@ -81,7 +81,12 @@ def units():
         ("schema",   "graph", "schema",   file_bytes(onto / "mlips.ttl"),       TTL),
         ("vocab",    "graph", "vocab",    file_bytes(kg / "mlips-vocab.ttl"),   TTL),
         ("kg",       "graph", "kg",       assemble(papers) if papers else None, TTL),
-        ("computed", "graph", "computed", assemble(computed) if computed else None, TTL),
+        # concon >= v0.2.0 owns the `computed` graph (it derives the
+        # axiom-expressible triples itself), so the *-computed.ttl
+        # materialisations are no longer PUT. The templated labels --
+        # not axiom-expressible -- go to the consumer-owned `labels`
+        # graph instead (from dist/, `make compute` first).
+        ("labels",   "graph", "labels",   assemble(labels) if labels else None, TTL),
         ("cq",       "graph", "cq",       file_bytes(kg / "cq.ttl"),            TTL),
         ("doc",      "doc",   None,       file_bytes(onto / "mlips.source.xhtml"),
          "application/xhtml+xml"),
