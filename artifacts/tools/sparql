@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# Repo-bundled `sparql` CLI used by the KG build/check scripts
+# (check-roundtrip.sh, build-listings.sh, build-computed.sh,
+# cq-queries/run-all.sh), which pick it up automatically when no
+# `sparql` is installed on the PATH. Interface:
+#
+#     sparql <query-file.rq> --graph <data-file.ttl>
+#
+# Output on stdout:
+#   - CONSTRUCT / DESCRIBE queries -> N-triples
+#   - SELECT / ASK queries         -> TSV (header line + one line per row)
+#
+# Engine: `oxigraph_server` when installed (fast path; e.g.
+# `cargo install oxigraph_server@0.3.23`), otherwise a pure-Python
+# rdflib driver (sparql_rdflib.py) run on the repo's build venv --
+# rdflib is pinned in requirements.lock, so `make venv` is the only
+# prerequisite and no extra binaries are needed. Set
+# SPARQL_ENGINE=rdflib to force the Python fallback.
+set -euo pipefail
+
+if [ -d "$HOME/.cargo/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.cargo/bin:"*) ;;
+    *) export PATH="$HOME/.cargo/bin:$PATH" ;;
+  esac
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+QUERY=""
+GRAPH=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --graph) GRAPH="$2"; shift 2 ;;
+    --graph=*) GRAPH="${1#--graph=}"; shift ;;
+    -*) shift ;;                       # ignore other flags
+    *) if [ -z "$QUERY" ]; then QUERY="$1"; fi; shift ;;
+  esac
+done
+
+if [ -z "$QUERY" ] || [ -z "$GRAPH" ]; then
+  echo "usage: sparql <query.rq> --graph <data.ttl>" >&2
+  exit 2
+fi
+
+# Choose the result format from the query form.
+if grep -qiE '^\s*(construct|describe)\b|\b(construct|describe)\s*[{]' "$QUERY"; then
+  FMT="nt"
+else
+  FMT="tsv"
+fi
+
+if [ "${SPARQL_ENGINE:-}" != "rdflib" ] && command -v oxigraph_server >/dev/null 2>&1; then
+  STORE="$(mktemp -d /tmp/sparql-shim.XXXXXX)"
+  trap 'rm -rf "$STORE"' EXIT
+  rmdir "$STORE"     # oxigraph wants to create the store location itself
+  oxigraph_server load -l "$STORE" -f "$GRAPH" >&2 2>/dev/null
+  oxigraph_server query -l "$STORE" --query-file "$QUERY" --results-format "$FMT" 2>/dev/null
+  exit 0
+fi
+
+PY="$REPO_ROOT/.venv/bin/python3"
+[ -x "$PY" ] || PY="$(command -v python3)"
+exec "$PY" "$SCRIPT_DIR/sparql_rdflib.py" --format "$FMT" --graph "$GRAPH" "$QUERY"

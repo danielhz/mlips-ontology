@@ -96,8 +96,12 @@ make sync-from-dataset DATASET_PATH=/abs/path/to/this/repo
 ## Tooling dependencies
 
 - `rapper` (raptor2) — Turtle parsing and serialisation.
-- `sparql` (Rust CLI) or any SPARQL CLI — CONSTRUCT execution for
-  the round-trip checker.
+- SPARQL execution (round-trip checker, listings, CQ harness) is
+  self-contained: the scripts use an installed `sparql` CLI if one is
+  on the PATH, and otherwise fall back to the bundled
+  `artifacts/tools/sparql` shim — `oxigraph_server` when available,
+  else a pure-Python rdflib driver on the build venv (no extra
+  install needed beyond `make venv`).
 - Python 3 — `scripts/generate_term_appendix.py` and `tools/`.
 - Saxon-HE — XHTML→OWL extraction (`make ontology`).
 - Graphviz — `tools/render_figures.sh`.

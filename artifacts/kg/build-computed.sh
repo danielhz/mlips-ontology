@@ -26,6 +26,13 @@ if [ -d "$HOME/.cargo/bin" ]; then
   esac
 fi
 
+# Fall back to the repo-bundled shim (artifacts/tools/sparql) when no
+# `sparql` CLI is installed: oxigraph_server when available, otherwise
+# a pure-Python rdflib driver on the repo venv (see the shim's header).
+if ! command -v sparql >/dev/null 2>&1; then
+  export PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/../tools" && pwd):$PATH"
+fi
+
 if [ $# -ne 1 ]; then
   echo "Usage: $0 <paper-id>" >&2
   exit 2
