@@ -106,7 +106,9 @@ def main():
             " generated from a committed state (--allow-dirty to override)."
         )
 
-    refs = ["main"]
+    # HEAD (= main in the throwaway clone) is bundled too so that a
+    # plain `git clone <bundle>` finds a default branch to check out.
+    refs = ["HEAD", "main"]
     tag_sha = None
     try:
         tag_sha = run("git", "rev-parse", "--verify", "refs/tags/" + tag + "^{commit}")
