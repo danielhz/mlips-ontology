@@ -72,6 +72,7 @@ def units():
     kg = REPO / "artifacts" / "kg"
     papers = sorted(glob.glob(str(kg / "papers" / "*.ttl")))
     labels = sorted(glob.glob(str(REPO / "dist" / "artifacts" / "kg" / "papers" / "*-labels.ttl")))
+    derived = sorted(glob.glob(str(kg / "datasets" / "derived" / "*.ttl")))
 
     def file_bytes(p):
         return Path(p).read_bytes() if Path(p).exists() else None
@@ -91,6 +92,11 @@ def units():
         # `make wikidata-fetch`) -- feeds the SHACL cross-reference
         # check and the CQ10 review queue.
         ("wikidata", "graph", "wikidata", file_bytes(kg / "wikidata-types.ttl"), TTL),
+        # Artifact-derived dataset metadata (extraction epic): aggregate
+        # facts read from the collected training-data artifacts, on the
+        # same entity:ds-* IRIs as the kg graph -- the graph boundary is
+        # the provenance boundary (see EXTRACTION-DESIGN.md).
+        ("datasets", "graph", "datasets", assemble(derived) if derived else None, TTL),
         ("cq",       "graph", "cq",       file_bytes(kg / "cq.ttl"),            TTL),
         ("doc",      "doc",   None,       file_bytes(onto / "mlips.source.xhtml"),
          "application/xhtml+xml"),

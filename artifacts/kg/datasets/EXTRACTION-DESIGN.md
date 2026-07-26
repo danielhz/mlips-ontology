@@ -106,11 +106,13 @@ Dossier file: `artifacts/kg/datasets/DISCREPANCIES.md`, one entry per
 disagreement: paper-text value, artifact value, evidence, status
 (open/decided), decision owner.
 
-## 6. Spike (this commit)
+## 6. Status
 
-`spike/` contains the extxyz handler output for **shapeev2016**
-(clean exact-match case) and **kumar2025** (the count-mismatch case):
-`spike/shapeev2016.ttl`, `spike/kumar2025.ttl`, emitted by
-`artifacts/scripts/extract_dataset_metadata.py` running on kg1.
-Existing terms + DCAT/PROV/SPDX only. After green-light, `spike/`
-becomes `derived/` and the remaining parsers follow §4.
+APPROVED (coordinator note 2026-07-26 22:40; Daniel). The spike
+(`shapeev2016`, `kumar2025`) validated the pipeline; `spike/` is now
+**`derived/`** — one TTL per paper for every collected dataset,
+emitted by `artifacts/scripts/extract_dataset_metadata.py` on kg1 and
+uploaded as the `datasets` unit (`…/graph/datasets`) by
+`upload_to_concon.py`. The `dcat:distribution` schema documentation
+is deferred to the v0.2.0 modeling set; disagreements live in
+`DISCREPANCIES.md`.
