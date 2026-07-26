@@ -8,6 +8,8 @@
 #   make figures          Render ontology figures into artifacts/figures/.
 #   make release          ontology + roundtrip-check + listings + term-appendices + figures.
 #   make codemeta         Regenerate codemeta.json from CITATION.cff.
+#   make wikidata-fetch   Refresh the Wikidata type snapshot (deliberate step).
+#   make wikidata-check   SHACL-validate sameAsWikidata targets by type.
 #   make darus            Package the DaRUS deposit zip into dist/darus/.
 #   make clean            Remove generated outputs (keep canonical sources).
 
@@ -37,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
 
 all: release
 
@@ -173,6 +175,22 @@ codemeta: codemeta.json
 
 codemeta.json: CITATION.cff artifacts/scripts/gen_codemeta.py | $(VENV_STAMP)
 	$(PY) artifacts/scripts/gen_codemeta.py
+
+# === Wikidata cross-reference type validation ===
+#
+# wikidata-fetch is a deliberate, dated snapshot step (NOT part of any
+# build target: Wikidata is non-deterministic and rate-limited); it
+# rewrites artifacts/kg/wikidata-types.ttl. wikidata-check validates
+# every mlips:sameAsWikidata target against the snapshot with
+# shapes/wikidata-shapes.ttl and writes the review queue to
+# artifacts/kg/wikidata-review.md; exit 1 only on wrong-type
+# violations (untyped targets are non-blocking warnings).
+
+wikidata-fetch: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/fetch_wikidata_types.py
+
+wikidata-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/check_wikidata_types.py
 
 # === DaRUS deposit packaging ===
 #

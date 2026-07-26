@@ -30,13 +30,15 @@ DATASET_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 ONTOLOGY="$DATASET_ROOT/artifacts/ontology/mlips.ttl"
 VOCAB="$DATASET_ROOT/artifacts/kg/mlips-vocab.ttl"
+# The Wikidata type snapshot feeds CQ10 (cross-reference review queue).
+WIKIDATA="$DATASET_ROOT/artifacts/kg/wikidata-types.ttl"
 PAPERS=("$DATASET_ROOT"/artifacts/kg/papers/*.ttl)
 
 CORPUS=$(mktemp /tmp/mlips-corpus.XXXXXX.ttl)
 trap 'rm -f "$CORPUS" "$CORPUS".nt' EXIT
 
 # Build a deduplicated merged corpus (ontology + vocab + 20 papers).
-for f in "$ONTOLOGY" "$VOCAB" "${PAPERS[@]}"; do
+for f in "$ONTOLOGY" "$VOCAB" "$WIKIDATA" "${PAPERS[@]}"; do
   rapper -q -i turtle -o ntriples "$f" 2>/dev/null
 done | sort -u > "$CORPUS".nt
 rapper -q -i ntriples -o turtle "$CORPUS".nt > "$CORPUS" 2>/dev/null

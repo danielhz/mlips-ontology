@@ -275,3 +275,85 @@ SELECT ?algo ?inf_complexity ?gpu_hours ?t_inf ?rmse WHERE {
   OPTIONAL { ?run mlips:gpuHours ?gpu_hours }
 } ORDER BY ?t_inf
 """ .
+
+cq:CQ10 a cq:CompetencyQuestion ;
+    dcterms:identifier "CQ10" ;
+    rdfs:label "Cross-reference integrity: Wikidata links failing type validation"@en ;
+    cq:questionText "Which sameAsWikidata links have a target whose Wikidata type (P31/P279 ancestry) is not in the allowed class set for the subject's kind, or cannot be verified because the target carries no type statements?" ;
+    cq:motivates mlips:MaterialSystem, mlips:Library, mlips:SimulationType, mlips:WfMethod, mlips:PseudopotentialType, mlips:XCFunctional ;
+    cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
+PREFIX wdt:   <http://www.wikidata.org/prop/direct/>
+PREFIX wd:    <http://www.wikidata.org/entity/>
+
+# CQ10: review queue for Wikidata cross-references. Mirrors
+# shapes/wikidata-shapes.ttl (same allowed-class sets, calibrated
+# 2026-07-26) so the queue is queryable live. Requires the
+# materialized type snapshot (artifacts/kg/wikidata-types.ttl /
+# the .../graph/wikidata named graph) in the queried corpus.
+# An empty result means every link passes; "untyped" rows are
+# Wikidata gaps (add P31 upstream), "wrong type" rows are the
+# wrong-QID signature (fix the link).
+
+SELECT DISTINCT ?subject ?kind ?target ?status WHERE {
+  {
+    ?subject mlips:sameAsWikidata ?target ; a ?kind .
+    FILTER NOT EXISTS { ?target wdt:P31 ?t1 }
+    FILTER NOT EXISTS { ?target wdt:P279 ?t2 }
+    BIND("untyped on Wikidata (cannot verify)" AS ?status)
+  } UNION {
+    ?subject a mlips:MaterialSystem ; mlips:sameAsWikidata ?target .
+    BIND(mlips:MaterialSystem AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q11344, wd:Q11173, wd:Q113145171, wd:Q72070508, wd:Q37756))
+    }
+    BIND("wrong type" AS ?status)
+  } UNION {
+    ?subject a mlips:Library ; mlips:sameAsWikidata ?target .
+    BIND(mlips:Library AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q7397))
+    }
+    BIND("wrong type" AS ?status)
+  } UNION {
+    ?subject a mlips:SimulationType ; mlips:sameAsWikidata ?target .
+    BIND(mlips:SimulationType AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q1799072, wd:Q8366, wd:Q976981))
+    }
+    BIND("wrong type" AS ?status)
+  } UNION {
+    ?subject a mlips:WfMethod ; mlips:sameAsWikidata ?target .
+    BIND(mlips:WfMethod AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q1799072, wd:Q8366, wd:Q911364, wd:Q976981))
+    }
+    BIND("wrong type" AS ?status)
+  } UNION {
+    ?subject a mlips:PseudopotentialType ; mlips:sameAsWikidata ?target .
+    BIND(mlips:PseudopotentialType AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q1799072))
+    }
+    BIND("wrong type" AS ?status)
+  } UNION {
+    ?subject a mlips:XCFunctional ; mlips:sameAsWikidata ?target .
+    BIND(mlips:XCFunctional AS ?kind)
+    FILTER EXISTS { ?target (wdt:P31|wdt:P279) ?any }
+    FILTER NOT EXISTS {
+      ?target (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+      FILTER(?cls IN (wd:Q1799072))
+    }
+    BIND("wrong type" AS ?status)
+  }
+} ORDER BY ?status ?subject
+""" .

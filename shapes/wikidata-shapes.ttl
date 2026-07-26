@@ -1,0 +1,153 @@
+# SHACL shapes validating mlips:sameAsWikidata cross-reference targets
+# by Wikidata type, against the materialized snapshot
+# artifacts/kg/wikidata-types.ttl (P31 + bounded P279 ancestry).
+#
+# Motivation: the v0.1.1 wrong-QID bugs (Q655 "Chihuahua" for tungsten,
+# Q3520520 a TV show for Ti-Al, Q188553 "Batavian Republic" for MD)
+# were all target-TYPE mismatches. A target must reach, via
+# (P31|P279)/P279*, an allowed Wikidata class for its subject's kind.
+#
+# Severity policy:
+#   sh:Violation  - target HAS Wikidata type statements but none reaches
+#                   an allowed class (the wrong-QID signature).
+#   sh:Warning    - target has NO P31/P279 at all in the snapshot
+#                   (cannot be type-checked; Wikidata gap, review
+#                   manually). As of 2026-07-26: Q898241 (LDA),
+#                   Q11289206/Q11325789 (pseudopotential types),
+#                   Q25304396 (CASPT) are such items.
+#
+# Allowed-class sets were calibrated over the 20-paper corpus
+# (2026-07-26); every typed link passes. "formula" (Q976981) is
+# deliberately admitted for method-like kinds because Wikidata types
+# thermodynamic integration and NEVPT that way.
+#
+# Run: make wikidata-check (artifacts/scripts/check_wikidata_types.py);
+# the review queue is written to artifacts/kg/wikidata-review.md.
+
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix wds:   <https://w3id.org/mlips/shapes/wikidata#> .
+
+wds:prefixes sh:declare
+    [ sh:prefix "mlips" ; sh:namespace "https://w3id.org/mlips#"^^<http://www.w3.org/2001/XMLSchema#anyURI> ],
+    [ sh:prefix "wdt" ; sh:namespace "http://www.wikidata.org/prop/direct/"^^<http://www.w3.org/2001/XMLSchema#anyURI> ],
+    [ sh:prefix "wd" ; sh:namespace "http://www.wikidata.org/entity/"^^<http://www.w3.org/2001/XMLSchema#anyURI> ] .
+
+# --- untyped targets: cannot verify (Warning) --------------------------
+wds:UntypedWikidataTarget a sh:NodeShape ;
+    sh:targetSubjectsOf mlips:sameAsWikidata ;
+    sh:severity sh:Warning ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "sameAsWikidata target has no P31/P279 statements in the snapshot -- cannot type-check; review manually" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER NOT EXISTS { ?value wdt:P31 ?t1 }
+                FILTER NOT EXISTS { ?value wdt:P279 ?t2 }
+            }""" ;
+    ] .
+
+# --- per-kind wrong-type shapes (Violation) ----------------------------
+wds:MaterialSystemWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:MaterialSystem ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "MaterialSystem sameAsWikidata target is typed but reaches no allowed class (chemical element Q11344, chemical compound Q11173, type of chemical entity Q113145171, group/class of chemical entities Q72070508, alloy Q37756)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q11344, wd:Q11173, wd:Q113145171, wd:Q72070508, wd:Q37756))
+                }
+            }""" ;
+    ] .
+
+wds:LibraryWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:Library ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "Library sameAsWikidata target is typed but reaches no allowed class (software Q7397)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q7397))
+                }
+            }""" ;
+    ] .
+
+wds:SimulationTypeWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:SimulationType ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "SimulationType sameAsWikidata target is typed but reaches no allowed class (method Q1799072, algorithm Q8366, formula Q976981)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q1799072, wd:Q8366, wd:Q976981))
+                }
+            }""" ;
+    ] .
+
+wds:WfMethodWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:WfMethod ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "WfMethod sameAsWikidata target is typed but reaches no allowed class (method Q1799072, algorithm Q8366, perturbation theory Q911364, formula Q976981)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q1799072, wd:Q8366, wd:Q911364, wd:Q976981))
+                }
+            }""" ;
+    ] .
+
+wds:PseudopotentialTypeWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:PseudopotentialType ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "PseudopotentialType sameAsWikidata target is typed but reaches no allowed class (method Q1799072)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q1799072))
+                }
+            }""" ;
+    ] .
+
+wds:XCFunctionalWikidataType a sh:NodeShape ;
+    sh:targetClass mlips:XCFunctional ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:prefixes wds:prefixes ;
+        sh:message "XCFunctional sameAsWikidata target is typed but reaches no allowed class (method Q1799072)" ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this mlips:sameAsWikidata ?value .
+                FILTER EXISTS { ?value (wdt:P31|wdt:P279) ?any }
+                FILTER NOT EXISTS {
+                    ?value (wdt:P31|wdt:P279)/(wdt:P279*) ?cls .
+                    FILTER(?cls IN (wd:Q1799072))
+                }
+            }""" ;
+    ] .

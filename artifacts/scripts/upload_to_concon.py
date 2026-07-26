@@ -87,6 +87,10 @@ def units():
         # not axiom-expressible -- go to the consumer-owned `labels`
         # graph instead (from dist/, `make compute` first).
         ("labels",   "graph", "labels",   assemble(labels) if labels else None, TTL),
+        # Wikidata type snapshot (CC0; dated, refreshed deliberately by
+        # `make wikidata-fetch`) -- feeds the SHACL cross-reference
+        # check and the CQ10 review queue.
+        ("wikidata", "graph", "wikidata", file_bytes(kg / "wikidata-types.ttl"), TTL),
         ("cq",       "graph", "cq",       file_bytes(kg / "cq.ttl"),            TTL),
         ("doc",      "doc",   None,       file_bytes(onto / "mlips.source.xhtml"),
          "application/xhtml+xml"),
