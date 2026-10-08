@@ -1,0 +1,321 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Kazuma Ito et al. (2024). Machine learning interatomic potential with DFT accuracy for general grain boundaries in α-Fe.
+#   npj Computational Materials. doi:10.1038/s41524-024-01451-y
+#
+# Version read: publisher (sha256 63e2268845ca3be9...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 149 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the level-22 MTP for alpha-Fe, its VASP reference
+# calculations, the two-part training set (domain-expertise and RANDSPG
+# structures), and the energy and force RMSEs the text states for the
+# training and validation sets and for cells cut from nano-polycrystals
+# (general grain boundaries and triple junctions).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ito2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Ito et al. (2024): MTP with DFT accuracy for general grain boundaries in alpha-Fe" ;
+    mlips:reportedIn entity:article-ito2024 .
+
+entity:article-ito2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01451-y> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potential with DFT accuracy for general grain boundaries in α-Fe" ;
+    schema:author <https://orcid.org/0000-0002-3456-1055> ,
+        <https://orcid.org/0000-0002-5178-3952> ,
+        entity:person-Hyodo-ito2024 ,
+        <https://orcid.org/0000-0001-5608-4053> .
+
+<https://orcid.org/0000-0002-3456-1055> a schema:Person ;
+    schema:name "Kazuma Ito" ;
+    schema:givenName "Kazuma" ;
+    schema:familyName "Ito" ;
+    schema:identifier <https://orcid.org/0000-0002-3456-1055> .
+
+<https://orcid.org/0000-0002-5178-3952> a schema:Person ;
+    schema:name "Tatsuya Yokoi" ;
+    schema:givenName "Tatsuya" ;
+    schema:familyName "Yokoi" ;
+    schema:identifier <https://orcid.org/0000-0002-5178-3952> .
+
+entity:person-Hyodo-ito2024 a schema:Person ;
+    schema:name "Katsutoshi Hyodo" ;
+    schema:givenName "Katsutoshi" ;
+    schema:familyName "Hyodo" .
+
+<https://orcid.org/0000-0001-5608-4053> a schema:Person ;
+    schema:name "Hideki Mori" ;
+    schema:givenName "Hideki" ;
+    schema:familyName "Mori" ;
+    schema:identifier <https://orcid.org/0000-0001-5608-4053> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Fe-ito2024 a mlips:MaterialSystem ;
+    rdfs:label "alpha-iron (ferromagnetic bcc Fe; bulk, point defects, mechanically generated structures)" ;
+    mlips:chemicalFormula "Fe" ;
+    mlips:materialClass "Elemental metal" .
+
+entity:mat-GGB-ito2024 a mlips:MaterialSystem ;
+    rdfs:label "General grain boundaries in alpha-Fe nano-polycrystals (cut-out cells)" ;
+    mlips:chemicalFormula "Fe" ;
+    mlips:materialClass "Grain boundaries" .
+
+entity:mat-TJ-ito2024 a mlips:MaterialSystem ;
+    rdfs:label "Grain-boundary triple junctions in alpha-Fe nano-polycrystals (cut-out cells)" ;
+    mlips:chemicalFormula "Fe" ;
+    mlips:materialClass "Grain boundaries" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ito2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ito2024 mlips:hasDFTSettings entity:calc-settings-dft-ito2024 .
+
+entity:calc-settings-dft-ito2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack mesh equivalent to 18x18x18 for the alpha-Fe conventional cell" ;
+    rdfs:comment "Spin-polarised; 4s and 3d electrons as valence; Methfessel-Paxton smearing of 0.1 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Fe-ito2024 a mlips:TrainingDataset ;
+    rdfs:label "alpha-Fe training set (19,950 structures, 267,188 atomic environments: DE 2,490 and RANDSPG 17,460 structures)" ;
+    mlips:coversMaterial entity:mat-Fe-ito2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 19950 ;
+    mlips:hasDFTCalculation entity:calc-dft-ito2024 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Fe-ito2024 mlips:samplingStrategy
+    entity:sampling-de-ito2024 ,
+    entity:sampling-randspg-ito2024 .
+
+entity:sampling-de-ito2024 a mlips:SamplingStrategy ;
+    rdfs:label "Domain-expertise (DE) set built by hand: perfect crystal, vacancy and self-interstitial structures, including ab initio MD (NVT and NPT, 2 fs step)" .
+
+entity:sampling-randspg-ito2024 a mlips:SamplingStrategy ;
+    rdfs:label "RANDSPG structures: 2482 basic structures of at most 10 atoms over all space groups, relaxed stepwise (VOLMIN, CELLMIN, INTMIN) and perturbed (TRIAX, SHEAR, RATTLE); only ferromagnetic structures with moments above 1.5 Bohr magnetons kept" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasHyperparameter mlips:momentLevel ,
+        mlips:cutoffRadius ;
+    mlips:hasImplementation entity:impl-MTP-ito2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:impl-MTP-ito2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP ;
+    mlips:version "MLIP-3" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Fe-momentLevel-ito2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "22"^^xsd:integer .
+
+entity:setting-Fe-cutoffRadius-ito2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Fe-ito2024 a mlips:MLIPRun ;
+    rdfs:label "MTP training for alpha-Fe (level 22)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Fe-ito2024 ;
+    mlips:hasHyperparameterSetting entity:setting-Fe-momentLevel-ito2024 ,
+        entity:setting-Fe-cutoffRadius-ito2024 ;
+    mlips:produces entity:model-Fe-ito2024 .
+
+entity:model-Fe-ito2024 a mlips:TrainedModel ;
+    rdfs:label "MTP for alpha-Fe (level 22)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ito2024 mlips:hasResult
+    entity:result-train-ito2024 ,
+    entity:result-validation-ito2024 ,
+    entity:result-ggb-300K-ito2024 ,
+    entity:result-tj-300K-ito2024 ,
+    entity:result-ggb-relaxed-ito2024 ,
+    entity:result-tj-relaxed-ito2024 .
+
+entity:result-train-ito2024 a mlips:BenchmarkResult ;
+    rdfs:comment "Per part (Table 1): DE 2.03 meV/atom and 63.60 meV/A; RANDSPG 15.14 meV/atom and 81.94 meV/A." ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-Fe-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-ito2024 ,
+        entity:metric-train-2-ito2024 .
+
+entity:metric-train-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "14.11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "71.88"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-validation-ito2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-Fe-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-validation-1-ito2024 ,
+        entity:metric-validation-2-ito2024 .
+
+entity:metric-validation-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, validation set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "14.79"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-validation-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, validation set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "75.42"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ggb-300K-ito2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-GGB-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-ggb-300K-1-ito2024 ,
+        entity:metric-ggb-300K-2-ito2024 .
+
+entity:metric-ggb-300K-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, general grain boundary cells from a nano-polycrystal at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-ggb-300K-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, general grain boundary cells from a nano-polycrystal at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "81.05"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-tj-300K-ito2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-TJ-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-tj-300K-1-ito2024 ,
+        entity:metric-tj-300K-2-ito2024 .
+
+entity:metric-tj-300K-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, triple-junction cells from a nano-polycrystal at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-tj-300K-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, triple-junction cells from a nano-polycrystal at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "86.76"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ggb-relaxed-ito2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-GGB-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-ggb-relaxed-1-ito2024 ,
+        entity:metric-ggb-relaxed-2-ito2024 .
+
+entity:metric-ggb-relaxed-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, general grain boundary cells after annealing at 300 K and MTP relaxation" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.44"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-ggb-relaxed-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, general grain boundary cells after annealing at 300 K and MTP relaxation" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "80.34"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-tj-relaxed-ito2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Fe-ito2024 ;
+    mlips:targetMaterial entity:mat-TJ-ito2024 ;
+    mlips:hasAccuracyMetric entity:metric-tj-relaxed-1-ito2024 ,
+        entity:metric-tj-relaxed-2-ito2024 .
+
+entity:metric-tj-relaxed-1-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, triple-junction cells after annealing at 300 K and MTP relaxation" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.44"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-tj-relaxed-2-ito2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, triple-junction cells after annealing at 300 K and MTP relaxation" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "81.54"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The size of the validation set and of the cut-out test cells is not stated in the text read. The force RMSE for eight symmetric tilt grain boundaries at 300 K (82.4 meV/A, forces near the boundary centre only) and the comparison potentials (NNIP for Fe-H, EAM, MEAM) are not encoded.
+# - Grain-boundary energies, defect energies, elastic constants, phonons and segregation-related results are not encoded (no metric property). Simulation types are read from the applications (LAMMPS MD and relaxations, quasi-harmonic phonons).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
