@@ -1,0 +1,301 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Omid Shayestehpour et al. (2023). Efficient Molecular Dynamics Simulations of Deep Eutectic Solvents with First-Principles Accuracy Using Machine Learning Interatomic Potentials.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.3c00944
+#
+# Version read: publisher (sha256 2170a704687c2bbf...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 200 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the Deep Potential model for the reline deep eutectic
+# solvent (choline chloride : urea 1:2): CP2K reference calculations, the
+# primary DFTB-sampled data set and its DP-GEN extension, model and
+# training settings, and the test RMSEs for two system sizes. Liquid
+# structure and transport results are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-shayestehpour2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Shayestehpour and Zahn (2023): MD of deep eutectic solvents with first-principles accuracy using MLIPs (reline)" ;
+    mlips:reportedIn entity:article-shayestehpour2023 .
+
+entity:article-shayestehpour2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.3c00944> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Efficient Molecular Dynamics Simulations of Deep Eutectic Solvents with First-Principles Accuracy Using Machine Learning Interatomic Potentials" ;
+    schema:author <https://orcid.org/0000-0002-2088-8508> ,
+        <https://orcid.org/0000-0002-4858-0687> .
+
+<https://orcid.org/0000-0002-2088-8508> a schema:Person ;
+    schema:name "Omid Shayestehpour" ;
+    schema:givenName "Omid" ;
+    schema:familyName "Shayestehpour" ;
+    schema:identifier <https://orcid.org/0000-0002-2088-8508> .
+
+<https://orcid.org/0000-0002-4858-0687> a schema:Person ;
+    schema:name "Stefan Zahn" ;
+    schema:givenName "Stefan" ;
+    schema:familyName "Zahn" ;
+    schema:identifier <https://orcid.org/0000-0002-4858-0687> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-reline-shayestehpour2023 a mlips:MaterialSystem ;
+    rdfs:label "Reline deep eutectic solvent, choline chloride : urea 1:2 (8 ChCl + 16 urea, 304 atoms)" ;
+    mlips:chemicalFormula "ChCl:urea 1:2" ;
+    mlips:materialClass "Deep eutectic solvent" .
+
+entity:mat-reline-large-shayestehpour2023 a mlips:MaterialSystem ;
+    rdfs:label "Reline, larger system of 18 ChCl + 36 urea (684 atoms)" ;
+    mlips:chemicalFormula "ChCl:urea 1:2" ;
+    mlips:materialClass "Deep eutectic solvent" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-shayestehpour2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-shayestehpour2023 mlips:hasDFTSettings entity:calc-settings-dft-shayestehpour2023 .
+
+entity:calc-settings-dft-shayestehpour2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-shayestehpour2023 ;
+    mlips:xcFunctional entity:xc-BLYP-D3-shayestehpour2023 ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    mlips:dftBasisSet entity:basis-MOLOPT-TZVP-shayestehpour2023 ;
+    rdfs:comment "Goedecker-Teter-Hutter pseudopotentials; periodic boundary conditions." .
+
+entity:lib-CP2K-shayestehpour2023 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    rdfs:comment "Gaussian and plane-wave (GPW) method, plane-wave cutoff 700 Ry." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-BLYP-D3-shayestehpour2023 a mlips:XCFunctional ;
+    rdfs:label "BLYP-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-MOLOPT-TZVP-shayestehpour2023 a mlips:DftBasisSet ;
+    rdfs:label "MOLOPT-TZVP" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-reline-shayestehpour2023 a mlips:TrainingDataset ;
+    rdfs:label "Reline training data: 18,000 primary configurations plus about 10,000 from active learning" ;
+    mlips:coversMaterial entity:mat-reline-shayestehpour2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-shayestehpour2023 ;
+    rdfs:comment "The final size is given only approximately (18,000 + about 10,000), so no mlips:numConfigurations is stated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-reline-shayestehpour2023 mlips:samplingStrategy
+    entity:sampling-dftb-shayestehpour2023 ,
+    entity:sampling-dpgen-shayestehpour2023 .
+
+entity:sampling-dftb-shayestehpour2023 a mlips:SamplingStrategy ;
+    rdfs:label "Configurations sampled from DFTB molecular-dynamics trajectories of 8 ChCl + 16 urea and labelled with the target DFT (19,000 configurations; 18,000 training, 1,000 validation)" .
+
+entity:sampling-dpgen-shayestehpour2023 a mlips:SamplingStrategy ;
+    rdfs:label "DP-GEN active learning: 30 Deep Potential MD runs per iteration (LAMMPS, 360-440 K, 10 to 200 ps), candidates with ensemble force deviation between 0.15 and 0.30 eV/A over four models, up to 900 labelled per iteration, until fewer than 100 candidates remain (about 10,000 configurations added)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasLossFunction entity:loss-DeePMD-shayestehpour2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-shayestehpour2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-rcut-smooth-shayestehpour2023 ,
+        entity:hp-embedding-net-shayestehpour2023 ,
+        entity:hp-axis-neurons-shayestehpour2023 ,
+        entity:hp-fitting-net-shayestehpour2023 ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        entity:hp-lr-decay-steps-shayestehpour2023 ;
+    mlips:hasImplementation entity:impl-DeePMD-shayestehpour2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-DeePMD-shayestehpour2023 a mlips:LossFunction ;
+    rdfs:label "DeePMD loss with energy prefactor from 0.02 to 1 and force prefactor from 1000 to 1" .
+
+entity:alg-DeePMD-shayestehpour2023 a mls:Algorithm ;
+    rdfs:label "Adam with learning rate decaying exponentially from 1e-3 to 5e-8; ensemble of four models, the one with the lowest test RMSE used for production" .
+
+entity:impl-DeePMD-shayestehpour2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit .
+
+entity:hp-rcut-smooth-shayestehpour2023 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential smoothing cutoff r_s (Angstrom)" ;
+    mlips:hyperparameterName "rcut_smth" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-embedding-net-shayestehpour2023 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-axis-neurons-shayestehpour2023 a mlips:Hyperparameter ;
+    rdfs:label "Number of axis neurons M2" ;
+    mlips:hyperparameterName "axis_neuron" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-shayestehpour2023 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-steps-shayestehpour2023 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay steps" ;
+    mlips:hyperparameterName "lr_decay_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-reline-cutoffRadius-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-reline-rcut-smooth-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-shayestehpour2023 ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-reline-embedding-net-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-shayestehpour2023 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-reline-axis-neurons-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-axis-neurons-shayestehpour2023 ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-reline-fitting-net-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-shayestehpour2023 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-reline-batchSize-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-reline-learningRate-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-reline-lr-decay-steps-shayestehpour2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-shayestehpour2023 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-reline-shayestehpour2023 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training for reline" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-reline-shayestehpour2023 ;
+    mlips:hasHyperparameterSetting entity:setting-reline-cutoffRadius-shayestehpour2023 ,
+        entity:setting-reline-rcut-smooth-shayestehpour2023 ,
+        entity:setting-reline-embedding-net-shayestehpour2023 ,
+        entity:setting-reline-axis-neurons-shayestehpour2023 ,
+        entity:setting-reline-fitting-net-shayestehpour2023 ,
+        entity:setting-reline-batchSize-shayestehpour2023 ,
+        entity:setting-reline-learningRate-shayestehpour2023 ,
+        entity:setting-reline-lr-decay-steps-shayestehpour2023 ;
+    mlips:produces entity:model-reline-shayestehpour2023 .
+
+entity:model-reline-shayestehpour2023 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for reline" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-shayestehpour2023 mlips:hasResult
+    entity:result-test-304-shayestehpour2023 ,
+    entity:result-test-684-shayestehpour2023 .
+
+entity:result-test-304-shayestehpour2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-reline-shayestehpour2023 ;
+    mlips:targetMaterial entity:mat-reline-shayestehpour2023 ;
+    mlips:hasAccuracyMetric entity:metric-test-304-1-shayestehpour2023 ,
+        entity:metric-test-304-2-shayestehpour2023 .
+
+entity:metric-test-304-1-shayestehpour2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 50 test structures of 304 atoms (from a separate DFTB trajectory)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-304-2-shayestehpour2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 50 test structures of 304 atoms (stated as about 0.05)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.05"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-test-684-shayestehpour2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-reline-shayestehpour2023 ;
+    mlips:targetMaterial entity:mat-reline-large-shayestehpour2023 ;
+    mlips:hasAccuracyMetric entity:metric-test-684-1-shayestehpour2023 ,
+        entity:metric-test-684-2-shayestehpour2023 .
+
+entity:metric-test-684-1-shayestehpour2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 50 test structures of 684 atoms (from a first-principles MD trajectory)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.48"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-684-2-shayestehpour2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 50 test structures of 684 atoms (stated as about 0.05)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.05"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The force RMSE is given as 'about 0.05 eV/A for both systems'; the same approximate value is recorded for each. Energy RMSEs are also given in kcal/mol (0.02 and 0.13) in the text.
+# - Liquid densities (Table 1), diffusion activation energies (Table 2), coordination numbers (Table 3), radial distribution functions and ionic conductivity are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
