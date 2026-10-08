@@ -1,0 +1,229 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Aidan P. Thompson et al. (2014). Spectral neighbor analysis method for automated generation of quantum-accurate interatomic potentials.
+#   Journal of Computational Physics. doi:10.1016/j.jcp.2014.12.018  arXiv:1409.3880v1
+#
+# Version read: arxiv-preprint arXiv:1409.3880v1 (sha256 6dd40d232062bb03...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 33 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SNAP method (introduced here) and its one worked
+# potential, SNAP for tantalum: the DFT training data of Table 1, the
+# parameters of Table 2 and the fitting procedure. The paper validates
+# against properties (Table 4, figures) and prints no energy/force error.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-thompson2014 a mlips:BenchmarkStudy ;
+    rdfs:label "Thompson et al. (2015): spectral neighbor analysis potential (SNAP), with a SNAP potential for tantalum" ;
+    mlips:reportedIn entity:article-thompson2014 .
+
+entity:article-thompson2014 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.jcp.2014.12.018> ;
+    schema:datePublished "2014"^^xsd:gYear ;
+    schema:name "Spectral neighbor analysis method for automated generation of quantum-accurate interatomic potentials" ;
+    schema:author entity:person-Thompson-thompson2014 ,
+        entity:person-Swiler-thompson2014 ,
+        entity:person-Trott-thompson2014 ,
+        entity:person-Foiles-thompson2014 ,
+        entity:person-Tucker-thompson2014 .
+
+entity:person-Thompson-thompson2014 a schema:Person ;
+    schema:name "A.P. Thompson" ;
+    schema:givenName "A.P." ;
+    schema:familyName "Thompson" .
+
+entity:person-Swiler-thompson2014 a schema:Person ;
+    schema:name "L.P. Swiler" ;
+    schema:givenName "L.P." ;
+    schema:familyName "Swiler" .
+
+entity:person-Trott-thompson2014 a schema:Person ;
+    schema:name "C.R. Trott" ;
+    schema:givenName "C.R." ;
+    schema:familyName "Trott" .
+
+entity:person-Foiles-thompson2014 a schema:Person ;
+    schema:name "S.M. Foiles" ;
+    schema:givenName "S.M." ;
+    schema:familyName "Foiles" .
+
+entity:person-Tucker-thompson2014 a schema:Person ;
+    schema:name "G.J. Tucker" ;
+    schema:givenName "G.J." ;
+    schema:familyName "Tucker" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Ta-thompson2014 a mlips:MaterialSystem ;
+    rdfs:label "Tantalum (bcc ground state; A15, fcc, hcp, liquid, surfaces and stacking faults sampled)" ;
+    mlips:chemicalFormula "Ta" ;
+    mlips:materialClass "bcc refractory transition metal" ;
+    mlips:microstructuralFeature "Generalized stacking faults on (110) and (112); (100), (110), (111), (112) surfaces; screw dislocations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-thompson2014 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-thompson2014 mlips:hasDFTSettings entity:calc-settings-dft-thompson2014 .
+
+entity:calc-settings-dft-thompson2014 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack, mesh size depending on the geometry and chosen to converge energy, forces and stress tensor" ;
+    rdfs:comment "PAW pseudopotential treating 11 electrons (5p 5d 6s) as valence." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Ta-thompson2014 a mlips:TrainingDataset ;
+    rdfs:label "DFT training data for the tantalum SNAP potential (Table 1)" ;
+    mlips:coversMaterial entity:mat-Ta-thompson2014 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 181 ;
+    mlips:hasDFTCalculation entity:calc-dft-thompson2014 ;
+    rdfs:comment "numConfigurations is the sum of the Nconf column of Table 1 (9 + 9 + 9 + 100 + 22 + 22 + 3 + 7)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Ta-thompson2014 mlips:samplingStrategy
+    entity:sampling-displaced-thompson2014 ,
+    entity:sampling-elastic-thompson2014 ,
+    entity:sampling-gsf-thompson2014 ,
+    entity:sampling-liquid-thompson2014 ,
+    entity:sampling-surface-thompson2014 .
+
+entity:sampling-displaced-thompson2014 a mlips:SamplingStrategy ;
+    rdfs:label "Random atomic displacements in A15, BCC and FCC supercells" ;
+    rdfs:comment "9 configurations each of 64 (A15), 54 (BCC) and 48 (FCC) atoms; maximum displacement limited to 10% of the nearest-neighbour distance." .
+
+entity:sampling-elastic-thompson2014 a mlips:SamplingStrategy ;
+    rdfs:label "Randomly deformed primitive BCC cells" ;
+    rdfs:comment "100 two-atom configurations; only the stress enters the fit (weight 0.0001), energy and force weights are zero." .
+
+entity:sampling-gsf-thompson2014 a mlips:SamplingStrategy ;
+    rdfs:label "Generalized stacking faults" ;
+    rdfs:comment "Relaxed and unrelaxed stacking faults on the (110) and (112) planes in the <111> direction; 22 configurations each (24 and 30 atoms)." .
+
+entity:sampling-liquid-thompson2014 a mlips:SamplingStrategy ;
+    rdfs:label "Liquid configurations from high-temperature quantum MD" ;
+    rdfs:comment "3 configurations of 100 atoms from quantum molecular dynamics of molten tantalum." .
+
+entity:sampling-surface-thompson2014 a mlips:SamplingStrategy ;
+    rdfs:label "Free surfaces" ;
+    rdfs:comment "7 relaxed and unrelaxed (100), (110), (111) and (112) BCC surface configurations of 30 atoms." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:SNAP a mlips:MLIPMethod ;
+    rdfs:label "Spectral Neighbor Analysis Potential (SNAP)" ;
+    mlips:hasFunctionalForm entity:ff-SNAP ;
+    mlips:hasLossFunction entity:loss-SNAP-thompson2014 ;
+    mlips:hasTrainingAlgorithm entity:alg-SNAP-thompson2014 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-J-thompson2014 ;
+    mlips:hasImplementation entity:impl-SNAP-thompson2014 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ff-SNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components of the atomic neighbour density" .
+
+entity:loss-SNAP-thompson2014 a mlips:LossFunction ;
+    rdfs:label "Weighted linear least squares on energies, forces and stress tensors relative to a ZBL reference potential, with weights per configuration group (energy 100 and force 1 for all groups except Elastic; stress 0.0001 for Elastic only)" .
+
+entity:alg-SNAP-thompson2014 a mls:Algorithm ;
+    rdfs:label "QR factorisation for the linear coefficients; hyperparameters (cutoff, group weights) optimised with DAKOTA against a weighted sum of energy, force, stress and elastic-constant errors" .
+
+entity:impl-SNAP-thompson2014 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-LAMMPS-thompson2014 .
+
+entity:lib-LAMMPS-thompson2014 a mlips:Library ;
+    rdfs:label "LAMMPS" ;
+    rdfs:comment "SNAP is implemented in LAMMPS, with a Python framework that generates the fit." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-J-thompson2014 a mlips:Hyperparameter ;
+    rdfs:label "Bispectrum band limit J" ;
+    mlips:hyperparameterName "J" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-snap-Ta-cutoffRadius-thompson2014 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.67637"^^xsd:double .
+
+entity:setting-snap-Ta-J-thompson2014 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-J-thompson2014 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-snap-Ta-thompson2014 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for tantalum" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Ta-thompson2014 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Ta-cutoffRadius-thompson2014 ,
+        entity:setting-snap-Ta-J-thompson2014 ;
+    mlips:produces entity:model-snap-Ta-thompson2014 .
+
+entity:model-snap-Ta-thompson2014 a mlips:TrainedModel ;
+    rdfs:label "SNAP potential for tantalum (J = 3, Rcut = 4.67637 A, ZBL reference)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Section 4.1 reports parallel scaling of the LAMMPS implementation (time
+# per timestep for 512, 4096 and 32768 atoms on 8 to 256 nodes) in figures
+# only; no training cost is given.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No energy or force error is printed; validation is by properties (lattice constant, elastic constants, defect formation energies in Table 4, energy-volume curves, melting point, liquid structure, screw-dislocation barrier), which have no MetricProperty in schema 0.1.2.
+# - The ZBL reference-potential parameters (R_zbl,i = 4.0 A, R_zbl,o = 4.8 A, Z_zbl = 73.0) and theta0_max = 0.99363 pi of Table 2 are not encoded as settings.
+# - The bispectrum descriptor has no AtomicEnvironmentDescriptor individual in the vocabulary, so the registry method carries no hasDescriptor.
+# - Version read is arXiv v1 (2014); the version of record appeared in J. Comput. Phys. 285 (2015).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
