@@ -1,0 +1,224 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Linfeng Zhang et al. (2019). Active learning of uniformly accurate interatomic potentials for materials simulation.
+#   Physical Review Materials. doi:10.1103/physrevmaterials.3.023804  arXiv:1810.11890v2
+#
+# Version read: arxiv-preprint arXiv:1810.11890v2 (sha256 4a92af72ee22f3dd...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 158 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the Deep Potential model for the Al-Mg system produced
+# by the DP-GEN concurrent-learning scheme: reference DFT, the labelled
+# data set with its exploration strategy, and the model and training
+# settings. The paper validates through material properties against DFT
+# and MEAM and prints no energy or force RMSE. Read from the arXiv
+# preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2019): active learning of uniformly accurate interatomic potentials (DP-GEN, Al-Mg)" ;
+    mlips:reportedIn entity:article-zhang2019 .
+
+entity:article-zhang2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevmaterials.3.023804> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Active learning of uniformly accurate interatomic potentials for materials simulation" ;
+    schema:author entity:person-Zhang-zhang2019 ,
+        entity:person-Lin-zhang2019 ,
+        entity:person-Wang-zhang2019 ,
+        entity:person-Car-zhang2019 ,
+        entity:person-E-zhang2019 .
+
+entity:person-Zhang-zhang2019 a schema:Person ;
+    schema:name "Linfeng Zhang" ;
+    schema:givenName "Linfeng" ;
+    schema:familyName "Zhang" .
+
+entity:person-Lin-zhang2019 a schema:Person ;
+    schema:name "De-Ye Lin" ;
+    schema:givenName "De-Ye" ;
+    schema:familyName "Lin" .
+
+entity:person-Wang-zhang2019 a schema:Person ;
+    schema:name "Han Wang" ;
+    schema:givenName "Han" ;
+    schema:familyName "Wang" .
+
+entity:person-Car-zhang2019 a schema:Person ;
+    schema:name "Roberto Car" ;
+    schema:givenName "Roberto" ;
+    schema:familyName "Car" .
+
+entity:person-E-zhang2019 a schema:Person ;
+    schema:name "Weinan E" ;
+    schema:givenName "Weinan" ;
+    schema:familyName "E" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-AlMg-zhang2019 a mlips:MaterialSystem ;
+    rdfs:label "Al, Mg and Al-Mg alloys (bulk fcc, hcp, diamond and simple-cubic structures and low-index surfaces)" ;
+    mlips:chemicalFormula "Al-Mg" ;
+    mlips:materialClass "Binary metallic system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhang2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhang2019 mlips:hasDFTSettings entity:calc-settings-dft-zhang2019 .
+
+entity:calc-settings-dft-zhang2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "600"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack mesh with spacing 0.08 per Angstrom" ;
+    rdfs:comment "VASP 5.4.4; Methfessel-Paxton smearing of order 1 with sigma = 0.25 eV; SCF converged to 1e-6 eV. Pseudopotential type not stated in the text read." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-AlMg-zhang2019 a mlips:TrainingDataset ;
+    rdfs:label "DP-GEN labelled data for Al (6,489), Mg (3,689) and Al-Mg alloys (18,654 configurations)" ;
+    mlips:coversMaterial entity:mat-AlMg-zhang2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2019 ;
+    rdfs:comment "About 650 million configurations were explored by DPMD and 0.0044% of them labelled (Table S4). The total is not stated as a single number and is not summed here. That virials are among the labels is assumed from the DeePMD workflow, not stated in the text read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-AlMg-zhang2019 mlips:samplingStrategy
+    entity:sampling-dpgen-zhang2019 .
+
+entity:sampling-dpgen-zhang2019 a mlips:SamplingStrategy ;
+    rdfs:label "DP-GEN: Deep Potential MD (LAMMPS) from bulk and surface initial structures over 50-2000 K and a range of volumes; configurations whose force model deviation over four models falls in [0.05, 0.15] eV/A (Al, Al-Mg) or [0.03, 0.13] eV/A (Mg) are labelled with DFT" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-zhang2019 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-rcut-smooth-zhang2019 ,
+        entity:hp-embedding-net-zhang2019 ,
+        entity:hp-fitting-net-zhang2019 ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-DeePMD-zhang2019 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:alg-DeePMD-zhang2019 a mls:Algorithm ;
+    rdfs:label "Adam with learning rate decaying exponentially from 5.0e-4 to 1.8e-8; four models with different initialisations per iteration (400,000 steps each) for the model deviation; ResNet-like skip connections" .
+
+entity:impl-DeePMD-zhang2019 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "smooth edition (DeepPot-SE)" .
+
+entity:hp-rcut-smooth-zhang2019 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential smoothing onset radius (Angstrom)" ;
+    mlips:hyperparameterName "rcut_smth" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-embedding-net-zhang2019 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-zhang2019 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-AlMg-cutoffRadius-zhang2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "9"^^xsd:integer .
+
+entity:setting-AlMg-rcut-smooth-zhang2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-zhang2019 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-AlMg-embedding-net-zhang2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-zhang2019 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-AlMg-fitting-net-zhang2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-zhang2019 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-AlMg-learningRate-zhang2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-AlMg-zhang2019 a mlips:MLIPRun ;
+    rdfs:label "Final Deep Potential training for the Al-Mg system on all DP-GEN data" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-AlMg-zhang2019 ;
+    mlips:hasHyperparameterSetting entity:setting-AlMg-cutoffRadius-zhang2019 ,
+        entity:setting-AlMg-rcut-smooth-zhang2019 ,
+        entity:setting-AlMg-embedding-net-zhang2019 ,
+        entity:setting-AlMg-fitting-net-zhang2019 ,
+        entity:setting-AlMg-learningRate-zhang2019 ;
+    mlips:produces entity:model-AlMg-zhang2019 .
+
+entity:model-AlMg-zhang2019 a mlips:TrainedModel ;
+    rdfs:label "DP model for the Al-Mg system (DP-GEN)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: accuracy is shown through properties (Table I and S6 to S9: atomization energy, equilibrium volume, defect formation energies, elastic constants, stacking-fault and surface energies, melting point, alloy formation energies) against DFT, experiment and MEAM; no energy or force RMSE is printed.
+# - The number of steps of the final training is garbled in the extracted text ('1,2800,000') and is not encoded; the committee models use 400,000 steps. Loss prefactors are not given in the text read.
+# - Removing 'Stresses' from the data-set properties is the correction to make if the virial assumption is wrong. Read from the arXiv v2 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
