@@ -1,0 +1,1213 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Oliver T. Unke et al. (2019). PhysNet: A Neural Network for Predicting Energies, Forces, Dipole Moments, and Partial Charges.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.9b00181  arXiv:1902.08408v2
+#
+# Version read: arxiv-preprint arXiv:1902.08408v2 (sha256 6f2450dc4c264a4b...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 42 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the PhysNet architecture and its benchmark fits: QM9
+# (energies), the eight MD17 molecules, ISO17, and the two data sets
+# introduced by the paper (SN2 reactions, solvated protein fragments).
+# Errors are those of single PhysNet models averaged over five
+# independent runs (Tables 3-7).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-unke2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Unke and Meuwly (2019): PhysNet" ;
+    mlips:reportedIn entity:article-unke2019 .
+
+entity:article-unke2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.9b00181> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "PhysNet: A Neural Network for Predicting Energies, Forces, Dipole Moments, and Partial Charges" ;
+    schema:author <https://orcid.org/0000-0001-7503-406X> ,
+        <https://orcid.org/0000-0001-7930-8806> .
+
+<https://orcid.org/0000-0001-7503-406X> a schema:Person ;
+    schema:name "Oliver T. Unke" ;
+    schema:givenName "Oliver T." ;
+    schema:familyName "Unke" ;
+    schema:identifier <https://orcid.org/0000-0001-7503-406X> .
+
+<https://orcid.org/0000-0001-7930-8806> a schema:Person ;
+    schema:name "Markus Meuwly" ;
+    schema:givenName "Markus" ;
+    schema:familyName "Meuwly" ;
+    schema:identifier <https://orcid.org/0000-0001-7930-8806> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-QM9-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "QM9 small organic molecules (equilibrium geometries)" ;
+    mlips:materialClass "Small organic molecules (gas phase)" .
+
+entity:mat-ISO17-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "ISO17: 127 isomers of C7O2H10" ;
+    mlips:chemicalFormula "C7O2H10" ;
+    mlips:materialClass "Small organic molecules (gas phase), MD conformations" .
+
+entity:mat-SN2-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "SN2 reaction systems X- + H3C-Y with X, Y in {F, Cl, Br, I} and their fragments" ;
+    mlips:materialClass "Gas-phase reactive ion-molecule systems" .
+
+entity:mat-SPF-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Solvated protein fragments (amons up to eight heavy atoms, dimers, water clusters)" ;
+    mlips:materialClass "Organic molecules and molecular clusters in gas phase and with explicit water; elements H, C, N, O, S" .
+
+entity:mat-aspirin-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-benzene-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-ethanol-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-naphthalene-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-salicylic-acid-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-uracil-unke2019 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-qm9-dft-unke2019 a mlips:DFTCalculation .
+
+entity:calc-md17-dft-unke2019 a mlips:DFTCalculation .
+
+entity:calc-sn2-dft-unke2019 a mlips:DFTCalculation .
+
+entity:calc-spf-dft-unke2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-qm9-dft-unke2019 mlips:hasDFTSettings entity:calc-settings-qm9-dft-unke2019 .
+
+entity:calc-settings-qm9-dft-unke2019 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-B3LYP-unke2019 ;
+    mlips:dftBasisSet entity:basis-6-31G-2df-p-unke2019 ;
+    rdfs:comment "B3LYP/6-31G(2df,p), the QM9 level of theory." .
+
+entity:calc-md17-dft-unke2019 mlips:hasDFTSettings entity:calc-settings-md17-dft-unke2019 .
+
+entity:calc-settings-md17-dft-unke2019 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-PBE-vdW-TS-unke2019 ;
+    rdfs:comment "Level of theory of the MD17 and ISO17 trajectories; code and basis are not restated in this paper." .
+
+entity:calc-sn2-dft-unke2019 mlips:hasDFTSettings entity:calc-settings-sn2-dft-unke2019 .
+
+entity:calc-settings-sn2-dft-unke2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional entity:xc-DSD-BLYP-D3-BJ-unke2019 ;
+    mlips:dftBasisSet entity:basis-def2-TZVP-unke2019 ;
+    rdfs:comment "ORCA 4.0.1." .
+
+entity:calc-spf-dft-unke2019 mlips:hasDFTSettings entity:calc-settings-spf-dft-unke2019 .
+
+entity:calc-settings-spf-dft-unke2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional entity:xc-revPBE-D3-BJ-unke2019 ;
+    mlips:dftBasisSet entity:basis-def2-TZVP-unke2019 ;
+    rdfs:comment "ORCA 4.0.1." .
+
+entity:xc-B3LYP-unke2019 a mlips:XCFunctional ;
+    rdfs:label "B3LYP" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-6-31G-2df-p-unke2019 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(2df,p)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:xc-PBE-vdW-TS-unke2019 a mlips:XCFunctional ;
+    rdfs:label "PBE+vdW-TS" ;
+    rdfs:comment "PBE with Tkatchenko-Scheffler van der Waals correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:xc-DSD-BLYP-D3-BJ-unke2019 a mlips:XCFunctional ;
+    rdfs:label "DSD-BLYP-D3(BJ)" ;
+    rdfs:comment "Double-hybrid functional with D3(BJ) dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVP-unke2019 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVP" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:xc-revPBE-D3-BJ-unke2019 a mlips:XCFunctional ;
+    rdfs:label "revPBE-D3(BJ)" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVP-unke2019 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVP" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-QM9-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "QM9 training and validation split (110,426 structures)" ;
+    mlips:coversMaterial entity:mat-QM9-unke2019 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 110426 ;
+    mlips:hasDFTCalculation entity:calc-qm9-dft-unke2019 .
+
+entity:ds-ISO17-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "ISO17 training and validation split (400k + 4k structures)" ;
+    mlips:coversMaterial entity:mat-ISO17-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 404000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 ;
+    rdfs:comment "The full data set has 635k structures." .
+
+entity:ds-SN2-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "SN2 reactions data set: training and validation split (400k + 5k structures)" ;
+    mlips:coversMaterial entity:mat-SN2-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 405000 ;
+    mlips:hasDFTCalculation entity:calc-sn2-dft-unke2019 ;
+    rdfs:comment "Introduced by this paper; 452,709 structures in total with energies, forces and dipole moments." .
+
+entity:ds-SPF-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "Solvated protein fragments data set: training and validation split (2560k + 100k structures)" ;
+    mlips:coversMaterial entity:mat-SPF-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2660000 ;
+    mlips:hasDFTCalculation entity:calc-spf-dft-unke2019 ;
+    rdfs:comment "Introduced by this paper; 2,731,180 structures in total with energies, forces and dipole moments; on average 21 atoms, at most 120." .
+
+entity:ds-aspirin-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 aspirin: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-aspirin-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-benzene-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 benzene: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-benzene-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-ethanol-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 ethanol: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-ethanol-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-malonaldehyde-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 malonaldehyde: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-naphthalene-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 naphthalene: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-naphthalene-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-salicylic-acid-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 salicylic acid: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-toluene-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 toluene: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-toluene-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+entity:ds-uracil-unke2019 a mlips:TrainingDataset ;
+    rdfs:label "MD17 uracil: 50k structures for training and validation" ;
+    mlips:coversMaterial entity:mat-uracil-unke2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md17-dft-unke2019 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-QM9-unke2019 mlips:samplingStrategy
+    entity:sampling-qm9-equilibrium-unke2019 .
+
+entity:ds-ISO17-unke2019 mlips:samplingStrategy
+    entity:sampling-iso17-aimd-unke2019 .
+
+entity:ds-SN2-unke2019 mlips:samplingStrategy
+    entity:sampling-pm7-md-5000K-unke2019 ,
+    entity:sampling-ion-placement-unke2019 .
+
+entity:ds-SPF-unke2019 mlips:samplingStrategy
+    entity:sampling-pm7-md-1000K-unke2019 ,
+    entity:sampling-adaptive-unke2019 .
+
+entity:ds-aspirin-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-benzene-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-ethanol-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-malonaldehyde-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-naphthalene-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-salicylic-acid-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-toluene-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:ds-uracil-unke2019 mlips:samplingStrategy
+    entity:sampling-md17-aimd-unke2019 .
+
+entity:sampling-qm9-equilibrium-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Equilibrium geometries (QM9)" ;
+    rdfs:comment "Pruned QM9 (about 131k structures after removing about 3k molecules that fail a consistency check or are hard to converge)." .
+
+entity:sampling-md17-aimd-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD at 500 K (MD17)" ;
+    rdfs:comment "Trajectories at 500 K with 0.5 fs resolution; 50k structures per molecule for training and validation." .
+
+entity:sampling-iso17-aimd-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Short MD trajectories of isomers (ISO17)" ;
+    rdfs:comment "5k conformations per molecule at 1 fs resolution; about 80% of molecules and conformations used for training." .
+
+entity:sampling-pm7-md-5000K-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Semi-empirical PM7 MD at 5000 K" ;
+    rdfs:comment "MD with PM7 (MOPAC2016) through ASE, time step 0.1 fs, structures saved every 10 steps, started from PM7-optimised geometries, van der Waals complexes or transition states." .
+
+entity:sampling-ion-placement-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Random placement of a halide ion near CH3X" ;
+    rdfs:comment "Long-range interactions sampled by placing an ion Y- at most 16 A from a random CH3X conformation." .
+
+entity:sampling-pm7-md-1000K-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Semi-empirical PM7 MD at 1000 K" ;
+    rdfs:comment "100 conformations per structure from PM7 MD at 1000 K, time step 0.1 fs, saved every 10 steps." .
+
+entity:sampling-adaptive-unke2019 a mlips:SamplingStrategy ;
+    rdfs:label "Adaptive sampling with an ensemble of three PhysNet models" ;
+    rdfs:comment "Structures from MD on which the ensemble predictions deviate by more than 1 kcal/mol are recomputed with the reference method and added; four rounds." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:PhysNet a mlips:MLIPMethod ;
+    rdfs:label "PhysNet (message-passing neural network for energies, forces, dipole moments and partial charges)" ;
+    mlips:hasFunctionalForm entity:ff-PhysNet ;
+    mlips:hasLossFunction entity:loss-PhysNet-unke2019 ;
+    mlips:hasTrainingAlgorithm entity:alg-PhysNet-unke2019 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        mlips:numLayers ,
+        mlips:learningRate ,
+        mlips:batchSize .
+
+entity:ff-PhysNet a mlips:FunctionalForm ;
+    rdfs:label "Message-passing neural network of stacked modular blocks with residual refinements over radial-basis-expanded interatomic distances; atomic energy and partial-charge outputs, optionally augmented with explicit long-range electrostatics and dispersion" .
+
+entity:loss-PhysNet-unke2019 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of absolute errors in energy and forces (plus total charge and dipole moment when charges are predicted) and a non-hierarchicality penalty" .
+
+entity:alg-PhysNet-unke2019 a mls:Algorithm ;
+    rdfs:label "AMSGrad with learning rate 1e-3 and batches of 32 randomly chosen structures" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-QM9-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-QM9-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-QM9-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-QM9-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-QM9-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-QM9-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-ISO17-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-ISO17-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-ISO17-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-ISO17-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ISO17-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ISO17-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-SN2-noLR-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-SN2-noLR-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-SN2-noLR-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-SN2-noLR-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SN2-noLR-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-SN2-noLR-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-SN2-LR-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-SN2-LR-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-SN2-LR-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-SN2-LR-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SN2-LR-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-SN2-LR-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-SPF-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-SPF-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-SPF-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-SPF-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SPF-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-SPF-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-aspirin-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-aspirin-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-aspirin-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-aspirin-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-aspirin-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-aspirin-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-benzene-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-benzene-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-benzene-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-benzene-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-benzene-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-benzene-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-ethanol-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-ethanol-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-ethanol-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-ethanol-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ethanol-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ethanol-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-malonaldehyde-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-malonaldehyde-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-malonaldehyde-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-malonaldehyde-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-malonaldehyde-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-malonaldehyde-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-naphthalene-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-naphthalene-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-naphthalene-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-naphthalene-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-naphthalene-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-naphthalene-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-salicylic-acid-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-salicylic-acid-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-salicylic-acid-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-salicylic-acid-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-salicylic-acid-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-salicylic-acid-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-toluene-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-toluene-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-toluene-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-toluene-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-toluene-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-toluene-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-uracil-cutoffRadius-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-uracil-numFeatures-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-uracil-numRadialBasis-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-uracil-numLayers-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-uracil-learningRate-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-uracil-batchSize-unke2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-QM9-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on QM9 (energies)" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-QM9-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-QM9-cutoffRadius-unke2019 ,
+        entity:setting-QM9-numFeatures-unke2019 ,
+        entity:setting-QM9-numRadialBasis-unke2019 ,
+        entity:setting-QM9-numLayers-unke2019 ,
+        entity:setting-QM9-learningRate-unke2019 ,
+        entity:setting-QM9-batchSize-unke2019 ;
+    mlips:produces entity:model-QM9-unke2019 .
+
+entity:model-QM9-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet QM9 model (mean of five runs)" .
+
+entity:run-ISO17-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on ISO17" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-ISO17-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-ISO17-cutoffRadius-unke2019 ,
+        entity:setting-ISO17-numFeatures-unke2019 ,
+        entity:setting-ISO17-numRadialBasis-unke2019 ,
+        entity:setting-ISO17-numLayers-unke2019 ,
+        entity:setting-ISO17-learningRate-unke2019 ,
+        entity:setting-ISO17-batchSize-unke2019 ;
+    mlips:produces entity:model-ISO17-unke2019 .
+
+entity:model-ISO17-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet ISO17 model (mean of five runs)" .
+
+entity:run-SN2-noLR-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on the SN2 reactions data set, without long-range augmentation" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-SN2-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-SN2-noLR-cutoffRadius-unke2019 ,
+        entity:setting-SN2-noLR-numFeatures-unke2019 ,
+        entity:setting-SN2-noLR-numRadialBasis-unke2019 ,
+        entity:setting-SN2-noLR-numLayers-unke2019 ,
+        entity:setting-SN2-noLR-learningRate-unke2019 ,
+        entity:setting-SN2-noLR-batchSize-unke2019 ;
+    mlips:produces entity:model-SN2-noLR-unke2019 .
+
+entity:model-SN2-noLR-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet SN2 model without explicit long-range interactions (mean of five runs)" .
+
+entity:run-SN2-LR-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on the SN2 reactions data set, with long-range augmentation" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-SN2-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-SN2-LR-cutoffRadius-unke2019 ,
+        entity:setting-SN2-LR-numFeatures-unke2019 ,
+        entity:setting-SN2-LR-numRadialBasis-unke2019 ,
+        entity:setting-SN2-LR-numLayers-unke2019 ,
+        entity:setting-SN2-LR-learningRate-unke2019 ,
+        entity:setting-SN2-LR-batchSize-unke2019 ;
+    mlips:produces entity:model-SN2-LR-unke2019 .
+
+entity:model-SN2-LR-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet SN2 model with explicit long-range interactions (mean of five runs)" .
+
+entity:run-SPF-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on the solvated protein fragments data set" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-SPF-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-SPF-cutoffRadius-unke2019 ,
+        entity:setting-SPF-numFeatures-unke2019 ,
+        entity:setting-SPF-numRadialBasis-unke2019 ,
+        entity:setting-SPF-numLayers-unke2019 ,
+        entity:setting-SPF-learningRate-unke2019 ,
+        entity:setting-SPF-batchSize-unke2019 ;
+    mlips:produces entity:model-SPF-unke2019 .
+
+entity:model-SPF-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet solvated-protein-fragments model with long-range interactions (mean of five runs)" .
+
+entity:run-aspirin-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 aspirin" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-aspirin-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-aspirin-cutoffRadius-unke2019 ,
+        entity:setting-aspirin-numFeatures-unke2019 ,
+        entity:setting-aspirin-numRadialBasis-unke2019 ,
+        entity:setting-aspirin-numLayers-unke2019 ,
+        entity:setting-aspirin-learningRate-unke2019 ,
+        entity:setting-aspirin-batchSize-unke2019 ;
+    mlips:produces entity:model-aspirin-unke2019 .
+
+entity:model-aspirin-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 aspirin model (mean of five runs)" .
+
+entity:run-benzene-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 benzene" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-benzene-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-benzene-cutoffRadius-unke2019 ,
+        entity:setting-benzene-numFeatures-unke2019 ,
+        entity:setting-benzene-numRadialBasis-unke2019 ,
+        entity:setting-benzene-numLayers-unke2019 ,
+        entity:setting-benzene-learningRate-unke2019 ,
+        entity:setting-benzene-batchSize-unke2019 ;
+    mlips:produces entity:model-benzene-unke2019 .
+
+entity:model-benzene-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 benzene model (mean of five runs)" .
+
+entity:run-ethanol-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 ethanol" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-ethanol-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-ethanol-cutoffRadius-unke2019 ,
+        entity:setting-ethanol-numFeatures-unke2019 ,
+        entity:setting-ethanol-numRadialBasis-unke2019 ,
+        entity:setting-ethanol-numLayers-unke2019 ,
+        entity:setting-ethanol-learningRate-unke2019 ,
+        entity:setting-ethanol-batchSize-unke2019 ;
+    mlips:produces entity:model-ethanol-unke2019 .
+
+entity:model-ethanol-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 ethanol model (mean of five runs)" .
+
+entity:run-malonaldehyde-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 malonaldehyde" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-malonaldehyde-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-malonaldehyde-cutoffRadius-unke2019 ,
+        entity:setting-malonaldehyde-numFeatures-unke2019 ,
+        entity:setting-malonaldehyde-numRadialBasis-unke2019 ,
+        entity:setting-malonaldehyde-numLayers-unke2019 ,
+        entity:setting-malonaldehyde-learningRate-unke2019 ,
+        entity:setting-malonaldehyde-batchSize-unke2019 ;
+    mlips:produces entity:model-malonaldehyde-unke2019 .
+
+entity:model-malonaldehyde-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 malonaldehyde model (mean of five runs)" .
+
+entity:run-naphthalene-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 naphthalene" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-naphthalene-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-naphthalene-cutoffRadius-unke2019 ,
+        entity:setting-naphthalene-numFeatures-unke2019 ,
+        entity:setting-naphthalene-numRadialBasis-unke2019 ,
+        entity:setting-naphthalene-numLayers-unke2019 ,
+        entity:setting-naphthalene-learningRate-unke2019 ,
+        entity:setting-naphthalene-batchSize-unke2019 ;
+    mlips:produces entity:model-naphthalene-unke2019 .
+
+entity:model-naphthalene-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 naphthalene model (mean of five runs)" .
+
+entity:run-salicylic-acid-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 salicylic acid" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-salicylic-acid-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-salicylic-acid-cutoffRadius-unke2019 ,
+        entity:setting-salicylic-acid-numFeatures-unke2019 ,
+        entity:setting-salicylic-acid-numRadialBasis-unke2019 ,
+        entity:setting-salicylic-acid-numLayers-unke2019 ,
+        entity:setting-salicylic-acid-learningRate-unke2019 ,
+        entity:setting-salicylic-acid-batchSize-unke2019 ;
+    mlips:produces entity:model-salicylic-acid-unke2019 .
+
+entity:model-salicylic-acid-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 salicylic acid model (mean of five runs)" .
+
+entity:run-toluene-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 toluene" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-toluene-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-toluene-cutoffRadius-unke2019 ,
+        entity:setting-toluene-numFeatures-unke2019 ,
+        entity:setting-toluene-numRadialBasis-unke2019 ,
+        entity:setting-toluene-numLayers-unke2019 ,
+        entity:setting-toluene-learningRate-unke2019 ,
+        entity:setting-toluene-batchSize-unke2019 ;
+    mlips:produces entity:model-toluene-unke2019 .
+
+entity:model-toluene-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 toluene model (mean of five runs)" .
+
+entity:run-uracil-unke2019 a mlips:MLIPRun ;
+    rdfs:label "PhysNet training on MD17 uracil" ;
+    mlips:appliesMethod entity:PhysNet ;
+    mlips:runsOn entity:ds-uracil-unke2019 ;
+    mlips:hasHyperparameterSetting entity:setting-uracil-cutoffRadius-unke2019 ,
+        entity:setting-uracil-numFeatures-unke2019 ,
+        entity:setting-uracil-numRadialBasis-unke2019 ,
+        entity:setting-uracil-numLayers-unke2019 ,
+        entity:setting-uracil-learningRate-unke2019 ,
+        entity:setting-uracil-batchSize-unke2019 ;
+    mlips:produces entity:model-uracil-unke2019 .
+
+entity:model-uracil-unke2019 a mlips:TrainedModel ;
+    rdfs:label "PhysNet MD17 uracil model (mean of five runs)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-unke2019 mlips:hasResult
+    entity:result-QM9-unke2019 ,
+    entity:result-aspirin-unke2019 ,
+    entity:result-benzene-unke2019 ,
+    entity:result-ethanol-unke2019 ,
+    entity:result-malonaldehyde-unke2019 ,
+    entity:result-naphthalene-unke2019 ,
+    entity:result-salicylic-acid-unke2019 ,
+    entity:result-toluene-unke2019 ,
+    entity:result-uracil-unke2019 ,
+    entity:result-ISO17-known-unke2019 ,
+    entity:result-ISO17-unknown-unke2019 ,
+    entity:result-SN2-noLR-unke2019 ,
+    entity:result-SN2-LR-unke2019 ,
+    entity:result-SPF-unke2019 .
+
+entity:result-QM9-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-QM9-unke2019 ;
+    mlips:targetMaterial entity:mat-QM9-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-QM9-1-unke2019 .
+
+entity:metric-QM9-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, QM9, 110,426 training and validation structures" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.19"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-aspirin-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-aspirin-unke2019 ;
+    mlips:targetMaterial entity:mat-aspirin-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-aspirin-1-unke2019 ,
+        entity:metric-aspirin-2-unke2019 .
+
+entity:metric-aspirin-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.12"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-aspirin-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.06"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-benzene-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-benzene-unke2019 ;
+    mlips:targetMaterial entity:mat-benzene-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-benzene-1-unke2019 ,
+        entity:metric-benzene-2-unke2019 .
+
+entity:metric-benzene-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.07"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-benzene-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.15"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ethanol-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ethanol-unke2019 ;
+    mlips:targetMaterial entity:mat-ethanol-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-ethanol-1-unke2019 ,
+        entity:metric-ethanol-2-unke2019 .
+
+entity:metric-ethanol-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.05"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-ethanol-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.03"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-malonaldehyde-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-malonaldehyde-unke2019 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-malonaldehyde-1-unke2019 ,
+        entity:metric-malonaldehyde-2-unke2019 .
+
+entity:metric-malonaldehyde-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.07"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-malonaldehyde-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.04"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-naphthalene-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-naphthalene-unke2019 ;
+    mlips:targetMaterial entity:mat-naphthalene-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-naphthalene-1-unke2019 ,
+        entity:metric-naphthalene-2-unke2019 .
+
+entity:metric-naphthalene-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.12"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-naphthalene-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.04"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-salicylic-acid-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-salicylic-acid-unke2019 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-salicylic-acid-1-unke2019 ,
+        entity:metric-salicylic-acid-2-unke2019 .
+
+entity:metric-salicylic-acid-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.11"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-salicylic-acid-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.04"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-toluene-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-toluene-unke2019 ;
+    mlips:targetMaterial entity:mat-toluene-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-toluene-1-unke2019 ,
+        entity:metric-toluene-2-unke2019 .
+
+entity:metric-toluene-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.1"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-toluene-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.03"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-uracil-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-uracil-unke2019 ;
+    mlips:targetMaterial entity:mat-uracil-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-uracil-1-unke2019 ,
+        entity:metric-uracil-2-unke2019 .
+
+entity:metric-uracil-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, MD17 uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.1"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-uracil-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, MD17 uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.03"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ISO17-known-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ISO17-unke2019 ;
+    mlips:targetMaterial entity:mat-ISO17-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-ISO17-known-1-unke2019 ,
+        entity:metric-ISO17-known-2-unke2019 .
+
+entity:metric-ISO17-known-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, ISO17, known molecules / unknown conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.1"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-ISO17-known-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, ISO17, known molecules / unknown conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.12"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ISO17-unknown-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ISO17-unke2019 ;
+    mlips:targetMaterial entity:mat-ISO17-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-ISO17-unknown-1-unke2019 ,
+        entity:metric-ISO17-unknown-2-unke2019 .
+
+entity:metric-ISO17-unknown-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet, ISO17, unknown molecules / unknown conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.94"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-ISO17-unknown-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, ISO17, unknown molecules / unknown conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.38"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-SN2-noLR-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SN2-noLR-unke2019 ;
+    mlips:targetMaterial entity:mat-SN2-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-SN2-noLR-1-unke2019 ,
+        entity:metric-SN2-noLR-2-unke2019 .
+
+entity:metric-SN2-noLR-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet without long-range augmentation, SN2 reactions" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.071"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-SN2-noLR-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet without long-range augmentation, SN2 reactions" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.035"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-SN2-LR-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SN2-LR-unke2019 ;
+    mlips:targetMaterial entity:mat-SN2-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-SN2-LR-1-unke2019 ,
+        entity:metric-SN2-LR-2-unke2019 .
+
+entity:metric-SN2-LR-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: PhysNet with long-range augmentation, SN2 reactions" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.009"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-SN2-LR-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet with long-range augmentation, SN2 reactions" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.012"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-SPF-unke2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SPF-unke2019 ;
+    mlips:targetMaterial entity:mat-SPF-unke2019 ;
+    mlips:hasAccuracyMetric entity:metric-SPF-1-unke2019 ,
+        entity:metric-SPF-2-unke2019 .
+
+entity:metric-SPF-1-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: PhysNet, solvated protein fragments" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.03"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-SPF-2-unke2019 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: PhysNet, solvated protein fragments" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.88"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Each encoded value is the mean over five independently trained PhysNet models; the run and model stand for that set of five. The ensemble results (PhysNet-ens5) are not encoded.
+# - Dipole-moment and charge errors (Tables 6 and 7) and the per-atom energy MAE of Table 7 (0.054 kcal/mol) are not encoded.
+# - QM9 results at smaller training sizes (100,000: 0.19; 50,000: 0.30 kcal/mol) are not encoded.
+# - The residual-block counts of Table 1 (atomic 2, interaction 3, output 1) are not encoded as settings; N_module = 5 is encoded as mlips:numLayers.
+# - Loss weights w_E, w_F are defined in the paper but their values were not captured; the software implementation is not named in the parts read.
+# - No computational cost is reported.
+# - Values of other models quoted in the tables (SchNet, DTNN, HIP-NN, GDML, enn-s2s) are literature values and are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
