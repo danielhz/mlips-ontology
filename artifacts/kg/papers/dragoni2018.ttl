@@ -1,0 +1,238 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Daniele Dragoni et al. (2018). Achieving DFT accuracy with a machine-learning interatomic potential: Thermomechanics and defects in bcc ferromagnetic iron.
+#   Physical Review Materials. doi:10.1103/physrevmaterials.2.013808  arXiv:1706.10229v1
+#
+# Version read: arxiv-preprint arXiv:1706.10229v1 (sha256 d73c2b53388ee7d6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 154 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SOAP-GAP model for alpha-Fe with its
+# hyperparameters (Table I and the QUIP command line), the Quantum
+# ESPRESSO reference calculations and the training database of eight
+# sub-databases (Table II). The paper validates against properties
+# (elastic constants, phonons, defects, surfaces, gamma surfaces) and
+# prints no energy or force RMSE. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-dragoni2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Dragoni et al. (2018): GAP for thermomechanics and defects in bcc ferromagnetic iron" ;
+    mlips:reportedIn entity:article-dragoni2018 .
+
+entity:article-dragoni2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevmaterials.2.013808> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Achieving DFT accuracy with a machine-learning interatomic potential: Thermomechanics and defects in bcc ferromagnetic iron" ;
+    schema:author entity:person-Dragoni-dragoni2018 ,
+        entity:person-Daff-dragoni2018 ,
+        entity:person-Csanyi-dragoni2018 ,
+        entity:person-Marzari-dragoni2018 .
+
+entity:person-Dragoni-dragoni2018 a schema:Person ;
+    schema:name "Daniele Dragoni" ;
+    schema:givenName "Daniele" ;
+    schema:familyName "Dragoni" .
+
+entity:person-Daff-dragoni2018 a schema:Person ;
+    schema:name "Thomas D. Daff" ;
+    schema:givenName "Thomas D." ;
+    schema:familyName "Daff" .
+
+entity:person-Csanyi-dragoni2018 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+entity:person-Marzari-dragoni2018 a schema:Person ;
+    schema:name "Nicola Marzari" ;
+    schema:givenName "Nicola" ;
+    schema:familyName "Marzari" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Fe-dragoni2018 a mlips:MaterialSystem ;
+    rdfs:label "bcc ferromagnetic iron (bulk, vacancies, self-interstitials, surfaces, gamma surfaces)" ;
+    mlips:chemicalFormula "Fe" ;
+    mlips:materialClass "Elemental metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-dragoni2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-dragoni2018 mlips:hasDFTSettings entity:calc-settings-dft-dragoni2018 .
+
+entity:calc-settings-dft-dragoni2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:Ultrasoft ;
+    mlips:kPointMesh "k-spacing below 0.03 per Angstrom for all sub-databases (typically 0.025; per-database values in Table II)" ;
+    rdfs:comment "Collinear spin-polarised; ultrasoft pseudopotential from pslibrary 0.2.1 with semicore electrons in valence; plane-wave cutoff 90 Ry for wave functions (144 Ry where stresses are used), stated in Ry and not converted. Sampling runs used a lower cutoff (60 Ry) before recomputation." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Fe-dragoni2018 a mlips:TrainingDataset ;
+    rdfs:label "alpha-Fe GAP training database (DB1 to DB8, 152,070 local atomic environments)" ;
+    mlips:coversMaterial entity:mat-Fe-dragoni2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-dragoni2018 ;
+    rdfs:comment "Sub-databases: DB1 distorted primitive cells (elastic constants), DB2 bulk phonons, DB3 mono-vacancies, DB4 di-vacancies, DB5 tri-vacancies and vacancy clusters, DB6 self- and di-interstitials, DB7 surfaces, DB8 gamma surfaces. The size is given as atomic environments, not configurations; stresses are used only for part of the database." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Fe-dragoni2018 mlips:samplingStrategy
+    entity:sampling-dftmd-dragoni2018 .
+
+entity:sampling-dftmd-dragoni2018 a mlips:SamplingStrategy ;
+    rdfs:label "DFT molecular dynamics (and slice-sampling Monte Carlo cells rescaled from an earlier tungsten study) at moderate convergence for each target property; weakly correlated subsets recomputed with highly converged settings" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasLossFunction entity:loss-GAP-dragoni2018 ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-dragoni2018 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-cutoff-transition-width-dragoni2018 ,
+        entity:hp-sigma-atom-dragoni2018 ,
+        entity:hp-zeta-dragoni2018 ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:numSparseConfigs ;
+    mlips:hasImplementation entity:impl-GAP-dragoni2018 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation ,
+        mlips:NudgedElasticBand ,
+        mlips:GeometryOptimization ;
+    mlips:inferenceComplexity "O(M) per local atomic energy" ;
+    mlips:trainingComplexity "O(N M^2) with M representative environments" .
+
+entity:loss-GAP-dragoni2018 a mlips:LossFunction ;
+    rdfs:label "Gaussian process regression with default tolerances 0.005 eV/atom (energy), 0.2 eV/A (force) and 1.0 eV (virial), tightened per configuration type (0.0001 / 0.01 / 0.01 for the slice-sampled cells; 0.001 / 0.05 / 1.0 for the phonon cells)" .
+
+entity:alg-GAP-dragoni2018 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression with 4500 representative environments chosen by CUR decomposition (500 each from three configuration types and 3000 from the rest)" .
+
+entity:impl-GAP-dragoni2018 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP ;
+    mlips:version "GAP software version 1469201250" .
+
+entity:hp-cutoff-transition-width-dragoni2018 a mlips:Hyperparameter ;
+    rdfs:label "Width of the cutoff transition region (Angstrom)" ;
+    mlips:hyperparameterName "cutoff_transition_width" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-atom-dragoni2018 a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width sigma_atom (Angstrom)" ;
+    mlips:hyperparameterName "atom_sigma" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-zeta-dragoni2018 a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel exponent zeta" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Fe-cutoffRadius-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-Fe-cutoff-transition-width-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-dragoni2018 ;
+    mlips:settingValue "1"^^xsd:double .
+
+entity:setting-Fe-sigma-atom-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-dragoni2018 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-Fe-zeta-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-dragoni2018 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-Fe-numRadialBasis-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-Fe-numAngularBasis-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-Fe-numSparseConfigs-dragoni2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "4500"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Fe-dragoni2018 a mlips:MLIPRun ;
+    rdfs:label "SOAP-GAP training for bcc ferromagnetic iron" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Fe-dragoni2018 ;
+    mlips:hasHyperparameterSetting entity:setting-Fe-cutoffRadius-dragoni2018 ,
+        entity:setting-Fe-cutoff-transition-width-dragoni2018 ,
+        entity:setting-Fe-sigma-atom-dragoni2018 ,
+        entity:setting-Fe-zeta-dragoni2018 ,
+        entity:setting-Fe-numRadialBasis-dragoni2018 ,
+        entity:setting-Fe-numAngularBasis-dragoni2018 ,
+        entity:setting-Fe-numSparseConfigs-dragoni2018 ;
+    mlips:produces entity:model-Fe-dragoni2018 .
+
+entity:model-Fe-dragoni2018 a mlips:TrainedModel ;
+    rdfs:label "GAP for bcc ferromagnetic iron" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: the paper reports no energy, force or stress RMSE on a test set in the parts read; accuracy is shown through properties (Table III lattice parameter, bulk modulus and elastic constants; phonons; Table IV defect formation and binding energies; surface energies; gamma surfaces; dislocation Peierls barrier), which have no metric property.
+# - n_max = 12 and l_max = 12 are encoded as numRadialBasis and numAngularBasis. Simulation types are read from the applications (MD for thermal expansion, phonons, NEB-type migration and dislocation barriers, relaxations).
+# - Read from the arXiv v1 preprint (2017), not the Physical Review Materials version.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
