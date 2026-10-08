@@ -1,0 +1,1206 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Qianyu Zheng et al. (2026). Improving Reliability of Machine Learning Interatomic Potentials with Physics-Informed Pretraining.
+#   Journal of Chemical Information and Modeling. doi:10.1021/acs.jcim.6c00826  arXiv:2602.19592v1
+#
+# Version read: arxiv-preprint arXiv:2602.19592v1 (sha256 c8d75eb1f1e60043...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 97 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the comparison of Table 2: CGCNN, TorchMD-NET and
+# M3GNet trained on a silica, a phosphorus and an MPtrj (Li-Mn-O-P) data
+# set under three training strategies (baseline, sharpness-aware
+# minimisation, and the paper's pretraining on data labelled by a fitted
+# EAM potential followed by fine-tuning): 24 runs with energy, force and
+# stress MAEs.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zheng2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Zheng et al. (2026): improving reliability of MLIPs with physics-informed pretraining (EAM-assisted)" ;
+    mlips:reportedIn entity:article-zheng2026 .
+
+entity:article-zheng2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jcim.6c00826> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Improving Reliability of Machine Learning Interatomic Potentials with Physics-Informed Pretraining" ;
+    schema:author entity:person-Zheng-zheng2026 ,
+        <https://orcid.org/0000-0002-3347-6983> .
+
+entity:person-Zheng-zheng2026 a schema:Person ;
+    schema:name "Qianyu Zheng" ;
+    schema:givenName "Qianyu" ;
+    schema:familyName "Zheng" .
+
+<https://orcid.org/0000-0002-3347-6983> a schema:Person ;
+    schema:name "Victor Fung" ;
+    schema:givenName "Victor" ;
+    schema:familyName "Fung" ;
+    schema:identifier <https://orcid.org/0000-0002-3347-6983> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-silica-zheng2026 a mlips:MaterialSystem ;
+    rdfs:label "Silica: amorphous, liquid, glass and crystalline SiO2 configurations" ;
+    mlips:chemicalFormula "SiO2" ;
+    mlips:materialClass "Oxide; crystalline, liquid and amorphous" .
+
+entity:mat-phosphorus-zheng2026 a mlips:MaterialSystem ;
+    rdfs:label "Phosphorus across phases: GAP-RSS structures, molecular and network liquids, phosphorene with defects, bulk crystals up to 100 GPa, molecular fragments" ;
+    mlips:chemicalFormula "P" ;
+    mlips:materialClass "Elemental; molecular, layered and network phases" .
+
+entity:mat-mptrj-zheng2026 a mlips:MaterialSystem ;
+    rdfs:label "Li-Mn-O-P compounds from MPtrj" ;
+    mlips:chemicalFormula "Li-Mn-O-P" ;
+    mlips:materialClass "Inorganic crystals with only Li, Mn, O and P; relaxation trajectories" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mptrj-10-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj Li-Mn-O-P subset data set, 10% of the available training data" ;
+    mlips:coversMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The data set has 4965 configurations in total; the reduced-data protocol uses 10% of the available training data (number not stated)." .
+
+entity:ds-mptrj-full-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj Li-Mn-O-P subset data set, all available training data" ;
+    mlips:coversMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 4965 ;
+    rdfs:comment "The data set has 4965 configurations in total; numConfigurations is that total, of which a test set is held out." .
+
+entity:ds-phosphorus-5-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "Phosphorus data set, 5% of the available training data" ;
+    mlips:coversMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The data set has 4798 configurations in total; the reduced-data protocol uses 5% of the available training data (number not stated)." .
+
+entity:ds-phosphorus-full-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "Phosphorus data set, all available training data" ;
+    mlips:coversMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 4798 ;
+    rdfs:comment "The data set has 4798 configurations in total; numConfigurations is that total, of which a test set is held out." .
+
+entity:ds-silica-10-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "Silica data set, 10% of the available training data" ;
+    mlips:coversMaterial entity:mat-silica-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The data set has 2864 configurations in total; the reduced-data protocol uses 10% of the available training data (number not stated)." .
+
+entity:ds-silica-full-zheng2026 a mlips:TrainingDataset ;
+    rdfs:label "Silica data set, all available training data" ;
+    mlips:coversMaterial entity:mat-silica-zheng2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 2864 ;
+    rdfs:comment "The data set has 2864 configurations in total; numConfigurations is that total, of which a test set is held out." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mptrj-10-zheng2026 mlips:samplingStrategy
+    entity:sampling-mptrj-filter-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:ds-mptrj-full-zheng2026 mlips:samplingStrategy
+    entity:sampling-mptrj-filter-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:ds-phosphorus-5-zheng2026 mlips:samplingStrategy
+    entity:sampling-phosphorus-rss-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:ds-phosphorus-full-zheng2026 mlips:samplingStrategy
+    entity:sampling-phosphorus-rss-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:ds-silica-10-zheng2026 mlips:samplingStrategy
+    entity:sampling-silica-gap-md-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:ds-silica-full-zheng2026 mlips:samplingStrategy
+    entity:sampling-silica-gap-md-zheng2026 ,
+    entity:sampling-eam-augmentation-zheng2026 .
+
+entity:sampling-silica-gap-md-zheng2026 a mlips:SamplingStrategy ;
+    rdfs:label "Iteratively expanded silica database from GAP fitting and MD" ;
+    rdfs:comment "Distorted crystals, isolated dimers and melt-quench trajectories; single-point DFT labels for energy, forces and stress (ref. 54 of the paper)." .
+
+entity:sampling-phosphorus-rss-zheng2026 a mlips:SamplingStrategy ;
+    rdfs:label "Phosphorus GAP-RSS and curated configurations" ;
+    rdfs:comment "Random structure search configurations, liquids, 2D structures, bulk crystals and fragments with DFT energies and forces (ref. 53)." .
+
+entity:sampling-mptrj-filter-zheng2026 a mlips:SamplingStrategy ;
+    rdfs:label "MPtrj relaxation trajectories filtered by composition" ;
+    rdfs:comment "Structures containing exclusively Li, Mn, O and P." .
+
+entity:sampling-eam-augmentation-zheng2026 a mlips:SamplingStrategy ;
+    rdfs:label "Augmentation with configurations labelled by a fitted EAM potential" ;
+    rdfs:comment "An empirical EAM potential is fitted to the available DFT data and used to label additional configurations for pretraining (the paper's physics-informed pretraining)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CGCNN a mlips:MLIPMethod ;
+    rdfs:label "Crystal Graph Convolutional Neural Network (CGCNN)" ;
+    mlips:hasHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:TorchMD-ET a mlips:MLIPMethod ;
+    rdfs:label "Equivariant Transformer (TorchMD-NET)" ;
+    mlips:hasHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:hasHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:hp-training-strategy-zheng2026 a mlips:Hyperparameter ;
+    rdfs:label "Training strategy (baseline, SAM, or EAM-assisted pretraining)" ;
+    mlips:hyperparameterName "training_strategy" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-CGCNN-silica-full-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-CGCNN-silica-full-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-CGCNN-silica-full-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-TorchMD-ET-silica-10-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-TorchMD-ET-silica-10-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-TorchMD-ET-silica-10-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-M3GNet-silica-10-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-M3GNet-silica-10-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-CGCNN-phosphorus-full-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-CGCNN-phosphorus-full-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-CGCNN-phosphorus-full-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-TorchMD-ET-phosphorus-5-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-TorchMD-ET-phosphorus-5-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-TorchMD-ET-phosphorus-5-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-M3GNet-phosphorus-5-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-M3GNet-phosphorus-5-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-CGCNN-mptrj-full-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-CGCNN-mptrj-full-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-CGCNN-mptrj-full-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-TorchMD-ET-mptrj-10-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-TorchMD-ET-mptrj-10-SAM-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "sharpness-aware minimisation (SAM)" .
+
+entity:setting-TorchMD-ET-mptrj-10-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+entity:setting-M3GNet-mptrj-10-baseline-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "baseline training on DFT labels" .
+
+entity:setting-M3GNet-mptrj-10-pretrain-training-strategy-zheng2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-strategy-zheng2026 ;
+    mlips:settingValue "pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-CGCNN-silica-full-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Silica data set (all available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-silica-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-silica-full-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-silica-full-baseline-zheng2026 .
+
+entity:model-CGCNN-silica-full-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Silica model, baseline" .
+
+entity:run-CGCNN-silica-full-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Silica data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-silica-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-silica-full-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-silica-full-SAM-zheng2026 .
+
+entity:model-CGCNN-silica-full-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Silica model, SAM" .
+
+entity:run-CGCNN-silica-full-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Silica data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-silica-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-silica-full-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-silica-full-pretrain-zheng2026 .
+
+entity:model-CGCNN-silica-full-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Silica model, pretrain" .
+
+entity:run-TorchMD-ET-silica-10-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-silica-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-silica-10-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-silica-10-baseline-zheng2026 .
+
+entity:model-TorchMD-ET-silica-10-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Silica model, baseline" .
+
+entity:run-TorchMD-ET-silica-10-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Silica data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-silica-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-silica-10-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-silica-10-SAM-zheng2026 .
+
+entity:model-TorchMD-ET-silica-10-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Silica model, SAM" .
+
+entity:run-TorchMD-ET-silica-10-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-silica-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-silica-10-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-silica-10-pretrain-zheng2026 .
+
+entity:model-TorchMD-ET-silica-10-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Silica model, pretrain" .
+
+entity:run-M3GNet-silica-10-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-silica-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-silica-10-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-silica-10-baseline-zheng2026 .
+
+entity:model-M3GNet-silica-10-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet Silica model, baseline" .
+
+entity:run-M3GNet-silica-10-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-silica-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-silica-10-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-silica-10-pretrain-zheng2026 .
+
+entity:model-M3GNet-silica-10-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet Silica model, pretrain" .
+
+entity:run-CGCNN-phosphorus-full-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Phosphorus data set (all available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-phosphorus-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-phosphorus-full-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-phosphorus-full-baseline-zheng2026 .
+
+entity:model-CGCNN-phosphorus-full-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Phosphorus model, baseline" .
+
+entity:run-CGCNN-phosphorus-full-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Phosphorus data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-phosphorus-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-phosphorus-full-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-phosphorus-full-SAM-zheng2026 .
+
+entity:model-CGCNN-phosphorus-full-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Phosphorus model, SAM" .
+
+entity:run-CGCNN-phosphorus-full-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the Phosphorus data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-phosphorus-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-phosphorus-full-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-phosphorus-full-pretrain-zheng2026 .
+
+entity:model-CGCNN-phosphorus-full-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN Phosphorus model, pretrain" .
+
+entity:run-TorchMD-ET-phosphorus-5-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-phosphorus-5-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-phosphorus-5-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-phosphorus-5-baseline-zheng2026 .
+
+entity:model-TorchMD-ET-phosphorus-5-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Phosphorus model, baseline" .
+
+entity:run-TorchMD-ET-phosphorus-5-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Phosphorus data set (5% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-phosphorus-5-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-phosphorus-5-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-phosphorus-5-SAM-zheng2026 .
+
+entity:model-TorchMD-ET-phosphorus-5-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Phosphorus model, SAM" .
+
+entity:run-TorchMD-ET-phosphorus-5-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-phosphorus-5-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-phosphorus-5-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-phosphorus-5-pretrain-zheng2026 .
+
+entity:model-TorchMD-ET-phosphorus-5-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET Phosphorus model, pretrain" .
+
+entity:run-M3GNet-phosphorus-5-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-phosphorus-5-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-phosphorus-5-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-phosphorus-5-baseline-zheng2026 .
+
+entity:model-M3GNet-phosphorus-5-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet Phosphorus model, baseline" .
+
+entity:run-M3GNet-phosphorus-5-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-phosphorus-5-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-phosphorus-5-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-phosphorus-5-pretrain-zheng2026 .
+
+entity:model-M3GNet-phosphorus-5-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet Phosphorus model, pretrain" .
+
+entity:run-CGCNN-mptrj-full-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-mptrj-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-mptrj-full-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-mptrj-full-baseline-zheng2026 .
+
+entity:model-CGCNN-mptrj-full-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN MPtrj Li-Mn-O-P subset model, baseline" .
+
+entity:run-CGCNN-mptrj-full-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-mptrj-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-mptrj-full-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-mptrj-full-SAM-zheng2026 .
+
+entity:model-CGCNN-mptrj-full-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN MPtrj Li-Mn-O-P subset model, SAM" .
+
+entity:run-CGCNN-mptrj-full-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-mptrj-full-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CGCNN-mptrj-full-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-CGCNN-mptrj-full-pretrain-zheng2026 .
+
+entity:model-CGCNN-mptrj-full-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "CGCNN MPtrj Li-Mn-O-P subset model, pretrain" .
+
+entity:run-TorchMD-ET-mptrj-10-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-mptrj-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-mptrj-10-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-mptrj-10-baseline-zheng2026 .
+
+entity:model-TorchMD-ET-mptrj-10-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET MPtrj Li-Mn-O-P subset model, baseline" .
+
+entity:run-TorchMD-ET-mptrj-10-SAM-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-mptrj-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-mptrj-10-SAM-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-mptrj-10-SAM-zheng2026 .
+
+entity:model-TorchMD-ET-mptrj-10-SAM-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET MPtrj Li-Mn-O-P subset model, SAM" .
+
+entity:run-TorchMD-ET-mptrj-10-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-mptrj-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-TorchMD-ET-mptrj-10-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-TorchMD-ET-mptrj-10-pretrain-zheng2026 .
+
+entity:model-TorchMD-ET-mptrj-10-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "TorchMD-NET MPtrj Li-Mn-O-P subset model, pretrain" .
+
+entity:run-M3GNet-mptrj-10-baseline-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-mptrj-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-mptrj-10-baseline-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-mptrj-10-baseline-zheng2026 .
+
+entity:model-M3GNet-mptrj-10-baseline-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet MPtrj Li-Mn-O-P subset model, baseline" .
+
+entity:run-M3GNet-mptrj-10-pretrain-zheng2026 a mlips:MLIPRun ;
+    rdfs:label "M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-mptrj-10-zheng2026 ;
+    mlips:hasHyperparameterSetting entity:setting-M3GNet-mptrj-10-pretrain-training-strategy-zheng2026 ;
+    mlips:produces entity:model-M3GNet-mptrj-10-pretrain-zheng2026 .
+
+entity:model-M3GNet-mptrj-10-pretrain-zheng2026 a mlips:TrainedModel ;
+    rdfs:label "M3GNet MPtrj Li-Mn-O-P subset model, pretrain" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zheng2026 mlips:hasResult
+    entity:result-CGCNN-silica-full-baseline-zheng2026 ,
+    entity:result-CGCNN-silica-full-SAM-zheng2026 ,
+    entity:result-CGCNN-silica-full-pretrain-zheng2026 ,
+    entity:result-TorchMD-ET-silica-10-baseline-zheng2026 ,
+    entity:result-TorchMD-ET-silica-10-SAM-zheng2026 ,
+    entity:result-TorchMD-ET-silica-10-pretrain-zheng2026 ,
+    entity:result-M3GNet-silica-10-baseline-zheng2026 ,
+    entity:result-M3GNet-silica-10-pretrain-zheng2026 ,
+    entity:result-CGCNN-phosphorus-full-baseline-zheng2026 ,
+    entity:result-CGCNN-phosphorus-full-SAM-zheng2026 ,
+    entity:result-CGCNN-phosphorus-full-pretrain-zheng2026 ,
+    entity:result-TorchMD-ET-phosphorus-5-baseline-zheng2026 ,
+    entity:result-TorchMD-ET-phosphorus-5-SAM-zheng2026 ,
+    entity:result-TorchMD-ET-phosphorus-5-pretrain-zheng2026 ,
+    entity:result-M3GNet-phosphorus-5-baseline-zheng2026 ,
+    entity:result-M3GNet-phosphorus-5-pretrain-zheng2026 ,
+    entity:result-CGCNN-mptrj-full-baseline-zheng2026 ,
+    entity:result-CGCNN-mptrj-full-SAM-zheng2026 ,
+    entity:result-CGCNN-mptrj-full-pretrain-zheng2026 ,
+    entity:result-TorchMD-ET-mptrj-10-baseline-zheng2026 ,
+    entity:result-TorchMD-ET-mptrj-10-SAM-zheng2026 ,
+    entity:result-TorchMD-ET-mptrj-10-pretrain-zheng2026 ,
+    entity:result-M3GNet-mptrj-10-baseline-zheng2026 ,
+    entity:result-M3GNet-mptrj-10-pretrain-zheng2026 .
+
+entity:result-CGCNN-silica-full-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-silica-full-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-silica-full-baseline-1-zheng2026 ,
+        entity:metric-CGCNN-silica-full-baseline-2-zheng2026 ,
+        entity:metric-CGCNN-silica-full-baseline-3-zheng2026 .
+
+entity:metric-CGCNN-silica-full-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Silica data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "29.062"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-silica-full-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Silica data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.208"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-silica-full-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the Silica data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.0029"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-CGCNN-silica-full-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-silica-full-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-silica-full-SAM-1-zheng2026 ,
+        entity:metric-CGCNN-silica-full-SAM-2-zheng2026 ,
+        entity:metric-CGCNN-silica-full-SAM-3-zheng2026 .
+
+entity:metric-CGCNN-silica-full-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Silica data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.722"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-silica-full-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Silica data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.216"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-silica-full-SAM-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the Silica data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00306"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-CGCNN-silica-full-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-silica-full-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-silica-full-pretrain-1-zheng2026 ,
+        entity:metric-CGCNN-silica-full-pretrain-2-zheng2026 ,
+        entity:metric-CGCNN-silica-full-pretrain-3-zheng2026 .
+
+entity:metric-CGCNN-silica-full-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Silica data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23.871"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-silica-full-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Silica data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.202"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-silica-full-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the Silica data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.002209"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-silica-10-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-silica-10-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-silica-10-baseline-1-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-baseline-2-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-baseline-3-zheng2026 .
+
+entity:metric-TorchMD-ET-silica-10-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.157"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-silica-10-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.174"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-silica-10-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00117"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-silica-10-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-silica-10-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-silica-10-SAM-1-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-SAM-2-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-SAM-3-zheng2026 .
+
+entity:metric-TorchMD-ET-silica-10-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Silica data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.071"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-silica-10-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Silica data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.107"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-silica-10-SAM-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the Silica data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.000876"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-silica-10-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-silica-10-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-silica-10-pretrain-1-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-pretrain-2-zheng2026 ,
+        entity:metric-TorchMD-ET-silica-10-pretrain-3-zheng2026 .
+
+entity:metric-TorchMD-ET-silica-10-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.82"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-silica-10-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.113"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-silica-10-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.000374"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-M3GNet-silica-10-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-silica-10-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-silica-10-baseline-1-zheng2026 ,
+        entity:metric-M3GNet-silica-10-baseline-2-zheng2026 ,
+        entity:metric-M3GNet-silica-10-baseline-3-zheng2026 .
+
+entity:metric-M3GNet-silica-10-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.252"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-silica-10-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.114"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-M3GNet-silica-10-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: M3GNet on the Silica data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00441"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-M3GNet-silica-10-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-silica-10-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-silica-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-silica-10-pretrain-1-zheng2026 ,
+        entity:metric-M3GNet-silica-10-pretrain-2-zheng2026 ,
+        entity:metric-M3GNet-silica-10-pretrain-3-zheng2026 .
+
+entity:metric-M3GNet-silica-10-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.069"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-silica-10-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.112"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-M3GNet-silica-10-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: M3GNet on the Silica data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00286"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-CGCNN-phosphorus-full-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-phosphorus-full-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-phosphorus-full-baseline-1-zheng2026 ,
+        entity:metric-CGCNN-phosphorus-full-baseline-2-zheng2026 .
+
+entity:metric-CGCNN-phosphorus-full-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Phosphorus data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.976"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-phosphorus-full-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Phosphorus data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.252"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CGCNN-phosphorus-full-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-phosphorus-full-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-phosphorus-full-SAM-1-zheng2026 ,
+        entity:metric-CGCNN-phosphorus-full-SAM-2-zheng2026 .
+
+entity:metric-CGCNN-phosphorus-full-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Phosphorus data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "10.778"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-phosphorus-full-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Phosphorus data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.265"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CGCNN-phosphorus-full-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-phosphorus-full-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-phosphorus-full-pretrain-1-zheng2026 ,
+        entity:metric-CGCNN-phosphorus-full-pretrain-2-zheng2026 .
+
+entity:metric-CGCNN-phosphorus-full-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the Phosphorus data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.476"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-phosphorus-full-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the Phosphorus data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.232"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-TorchMD-ET-phosphorus-5-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-phosphorus-5-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-phosphorus-5-baseline-1-zheng2026 ,
+        entity:metric-TorchMD-ET-phosphorus-5-baseline-2-zheng2026 .
+
+entity:metric-TorchMD-ET-phosphorus-5-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.301"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-phosphorus-5-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.201"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-TorchMD-ET-phosphorus-5-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-phosphorus-5-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-phosphorus-5-SAM-1-zheng2026 ,
+        entity:metric-TorchMD-ET-phosphorus-5-SAM-2-zheng2026 .
+
+entity:metric-TorchMD-ET-phosphorus-5-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Phosphorus data set (5% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.439"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-phosphorus-5-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Phosphorus data set (5% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.233"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-TorchMD-ET-phosphorus-5-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-phosphorus-5-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-phosphorus-5-pretrain-1-zheng2026 ,
+        entity:metric-TorchMD-ET-phosphorus-5-pretrain-2-zheng2026 .
+
+entity:metric-TorchMD-ET-phosphorus-5-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "22.196"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-phosphorus-5-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.203"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-M3GNet-phosphorus-5-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-phosphorus-5-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-phosphorus-5-baseline-1-zheng2026 ,
+        entity:metric-M3GNet-phosphorus-5-baseline-2-zheng2026 .
+
+entity:metric-M3GNet-phosphorus-5-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.17"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-phosphorus-5-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the Phosphorus data set (5% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.257"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-M3GNet-phosphorus-5-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-phosphorus-5-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-phosphorus-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-phosphorus-5-pretrain-1-zheng2026 ,
+        entity:metric-M3GNet-phosphorus-5-pretrain-2-zheng2026 .
+
+entity:metric-M3GNet-phosphorus-5-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23.033"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-phosphorus-5-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the Phosphorus data set (5% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.248"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CGCNN-mptrj-full-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-mptrj-full-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-mptrj-full-baseline-1-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-baseline-2-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-baseline-3-zheng2026 .
+
+entity:metric-CGCNN-mptrj-full-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.485"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-mptrj-full-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0914"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-mptrj-full-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00191"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-CGCNN-mptrj-full-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-mptrj-full-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-mptrj-full-SAM-1-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-SAM-2-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-SAM-3-zheng2026 .
+
+entity:metric-CGCNN-mptrj-full-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.518"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-mptrj-full-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0847"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-mptrj-full-SAM-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.0018"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-CGCNN-mptrj-full-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-mptrj-full-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-mptrj-full-pretrain-1-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-pretrain-2-zheng2026 ,
+        entity:metric-CGCNN-mptrj-full-pretrain-3-zheng2026 .
+
+entity:metric-CGCNN-mptrj-full-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.575"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CGCNN-mptrj-full-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0782"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-CGCNN-mptrj-full-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: CGCNN on the MPtrj Li-Mn-O-P subset data set (all available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00167"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-mptrj-10-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-mptrj-10-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-mptrj-10-baseline-1-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-baseline-2-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-baseline-3-zheng2026 .
+
+entity:metric-TorchMD-ET-mptrj-10-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.139"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-mptrj-10-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0931"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-mptrj-10-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00184"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-mptrj-10-SAM-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-mptrj-10-SAM-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-mptrj-10-SAM-1-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-SAM-2-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-SAM-3-zheng2026 .
+
+entity:metric-TorchMD-ET-mptrj-10-SAM-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.91"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-mptrj-10-SAM-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0736"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-mptrj-10-SAM-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), sharpness-aware minimisation (SAM)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.0015"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-TorchMD-ET-mptrj-10-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-TorchMD-ET-mptrj-10-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-TorchMD-ET-mptrj-10-pretrain-1-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-pretrain-2-zheng2026 ,
+        entity:metric-TorchMD-ET-mptrj-10-pretrain-3-zheng2026 .
+
+entity:metric-TorchMD-ET-mptrj-10-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.945"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-TorchMD-ET-mptrj-10-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0861"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-TorchMD-ET-mptrj-10-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: TorchMD-NET on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00179"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-M3GNet-mptrj-10-baseline-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-mptrj-10-baseline-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-mptrj-10-baseline-1-zheng2026 ,
+        entity:metric-M3GNet-mptrj-10-baseline-2-zheng2026 ,
+        entity:metric-M3GNet-mptrj-10-baseline-3-zheng2026 .
+
+entity:metric-M3GNet-mptrj-10-baseline-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.065"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-mptrj-10-baseline-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0854"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-M3GNet-mptrj-10-baseline-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), baseline training on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00231"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-M3GNet-mptrj-10-pretrain-zheng2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-mptrj-10-pretrain-zheng2026 ;
+    mlips:targetMaterial entity:mat-mptrj-zheng2026 ;
+    mlips:hasAccuracyMetric entity:metric-M3GNet-mptrj-10-pretrain-1-zheng2026 ,
+        entity:metric-M3GNet-mptrj-10-pretrain-2-zheng2026 ,
+        entity:metric-M3GNet-mptrj-10-pretrain-3-zheng2026 .
+
+entity:metric-M3GNet-mptrj-10-pretrain-1-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.568"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-M3GNet-mptrj-10-pretrain-2-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0652"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-M3GNet-mptrj-10-pretrain-3-zheng2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: M3GNet on the MPtrj Li-Mn-O-P subset data set (10% of the available training data), pretraining on EAM-labelled augmented data, then fine-tuning on DFT labels" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.00171"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy errors are printed 'in eV' with values between 1.5 and 29 for systems of this kind; whether the unit is eV per structure or a different unit (e.g. meV/atom) is unclear from the caption. Values are encoded as printed with unit eV and should be checked.
+# - 'TorchMD-NET' is encoded under the registry method entity:TorchMD-ET (Equivariant Transformer of TorchMD-NET); the paper does not say which TorchMD-NET architecture was used.
+# - The data-set nodes carry both the DFT sampling and the EAM-labelled augmentation; only the pretraining strategy uses the latter. The reference levels of the three data sets are those of their source papers and are not restated.
+# - The weighted 'total error' of Table 2, the trajectory-physicality benchmarks (Table 1), the RDF errors against DFT MD and the knowledge-transfer analysis have no MetricProperty. Hyperparameters of the three architectures were not captured.
+# - The pretrained-then-fine-tuned model is one run per architecture and data set; the two stages cannot be expressed separately in schema 0.1.2.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
