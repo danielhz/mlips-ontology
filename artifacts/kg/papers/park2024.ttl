@@ -1,0 +1,874 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yutack Park et al. (2024). Scalable Parallel Algorithm for Graph Neural Network Interatomic Potentials in Molecular Dynamics Simulations.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.4c00190  arXiv:2402.03789v1
+#
+# Version read: arxiv-preprint arXiv:2402.03789v1 (sha256 4e67f95911c39de6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 44 (Software/implementation). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SevenNet package (a parallel LAMMPS implementation
+# of the NequIP architecture), the general-purpose pretrained model
+# SevenNet-0 trained on the M3GNet (MPF) data set, with its settings and
+# test errors, and the 20 NequIP models of varying width and depth
+# trained on SiO2 for the parallel-scaling benchmarks.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-park2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Park et al. (2024): SevenNet, a scalable parallel algorithm for GNN interatomic potentials in MD, and the pretrained SevenNet-0" ;
+    mlips:reportedIn entity:article-park2024 .
+
+entity:article-park2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.4c00190> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Scalable Parallel Algorithm for Graph Neural Network Interatomic Potentials in Molecular Dynamics Simulations" ;
+    schema:author <https://orcid.org/0009-0008-8690-935X> ,
+        <https://orcid.org/0009-0000-6646-1318> ,
+        <https://orcid.org/0000-0002-1523-8340> ,
+        <https://orcid.org/0000-0003-3958-0922> .
+
+<https://orcid.org/0009-0008-8690-935X> a schema:Person ;
+    schema:name "Yutack Park" ;
+    schema:givenName "Yutack" ;
+    schema:familyName "Park" ;
+    schema:identifier <https://orcid.org/0009-0008-8690-935X> .
+
+<https://orcid.org/0009-0000-6646-1318> a schema:Person ;
+    schema:name "Jaesun Kim" ;
+    schema:givenName "Jaesun" ;
+    schema:familyName "Kim" ;
+    schema:identifier <https://orcid.org/0009-0000-6646-1318> .
+
+<https://orcid.org/0000-0002-1523-8340> a schema:Person ;
+    schema:name "Seungwoo Hwang" ;
+    schema:givenName "Seungwoo" ;
+    schema:familyName "Hwang" ;
+    schema:identifier <https://orcid.org/0000-0002-1523-8340> .
+
+<https://orcid.org/0000-0003-3958-0922> a schema:Person ;
+    schema:name "Seungwu Han" ;
+    schema:givenName "Seungwu" ;
+    schema:familyName "Han" ;
+    schema:identifier <https://orcid.org/0000-0003-3958-0922> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mpf-park2024 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project crystal structures over 89 elements (M3GNet MPF data set)" ;
+    mlips:materialClass "Universal inorganic crystals; relaxation steps" .
+
+entity:mat-SiO2-park2024 a mlips:MaterialSystem ;
+    rdfs:label "SiO2: alpha-quartz at 300 K and melt-quench-anneal configurations (72 formula units)" ;
+    mlips:chemicalFormula "SiO2" ;
+    mlips:materialClass "Oxide; crystalline, liquid and amorphous" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-sio2-dft-park2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-sio2-dft-park2024 mlips:hasDFTSettings entity:calc-settings-sio2-dft-park2024 .
+
+entity:calc-settings-sio2-dft-park2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "450"^^xsd:double ;
+    mlips:kPointMesh "Gamma point only" ;
+    rdfs:comment "DFT MD run with the default plane-wave cutoff; sampled snapshots recalculated at 450 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mpf-park2024 a mlips:TrainingDataset ;
+    rdfs:label "M3GNet (MPF) data set, 90% training split" ;
+    mlips:coversMaterial entity:mat-mpf-park2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The number of structures is not restated in this paper; the reference settings are those of the Materials Project." .
+
+entity:ds-SiO2-park2024 a mlips:TrainingDataset ;
+    rdfs:label "SiO2 DFT MD snapshots (1600 structures)" ;
+    mlips:coversMaterial entity:mat-SiO2-park2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1600 ;
+    mlips:hasDFTCalculation entity:calc-sio2-dft-park2024 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mpf-park2024 mlips:samplingStrategy
+    entity:sampling-mpf-relaxation-park2024 .
+
+entity:ds-SiO2-park2024 mlips:samplingStrategy
+    entity:sampling-sio2-md-park2024 .
+
+entity:sampling-mpf-relaxation-park2024 a mlips:SamplingStrategy ;
+    rdfs:label "Three relaxation steps per Materials Project crystal (M3GNet data set)" ;
+    rdfs:comment "Split into training, validation and test sets in proportions 90% / 5% / 5% by material, following the original paper." .
+
+entity:sampling-sio2-md-park2024 a mlips:SamplingStrategy ;
+    rdfs:label "DFT MD of SiO2: melt-quench-anneal and alpha-quartz vibrations at 300 K" ;
+    rdfs:comment "Snapshots every 40 fs, 1600 structures, shuffled and split 9:1 into training and validation." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-park2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-park2024 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:numAngularBasis ,
+        mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-irreps-park2024 ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-NequIP-park2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-NequIP-park2024 a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta = 0.01) on energy per atom, force components and stress components, with force weight 0.1 and stress weight 0.01 (SevenNet-0)" .
+
+entity:alg-NequIP-park2024 a mls:Algorithm ;
+    rdfs:label "Adam, initial learning rate 0.004, halved when the validation loss does not improve for 50 epochs; multi-GPU training with batch size 16 (SevenNet-0)" .
+
+entity:impl-NequIP-park2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SevenNet-park2024 .
+
+entity:lib-SevenNet-park2024 a mlips:Library ;
+    rdfs:label "SevenNet" ;
+    rdfs:comment "PyTorch / e3nn implementation of the NequIP architecture with spatial-decomposition parallelism in LAMMPS through TorchScript; the self-connection tensor product is replaced by a linear layer in SevenNet-0." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-irreps-park2024 a mlips:Hyperparameter ;
+    rdfs:label "NequIP node-feature irreducible representations" ;
+    mlips:hyperparameterName "irreps" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-sevennet-0-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sevennet-0-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-sevennet-0-irreps-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-irreps-park2024 ;
+    mlips:settingValue "128 scalars (l=0), 64 vectors (l=1), 32 tensors (l=2)" .
+
+entity:setting-sevennet-0-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sevennet-0-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sevennet-0-numRadialBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-sevennet-0-batchSize-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-sevennet-0-learningRate-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.004"^^xsd:double .
+
+entity:setting-sevennet-0-numEpochs-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "450"^^xsd:integer .
+
+entity:setting-sio2-c4-l2-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c4-l2-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sio2-c4-l2-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c4-l2-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c4-l3-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c4-l3-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c4-l3-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c4-l3-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c4-l4-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c4-l4-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c4-l4-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c4-l4-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c4-l5-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c4-l5-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sio2-c4-l5-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c4-l5-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c8-l2-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-sio2-c8-l2-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sio2-c8-l2-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c8-l2-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c8-l3-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-sio2-c8-l3-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c8-l3-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c8-l3-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c8-l4-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-sio2-c8-l4-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c8-l4-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c8-l4-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c8-l5-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-sio2-c8-l5-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sio2-c8-l5-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c8-l5-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c16-l2-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-sio2-c16-l2-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sio2-c16-l2-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c16-l2-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c16-l3-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-sio2-c16-l3-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c16-l3-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c16-l3-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c16-l4-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-sio2-c16-l4-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c16-l4-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c16-l4-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c16-l5-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-sio2-c16-l5-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sio2-c16-l5-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c16-l5-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c32-l2-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-sio2-c32-l2-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sio2-c32-l2-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c32-l2-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c32-l3-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-sio2-c32-l3-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c32-l3-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c32-l3-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c32-l4-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-sio2-c32-l4-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c32-l4-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c32-l4-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c32-l5-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-sio2-c32-l5-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sio2-c32-l5-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c32-l5-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c64-l2-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-sio2-c64-l2-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sio2-c64-l2-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c64-l2-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c64-l3-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-sio2-c64-l3-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c64-l3-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c64-l3-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c64-l4-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-sio2-c64-l4-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-sio2-c64-l4-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c64-l4-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-sio2-c64-l5-numFeatures-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-sio2-c64-l5-numLayers-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sio2-c64-l5-numAngularBasis-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-sio2-c64-l5-cutoffRadius-park2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SevenNet-0-MPF a mlips:MLIPRun ;
+    rdfs:label "Training run of SevenNet-0 as published by Park et al. 2024 (0.84M parameters, trained on the M3GNet MPF data set)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mpf-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sevennet-0-numLayers-park2024 ,
+        entity:setting-sevennet-0-numFeatures-park2024 ,
+        entity:setting-sevennet-0-irreps-park2024 ,
+        entity:setting-sevennet-0-numAngularBasis-park2024 ,
+        entity:setting-sevennet-0-cutoffRadius-park2024 ,
+        entity:setting-sevennet-0-numRadialBasis-park2024 ,
+        entity:setting-sevennet-0-batchSize-park2024 ,
+        entity:setting-sevennet-0-learningRate-park2024 ,
+        entity:setting-sevennet-0-numEpochs-park2024 ;
+    mlips:trainingHardware "Four NVIDIA A100 GPUs (multi-GPU training)" ;
+    mlips:produces entity:model-SevenNet-0-MPF .
+
+entity:model-SevenNet-0-MPF a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 as published by Park et al. 2024 (0.84M parameters, trained on the M3GNet MPF data set)" ;
+    mlips:inferenceHardware "GPU cluster node with 8 NVIDIA A100 80 GB GPUs (melt-quench MD of more than 100,000 atoms of Si3N4)" .
+
+entity:run-sio2-c4-l2-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 4 channels, 2 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c4-l2-numFeatures-park2024 ,
+        entity:setting-sio2-c4-l2-numLayers-park2024 ,
+        entity:setting-sio2-c4-l2-numAngularBasis-park2024 ,
+        entity:setting-sio2-c4-l2-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c4-l2-park2024 .
+
+entity:model-sio2-c4-l2-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (4 channels, 2 layers)" .
+
+entity:run-sio2-c4-l3-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 4 channels, 3 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c4-l3-numFeatures-park2024 ,
+        entity:setting-sio2-c4-l3-numLayers-park2024 ,
+        entity:setting-sio2-c4-l3-numAngularBasis-park2024 ,
+        entity:setting-sio2-c4-l3-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c4-l3-park2024 .
+
+entity:model-sio2-c4-l3-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (4 channels, 3 layers)" .
+
+entity:run-sio2-c4-l4-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 4 channels, 4 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c4-l4-numFeatures-park2024 ,
+        entity:setting-sio2-c4-l4-numLayers-park2024 ,
+        entity:setting-sio2-c4-l4-numAngularBasis-park2024 ,
+        entity:setting-sio2-c4-l4-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c4-l4-park2024 .
+
+entity:model-sio2-c4-l4-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (4 channels, 4 layers)" .
+
+entity:run-sio2-c4-l5-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 4 channels, 5 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c4-l5-numFeatures-park2024 ,
+        entity:setting-sio2-c4-l5-numLayers-park2024 ,
+        entity:setting-sio2-c4-l5-numAngularBasis-park2024 ,
+        entity:setting-sio2-c4-l5-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c4-l5-park2024 .
+
+entity:model-sio2-c4-l5-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (4 channels, 5 layers)" .
+
+entity:run-sio2-c8-l2-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 8 channels, 2 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c8-l2-numFeatures-park2024 ,
+        entity:setting-sio2-c8-l2-numLayers-park2024 ,
+        entity:setting-sio2-c8-l2-numAngularBasis-park2024 ,
+        entity:setting-sio2-c8-l2-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c8-l2-park2024 .
+
+entity:model-sio2-c8-l2-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (8 channels, 2 layers)" .
+
+entity:run-sio2-c8-l3-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 8 channels, 3 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c8-l3-numFeatures-park2024 ,
+        entity:setting-sio2-c8-l3-numLayers-park2024 ,
+        entity:setting-sio2-c8-l3-numAngularBasis-park2024 ,
+        entity:setting-sio2-c8-l3-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c8-l3-park2024 .
+
+entity:model-sio2-c8-l3-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (8 channels, 3 layers)" .
+
+entity:run-sio2-c8-l4-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 8 channels, 4 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c8-l4-numFeatures-park2024 ,
+        entity:setting-sio2-c8-l4-numLayers-park2024 ,
+        entity:setting-sio2-c8-l4-numAngularBasis-park2024 ,
+        entity:setting-sio2-c8-l4-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c8-l4-park2024 .
+
+entity:model-sio2-c8-l4-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (8 channels, 4 layers)" .
+
+entity:run-sio2-c8-l5-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 8 channels, 5 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c8-l5-numFeatures-park2024 ,
+        entity:setting-sio2-c8-l5-numLayers-park2024 ,
+        entity:setting-sio2-c8-l5-numAngularBasis-park2024 ,
+        entity:setting-sio2-c8-l5-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c8-l5-park2024 .
+
+entity:model-sio2-c8-l5-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (8 channels, 5 layers)" .
+
+entity:run-sio2-c16-l2-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 16 channels, 2 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c16-l2-numFeatures-park2024 ,
+        entity:setting-sio2-c16-l2-numLayers-park2024 ,
+        entity:setting-sio2-c16-l2-numAngularBasis-park2024 ,
+        entity:setting-sio2-c16-l2-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c16-l2-park2024 .
+
+entity:model-sio2-c16-l2-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (16 channels, 2 layers)" .
+
+entity:run-sio2-c16-l3-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 16 channels, 3 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c16-l3-numFeatures-park2024 ,
+        entity:setting-sio2-c16-l3-numLayers-park2024 ,
+        entity:setting-sio2-c16-l3-numAngularBasis-park2024 ,
+        entity:setting-sio2-c16-l3-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c16-l3-park2024 .
+
+entity:model-sio2-c16-l3-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (16 channels, 3 layers)" .
+
+entity:run-sio2-c16-l4-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 16 channels, 4 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c16-l4-numFeatures-park2024 ,
+        entity:setting-sio2-c16-l4-numLayers-park2024 ,
+        entity:setting-sio2-c16-l4-numAngularBasis-park2024 ,
+        entity:setting-sio2-c16-l4-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c16-l4-park2024 .
+
+entity:model-sio2-c16-l4-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (16 channels, 4 layers)" .
+
+entity:run-sio2-c16-l5-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 16 channels, 5 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c16-l5-numFeatures-park2024 ,
+        entity:setting-sio2-c16-l5-numLayers-park2024 ,
+        entity:setting-sio2-c16-l5-numAngularBasis-park2024 ,
+        entity:setting-sio2-c16-l5-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c16-l5-park2024 .
+
+entity:model-sio2-c16-l5-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (16 channels, 5 layers)" .
+
+entity:run-sio2-c32-l2-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 32 channels, 2 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c32-l2-numFeatures-park2024 ,
+        entity:setting-sio2-c32-l2-numLayers-park2024 ,
+        entity:setting-sio2-c32-l2-numAngularBasis-park2024 ,
+        entity:setting-sio2-c32-l2-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c32-l2-park2024 .
+
+entity:model-sio2-c32-l2-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (32 channels, 2 layers)" .
+
+entity:run-sio2-c32-l3-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 32 channels, 3 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c32-l3-numFeatures-park2024 ,
+        entity:setting-sio2-c32-l3-numLayers-park2024 ,
+        entity:setting-sio2-c32-l3-numAngularBasis-park2024 ,
+        entity:setting-sio2-c32-l3-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c32-l3-park2024 .
+
+entity:model-sio2-c32-l3-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (32 channels, 3 layers)" .
+
+entity:run-sio2-c32-l4-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 32 channels, 4 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c32-l4-numFeatures-park2024 ,
+        entity:setting-sio2-c32-l4-numLayers-park2024 ,
+        entity:setting-sio2-c32-l4-numAngularBasis-park2024 ,
+        entity:setting-sio2-c32-l4-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c32-l4-park2024 .
+
+entity:model-sio2-c32-l4-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (32 channels, 4 layers)" .
+
+entity:run-sio2-c32-l5-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 32 channels, 5 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c32-l5-numFeatures-park2024 ,
+        entity:setting-sio2-c32-l5-numLayers-park2024 ,
+        entity:setting-sio2-c32-l5-numAngularBasis-park2024 ,
+        entity:setting-sio2-c32-l5-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c32-l5-park2024 .
+
+entity:model-sio2-c32-l5-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (32 channels, 5 layers)" .
+
+entity:run-sio2-c64-l2-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 64 channels, 2 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c64-l2-numFeatures-park2024 ,
+        entity:setting-sio2-c64-l2-numLayers-park2024 ,
+        entity:setting-sio2-c64-l2-numAngularBasis-park2024 ,
+        entity:setting-sio2-c64-l2-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c64-l2-park2024 .
+
+entity:model-sio2-c64-l2-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (64 channels, 2 layers)" .
+
+entity:run-sio2-c64-l3-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 64 channels, 3 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c64-l3-numFeatures-park2024 ,
+        entity:setting-sio2-c64-l3-numLayers-park2024 ,
+        entity:setting-sio2-c64-l3-numAngularBasis-park2024 ,
+        entity:setting-sio2-c64-l3-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c64-l3-park2024 .
+
+entity:model-sio2-c64-l3-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (64 channels, 3 layers)" .
+
+entity:run-sio2-c64-l4-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 64 channels, 4 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c64-l4-numFeatures-park2024 ,
+        entity:setting-sio2-c64-l4-numLayers-park2024 ,
+        entity:setting-sio2-c64-l4-numAngularBasis-park2024 ,
+        entity:setting-sio2-c64-l4-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c64-l4-park2024 .
+
+entity:model-sio2-c64-l4-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (64 channels, 4 layers)" .
+
+entity:run-sio2-c64-l5-park2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP (SevenNet) benchmark model for SiO2: 64 channels, 5 message-passing layers" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO2-park2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sio2-c64-l5-numFeatures-park2024 ,
+        entity:setting-sio2-c64-l5-numLayers-park2024 ,
+        entity:setting-sio2-c64-l5-numAngularBasis-park2024 ,
+        entity:setting-sio2-c64-l5-cutoffRadius-park2024 ;
+    mlips:produces entity:model-sio2-c64-l5-park2024 .
+
+entity:model-sio2-c64-l5-park2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet SiO2 benchmark model (64 channels, 5 layers)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-park2024 mlips:hasResult
+    entity:result-sevennet-0-test-park2024 .
+
+entity:result-sevennet-0-test-park2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SevenNet-0-MPF ;
+    mlips:targetMaterial entity:mat-mpf-park2024 ;
+    mlips:hasAccuracyMetric entity:metric-sevennet-0-test-1-park2024 ,
+        entity:metric-sevennet-0-test-2-park2024 ,
+        entity:metric-sevennet-0-test-3-park2024 .
+
+entity:metric-sevennet-0-test-1-park2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SevenNet-0, M3GNet data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "24"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-sevennet-0-test-2-park2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SevenNet-0, M3GNet data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.067"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-sevennet-0-test-3-park2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: SevenNet-0, M3GNet data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.65"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# SevenNet-0 was trained on four A100 GPUs for 450 epochs (no time given).
+# The scaling benchmarks (weak and strong scaling on up to 32 A100 GPUs,
+# alpha-quartz SiO2, LAMMPS 23Jun2022) are reported as figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - SevenNet is an implementation of the NequIP architecture (the paper: 'The GNN architecture of SevenNet is identical to that of NequIP'), so the models apply the registry method entity:NequIP and SevenNet is an implementation library.
+# - SevenNet-0 here is the registry model SevenNet-0-MPF (trained on the M3GNet MPF data). The stub 'SevenNet-0 trained on MPtrj' evaluated by loew2025 is a later checkpoint and a different registry model.
+# - The 20 SiO2 models exist to measure parallel performance; no accuracy is reported for them. Their timings (scaled-size and fixed-size tests) are figures.
+# - Parameter count (0.84 million, against 16.24 million in GNoME) is in the registry label; the average-neighbour normalisation and the pruned tensor-product paths are not encoded.
+# - Structural results of the Si3N4 melt-quench simulation have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
