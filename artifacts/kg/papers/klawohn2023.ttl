@@ -1,0 +1,358 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Sascha Klawohn et al. (2023). Gaussian approximation potentials: Theory, software implementation and application examples.
+#   The Journal of Chemical Physics. doi:10.1063/5.0160898  arXiv:2310.03921v1
+#
+# Version read: arxiv-preprint arXiv:2310.03921v1 (sha256 682436c82e309fcd...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 38 (Software/implementation). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a software paper on the GAP code (gap_fit in QUIP, SOAP
+# and soap_turbo descriptors, sparsification, MPI parallelisation). Two
+# documented example fits are encoded with their gap_fit parameters: the
+# silicon model on the database of Bartok et al. (Table I) and the
+# Mo-Nb-Ta-V-W high-entropy-alloy model on the database of Byggmastar et
+# al. (Table II). All errors are shown as figures.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-klawohn2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Klawohn et al. (2023): Gaussian approximation potentials, theory, software implementation and application examples" ;
+    mlips:reportedIn entity:article-klawohn2023 .
+
+entity:article-klawohn2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0160898> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Gaussian approximation potentials: Theory, software implementation and application examples" ;
+    schema:author <https://orcid.org/0000-0003-4850-776X> ,
+        <https://orcid.org/0000-0002-3365-599X> ,
+        <https://orcid.org/0000-0001-6755-6271> ,
+        <https://orcid.org/0000-0002-8180-2034> ,
+        <https://orcid.org/0000-0001-9304-4261> ,
+        <https://orcid.org/0000-0002-4347-8819> .
+
+<https://orcid.org/0000-0003-4850-776X> a schema:Person ;
+    schema:name "Sascha Klawohn" ;
+    schema:givenName "Sascha" ;
+    schema:familyName "Klawohn" ;
+    schema:identifier <https://orcid.org/0000-0003-4850-776X> .
+
+<https://orcid.org/0000-0002-3365-599X> a schema:Person ;
+    schema:name "James P. Darby" ;
+    schema:givenName "James P." ;
+    schema:familyName "Darby" ;
+    schema:identifier <https://orcid.org/0000-0002-3365-599X> .
+
+<https://orcid.org/0000-0001-6755-6271> a schema:Person ;
+    schema:name "James R. Kermode" ;
+    schema:givenName "James R." ;
+    schema:familyName "Kermode" ;
+    schema:identifier <https://orcid.org/0000-0001-6755-6271> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0001-9304-4261> a schema:Person ;
+    schema:name "Miguel A. Caro" ;
+    schema:givenName "Miguel A." ;
+    schema:familyName "Caro" ;
+    schema:identifier <https://orcid.org/0000-0001-9304-4261> .
+
+<https://orcid.org/0000-0002-4347-8819> a schema:Person ;
+    schema:name "Albert P. Bartók" ;
+    schema:givenName "Albert P." ;
+    schema:familyName "Bartók" ;
+    schema:identifier <https://orcid.org/0000-0002-4347-8819> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Si-klawohn2023 a mlips:MaterialSystem ;
+    rdfs:label "Silicon (general-purpose database: crystalline, liquid, amorphous and defective configurations)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental semiconductor" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+entity:mat-MoNbTaVW-klawohn2023 a mlips:MaterialSystem ;
+    rdfs:label "Mo-Nb-Ta-V-W quinary high-entropy alloy" ;
+    mlips:chemicalFormula "Mo-Nb-Ta-V-W" ;
+    mlips:materialClass "Refractory bcc high-entropy alloy; bulk, surface, liquid, dimer and short-range configurations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Si-klawohn2023 a mlips:TrainingDataset ;
+    rdfs:label "Silicon GAP database of Bartok et al. (80% training split)" ;
+    mlips:coversMaterial entity:mat-Si-klawohn2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The number of configurations is not stated in this paper." .
+
+entity:ds-MoNbTaVW-klawohn2023 a mlips:TrainingDataset ;
+    rdfs:label "Mo-Nb-Ta-V-W GAP database of Byggmastar et al. (reduced)" ;
+    mlips:coversMaterial entity:mat-MoNbTaVW-klawohn2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The number of configurations is not stated in this paper." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Si-klawohn2023 mlips:samplingStrategy
+    entity:sampling-si-database-klawohn2023 .
+
+entity:ds-MoNbTaVW-klawohn2023 mlips:samplingStrategy
+    entity:sampling-hea-database-klawohn2023 .
+
+entity:sampling-si-database-klawohn2023 a mlips:SamplingStrategy ;
+    rdfs:label "Published silicon GAP database, random 80/20 split" ;
+    rdfs:comment "The extended XYZ database shared with Ref. [39] (Bartok et al.), split at random into 80% training and 20% test configurations." .
+
+entity:sampling-hea-database-klawohn2023 a mlips:SamplingStrategy ;
+    rdfs:label "Published Mo-Nb-Ta-V-W database (reduced)" ;
+    rdfs:comment "Database of Byggmastar et al. (file db_HEA_reduced.xyz) with configuration types dimer, HEA short range, HEA surface, isolated atom, liquid composition, liquid HEA, short range and surface/liquid." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-klawohn2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:numSparseConfigs ,
+        entity:hp-zeta-klawohn2023 ,
+        entity:hp-sigma-atom-klawohn2023 ,
+        entity:hp-reg-energy-klawohn2023 ,
+        entity:hp-reg-force-klawohn2023 ,
+        entity:hp-reg-virial-klawohn2023 ,
+        entity:hp-cutoff-transition-width-klawohn2023 ;
+    mlips:hasImplementation entity:impl-GAP-klawohn2023 .
+
+entity:alg-GAP-klawohn2023 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression with gap_fit; sparse points chosen by CUR decomposition; dot-product (polynomial SOAP) kernel; MPI-ScaLAPACK parallel solver" .
+
+entity:impl-GAP-klawohn2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP ;
+    mlips:version "GAP submodule (gap_fit program)" .
+
+entity:hp-zeta-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "SOAP polynomial kernel exponent (soap_exponent)" ;
+    mlips:hyperparameterName "soap_exponent" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-atom-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width (atom_gaussian_width, Angstrom)" ;
+    mlips:hyperparameterName "atom_gaussian_width" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-reg-energy-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "GAP default kernel regularisation for energies" ;
+    mlips:hyperparameterName "default_kernel_regularisation[energy]" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-reg-force-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "GAP default kernel regularisation for forces" ;
+    mlips:hyperparameterName "default_kernel_regularisation[force]" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-reg-virial-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "GAP default kernel regularisation for virials" ;
+    mlips:hyperparameterName "default_kernel_regularisation[virial]" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-cutoff-transition-width-klawohn2023 a mlips:Hyperparameter ;
+    rdfs:label "SOAP cutoff transition width (Angstrom)" ;
+    mlips:hyperparameterName "cutoff_transition_width" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-Si-cutoffRadius-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-gap-Si-numRadialBasis-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-gap-Si-numAngularBasis-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-gap-Si-numSparseConfigs-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "8000"^^xsd:integer .
+
+entity:setting-gap-Si-zeta-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-klawohn2023 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Si-sigma-atom-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-klawohn2023 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-gap-Si-reg-energy-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-energy-klawohn2023 ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-gap-Si-reg-force-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-force-klawohn2023 ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+entity:setting-gap-Si-reg-virial-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-virial-klawohn2023 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Si-cutoff-transition-width-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-klawohn2023 ;
+    mlips:settingValue "1"^^xsd:double .
+
+entity:setting-gap-HEA-cutoffRadius-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-gap-HEA-numRadialBasis-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-HEA-numAngularBasis-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-HEA-numSparseConfigs-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "4000"^^xsd:integer .
+
+entity:setting-gap-HEA-zeta-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-klawohn2023 ;
+    mlips:settingValue "2"^^xsd:double .
+
+entity:setting-gap-HEA-sigma-atom-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-klawohn2023 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-gap-HEA-reg-energy-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-energy-klawohn2023 ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-gap-HEA-reg-force-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-force-klawohn2023 ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+entity:setting-gap-HEA-reg-virial-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-reg-virial-klawohn2023 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-gap-HEA-cutoff-transition-width-klawohn2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-klawohn2023 ;
+    mlips:settingValue "1"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-Si-klawohn2023 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for silicon with the Table I parameters" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Si-klawohn2023 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Si-cutoffRadius-klawohn2023 ,
+        entity:setting-gap-Si-numRadialBasis-klawohn2023 ,
+        entity:setting-gap-Si-numAngularBasis-klawohn2023 ,
+        entity:setting-gap-Si-numSparseConfigs-klawohn2023 ,
+        entity:setting-gap-Si-zeta-klawohn2023 ,
+        entity:setting-gap-Si-sigma-atom-klawohn2023 ,
+        entity:setting-gap-Si-reg-energy-klawohn2023 ,
+        entity:setting-gap-Si-reg-force-klawohn2023 ,
+        entity:setting-gap-Si-reg-virial-klawohn2023 ,
+        entity:setting-gap-Si-cutoff-transition-width-klawohn2023 ;
+    mlips:produces entity:model-gap-Si-klawohn2023 .
+
+entity:model-gap-Si-klawohn2023 a mlips:TrainedModel ;
+    rdfs:label "SOAP-GAP for silicon (n_max 6, l_max 6, cutoff 5 A, 8000 sparse points)" .
+
+entity:run-gap-HEA-klawohn2023 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for the Mo-Nb-Ta-V-W high-entropy alloy with the Table II parameters (two-body + SOAP)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-MoNbTaVW-klawohn2023 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-HEA-cutoffRadius-klawohn2023 ,
+        entity:setting-gap-HEA-numRadialBasis-klawohn2023 ,
+        entity:setting-gap-HEA-numAngularBasis-klawohn2023 ,
+        entity:setting-gap-HEA-numSparseConfigs-klawohn2023 ,
+        entity:setting-gap-HEA-zeta-klawohn2023 ,
+        entity:setting-gap-HEA-sigma-atom-klawohn2023 ,
+        entity:setting-gap-HEA-reg-energy-klawohn2023 ,
+        entity:setting-gap-HEA-reg-force-klawohn2023 ,
+        entity:setting-gap-HEA-reg-virial-klawohn2023 ,
+        entity:setting-gap-HEA-cutoff-transition-width-klawohn2023 ;
+    mlips:produces entity:model-gap-HEA-klawohn2023 .
+
+entity:model-gap-HEA-klawohn2023 a mlips:TrainedModel ;
+    rdfs:label "Two-body + SOAP GAP for Mo-Nb-Ta-V-W (n_max 8, l_max 4, 4000 sparse points per element)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Evaluation time per atom of the silicon models is plotted against the
+# descriptor parameters (Fig. 4), measured on a single core of an Intel
+# Core i5-9600K at 3.70 GHz; no number is printed.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy, force and virial RMSEs of the silicon models (Figs. 4 and 5) and the core-level-energy models on QM9-GW (Fig. 6) are given as figures; no AccuracyMetric is encoded.
+# - The silicon run encodes the baseline parameters of Table I; the paper varies n_max, l_max, cutoff, sigma, zeta, the number of sparse points and the three regularisation values one at a time around it, and those variants are not encoded.
+# - Per-configuration-type regularisation overrides (liq, amorph, sp for Si; eight types for the HEA) and the two-body descriptor of the HEA model (20 uniform sparse points, squared-exponential kernel, cutoff 5.0 A) are not encoded as settings.
+# - The reference DFT settings of the two databases are not restated here; they are those of the original papers. The silicon database is the one of bartok2018si, whose data-set node is not reused (data sets are paper-local).
+# - The XPS/GW local-property example (C1s and O1s core-electron binding energies on QM9-GW) is not an interatomic potential and is not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
