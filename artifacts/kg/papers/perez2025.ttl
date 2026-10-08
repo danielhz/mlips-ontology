@@ -1,0 +1,163 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Danny Pérez et al. (2025). Uncertainty quantification for misspecified machine learned interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-025-01758-4  arXiv:2502.07104v2
+#
+# Version read: arxiv-preprint arXiv:2502.07104v2 (sha256 2984365dcf44706e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 117 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper develops a misspecification-aware Bayesian
+# uncertainty quantification (the POPS-hypercube ansatz) for linear
+# MLIPs and tests it on a quadratic SNAP potential for tungsten. The
+# qSNAP fit (data set, weighting, least-squares training) is encoded; the
+# uncertainty statistics, which are the paper's results, are not
+# expressible.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-perez2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Perez et al. (2025): uncertainty quantification for misspecified machine learned interatomic potentials (POPS, qSNAP for tungsten)" ;
+    mlips:reportedIn entity:article-perez2025 .
+
+entity:article-perez2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01758-4> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Uncertainty quantification for misspecified machine learned interatomic potentials" ;
+    schema:author entity:person-Perez-perez2025 ,
+        entity:person-Subramanyam-perez2025 ,
+        entity:person-Maliyov-perez2025 ,
+        entity:person-Swinburne-perez2025 .
+
+entity:person-Perez-perez2025 a schema:Person ;
+    schema:name "Danny Perez" ;
+    schema:givenName "Danny" ;
+    schema:familyName "Perez" .
+
+entity:person-Subramanyam-perez2025 a schema:Person ;
+    schema:name "Aparna P. A. Subramanyam" ;
+    schema:givenName "Aparna P. A." ;
+    schema:familyName "Subramanyam" .
+
+entity:person-Maliyov-perez2025 a schema:Person ;
+    schema:name "Ivan Maliyov" ;
+    schema:givenName "Ivan" ;
+    schema:familyName "Maliyov" .
+
+entity:person-Swinburne-perez2025 a schema:Person ;
+    schema:name "Thomas D. Swinburne" ;
+    schema:givenName "Thomas D." ;
+    schema:familyName "Swinburne" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-W-perez2025 a mlips:MaterialSystem ;
+    rdfs:label "Tungsten: entropy-maximised, diverse-by-construction configurations rescaled to the interatomic spacing of tungsten" ;
+    mlips:chemicalFormula "W" ;
+    mlips:materialClass "Elemental bcc refractory metal; broad coverage of bispectrum feature space" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-W-perez2025 a mlips:TrainingDataset ;
+    rdfs:label "Entropy-maximised tungsten data set, training partition (7000 configurations)" ;
+    mlips:coversMaterial entity:mat-W-perez2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 7000 ;
+    rdfs:comment "The reference quantum method of the data set is not restated in the parts read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-W-perez2025 mlips:samplingStrategy
+    entity:sampling-entropy-max-perez2025 .
+
+entity:sampling-entropy-max-perez2025 a mlips:SamplingStrategy ;
+    rdfs:label "Diverse-by-construction generation by maximising the information entropy of the bispectrum-component distribution" ;
+    rdfs:comment "Data set introduced in Ref. [68] of the paper and rescaled to tungsten; partitioned into a training set of 7000 energies and 122,853 force components and a test set of 3000 energies and 53,493 force components." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:qSNAP a mlips:MLIPMethod ;
+    rdfs:label "Quadratic Spectral Neighbor Analysis Potential (qSNAP)" ;
+    mlips:hasFunctionalForm entity:ff-qSNAP ;
+    mlips:hasLossFunction entity:loss-qSNAP-perez2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-qSNAP-perez2025 .
+
+entity:ff-qSNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components plus all their distinct pairwise products" .
+
+entity:loss-qSNAP-perez2025 a mlips:LossFunction ;
+    rdfs:label "Weighted linear least squares on total energies and atomic forces with weights w_energy ~ exp(-E_ref / a) and w_force ~ exp(-|F_ref| / b), a = 2 eV and b = 50 eV/A, normalised so that energy and force weights sum equally" .
+
+entity:alg-qSNAP-perez2025 a mls:Algorithm ;
+    rdfs:label "Linear least squares for the linear and quadratic bispectrum coefficients (maximum-likelihood solution); an ensemble of parameter vectors from the POPS-hypercube ansatz provides misspecification-aware uncertainty bounds. Hyperparameters were deliberately not optimised." .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-qsnap-W-perez2025 a mlips:MLIPRun ;
+    rdfs:label "Quadratic SNAP fit for tungsten (maximum-likelihood model)" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-W-perez2025 ;
+    mlips:produces entity:model-qsnap-W-perez2025 .
+
+entity:model-qsnap-W-perez2025 a mlips:TrainedModel ;
+    rdfs:label "qSNAP potential for tungsten (assessment model for the UQ procedure)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric is encoded: the pointwise test errors of the model are shown as distributions (Fig. 3), and the tables report uncertainty-quantification statistics (envelope violations, bounds on formation energies, volumes, bulk moduli, defect and surface energetics, barriers) that have no MetricProperty.
+# - The cutoff radius and the bispectrum band limit are not stated ('not fine-tuned nor optimised'); the software was not captured (SNAP fits are usually done with FitSNAP and LAMMPS).
+# - The UQ ensemble (many parameter vectors of the same functional form) is one run and one model here; schema 0.1.2 has no notion of a model ensemble or of an uncertainty estimate. The application of the method to universal MLIPs (Section III G) is not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
