@@ -1,0 +1,777 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yury V. Lysogorskiy et al. (2026). Graph atomic cluster expansion for foundational machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-026-01979-1  arXiv:2508.17936v2
+#
+# Version read: arxiv-preprint arXiv:2508.17936v2 (sha256 f274a6e8003fe035...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 26 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the GRACE foundational models: five architectures
+# (1L, 1L-L, 2L, 2L-M, 2L-L; Table S1) parameterised on OMat24 ("-OMAT")
+# and fine-tuned on MPTraj + sAlex ("-OAM"), ten named models in all,
+# with their settings, training protocol and reported throughput.
+# Validation is by benchmark scores and properties, not by energy/force
+# errors on a material system.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-lysogorskiy2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Lysogorskiy et al. (2026): GRACE foundational machine learning interatomic potentials" ;
+    mlips:reportedIn entity:article-lysogorskiy2026 .
+
+entity:article-lysogorskiy2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-026-01979-1> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Graph atomic cluster expansion for foundational machine learning interatomic potentials" ;
+    schema:author entity:person-Lysogorskiy-lysogorskiy2026 ,
+        entity:person-Bochkarev-lysogorskiy2026 ,
+        entity:person-Drautz-lysogorskiy2026 .
+
+entity:person-Lysogorskiy-lysogorskiy2026 a schema:Person ;
+    schema:name "Yury Lysogorskiy" ;
+    schema:givenName "Yury" ;
+    schema:familyName "Lysogorskiy" .
+
+entity:person-Bochkarev-lysogorskiy2026 a schema:Person ;
+    schema:name "Anton Bochkarev" ;
+    schema:givenName "Anton" ;
+    schema:familyName "Bochkarev" .
+
+entity:person-Drautz-lysogorskiy2026 a schema:Person ;
+    schema:name "Ralf Drautz" ;
+    schema:givenName "Ralf" ;
+    schema:familyName "Drautz" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-universal-lysogorskiy2026 a mlips:MaterialSystem ;
+    rdfs:label "Inorganic materials across 89 elements (universal training domain of OMat24, MPTraj and sAlex)" ;
+    mlips:materialClass "Universal inorganic materials; bulk crystals, non-equilibrium and relaxation-trajectory configurations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-omat-dft-lysogorskiy2026 a mlips:DFTCalculation .
+
+entity:calc-mp-dft-lysogorskiy2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-omat-dft-lysogorskiy2026 mlips:hasDFTSettings entity:calc-settings-omat-dft-lysogorskiy2026 .
+
+entity:calc-settings-omat-dft-lysogorskiy2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "OMat24: GGA-PBE with Hubbard U corrections for specific oxides and fluorides, consistent with Materials Project defaults; DFT and pseudopotential settings differ from those of Alexandria and the Materials Project." .
+
+entity:calc-mp-dft-lysogorskiy2026 mlips:hasDFTSettings entity:calc-settings-mp-dft-lysogorskiy2026 .
+
+entity:calc-settings-mp-dft-lysogorskiy2026 a mlips:DFTSettings ;
+    rdfs:comment "MPTraj (v2022.10.28) and sAlex reference calculations (Materials Project and Alexandria settings); their code, functional and pseudopotentials are not restated in this paper, only that they differ from the OMat24 settings." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-OMat24-lysogorskiy2026 a mlips:TrainingDataset ;
+    rdfs:label "OMat24 (110 million DFT calculations)" ;
+    mlips:coversMaterial entity:mat-universal-lysogorskiy2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 110000000 ;
+    mlips:hasDFTCalculation entity:calc-omat-dft-lysogorskiy2026 ;
+    rdfs:comment "numConfigurations is the size of OMat24 as stated in the paper ('110 million DFT calculations'); the paper does not say whether a subset was used." .
+
+entity:ds-MPTraj-sAlex-lysogorskiy2026 a mlips:TrainingDataset ;
+    rdfs:label "MPTraj (v2022.10.28) + subsampled Alexandria (sAlex)" ;
+    mlips:coversMaterial entity:mat-universal-lysogorskiy2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-mp-dft-lysogorskiy2026 ;
+    rdfs:comment "sAlex is curated to prevent data leakage with the WBM test set. Used to fine-tune the OMat-base models into the -OAM models; sizes are not stated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-OMat24-lysogorskiy2026 mlips:samplingStrategy
+    entity:sampling-rattled-boltzmann-lysogorskiy2026 ,
+    entity:sampling-aimd-lysogorskiy2026 ,
+    entity:sampling-relaxations-lysogorskiy2026 .
+
+entity:ds-MPTraj-sAlex-lysogorskiy2026 mlips:samplingStrategy
+    entity:sampling-relaxations-lysogorskiy2026 .
+
+entity:sampling-rattled-boltzmann-lysogorskiy2026 a mlips:SamplingStrategy ;
+    rdfs:label "Boltzmann sampling of structures with randomly displaced atoms (OMat24)" .
+
+entity:sampling-aimd-lysogorskiy2026 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio molecular dynamics (OMat24)" .
+
+entity:sampling-relaxations-lysogorskiy2026 a mlips:SamplingStrategy ;
+    rdfs:label "Structural relaxation trajectories" ;
+    rdfs:comment "Relaxations of the sampled configurations in OMat24; sAlex and MPTraj consist of relaxation trajectories only." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GRACE a mlips:MLIPMethod ;
+    rdfs:label "Graph Atomic Cluster Expansion (GRACE)" ;
+    mlips:hasFunctionalForm entity:ff-GRACE ;
+    mlips:hasLossFunction entity:loss-GRACE-lysogorskiy2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-GRACE-lysogorskiy2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:bodyOrder ,
+        mlips:numLayers ,
+        entity:hp-chem-embedding-lysogorskiy2026 ,
+        entity:hp-num-radial-functions-lysogorskiy2026 ,
+        mlips:learningRate ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-GRACE-lysogorskiy2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:ff-GRACE a mlips:FunctionalForm ;
+    rdfs:label "Graph extension of the atomic cluster expansion with star- and tree-like many-body basis functions; one-layer models use star-graph ACE basis functions, two-layer models add semi-local interactions through equivariant message passing; atomic energies are summed to the total energy" .
+
+entity:loss-GRACE-lysogorskiy2026 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of Huber losses (delta = 0.01) on energy per atom, force components and stress components; weights alpha_E : alpha_F : alpha_S = 16 : 128 : 128 for the OMat-base stage and 128 : 128 : 256 for the fine-tuning stages" .
+
+entity:alg-GRACE-lysogorskiy2026 a mls:Algorithm ;
+    rdfs:label "Adam with cosine learning-rate reduction from 8e-3 to 5e-4; constant learning rate 1e-4 for fine-tuning; batches of 165000 bonds per device (about 200 structures on average)" .
+
+entity:impl-GRACE-lysogorskiy2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-grace-tensorpotential-lysogorskiy2026 .
+
+entity:lib-grace-tensorpotential-lysogorskiy2026 a mlips:Library ;
+    rdfs:label "grace-tensorpotential" ;
+    rdfs:comment "TensorFlow-based package; double precision, JIT-compiled with XLA; MD through ASE and LAMMPS." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-chem-embedding-lysogorskiy2026 a mlips:Hyperparameter ;
+    rdfs:label "GRACE chemical embedding dimension" ;
+    mlips:hyperparameterName "chemical_embedding" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-radial-functions-lysogorskiy2026 a mlips:Hyperparameter ;
+    rdfs:label "GRACE number of radial functions" ;
+    mlips:hyperparameterName "num_radial_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-1L-OMAT-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-1L-OMAT-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-1L-OMAT-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-OMAT-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-OMAT-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-1L-OMAT-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-1L-OMAT-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-1L-OMAT-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-1L-OMAT-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-1L-OAM-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-1L-OAM-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-1L-OAM-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-OAM-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-OAM-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-1L-OAM-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-1L-OAM-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-1L-OAM-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-1L-OAM-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-1L-L-OMAT-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-1L-L-OMAT-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-1L-L-OAM-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-1L-L-OAM-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-1L-L-OAM-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-L-OAM-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-1L-L-OAM-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-1L-L-OAM-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-1L-L-OAM-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-1L-L-OAM-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-1L-L-OAM-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-OMAT-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-OMAT-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-OMAT-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-OMAT-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-OMAT-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-OMAT-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-OMAT-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-2L-OMAT-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-2L-OMAT-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-OAM-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-OAM-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-OAM-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-OAM-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-OAM-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-OAM-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-OAM-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-2L-OAM-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-2L-OAM-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "42"^^xsd:integer .
+
+entity:setting-2L-M-OMAT-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-2L-M-OMAT-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-M-OAM-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-M-OAM-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-2L-M-OAM-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-M-OAM-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-M-OAM-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-M-OAM-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-M-OAM-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "42"^^xsd:integer .
+
+entity:setting-2L-M-OAM-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-2L-M-OAM-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "42"^^xsd:integer .
+
+entity:setting-2L-L-OMAT-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-2L-L-OMAT-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-2L-L-OAM-cutoffRadius-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-2L-L-OAM-numRadialBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-2L-L-OAM-numAngularBasis-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-L-OAM-bodyOrder-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-2L-L-OAM-numLayers-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-2L-L-OAM-chem-embedding-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-chem-embedding-lysogorskiy2026 ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-2L-L-OAM-num-radial-functions-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-radial-functions-lysogorskiy2026 ;
+    mlips:settingValue "42"^^xsd:integer .
+
+entity:setting-2L-L-OAM-learningRate-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-2L-L-OAM-numEpochs-lysogorskiy2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-1L-OMAT-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OMAT parameterisation on OMat24 (12 epochs, then 2 epochs with energy-weighted loss)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-OMat24-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-1L-OMAT-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-bodyOrder-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-numLayers-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-chem-embedding-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-learningRate-lysogorskiy2026 ,
+        entity:setting-1L-OMAT-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-1L-OMAT-lysogorskiy2026 .
+
+entity:model-1L-OMAT-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OMAT (3447148 parameters)" ;
+    mlips:inferenceHardware "Nvidia A100 (80 GB), ASE MD of a BCC tungsten supercell: 54 / 51 / 48 microseconds/atom/step for 512 / 1k / 2k atoms (Table II)" .
+
+entity:run-1L-OAM-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuning of the OMat-base model on MPTraj + sAlex (8 epochs)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MPTraj-sAlex-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-1L-OAM-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-1L-OAM-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-1L-OAM-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-1L-OAM-bodyOrder-lysogorskiy2026 ,
+        entity:setting-1L-OAM-numLayers-lysogorskiy2026 ,
+        entity:setting-1L-OAM-chem-embedding-lysogorskiy2026 ,
+        entity:setting-1L-OAM-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-1L-OAM-learningRate-lysogorskiy2026 ,
+        entity:setting-1L-OAM-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-1L-OAM-lysogorskiy2026 .
+
+entity:model-1L-OAM-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM (3447148 parameters)" .
+
+entity:run-1L-L-OMAT-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OMAT-L parameterisation on OMat24 (12 epochs, then 2 epochs with energy-weighted loss)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-OMat24-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-1L-L-OMAT-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-bodyOrder-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-numLayers-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-chem-embedding-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-learningRate-lysogorskiy2026 ,
+        entity:setting-1L-L-OMAT-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-1L-L-OMAT-lysogorskiy2026 .
+
+entity:model-1L-L-OMAT-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OMAT-L (8953529 parameters)" ;
+    mlips:inferenceHardware "Nvidia A100 (80 GB), ASE MD of a BCC tungsten supercell: 57 / 54 / 51 microseconds/atom/step for 512 / 1k / 2k atoms (Table II)" .
+
+entity:run-1L-L-OAM-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM-L fine-tuning of the OMat-base model on MPTraj + sAlex (8 epochs)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MPTraj-sAlex-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-1L-L-OAM-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-bodyOrder-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-numLayers-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-chem-embedding-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-learningRate-lysogorskiy2026 ,
+        entity:setting-1L-L-OAM-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-1L-L-OAM-lysogorskiy2026 .
+
+entity:model-1L-L-OAM-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM-L (8953529 parameters)" .
+
+entity:run-2L-OMAT-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OMAT parameterisation on OMat24 (8 epochs, then 2 epochs with energy-weighted loss)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-OMat24-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-OMAT-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-OMAT-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-OMAT-lysogorskiy2026 .
+
+entity:model-2L-OMAT-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OMAT (12597516 parameters)" ;
+    mlips:inferenceHardware "Nvidia A100 (80 GB), ASE MD of a BCC tungsten supercell: 68 / 64 / 62 microseconds/atom/step for 512 / 1k / 2k atoms (Table II)" .
+
+entity:run-2L-OAM-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OAM fine-tuning of the OMat-base model on MPTraj + sAlex (4 epochs)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MPTraj-sAlex-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-OAM-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-OAM-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-OAM-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-OAM-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-OAM-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-OAM-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-OAM-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-OAM-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-OAM-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-OAM-lysogorskiy2026 .
+
+entity:model-2L-OAM-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OAM (12597516 parameters)" .
+
+entity:run-2L-M-OMAT-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OMAT-M parameterisation on OMat24 (8 epochs, then 2 epochs with energy-weighted loss)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-OMat24-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-M-OMAT-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-M-OMAT-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-M-OMAT-lysogorskiy2026 .
+
+entity:model-2L-M-OMAT-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OMAT-M (21764956 parameters)" ;
+    mlips:inferenceHardware "Nvidia A100 (80 GB), ASE MD of a BCC tungsten supercell: 74 / 71 / 69 microseconds/atom/step for 512 / 1k / 2k atoms (Table II)" .
+
+entity:run-2L-M-OAM-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OAM-M fine-tuning of the OMat-base model on MPTraj + sAlex (4 epochs)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MPTraj-sAlex-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-M-OAM-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-M-OAM-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-M-OAM-lysogorskiy2026 .
+
+entity:model-2L-M-OAM-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OAM-M (21764956 parameters)" .
+
+entity:run-2L-L-OMAT-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OMAT-L parameterisation on OMat24 (8 epochs, then 2 epochs with energy-weighted loss)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-OMat24-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-L-OMAT-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-L-OMAT-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-L-OMAT-lysogorskiy2026 .
+
+entity:model-2L-L-OMAT-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OMAT-L (26394284 parameters)" ;
+    mlips:inferenceHardware "Nvidia A100 (80 GB), ASE MD of a BCC tungsten supercell: 95 / 91 / 95 microseconds/atom/step for 512 / 1k / 2k atoms (Table II)" .
+
+entity:run-2L-L-OAM-lysogorskiy2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-2L-OAM-L fine-tuning of the OMat-base model on MPTraj + sAlex (4 epochs)" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MPTraj-sAlex-lysogorskiy2026 ;
+    mlips:hasHyperparameterSetting entity:setting-2L-L-OAM-cutoffRadius-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-numRadialBasis-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-numAngularBasis-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-bodyOrder-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-numLayers-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-chem-embedding-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-num-radial-functions-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-learningRate-lysogorskiy2026 ,
+        entity:setting-2L-L-OAM-numEpochs-lysogorskiy2026 ;
+    mlips:trainingHardware "Single node with 8 Nvidia H100 80GB GPUs; the complete training cost of the GRACE models is stated as 400 (smallest) to 700 (most complex) GPU hours" ;
+    mlips:produces entity:model-2L-L-OAM-lysogorskiy2026 .
+
+entity:model-2L-L-OAM-lysogorskiy2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-2L-OAM-L (26394284 parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Training ran on a single node with 8 Nvidia H100 80GB GPUs; the complete
+# training cost is stated as 400 to 700 GPU hours from the smallest to the
+# most complex model (kept as text in trainingHardware because the figure
+# is not attributed to a single training stage). Table II gives MD
+# throughput in microseconds/atom/step on four GPU types; the A100 column
+# is recorded as inferenceHardware on the five -OMAT models.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Validation is by MatBench Discovery F1, kappa-SRME, elastic constants, and grain-boundary, surface and point-defect formation energies; none is an energy/force/stress error on a material system, so no AccuracyMetric is encoded.
+# - Table S2 (distillation of fine-tuned models into GRACE-FS on HEA25S, with energy and force errors) and the fine-tuning study of Fig. 8 are not encoded.
+# - Table S1 also lists a 1L-medium configuration; no model of that configuration is named in the benchmark tables, so it is not encoded.
+# - Each -OMAT model is the result of two stages (OMat-base, then 2 more epochs with alpha_E : alpha_F : alpha_S = 128 : 128 : 256); the run encodes the base-stage epochs and learning rate and names the second stage in its label. The -OAM models start from the OMat-base weights, which schema 0.1.2 cannot express.
+# - lmax = 4 is encoded as mlips:numAngularBasis and the product order 4 as mlips:bodyOrder, following the reading used for MACE and CACE.
+# - Other foundation models compared in the paper (ORB-v3, SevenNet-MF-ompa, MatterSim, MACE-MPA-0, MACE-OMAT-0, eSEN, DPA-3.1) are evaluated on benchmark scores and throughput only and are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
