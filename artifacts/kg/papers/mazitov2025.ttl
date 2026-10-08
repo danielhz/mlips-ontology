@@ -1,0 +1,492 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Arslan Mazitov et al. (2025). PET-MAD as a lightweight universal interatomic potential for advanced materials modeling.
+#   Nature Communications. doi:10.1038/s41467-025-65662-7  arXiv:2503.14118v2
+#
+# Version read: arxiv-preprint arXiv:2503.14118v2 (sha256 eb550550c4d60044...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 186 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the PET-MAD model (Point Edge Transformer trained on
+# the MAD data set): reference calculations, data set, architecture and
+# training settings, training cost, and its energy and force MAEs on the
+# MAD splits and on six external benchmark sets (Table I). The comparison
+# models of Table I, the fine-tuned and bespoke PET models and the six
+# application studies are not encoded; see gaps. Read from the arXiv
+# preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-mazitov2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Mazitov et al. (2025): PET-MAD, a lightweight universal interatomic potential for advanced materials modeling" ;
+    mlips:reportedIn entity:article-mazitov2025 .
+
+entity:article-mazitov2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-025-65662-7> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "PET-MAD as a lightweight universal interatomic potential for advanced materials modeling" ;
+    schema:author <https://orcid.org/0000-0002-6549-7324> ,
+        entity:person-Bigi-mazitov2025 ,
+        entity:person-Kellner-mazitov2025 ,
+        <https://orcid.org/0000-0003-1491-8229> ,
+        <https://orcid.org/0000-0001-7229-6101> ,
+        entity:person-Fraux-mazitov2025 ,
+        entity:person-Pozdnyakov-mazitov2025 ,
+        <https://orcid.org/0000-0002-9112-0010> ,
+        <https://orcid.org/0000-0003-2571-2832> .
+
+<https://orcid.org/0000-0002-6549-7324> a schema:Person ;
+    schema:name "Arslan Mazitov" ;
+    schema:givenName "Arslan" ;
+    schema:familyName "Mazitov" ;
+    schema:identifier <https://orcid.org/0000-0002-6549-7324> .
+
+entity:person-Bigi-mazitov2025 a schema:Person ;
+    schema:name "Filippo Bigi" ;
+    schema:givenName "Filippo" ;
+    schema:familyName "Bigi" .
+
+entity:person-Kellner-mazitov2025 a schema:Person ;
+    schema:name "Matthias Kellner" ;
+    schema:givenName "Matthias" ;
+    schema:familyName "Kellner" .
+
+<https://orcid.org/0000-0003-1491-8229> a schema:Person ;
+    schema:name "Paolo Pegolo" ;
+    schema:givenName "Paolo" ;
+    schema:familyName "Pegolo" ;
+    schema:identifier <https://orcid.org/0000-0003-1491-8229> .
+
+<https://orcid.org/0000-0001-7229-6101> a schema:Person ;
+    schema:name "Davide Tisi" ;
+    schema:givenName "Davide" ;
+    schema:familyName "Tisi" ;
+    schema:identifier <https://orcid.org/0000-0001-7229-6101> .
+
+entity:person-Fraux-mazitov2025 a schema:Person ;
+    schema:name "Guillaume Fraux" ;
+    schema:givenName "Guillaume" ;
+    schema:familyName "Fraux" .
+
+entity:person-Pozdnyakov-mazitov2025 a schema:Person ;
+    schema:name "Sergey Pozdnyakov" ;
+    schema:givenName "Sergey" ;
+    schema:familyName "Pozdnyakov" .
+
+<https://orcid.org/0000-0002-9112-0010> a schema:Person ;
+    schema:name "Philip Loche" ;
+    schema:givenName "Philip" ;
+    schema:familyName "Loche" ;
+    schema:identifier <https://orcid.org/0000-0002-9112-0010> .
+
+<https://orcid.org/0000-0003-2571-2832> a schema:Person ;
+    schema:name "Michele Ceriotti" ;
+    schema:givenName "Michele" ;
+    schema:familyName "Ceriotti" ;
+    schema:identifier <https://orcid.org/0000-0003-2571-2832> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-MAD-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "MAD: organic and inorganic systems of 85 elements in all dimensionalities (3D and 2D crystals, rattled and random structures, surfaces, clusters, molecular crystals and fragments)" ;
+    mlips:materialClass "Universal (organic and inorganic)" .
+
+entity:mat-MPtrj-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "Bulk inorganic crystals of MPtrj (relaxation trajectories)" ;
+    mlips:materialClass "Universal inorganic materials" .
+
+entity:mat-Alexandria-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "Bulk, 2D and 1D inorganic systems of Alexandria (relaxation trajectories)" ;
+    mlips:materialClass "Universal inorganic materials" .
+
+entity:mat-OC2020-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "Adsorbates on catalytic surfaces, OC2020 S2EF" ;
+    mlips:materialClass "Adsorbate-surface systems" .
+
+entity:mat-SPICE-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "Drug-like molecules and peptides of SPICE" ;
+    mlips:materialClass "Organic molecules" .
+
+entity:mat-MD22-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "Peptides, DNA fragments, carbohydrates and fatty acids of MD22" ;
+    mlips:materialClass "Large molecules" .
+
+entity:mat-Matbench-mazitov2025 a mlips:MaterialSystem ;
+    rdfs:label "WBM crystals of Matbench Discovery (single-element substitutions on bulk inorganic crystals)" ;
+    mlips:materialClass "Universal inorganic materials" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-mazitov2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-mazitov2025 mlips:hasDFTSettings entity:calc-settings-dft-mazitov2025 .
+
+entity:calc-settings-dft-mazitov2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional entity:xc-PBEsol-mazitov2025 ;
+    mlips:kPointMesh "Gamma-centred grid with resolution 0.125 per Angstrom in periodic directions" ;
+    rdfs:comment "Quantum ESPRESSO v7.2 with SIRIUS, driven by AiiDA; non-magnetic; SSSP v1.2 efficiency pseudopotentials (mixed types) with cutoffs 110 Ry (wave functions) and 1320 Ry (density), stated in Ry; Marzari-Vanderbilt cold smearing of 0.01 Ry; Coulomb truncation for 2D and 0D systems." .
+
+entity:xc-PBEsol-mazitov2025 a mlips:XCFunctional ;
+    rdfs:label "PBEsol" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-MAD-mazitov2025 a mlips:TrainingDataset ;
+    rdfs:label "MAD data set (95,595 structures of 85 elements; 80% / 10% / 10% train / validation / test per subset)" ;
+    mlips:coversMaterial entity:mat-MAD-mazitov2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 95595 ;
+    mlips:hasDFTCalculation entity:calc-dft-mazitov2025 ;
+    rdfs:comment "The count is the whole data set; training uses 80% of each subset. Stresses are not named among the training targets in the text read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-MAD-mazitov2025 mlips:samplingStrategy
+    entity:sampling-mad-mazitov2025 .
+
+entity:sampling-mad-mazitov2025 a mlips:SamplingStrategy ;
+    rdfs:label "Eight subsets: MC3D crystals, rattled MC3D, random-composition MC3D, MC3D surfaces, MC3D clusters, MC2D crystals, SHIFTML molecular crystals and molecular fragments; outliers with very large forces removed" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:PET a mlips:MLIPMethod ;
+    rdfs:label "Point Edge Transformer (PET)" ;
+    mlips:hasLossFunction entity:loss-PET-mazitov2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-PET-mazitov2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        entity:hp-transformer-layers-mazitov2025 ,
+        mlips:numFeatures ,
+        entity:hp-attention-heads-mazitov2025 ,
+        mlips:batchSize ,
+        mlips:numEpochs ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-PET-mazitov2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation ,
+        mlips:MonteCarlo .
+
+entity:loss-PET-mazitov2025 a mlips:LossFunction ;
+    rdfs:label "Root-mean-square differences of energies and forces, with a factor 0.1 on the energy term" .
+
+entity:alg-PET-mazitov2025 a mls:Algorithm ;
+    rdfs:label "Adam with the learning rate halved every 250 epochs; rotational symmetry learned through data augmentation (no explicit equivariance); a separate head for direct (non-conservative) force prediction is trained as well" .
+
+entity:impl-PET-mazitov2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-metatrain-mazitov2025 .
+
+entity:lib-metatrain-mazitov2025 a mlips:Library ;
+    rdfs:label "metatrain" ;
+    rdfs:comment "PyTorch framework and the metatrain package." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-transformer-layers-mazitov2025 a mlips:Hyperparameter ;
+    rdfs:label "Transformer layers per message-passing layer" ;
+    mlips:hyperparameterName "num_transformer_layers" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-attention-heads-mazitov2025 a mlips:Hyperparameter ;
+    rdfs:label "Heads in the multi-head attention layer" ;
+    mlips:hyperparameterName "num_heads" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-PET-MAD-cutoffRadius-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-PET-MAD-numLayers-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-PET-MAD-transformer-layers-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-transformer-layers-mazitov2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-PET-MAD-numFeatures-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-PET-MAD-attention-heads-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-attention-heads-mazitov2025 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-PET-MAD-batchSize-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "24"^^xsd:integer .
+
+entity:setting-PET-MAD-numEpochs-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1500"^^xsd:integer .
+
+entity:setting-PET-MAD-learningRate-mazitov2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-PET-MAD-mazitov2025 a mlips:MLIPRun ;
+    rdfs:label "Training of PET-MAD on the MAD data set" ;
+    mlips:appliesMethod entity:PET ;
+    mlips:runsOn entity:ds-MAD-mazitov2025 ;
+    mlips:hasHyperparameterSetting entity:setting-PET-MAD-cutoffRadius-mazitov2025 ,
+        entity:setting-PET-MAD-numLayers-mazitov2025 ,
+        entity:setting-PET-MAD-transformer-layers-mazitov2025 ,
+        entity:setting-PET-MAD-numFeatures-mazitov2025 ,
+        entity:setting-PET-MAD-attention-heads-mazitov2025 ,
+        entity:setting-PET-MAD-batchSize-mazitov2025 ,
+        entity:setting-PET-MAD-numEpochs-mazitov2025 ,
+        entity:setting-PET-MAD-learningRate-mazitov2025 ;
+    mlips:trainingDuration "40"^^xsd:double ;
+    mlips:trainingHardware "8 NVIDIA H100 GPUs" ;
+    mlips:produces entity:model-PET-MAD-mazitov2025 .
+
+entity:model-PET-MAD-mazitov2025 a mlips:TrainedModel ;
+    rdfs:label "PET-MAD" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-mazitov2025 mlips:hasResult
+    entity:result-train-mazitov2025 ,
+    entity:result-validation-mazitov2025 ,
+    entity:result-test-MAD-mazitov2025 ,
+    entity:result-test-MPtrj-mazitov2025 ,
+    entity:result-test-Matbench-mazitov2025 ,
+    entity:result-test-Alexandria-mazitov2025 ,
+    entity:result-test-OC2020-mazitov2025 ,
+    entity:result-test-SPICE-mazitov2025 ,
+    entity:result-test-MD22-mazitov2025 .
+
+entity:result-train-mazitov2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-MAD-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-mazitov2025 ,
+        entity:metric-train-2-mazitov2025 .
+
+entity:metric-train-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, MAD training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, MAD training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-validation-mazitov2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-MAD-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-validation-1-mazitov2025 ,
+        entity:metric-validation-2-mazitov2025 .
+
+entity:metric-validation-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, MAD validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "14.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-validation-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, MAD validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "72.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-MAD-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Same row for the comparison models: MACE-MP-0-L 81.6 | 181.5, MatterSim-5M 47.3 | 133.7, Orb-v2 52.9 | 96.2, SevenNet-l3i5 82.1 | 173.5." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-MAD-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-MAD-1-mazitov2025 ,
+        entity:metric-test-MAD-2-mazitov2025 .
+
+entity:metric-test-MAD-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, MAD benchmark (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-MAD-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, MAD benchmark (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "65.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-MPtrj-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Comparison models: MACE-MP-0-L 15.1 | 50.8, MatterSim-5M 21.3 | 61.4, Orb-v2 5.6 | 21.9, SevenNet-l3i5 9.8 | 25.5." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-MPtrj-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-MPtrj-1-mazitov2025 ,
+        entity:metric-test-MPtrj-2-mazitov2025 .
+
+entity:metric-test-MPtrj-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, MPtrj benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "22.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-MPtrj-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, MPtrj benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "77.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-Matbench-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "No reference forces. Comparison models: MACE-MP-0-L 58.5, MatterSim-5M 38.2, Orb-v2 37.9, SevenNet-l3i5 47.5." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-Matbench-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-Matbench-1-mazitov2025 .
+
+entity:metric-test-Matbench-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, Matbench Discovery (WBM) benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-test-Alexandria-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Comparison models: MACE-MP-0-L 65.4 | 79.5, MatterSim-5M 21.2 | 39.9, Orb-v2 13.2 | 10.5, SevenNet-l3i5 47.6 | 70.3." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-Alexandria-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-Alexandria-1-mazitov2025 ,
+        entity:metric-test-Alexandria-2-mazitov2025 .
+
+entity:metric-test-Alexandria-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, Alexandria benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-Alexandria-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, Alexandria benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "66.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-OC2020-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Comparison models: MACE-MP-0-L 82.4 | 169.6, MatterSim-5M 31.5 | 119.2, Orb-v2 19.8 | 99.3, SevenNet-l3i5 45.7 | 162.7." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-OC2020-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-OC2020-1-mazitov2025 ,
+        entity:metric-test-OC2020-2-mazitov2025 .
+
+entity:metric-test-OC2020-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, OC2020 S2EF benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "18.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-OC2020-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, OC2020 S2EF benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "114.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-SPICE-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Comparison models: MACE-MP-0-L 10.6 | 166.8, MatterSim-5M 21.3 | 145.6, Orb-v2 59.0 | 140.8, SevenNet-l3i5 11.3 | 139.1." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-SPICE-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-SPICE-1-mazitov2025 ,
+        entity:metric-test-SPICE-2-mazitov2025 .
+
+entity:metric-test-SPICE-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, SPICE benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-SPICE-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, SPICE benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "59.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-MD22-mazitov2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Comparison models: MACE-MP-0-L 9.4 | 182.9, MatterSim-5M 28.6 | 160.4, Orb-v2 174.3 | 220.7, SevenNet-l3i5 11.1 | 146.2." ;
+    mlips:evaluatesModel entity:model-PET-MAD-mazitov2025 ;
+    mlips:targetMaterial entity:mat-MD22-mazitov2025 ;
+    mlips:hasAccuracyMetric entity:metric-test-MD22-1-mazitov2025 ,
+        entity:metric-test-MD22-2-mazitov2025 .
+
+entity:metric-test-MD22-1-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, MD22 benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-MD22-2-mazitov2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, MD22 benchmark subset (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "65.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Review first: the four comparison models of Table I (28 energy|force pairs, kept in the result comments) are not linked to registry models. The paper describes MACE-MP-0-L with about 15.8M parameters and MatterSim-5M with 4.6M parameters trained on 17M structures, while the registry rows say 5.7M parameters for MACE-MP-0 L=2 (2024-01-07) and 'about 6M training structures' for MatterSim-v1; until those descriptions are reconciled the identity is not certain. Orb-v2 and SevenNet-l3i5 are not in the registry.
+# - Table I benchmarks are subsets recomputed with the MAD (PBEsol) settings, as the paper explains in its methods; the errors of models trained on PBE data therefore include the change of functional. The row labelled MAD is taken as the MAD test split.
+# - PET is registered as a method with this paper as its first use in the KG; the method was introduced earlier (Pozdnyakov and Ceriotti, 2023). numFeatures holds the token size (256); batchSize is per GPU (24 on each of 8 GPUs). trainingDuration is the stated 'about 40 hours'.
+# - Not encoded: LoRA fine-tuned and bespoke PET models for the six applications (Li thiophosphate conductivity, GaAs melting, HEA surface segregation, quantum nuclear effects in water and NMR, BaTiO3 dielectric response), the uncertainty-quantification scheme, the direct-force head and timings. Read from the arXiv v2 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
