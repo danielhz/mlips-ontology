@@ -1,0 +1,1151 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Wojciech G. Stark et al. (2023). Machine Learning Interatomic Potentials for Reactive Hydrogen Dynamics at Metal Surfaces Based on Iterative Refinement of Reaction Probabilities.
+#   The Journal of Physical Chemistry C. doi:10.1021/acs.jpcc.3c06648  arXiv:2305.10873v5
+#
+# Version read: arxiv-preprint arXiv:2305.10873v5 (sha256 6c6cf4c089cfb2e9...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 161 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the initial and final SchNet and PaiNN models for H2 on
+# Cu(111), (100), (110) and (211), the FHI-aims reference calculations,
+# the initial and adaptively sampled data sets, the optimised model
+# settings and the test errors of Table 1 (all facets and per facet).
+# Sticking probabilities are not encoded. Read from the arXiv preprint
+# (v5).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-stark2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Stark et al. (2023): MLIPs for reactive hydrogen dynamics at copper surfaces by iterative refinement of reaction probabilities" ;
+    mlips:reportedIn entity:article-stark2023 .
+
+entity:article-stark2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jpcc.3c06648> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Machine Learning Interatomic Potentials for Reactive Hydrogen Dynamics at Metal Surfaces Based on Iterative Refinement of Reaction Probabilities" ;
+    schema:author <https://orcid.org/0000-0001-6279-2638> ,
+        <https://orcid.org/0000-0002-6531-0742> ,
+        <https://orcid.org/0000-0002-2250-3894> ,
+        <https://orcid.org/0000-0003-1840-804X> ,
+        <https://orcid.org/0000-0001-5932-6011> ,
+        <https://orcid.org/0000-0002-3004-785X> .
+
+<https://orcid.org/0000-0001-6279-2638> a schema:Person ;
+    schema:name "Wojciech G. Stark" ;
+    schema:givenName "Wojciech G." ;
+    schema:familyName "Stark" ;
+    schema:identifier <https://orcid.org/0000-0001-6279-2638> .
+
+<https://orcid.org/0000-0002-6531-0742> a schema:Person ;
+    schema:name "Julia Westermayr" ;
+    schema:givenName "Julia" ;
+    schema:familyName "Westermayr" ;
+    schema:identifier <https://orcid.org/0000-0002-6531-0742> .
+
+<https://orcid.org/0000-0002-2250-3894> a schema:Person ;
+    schema:name "Oscar A. Douglas-Gallardo" ;
+    schema:givenName "Oscar A." ;
+    schema:familyName "Douglas-Gallardo" ;
+    schema:identifier <https://orcid.org/0000-0002-2250-3894> .
+
+<https://orcid.org/0000-0003-1840-804X> a schema:Person ;
+    schema:name "James Gardner" ;
+    schema:givenName "James" ;
+    schema:familyName "Gardner" ;
+    schema:identifier <https://orcid.org/0000-0003-1840-804X> .
+
+<https://orcid.org/0000-0001-5932-6011> a schema:Person ;
+    schema:name "Scott Habershon" ;
+    schema:givenName "Scott" ;
+    schema:familyName "Habershon" ;
+    schema:identifier <https://orcid.org/0000-0001-5932-6011> .
+
+<https://orcid.org/0000-0002-3004-785X> a schema:Person ;
+    schema:name "Reinhard J. Maurer" ;
+    schema:givenName "Reinhard J." ;
+    schema:familyName "Maurer" ;
+    schema:identifier <https://orcid.org/0000-0002-3004-785X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-all-stark2023 a mlips:MaterialSystem ;
+    rdfs:label "H2 on copper surfaces and clean copper slabs, all four facets" ;
+    mlips:chemicalFormula "H2/Cu" ;
+    mlips:materialClass "Gas-surface system" .
+
+entity:mat-Cu111-stark2023 a mlips:MaterialSystem ;
+    rdfs:label "H2 on Cu(111) and clean Cu(111) slabs" ;
+    mlips:chemicalFormula "H2/Cu(111)" ;
+    mlips:materialClass "Gas-surface system" .
+
+entity:mat-Cu100-stark2023 a mlips:MaterialSystem ;
+    rdfs:label "H2 on Cu(100) and clean Cu(100) slabs" ;
+    mlips:chemicalFormula "H2/Cu(100)" ;
+    mlips:materialClass "Gas-surface system" .
+
+entity:mat-Cu110-stark2023 a mlips:MaterialSystem ;
+    rdfs:label "H2 on Cu(110) and clean Cu(110) slabs" ;
+    mlips:chemicalFormula "H2/Cu(110)" ;
+    mlips:materialClass "Gas-surface system" .
+
+entity:mat-Cu211-stark2023 a mlips:MaterialSystem ;
+    rdfs:label "H2 on Cu(211) and clean Cu(211) slabs" ;
+    mlips:chemicalFormula "H2/Cu(211)" ;
+    mlips:materialClass "Gas-surface system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-stark2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-stark2023 mlips:hasDFTSettings entity:calc-settings-dft-stark2023 .
+
+entity:calc-settings-dft-stark2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional entity:xc-SRP48-stark2023 ;
+    mlips:dftBasisSet entity:basis-FHI-aims-tight-default-basis-stark2023 ;
+    mlips:kPointMesh "12x12x1" ;
+    rdfs:comment "All-electron numeric atomic orbitals; 6-layer 3x3 slabs." .
+
+entity:xc-SRP48-stark2023 a mlips:XCFunctional ;
+    rdfs:label "SRP48" ;
+    rdfs:comment "Specific-reaction-parameter functional with 52% PBE and 48% RPBE." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-FHI-aims-tight-default-basis-stark2023 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'tight' default basis" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-initial-stark2023 a mlips:TrainingDataset ;
+    rdfs:label "Initial data set (2530 data points: 845 H2/Cu and 1685 clean-surface structures)" ;
+    mlips:coversMaterial entity:mat-all-stark2023 ,
+        entity:mat-Cu111-stark2023 ,
+        entity:mat-Cu100-stark2023 ,
+        entity:mat-Cu110-stark2023 ,
+        entity:mat-Cu211-stark2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2530 ;
+    mlips:hasDFTCalculation entity:calc-dft-stark2023 .
+
+entity:ds-final-stark2023 a mlips:TrainingDataset ;
+    rdfs:label "Final data set after adaptive sampling (4230 data points: 2545 H2/Cu and 1685 clean-surface structures)" ;
+    mlips:coversMaterial entity:mat-all-stark2023 ,
+        entity:mat-Cu111-stark2023 ,
+        entity:mat-Cu100-stark2023 ,
+        entity:mat-Cu110-stark2023 ,
+        entity:mat-Cu211-stark2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 4230 ;
+    mlips:hasDFTCalculation entity:calc-dft-stark2023 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-initial-stark2023 mlips:samplingStrategy
+    entity:sampling-initial-stark2023 .
+
+entity:ds-final-stark2023 mlips:samplingStrategy
+    entity:sampling-initial-stark2023 ,
+    entity:sampling-adaptive-stark2023 .
+
+entity:sampling-initial-stark2023 a mlips:SamplingStrategy ;
+    rdfs:label "Initial set: slabs from MD with a SchNet model trained on earlier published data and AIMD of adsorbed hydrogen, recomputed with DFT; H2 far above the surface at varying bond length; AIMD of clean surfaces" .
+
+entity:sampling-adaptive-stark2023 a mlips:SamplingStrategy ;
+    rdfs:label "Adaptive sampling in four iterations: reactive scattering MD with three models, structures with energy standard deviation above 0.03 eV (0.025 eV in the last iterations), k-means clustering (100-200 clusters per surface), manual removal of unphysical points; 300-600 new points per step" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:SchNet a mlips:MLIPMethod ;
+    rdfs:label "SchNet (continuous-filter convolutional deep neural network)" ;
+    mlips:hasLossFunction entity:loss-SchNet-stark2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-SchNet-stark2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        entity:hp-energy-weight-stark2023 ,
+        entity:hp-force-weight-stark2023 ;
+    mlips:hasImplementation entity:impl-SchNet-stark2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-SchNet-stark2023 a mlips:LossFunction ;
+    rdfs:label "Joint energy and force loss" .
+
+entity:alg-SchNet-stark2023 a mls:Algorithm ;
+    rdfs:label "5-fold cross-validation for the model-parameter optimisation; ensembles of models with different train/test splits" .
+
+entity:impl-SchNet-stark2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:SchNet ;
+    mlips:version "SchNetPack v1.0.0 (master branch)" .
+
+entity:PaiNN a mlips:MLIPMethod ;
+    rdfs:label "PaiNN (polarizable atom interaction neural network)" ;
+    mlips:hasLossFunction entity:loss-PaiNN-stark2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-PaiNN-stark2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        entity:hp-energy-weight-stark2023 ,
+        entity:hp-force-weight-stark2023 ;
+    mlips:hasImplementation entity:impl-PaiNN-stark2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-PaiNN-stark2023 a mlips:LossFunction ;
+    rdfs:label "Joint energy and force loss" .
+
+entity:alg-PaiNN-stark2023 a mls:Algorithm ;
+    rdfs:label "5-fold cross-validation for the model-parameter optimisation; ensembles of models with different train/test splits" .
+
+entity:impl-PaiNN-stark2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:SchNet ;
+    mlips:version "SchNetPack development branch (base of v2.0)" .
+
+entity:hp-energy-weight-stark2023 a mlips:Hyperparameter ;
+    rdfs:label "Loss weight on the energy" ;
+    mlips:hyperparameterName "energy_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-force-weight-stark2023 a mlips:Hyperparameter ;
+    rdfs:label "Loss weight on the forces" ;
+    mlips:hyperparameterName "force_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-SchNet-initial-cutoffRadius-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SchNet-initial-numLayers-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-SchNet-initial-numFeatures-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-SchNet-initial-energy-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-energy-weight-stark2023 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-SchNet-initial-force-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-stark2023 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-PaiNN-initial-cutoffRadius-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-PaiNN-initial-numLayers-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-PaiNN-initial-numFeatures-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-PaiNN-initial-energy-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-energy-weight-stark2023 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-PaiNN-initial-force-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-stark2023 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-SchNet-final-cutoffRadius-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SchNet-final-numLayers-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-SchNet-final-numFeatures-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-SchNet-final-energy-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-energy-weight-stark2023 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-SchNet-final-force-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-stark2023 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-PaiNN-final-cutoffRadius-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-PaiNN-final-numLayers-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-PaiNN-final-numFeatures-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-PaiNN-final-energy-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-energy-weight-stark2023 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-PaiNN-final-force-weight-stark2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-stark2023 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SchNet-initial-stark2023 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on the initial data set (average of 5 models)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-initial-stark2023 ;
+    mlips:hasHyperparameterSetting entity:setting-SchNet-initial-cutoffRadius-stark2023 ,
+        entity:setting-SchNet-initial-numLayers-stark2023 ,
+        entity:setting-SchNet-initial-numFeatures-stark2023 ,
+        entity:setting-SchNet-initial-energy-weight-stark2023 ,
+        entity:setting-SchNet-initial-force-weight-stark2023 ;
+    mlips:produces entity:model-SchNet-initial-stark2023 .
+
+entity:model-SchNet-initial-stark2023 a mlips:TrainedModel ;
+    rdfs:label "Initial SchNet model for H2/Cu" .
+
+entity:run-PaiNN-initial-stark2023 a mlips:MLIPRun ;
+    rdfs:label "PaiNN trained on the initial data set (average of 5 models)" ;
+    mlips:appliesMethod entity:PaiNN ;
+    mlips:runsOn entity:ds-initial-stark2023 ;
+    mlips:hasHyperparameterSetting entity:setting-PaiNN-initial-cutoffRadius-stark2023 ,
+        entity:setting-PaiNN-initial-numLayers-stark2023 ,
+        entity:setting-PaiNN-initial-numFeatures-stark2023 ,
+        entity:setting-PaiNN-initial-energy-weight-stark2023 ,
+        entity:setting-PaiNN-initial-force-weight-stark2023 ;
+    mlips:produces entity:model-PaiNN-initial-stark2023 .
+
+entity:model-PaiNN-initial-stark2023 a mlips:TrainedModel ;
+    rdfs:label "Initial PaiNN model for H2/Cu" .
+
+entity:run-SchNet-final-stark2023 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on the final data set (average of 5 models)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-final-stark2023 ;
+    mlips:hasHyperparameterSetting entity:setting-SchNet-final-cutoffRadius-stark2023 ,
+        entity:setting-SchNet-final-numLayers-stark2023 ,
+        entity:setting-SchNet-final-numFeatures-stark2023 ,
+        entity:setting-SchNet-final-energy-weight-stark2023 ,
+        entity:setting-SchNet-final-force-weight-stark2023 ;
+    mlips:produces entity:model-SchNet-final-stark2023 .
+
+entity:model-SchNet-final-stark2023 a mlips:TrainedModel ;
+    rdfs:label "Final SchNet model for H2/Cu" .
+
+entity:run-PaiNN-final-stark2023 a mlips:MLIPRun ;
+    rdfs:label "PaiNN trained on the final data set (average of 5 models)" ;
+    mlips:appliesMethod entity:PaiNN ;
+    mlips:runsOn entity:ds-final-stark2023 ;
+    mlips:hasHyperparameterSetting entity:setting-PaiNN-final-cutoffRadius-stark2023 ,
+        entity:setting-PaiNN-final-numLayers-stark2023 ,
+        entity:setting-PaiNN-final-numFeatures-stark2023 ,
+        entity:setting-PaiNN-final-energy-weight-stark2023 ,
+        entity:setting-PaiNN-final-force-weight-stark2023 ;
+    mlips:produces entity:model-PaiNN-final-stark2023 .
+
+entity:model-PaiNN-final-stark2023 a mlips:TrainedModel ;
+    rdfs:label "Final PaiNN model for H2/Cu" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-stark2023 mlips:hasResult
+    entity:result-SchNet-initial-111-stark2023 ,
+    entity:result-SchNet-initial-100-stark2023 ,
+    entity:result-SchNet-initial-110-stark2023 ,
+    entity:result-SchNet-initial-211-stark2023 ,
+    entity:result-SchNet-initial-all-stark2023 ,
+    entity:result-PaiNN-initial-111-stark2023 ,
+    entity:result-PaiNN-initial-100-stark2023 ,
+    entity:result-PaiNN-initial-110-stark2023 ,
+    entity:result-PaiNN-initial-211-stark2023 ,
+    entity:result-PaiNN-initial-all-stark2023 ,
+    entity:result-SchNet-final-111-stark2023 ,
+    entity:result-SchNet-final-100-stark2023 ,
+    entity:result-SchNet-final-110-stark2023 ,
+    entity:result-SchNet-final-211-stark2023 ,
+    entity:result-SchNet-final-all-stark2023 ,
+    entity:result-PaiNN-final-111-stark2023 ,
+    entity:result-PaiNN-final-100-stark2023 ,
+    entity:result-PaiNN-final-110-stark2023 ,
+    entity:result-PaiNN-final-211-stark2023 ,
+    entity:result-PaiNN-final-all-stark2023 .
+
+entity:result-SchNet-initial-111-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu111-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-initial-111-1-stark2023 ,
+        entity:metric-SchNet-initial-111-2-stark2023 ,
+        entity:metric-SchNet-initial-111-3-stark2023 ,
+        entity:metric-SchNet-initial-111-4-stark2023 .
+
+entity:metric-SchNet-initial-111-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "159.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-111-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "128"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-111-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "149.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-initial-111-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "106.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-initial-100-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu100-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-initial-100-1-stark2023 ,
+        entity:metric-SchNet-initial-100-2-stark2023 ,
+        entity:metric-SchNet-initial-100-3-stark2023 ,
+        entity:metric-SchNet-initial-100-4-stark2023 .
+
+entity:metric-SchNet-initial-100-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "262.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-100-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "165.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-100-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "254.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-initial-100-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "94.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-initial-110-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu110-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-initial-110-1-stark2023 ,
+        entity:metric-SchNet-initial-110-2-stark2023 ,
+        entity:metric-SchNet-initial-110-3-stark2023 ,
+        entity:metric-SchNet-initial-110-4-stark2023 .
+
+entity:metric-SchNet-initial-110-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "202.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-110-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "139.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-110-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "199.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-initial-110-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "112.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-initial-211-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu211-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-initial-211-1-stark2023 ,
+        entity:metric-SchNet-initial-211-2-stark2023 ,
+        entity:metric-SchNet-initial-211-3-stark2023 ,
+        entity:metric-SchNet-initial-211-4-stark2023 .
+
+entity:metric-SchNet-initial-211-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "334.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-211-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "251.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-211-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "329.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-initial-211-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "148.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-initial-all-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-all-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-initial-all-1-stark2023 ,
+        entity:metric-SchNet-initial-all-2-stark2023 ,
+        entity:metric-SchNet-initial-all-3-stark2023 ,
+        entity:metric-SchNet-initial-all-4-stark2023 .
+
+entity:metric-SchNet-initial-all-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "259.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-all-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "175.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-initial-all-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "257.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-initial-all-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "117"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-initial-111-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu111-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-initial-111-1-stark2023 ,
+        entity:metric-PaiNN-initial-111-2-stark2023 ,
+        entity:metric-PaiNN-initial-111-3-stark2023 ,
+        entity:metric-PaiNN-initial-111-4-stark2023 .
+
+entity:metric-PaiNN-initial-111-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "54.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-111-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "51.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-111-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-initial-111-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-initial-100-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu100-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-initial-100-1-stark2023 ,
+        entity:metric-PaiNN-initial-100-2-stark2023 ,
+        entity:metric-PaiNN-initial-100-3-stark2023 ,
+        entity:metric-PaiNN-initial-100-4-stark2023 .
+
+entity:metric-PaiNN-initial-100-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "60.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-100-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "57.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-100-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-initial-100-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-initial-110-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu110-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-initial-110-1-stark2023 ,
+        entity:metric-PaiNN-initial-110-2-stark2023 ,
+        entity:metric-PaiNN-initial-110-3-stark2023 ,
+        entity:metric-PaiNN-initial-110-4-stark2023 .
+
+entity:metric-PaiNN-initial-110-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "56.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-110-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "52.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-110-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-initial-110-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-initial-211-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu211-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-initial-211-1-stark2023 ,
+        entity:metric-PaiNN-initial-211-2-stark2023 ,
+        entity:metric-PaiNN-initial-211-3-stark2023 ,
+        entity:metric-PaiNN-initial-211-4-stark2023 .
+
+entity:metric-PaiNN-initial-211-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "62.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-211-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "56"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-211-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-initial-211-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-initial-all-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-initial-stark2023 ;
+    mlips:targetMaterial entity:mat-all-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-initial-all-1-stark2023 ,
+        entity:metric-PaiNN-initial-all-2-stark2023 ,
+        entity:metric-PaiNN-initial-all-3-stark2023 ,
+        entity:metric-PaiNN-initial-all-4-stark2023 .
+
+entity:metric-PaiNN-initial-all-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "58.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-all-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "54.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-initial-all-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "15.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-initial-all-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-final-111-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu111-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-final-111-1-stark2023 ,
+        entity:metric-SchNet-final-111-2-stark2023 ,
+        entity:metric-SchNet-final-111-3-stark2023 ,
+        entity:metric-SchNet-final-111-4-stark2023 .
+
+entity:metric-SchNet-final-111-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "51.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-111-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "28.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-111-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "48.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-final-111-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-final-100-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu100-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-final-100-1-stark2023 ,
+        entity:metric-SchNet-final-100-2-stark2023 ,
+        entity:metric-SchNet-final-100-3-stark2023 ,
+        entity:metric-SchNet-final-100-4-stark2023 .
+
+entity:metric-SchNet-final-100-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "73.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-100-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "41.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-100-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "89.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-final-100-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-final-110-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu110-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-final-110-1-stark2023 ,
+        entity:metric-SchNet-final-110-2-stark2023 ,
+        entity:metric-SchNet-final-110-3-stark2023 ,
+        entity:metric-SchNet-final-110-4-stark2023 .
+
+entity:metric-SchNet-final-110-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "61.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-110-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "37.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-110-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "60.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-final-110-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-final-211-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu211-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-final-211-1-stark2023 ,
+        entity:metric-SchNet-final-211-2-stark2023 ,
+        entity:metric-SchNet-final-211-3-stark2023 ,
+        entity:metric-SchNet-final-211-4-stark2023 .
+
+entity:metric-SchNet-final-211-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "72.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-211-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-211-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "58.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-final-211-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "36.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-final-all-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-final-stark2023 ;
+    mlips:targetMaterial entity:mat-all-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-final-all-1-stark2023 ,
+        entity:metric-SchNet-final-all-2-stark2023 ,
+        entity:metric-SchNet-final-all-3-stark2023 ,
+        entity:metric-SchNet-final-all-4-stark2023 .
+
+entity:metric-SchNet-final-all-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "67.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-all-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "39.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-final-all-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "68.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SchNet-final-all-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-final-111-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu111-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-final-111-1-stark2023 ,
+        entity:metric-PaiNN-final-111-2-stark2023 ,
+        entity:metric-PaiNN-final-111-3-stark2023 ,
+        entity:metric-PaiNN-final-111-4-stark2023 .
+
+entity:metric-PaiNN-final-111-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "28.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-111-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "24.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-111-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(111)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-final-111-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(111)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-final-100-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu100-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-final-100-1-stark2023 ,
+        entity:metric-PaiNN-final-100-2-stark2023 ,
+        entity:metric-PaiNN-final-100-3-stark2023 ,
+        entity:metric-PaiNN-final-100-4-stark2023 .
+
+entity:metric-PaiNN-final-100-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-100-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "24.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-100-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(100)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-final-100-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(100)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-final-110-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu110-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-final-110-1-stark2023 ,
+        entity:metric-PaiNN-final-110-2-stark2023 ,
+        entity:metric-PaiNN-final-110-3-stark2023 ,
+        entity:metric-PaiNN-final-110-4-stark2023 .
+
+entity:metric-PaiNN-final-110-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-110-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-110-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(110)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-final-110-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(110)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-final-211-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-final-stark2023 ;
+    mlips:targetMaterial entity:mat-Cu211-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-final-211-1-stark2023 ,
+        entity:metric-PaiNN-final-211-2-stark2023 ,
+        entity:metric-PaiNN-final-211-3-stark2023 ,
+        entity:metric-PaiNN-final-211-4-stark2023 .
+
+entity:metric-PaiNN-final-211-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "29.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-211-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-211-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Cu(211)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-final-211-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Cu(211)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-final-all-stark2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-final-stark2023 ;
+    mlips:targetMaterial entity:mat-all-stark2023 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-final-all-1-stark2023 ,
+        entity:metric-PaiNN-final-all-2-stark2023 ,
+        entity:metric-PaiNN-final-all-3-stark2023 ,
+        entity:metric-PaiNN-final-all-4-stark2023 .
+
+entity:metric-PaiNN-final-all-1-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "29.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-all-2-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (total energy of the cell), test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-final-all-3-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, all facets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-final-all-4-stark2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, all facets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Review first: Table 1 is read in column order SchNet (energy RMSE, MAE; force RMSE, MAE) then PaiNN (same). Energies are total-energy errors of 56-atom (54-atom for clean slabs) cells in meV, not per atom. The settings (7 interactions, 512 features, 4 A cutoff, loss weights 0.05 / 0.95) are the optimised ones the paper states for the final models; whether the 'initial model' rows of Table 1 use the same settings on the initial data, as the table suggests, is assumed. The models used during adaptive sampling were SchNet with default settings, a 5 A cutoff and batch size 10 and are not encoded.
+# - PaiNN was run through SchNetPack, so its implementation points at the vocabulary library SchNet (meaning the SchNetPack code base) with the version string naming the branch.
+# - Errors are averages over 5 models with different random train/test splits; one run per method and data set is encoded. Sticking probabilities against experiment, minimum-energy paths, elbow plots and learning curves are not encoded.
+# - Read from the arXiv v5 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
