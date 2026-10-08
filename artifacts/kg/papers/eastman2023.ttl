@@ -1,0 +1,328 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Peter K. Eastman et al. (2023). SPICE, A Dataset of Drug-like Molecules and Peptides for Training Machine Learning Potentials.
+#   Scientific Data. doi:10.1038/s41597-022-01882-6  arXiv:2209.10702v2
+#
+# Version read: arxiv-preprint arXiv:2209.10702v2 (sha256 3a0ad22538cb2f79...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 15 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SPICE data set (version 1; six subsets, 1,132,808
+# conformations at the omegaB97M-D3(BJ)/def2-TZVPPD level) and the
+# proof-of-concept Equivariant Transformer model trained on it (the best
+# of an ensemble of five), with the one energy MAE the paper prints.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-eastman2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Eastman et al. (2023): SPICE data set of drug-like molecules and peptides, with proof-of-concept Equivariant Transformer models" ;
+    mlips:reportedIn entity:article-eastman2023 .
+
+entity:article-eastman2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41597-022-01882-6> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "SPICE, A Dataset of Drug-like Molecules and Peptides for Training Machine Learning Potentials" ;
+    schema:author <https://orcid.org/0000-0002-9566-9684> ,
+        entity:person-Behara-eastman2023 ,
+        <https://orcid.org/0000-0001-5879-2942> ,
+        <https://orcid.org/0000-0001-8431-1612> ,
+        entity:person-Herr-eastman2023 ,
+        <https://orcid.org/0000-0001-8694-7200> ,
+        <https://orcid.org/0000-0001-5362-4333> ,
+        entity:person-Chodera-eastman2023 ,
+        entity:person-Pritchard-eastman2023 ,
+        entity:person-Wang-eastman2023 ,
+        entity:person-DeFabritiis-eastman2023 ,
+        entity:person-Markland-eastman2023 .
+
+<https://orcid.org/0000-0002-9566-9684> a schema:Person ;
+    schema:name "Peter Eastman" ;
+    schema:givenName "Peter" ;
+    schema:familyName "Eastman" ;
+    schema:identifier <https://orcid.org/0000-0002-9566-9684> .
+
+entity:person-Behara-eastman2023 a schema:Person ;
+    schema:name "Pavan Kumar Behara" ;
+    schema:givenName "Pavan Kumar" ;
+    schema:familyName "Behara" .
+
+<https://orcid.org/0000-0001-5879-2942> a schema:Person ;
+    schema:name "David L. Dotson" ;
+    schema:givenName "David L." ;
+    schema:familyName "Dotson" ;
+    schema:identifier <https://orcid.org/0000-0001-5879-2942> .
+
+<https://orcid.org/0000-0001-8431-1612> a schema:Person ;
+    schema:name "Raimondas Galvelis" ;
+    schema:givenName "Raimondas" ;
+    schema:familyName "Galvelis" ;
+    schema:identifier <https://orcid.org/0000-0001-8431-1612> .
+
+entity:person-Herr-eastman2023 a schema:Person ;
+    schema:name "John E. Herr" ;
+    schema:givenName "John E." ;
+    schema:familyName "Herr" .
+
+<https://orcid.org/0000-0001-8694-7200> a schema:Person ;
+    schema:name "Josh T. Horton" ;
+    schema:givenName "Josh T." ;
+    schema:familyName "Horton" ;
+    schema:identifier <https://orcid.org/0000-0001-8694-7200> .
+
+<https://orcid.org/0000-0001-5362-4333> a schema:Person ;
+    schema:name "Yuezhi Mao" ;
+    schema:givenName "Yuezhi" ;
+    schema:familyName "Mao" ;
+    schema:identifier <https://orcid.org/0000-0001-5362-4333> .
+
+entity:person-Chodera-eastman2023 a schema:Person ;
+    schema:name "John D. Chodera" ;
+    schema:givenName "John D." ;
+    schema:familyName "Chodera" .
+
+entity:person-Pritchard-eastman2023 a schema:Person ;
+    schema:name "Benjamin P. Pritchard" ;
+    schema:givenName "Benjamin P." ;
+    schema:familyName "Pritchard" .
+
+entity:person-Wang-eastman2023 a schema:Person ;
+    schema:name "Yuanqing Wang" ;
+    schema:givenName "Yuanqing" ;
+    schema:familyName "Wang" .
+
+entity:person-DeFabritiis-eastman2023 a schema:Person ;
+    schema:name "Gianni De Fabritiis" ;
+    schema:givenName "Gianni" ;
+    schema:familyName "De Fabritiis" .
+
+entity:person-Markland-eastman2023 a schema:Person ;
+    schema:name "Thomas E. Markland" ;
+    schema:givenName "Thomas E." ;
+    schema:familyName "Markland" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-spice-eastman2023 a mlips:MaterialSystem ;
+    rdfs:label "SPICE chemical space: drug-like small molecules, dipeptides, solvated amino acids, molecular dimers and ion pairs" ;
+    mlips:materialClass "Organic molecules and molecular complexes of 2 to 96 atoms; elements H, Li, C, N, O, F, Na, Mg, P, S, Cl, K, Ca, Br, I; charged and neutral species" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-eastman2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-eastman2023 mlips:hasDFTSettings entity:calc-settings-dft-eastman2023 .
+
+entity:calc-settings-dft-eastman2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-Psi4-eastman2023 ;
+    mlips:xcFunctional entity:xc-omegaB97M-D3-BJ-eastman2023 ;
+    mlips:dftBasisSet entity:basis-def2-TZVPPD-eastman2023 .
+
+entity:lib-Psi4-eastman2023 a mlips:Library ;
+    rdfs:label "Psi4" ;
+    rdfs:comment "Psi4 1.4.1 through QCEngine; calculations set up with OpenFF-QCSubmit and managed with QCFractal." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-omegaB97M-D3-BJ-eastman2023 a mlips:XCFunctional ;
+    rdfs:label "omegaB97M-D3(BJ)" ;
+    rdfs:comment "Range-separated hybrid meta-GGA with D3(BJ) dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVPPD-eastman2023 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVPPD" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-spice-eastman2023 a mlips:TrainingDataset ;
+    rdfs:label "SPICE version 1 (1,132,808 conformations of 19,238 molecules and clusters)" ;
+    mlips:coversMaterial entity:mat-spice-eastman2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1132808 ;
+    mlips:hasDFTCalculation entity:calc-dft-eastman2023 ;
+    rdfs:comment "Subsets (Table 1): Dipeptides 33,850; Solvated Amino Acids 1,300; DES370K Dimers 345,676; DES370K Monomers 18,700; PubChem 731,856; Ion Pairs 1,426 conformations. For model training, samples with any force component above 1 hartree/bohr are discarded (about 2%), leaving 1,109,212, of which a random 5% (55,461) is the test set of each model. The data set also carries dipole and quadrupole moments, MBIS charges and other properties." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-spice-eastman2023 mlips:samplingStrategy
+    entity:sampling-md-high-energy-eastman2023 ,
+    entity:sampling-low-energy-eastman2023 ,
+    entity:sampling-solvated-md-eastman2023 ,
+    entity:sampling-des370k-eastman2023 ,
+    entity:sampling-ion-pair-scan-eastman2023 .
+
+entity:sampling-md-high-energy-eastman2023 a mlips:SamplingStrategy ;
+    rdfs:label "Classical MD at 500 K with selection of maximally different conformations" ;
+    rdfs:comment "10 diverse RDKit conformations per molecule, each run for 100 ps with OpenMM and the Amber14 force field (OpenFF 2.0.0 for PubChem molecules), a conformation saved every 10 ps; 25 conformations selected to be maximally different by all-atom RMSD." .
+
+entity:sampling-low-energy-eastman2023 a mlips:SamplingStrategy ;
+    rdfs:label "Partial minimisation and cold MD of the high-energy conformations" ;
+    rdfs:comment "Five iterations of L-BFGS minimisation followed by 1 ps of MD at 100 K give 25 low-energy conformations per molecule." .
+
+entity:sampling-solvated-md-eastman2023 a mlips:SamplingStrategy ;
+    rdfs:label "MD of solvated amino acids at 300 K" ;
+    rdfs:comment "Each capped amino acid in a 2.2 nm cube of TIP3P-FB water, 1 ns of MD with a conformation every 20 ps; the 20 closest water molecules are kept." .
+
+entity:sampling-des370k-eastman2023 a mlips:SamplingStrategy ;
+    rdfs:label "Dimer conformations taken from DES370K" ;
+    rdfs:comment "All DES370K dimer structures except those with noble-gas atoms; DES370K monomers resampled with the MD procedure." .
+
+entity:sampling-ion-pair-scan-eastman2023 a mlips:SamplingStrategy ;
+    rdfs:label "Distance scan of monatomic ion pairs" ;
+    rdfs:comment "All 28 pairs of Br-, Cl-, F-, I-, K+, Li+, Na+ at distances from 2.5 to 7.5 A in steps of 0.1 A." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:TorchMD-ET a mlips:MLIPMethod ;
+    rdfs:label "Equivariant Transformer (TorchMD-NET)" ;
+    mlips:hasLossFunction entity:loss-TorchMD-ET-eastman2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-TorchMD-ET-eastman2023 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-attention-heads-eastman2023 ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-TorchMD-ET-eastman2023 .
+
+entity:loss-TorchMD-ET-eastman2023 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of L2 losses on energies and forces, with weights 1 (kJ/mol)^-2 and 1 (kJ/mol/A)^-2; atomic reference energies subtracted, so formation energies are learned" .
+
+entity:alg-TorchMD-ET-eastman2023 a mls:Algorithm ;
+    rdfs:label "AdamW, batch size 128; learning rate 0.0005, halved after any epoch in which the training loss fails to decrease" .
+
+entity:impl-TorchMD-ET-eastman2023 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-TorchMD-NET-eastman2023 .
+
+entity:lib-TorchMD-NET-eastman2023 a mlips:Library ;
+    rdfs:label "TorchMD-NET" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-attention-heads-eastman2023 a mlips:Hyperparameter ;
+    rdfs:label "Equivariant Transformer number of attention heads per layer" ;
+    mlips:hyperparameterName "num_heads" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-et-best-numLayers-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-et-best-attention-heads-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-attention-heads-eastman2023 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-et-best-numFeatures-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-et-best-cutoffRadius-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-et-best-numRadialBasis-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-et-best-batchSize-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-et-best-learningRate-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-et-best-numEpochs-eastman2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "118"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-et-best-eastman2023 a mlips:MLIPRun ;
+    rdfs:label "Equivariant Transformer training on SPICE (best of five models differing only in the random seed)" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-spice-eastman2023 ;
+    mlips:hasHyperparameterSetting entity:setting-et-best-numLayers-eastman2023 ,
+        entity:setting-et-best-attention-heads-eastman2023 ,
+        entity:setting-et-best-numFeatures-eastman2023 ,
+        entity:setting-et-best-cutoffRadius-eastman2023 ,
+        entity:setting-et-best-numRadialBasis-eastman2023 ,
+        entity:setting-et-best-batchSize-eastman2023 ,
+        entity:setting-et-best-learningRate-eastman2023 ,
+        entity:setting-et-best-numEpochs-eastman2023 ;
+    mlips:trainingDuration "24"^^xsd:double ;
+    mlips:trainingHardware "Four NVIDIA A100 GPUs; 24 hours, 118 epochs" ;
+    mlips:produces entity:model-et-best-eastman2023 .
+
+entity:model-et-best-eastman2023 a mlips:TrainedModel ;
+    rdfs:label "Equivariant Transformer SPICE proof-of-concept model 1 (training loss 179, test loss 195)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-eastman2023 mlips:hasResult
+    entity:result-et-best-eastman2023 .
+
+entity:result-et-best-eastman2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-et-best-eastman2023 ;
+    mlips:targetMaterial entity:mat-spice-eastman2023 ;
+    mlips:hasAccuracyMetric entity:metric-et-best-1-eastman2023 .
+
+entity:metric-et-best-1-eastman2023 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy over the entire SPICE data set (training and test sets together), in kJ/mol: best Equivariant Transformer model" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.663"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Each model was trained for 24 hours on four NVIDIA A100 GPUs, completing
+# 118 epochs (trainingDuration 24 h, trainingHardware). No inference cost.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The only numeric accuracy is the energy MAE of 4.663 kJ/mol (median 2.912 kJ/mol) over the whole data set, training samples included; kJ/mol has no unit individual, so mlips:hasUnit is omitted. No force error is printed.
+# - The cutoff is stated as 1 nm and encoded as 10 (Angstrom), the unit used for mlips:cutoffRadius elsewhere.
+# - The paper trains five models with identical hyperparameters; only the best one is encoded. The authors call the models a proof of concept, not intended for production use.
+# - Later SPICE versions (the version 2 used by kovacs2025) are not described here. This file's data-set node is paper-local; kovacs2025 declares its own SPICE-derived training sets.
+# - Total embedding width 128 is encoded as mlips:numFeatures.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
