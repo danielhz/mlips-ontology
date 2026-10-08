@@ -1,0 +1,687 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Nicholas Lubbers et al. (2018). Hierarchical modeling of molecular energies using a deep neural network.
+#   The Journal of Chemical Physics. doi:10.1063/1.5011181  arXiv:1710.00017v1
+#
+# Version read: arxiv-preprint arXiv:1710.00017v1 (sha256 87113a9f02493440...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 48 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the HIP-NN method (introduced here; energies only) and
+# its benchmark fits: QM9 with 110,426 training and validation molecules
+# (Tables I and II, N_feature = 80) and four MD-trajectory molecules at
+# 1k and 50k training conformations (Table III). Every value is a mean
+# over eight models with different random data splits.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-lubbers2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Lubbers, Smith and Barros (2018): HIP-NN, hierarchical modeling of molecular energies with a deep neural network" ;
+    mlips:reportedIn entity:article-lubbers2018 .
+
+entity:article-lubbers2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/1.5011181> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Hierarchical modeling of molecular energies using a deep neural network" ;
+    schema:author <https://orcid.org/0000-0002-9001-9973> ,
+        <https://orcid.org/0000-0001-7314-7896> ,
+        <https://orcid.org/0000-0002-1333-5972> .
+
+<https://orcid.org/0000-0002-9001-9973> a schema:Person ;
+    schema:name "Nicholas Lubbers" ;
+    schema:givenName "Nicholas" ;
+    schema:familyName "Lubbers" ;
+    schema:identifier <https://orcid.org/0000-0002-9001-9973> .
+
+<https://orcid.org/0000-0001-7314-7896> a schema:Person ;
+    schema:name "Justin S. Smith" ;
+    schema:givenName "Justin S." ;
+    schema:familyName "Smith" ;
+    schema:identifier <https://orcid.org/0000-0001-7314-7896> .
+
+<https://orcid.org/0000-0002-1333-5972> a schema:Person ;
+    schema:name "Kipton Barros" ;
+    schema:givenName "Kipton" ;
+    schema:familyName "Barros" ;
+    schema:identifier <https://orcid.org/0000-0002-1333-5972> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-QM9-lubbers2018 a mlips:MaterialSystem ;
+    rdfs:label "QM9 small organic molecules (H, C, N, O, F; up to nine heavy atoms)" ;
+    mlips:materialClass "Small organic molecules, equilibrium geometries" .
+
+entity:mat-benzene-lubbers2018 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule, MD conformations at 500 K" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-lubbers2018 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule, MD conformations at 500 K" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-salicylic-acid-lubbers2018 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule, MD conformations at 500 K" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-lubbers2018 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule, MD conformations at 500 K" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-qm9-dft-lubbers2018 a mlips:DFTCalculation .
+
+entity:calc-md-dft-lubbers2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-qm9-dft-lubbers2018 mlips:hasDFTSettings entity:calc-settings-qm9-dft-lubbers2018 .
+
+entity:calc-settings-qm9-dft-lubbers2018 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-B3LYP-lubbers2018 ;
+    mlips:dftBasisSet entity:basis-6-31G-2df-p-lubbers2018 ;
+    rdfs:comment "B3LYP/6-31G(2df,p), the QM9 level of theory." .
+
+entity:calc-md-dft-lubbers2018 mlips:hasDFTSettings entity:calc-settings-md-dft-lubbers2018 .
+
+entity:calc-settings-md-dft-lubbers2018 a mlips:DFTSettings ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "DFT with the PBE functional (data sets of Schutt et al.); code and basis are not restated." .
+
+entity:xc-B3LYP-lubbers2018 a mlips:XCFunctional ;
+    rdfs:label "B3LYP" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-6-31G-2df-p-lubbers2018 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(2df,p)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-QM9-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "QM9 training and validation split (110,426 molecules)" ;
+    mlips:coversMaterial entity:mat-QM9-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 110426 ;
+    mlips:hasDFTCalculation entity:calc-qm9-dft-lubbers2018 .
+
+entity:ds-benzene-1k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Benzene MD conformations, 1k training set" ;
+    mlips:coversMaterial entity:mat-benzene-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-benzene-50k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Benzene MD conformations, 50k training set" ;
+    mlips:coversMaterial entity:mat-benzene-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-malonaldehyde-1k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Malonaldehyde MD conformations, 1k training set" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-malonaldehyde-50k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Malonaldehyde MD conformations, 50k training set" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-salicylic-acid-1k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Salicylic acid MD conformations, 1k training set" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-salicylic-acid-50k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Salicylic acid MD conformations, 50k training set" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-toluene-1k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Toluene MD conformations, 1k training set" ;
+    mlips:coversMaterial entity:mat-toluene-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+entity:ds-toluene-50k-lubbers2018 a mlips:TrainingDataset ;
+    rdfs:label "Toluene MD conformations, 50k training set" ;
+    mlips:coversMaterial entity:mat-toluene-lubbers2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 50000 ;
+    mlips:hasDFTCalculation entity:calc-md-dft-lubbers2018 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-QM9-lubbers2018 mlips:samplingStrategy
+    entity:sampling-qm9-equilibrium-lubbers2018 .
+
+entity:ds-benzene-1k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-benzene-50k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-malonaldehyde-1k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-malonaldehyde-50k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-salicylic-acid-1k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-salicylic-acid-50k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-toluene-1k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:ds-toluene-50k-lubbers2018 mlips:samplingStrategy
+    entity:sampling-md-500K-lubbers2018 .
+
+entity:sampling-qm9-equilibrium-lubbers2018 a mlips:SamplingStrategy ;
+    rdfs:label "Equilibrium geometries (pruned QM9)" ;
+    rdfs:comment "About 131k molecules after removing about 3k that fail a geometric consistency check and 11 with minimisation difficulties; random partition into training, validation (1000) and test sets." .
+
+entity:sampling-md-500K-lubbers2018 a mlips:SamplingStrategy ;
+    rdfs:label "MD trajectories in vacuum at 500 K" ;
+    rdfs:comment "Conformations drawn at random from the trajectory; 1k further conformations for early stopping, the rest for testing." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HIP-NN a mlips:MLIPMethod ;
+    rdfs:label "Hierarchically Interacting Particle Neural Network (HIP-NN)" ;
+    mlips:hasFunctionalForm entity:ff-HIP-NN ;
+    mlips:hasLossFunction entity:loss-HIP-NN-lubbers2018 ;
+    mlips:hasTrainingAlgorithm entity:alg-HIP-NN-lubbers2018 ;
+    mlips:hasHyperparameter mlips:numFeatures ,
+        entity:hp-n-on-site-lubbers2018 ,
+        mlips:batchSize ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-HIP-NN-lubbers2018 .
+
+entity:ff-HIP-NN a mlips:FunctionalForm ;
+    rdfs:label "Deep neural network with on-site and interaction layers over inverse-distance sensitivity functions; the molecular energy is a sum of atomic energies decomposed into hierarchical contributions from successive interaction layers" .
+
+entity:loss-HIP-NN-lubbers2018 a mlips:LossFunction ;
+    rdfs:label "(MAE + RMSE) of the energy scaled by the standard deviation of the energies, plus L2 regularisation (lambda_L2 = 1e-6) and a hierarchicality regularisation (lambda_R = 1e-2)" .
+
+entity:alg-HIP-NN-lubbers2018 a mls:Algorithm ;
+    rdfs:label "Adam (beta1 = 0.9, beta2 = 0.999), initial learning rate 1e-3 held for 100 epochs, multiplied by 0.5 when the validation MAE plateaus for 50 epochs; early stopping, at most 2000 epochs; mini-batches of 30 molecules" .
+
+entity:impl-HIP-NN-lubbers2018 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-Theano-Lasagne-implementation-of-HIP-NN-lubbers2018 .
+
+entity:lib-Theano-Lasagne-implementation-of-HIP-NN-lubbers2018 a mlips:Library ;
+    rdfs:label "Theano / Lasagne implementation of HIP-NN" ;
+    rdfs:comment "Custom layers in the Theano framework with the Lasagne library." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-n-on-site-lubbers2018 a mlips:Hyperparameter ;
+    rdfs:label "HIP-NN number of on-site layers per interaction block" ;
+    mlips:hyperparameterName "N_on-site" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-QM9-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "80"^^xsd:integer .
+
+entity:setting-QM9-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-QM9-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-QM9-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-benzene-1k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-benzene-1k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-benzene-1k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-benzene-1k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-benzene-50k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "40"^^xsd:integer .
+
+entity:setting-benzene-50k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-benzene-50k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-benzene-50k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-malonaldehyde-1k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-malonaldehyde-1k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-malonaldehyde-1k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-malonaldehyde-1k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-malonaldehyde-50k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "40"^^xsd:integer .
+
+entity:setting-malonaldehyde-50k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-malonaldehyde-50k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-malonaldehyde-50k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-salicylic-acid-1k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-salicylic-acid-1k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-salicylic-acid-1k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-salicylic-acid-1k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-salicylic-acid-50k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "40"^^xsd:integer .
+
+entity:setting-salicylic-acid-50k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-salicylic-acid-50k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-salicylic-acid-50k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-toluene-1k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-toluene-1k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-toluene-1k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-toluene-1k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-toluene-50k-numFeatures-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "40"^^xsd:integer .
+
+entity:setting-toluene-50k-n-on-site-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-on-site-lubbers2018 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-toluene-50k-batchSize-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-toluene-50k-learningRate-lubbers2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-QM9-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on QM9 (N_on-site = 3, N_feature = 80)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-QM9-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-QM9-numFeatures-lubbers2018 ,
+        entity:setting-QM9-n-on-site-lubbers2018 ,
+        entity:setting-QM9-batchSize-lubbers2018 ,
+        entity:setting-QM9-learningRate-lubbers2018 ;
+    mlips:trainingHardware "Single Nvidia Tesla P100 GPU: about 1 minute per epoch on the full QM9 data set, typically 1000 to 2000 epochs" ;
+    mlips:produces entity:model-QM9-lubbers2018 .
+
+entity:model-QM9-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN QM9 model (234k parameters; mean of eight models)" .
+
+entity:run-benzene-1k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 1k benzene conformations (N_on-site = 0, N_feature = 20)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-benzene-1k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-benzene-1k-numFeatures-lubbers2018 ,
+        entity:setting-benzene-1k-n-on-site-lubbers2018 ,
+        entity:setting-benzene-1k-batchSize-lubbers2018 ,
+        entity:setting-benzene-1k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-benzene-1k-lubbers2018 .
+
+entity:model-benzene-1k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN benzene model, 1k training conformations (about 10k parameters)" .
+
+entity:run-benzene-50k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 50k benzene conformations (N_on-site = 3, N_feature = 40)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-benzene-50k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-benzene-50k-numFeatures-lubbers2018 ,
+        entity:setting-benzene-50k-n-on-site-lubbers2018 ,
+        entity:setting-benzene-50k-batchSize-lubbers2018 ,
+        entity:setting-benzene-50k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-benzene-50k-lubbers2018 .
+
+entity:model-benzene-50k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN benzene model, 50k training conformations (about 59k parameters)" .
+
+entity:run-malonaldehyde-1k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 1k malonaldehyde conformations (N_on-site = 0, N_feature = 20)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-malonaldehyde-1k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-malonaldehyde-1k-numFeatures-lubbers2018 ,
+        entity:setting-malonaldehyde-1k-n-on-site-lubbers2018 ,
+        entity:setting-malonaldehyde-1k-batchSize-lubbers2018 ,
+        entity:setting-malonaldehyde-1k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-malonaldehyde-1k-lubbers2018 .
+
+entity:model-malonaldehyde-1k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN malonaldehyde model, 1k training conformations (about 10k parameters)" .
+
+entity:run-malonaldehyde-50k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 50k malonaldehyde conformations (N_on-site = 3, N_feature = 40)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-malonaldehyde-50k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-malonaldehyde-50k-numFeatures-lubbers2018 ,
+        entity:setting-malonaldehyde-50k-n-on-site-lubbers2018 ,
+        entity:setting-malonaldehyde-50k-batchSize-lubbers2018 ,
+        entity:setting-malonaldehyde-50k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-malonaldehyde-50k-lubbers2018 .
+
+entity:model-malonaldehyde-50k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN malonaldehyde model, 50k training conformations (about 59k parameters)" .
+
+entity:run-salicylic-acid-1k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 1k salicylic acid conformations (N_on-site = 0, N_feature = 20)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-salicylic-acid-1k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-salicylic-acid-1k-numFeatures-lubbers2018 ,
+        entity:setting-salicylic-acid-1k-n-on-site-lubbers2018 ,
+        entity:setting-salicylic-acid-1k-batchSize-lubbers2018 ,
+        entity:setting-salicylic-acid-1k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-salicylic-acid-1k-lubbers2018 .
+
+entity:model-salicylic-acid-1k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN salicylic acid model, 1k training conformations (about 10k parameters)" .
+
+entity:run-salicylic-acid-50k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 50k salicylic acid conformations (N_on-site = 3, N_feature = 40)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-salicylic-acid-50k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-salicylic-acid-50k-numFeatures-lubbers2018 ,
+        entity:setting-salicylic-acid-50k-n-on-site-lubbers2018 ,
+        entity:setting-salicylic-acid-50k-batchSize-lubbers2018 ,
+        entity:setting-salicylic-acid-50k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-salicylic-acid-50k-lubbers2018 .
+
+entity:model-salicylic-acid-50k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN salicylic acid model, 50k training conformations (about 59k parameters)" .
+
+entity:run-toluene-1k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 1k toluene conformations (N_on-site = 0, N_feature = 20)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-toluene-1k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-toluene-1k-numFeatures-lubbers2018 ,
+        entity:setting-toluene-1k-n-on-site-lubbers2018 ,
+        entity:setting-toluene-1k-batchSize-lubbers2018 ,
+        entity:setting-toluene-1k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-toluene-1k-lubbers2018 .
+
+entity:model-toluene-1k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN toluene model, 1k training conformations (about 10k parameters)" .
+
+entity:run-toluene-50k-lubbers2018 a mlips:MLIPRun ;
+    rdfs:label "HIP-NN training on 50k toluene conformations (N_on-site = 3, N_feature = 40)" ;
+    mlips:appliesMethod entity:HIP-NN ;
+    mlips:runsOn entity:ds-toluene-50k-lubbers2018 ;
+    mlips:hasHyperparameterSetting entity:setting-toluene-50k-numFeatures-lubbers2018 ,
+        entity:setting-toluene-50k-n-on-site-lubbers2018 ,
+        entity:setting-toluene-50k-batchSize-lubbers2018 ,
+        entity:setting-toluene-50k-learningRate-lubbers2018 ;
+    mlips:produces entity:model-toluene-50k-lubbers2018 .
+
+entity:model-toluene-50k-lubbers2018 a mlips:TrainedModel ;
+    rdfs:label "HIP-NN toluene model, 50k training conformations (about 59k parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-lubbers2018 mlips:hasResult
+    entity:result-QM9-lubbers2018 ,
+    entity:result-benzene-1k-lubbers2018 ,
+    entity:result-benzene-50k-lubbers2018 ,
+    entity:result-malonaldehyde-1k-lubbers2018 ,
+    entity:result-malonaldehyde-50k-lubbers2018 ,
+    entity:result-salicylic-acid-1k-lubbers2018 ,
+    entity:result-salicylic-acid-50k-lubbers2018 ,
+    entity:result-toluene-1k-lubbers2018 ,
+    entity:result-toluene-50k-lubbers2018 .
+
+entity:result-QM9-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-QM9-lubbers2018 ;
+    mlips:targetMaterial entity:mat-QM9-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-QM9-1-lubbers2018 ,
+        entity:metric-QM9-2-lubbers2018 .
+
+entity:metric-QM9-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN, QM9, N_feature = 80 (+/- 0.003)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.256"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-QM9-2-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: HIP-NN, QM9, N_feature = 80 (+/- 0.020)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.527"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-benzene-1k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-benzene-1k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-benzene-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-benzene-1k-1-lubbers2018 .
+
+entity:metric-benzene-1k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 1k benzene conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.162"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-benzene-50k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-benzene-50k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-benzene-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-benzene-50k-1-lubbers2018 .
+
+entity:metric-benzene-50k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 50k benzene conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.064"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-malonaldehyde-1k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-malonaldehyde-1k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-malonaldehyde-1k-1-lubbers2018 .
+
+entity:metric-malonaldehyde-1k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 1k malonaldehyde conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.97"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-malonaldehyde-50k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-malonaldehyde-50k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-malonaldehyde-50k-1-lubbers2018 .
+
+entity:metric-malonaldehyde-50k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 50k malonaldehyde conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.094"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-salicylic-acid-1k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-salicylic-acid-1k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-salicylic-acid-1k-1-lubbers2018 .
+
+entity:metric-salicylic-acid-1k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 1k salicylic acid conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.444"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-salicylic-acid-50k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-salicylic-acid-50k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-salicylic-acid-50k-1-lubbers2018 .
+
+entity:metric-salicylic-acid-50k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 50k salicylic acid conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.195"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-toluene-1k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-toluene-1k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-toluene-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-toluene-1k-1-lubbers2018 .
+
+entity:metric-toluene-1k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 1k toluene conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.88"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-toluene-50k-lubbers2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-toluene-50k-lubbers2018 ;
+    mlips:targetMaterial entity:mat-toluene-lubbers2018 ;
+    mlips:hasAccuracyMetric entity:metric-toluene-50k-1-lubbers2018 .
+
+entity:metric-toluene-50k-1-lubbers2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: HIP-NN trained on energies of 50k toluene conformations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.144"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# One training epoch on the full QM9 data set takes about 1 minute on a
+# single Nvidia Tesla P100 (N_on-site = 3, N_feature = 80); training
+# typically completes in 1000 to 2000 epochs (trainingHardware).
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - HIP-NN in this paper trains on energies only; no force error exists. All values are means over eight models with different random splits (error bars in the labels where captured).
+# - Sensitivity-function parameters are given in Bohr (R_low = 1.7, R_high = 10, R_cutoff = 15 Bohr) and are not encoded as mlips:cutoffRadius, which is used in Angstrom elsewhere.
+# - Table II (N_feature from 5 to 80, with and without hierarchy) and the smaller QM9 training sizes of Table I (100,000: 0.261; 50,000: 0.354 kcal/mol) are not encoded beyond the N_feature = 80 model. Whether Table II refers to the 110,426 split is inferred from the matching MAE of 0.256.
+# - The assumption that the batch size of 30 and the learning-rate schedule stated for QM9 also apply to the MD-trajectory fits is the paper's ('the same' procedure is described once); the number of interaction layers was not captured.
+# - Literature values of other models in Tables I and III are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
