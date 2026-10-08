@@ -1,0 +1,626 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Can Polat et al. (2026). CliffordIP: Clifford algebra equivariant interatomic potentials for heterogeneous catalysis.
+#   npj Computational Materials. doi:10.1038/s41524-026-02259-8
+#
+# Version read: publisher (sha256 367362f89047f09d...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 162 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the CliffordIP method (introduced here) and the S2EF
+# energy MAEs the text states for CliffordIP and the EquiformerV2 and
+# NequIP baselines, all trained by the authors under one protocol on the
+# OC20 200K split and on OC22. The full benchmark (twelve baselines,
+# IS2RE, OOD splits, rMD17) is in figures and supplementary tables; see
+# gaps. Read from the publisher's 'article in press' PDF.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-polat2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Polat et al. (2026): CliffordIP, Clifford algebra equivariant interatomic potentials for heterogeneous catalysis" ;
+    mlips:reportedIn entity:article-polat2026 .
+
+entity:article-polat2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-026-02259-8> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "CliffordIP: Clifford algebra equivariant interatomic potentials for heterogeneous catalysis" ;
+    schema:author entity:person-Polat-polat2026 ,
+        entity:person-Serpedin-polat2026 ,
+        entity:person-Kurban-polat2026 ,
+        entity:person-KurbanHasan-polat2026 .
+
+entity:person-Polat-polat2026 a schema:Person ;
+    schema:name "Can Polat" ;
+    schema:givenName "Can" ;
+    schema:familyName "Polat" .
+
+entity:person-Serpedin-polat2026 a schema:Person ;
+    schema:name "Erchin Serpedin" ;
+    schema:givenName "Erchin" ;
+    schema:familyName "Serpedin" .
+
+entity:person-Kurban-polat2026 a schema:Person ;
+    schema:name "Mustafa Kurban" ;
+    schema:givenName "Mustafa" ;
+    schema:familyName "Kurban" .
+
+entity:person-KurbanHasan-polat2026 a schema:Person ;
+    schema:name "Hasan Kurban" ;
+    schema:givenName "Hasan" ;
+    schema:familyName "Kurban" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-oc20-polat2026 a mlips:MaterialSystem ;
+    rdfs:label "Adsorbate-catalyst structures of Open Catalyst 2020 (metallic surfaces)" ;
+    mlips:materialClass "Adsorbate-surface systems" .
+
+entity:mat-oc22-polat2026 a mlips:MaterialSystem ;
+    rdfs:label "Adsorbate-catalyst structures of Open Catalyst 2022 (oxide surfaces)" ;
+    mlips:materialClass "Adsorbate-surface systems" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-oc20-polat2026 a mlips:TrainingDataset ;
+    rdfs:label "OC20 S2EF 200K training split" ;
+    mlips:coversMaterial entity:mat-oc20-polat2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 200000 .
+
+entity:ds-oc22-polat2026 a mlips:TrainingDataset ;
+    rdfs:label "OC22 S2EF complete training set" ;
+    mlips:coversMaterial entity:mat-oc22-polat2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-oc20-polat2026 mlips:samplingStrategy
+    entity:sampling-published-polat2026 .
+
+entity:ds-oc22-polat2026 mlips:samplingStrategy
+    entity:sampling-published-polat2026 .
+
+entity:sampling-published-polat2026 a mlips:SamplingStrategy ;
+    rdfs:label "Published data set used as provided" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CliffordIP a mlips:MLIPMethod ;
+    rdfs:label "CliffordIP (Clifford algebra equivariant interatomic potential)" ;
+    mlips:hasLossFunction entity:loss-CliffordIP-polat2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-CliffordIP-polat2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-max-neighbors-polat2026 ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-CliffordIP-polat2026 .
+
+entity:loss-CliffordIP-polat2026 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of a per-atom energy MAE and a per-atom force-vector norm loss (forces on free atoms only)" .
+
+entity:alg-CliffordIP-polat2026 a mls:Algorithm ;
+    rdfs:label "Adam, fixed learning rate, no weight decay; early stopping with patience 30" .
+
+entity:impl-CliffordIP-polat2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-cliffordip-polat2026 .
+
+entity:EquiformerV2 a mlips:MLIPMethod ;
+    rdfs:label "EquiformerV2 (equivariant transformer)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-max-neighbors-polat2026 ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        entity:hp-lmax-polat2026 .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-max-neighbors-polat2026 ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        entity:hp-lmax-polat2026 .
+
+entity:lib-cliffordip-polat2026 a mlips:Library ;
+    rdfs:label "cliffordip" ;
+    rdfs:comment "PyPI package cliffordip; https://github.com/KurbanIntelligenceLab/CliffordIP" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-lmax-polat2026 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order L_max" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-max-neighbors-polat2026 a mlips:Hyperparameter ;
+    rdfs:label "Maximum number of neighbours per atom" ;
+    mlips:hyperparameterName "max_neighbors" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-cliffordip-oc20-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-cliffordip-oc20-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-cliffordip-oc20-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-cliffordip-oc20-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-cliffordip-oc20-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-cliffordip-oc22-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-cliffordip-oc22-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-cliffordip-oc22-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-cliffordip-oc22-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-cliffordip-oc22-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-eqv2-l2-oc20-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-eqv2-l2-oc20-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-numLayers-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-numFeatures-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc20-lmax-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-polat2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-eqv2-l4-oc20-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-eqv2-l4-oc20-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-numLayers-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-numFeatures-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc20-lmax-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-polat2026 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-eqv2-l2-oc22-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-eqv2-l2-oc22-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-numLayers-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-numFeatures-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-eqv2-l2-oc22-lmax-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-polat2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-eqv2-l4-oc22-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-eqv2-l4-oc22-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-numLayers-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-numFeatures-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-eqv2-l4-oc22-lmax-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-polat2026 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-nequip-oc22-cutoffRadius-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-oc22-max-neighbors-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-neighbors-polat2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-nequip-oc22-learningRate-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-nequip-oc22-batchSize-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-nequip-oc22-numEpochs-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-nequip-oc22-numLayers-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-nequip-oc22-numFeatures-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "44"^^xsd:integer .
+
+entity:setting-nequip-oc22-numRadialBasis-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-oc22-lmax-polat2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-polat2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-cliffordip-oc20-polat2026 a mlips:MLIPRun ;
+    rdfs:label "CliffordIP trained on OC20 S2EF 200K" ;
+    mlips:appliesMethod entity:CliffordIP ;
+    mlips:runsOn entity:ds-oc20-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-cliffordip-oc20-cutoffRadius-polat2026 ,
+        entity:setting-cliffordip-oc20-max-neighbors-polat2026 ,
+        entity:setting-cliffordip-oc20-learningRate-polat2026 ,
+        entity:setting-cliffordip-oc20-batchSize-polat2026 ,
+        entity:setting-cliffordip-oc20-numEpochs-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-cliffordip-oc20-polat2026 .
+
+entity:model-cliffordip-oc20-polat2026 a mlips:TrainedModel ;
+    rdfs:label "CliffordIP, OC20 S2EF 200K" .
+
+entity:run-cliffordip-oc22-polat2026 a mlips:MLIPRun ;
+    rdfs:label "CliffordIP trained on OC22 S2EF" ;
+    mlips:appliesMethod entity:CliffordIP ;
+    mlips:runsOn entity:ds-oc22-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-cliffordip-oc22-cutoffRadius-polat2026 ,
+        entity:setting-cliffordip-oc22-max-neighbors-polat2026 ,
+        entity:setting-cliffordip-oc22-learningRate-polat2026 ,
+        entity:setting-cliffordip-oc22-batchSize-polat2026 ,
+        entity:setting-cliffordip-oc22-numEpochs-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-cliffordip-oc22-polat2026 .
+
+entity:model-cliffordip-oc22-polat2026 a mlips:TrainedModel ;
+    rdfs:label "CliffordIP, OC22 S2EF" .
+
+entity:run-eqv2-l2-oc20-polat2026 a mlips:MLIPRun ;
+    rdfs:label "EquiformerV2 (L=2) trained on OC20 S2EF 200K" ;
+    mlips:appliesMethod entity:EquiformerV2 ;
+    mlips:runsOn entity:ds-oc20-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-eqv2-l2-oc20-cutoffRadius-polat2026 ,
+        entity:setting-eqv2-l2-oc20-max-neighbors-polat2026 ,
+        entity:setting-eqv2-l2-oc20-learningRate-polat2026 ,
+        entity:setting-eqv2-l2-oc20-batchSize-polat2026 ,
+        entity:setting-eqv2-l2-oc20-numEpochs-polat2026 ,
+        entity:setting-eqv2-l2-oc20-numLayers-polat2026 ,
+        entity:setting-eqv2-l2-oc20-numFeatures-polat2026 ,
+        entity:setting-eqv2-l2-oc20-lmax-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-eqv2-l2-oc20-polat2026 .
+
+entity:model-eqv2-l2-oc20-polat2026 a mlips:TrainedModel ;
+    rdfs:label "EquiformerV2 (L=2), OC20 S2EF 200K" .
+
+entity:run-eqv2-l4-oc20-polat2026 a mlips:MLIPRun ;
+    rdfs:label "EquiformerV2 (L=4) trained on OC20 S2EF 200K" ;
+    mlips:appliesMethod entity:EquiformerV2 ;
+    mlips:runsOn entity:ds-oc20-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-eqv2-l4-oc20-cutoffRadius-polat2026 ,
+        entity:setting-eqv2-l4-oc20-max-neighbors-polat2026 ,
+        entity:setting-eqv2-l4-oc20-learningRate-polat2026 ,
+        entity:setting-eqv2-l4-oc20-batchSize-polat2026 ,
+        entity:setting-eqv2-l4-oc20-numEpochs-polat2026 ,
+        entity:setting-eqv2-l4-oc20-numLayers-polat2026 ,
+        entity:setting-eqv2-l4-oc20-numFeatures-polat2026 ,
+        entity:setting-eqv2-l4-oc20-lmax-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-eqv2-l4-oc20-polat2026 .
+
+entity:model-eqv2-l4-oc20-polat2026 a mlips:TrainedModel ;
+    rdfs:label "EquiformerV2 (L=4), OC20 S2EF 200K" .
+
+entity:run-eqv2-l2-oc22-polat2026 a mlips:MLIPRun ;
+    rdfs:label "EquiformerV2 (L=2) trained on OC22 S2EF" ;
+    mlips:appliesMethod entity:EquiformerV2 ;
+    mlips:runsOn entity:ds-oc22-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-eqv2-l2-oc22-cutoffRadius-polat2026 ,
+        entity:setting-eqv2-l2-oc22-max-neighbors-polat2026 ,
+        entity:setting-eqv2-l2-oc22-learningRate-polat2026 ,
+        entity:setting-eqv2-l2-oc22-batchSize-polat2026 ,
+        entity:setting-eqv2-l2-oc22-numEpochs-polat2026 ,
+        entity:setting-eqv2-l2-oc22-numLayers-polat2026 ,
+        entity:setting-eqv2-l2-oc22-numFeatures-polat2026 ,
+        entity:setting-eqv2-l2-oc22-lmax-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-eqv2-l2-oc22-polat2026 .
+
+entity:model-eqv2-l2-oc22-polat2026 a mlips:TrainedModel ;
+    rdfs:label "EquiformerV2 (L=2), OC22 S2EF" .
+
+entity:run-eqv2-l4-oc22-polat2026 a mlips:MLIPRun ;
+    rdfs:label "EquiformerV2 (L=4) trained on OC22 S2EF" ;
+    mlips:appliesMethod entity:EquiformerV2 ;
+    mlips:runsOn entity:ds-oc22-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-eqv2-l4-oc22-cutoffRadius-polat2026 ,
+        entity:setting-eqv2-l4-oc22-max-neighbors-polat2026 ,
+        entity:setting-eqv2-l4-oc22-learningRate-polat2026 ,
+        entity:setting-eqv2-l4-oc22-batchSize-polat2026 ,
+        entity:setting-eqv2-l4-oc22-numEpochs-polat2026 ,
+        entity:setting-eqv2-l4-oc22-numLayers-polat2026 ,
+        entity:setting-eqv2-l4-oc22-numFeatures-polat2026 ,
+        entity:setting-eqv2-l4-oc22-lmax-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-eqv2-l4-oc22-polat2026 .
+
+entity:model-eqv2-l4-oc22-polat2026 a mlips:TrainedModel ;
+    rdfs:label "EquiformerV2 (L=4), OC22 S2EF" .
+
+entity:run-nequip-oc22-polat2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on OC22 S2EF" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-oc22-polat2026 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-oc22-cutoffRadius-polat2026 ,
+        entity:setting-nequip-oc22-max-neighbors-polat2026 ,
+        entity:setting-nequip-oc22-learningRate-polat2026 ,
+        entity:setting-nequip-oc22-batchSize-polat2026 ,
+        entity:setting-nequip-oc22-numEpochs-polat2026 ,
+        entity:setting-nequip-oc22-numLayers-polat2026 ,
+        entity:setting-nequip-oc22-numFeatures-polat2026 ,
+        entity:setting-nequip-oc22-numRadialBasis-polat2026 ,
+        entity:setting-nequip-oc22-lmax-polat2026 ;
+    mlips:trainingHardware "Single NVIDIA RTX 5090 GPU per run" ;
+    mlips:produces entity:model-nequip-oc22-polat2026 .
+
+entity:model-nequip-oc22-polat2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP, OC22 S2EF" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-polat2026 mlips:hasResult
+    entity:result-cliffordip-oc20-polat2026 ,
+    entity:result-cliffordip-oc22-polat2026 ,
+    entity:result-eqv2-l4-oc20-polat2026 ,
+    entity:result-eqv2-l2-oc20-polat2026 ,
+    entity:result-eqv2-l2-oc22-polat2026 ,
+    entity:result-eqv2-l4-oc22-polat2026 ,
+    entity:result-nequip-oc22-polat2026 .
+
+entity:result-cliffordip-oc20-polat2026 a mlips:BenchmarkResult ;
+    rdfs:comment "Force MAE is stated only as within 0.005 eV/A of the EquiformerV2 family (0.059-0.060 eV/A). On adsorbate subsets of the OC20 validation set the same model reaches 2.08 eV (CO2RR), 1.98 eV (N2RR) and 1.87 eV (C2)." ;
+    mlips:evaluatesModel entity:model-cliffordip-oc20-polat2026 ;
+    mlips:targetMaterial entity:mat-oc20-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-cliffordip-oc20-1-polat2026 .
+
+entity:metric-cliffordip-oc20-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC20 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.889"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-cliffordip-oc22-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cliffordip-oc22-polat2026 ;
+    mlips:targetMaterial entity:mat-oc22-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-cliffordip-oc22-1-polat2026 .
+
+entity:metric-cliffordip-oc22-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC22 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.89"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-eqv2-l4-oc20-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-eqv2-l4-oc20-polat2026 ;
+    mlips:targetMaterial entity:mat-oc20-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-eqv2-l4-oc20-1-polat2026 .
+
+entity:metric-eqv2-l4-oc20-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC20 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.366"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-eqv2-l2-oc20-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-eqv2-l2-oc20-polat2026 ;
+    mlips:targetMaterial entity:mat-oc20-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-eqv2-l2-oc20-1-polat2026 .
+
+entity:metric-eqv2-l2-oc20-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC20 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.474"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-eqv2-l2-oc22-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-eqv2-l2-oc22-polat2026 ;
+    mlips:targetMaterial entity:mat-oc22-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-eqv2-l2-oc22-1-polat2026 .
+
+entity:metric-eqv2-l2-oc22-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC22 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.133"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-eqv2-l4-oc22-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-eqv2-l4-oc22-polat2026 ;
+    mlips:targetMaterial entity:mat-oc22-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-eqv2-l4-oc22-1-polat2026 .
+
+entity:metric-eqv2-l4-oc22-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC22 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.378"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-nequip-oc22-polat2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-oc22-polat2026 ;
+    mlips:targetMaterial entity:mat-oc22-polat2026 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-oc22-1-polat2026 .
+
+entity:metric-nequip-oc22-1-polat2026 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE, OC22 (mean of three seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.897"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy MAEs are total-energy errors in eV under a compute-constrained protocol (50 epochs at most), which is why they are far above published leaderboard values; the text does not say on which validation split the headline numbers are (the in-distribution split is implied by the efficiency section). Each value is a mean over three seeds; one run per model and data set is encoded.
+# - Not encoded: the other baselines (SchNet, DimeNet++, PaiNN, TorchMD-Net, GotenNet, MACE, ICTP), whose values are in figures and the supplement (GotenNet 3.562 eV on OC20 is stated in the text, but GotenNet and ICTP are not in the registry); IS2RE results; OOD splits; force cosine similarity; per-step timings and training hours (Table 5: CliffordIP 216.6 h over 12 runs).
+# - rMD17 (Table 1) gives aggregate MAEs over ten per-molecule models (CliffordIP 0.034 eV and 0.021 eV/A; FAENet 0.024 and 0.021; EquiformerV2 about 247 eV energy MAE, which the authors attribute to an uncalibrated energy head). Encoding it would need ten runs per architecture; it is left out.
+# - The CliffordIP architecture row of Table 4 was not captured, so its layer and feature settings are missing. Read from the 'article in press' PDF, whose text carries a watermark; numbers should be checked against the final version.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
