@@ -1,0 +1,131 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Juno Nam et al. (2025). Interpolation and differentiation of alchemical degrees of freedom in machine learning interatomic potentials.
+#   Nature Communications. doi:10.1038/s41467-025-59543-2  arXiv:2404.10746v3
+#
+# Version read: arxiv-preprint arXiv:2404.10746v3 (sha256 312957123ca33509...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 84 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper modifies the message passing of pretrained
+# universal MLIPs (the MACE-MP-0 medium model, and CHGNet in the
+# supplement) so that chemical composition becomes a continuous,
+# differentiable variable, and uses this for solid-solution modelling and
+# alchemical free-energy calculations. No model is trained and no
+# energy/force error is reported; only the demonstrated simulation types
+# of the method are asserted.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-nam2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Nam, Peng and Gomez-Bombarelli (2025): interpolation and differentiation of alchemical degrees of freedom in MLIPs" ;
+    mlips:reportedIn entity:article-nam2025 .
+
+entity:article-nam2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-025-59543-2> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Interpolation and differentiation of alchemical degrees of freedom in machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-9506-2938> ,
+        <https://orcid.org/0000-0003-3696-770X> ,
+        <https://orcid.org/0000-0002-9495-8599> .
+
+<https://orcid.org/0000-0002-9506-2938> a schema:Person ;
+    schema:name "Juno Nam" ;
+    schema:givenName "Juno" ;
+    schema:familyName "Nam" ;
+    schema:identifier <https://orcid.org/0000-0002-9506-2938> .
+
+<https://orcid.org/0000-0003-3696-770X> a schema:Person ;
+    schema:name "Jiayu Peng" ;
+    schema:givenName "Jiayu" ;
+    schema:familyName "Peng" ;
+    schema:identifier <https://orcid.org/0000-0003-3696-770X> .
+
+<https://orcid.org/0000-0002-9495-8599> a schema:Person ;
+    schema:name "Rafael Gómez-Bombarelli" ;
+    schema:givenName "Rafael" ;
+    schema:familyName "Gómez-Bombarelli" ;
+    schema:identifier <https://orcid.org/0000-0002-9495-8599> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+# No material system is characterised by the paper (see Q12).
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+# No training dataset is characterised by the paper (see Q12).
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+# No sampling strategy is described by the paper (see Q12).
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:ThermodynamicIntegration .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# No training run or trained model is reported by the paper (see Q12).
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No training, data set, hyperparameter setting or accuracy metric (Q2-Q6 and Q8-Q10 empty). The pretrained model is given as 'MACE-MP-0 medium [15]' without a release; it is not linked to a registry model, because the registry distinguishes the 2023.12.03 release from the 0b3 checkpoint and the paper does not say which was used.
+# - Thermodynamic integration is asserted for entity:MACE on the basis of the alchemical and Frenkel-Ladd free-energy calculations (free energy of vacancy formation in bcc iron, composition changes); geometry optimisation and MD on the basis of the relaxations and sampling runs with the alchemically modified model.
+# - The CHGNet results of the supplementary information are not encoded. Results on lattice parameters and band-gap trends of solid solutions, order-disorder energetics of double perovskites and free energies have no MetricProperty.
+# - The alchemical modification itself (weighted 'alchemical' atoms in the graph) is a new capability of the method that schema 0.1.2 has no term for.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
