@@ -1,0 +1,220 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Natascia L. Fragapane et al. (2026). Li–P–S Electrolyte Materials as a Benchmark for Machine-Learned Interatomic Potentials.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.5c02006  arXiv:2511.16569v1
+#
+# Version read: arxiv-preprint arXiv:2511.16569v1 (sha256 438818e8a091c039...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 187 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the LiPS-25 data set (reference DFT, composition,
+# construction) and the NequIP model used to drive its iterative
+# melt-quench extension, with its settings. The benchmark results for
+# MACE models and fine-tuned foundation models (four tasks: formation
+# energies, force accuracy on a melt-quench trajectory, ionic
+# conductivity, robustness) are figures and task metrics and are not
+# encoded. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-fragapane2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Fragapane et al. (2026): Li-P-S electrolyte materials as a benchmark for machine-learned interatomic potentials" ;
+    mlips:reportedIn entity:article-fragapane2026 .
+
+entity:article-fragapane2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.5c02006> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Li–P–S Electrolyte Materials as a Benchmark for Machine-Learned Interatomic Potentials" ;
+    schema:author <https://orcid.org/0009-0005-5707-4005> ,
+        <https://orcid.org/0000-0001-6873-0278> .
+
+<https://orcid.org/0009-0005-5707-4005> a schema:Person ;
+    schema:name "Natascia L. Fragapane" ;
+    schema:givenName "Natascia L." ;
+    schema:familyName "Fragapane" ;
+    schema:identifier <https://orcid.org/0009-0005-5707-4005> .
+
+<https://orcid.org/0000-0001-6873-0278> a schema:Person ;
+    schema:name "Volker L. Deringer" ;
+    schema:givenName "Volker L." ;
+    schema:familyName "Deringer" ;
+    schema:identifier <https://orcid.org/0000-0001-6873-0278> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LiPS-fragapane2026 a mlips:MaterialSystem ;
+    rdfs:label "Li-P-S system along and around the Li2S-P2S5 tie-line (crystalline, liquid and glassy; seven key compositions from Li2S to P2S5)" ;
+    mlips:chemicalFormula "Li-P-S" ;
+    mlips:materialClass "Sulfide solid electrolytes" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-fragapane2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-fragapane2026 mlips:hasDFTSettings entity:calc-settings-dft-fragapane2026 .
+
+entity:calc-settings-dft-fragapane2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-PBEsol-fragapane2026 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "1000"^^xsd:double ;
+    mlips:kPointMesh "Automatically generated grids with maximum spacing 0.2 per Angstrom" ;
+    rdfs:comment "VASP 6.4.3; SCF tolerance 1e-8 eV per cell. The AIMD used to generate structures ran at lower settings (400 eV, Gamma point) before relabelling." .
+
+entity:xc-PBEsol-fragapane2026 a mlips:XCFunctional ;
+    rdfs:label "PBEsol" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-LiPS25-fragapane2026 a mlips:TrainingDataset ;
+    rdfs:label "LiPS-25 data set (12,525 cells, 531,576 atoms; predefined 80:10:10 train / validation / test split)" ;
+    mlips:coversMaterial entity:mat-LiPS-fragapane2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 12525 ;
+    mlips:hasDFTCalculation entity:calc-dft-fragapane2026 ;
+    rdfs:comment "Crystalline 8,891; AIMD 1,246; random hard spheres 500; dimers 138; Iter1 1,000; Iter2 750 cells. The count is the whole data set." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-LiPS25-fragapane2026 mlips:samplingStrategy
+    entity:sampling-iter0-fragapane2026 ,
+    entity:sampling-mq-fragapane2026 .
+
+entity:sampling-iter0-fragapane2026 a mlips:SamplingStrategy ;
+    rdfs:label "Iter0: distorted and rattled elemental, binary and ternary Li/P/S crystals from ICSD and the Materials Project; AIMD snapshots at 250, 500 and 1000 K for seven compositions; random hard-sphere structures (buildcell); isolated dimers" .
+
+entity:sampling-mq-fragapane2026 a mlips:SamplingStrategy ;
+    rdfs:label "Iterative melt-quench MD with NequIP and query by committee (five models on random 50% subsets): Iter1 NVT cycles 300 K to 1000 or 1500 K and back; Iter2 NPT cycles targeting glassy structures in the post-quench anneal" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-fragapane2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-fragapane2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-lmax-fragapane2026 ,
+        mlips:numFeatures ,
+        mlips:numLayers ,
+        mlips:numRadialBasis ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-NequIP-fragapane2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-NequIP-fragapane2026 a mlips:LossFunction ;
+    rdfs:label "Equal weighting of energy and force terms" .
+
+entity:alg-NequIP-fragapane2026 a mls:Algorithm ;
+    rdfs:label "Learning rate halved after 100 epochs without validation improvement; early stopping; float32" .
+
+entity:impl-NequIP-fragapane2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP .
+
+entity:hp-lmax-fragapane2026 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order l_max" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-nequip-cutoffRadius-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-nequip-lmax-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-fragapane2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-numFeatures-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-numLayers-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-nequip-numRadialBasis-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-learningRate-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-nequip-batchSize-fragapane2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "50"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-nequip-fragapane2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP model trained on the growing LiPS data set to drive the melt-quench iterations" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-LiPS25-fragapane2026 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-cutoffRadius-fragapane2026 ,
+        entity:setting-nequip-lmax-fragapane2026 ,
+        entity:setting-nequip-numFeatures-fragapane2026 ,
+        entity:setting-nequip-numLayers-fragapane2026 ,
+        entity:setting-nequip-numRadialBasis-fragapane2026 ,
+        entity:setting-nequip-learningRate-fragapane2026 ,
+        entity:setting-nequip-batchSize-fragapane2026 ;
+    mlips:trainingHardware "NVIDIA RTX A6000 GPU" ;
+    mlips:produces entity:model-nequip-fragapane2026 .
+
+entity:model-nequip-fragapane2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for Li-P-S (data-generation model)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The NequIP run is attached to the final data-set node, although each iteration trained on the data available at that point; the per-iteration subsets are not separate nodes.
+# - Not encoded: the MACE hyperparameter sweep (five seeds per setting, 6 A cutoff, learning rate 0.001, batch 32; Fig. 3) and the naive fine-tuning of nine foundation models on 25 Li7P3S11 structures (MACE-MP-0b3, MACE-MPA-0, MACE-OMAT-0, MACE-MATPES-0, Orb-v2, two Orb-v3 models, MatterSim-1m and -5m), because their results are figures and task metrics: RMSE of formation energies, force RMSE on a melt-quench trajectory, room-temperature ionic conductivity (Tables 2 and 3) and simulation robustness. MACE-MP-0b3 is a registry model and could be linked once those tables are transcribed.
+# - Read from the arXiv v1 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
