@@ -1,0 +1,271 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Caitlin A. McCandler et al. (2024). Gold–Thiolate Nanocluster Dynamics and Intercluster Reactions Enabled by a Machine Learned Interatomic Potential.
+#   ACS Nano. doi:10.1021/acsnano.4c03094
+#
+# Version read: submittedVersion (sha256 4d5570dfa010650e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 160 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the Au-S-C-H ACE potential for methylthiolate-protected
+# gold nanoclusters: GPAW reference data, the training set assembled from
+# earlier AIMD and Monte Carlo data plus active learning, settings, and
+# the energy and force RMSEs stated in the text. Cluster dynamics and
+# intercluster reactions are not encoded. Read from the submitted version.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-mccandler2024 a mlips:BenchmarkStudy ;
+    rdfs:label "McCandler et al. (2024): gold-thiolate nanocluster dynamics enabled by an ACE potential" ;
+    mlips:reportedIn entity:article-mccandler2024 .
+
+entity:article-mccandler2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acsnano.4c03094> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Gold–Thiolate Nanocluster Dynamics and Intercluster Reactions Enabled by a Machine Learned Interatomic Potential" ;
+    schema:author <https://orcid.org/0000-0003-2616-310X> ,
+        entity:person-Pihlajamaki-mccandler2024 ,
+        entity:person-Malola-mccandler2024 ,
+        <https://orcid.org/0000-0002-8558-5436> ,
+        entity:person-Persson-mccandler2024 .
+
+<https://orcid.org/0000-0003-2616-310X> a schema:Person ;
+    schema:name "Caitlin A. McCandler" ;
+    schema:givenName "Caitlin A." ;
+    schema:familyName "McCandler" ;
+    schema:identifier <https://orcid.org/0000-0003-2616-310X> .
+
+entity:person-Pihlajamaki-mccandler2024 a schema:Person ;
+    schema:name "Antti Pihlajamäki" ;
+    schema:givenName "Antti" ;
+    schema:familyName "Pihlajamäki" .
+
+entity:person-Malola-mccandler2024 a schema:Person ;
+    schema:name "Sami Malola" ;
+    schema:givenName "Sami" ;
+    schema:familyName "Malola" .
+
+<https://orcid.org/0000-0002-8558-5436> a schema:Person ;
+    schema:name "Hannu Häkkinen" ;
+    schema:givenName "Hannu" ;
+    schema:familyName "Häkkinen" ;
+    schema:identifier <https://orcid.org/0000-0002-8558-5436> .
+
+entity:person-Persson-mccandler2024 a schema:Person ;
+    schema:name "Kristin A. Persson" ;
+    schema:givenName "Kristin A." ;
+    schema:familyName "Persson" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-AuSR-mccandler2024 a mlips:MaterialSystem ;
+    rdfs:label "Neutral methylthiolate-protected gold nanoclusters (Au38(SCH3)24 isomers and clusters of other sizes, in vacuum)" ;
+    mlips:chemicalFormula "Au-S-C-H" ;
+    mlips:materialClass "Ligand-protected metal nanoclusters" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-mccandler2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-mccandler2024 mlips:hasDFTSettings entity:calc-settings-dft-mccandler2024 .
+
+entity:calc-settings-dft-mccandler2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-GPAW-mccandler2024 ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:dftBasisSet entity:basis-Real-space-grid-spacing-0_2-Angstrom-mccandler2024 ;
+    rdfs:comment "Settings as in the earlier Au38 AIMD study the data come from." .
+
+entity:lib-GPAW-mccandler2024 a mlips:Library ;
+    rdfs:label "GPAW" ;
+    rdfs:comment "Real-space grid code; versions 1.3.0 and 22.8.0 were both used (reference-energy differences benchmarked in the SI)." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:basis-Real-space-grid-spacing-0_2-Angstrom-mccandler2024 a mlips:DftBasisSet ;
+    rdfs:label "Real-space grid, spacing 0.2 Angstrom" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-AuSR-mccandler2024 a mlips:TrainingDataset ;
+    rdfs:label "Au-S-C-H training set (31,942 structures; test set of 11,702 AIMD structures)" ;
+    mlips:coversMaterial entity:mat-AuSR-mccandler2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 31942 ;
+    mlips:hasDFTCalculation entity:calc-dft-mccandler2024 ;
+    rdfs:comment "The test set is the AIMD test set of the earlier EMLM study (Au38 isomers at 300, 500 and 800 K, Langevin dynamics)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-AuSR-mccandler2024 mlips:samplingStrategy
+    entity:sampling-aimd-mccandler2024 ,
+    entity:sampling-mc-mccandler2024 ,
+    entity:sampling-al-mccandler2024 .
+
+entity:sampling-aimd-mccandler2024 a mlips:SamplingStrategy ;
+    rdfs:label "AIMD trajectories of the Au38 Q and T isomers from an earlier study (500-1200 K, 2 fs step, Berendsen dynamics): 12,413 and 12,647 structures" .
+
+entity:sampling-mc-mccandler2024 a mlips:SamplingStrategy ;
+    rdfs:label "5,749 structures from Monte Carlo simulations with an earlier EMLM model" .
+
+entity:sampling-al-mccandler2024 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning in three rounds: simulations with the current ACE, structures with high extrapolation grade recomputed with DFT (1,133 structures)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-mccandler2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-mccandler2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-num-basis-functions-mccandler2024 ,
+        entity:hp-kappa-mccandler2024 ;
+    mlips:hasImplementation entity:impl-ACE-mccandler2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-ACE-mccandler2024 a mlips:LossFunction ;
+    rdfs:label "Lambda = (1 - kappa) Delta_E^2 + kappa Delta_F^2 with kappa = 0.9" .
+
+entity:alg-ACE-mccandler2024 a mls:Algorithm ;
+    rdfs:label "Body-order hierarchical fitting with linear embedding: 125 two-body functions, then 950 three-body functions, a round of active learning, then 559 Au/S four-body functions" .
+
+entity:impl-ACE-mccandler2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "ML-PACE in LAMMPS" .
+
+entity:hp-num-basis-functions-mccandler2024 a mlips:Hyperparameter ;
+    rdfs:label "Number of ACE basis functions" ;
+    mlips:hyperparameterName "num_basis_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-kappa-mccandler2024 a mlips:Hyperparameter ;
+    rdfs:label "Loss weight kappa between energy and force terms" ;
+    mlips:hyperparameterName "kappa" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-AuSR-cutoffRadius-mccandler2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "9"^^xsd:integer .
+
+entity:setting-AuSR-num-basis-functions-mccandler2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-basis-functions-mccandler2024 ;
+    mlips:settingValue "1634"^^xsd:integer .
+
+entity:setting-AuSR-kappa-mccandler2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-kappa-mccandler2024 ;
+    mlips:settingValue "0.9"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-AuSR-mccandler2024 a mlips:MLIPRun ;
+    rdfs:label "ACE parametrisation for Au-S-C-H nanoclusters" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-AuSR-mccandler2024 ;
+    mlips:hasHyperparameterSetting entity:setting-AuSR-cutoffRadius-mccandler2024 ,
+        entity:setting-AuSR-num-basis-functions-mccandler2024 ,
+        entity:setting-AuSR-kappa-mccandler2024 ;
+    mlips:produces entity:model-AuSR-mccandler2024 .
+
+entity:model-AuSR-mccandler2024 a mlips:TrainedModel ;
+    rdfs:label "Au-S-C-H ACE potential" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-mccandler2024 mlips:hasResult
+    entity:result-test-mccandler2024 ,
+    entity:result-train-mccandler2024 .
+
+entity:result-test-mccandler2024 a mlips:BenchmarkResult ;
+    rdfs:comment "The earlier EMLM model reaches 16.9 meV/atom on the same test set. The force RMSE corresponds to 14% of the forces." ;
+    mlips:evaluatesModel entity:model-AuSR-mccandler2024 ;
+    mlips:targetMaterial entity:mat-AuSR-mccandler2024 ;
+    mlips:hasAccuracyMetric entity:metric-test-1-mccandler2024 ,
+        entity:metric-test-2-mccandler2024 .
+
+entity:metric-test-1-mccandler2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, testing set (11,702 AIMD structures)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-2-mccandler2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, testing set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "121.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-train-mccandler2024 a mlips:BenchmarkResult ;
+    rdfs:comment "The training error exceeds the test error because the training set includes structures far from equilibrium (stated by the authors)." ;
+    mlips:evaluatesModel entity:model-AuSR-mccandler2024 ;
+    mlips:targetMaterial entity:mat-AuSR-mccandler2024 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-mccandler2024 ,
+        entity:metric-train-2-mccandler2024 .
+
+entity:metric-train-1-mccandler2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-mccandler2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "87.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The sentence giving the force RMSEs pairs 'testing and training' with 121.1 and 87.83 meV/A and then '14% and 22%'; the assignment follows the sentence order and should be checked against the PDF.
+# - The paper says kappa = 0.9 was set 'to prioritize learning the forces'; the value is encoded as given. Per-pair n_max and l_max of the final potential (Table 2) are not encoded.
+# - Relaxed-structure energies of known clusters (Table 1), vibrational spectra, chiral transition barriers and the coalescence simulations are not encoded. Read from the submitted version, not the ACS Nano version of record.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
