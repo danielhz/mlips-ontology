@@ -1,0 +1,357 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Stefan Chmiela et al. (2017). Machine learning of accurate energy-conserving molecular force fields.
+#   Science Advances. doi:10.1126/sciadv.1603015  arXiv:1611.04678v4
+#
+# Version read: arxiv-preprint arXiv:1611.04678v4 (sha256 94e25dae2e9b364c...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 47 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the gradient-domain machine learning (GDML) method,
+# introduced here, and its eight molecular force fields trained on about
+# 1000 geometries each from ab initio MD trajectories (the data later
+# known as MD17). The per-molecule errors are in the supplementary
+# tables, which are not part of the PDF read.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-chmiela2017 a mlips:BenchmarkStudy ;
+    rdfs:label "Chmiela et al. (2017): machine learning of accurate energy-conserving molecular force fields (GDML)" ;
+    mlips:reportedIn entity:article-chmiela2017 .
+
+entity:article-chmiela2017 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1126/sciadv.1603015> ;
+    schema:datePublished "2017"^^xsd:gYear ;
+    schema:name "Machine learning of accurate energy-conserving molecular force fields" ;
+    schema:author entity:person-Chmiela-chmiela2017 ,
+        <https://orcid.org/0000-0002-1012-4854> ,
+        <https://orcid.org/0000-0001-6091-3408> ,
+        entity:person-Poltavsky-chmiela2017 ,
+        <https://orcid.org/0000-0001-8342-0964> ,
+        entity:person-Muller-chmiela2017 .
+
+entity:person-Chmiela-chmiela2017 a schema:Person ;
+    schema:name "Stefan Chmiela" ;
+    schema:givenName "Stefan" ;
+    schema:familyName "Chmiela" .
+
+<https://orcid.org/0000-0002-1012-4854> a schema:Person ;
+    schema:name "Alexandre Tkatchenko" ;
+    schema:givenName "Alexandre" ;
+    schema:familyName "Tkatchenko" ;
+    schema:identifier <https://orcid.org/0000-0002-1012-4854> .
+
+<https://orcid.org/0000-0001-6091-3408> a schema:Person ;
+    schema:name "Huziel E. Sauceda" ;
+    schema:givenName "Huziel E." ;
+    schema:familyName "Sauceda" ;
+    schema:identifier <https://orcid.org/0000-0001-6091-3408> .
+
+entity:person-Poltavsky-chmiela2017 a schema:Person ;
+    schema:name "Igor Poltavsky" ;
+    schema:givenName "Igor" ;
+    schema:familyName "Poltavsky" .
+
+<https://orcid.org/0000-0001-8342-0964> a schema:Person ;
+    schema:name "Kristof T. Schütt" ;
+    schema:givenName "Kristof T." ;
+    schema:familyName "Schütt" ;
+    schema:identifier <https://orcid.org/0000-0001-8342-0964> .
+
+entity:person-Muller-chmiela2017 a schema:Person ;
+    schema:name "Klaus-Robert Müller" ;
+    schema:givenName "Klaus-Robert" ;
+    schema:familyName "Müller" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-benzene-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-uracil-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-naphthalene-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-aspirin-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-salicylic-acid-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-malonaldehyde-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-ethanol-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+entity:mat-toluene-chmiela2017 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase), AIMD conformations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-chmiela2017 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-chmiela2017 mlips:hasDFTSettings entity:calc-settings-dft-chmiela2017 .
+
+entity:calc-settings-dft-chmiela2017 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-PBE-vdW-TS-chmiela2017 ;
+    rdfs:comment "Total energies and forces of the AIMD trajectories (resolution 0.5 fs); code and basis are not given in the main text." .
+
+entity:xc-PBE-vdW-TS-chmiela2017 a mlips:XCFunctional ;
+    rdfs:label "PBE+vdW-TS" ;
+    rdfs:comment "PBE with Tkatchenko-Scheffler van der Waals correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-benzene-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for benzene (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-benzene-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-uracil-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for uracil (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-uracil-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-naphthalene-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for naphthalene (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-naphthalene-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-aspirin-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for aspirin (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-aspirin-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-salicylic-acid-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for salicylic acid (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-malonaldehyde-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for malonaldehyde (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-ethanol-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for ethanol (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-ethanol-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+entity:ds-toluene-chmiela2017 a mlips:TrainingDataset ;
+    rdfs:label "GDML training set for toluene (about 1000 geometries)" ;
+    mlips:coversMaterial entity:mat-toluene-chmiela2017 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-chmiela2017 ;
+    rdfs:comment "The paper gives the size as '~1000 geometries'. GDML is trained on forces; energies are recovered by integration." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-benzene-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-uracil-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-naphthalene-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-aspirin-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-salicylic-acid-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-malonaldehyde-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-ethanol-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:ds-toluene-chmiela2017 mlips:samplingStrategy
+    entity:sampling-aimd-energy-uniform-chmiela2017 .
+
+entity:sampling-aimd-energy-uniform-chmiela2017 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD with sampling uniform in the trajectory energy distribution" ;
+    rdfs:comment "Trajectories of 150 k to nearly 1 M conformations at 0.5 fs resolution; about 1000 geometries per molecule are drawn uniformly according to the energy distribution of the MD@DFT trajectory." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GDML a mlips:MLIPMethod ;
+    rdfs:label "Gradient-Domain Machine Learning (GDML)" ;
+    mlips:hasTrainingAlgorithm entity:alg-GDML-chmiela2017 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-GDML-chmiela2017 a mls:Algorithm ;
+    rdfs:label "Kernel ridge regression in the gradient domain: the force field is learned directly as a conservative vector field, with hyperparameters selected per data set and errors estimated by cross-validation" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gdml-benzene-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for benzene" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-benzene-chmiela2017 ;
+    mlips:produces entity:model-gdml-benzene-chmiela2017 .
+
+entity:model-gdml-benzene-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for benzene (about 1000 training geometries)" .
+
+entity:run-gdml-uracil-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for uracil" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-uracil-chmiela2017 ;
+    mlips:produces entity:model-gdml-uracil-chmiela2017 .
+
+entity:model-gdml-uracil-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for uracil (about 1000 training geometries)" .
+
+entity:run-gdml-naphthalene-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for naphthalene" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-naphthalene-chmiela2017 ;
+    mlips:produces entity:model-gdml-naphthalene-chmiela2017 .
+
+entity:model-gdml-naphthalene-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for naphthalene (about 1000 training geometries)" .
+
+entity:run-gdml-aspirin-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for aspirin" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-aspirin-chmiela2017 ;
+    mlips:produces entity:model-gdml-aspirin-chmiela2017 .
+
+entity:model-gdml-aspirin-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for aspirin (about 1000 training geometries)" .
+
+entity:run-gdml-salicylic-acid-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for salicylic acid" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-salicylic-acid-chmiela2017 ;
+    mlips:produces entity:model-gdml-salicylic-acid-chmiela2017 .
+
+entity:model-gdml-salicylic-acid-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for salicylic acid (about 1000 training geometries)" .
+
+entity:run-gdml-malonaldehyde-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for malonaldehyde" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-malonaldehyde-chmiela2017 ;
+    mlips:produces entity:model-gdml-malonaldehyde-chmiela2017 .
+
+entity:model-gdml-malonaldehyde-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for malonaldehyde (about 1000 training geometries)" .
+
+entity:run-gdml-ethanol-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for ethanol" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-ethanol-chmiela2017 ;
+    mlips:produces entity:model-gdml-ethanol-chmiela2017 .
+
+entity:model-gdml-ethanol-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for ethanol (about 1000 training geometries)" .
+
+entity:run-gdml-toluene-chmiela2017 a mlips:MLIPRun ;
+    rdfs:label "GDML force field for toluene" ;
+    mlips:appliesMethod entity:GDML ;
+    mlips:runsOn entity:ds-toluene-chmiela2017 ;
+    mlips:produces entity:model-gdml-toluene-chmiela2017 .
+
+entity:model-gdml-toluene-chmiela2017 a mlips:TrainedModel ;
+    rdfs:label "GDML model for toluene (about 1000 training geometries)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The GDML model is stated to be three orders of magnitude faster than DFT;
+# no absolute timing or hardware is given.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Per-molecule force and energy errors are in supplementary tables S1 and S3, not in the PDF read; the main text gives only the target force accuracy of 1 kcal/mol/A reached with about 1000 samples and an energy error of about 0.2 kcal/mol. No AccuracyMetric is encoded.
+# - Kernel, descriptor and regularisation hyperparameters are not stated in the main text.
+# - Classical and path-integral MD of aspirin at 300 K with the GDML model are demonstrated (interatomic distance and dihedral distributions); these are figures.
+# - The manifest classes this paper as 'Application/model instance'; it is the originating GDML method paper (registry origin of entity:GDML).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
