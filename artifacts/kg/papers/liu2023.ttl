@@ -1,0 +1,169 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yunsheng Liu et al. (2023). Discrepancies and error evaluation metrics for machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-023-01123-3  arXiv:2306.11639v2
+#
+# Version read: arxiv-preprint arXiv:2306.11639v2 (sha256 cb02e55f1c2f88f4...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 109 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a study of where silicon MLIPs with low average errors
+# still fail (rare-event migration of vacancies and interstitials,
+# defect vibrations) and of error metrics that reveal it. The existing
+# GAP, NNP, SNAP and MTP models of zuo2020 and a published GAP are
+# evaluated, and one DeePMD model is trained here on the zuo2020 silicon
+# data; that run is encoded. All errors are in figures and
+# supplementary tables.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-liu2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Liu, He and Mo (2023): discrepancies and error evaluation metrics for machine learning interatomic potentials (silicon)" ;
+    mlips:reportedIn entity:article-liu2023 .
+
+entity:article-liu2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-023-01123-3> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Discrepancies and error evaluation metrics for machine learning interatomic potentials" ;
+    schema:author entity:person-Liu-liu2023 ,
+        entity:person-He-liu2023 ,
+        <https://orcid.org/0000-0002-8162-4629> .
+
+entity:person-Liu-liu2023 a schema:Person ;
+    schema:name "Yunsheng Liu" ;
+    schema:givenName "Yunsheng" ;
+    schema:familyName "Liu" .
+
+entity:person-He-liu2023 a schema:Person ;
+    schema:name "Xingfeng He" ;
+    schema:givenName "Xingfeng" ;
+    schema:familyName "He" .
+
+<https://orcid.org/0000-0002-8162-4629> a schema:Person ;
+    schema:name "Yifei Mo" ;
+    schema:givenName "Yifei" ;
+    schema:familyName "Mo" ;
+    schema:identifier <https://orcid.org/0000-0002-8162-4629> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Si-liu2023 a mlips:MaterialSystem ;
+    rdfs:label "Bulk silicon with a single vacancy or a single interstitial (2x2x2 conventional cells, 63 or 65 atoms)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental semiconductor; point-defect migration at high temperature" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-liu2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-liu2023 mlips:hasDFTSettings entity:calc-settings-dft-liu2023 .
+
+entity:calc-settings-dft-liu2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "4x4x4 mesh for the benchmark values (K4); Gamma-centred 1x1x1 and 2x2x2 also evaluated" ;
+    rdfs:comment "Spin-polarised static calculations, electronic convergence 1e-5 eV, other parameters as in the Materials Project. AIMD for the test sets: non-spin-polarised, 1e-4 eV, time step 2 fs." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Si-zuo-liu2023 a mlips:TrainingDataset ;
+    rdfs:label "Silicon training data of Zuo et al. (as used for the DeePMD model of this work)" ;
+    mlips:coversMaterial entity:mat-Si-liu2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-liu2023 ;
+    rdfs:comment "The data set of zuo2020 (214 training structures there); the size is not restated here. The rare-event test sets of this paper are 100 AIMD snapshots at 1230 K each for a migrating vacancy and a migrating interstitial." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Si-zuo-liu2023 mlips:samplingStrategy
+    entity:sampling-zuo-si-liu2023 .
+
+entity:sampling-zuo-si-liu2023 a mlips:SamplingStrategy ;
+    rdfs:label "Silicon training data of Zuo et al. (mlearn)" ;
+    rdfs:comment "Solid, melted, strained, surface and vacancy structures of Si from AIMD at a wide range of temperatures; the same training data as for the GAP, NNP, SNAP and MTP models of Zuo et al." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-liu2023 ;
+    mlips:hasImplementation entity:impl-DeePMD-liu2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-DeePMD-liu2023 a mls:Algorithm ;
+    rdfs:label "Hyperparameters (network size, cutoff radius, number of iteration steps) by grid search on the RMSEs of energies and forces over a separate vacancy validation set of 100 AIMD snapshots" .
+
+entity:impl-DeePMD-liu2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-deepmd-Si-liu2023 a mlips:MLIPRun ;
+    rdfs:label "DeePMD trained on the silicon data of Zuo et al." ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-Si-zuo-liu2023 ;
+    mlips:produces entity:model-deepmd-Si-liu2023 .
+
+entity:model-deepmd-Si-liu2023 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for silicon trained on the Zuo et al. data" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy and force RMSEs of all models on the vacancy and interstitial rare-event test sets are given as bounds in the text (below 10 meV/atom and 0.3 eV/A for most models on the vacancy set; below 15 meV/atom and 0.3 eV/A on the interstitial set) and in Supplementary Table 1; no AccuracyMetric is encoded, and the evaluated external models are therefore not linked.
+# - The evaluated external models are the zuo2020 silicon models (GAP, NNP, SNAP, MTP; of these only the MTP has a registry row so far) and 'GAP-PRX' retrieved from Ward et al., which is the silicon GAP of bartok2018si. When the supplementary numbers are added, these should be linked by IRI.
+# - The paper's own contribution, error metrics on rare-event configurations and force performance scores, and the diffusivity, phonon and defect-vibration comparisons between MLIP MD and AIMD, have no MetricProperty.
+# - The chosen DeePMD hyperparameters were not captured (they are optimised by grid search). The paper distinguishes the early DeePMD from DeepPot-SE in its supplement; both map to entity:DeePMD.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
