@@ -1,0 +1,520 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yuanchang Zhou et al. (2026). MatRIS: Toward Reliable and Efficient Pretrained Machine Learning Interatomic Potentials.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2603.02002  arXiv:2603.02002v3
+#
+# Version read: arxiv-preprint arXiv:2603.02002v3 (sha256 d47070b2e356163f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 133 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MatRIS architecture (introduced here) and the six
+# pretrained variants whose hyperparameters Table 12 lists: three sizes
+# trained on MPTrj, MatRIS-OAM (OMat24, fine-tuned on sAlex + MPTrj), a
+# molecular model trained on SPICE-MACE-OFF23, and a MatPES model.
+# Benchmark results are spread over a dozen tables (Matbench Discovery,
+# MatCalc, phonons, molecular zero-shot, LAMBench, zeolites); none is
+# encoded, see the gaps. Preprint only.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhou2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhou et al. (2026): MatRIS, toward reliable and efficient pretrained MLIPs" ;
+    mlips:reportedIn entity:article-zhou2026 .
+
+entity:article-zhou2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2603.02002> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "MatRIS: Toward Reliable and Efficient Pretrained Machine Learning Interatomic Potentials" ;
+    schema:author entity:person-Zhou-zhou2026 ,
+        entity:person-Hu-zhou2026 ,
+        entity:person-Zhang-zhou2026 ,
+        entity:person-Wang-zhou2026 ,
+        entity:person-Tan-zhou2026 ,
+        entity:person-Jia-zhou2026 .
+
+entity:person-Zhou-zhou2026 a schema:Person ;
+    schema:name "Yuanchang Zhou" ;
+    schema:givenName "Yuanchang" ;
+    schema:familyName "Zhou" .
+
+entity:person-Hu-zhou2026 a schema:Person ;
+    schema:name "Siyu Hu" ;
+    schema:givenName "Siyu" ;
+    schema:familyName "Hu" .
+
+entity:person-Zhang-zhou2026 a schema:Person ;
+    schema:name "Xiangyu Zhang" ;
+    schema:givenName "Xiangyu" ;
+    schema:familyName "Zhang" .
+
+entity:person-Wang-zhou2026 a schema:Person ;
+    schema:name "Hongyu Wang" ;
+    schema:givenName "Hongyu" ;
+    schema:familyName "Wang" .
+
+entity:person-Tan-zhou2026 a schema:Person ;
+    schema:name "Guangming Tan" ;
+    schema:givenName "Guangming" ;
+    schema:familyName "Tan" .
+
+entity:person-Jia-zhou2026 a schema:Person ;
+    schema:name "Weile Jia" ;
+    schema:givenName "Weile" ;
+    schema:familyName "Jia" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-inorganic-zhou2026 a mlips:MaterialSystem ;
+    rdfs:label "Inorganic crystals of MPTrj, OMat24, sAlex and MatPES" ;
+    mlips:materialClass "Universal inorganic materials" .
+
+entity:mat-organic-zhou2026 a mlips:MaterialSystem ;
+    rdfs:label "Small organic molecules of SPICE-MACE-OFF23" ;
+    mlips:materialClass "Organic molecules and molecular clusters" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-spice-dft-zhou2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-spice-dft-zhou2026 mlips:hasDFTSettings entity:calc-settings-spice-dft-zhou2026 .
+
+entity:calc-settings-spice-dft-zhou2026 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-omegaB97M-D3-BJ-zhou2026 ;
+    mlips:dftBasisSet entity:basis-def2-TZVPPD-zhou2026 ;
+    rdfs:comment "Level of the SPICE-MACE-OFF23 data (the training set of kovacs2025)." .
+
+entity:xc-omegaB97M-D3-BJ-zhou2026 a mlips:XCFunctional ;
+    rdfs:label "omegaB97M-D3(BJ)" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVPPD-zhou2026 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVPPD" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mptrj-zhou2026 a mlips:TrainingDataset ;
+    rdfs:label "MPTrj" ;
+    mlips:coversMaterial entity:mat-inorganic-zhou2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-oam-zhou2026 a mlips:TrainingDataset ;
+    rdfs:label "OMat24, then sAlex + MPTrj for fine-tuning" ;
+    mlips:coversMaterial entity:mat-inorganic-zhou2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-matpes-zhou2026 a mlips:TrainingDataset ;
+    rdfs:label "MatPES (1.4M)" ;
+    mlips:coversMaterial entity:mat-inorganic-zhou2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-spice-zhou2026 a mlips:TrainingDataset ;
+    rdfs:label "SPICE-MACE-OFF23 (951,005 small-molecule configurations)" ;
+    mlips:coversMaterial entity:mat-organic-zhou2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 951005 ;
+    mlips:hasDFTCalculation entity:calc-spice-dft-zhou2026 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mptrj-zhou2026 mlips:samplingStrategy
+    entity:sampling-published-zhou2026 .
+
+entity:ds-oam-zhou2026 mlips:samplingStrategy
+    entity:sampling-published-zhou2026 .
+
+entity:ds-matpes-zhou2026 mlips:samplingStrategy
+    entity:sampling-published-zhou2026 .
+
+entity:ds-spice-zhou2026 mlips:samplingStrategy
+    entity:sampling-published-zhou2026 .
+
+entity:sampling-published-zhou2026 a mlips:SamplingStrategy ;
+    rdfs:label "Published pretraining data sets used as provided" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MatRIS a mlips:MLIPMethod ;
+    rdfs:label "MatRIS (invariant graph-attention interatomic potential with three-body features)" ;
+    mlips:hasLossFunction entity:loss-MatRIS-zhou2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-MatRIS-zhou2026 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        mlips:cutoffRadius ,
+        entity:hp-three-body-cutoff-zhou2026 ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        mlips:numEpochs .
+
+entity:loss-MatRIS-zhou2026 a mlips:LossFunction ;
+    rdfs:label "Huber (delta = 0.01), MAE or L2-MAE loss depending on the variant, with prefactors 5 (energy), 5 (force), 0.1 (stress) and 0.1 (magnetic moment)" .
+
+entity:alg-MatRIS-zhou2026 a mls:Algorithm ;
+    rdfs:label "AdamW (Adam for MatPES) with cosine learning-rate schedule down to 1% of the maximum; gradient clipping 0.5; denoising pretraining for the MPTrj-M and MPTrj-L variants" .
+
+entity:hp-three-body-cutoff-zhou2026 a mlips:Hyperparameter ;
+    rdfs:label "MatRIS three-body cutoff (Angstrom)" ;
+    mlips:hyperparameterName "three_body_cutoff" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-MPTrj-S-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MPTrj-S-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-MPTrj-S-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-MPTrj-S-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-MPTrj-S-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-MPTrj-S-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-MPTrj-S-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MPTrj-S-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-MPTrj-M-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MPTrj-M-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-MPTrj-M-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-MPTrj-M-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-MPTrj-M-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-MPTrj-M-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-MPTrj-M-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-MPTrj-M-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "40"^^xsd:integer .
+
+entity:setting-MPTrj-L-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-MPTrj-L-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-MPTrj-L-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-MPTrj-L-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-MPTrj-L-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-MPTrj-L-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "320"^^xsd:integer .
+
+entity:setting-MPTrj-L-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-MPTrj-L-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-OAM-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-OAM-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-OAM-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-OAM-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-OAM-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-OAM-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-OAM-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-OAM-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SPICE-M-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-SPICE-M-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-SPICE-M-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-SPICE-M-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-SPICE-M-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-SPICE-M-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-SPICE-M-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-SPICE-M-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-MatPES-numLayers-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-MatPES-numFeatures-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-MatPES-numRadialBasis-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "7"^^xsd:integer .
+
+entity:setting-MatPES-cutoffRadius-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-MatPES-three-body-cutoff-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhou2026 ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-MatPES-batchSize-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-MatPES-learningRate-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-MatPES-numEpochs-zhou2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "30"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-MPTrj-S-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS-S trained on MPTrj" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-mptrj-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MPTrj-S-numLayers-zhou2026 ,
+        entity:setting-MPTrj-S-numFeatures-zhou2026 ,
+        entity:setting-MPTrj-S-numRadialBasis-zhou2026 ,
+        entity:setting-MPTrj-S-cutoffRadius-zhou2026 ,
+        entity:setting-MPTrj-S-three-body-cutoff-zhou2026 ,
+        entity:setting-MPTrj-S-batchSize-zhou2026 ,
+        entity:setting-MPTrj-S-learningRate-zhou2026 ,
+        entity:setting-MPTrj-S-numEpochs-zhou2026 ;
+    mlips:produces entity:model-MPTrj-S-zhou2026 .
+
+entity:model-MPTrj-S-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS-S trained on MPTrj" .
+
+entity:run-MPTrj-M-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS-M trained on MPTrj" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-mptrj-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MPTrj-M-numLayers-zhou2026 ,
+        entity:setting-MPTrj-M-numFeatures-zhou2026 ,
+        entity:setting-MPTrj-M-numRadialBasis-zhou2026 ,
+        entity:setting-MPTrj-M-cutoffRadius-zhou2026 ,
+        entity:setting-MPTrj-M-three-body-cutoff-zhou2026 ,
+        entity:setting-MPTrj-M-batchSize-zhou2026 ,
+        entity:setting-MPTrj-M-learningRate-zhou2026 ,
+        entity:setting-MPTrj-M-numEpochs-zhou2026 ;
+    mlips:produces entity:model-MPTrj-M-zhou2026 .
+
+entity:model-MPTrj-M-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS-M trained on MPTrj" .
+
+entity:run-MPTrj-L-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS-L trained on MPTrj" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-mptrj-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MPTrj-L-numLayers-zhou2026 ,
+        entity:setting-MPTrj-L-numFeatures-zhou2026 ,
+        entity:setting-MPTrj-L-numRadialBasis-zhou2026 ,
+        entity:setting-MPTrj-L-cutoffRadius-zhou2026 ,
+        entity:setting-MPTrj-L-three-body-cutoff-zhou2026 ,
+        entity:setting-MPTrj-L-batchSize-zhou2026 ,
+        entity:setting-MPTrj-L-learningRate-zhou2026 ,
+        entity:setting-MPTrj-L-numEpochs-zhou2026 ;
+    mlips:produces entity:model-MPTrj-L-zhou2026 .
+
+entity:model-MPTrj-L-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS-L trained on MPTrj" .
+
+entity:run-OAM-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS-OAM (OMat24 pretraining stage; fine-tuned on sAlex + MPTrj for 8 epochs)" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-oam-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-OAM-numLayers-zhou2026 ,
+        entity:setting-OAM-numFeatures-zhou2026 ,
+        entity:setting-OAM-numRadialBasis-zhou2026 ,
+        entity:setting-OAM-cutoffRadius-zhou2026 ,
+        entity:setting-OAM-three-body-cutoff-zhou2026 ,
+        entity:setting-OAM-batchSize-zhou2026 ,
+        entity:setting-OAM-learningRate-zhou2026 ,
+        entity:setting-OAM-numEpochs-zhou2026 ;
+    mlips:produces entity:model-OAM-zhou2026 .
+
+entity:model-OAM-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS-OAM" .
+
+entity:run-SPICE-M-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS-M trained on SPICE-MACE-OFF23" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-spice-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SPICE-M-numLayers-zhou2026 ,
+        entity:setting-SPICE-M-numFeatures-zhou2026 ,
+        entity:setting-SPICE-M-numRadialBasis-zhou2026 ,
+        entity:setting-SPICE-M-cutoffRadius-zhou2026 ,
+        entity:setting-SPICE-M-three-body-cutoff-zhou2026 ,
+        entity:setting-SPICE-M-batchSize-zhou2026 ,
+        entity:setting-SPICE-M-learningRate-zhou2026 ,
+        entity:setting-SPICE-M-numEpochs-zhou2026 ;
+    mlips:produces entity:model-SPICE-M-zhou2026 .
+
+entity:model-SPICE-M-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS-M trained on SPICE-MACE-OFF23" .
+
+entity:run-MatPES-zhou2026 a mlips:MLIPRun ;
+    rdfs:label "MatRIS trained on MatPES-1.4M" ;
+    mlips:appliesMethod entity:MatRIS ;
+    mlips:runsOn entity:ds-matpes-zhou2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatPES-numLayers-zhou2026 ,
+        entity:setting-MatPES-numFeatures-zhou2026 ,
+        entity:setting-MatPES-numRadialBasis-zhou2026 ,
+        entity:setting-MatPES-cutoffRadius-zhou2026 ,
+        entity:setting-MatPES-three-body-cutoff-zhou2026 ,
+        entity:setting-MatPES-batchSize-zhou2026 ,
+        entity:setting-MatPES-learningRate-zhou2026 ,
+        entity:setting-MatPES-numEpochs-zhou2026 ;
+    mlips:produces entity:model-MatPES-zhou2026 .
+
+entity:model-MatPES-zhou2026 a mlips:TrainedModel ;
+    rdfs:label "MatRIS trained on MatPES-1.4M" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric is encoded. The paper's tables are benchmark scores (Matbench Discovery F1 and kappa-SRME, MatCalc properties, MDR phonon metrics, LAMBench) or energy/force errors whose metric type or model is not unambiguous in the parts read: the molecular zero-shot table gives 'E' and 'F' in kcal/mol and kcal/mol/A for MD22 Ac-Ala3-NHMe, ANI-1x and AIMD-Chig without saying MAE or RMSE (MatRIS-M: 2.23 / 5.140, 4.15 / 4.414, 1.55 / 3.604; MACE-OFF-L: 2.29 / 5.205, 5.82 / 3.948, 8.25 / 3.853), and the zeolite table gives per-framework MAEs for a MatRIS-M model whose training set was not captured.
+# - MACE-OFF-L in the molecular table is the MACE-OFF23(L) model of kovacs2025 (paper-local there); it would be linked as a registry model once the metric type is confirmed.
+# - Settings follow Table 12: 'dimension of atom features' as numFeatures, 'pairwise cutoff' as cutoffRadius, maximum learning rate as learningRate; for MatRIS-OAM the values of the OMat24 stage are encoded (the fine-tuning stage uses batch 320, learning rate 1e-4, 8 epochs). The data-set nodes carry no sizes or reference levels except SPICE.
+# - Preprint only (arXiv v3, March 2026); authors from DataCite, without ORCIDs. The manifest classes it as 'Application/model instance'; it is a method and pretrained-model paper.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
