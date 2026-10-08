@@ -1,0 +1,306 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Evgeny V. Podryabinkin et al. (2019). Accelerating crystal structure prediction by machine-learning interatomic potentials with active learning.
+#   Physical review. B./Physical review. B. doi:10.1103/physrevb.99.064114  arXiv:1802.07605v3
+#
+# Version read: arxiv-preprint arXiv:1802.07605v3 (sha256 546b2fddb479a3aa...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 95 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: MTPs learned on the fly inside an evolutionary crystal
+# structure search (USPEX) for three elements: carbon (8-atom cells),
+# sodium at 120-300 GPa and boron (two MTPs: a robust one and an
+# accurate one restricted to low-energy structures), with the numbers of
+# DFT calculations and the energy errors stated in the text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-podryabinkin2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Podryabinkin et al. (2019): accelerating crystal structure prediction with MTPs and active learning" ;
+    mlips:reportedIn entity:article-podryabinkin2019 .
+
+entity:article-podryabinkin2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.99.064114> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Accelerating crystal structure prediction by machine-learning interatomic potentials with active learning" ;
+    schema:author entity:person-Podryabinkin-podryabinkin2019 ,
+        entity:person-Tikhonov-podryabinkin2019 ,
+        entity:person-Shapeev-podryabinkin2019 ,
+        entity:person-Oganov-podryabinkin2019 .
+
+entity:person-Podryabinkin-podryabinkin2019 a schema:Person ;
+    schema:name "Evgeny V. Podryabinkin" ;
+    schema:givenName "Evgeny V." ;
+    schema:familyName "Podryabinkin" .
+
+entity:person-Tikhonov-podryabinkin2019 a schema:Person ;
+    schema:name "Evgeny V. Tikhonov" ;
+    schema:givenName "Evgeny V." ;
+    schema:familyName "Tikhonov" .
+
+entity:person-Shapeev-podryabinkin2019 a schema:Person ;
+    schema:name "Alexander V. Shapeev" ;
+    schema:givenName "Alexander V." ;
+    schema:familyName "Shapeev" .
+
+entity:person-Oganov-podryabinkin2019 a schema:Person ;
+    schema:name "Artem R. Oganov" ;
+    schema:givenName "Artem R." ;
+    schema:familyName "Oganov" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-C-podryabinkin2019 a mlips:MaterialSystem ;
+    rdfs:label "Carbon allotropes (8 atoms per unit cell)" ;
+    mlips:chemicalFormula "C" ;
+    mlips:materialClass "Elemental solid; graphite, diamond, lonsdaleite and competing structures" .
+
+entity:mat-Na-podryabinkin2019 a mlips:MaterialSystem ;
+    rdfs:label "Sodium at 120-300 GPa (up to 20 atoms per unit cell)" ;
+    mlips:chemicalFormula "Na" ;
+    mlips:materialClass "Elemental metal under high pressure, including the hP4 electride" .
+
+entity:mat-B-podryabinkin2019 a mlips:MaterialSystem ;
+    rdfs:label "Boron allotropes (1 to 60 atoms per primitive cell)" ;
+    mlips:chemicalFormula "B" ;
+    mlips:materialClass "Elemental solid with many competing allotropes" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-podryabinkin2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-podryabinkin2019 mlips:hasDFTSettings entity:calc-settings-dft-podryabinkin2019 .
+
+entity:calc-settings-dft-podryabinkin2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:pseudopotentialType mlips:PAW ;
+    rdfs:comment "Generalized gradient approximation with the projector augmented wave method; the functional is cited (ref. 25) but not named, and no cutoff or k-point setting is given in the main text." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-C-podryabinkin2019 a mlips:TrainingDataset ;
+    rdfs:label "Carbon active-learning training set (about 1300 DFT calculations)" ;
+    mlips:coversMaterial entity:mat-C-podryabinkin2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1300 ;
+    mlips:hasDFTCalculation entity:calc-dft-podryabinkin2019 ;
+    rdfs:comment "The paper gives 'about 1300' DFT calculations for more than 1.9 x 10^4 MTP-evaluated configurations." .
+
+entity:ds-Na-podryabinkin2019 a mlips:TrainingDataset ;
+    rdfs:label "Sodium active-learning training set (about 1500 DFT calculations)" ;
+    mlips:coversMaterial entity:mat-Na-podryabinkin2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1500 ;
+    mlips:hasDFTCalculation entity:calc-dft-podryabinkin2019 ;
+    rdfs:comment "'About 1500' DFT calculations for more than 2 x 10^6 evaluated configurations." .
+
+entity:ds-B-podryabinkin2019 a mlips:TrainingDataset ;
+    rdfs:label "Boron active-learning training sets of the two MTPs (about 5000 DFT calculations in total)" ;
+    mlips:coversMaterial entity:mat-B-podryabinkin2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 5000 ;
+    mlips:hasDFTCalculation entity:calc-dft-podryabinkin2019 ;
+    rdfs:comment "'About 5000' DFT calculations to train both MTPs, for more than 4 x 10^8 evaluated configurations; the split between the two potentials is not given." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-C-podryabinkin2019 mlips:samplingStrategy
+    entity:sampling-on-the-fly-relaxation-podryabinkin2019 ,
+    entity:sampling-random-pre-exploration-podryabinkin2019 .
+
+entity:ds-Na-podryabinkin2019 mlips:samplingStrategy
+    entity:sampling-on-the-fly-relaxation-podryabinkin2019 ,
+    entity:sampling-random-pre-exploration-podryabinkin2019 .
+
+entity:ds-B-podryabinkin2019 mlips:samplingStrategy
+    entity:sampling-on-the-fly-relaxation-podryabinkin2019 ,
+    entity:sampling-random-pre-exploration-podryabinkin2019 .
+
+entity:sampling-on-the-fly-relaxation-podryabinkin2019 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning on the fly during structure relaxations" ;
+    rdfs:comment "Structures produced by the evolutionary search are relaxed with the MTP; a configuration enters the training set when its extrapolation grade (D-optimality / MaxVol) exceeds a threshold, and every configuration is taken until the training set is as large as the number of MTP parameters." .
+
+entity:sampling-random-pre-exploration-podryabinkin2019 a mlips:SamplingStrategy ;
+    rdfs:label "Pre-exploration with random structures" ;
+    rdfs:comment "A pool of 100,000 random structures subject to a minimal-distance constraint, from which the selection method (which needs no DFT data) picks an initial set." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-podryabinkin2019 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-podryabinkin2019 ;
+    mlips:hasHyperparameter entity:hp-num-parameters-podryabinkin2019 ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:loss-MTP-podryabinkin2019 a mlips:LossFunction ;
+    rdfs:label "Least-squares fit to DFT energies, forces and stresses; for the accurate boron MTP the equations are weighted by W = 1 / (E/N - E_min + 0.02)^2 to favour low-energy structures" .
+
+entity:alg-MTP-podryabinkin2019 a mls:Algorithm ;
+    rdfs:label "Active learning on the fly with the D-optimality (MaxVol) extrapolation grade" .
+
+entity:hp-num-parameters-podryabinkin2019 a mlips:Hyperparameter ;
+    rdfs:label "MTP number of parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mtp-C-num-parameters-podryabinkin2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-podryabinkin2019 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-mtp-Na-num-parameters-podryabinkin2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-podryabinkin2019 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-mtp-B-robust-num-parameters-podryabinkin2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-podryabinkin2019 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-mtp-B-accurate-num-parameters-podryabinkin2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-podryabinkin2019 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mtp-C-podryabinkin2019 a mlips:MLIPRun ;
+    rdfs:label "MTP learned on the fly for carbon" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-C-podryabinkin2019 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-C-num-parameters-podryabinkin2019 ;
+    mlips:produces entity:model-mtp-C-podryabinkin2019 .
+
+entity:model-mtp-C-podryabinkin2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for carbon structure prediction (about 800 parameters)" .
+
+entity:run-mtp-Na-podryabinkin2019 a mlips:MLIPRun ;
+    rdfs:label "MTP learned on the fly for sodium under pressure" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Na-podryabinkin2019 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Na-num-parameters-podryabinkin2019 ;
+    mlips:produces entity:model-mtp-Na-podryabinkin2019 .
+
+entity:model-mtp-Na-podryabinkin2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for sodium at 120-300 GPa (about 800 parameters)" .
+
+entity:run-mtp-B-robust-podryabinkin2019 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP learned on the fly for boron (screens out high-energy structures)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-B-podryabinkin2019 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-B-robust-num-parameters-podryabinkin2019 ;
+    mlips:produces entity:model-mtp-B-robust-podryabinkin2019 .
+
+entity:model-mtp-B-robust-podryabinkin2019 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP for boron (first relaxation stage)" .
+
+entity:run-mtp-B-accurate-podryabinkin2019 a mlips:MLIPRun ;
+    rdfs:label "Accurate MTP learned on the fly for low-energy boron structures" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-B-podryabinkin2019 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-B-accurate-num-parameters-podryabinkin2019 ;
+    mlips:produces entity:model-mtp-B-accurate-podryabinkin2019 .
+
+entity:model-mtp-B-accurate-podryabinkin2019 a mlips:TrainedModel ;
+    rdfs:label "Accurate MTP for low-energy boron structures (second relaxation stage)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-podryabinkin2019 mlips:hasResult
+    entity:result-mtp-C-training-podryabinkin2019 ,
+    entity:result-mtp-B-robust-training-podryabinkin2019 ,
+    entity:result-mtp-B-accurate-low-energy-podryabinkin2019 .
+
+entity:result-mtp-C-training-podryabinkin2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-C-podryabinkin2019 ;
+    mlips:targetMaterial entity:mat-C-podryabinkin2019 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-C-training-1-podryabinkin2019 .
+
+entity:metric-mtp-C-training-1-podryabinkin2019 a mlips:AccuracyMetric ;
+    rdfs:label "Training error on the actively selected training set after learning on the fly (stated as 'training error'; an overestimate of the prediction error, which was below 40 meV/atom on the predicted structures)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "86"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-mtp-B-robust-training-podryabinkin2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-B-robust-podryabinkin2019 ;
+    mlips:targetMaterial entity:mat-B-podryabinkin2019 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-B-robust-training-1-podryabinkin2019 .
+
+entity:metric-mtp-B-robust-training-1-podryabinkin2019 a mlips:AccuracyMetric ;
+    rdfs:label "Training error of the single (robust) MTP after alpha-boron was found (stated as 'training error')" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "170"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-mtp-B-accurate-low-energy-podryabinkin2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-B-accurate-podryabinkin2019 ;
+    mlips:targetMaterial entity:mat-B-podryabinkin2019 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-B-accurate-low-energy-1-podryabinkin2019 .
+
+entity:metric-mtp-B-accurate-low-energy-1-podryabinkin2019 a mlips:AccuracyMetric ;
+    rdfs:label "RMS error on the energies of the 100 lowest-energy structures found (two-stage scheme)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The 86 and 170 meV/atom figures are called 'training error' without naming the measure; they are encoded as RMSE because the fit is a least-squares fit, and the wording is kept in the labels. This is an interpretation and should be reviewed.
+# - 'About 800 parameters' applies to all MTPs; the level, cutoff and radial basis are not stated. Both boron MTPs point at one data-set node because only the total number of DFT calculations is given.
+# - The exchange-correlation functional is not named in the text. No error is stated for sodium.
+# - The structure-prediction outcomes (allotropes found, speed-up as the ratio of MTP to DFT evaluations) have no MetricProperty. Relaxation of candidate structures with the MTP is the ground for GeometryOptimization.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
