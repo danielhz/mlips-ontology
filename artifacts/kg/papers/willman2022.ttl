@@ -1,0 +1,199 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jonathan Willman et al. (2022). Machine learning interatomic potential for simulations of carbon at extreme conditions.
+#   Physical review. B./Physical review. B. doi:10.1103/physrevb.106.l180101  arXiv:2205.01209v1
+#
+# Version read: arxiv-preprint arXiv:2205.01209v1 (sha256 9fff70a84827b6f3...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 191 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the quadratic SNAP potential for carbon at extreme
+# pressures and temperatures and its training database of quantum MD
+# frames and static DFT structures. The paper validates through the phase
+# diagram, melting curves and shock Hugoniot (within 3% of quantum MD)
+# and prints no energy or force error in the main text. Read from the
+# arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-willman2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Willman et al. (2022): machine learning interatomic potential for simulations of carbon at extreme conditions" ;
+    mlips:reportedIn entity:article-willman2022 .
+
+entity:article-willman2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.106.l180101> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potential for simulations of carbon at extreme conditions" ;
+    schema:author entity:person-Willman-willman2022 ,
+        entity:person-NguyenCong-willman2022 ,
+        entity:person-Williams-willman2022 ,
+        <https://orcid.org/0000-0001-7531-3210> ,
+        entity:person-Moore-willman2022 ,
+        entity:person-Thompson-willman2022 ,
+        entity:person-Wood-willman2022 ,
+        <https://orcid.org/0000-0002-5348-6484> .
+
+entity:person-Willman-willman2022 a schema:Person ;
+    schema:name "Jonathan T. Willman" ;
+    schema:givenName "Jonathan T." ;
+    schema:familyName "Willman" .
+
+entity:person-NguyenCong-willman2022 a schema:Person ;
+    schema:name "Kien Nguyen-Cong" ;
+    schema:givenName "Kien" ;
+    schema:familyName "Nguyen-Cong" .
+
+entity:person-Williams-willman2022 a schema:Person ;
+    schema:name "Ashley S. Williams" ;
+    schema:givenName "Ashley S." ;
+    schema:familyName "Williams" .
+
+<https://orcid.org/0000-0001-7531-3210> a schema:Person ;
+    schema:name "Anatoly B. Belonoshko" ;
+    schema:givenName "Anatoly B." ;
+    schema:familyName "Belonoshko" ;
+    schema:identifier <https://orcid.org/0000-0001-7531-3210> .
+
+entity:person-Moore-willman2022 a schema:Person ;
+    schema:name "Stan G. Moore" ;
+    schema:givenName "Stan G." ;
+    schema:familyName "Moore" .
+
+entity:person-Thompson-willman2022 a schema:Person ;
+    schema:name "Aidan P. Thompson" ;
+    schema:givenName "Aidan P." ;
+    schema:familyName "Thompson" .
+
+entity:person-Wood-willman2022 a schema:Person ;
+    schema:name "Mitchell A. Wood" ;
+    schema:givenName "Mitchell A." ;
+    schema:familyName "Wood" .
+
+<https://orcid.org/0000-0002-5348-6484> a schema:Person ;
+    schema:name "Ivan I. Oleynik" ;
+    schema:givenName "Ivan I." ;
+    schema:familyName "Oleynik" ;
+    schema:identifier <https://orcid.org/0000-0002-5348-6484> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-C-willman2022 a mlips:MaterialSystem ;
+    rdfs:label "Carbon at extreme conditions: diamond, BC8 and simple-cubic solids, liquid, two-phase solid-liquid cells, defects and metastable structures (0 to 5 TPa, 0 to 40,000 K)" ;
+    mlips:chemicalFormula "C" ;
+    mlips:materialClass "Elemental carbon at extreme conditions" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-willman2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-willman2022 mlips:hasDFTSettings entity:calc-settings-dft-willman2022 .
+
+entity:calc-settings-dft-willman2022 a mlips:DFTSettings ;
+    rdfs:comment "Quantum molecular dynamics and static DFT; code, functional and settings are in the supplemental material and were not captured from the main text." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-C-willman2022 a mlips:TrainingDataset ;
+    rdfs:label "Carbon SNAP training database (636 structures, 124,907 atomic environments)" ;
+    mlips:coversMaterial entity:mat-C-willman2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 636 ;
+    mlips:hasDFTCalculation entity:calc-dft-willman2022 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-C-willman2022 mlips:samplingStrategy
+    entity:sampling-qmd-willman2022 ,
+    entity:sampling-static-willman2022 .
+
+entity:sampling-qmd-willman2022 a mlips:SamplingStrategy ;
+    rdfs:label "Individual frames (1-3 per simulation) from production quantum MD of up to 1,024 atoms: melting lines (two-phase cells), hydrostatic and uniaxial isotherms, shock Hugoniot; separate liquid and solid QMD added after a first validation cycle" .
+
+entity:sampling-static-willman2022 a mlips:SamplingStrategy ;
+    rdfs:label "Static DFT: binding-energy curves, point and extended defects, metastable structures from crystal-structure search" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:qSNAP a mlips:MLIPMethod ;
+    rdfs:label "Quadratic Spectral Neighbor Analysis Potential (qSNAP)" ;
+    mlips:hasFunctionalForm entity:ff-qSNAP ;
+    mlips:hasLossFunction entity:loss-qSNAP-willman2022 ;
+    mlips:hasTrainingAlgorithm entity:alg-qSNAP-willman2022 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ff-qSNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components plus all their distinct pairwise products" .
+
+entity:loss-qSNAP-willman2022 a mlips:LossFunction ;
+    rdfs:label "Regression on total energy, atomic forces and six stress components of each structure, with group weights" .
+
+entity:alg-qSNAP-willman2022 a mls:Algorithm ;
+    rdfs:label "Several development cycles of database construction, training and validation against quantum MD" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-C-willman2022 a mlips:MLIPRun ;
+    rdfs:label "Quadratic SNAP training for carbon at extreme conditions" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-C-willman2022 ;
+    mlips:produces entity:model-C-willman2022 .
+
+entity:model-C-willman2022 a mlips:TrainedModel ;
+    rdfs:label "SNAP potential for carbon at extreme conditions" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: no energy, force or stress RMSE is printed in the main text; accuracy is given as agreement of the phase diagram, melting curves and Hugoniot with quantum MD 'within 3%'.
+# - The paper calls the potential SNAP; its energy expression (Eq. 1) is quadratic in the bispectrum components, so the run applies the registry method qSNAP. The hyperparameters r_cut and J and the group weights are optimised but their values were not captured from the text read; the reference-calculation node therefore carries only a comment.
+# - Read from the arXiv v1 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
