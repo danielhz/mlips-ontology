@@ -1,0 +1,206 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Nongnuch Artrith et al. (2016). An implementation of artificial neural-network potentials for atomistic materials simulations: Performance for TiO2.
+#   Computational Materials Science. doi:10.1016/j.commatsci.2015.11.047
+#
+# Version read: publisher (sha256 eccbc01d2bf849eb...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 134 (Software/implementation). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the aenet package as an implementation of the
+# Behler-Parrinello high-dimensional neural network potential, and the
+# TiO2 potential built with it (reference DFT, data set, symmetry-function
+# cutoff, selected 70-10-10-1 architecture). The paper gives the final
+# accuracy as a target and as figures, not as a tabulated RMSE; see gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-artrith2016 a mlips:BenchmarkStudy ;
+    rdfs:label "Artrith and Urban (2016): the aenet implementation of neural-network potentials, with a TiO2 potential" ;
+    mlips:reportedIn entity:article-artrith2016 .
+
+entity:article-artrith2016 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2015.11.047> ;
+    schema:datePublished "2016"^^xsd:gYear ;
+    schema:name "An implementation of artificial neural-network potentials for atomistic materials simulations: Performance for TiO2" ;
+    schema:author entity:person-Artrith-artrith2016 ,
+        entity:person-Urban-artrith2016 .
+
+entity:person-Artrith-artrith2016 a schema:Person ;
+    schema:name "Nongnuch Artrith" ;
+    schema:givenName "Nongnuch" ;
+    schema:familyName "Artrith" .
+
+entity:person-Urban-artrith2016 a schema:Person ;
+    schema:name "Alexander Urban" ;
+    schema:givenName "Alexander" ;
+    schema:familyName "Urban" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-TiO2-artrith2016 a mlips:MaterialSystem ;
+    rdfs:label "Titanium dioxide (rutile, anatase, brookite and distorted, defective and slab structures)" ;
+    mlips:chemicalFormula "TiO2" ;
+    mlips:materialClass "Transition metal oxide" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-artrith2016 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-artrith2016 mlips:hasDFTSettings entity:calc-settings-dft-artrith2016 .
+
+entity:calc-settings-dft-artrith2016 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:Ultrasoft ;
+    mlips:kPointMesh "Gamma-centred meshes with a density corresponding to 8x8x8 for the 6-atom primitive rutile cell" ;
+    rdfs:comment "Plane-wave cutoffs 40 Ry (wave functions) and 200 Ry (density), stated in Ry and not converted. PWSCF of Quantum ESPRESSO with GBRV ultrasoft pseudopotentials; SCF converged to 1e-6 Ry." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-TiO2-artrith2016 a mlips:TrainingDataset ;
+    rdfs:label "TiO2 reference set (7694 structures of 6 to 95 atoms; 10% randomly held out for testing)" ;
+    mlips:coversMaterial entity:mat-TiO2-artrith2016 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 7694 ;
+    mlips:hasDFTCalculation entity:calc-dft-artrith2016 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-TiO2-artrith2016 mlips:samplingStrategy
+    entity:sampling-distort-artrith2016 .
+
+entity:sampling-distort-artrith2016 a mlips:SamplingStrategy ;
+    rdfs:label "Distortions of ideal rutile, anatase and brookite (cell scaling within about 10%), then iterative refinement: preliminary ANN potentials generate further structures until ANN and DFT energies agree" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasLossFunction entity:loss-HDNNP-artrith2016 ;
+    mlips:hasTrainingAlgorithm entity:alg-HDNNP-artrith2016 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        entity:hp-architecture-artrith2016 ,
+        entity:hp-activation-artrith2016 ;
+    mlips:hasImplementation entity:impl-HDNNP-artrith2016 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ;
+    mlips:inferenceComplexity "Linear in the number of atoms (compute time per atom independent of system size up to one million atoms)" .
+
+entity:loss-HDNNP-artrith2016 a mlips:LossFunction ;
+    rdfs:label "Squared error of the total energies of the reference structures (energy-only fit)" .
+
+entity:alg-HDNNP-artrith2016 a mls:Algorithm ;
+    rdfs:label "Levenberg-Marquardt for the selected potential; aenet also provides online gradient descent and batch L-BFGS, which are compared" .
+
+entity:impl-HDNNP-artrith2016 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-aenet-Atomic-Energy-Network-artrith2016 .
+
+entity:lib-aenet-Atomic-Energy-Network-artrith2016 a mlips:Library ;
+    rdfs:label "aenet (Atomic Energy Network)" ;
+    rdfs:comment "Fortran package with generate.x, train.x, predict.x and the aenetLib library with Fortran and C bindings and an ASE calculator; distributed at http://ann.atomistic.net." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-architecture-artrith2016 a mlips:Hyperparameter ;
+    rdfs:label "Atomic network architecture (nodes per layer)" ;
+    mlips:hyperparameterName "architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-activation-artrith2016 a mlips:Hyperparameter ;
+    rdfs:label "Activation function of the hidden layers" ;
+    mlips:hyperparameterName "activation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-TiO2-cutoffRadius-artrith2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-TiO2-numRadialBasis-artrith2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-TiO2-numAngularBasis-artrith2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "18"^^xsd:integer .
+
+entity:setting-TiO2-architecture-artrith2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-architecture-artrith2016 ;
+    mlips:settingValue "70-10-10-1" .
+
+entity:setting-TiO2-activation-artrith2016 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-activation-artrith2016 ;
+    mlips:settingValue "twisted hyperbolic tangent" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-TiO2-artrith2016 a mlips:MLIPRun ;
+    rdfs:label "aenet training of the TiO2 potential (70-10-10-1 networks)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-TiO2-artrith2016 ;
+    mlips:hasHyperparameterSetting entity:setting-TiO2-cutoffRadius-artrith2016 ,
+        entity:setting-TiO2-numRadialBasis-artrith2016 ,
+        entity:setting-TiO2-numAngularBasis-artrith2016 ,
+        entity:setting-TiO2-architecture-artrith2016 ,
+        entity:setting-TiO2-activation-artrith2016 ;
+    mlips:produces entity:model-TiO2-artrith2016 .
+
+entity:model-TiO2-artrith2016 a mlips:TrainedModel ;
+    rdfs:label "aenet ANN potential for TiO2" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric is encoded. The text states a target of better than 5 meV/atom (test RMSE, reached by Levenberg-Marquardt in under 100 iterations) and that about 95% of the test structures are within 4 meV/atom; the final RMSE of the selected potential is only readable from figures.
+# - numRadialBasis and numAngularBasis are per neighbour species or species pair (2 x 8 radial G2 and 3 x 18 angular G4 functions, 70 inputs per atom). The activation is read from the sentence that the Levenberg-Marquardt runs of Fig. 10a used the twisted hyperbolic tangent; the paper does not restate it for the final potential.
+# - Phase energies, volumes and bulk moduli against DFT (Table 3), strain and equation-of-state curves, parallel scaling on TACC Stampede and the CPU time per atom are not encoded (no metric property; timings given as figures). The potential omits explicit electrostatics.
+# - MolecularDynamics is recorded as demonstrated (NVE runs through the ASE interface); nudged elastic band and geometry optimisation are mentioned as available through ASE, not demonstrated.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
