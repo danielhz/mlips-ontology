@@ -1,0 +1,1066 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   E.T. Dubois et al. (2024). Atomistic simulations of nuclear fuel UO 2 with machine learning interatomic potentials.
+#   Physical Review Materials. doi:10.1103/physrevmaterials.8.025402
+#
+# Version read: publisher (sha256 8a545af16c608ffa...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 168 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SNAP and Behler-Parrinello HDNNP potentials for
+# UO2, their DFT+U reference calculations (ABINIT), the actively learned
+# training database (Table V), settings, and the test errors of Table I
+# for each group of configurations and in total. Defect formation
+# energies, stacking-fault surfaces and thermal properties are not
+# encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-dubois2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Dubois et al. (2024): atomistic simulations of nuclear fuel UO2 with machine learning interatomic potentials" ;
+    mlips:reportedIn entity:article-dubois2024 .
+
+entity:article-dubois2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevmaterials.8.025402> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Atomistic simulations of nuclear fuel UO 2 with machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0009-0000-1293-129X> ,
+        <https://orcid.org/0000-0003-2782-1282> ,
+        entity:person-Bouchet-dubois2024 ,
+        <https://orcid.org/0000-0003-4461-2394> .
+
+<https://orcid.org/0009-0000-1293-129X> a schema:Person ;
+    schema:name "Eliott T. Dubois" ;
+    schema:givenName "Eliott T." ;
+    schema:familyName "Dubois" ;
+    schema:identifier <https://orcid.org/0009-0000-1293-129X> .
+
+<https://orcid.org/0000-0003-2782-1282> a schema:Person ;
+    schema:name "Julien Tranchida" ;
+    schema:givenName "Julien" ;
+    schema:familyName "Tranchida" ;
+    schema:identifier <https://orcid.org/0000-0003-2782-1282> .
+
+entity:person-Bouchet-dubois2024 a schema:Person ;
+    schema:name "Johann Bouchet" ;
+    schema:givenName "Johann" ;
+    schema:familyName "Bouchet" .
+
+<https://orcid.org/0000-0003-4461-2394> a schema:Person ;
+    schema:name "Jean-Bernard Maillet" ;
+    schema:givenName "Jean-Bernard" ;
+    schema:familyName "Maillet" ;
+    schema:identifier <https://orcid.org/0000-0003-4461-2394> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-UO2-dubois2024 a mlips:MaterialSystem ;
+    rdfs:label "Uranium dioxide (fluorite and other polymorphs, hot bulk, defects, generalised stacking faults)" ;
+    mlips:chemicalFormula "UO2" ;
+    mlips:materialClass "Actinide oxide (nuclear fuel)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-dubois2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-dubois2024 mlips:hasDFTSettings entity:calc-settings-dft-dubois2024 .
+
+entity:calc-settings-dft-dubois2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-ABINIT-dubois2024 ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "680"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack 4x4x4 for 12-atom cells and 2x2x2 for 96- and 144-atom cells" ;
+    rdfs:comment "DFT+U (Liechtenstein scheme, U = 4.5 eV, J = 0.54 eV) with occupation-matrix control; longitudinal 1k antiferromagnetic order; spin-orbit coupling neglected." .
+
+entity:lib-ABINIT-dubois2024 a mlips:Library ;
+    rdfs:label "ABINIT" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-UO2-dubois2024 a mlips:TrainingDataset ;
+    rdfs:label "UO2 database (1844 configurations, 446,375 data; about 10% held out for testing)" ;
+    mlips:coversMaterial entity:mat-UO2-dubois2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1844 ;
+    mlips:hasDFTCalculation entity:calc-dft-dubois2024 ;
+    rdfs:comment "Groups (configurations): Fm-3m 130, polymorphs 300, hot bulk 1 409, hot bulk 2 145, hot bulk 3 223, defects 375, gamma surfaces 262. The count is the whole database; the testing subset is drawn from it." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-UO2-dubois2024 mlips:samplingStrategy
+    entity:sampling-initial-dubois2024 ,
+    entity:sampling-active-dubois2024 ,
+    entity:sampling-targeted-dubois2024 .
+
+entity:sampling-initial-dubois2024 a mlips:SamplingStrategy ;
+    rdfs:label "Initial database from physical intuition: cold curves of several crystal structures (Fm-3m, P42/mnm, Pnma, Pbcn) and small deformations of Fm-3m" .
+
+entity:sampling-active-dubois2024 a mlips:SamplingStrategy ;
+    rdfs:label "Batch active learning: candidates from classical NVT MD of a 96-atom cell with a first SNAP potential, selected by a weighted sum (gamma = 0.5) of an uncertainty criterion and a Mahalanobis-distance diversity criterion, labelled with single-point DFT" .
+
+entity:sampling-targeted-dubois2024 a mlips:SamplingStrategy ;
+    rdfs:label "Configurations targeting specific properties (defects, gamma surfaces) and machine-learning-assisted canonical sampling (MLACS)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:SNAP a mlips:MLIPMethod ;
+    rdfs:label "Spectral Neighbor Analysis Potential (SNAP)" ;
+    mlips:hasFunctionalForm entity:ff-SNAP ;
+    mlips:hasLossFunction entity:loss-SNAP-dubois2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-SNAP-dubois2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:ff-SNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components of the atomic neighbour density" .
+
+entity:loss-SNAP-dubois2024 a mlips:LossFunction ;
+    rdfs:label "Weighted linear least squares on energies, forces and stresses, with one weight per training group for each quantity" .
+
+entity:alg-SNAP-dubois2024 a mls:Algorithm ;
+    rdfs:label "Linear solve for the coefficients; group weights, cutoff and per-element radii optimised with an evolutionary algorithm (Dakota)" .
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasLossFunction entity:loss-HDNNP-dubois2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-HDNNP-dubois2024 ;
+    mlips:hasHyperparameter entity:hp-nn-architecture-dubois2024 ,
+        entity:hp-force-weight-dubois2024 ;
+    mlips:hasImplementation entity:impl-HDNNP-dubois2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-HDNNP-dubois2024 a mlips:LossFunction ;
+    rdfs:label "Squared energy error plus lambda times squared force errors (not trained on stress)" .
+
+entity:alg-HDNNP-dubois2024 a mls:Algorithm ;
+    rdfs:label "Multi-stream extended Kalman filter; symmetry functions generated systematically and selected by CUR decomposition; several networks trained and the best retained" .
+
+entity:impl-HDNNP-dubois2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-n2p2-dubois2024 .
+
+entity:lib-n2p2-dubois2024 a mlips:Library ;
+    rdfs:label "n2p2" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-nn-architecture-dubois2024 a mlips:Hyperparameter ;
+    rdfs:label "Network architecture" ;
+    mlips:hyperparameterName "nn_architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-force-weight-dubois2024 a mlips:Hyperparameter ;
+    rdfs:label "Force weighting factor lambda in the loss" ;
+    mlips:hyperparameterName "force_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-SNAP-cutoffRadius-dubois2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.18"^^xsd:double .
+
+entity:setting-HDNNP-nn-architecture-dubois2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-dubois2024 ;
+    mlips:settingValue "60 x 45 x 45 x 1" .
+
+entity:setting-HDNNP-force-weight-dubois2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-dubois2024 ;
+    mlips:settingValue "2"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SNAP-dubois2024 a mlips:MLIPRun ;
+    rdfs:label "SNAP training for UO2" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-UO2-dubois2024 ;
+    mlips:hasHyperparameterSetting entity:setting-SNAP-cutoffRadius-dubois2024 ;
+    mlips:produces entity:model-SNAP-dubois2024 .
+
+entity:model-SNAP-dubois2024 a mlips:TrainedModel ;
+    rdfs:label "SNAP potential for UO2" .
+
+entity:run-HDNNP-dubois2024 a mlips:MLIPRun ;
+    rdfs:label "Behler-Parrinello HDNNP training for UO2" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-UO2-dubois2024 ;
+    mlips:hasHyperparameterSetting entity:setting-HDNNP-nn-architecture-dubois2024 ,
+        entity:setting-HDNNP-force-weight-dubois2024 ;
+    mlips:produces entity:model-HDNNP-dubois2024 .
+
+entity:model-HDNNP-dubois2024 a mlips:TrainedModel ;
+    rdfs:label "BP-HDNNP potential for UO2" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-dubois2024 mlips:hasResult
+    entity:result-SNAP-fm3m-dubois2024 ,
+    entity:result-SNAP-polymorph-dubois2024 ,
+    entity:result-SNAP-hot1-dubois2024 ,
+    entity:result-SNAP-hot2-dubois2024 ,
+    entity:result-SNAP-hot3-dubois2024 ,
+    entity:result-SNAP-defects-dubois2024 ,
+    entity:result-SNAP-gamma-dubois2024 ,
+    entity:result-SNAP-total-dubois2024 ,
+    entity:result-HDNNP-fm3m-dubois2024 ,
+    entity:result-HDNNP-polymorph-dubois2024 ,
+    entity:result-HDNNP-hot1-dubois2024 ,
+    entity:result-HDNNP-hot2-dubois2024 ,
+    entity:result-HDNNP-hot3-dubois2024 ,
+    entity:result-HDNNP-defects-dubois2024 ,
+    entity:result-HDNNP-gamma-dubois2024 ,
+    entity:result-HDNNP-total-dubois2024 .
+
+entity:result-SNAP-fm3m-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-fm3m-1-dubois2024 ,
+        entity:metric-SNAP-fm3m-2-dubois2024 ,
+        entity:metric-SNAP-fm3m-3-dubois2024 ,
+        entity:metric-SNAP-fm3m-4-dubois2024 ,
+        entity:metric-SNAP-fm3m-5-dubois2024 ,
+        entity:metric-SNAP-fm3m-6-dubois2024 .
+
+entity:metric-SNAP-fm3m-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-fm3m-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-fm3m-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-fm3m-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.73"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-fm3m-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, Fm-3m (cold curve and small deformations) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "5.69"^^xsd:double .
+
+entity:metric-SNAP-fm3m-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, Fm-3m (cold curve and small deformations) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.01"^^xsd:double .
+
+entity:result-SNAP-polymorph-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-polymorph-1-dubois2024 ,
+        entity:metric-SNAP-polymorph-2-dubois2024 ,
+        entity:metric-SNAP-polymorph-3-dubois2024 ,
+        entity:metric-SNAP-polymorph-4-dubois2024 ,
+        entity:metric-SNAP-polymorph-5-dubois2024 ,
+        entity:metric-SNAP-polymorph-6-dubois2024 .
+
+entity:metric-SNAP-polymorph-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, polymorphs" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.64"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-polymorph-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, polymorphs" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-polymorph-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, polymorphs" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "156.74"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-polymorph-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, polymorphs" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "115.22"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-polymorph-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, polymorphs (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.93"^^xsd:double .
+
+entity:metric-SNAP-polymorph-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, polymorphs (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "1.89"^^xsd:double .
+
+entity:result-SNAP-hot1-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-hot1-1-dubois2024 ,
+        entity:metric-SNAP-hot1-2-dubois2024 ,
+        entity:metric-SNAP-hot1-3-dubois2024 ,
+        entity:metric-SNAP-hot1-4-dubois2024 ,
+        entity:metric-SNAP-hot1-5-dubois2024 ,
+        entity:metric-SNAP-hot1-6-dubois2024 .
+
+entity:metric-SNAP-hot1-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.39"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot1-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.25"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot1-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "221.11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot1-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "159.65"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot1-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 1 (300 to 2000 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "5.67"^^xsd:double .
+
+entity:metric-SNAP-hot1-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 1 (300 to 2000 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.65"^^xsd:double .
+
+entity:result-SNAP-hot2-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-hot2-1-dubois2024 ,
+        entity:metric-SNAP-hot2-2-dubois2024 ,
+        entity:metric-SNAP-hot2-3-dubois2024 ,
+        entity:metric-SNAP-hot2-4-dubois2024 ,
+        entity:metric-SNAP-hot2-5-dubois2024 ,
+        entity:metric-SNAP-hot2-6-dubois2024 .
+
+entity:metric-SNAP-hot2-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot2-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot2-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "385.19"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot2-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "295.84"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot2-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 2 (2200 to 2500 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "6"^^xsd:double .
+
+entity:metric-SNAP-hot2-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 2 (2200 to 2500 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "4.19"^^xsd:double .
+
+entity:result-SNAP-hot3-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-hot3-1-dubois2024 ,
+        entity:metric-SNAP-hot3-2-dubois2024 ,
+        entity:metric-SNAP-hot3-3-dubois2024 ,
+        entity:metric-SNAP-hot3-4-dubois2024 ,
+        entity:metric-SNAP-hot3-5-dubois2024 ,
+        entity:metric-SNAP-hot3-6-dubois2024 .
+
+entity:metric-SNAP-hot3-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot3-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.04"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-hot3-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "493.72"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot3-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "377.91"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-hot3-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 3 (2800 to 3200 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "7.45"^^xsd:double .
+
+entity:metric-SNAP-hot3-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 3 (2800 to 3200 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "5.27"^^xsd:double .
+
+entity:result-SNAP-defects-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-defects-1-dubois2024 ,
+        entity:metric-SNAP-defects-2-dubois2024 ,
+        entity:metric-SNAP-defects-3-dubois2024 ,
+        entity:metric-SNAP-defects-4-dubois2024 ,
+        entity:metric-SNAP-defects-5-dubois2024 ,
+        entity:metric-SNAP-defects-6-dubois2024 .
+
+entity:metric-SNAP-defects-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, defects" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.16"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-defects-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, defects" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.57"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-defects-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, defects" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "300.68"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-defects-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, defects" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "211.02"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-defects-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, defects (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "6.66"^^xsd:double .
+
+entity:metric-SNAP-defects-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, defects (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "4.15"^^xsd:double .
+
+entity:result-SNAP-gamma-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-gamma-1-dubois2024 ,
+        entity:metric-SNAP-gamma-2-dubois2024 ,
+        entity:metric-SNAP-gamma-3-dubois2024 ,
+        entity:metric-SNAP-gamma-4-dubois2024 ,
+        entity:metric-SNAP-gamma-5-dubois2024 ,
+        entity:metric-SNAP-gamma-6-dubois2024 .
+
+entity:metric-SNAP-gamma-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, gamma surfaces" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.42"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-gamma-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, gamma surfaces" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.97"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-gamma-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, gamma surfaces" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "163.15"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-gamma-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, gamma surfaces" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "82.47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-gamma-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, gamma surfaces (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "6.67"^^xsd:double .
+
+entity:metric-SNAP-gamma-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, gamma surfaces (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.41"^^xsd:double .
+
+entity:result-SNAP-total-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SNAP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-SNAP-total-1-dubois2024 ,
+        entity:metric-SNAP-total-2-dubois2024 ,
+        entity:metric-SNAP-total-3-dubois2024 ,
+        entity:metric-SNAP-total-4-dubois2024 ,
+        entity:metric-SNAP-total-5-dubois2024 ,
+        entity:metric-SNAP-total-6-dubois2024 .
+
+entity:metric-SNAP-total-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, whole testing database" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-total-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, whole testing database" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.52"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-SNAP-total-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, whole testing database" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "308.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-total-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, whole testing database" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "206"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-SNAP-total-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, whole testing database (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "6.07"^^xsd:double .
+
+entity:metric-SNAP-total-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, whole testing database (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.62"^^xsd:double .
+
+entity:result-HDNNP-fm3m-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-fm3m-1-dubois2024 ,
+        entity:metric-HDNNP-fm3m-2-dubois2024 ,
+        entity:metric-HDNNP-fm3m-3-dubois2024 ,
+        entity:metric-HDNNP-fm3m-4-dubois2024 ,
+        entity:metric-HDNNP-fm3m-5-dubois2024 ,
+        entity:metric-HDNNP-fm3m-6-dubois2024 .
+
+entity:metric-HDNNP-fm3m-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.71"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-fm3m-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.33"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-fm3m-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.72"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-fm3m-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, Fm-3m (cold curve and small deformations)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-fm3m-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, Fm-3m (cold curve and small deformations) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "10.53"^^xsd:double .
+
+entity:metric-HDNNP-fm3m-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, Fm-3m (cold curve and small deformations) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "4.01"^^xsd:double .
+
+entity:result-HDNNP-polymorph-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-polymorph-1-dubois2024 ,
+        entity:metric-HDNNP-polymorph-2-dubois2024 ,
+        entity:metric-HDNNP-polymorph-3-dubois2024 ,
+        entity:metric-HDNNP-polymorph-4-dubois2024 ,
+        entity:metric-HDNNP-polymorph-5-dubois2024 ,
+        entity:metric-HDNNP-polymorph-6-dubois2024 .
+
+entity:metric-HDNNP-polymorph-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, polymorphs" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-polymorph-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, polymorphs" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-polymorph-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, polymorphs" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "63.17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-polymorph-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, polymorphs" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.95"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-polymorph-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, polymorphs (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "14.37"^^xsd:double .
+
+entity:metric-HDNNP-polymorph-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, polymorphs (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "5.13"^^xsd:double .
+
+entity:result-HDNNP-hot1-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-hot1-1-dubois2024 ,
+        entity:metric-HDNNP-hot1-2-dubois2024 ,
+        entity:metric-HDNNP-hot1-3-dubois2024 ,
+        entity:metric-HDNNP-hot1-4-dubois2024 ,
+        entity:metric-HDNNP-hot1-5-dubois2024 ,
+        entity:metric-HDNNP-hot1-6-dubois2024 .
+
+entity:metric-HDNNP-hot1-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.53"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot1-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot1-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "99.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot1-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 1 (300 to 2000 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "72.13"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot1-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 1 (300 to 2000 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.91"^^xsd:double .
+
+entity:metric-HDNNP-hot1-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 1 (300 to 2000 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "2.14"^^xsd:double .
+
+entity:result-HDNNP-hot2-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-hot2-1-dubois2024 ,
+        entity:metric-HDNNP-hot2-2-dubois2024 ,
+        entity:metric-HDNNP-hot2-3-dubois2024 ,
+        entity:metric-HDNNP-hot2-4-dubois2024 ,
+        entity:metric-HDNNP-hot2-5-dubois2024 ,
+        entity:metric-HDNNP-hot2-6-dubois2024 .
+
+entity:metric-HDNNP-hot2-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.59"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot2-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.68"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot2-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "175.46"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot2-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 2 (2200 to 2500 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "130.76"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot2-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 2 (2200 to 2500 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "2.24"^^xsd:double .
+
+entity:metric-HDNNP-hot2-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 2 (2200 to 2500 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "1.52"^^xsd:double .
+
+entity:result-HDNNP-hot3-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-hot3-1-dubois2024 ,
+        entity:metric-HDNNP-hot3-2-dubois2024 ,
+        entity:metric-HDNNP-hot3-3-dubois2024 ,
+        entity:metric-HDNNP-hot3-4-dubois2024 ,
+        entity:metric-HDNNP-hot3-5-dubois2024 ,
+        entity:metric-HDNNP-hot3-6-dubois2024 .
+
+entity:metric-HDNNP-hot3-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot3-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.14"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-hot3-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "246.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot3-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, hot bulk 3 (2800 to 3200 K)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "177.47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-hot3-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, hot bulk 3 (2800 to 3200 K) (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "2.8"^^xsd:double .
+
+entity:metric-HDNNP-hot3-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, hot bulk 3 (2800 to 3200 K) (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "1.96"^^xsd:double .
+
+entity:result-HDNNP-defects-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-defects-1-dubois2024 ,
+        entity:metric-HDNNP-defects-2-dubois2024 ,
+        entity:metric-HDNNP-defects-3-dubois2024 ,
+        entity:metric-HDNNP-defects-4-dubois2024 ,
+        entity:metric-HDNNP-defects-5-dubois2024 ,
+        entity:metric-HDNNP-defects-6-dubois2024 .
+
+entity:metric-HDNNP-defects-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, defects" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.53"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-defects-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, defects" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.68"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-defects-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, defects" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "115.77"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-defects-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, defects" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "85.07"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-defects-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, defects (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.67"^^xsd:double .
+
+entity:metric-HDNNP-defects-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, defects (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "2.15"^^xsd:double .
+
+entity:result-HDNNP-gamma-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-gamma-1-dubois2024 ,
+        entity:metric-HDNNP-gamma-2-dubois2024 ,
+        entity:metric-HDNNP-gamma-3-dubois2024 ,
+        entity:metric-HDNNP-gamma-4-dubois2024 ,
+        entity:metric-HDNNP-gamma-5-dubois2024 ,
+        entity:metric-HDNNP-gamma-6-dubois2024 .
+
+entity:metric-HDNNP-gamma-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, gamma surfaces" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.33"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-gamma-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, gamma surfaces" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-gamma-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, gamma surfaces" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "64.75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-gamma-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, gamma surfaces" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "35.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-gamma-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, gamma surfaces (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "5.82"^^xsd:double .
+
+entity:metric-HDNNP-gamma-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, gamma surfaces (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "3.02"^^xsd:double .
+
+entity:result-HDNNP-total-dubois2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-HDNNP-dubois2024 ;
+    mlips:targetMaterial entity:mat-UO2-dubois2024 ;
+    mlips:hasAccuracyMetric entity:metric-HDNNP-total-1-dubois2024 ,
+        entity:metric-HDNNP-total-2-dubois2024 ,
+        entity:metric-HDNNP-total-3-dubois2024 ,
+        entity:metric-HDNNP-total-4-dubois2024 ,
+        entity:metric-HDNNP-total-5-dubois2024 ,
+        entity:metric-HDNNP-total-6-dubois2024 .
+
+entity:metric-HDNNP-total-1-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, test set, whole testing database" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.38"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-total-2-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set, whole testing database" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.67"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-HDNNP-total-3-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set, whole testing database" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "139.63"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-total-4-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set, whole testing database" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "90.48"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-HDNNP-total-5-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set, whole testing database (meV/A^3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "7.32"^^xsd:double .
+
+entity:metric-HDNNP-total-6-dubois2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, test set, whole testing database (meV/A^3)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "2.82"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Stress errors are in meV per cubic Angstrom (no vocabulary unit; in the label, not converted). The HDNNP was not trained on stress. Some HDNNP rows have MAE above RMSE as printed (hot bulk 2 energy 3.59 / 3.68; defects energy 2.53 / 3.68), which cannot be right for one of the two numbers; to be checked against the PDF.
+# - The per-group results all point at the one UO2 material node, with the group in the metric label; the groups are parts of the testing database, not separate materials.
+# - The SNAP angular-momentum limit and the HDNNP symmetry-function set and cutoff are in the paper's ref. [48] and not encoded; the SNAP implementation (LAMMPS) is not in the vocabulary and is left out. Defect formation energies (Table II), gamma surfaces, polymorph equations of state and thermal properties are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
