@@ -1,0 +1,388 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yuanchang Zhou et al. (2025). FastCHGNet: Training One Universal Interatomic Potential to 1.5 Hours with 32 GPUs.
+#   Proceedings - IEEE International Parallel and Distributed Processing Symposium. doi:10.1109/ipdps64566.2025.00029  arXiv:2412.20796v2
+#
+# Version read: arxiv-preprint arXiv:2412.20796v2 (sha256 12eda363c424f3b3...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 51 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: FastCHGNet, a performance-engineered reimplementation
+# of CHGNet, trained on MPtrj in two versions (without and with decoupled
+# force/stress heads), compared with the reference CHGNet v0.3.0 on the
+# MPtrj test set (Table I), with settings and reported training cost.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhou2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhou et al. (2025): FastCHGNet, training one universal interatomic potential in 1.5 hours with 32 GPUs" ;
+    mlips:reportedIn entity:article-zhou2025 .
+
+entity:article-zhou2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1109/ipdps64566.2025.00029> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "FastCHGNet: Training One Universal Interatomic Potential to 1.5 Hours with 32 GPUs" ;
+    schema:author entity:person-Zhou-zhou2025 ,
+        entity:person-Hu-zhou2025 ,
+        entity:person-Wang-zhou2025 ,
+        entity:person-WangLinWang-zhou2025 ,
+        entity:person-Tan-zhou2025 ,
+        entity:person-Jia-zhou2025 .
+
+entity:person-Zhou-zhou2025 a schema:Person ;
+    schema:name "Yuanchang Zhou" ;
+    schema:givenName "Yuanchang" ;
+    schema:familyName "Zhou" .
+
+entity:person-Hu-zhou2025 a schema:Person ;
+    schema:name "Siyu Hu" ;
+    schema:givenName "Siyu" ;
+    schema:familyName "Hu" .
+
+entity:person-Wang-zhou2025 a schema:Person ;
+    schema:name "Chen Wang" ;
+    schema:givenName "Chen" ;
+    schema:familyName "Wang" .
+
+entity:person-WangLinWang-zhou2025 a schema:Person ;
+    schema:name "Lin-Wang Wang" ;
+    schema:givenName "Lin-Wang" ;
+    schema:familyName "Wang" .
+
+entity:person-Tan-zhou2025 a schema:Person ;
+    schema:name "Guangming Tan" ;
+    schema:givenName "Guangming" ;
+    schema:familyName "Tan" .
+
+entity:person-Jia-zhou2025 a schema:Person ;
+    schema:name "Weile Jia" ;
+    schema:givenName "Weile" ;
+    schema:familyName "Jia" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mptrj-zhou2025 a mlips:MaterialSystem ;
+    rdfs:label "MPtrj inorganic crystals over 89 elements" ;
+    mlips:materialClass "Universal inorganic crystals; static and relaxation-trajectory frames from the Materials Project" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhou2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhou2025 mlips:hasDFTSettings entity:calc-settings-dft-zhou2025 .
+
+entity:calc-settings-dft-zhou2025 a mlips:DFTSettings ;
+    rdfs:comment "GGA / GGA+U calculations of the Materials Project (static and relaxation trajectories); code and settings are not restated in this paper." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mptrj-zhou2025 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj (1,580,395 structures)" ;
+    mlips:coversMaterial entity:mat-mptrj-zhou2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1580395 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhou2025 ;
+    rdfs:comment "1,580,395 energies, 49,295,660 forces, 14,223,555 stresses and 7,944,833 magnetic moments; split 0.9 : 0.05 : 0.05 into training, validation and test sets." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mptrj-zhou2025 mlips:samplingStrategy
+    entity:sampling-mp-trajectories-zhou2025 .
+
+entity:sampling-mp-trajectories-zhou2025 a mlips:SamplingStrategy ;
+    rdfs:label "Static and relaxation trajectories of the Materials Project (MPtrj)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
+    mlips:hasLossFunction entity:loss-CHGNet-zhou2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-CHGNet-zhou2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-bond-cutoff-zhou2025 ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ,
+        mlips:learningRate ,
+        mlips:numEpochs ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-CHGNet-zhou2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-CHGNet-zhou2025 a mlips:LossFunction ;
+    rdfs:label "Huber loss on energy, force, stress and magnetic moment with prefactors 2, 1.5, 0.1 and 0.1" .
+
+entity:alg-CHGNet-zhou2025 a mls:Algorithm ;
+    rdfs:label "Adam with cosine annealing; initial learning rate 0.0003 at batch size 128, scaled with the batch size for multi-GPU training (batch 2048); load-balanced multi-GPU sampler" .
+
+entity:impl-CHGNet-zhou2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-FastCHGNet-zhou2025 .
+
+entity:lib-FastCHGNet-zhou2025 a mlips:Library ;
+    rdfs:label "FastCHGNet" ;
+    rdfs:comment "PyTorch 2.3.1 reimplementation of CHGNet with parallel basis computation, kernel fusion, redundancy bypass and, in the 'F/S head' version, force and stress predicted by separate heads instead of derivatives." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-bond-cutoff-zhou2025 a mlips:Hyperparameter ;
+    rdfs:label "CHGNet bond-graph cutoff (Angstrom)" ;
+    mlips:hyperparameterName "bond_graph_cutoff" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-fastchgnet-nohead-cutoffRadius-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-bond-cutoff-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-bond-cutoff-zhou2025 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-numRadialBasis-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-numAngularBasis-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-numFeatures-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-learningRate-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-fastchgnet-nohead-numEpochs-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-fastchgnet-nohead-batchSize-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-cutoffRadius-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-bond-cutoff-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-bond-cutoff-zhou2025 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-numRadialBasis-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-numAngularBasis-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-numFeatures-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-learningRate-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-fastchgnet-fshead-numEpochs-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-fastchgnet-fshead-batchSize-zhou2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-fastchgnet-nohead-zhou2025 a mlips:MLIPRun ;
+    rdfs:label "FastCHGNet training on MPtrj, version without decoupled heads ('w/o head')" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mptrj-zhou2025 ;
+    mlips:hasHyperparameterSetting entity:setting-fastchgnet-nohead-cutoffRadius-zhou2025 ,
+        entity:setting-fastchgnet-nohead-bond-cutoff-zhou2025 ,
+        entity:setting-fastchgnet-nohead-numRadialBasis-zhou2025 ,
+        entity:setting-fastchgnet-nohead-numAngularBasis-zhou2025 ,
+        entity:setting-fastchgnet-nohead-numFeatures-zhou2025 ,
+        entity:setting-fastchgnet-nohead-learningRate-zhou2025 ,
+        entity:setting-fastchgnet-nohead-numEpochs-zhou2025 ,
+        entity:setting-fastchgnet-nohead-batchSize-zhou2025 ;
+    mlips:produces entity:model-fastchgnet-nohead-zhou2025 .
+
+entity:model-fastchgnet-nohead-zhou2025 a mlips:TrainedModel ;
+    rdfs:label "FastCHGNet 'w/o head' (411.2k parameters)" .
+
+entity:run-fastchgnet-fshead-zhou2025 a mlips:MLIPRun ;
+    rdfs:label "FastCHGNet training on MPtrj, version with decoupled force and stress heads ('F/S head')" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mptrj-zhou2025 ;
+    mlips:hasHyperparameterSetting entity:setting-fastchgnet-fshead-cutoffRadius-zhou2025 ,
+        entity:setting-fastchgnet-fshead-bond-cutoff-zhou2025 ,
+        entity:setting-fastchgnet-fshead-numRadialBasis-zhou2025 ,
+        entity:setting-fastchgnet-fshead-numAngularBasis-zhou2025 ,
+        entity:setting-fastchgnet-fshead-numFeatures-zhou2025 ,
+        entity:setting-fastchgnet-fshead-learningRate-zhou2025 ,
+        entity:setting-fastchgnet-fshead-numEpochs-zhou2025 ,
+        entity:setting-fastchgnet-fshead-batchSize-zhou2025 ;
+    mlips:trainingHardware "Nodes with two 64-core Intel Xeon Platinum 8358 CPUs and 8 NVIDIA A100 80 GB GPUs; 35.4 hours on a single A100, 1.5 hours with 32 GPUs (title)" ;
+    mlips:produces entity:model-fastchgnet-fshead-zhou2025 .
+
+entity:model-fastchgnet-fshead-zhou2025 a mlips:TrainedModel ;
+    rdfs:label "FastCHGNet 'F/S head' (429.1K parameters)" ;
+    mlips:inferenceHardware "NVIDIA A100: about 0.0077 s per MD step for LiMnO2 (8 atoms), LiTiPO5 (32 atoms) and Li9Co7O16 (32 atoms), 2.6 to 3.0 times faster than CHGNet (Table II)" .
+
+# Registry stub for the externally trained model CHGNet-0.3.0 (not trained in this paper).
+entity:run-CHGNet-0_3_0 a mlips:MLIPRun ;
+    rdfs:label "Training run of CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:produces entity:model-CHGNet-0_3_0 .
+
+entity:model-CHGNet-0_3_0 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zhou2025 mlips:hasResult
+    entity:result-chgnet-ref-zhou2025 ,
+    entity:result-fastchgnet-nohead-zhou2025 ,
+    entity:result-fastchgnet-fshead-zhou2025 .
+
+entity:result-chgnet-ref-zhou2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CHGNet-0_3_0 ;
+    mlips:targetMaterial entity:mat-mptrj-zhou2025 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-ref-1-zhou2025 ,
+        entity:metric-chgnet-ref-2-zhou2025 ,
+        entity:metric-chgnet-ref-3-zhou2025 .
+
+entity:metric-chgnet-ref-1-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: reference CHGNet v0.3.0, MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "29"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-chgnet-ref-2-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: reference CHGNet v0.3.0, MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "68"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-chgnet-ref-3-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: reference CHGNet v0.3.0, MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.314"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-fastchgnet-nohead-zhou2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-fastchgnet-nohead-zhou2025 ;
+    mlips:targetMaterial entity:mat-mptrj-zhou2025 ;
+    mlips:hasAccuracyMetric entity:metric-fastchgnet-nohead-1-zhou2025 ,
+        entity:metric-fastchgnet-nohead-2-zhou2025 ,
+        entity:metric-fastchgnet-nohead-3-zhou2025 .
+
+entity:metric-fastchgnet-nohead-1-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: FastCHGNet 'w/o head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-fastchgnet-nohead-2-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: FastCHGNet 'w/o head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "62"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-fastchgnet-nohead-3-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: FastCHGNet 'w/o head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.27"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-fastchgnet-fshead-zhou2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-fastchgnet-fshead-zhou2025 ;
+    mlips:targetMaterial entity:mat-mptrj-zhou2025 ;
+    mlips:hasAccuracyMetric entity:metric-fastchgnet-fshead-1-zhou2025 ,
+        entity:metric-fastchgnet-fshead-2-zhou2025 ,
+        entity:metric-fastchgnet-fshead-3-zhou2025 .
+
+entity:metric-fastchgnet-fshead-1-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: FastCHGNet 'F/S head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-fastchgnet-fshead-2-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: FastCHGNet 'F/S head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "73"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-fastchgnet-fshead-3-zhou2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: FastCHGNet 'F/S head', MPtrj test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.479"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Training one model takes 35.4 hours on a single A100 after the single-GPU
+# optimisations and 1.5 hours with 32 GPUs (title claim); strong and weak
+# scaling up to 32 GPUs are reported as efficiencies. Recorded as text in
+# trainingHardware; the per-step MD times of Table II in inferenceHardware.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - FastCHGNet is encoded as an implementation of the registry method entity:CHGNet. Its 'F/S head' version predicts forces and stresses with separate heads rather than as derivatives of the energy, which is a different functional form in a strict sense; if that distinction matters for queries it needs its own registry method.
+# - Magnetic-moment MAEs (37 / 35 / 36 m-mu_B) have no MetricProperty. The R^2 values and the learning-rate-tuning experiment at batch size 2048 (15 meV/atom, 72 meV/A, 0.476 GPa) are not encoded.
+# - Which version the 35.4 h and 1.5 h figures and the Table II timings refer to is not stated; they are attached to the 'F/S head' model, the final FastCHGNet.
+# - The 'radial and angular basis number is set to 31' is encoded as numRadialBasis = numAngularBasis = 31; the 64-dimensional atom/bond/angle embeddings as numFeatures 64.
+# - The manifest classes this paper as 'Training/reliability'; it is a software-performance paper.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
