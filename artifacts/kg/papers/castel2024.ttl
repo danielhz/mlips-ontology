@@ -1,0 +1,753 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Nicolas Castel et al. (2024). Machine learning interatomic potentials for amorphous zeolitic imidazolate frameworks.
+#   Digital Discovery. doi:10.1039/d3dd00236e
+#
+# Version read: publisher (sha256 54c73418471b1db2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 140 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the NequIP hyperparameter screen and the deployed NequIP
+# and Allegro models for ZIF-4, trained on frames of ab initio MD of the
+# liquid, with the reference DFT, the two sampling schemes and the
+# held-out errors and efficiencies of Table 1.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-castel2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Castel et al. (2024): machine learning interatomic potentials for amorphous ZIF-4" ;
+    mlips:reportedIn entity:article-castel2024 .
+
+entity:article-castel2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d3dd00236e> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potentials for amorphous zeolitic imidazolate frameworks" ;
+    schema:author entity:person-Castel-castel2024 ,
+        entity:person-Andre-castel2024 ,
+        entity:person-Edwards-castel2024 ,
+        <https://orcid.org/0000-0001-9521-2601> ,
+        <https://orcid.org/0000-0001-5318-3910> .
+
+entity:person-Castel-castel2024 a schema:Person ;
+    schema:name "Nicolas Castel" ;
+    schema:givenName "Nicolas" ;
+    schema:familyName "Castel" .
+
+entity:person-Andre-castel2024 a schema:Person ;
+    schema:name "Dune André" ;
+    schema:givenName "Dune" ;
+    schema:familyName "André" .
+
+entity:person-Edwards-castel2024 a schema:Person ;
+    schema:name "Connor Edwards" ;
+    schema:givenName "Connor" ;
+    schema:familyName "Edwards" .
+
+<https://orcid.org/0000-0001-9521-2601> a schema:Person ;
+    schema:name "Jack D. Evans" ;
+    schema:givenName "Jack D." ;
+    schema:familyName "Evans" ;
+    schema:identifier <https://orcid.org/0000-0001-9521-2601> .
+
+<https://orcid.org/0000-0001-5318-3910> a schema:Person ;
+    schema:name "François-Xavier Coudert" ;
+    schema:givenName "François-Xavier" ;
+    schema:familyName "Coudert" ;
+    schema:identifier <https://orcid.org/0000-0001-5318-3910> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-ZIF4-castel2024 a mlips:MaterialSystem ;
+    rdfs:label "ZIF-4 (zinc imidazolate framework; liquid, glass and crystal)" ;
+    mlips:chemicalFormula "Zn(C3H3N2)2" ;
+    mlips:materialClass "Metal-organic framework" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-castel2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-castel2024 mlips:hasDFTSettings entity:calc-settings-dft-castel2024 .
+
+entity:calc-settings-dft-castel2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-castel2024 ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    mlips:dftBasisSet entity:basis-DZVP-double-zeta-valence-polarised-castel2024 ;
+    rdfs:comment "PBE with DFT-D3 dispersion; Goedecker-Teter-Hutter pseudopotentials. NVT ab initio MD, 0.5 fs time step." .
+
+entity:lib-CP2K-castel2024 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    rdfs:comment "Quickstep module of CP2K 6.1." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:basis-DZVP-double-zeta-valence-polarised-castel2024 a mlips:DftBasisSet ;
+    rdfs:label "DZVP (double-zeta valence polarised)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-rand-castel2024 a mlips:TrainingDataset ;
+    rdfs:label "Random-sampling set (1000 training and 100 test frames)" ;
+    mlips:coversMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-castel2024 .
+
+entity:ds-flat-small-castel2024 a mlips:TrainingDataset ;
+    rdfs:label "Initial flat-histogram set (964 training and 96 test frames)" ;
+    mlips:coversMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 964 ;
+    mlips:hasDFTCalculation entity:calc-dft-castel2024 .
+
+entity:ds-flat-castel2024 a mlips:TrainingDataset ;
+    rdfs:label "Final flat-histogram set (2357 training and 190 test frames)" ;
+    mlips:coversMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2357 ;
+    mlips:hasDFTCalculation entity:calc-dft-castel2024 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-rand-castel2024 mlips:samplingStrategy
+    entity:sampling-aimd-castel2024 ,
+    entity:sampling-random-castel2024 .
+
+entity:ds-flat-small-castel2024 mlips:samplingStrategy
+    entity:sampling-aimd-castel2024 ,
+    entity:sampling-flathist-castel2024 .
+
+entity:ds-flat-castel2024 mlips:samplingStrategy
+    entity:sampling-aimd-castel2024 ,
+    entity:sampling-flathist-castel2024 .
+
+entity:sampling-aimd-castel2024 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD of ZIF-4 liquids: four trajectories at four volumes, 1500 K or 1750 K, each over 50 ps (1,189,836 frames in total)" .
+
+entity:sampling-random-castel2024 a mlips:SamplingStrategy ;
+    rdfs:label "Random selection of frames from the AIMD trajectories" .
+
+entity:sampling-flathist-castel2024 a mlips:SamplingStrategy ;
+    rdfs:label "Flat-histogram selection: frames binned by energy, one random frame per bin" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-castel2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-castel2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        entity:hp-lmax-castel2024 ,
+        entity:hp-parity-castel2024 ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-NequIP-castel2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-NequIP-castel2024 a mlips:LossFunction ;
+    rdfs:label "Weighted average of potential-energy and force errors (stress tested and not used)" .
+
+entity:alg-NequIP-castel2024 a mls:Algorithm ;
+    rdfs:label "Adam" .
+
+entity:impl-NequIP-castel2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP ;
+    mlips:version "0.5.6" .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasLossFunction entity:loss-Allegro-castel2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-Allegro-castel2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        entity:hp-lmax-castel2024 ,
+        entity:hp-parity-castel2024 ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-Allegro-castel2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-Allegro-castel2024 a mlips:LossFunction ;
+    rdfs:label "Weighted average of potential-energy and force errors" .
+
+entity:alg-Allegro-castel2024 a mls:Algorithm ;
+    rdfs:label "Adam" .
+
+entity:impl-Allegro-castel2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:Allegro .
+
+entity:hp-lmax-castel2024 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order l" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-parity-castel2024 a mlips:Hyperparameter ;
+    rdfs:label "Use of odd-mirror-parity features" ;
+    mlips:hyperparameterName "parity" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-l1-r6-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-l1-r6-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l1-r6-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-l1-r6-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "with parity" .
+
+entity:setting-l1-r6-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-l2-r4-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-l2-r4-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l2-r4-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l2-r4-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "with parity" .
+
+entity:setting-l2-r4-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-l2-r5-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-l2-r5-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l2-r5-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l2-r5-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "with parity" .
+
+entity:setting-l2-r5-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-l2-r6-nop-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-l2-r6-nop-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l2-r6-nop-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l2-r6-nop-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "no odd-parity features" .
+
+entity:setting-l2-r6-nop-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-l2-r6-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-l2-r6-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l2-r6-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l2-r6-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "with parity" .
+
+entity:setting-l2-r6-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-l2-r6-flat-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-l2-r6-flat-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-l2-r6-flat-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l2-r6-flat-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "with parity" .
+
+entity:setting-l2-r6-flat-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-deployed-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-deployed-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-nequip-deployed-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-deployed-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "no odd-parity features" .
+
+entity:setting-nequip-deployed-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-allegro-deployed-cutoffRadius-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-allegro-deployed-numLayers-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-allegro-deployed-lmax-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-castel2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-allegro-deployed-parity-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-parity-castel2024 ;
+    mlips:settingValue "no odd-parity features" .
+
+entity:setting-allegro-deployed-learningRate-castel2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-l1-r6-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 1, r = 6 A" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-rand-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l1-r6-cutoffRadius-castel2024 ,
+        entity:setting-l1-r6-numLayers-castel2024 ,
+        entity:setting-l1-r6-lmax-castel2024 ,
+        entity:setting-l1-r6-parity-castel2024 ,
+        entity:setting-l1-r6-learningRate-castel2024 ;
+    mlips:produces entity:model-l1-r6-castel2024 .
+
+entity:model-l1-r6-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 1, r = 6 A model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 240 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-l2-r4-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 2, r = 4 A" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-rand-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-r4-cutoffRadius-castel2024 ,
+        entity:setting-l2-r4-numLayers-castel2024 ,
+        entity:setting-l2-r4-lmax-castel2024 ,
+        entity:setting-l2-r4-parity-castel2024 ,
+        entity:setting-l2-r4-learningRate-castel2024 ;
+    mlips:produces entity:model-l2-r4-castel2024 .
+
+entity:model-l2-r4-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 2, r = 4 A model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 371 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-l2-r5-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 2, r = 5 A" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-rand-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-r5-cutoffRadius-castel2024 ,
+        entity:setting-l2-r5-numLayers-castel2024 ,
+        entity:setting-l2-r5-lmax-castel2024 ,
+        entity:setting-l2-r5-parity-castel2024 ,
+        entity:setting-l2-r5-learningRate-castel2024 ;
+    mlips:produces entity:model-l2-r5-castel2024 .
+
+entity:model-l2-r5-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 2, r = 5 A model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 369 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-l2-r6-nop-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 2, r = 6 A (no parity)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-rand-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-r6-nop-cutoffRadius-castel2024 ,
+        entity:setting-l2-r6-nop-numLayers-castel2024 ,
+        entity:setting-l2-r6-nop-lmax-castel2024 ,
+        entity:setting-l2-r6-nop-parity-castel2024 ,
+        entity:setting-l2-r6-nop-learningRate-castel2024 ;
+    mlips:produces entity:model-l2-r6-nop-castel2024 .
+
+entity:model-l2-r6-nop-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 2, r = 6 A (no parity) model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 280 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-l2-r6-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 2, r = 6 A" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-rand-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-r6-cutoffRadius-castel2024 ,
+        entity:setting-l2-r6-numLayers-castel2024 ,
+        entity:setting-l2-r6-lmax-castel2024 ,
+        entity:setting-l2-r6-parity-castel2024 ,
+        entity:setting-l2-r6-learningRate-castel2024 ;
+    mlips:produces entity:model-l2-r6-castel2024 .
+
+entity:model-l2-r6-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 2, r = 6 A model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 452 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-l2-r6-flat-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP l = 2, r = 6 A (flat histogram)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-flat-small-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-r6-flat-cutoffRadius-castel2024 ,
+        entity:setting-l2-r6-flat-numLayers-castel2024 ,
+        entity:setting-l2-r6-flat-lmax-castel2024 ,
+        entity:setting-l2-r6-flat-parity-castel2024 ,
+        entity:setting-l2-r6-flat-learningRate-castel2024 ;
+    mlips:produces entity:model-l2-r6-flat-castel2024 .
+
+entity:model-l2-r6-flat-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP l = 2, r = 6 A (flat histogram) model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 453 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-nequip-deployed-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of NequIP deployed" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-flat-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-deployed-cutoffRadius-castel2024 ,
+        entity:setting-nequip-deployed-numLayers-castel2024 ,
+        entity:setting-nequip-deployed-lmax-castel2024 ,
+        entity:setting-nequip-deployed-parity-castel2024 ,
+        entity:setting-nequip-deployed-learningRate-castel2024 ;
+    mlips:produces entity:model-nequip-deployed-castel2024 .
+
+entity:model-nequip-deployed-castel2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP deployed model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 282 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+entity:run-allegro-deployed-castel2024 a mlips:MLIPRun ;
+    rdfs:label "Training of Allegro deployed" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-flat-castel2024 ;
+    mlips:hasHyperparameterSetting entity:setting-allegro-deployed-cutoffRadius-castel2024 ,
+        entity:setting-allegro-deployed-numLayers-castel2024 ,
+        entity:setting-allegro-deployed-lmax-castel2024 ,
+        entity:setting-allegro-deployed-parity-castel2024 ,
+        entity:setting-allegro-deployed-learningRate-castel2024 ;
+    mlips:produces entity:model-allegro-deployed-castel2024 .
+
+entity:model-allegro-deployed-castel2024 a mlips:TrainedModel ;
+    rdfs:label "Allegro deployed model for ZIF-4" ;
+    mlips:inferenceHardware "NVIDIA Tesla V100; 347 ms per atom per call as printed in Table 1 (300 calls, 6 for warm-up)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-castel2024 mlips:hasResult
+    entity:result-l1-r6-castel2024 ,
+    entity:result-l2-r4-castel2024 ,
+    entity:result-l2-r5-castel2024 ,
+    entity:result-l2-r6-nop-castel2024 ,
+    entity:result-l2-r6-castel2024 ,
+    entity:result-l2-r6-flat-castel2024 ,
+    entity:result-nequip-deployed-castel2024 ,
+    entity:result-allegro-deployed-castel2024 .
+
+entity:result-l1-r6-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l1-r6-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l1-r6-1-castel2024 ,
+        entity:metric-l1-r6-2-castel2024 ,
+        entity:metric-l1-r6-3-castel2024 .
+
+entity:metric-l1-r6-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l1-r6-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l1-r6-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "352"^^xsd:double .
+
+entity:result-l2-r4-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-r4-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l2-r4-1-castel2024 ,
+        entity:metric-l2-r4-2-castel2024 ,
+        entity:metric-l2-r4-3-castel2024 .
+
+entity:metric-l2-r4-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-r4-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l2-r4-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "304"^^xsd:double .
+
+entity:result-l2-r5-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-r5-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l2-r5-1-castel2024 ,
+        entity:metric-l2-r5-2-castel2024 ,
+        entity:metric-l2-r5-3-castel2024 .
+
+entity:metric-l2-r5-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-r5-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l2-r5-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "320"^^xsd:double .
+
+entity:result-l2-r6-nop-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-r6-nop-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l2-r6-nop-1-castel2024 ,
+        entity:metric-l2-r6-nop-2-castel2024 ,
+        entity:metric-l2-r6-nop-3-castel2024 .
+
+entity:metric-l2-r6-nop-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-r6-nop-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l2-r6-nop-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "352"^^xsd:double .
+
+entity:result-l2-r6-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-r6-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l2-r6-1-castel2024 ,
+        entity:metric-l2-r6-2-castel2024 ,
+        entity:metric-l2-r6-3-castel2024 .
+
+entity:metric-l2-r6-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-r6-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "15.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l2-r6-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "361"^^xsd:double .
+
+entity:result-l2-r6-flat-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-r6-flat-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-l2-r6-flat-1-castel2024 ,
+        entity:metric-l2-r6-flat-2-castel2024 ,
+        entity:metric-l2-r6-flat-3-castel2024 .
+
+entity:metric-l2-r6-flat-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.61"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-r6-flat-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-l2-r6-flat-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "360"^^xsd:double .
+
+entity:result-nequip-deployed-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-deployed-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-deployed-1-castel2024 ,
+        entity:metric-nequip-deployed-2-castel2024 ,
+        entity:metric-nequip-deployed-3-castel2024 .
+
+entity:metric-nequip-deployed-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-nequip-deployed-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "15"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-nequip-deployed-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "352"^^xsd:double .
+
+entity:result-allegro-deployed-castel2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-deployed-castel2024 ;
+    mlips:targetMaterial entity:mat-ZIF4-castel2024 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-deployed-1-castel2024 ,
+        entity:metric-allegro-deployed-2-castel2024 ,
+        entity:metric-allegro-deployed-3-castel2024 .
+
+entity:metric-allegro-deployed-1-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-allegro-deployed-2-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, 10,000 held-out frames" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-allegro-deployed-3-castel2024 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE, 10,000 held-out frames (MPa)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "352"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table 1 heads the energy column 'Energy MAE (meV)'; the text gives the same values as 'meV on energy per atom', so meV/atom is used. Stress MAE is in MPa (no vocabulary unit; in the label, not converted). Stress was not a training target of the listed models.
+# - The efficiency column is copied into the inference-hardware string as printed (ms per atom per call); the magnitude looks like microseconds and should be checked against the PDF.
+# - The deployed models use l = 2 and a 6 A cutoff without parity, as the text states; the hyperparameter-screen rows without the remark are read as 'with parity'. The Allegro model uses the same hyperparameters as NequIP (stated). Number of epochs is not fixed (curves plateau near 1000 epochs).
+# - Structural properties (RDF, coordination, rings, pore volume), melt-quench glass models and mechanical properties (Table 3) are not encoded. Simulation cost: 100 ps of a 272-atom cell takes about 5 hours on one V100 GPU with NequIP.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
