@@ -1,0 +1,261 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   G. P. Purja Pun et al. (2020). Development of a general-purpose machine-learning interatomic potential for aluminum by the physically informed neural network method.
+#   Physical Review Materials. doi:10.1103/physrevmaterials.4.113807  arXiv:2009.06533v3
+#
+# Version read: arxiv-preprint arXiv:2009.06533v3 (sha256 24842d913c2dded1...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 167 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the second-generation PINN potential for Al (a neural
+# network that locally adjusts the parameters of a bond-order potential),
+# trained on energies from the DFT database of the original PINN paper:
+# training subset, settings and the energy and force RMSEs stated in the
+# text. Property tests and applications are not encoded. Read from the
+# arXiv preprint (v3).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-purjapun2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Purja Pun et al. (2020): general-purpose PINN potential for aluminium" ;
+    mlips:reportedIn entity:article-purjapun2020 .
+
+entity:article-purjapun2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevmaterials.4.113807> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Development of a general-purpose machine-learning interatomic potential for aluminum by the physically informed neural network method" ;
+    schema:author entity:person-Pun-purjapun2020 ,
+        <https://orcid.org/0000-0001-5528-9030> ,
+        <https://orcid.org/0000-0003-2206-9132> ,
+        entity:person-Glaessgen-purjapun2020 ,
+        <https://orcid.org/0000-0001-7299-433X> .
+
+entity:person-Pun-purjapun2020 a schema:Person ;
+    schema:name "G. P. Purja Pun" ;
+    schema:givenName "G. P. Purja" ;
+    schema:familyName "Pun" .
+
+<https://orcid.org/0000-0001-5528-9030> a schema:Person ;
+    schema:name "V. Yamakov" ;
+    schema:givenName "V." ;
+    schema:familyName "Yamakov" ;
+    schema:identifier <https://orcid.org/0000-0001-5528-9030> .
+
+<https://orcid.org/0000-0003-2206-9132> a schema:Person ;
+    schema:name "J. Hickman" ;
+    schema:givenName "J." ;
+    schema:familyName "Hickman" ;
+    schema:identifier <https://orcid.org/0000-0003-2206-9132> .
+
+entity:person-Glaessgen-purjapun2020 a schema:Person ;
+    schema:name "E. H. Glaessgen" ;
+    schema:givenName "E. H." ;
+    schema:familyName "Glaessgen" .
+
+<https://orcid.org/0000-0001-7299-433X> a schema:Person ;
+    schema:name "Y. Mishin" ;
+    schema:givenName "Y." ;
+    schema:familyName "Mishin" ;
+    schema:identifier <https://orcid.org/0000-0001-7299-433X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Al-purjapun2020 a mlips:MaterialSystem ;
+    rdfs:label "Aluminium (seven crystal structures under strain, surfaces, grain boundaries, stacking fault, vacancy, clusters of 2 to 79 atoms)" ;
+    mlips:chemicalFormula "Al" ;
+    mlips:materialClass "Elemental metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-purjapun2020 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-purjapun2020 mlips:hasDFTSettings entity:calc-settings-dft-purjapun2020 .
+
+entity:calc-settings-dft-purjapun2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    rdfs:comment "Settings as stated for the phonon calculations of this paper (6 irreducible k-points, Methfessel-Paxton smearing of order 1, width 0.2 eV); the database itself is the one of the original PINN paper (purjapun2019), whose DFT details are in that paper and the supplement." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-F-purjapun2020 a mlips:TrainingDataset ;
+    rdfs:label "Training database F (3,164 supercells, 108,052 atoms)" ;
+    mlips:coversMaterial entity:mat-Al-purjapun2020 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3164 ;
+    mlips:hasDFTCalculation entity:calc-dft-purjapun2020 ;
+    rdfs:comment "Ten disjoint validation sets of 495 supercells each from the same database; a separate test database T of 26,425 supercells (2,376,388 atoms)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-F-purjapun2020 mlips:samplingStrategy
+    entity:sampling-reused-purjapun2020 .
+
+entity:sampling-reused-purjapun2020 a mlips:SamplingStrategy ;
+    rdfs:label "Random selection of 3,164 supercells from the 36,490-supercell DFT database of the original PINN paper (static structures and DFT MD snapshots at different volumes and temperatures)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:PINN a mlips:MLIPMethod ;
+    rdfs:label "Physically informed neural network (PINN) potential" ;
+    mlips:hasFunctionalForm entity:ff-PINN ;
+    mlips:hasLossFunction entity:loss-PINN-purjapun2020 ;
+    mlips:hasTrainingAlgorithm entity:alg-PINN-purjapun2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-nn-architecture-purjapun2020 ,
+        entity:hp-num-parameters-purjapun2020 ;
+    mlips:hasImplementation entity:impl-PINN-purjapun2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:MonteCarlo ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms" .
+
+entity:ff-PINN a mlips:FunctionalForm ;
+    rdfs:label "Analytical bond-order potential whose parameters are predicted, atom by atom, by a neural network from local structural parameters of the atomic environment; the energy is evaluated with the bond-order formula using the predicted parameters" .
+
+entity:loss-PINN-purjapun2020 a mlips:LossFunction ;
+    rdfs:label "Fit to DFT energies only, with regularisation parameters tau_1 = 1e-4, tau_2 = 0 and tau_3 = 0.02" .
+
+entity:alg-PINN-purjapun2020 a mls:Algorithm ;
+    rdfs:label "Optimiser restarted about 10 times from random weights in [-0.1, 0.1]; more than 4,000 iterations for a complete optimisation; final potential chosen by predicted physical properties" .
+
+entity:impl-PINN-purjapun2020 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-In-house-PINN-training-code-C-C-MPI-MD-with-the-PGMC-code-purjapun2020 .
+
+entity:lib-In-house-PINN-training-code-C-C-MPI-MD-with-the-PGMC-code-purjapun2020 a mlips:Library ;
+    rdfs:label "In-house PINN training code (C/C++, MPI); MD with the PGMC code" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-nn-architecture-purjapun2020 a mlips:Hyperparameter ;
+    rdfs:label "Network architecture (inputs x hidden x hidden x outputs)" ;
+    mlips:hyperparameterName "nn_architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-purjapun2020 a mlips:Hyperparameter ;
+    rdfs:label "Number of fitting parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Al-cutoffRadius-purjapun2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Al-nn-architecture-purjapun2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-purjapun2020 ;
+    mlips:settingValue "40 x 16 x 16 x 8" .
+
+entity:setting-Al-num-parameters-purjapun2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-purjapun2020 ;
+    mlips:settingValue "1064"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Al-purjapun2020 a mlips:MLIPRun ;
+    rdfs:label "PINN potential training for aluminium (second generation)" ;
+    mlips:appliesMethod entity:PINN ;
+    mlips:runsOn entity:ds-F-purjapun2020 ;
+    mlips:hasHyperparameterSetting entity:setting-Al-cutoffRadius-purjapun2020 ,
+        entity:setting-Al-nn-architecture-purjapun2020 ,
+        entity:setting-Al-num-parameters-purjapun2020 ;
+    mlips:trainingHardware "400 CPU cores (20 nodes of 20 cores); about one hour per 200 optimisation iterations" ;
+    mlips:produces entity:model-Al-purjapun2020 .
+
+entity:model-Al-purjapun2020 a mlips:TrainedModel ;
+    rdfs:label "General-purpose PINN potential for Al" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-purjapun2020 mlips:hasResult
+    entity:result-train-purjapun2020 ,
+    entity:result-validation-purjapun2020 ,
+    entity:result-forces-purjapun2020 .
+
+entity:result-train-purjapun2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Al-purjapun2020 ;
+    mlips:targetMaterial entity:mat-Al-purjapun2020 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-purjapun2020 .
+
+entity:metric-train-1-purjapun2020 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, training database F" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-validation-purjapun2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Al-purjapun2020 ;
+    mlips:targetMaterial entity:mat-Al-purjapun2020 ;
+    mlips:hasAccuracyMetric entity:metric-validation-1-purjapun2020 .
+
+entity:metric-validation-1-purjapun2020 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, averaged over the 10 validation sets" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.94"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-forces-purjapun2020 a mlips:BenchmarkResult ;
+    rdfs:comment "Approximate value from the text; on which database the forces were compared is shown in a figure." ;
+    mlips:evaluatesModel entity:model-Al-purjapun2020 ;
+    mlips:targetMaterial entity:mat-Al-purjapun2020 ;
+    mlips:hasAccuracyMetric entity:metric-forces-1-purjapun2020 .
+
+entity:metric-forces-1-purjapun2020 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE against DFT forces (stated as 'about 0.1'; forces were not used in training)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.1"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The data set is the same DFT database as in purjapun2019 but each file declares its own data-set node (no shared data-set IRIs under the convention); the DFT settings recorded here are those this paper states for its own phonon calculations.
+# - The descriptor settings (five Legendre orders, eight Gaussian positions, width 1 A, 40 features) are described in the gaps only; the test-database error is given as a figure.
+# - Table I properties (lattice constant, elastic constants, defect, surface and stacking-fault energies), melting point, interface tensions, liquid structure and the grain-boundary crack simulation are not encoded. MD timings (for example 40 ps of 10,976 atoms in about 24 h on 28 cores) are not encoded.
+# - Read from the arXiv v3 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
