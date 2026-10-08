@@ -1,0 +1,190 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ming‐Yu Guo et al. (2026). In Situ Emulsion Crystallization Combined With Deep Potential Molecular Dynamics: Desensitization of Energetic Perovskite DAP‐4.
+#   Small Methods. doi:10.1002/smtd.70683
+#
+# Version read: publisher (sha256 8aa27340da2e3cc0...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 40 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: an experimental paper with one Deep Potential model for
+# the DAP-4 (100) surface with and without a stearic-acid (SA) coating,
+# built by DP-GEN active learning and used for equilibrium and sliding
+# (friction) molecular dynamics. The model development is described in
+# one section; errors are in the Supporting Information.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-guo2026dap4 a mlips:BenchmarkStudy ;
+    rdfs:label "Guo et al. (2026): in situ emulsion crystallization combined with Deep Potential MD for desensitizing the energetic perovskite DAP-4" ;
+    mlips:reportedIn entity:article-guo2026dap4 .
+
+entity:article-guo2026dap4 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1002/smtd.70683> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "In Situ Emulsion Crystallization Combined With Deep Potential Molecular Dynamics: Desensitization of Energetic Perovskite DAP‐4" ;
+    schema:author entity:person-Guo-guo2026dap4 ,
+        entity:person-Yu-guo2026dap4 ,
+        entity:person-Yan-guo2026dap4 ,
+        entity:person-Shang-guo2026dap4 ,
+        entity:person-Zhang-guo2026dap4 .
+
+entity:person-Guo-guo2026dap4 a schema:Person ;
+    schema:name "Ming‐Yu Guo" ;
+    schema:givenName "Ming‐Yu" ;
+    schema:familyName "Guo" .
+
+entity:person-Yu-guo2026dap4 a schema:Person ;
+    schema:name "Chen‐Xi Yu" ;
+    schema:givenName "Chen‐Xi" ;
+    schema:familyName "Yu" .
+
+entity:person-Yan-guo2026dap4 a schema:Person ;
+    schema:name "Yun‐Fan Yan" ;
+    schema:givenName "Yun‐Fan" ;
+    schema:familyName "Yan" .
+
+entity:person-Shang-guo2026dap4 a schema:Person ;
+    schema:name "Yu Shang" ;
+    schema:givenName "Yu" ;
+    schema:familyName "Shang" .
+
+entity:person-Zhang-guo2026dap4 a schema:Person ;
+    schema:name "Wei‐Xiong Zhang" ;
+    schema:givenName "Wei‐Xiong" ;
+    schema:familyName "Zhang" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-DAP4-SA-guo2026dap4 a mlips:MaterialSystem ;
+    rdfs:label "DAP-4 energetic perovskite (100) layer and slabs with and without a stearic acid coating" ;
+    mlips:materialClass "Molecular perovskite energetic material; surface slabs and organic coating" ;
+    mlips:microstructuralFeature "DAP-4 (100) surface / stearic acid interface" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-guo2026dap4 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-guo2026dap4 mlips:hasDFTSettings entity:calc-settings-dft-guo2026dap4 .
+
+entity:calc-settings-dft-guo2026dap4 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-guo2026dap4 ;
+    mlips:xcFunctional entity:xc-PBE-D3-guo2026dap4 ;
+    mlips:dftBasisSet entity:basis-MOLOPT-DZVP-SR-guo2026dap4 .
+
+entity:lib-CP2K-guo2026dap4 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    rdfs:comment "CP2K 2023." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-PBE-D3-guo2026dap4 a mlips:XCFunctional ;
+    rdfs:label "PBE-D3" ;
+    rdfs:comment "PBE with D3 dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-MOLOPT-DZVP-SR-guo2026dap4 a mlips:DftBasisSet ;
+    rdfs:label "MOLOPT-DZVP-SR" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-DAP4-SA-guo2026dap4 a mlips:TrainingDataset ;
+    rdfs:label "DAP-4 / stearic acid Deep Potential data set (6649 frames)" ;
+    mlips:coversMaterial entity:mat-DAP4-SA-guo2026dap4 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 6649 ;
+    mlips:hasDFTCalculation entity:calc-dft-guo2026dap4 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-DAP4-SA-guo2026dap4 mlips:samplingStrategy
+    entity:sampling-initial-md-guo2026dap4 ,
+    entity:sampling-dpgen-guo2026dap4 .
+
+entity:sampling-initial-md-guo2026dap4 a mlips:SamplingStrategy ;
+    rdfs:label "Initial short MD trajectory labelled with DFT" ;
+    rdfs:comment "Started from structures of the DAP-4 (100) layer and of slabs with and without surface stearic acid; an independent MD trajectory with a different random seed gives the test set." .
+
+entity:sampling-dpgen-guo2026dap4 a mlips:SamplingStrategy ;
+    rdfs:label "DP-GEN active learning with four models" ;
+    rdfs:comment "Four DP models per iteration with different random seeds; MD with the first model in LAMMPS; frames with relative force model deviation between 0.5 and 1.0 are candidates (below 0.5 accurate, above 1.0 failed); up to 250 candidates per iteration are labelled at the same DFT level and added." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasImplementation entity:impl-DeePMD-guo2026dap4 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-DeePMD-guo2026dap4 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "v2.2.9" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-DAP4-SA-guo2026dap4 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training for DAP-4 with and without stearic acid coating (final DP-GEN model)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-DAP4-SA-guo2026dap4 ;
+    mlips:produces entity:model-dp-DAP4-SA-guo2026dap4 .
+
+entity:model-dp-DAP4-SA-guo2026dap4 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for DAP-4 / stearic acid interfaces" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Accuracy is stated only qualitatively: 'more than 90% accuracy on hold-out frames' and test RMSEs 'corresponding to 20% of standard deviations' (details in Figure S4 of the Supporting Information, not part of the PDF read). No AccuracyMetric is encoded.
+# - Descriptor type, cutoff, network sizes, loss prefactors and training steps are not given in the main text.
+# - The paper is mainly experimental (emulsion crystallization, sensitivity tests); the MD results (interfacial species distributions under sliding, oscillation analysis) have no place in the protocol.
+# - The manifest classes this paper as 'Method/model'; it is an application of an existing method.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
