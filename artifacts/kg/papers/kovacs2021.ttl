@@ -1,0 +1,2209 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Dávid Péter Kovács et al. (2021). Linear Atomic Cluster Expansion Force Fields for Organic Molecules: Beyond RMSE.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.1c00647
+#
+# Version read: publisher (sha256 e200a91a0885c4fc...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 35 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the models the authors trained themselves and compare:
+# linear ACE, sGDML, GAP and ANI (the last initialised from ANI-2x) on the
+# ten rMD17 molecules with 1000 training configurations (Table 2) and on
+# the 3BPA data set introduced here, fitted at 300 K and at mixed
+# temperatures and tested at 300, 600 and 1200 K (Table 6), plus the
+# pretrained ANI-2x on the 3BPA test sets. Literature columns and the
+# classical force field are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kovacs2021 a mlips:BenchmarkStudy ;
+    rdfs:label "Kovacs et al. (2021): linear atomic cluster expansion force fields for organic molecules, beyond RMSE" ;
+    mlips:reportedIn entity:article-kovacs2021 .
+
+entity:article-kovacs2021 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.1c00647> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "Linear Atomic Cluster Expansion Force Fields for Organic Molecules: Beyond RMSE" ;
+    schema:author <https://orcid.org/0000-0002-0854-2635> ,
+        entity:person-Oord-kovacs2021 ,
+        entity:person-Kucera-kovacs2021 ,
+        <https://orcid.org/0000-0002-8727-8333> ,
+        entity:person-Cole-kovacs2021 ,
+        entity:person-Ortner-kovacs2021 ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0002-0854-2635> a schema:Person ;
+    schema:name "Dávid Péter Kovács" ;
+    schema:givenName "Dávid Péter" ;
+    schema:familyName "Kovács" ;
+    schema:identifier <https://orcid.org/0000-0002-0854-2635> .
+
+entity:person-Oord-kovacs2021 a schema:Person ;
+    schema:name "Cas van der Oord" ;
+    schema:givenName "Cas van der" ;
+    schema:familyName "Oord" .
+
+entity:person-Kucera-kovacs2021 a schema:Person ;
+    schema:name "Jiri Kucera" ;
+    schema:givenName "Jiri" ;
+    schema:familyName "Kucera" .
+
+<https://orcid.org/0000-0002-8727-8333> a schema:Person ;
+    schema:name "Alice E. A. Allen" ;
+    schema:givenName "Alice E. A." ;
+    schema:familyName "Allen" ;
+    schema:identifier <https://orcid.org/0000-0002-8727-8333> .
+
+entity:person-Cole-kovacs2021 a schema:Person ;
+    schema:name "Daniel J. Cole" ;
+    schema:givenName "Daniel J." ;
+    schema:familyName "Cole" .
+
+entity:person-Ortner-kovacs2021 a schema:Person ;
+    schema:name "Christoph Ortner" ;
+    schema:givenName "Christoph" ;
+    schema:familyName "Ortner" .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-3BPA-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA) molecule" ;
+    mlips:materialClass "Flexible drug-like organic molecule (gas phase) with three rotatable dihedral angles" .
+
+entity:mat-aspirin-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-azobenzene-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Azobenzene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-benzene-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-ethanol-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-naphthalene-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-paracetamol-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Paracetamol molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-salicylic-acid-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-uracil-kovacs2021 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-bpa-dft-kovacs2021 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-bpa-dft-kovacs2021 mlips:hasDFTSettings entity:calc-settings-bpa-dft-kovacs2021 .
+
+entity:calc-settings-bpa-dft-kovacs2021 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional mlips:omegaB97X ;
+    mlips:dftBasisSet entity:basis-6-31G-d-kovacs2021 ;
+    rdfs:comment "omegaB97X/6-31G(d) with ORCA, settings similar to those of the ANI-1x data set." .
+
+entity:basis-6-31G-d-kovacs2021 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(d)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-3BPA-300K-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set: 500 configurations from the 300 K set" ;
+    mlips:coversMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 500 ;
+    mlips:hasDFTCalculation entity:calc-bpa-dft-kovacs2021 .
+
+entity:ds-3BPA-mixedT-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "3BPA 'mixed-T' training set: 133 configurations from each of the 300, 600 and 1200 K trajectories" ;
+    mlips:coversMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 399 ;
+    mlips:hasDFTCalculation entity:calc-bpa-dft-kovacs2021 ;
+    rdfs:comment "numConfigurations is 3 x 133, as described." .
+
+entity:ds-rmd17-aspirin-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 aspirin: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-aspirin-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-azobenzene-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 azobenzene: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-azobenzene-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-benzene-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 benzene: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-benzene-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-ethanol-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 ethanol: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-ethanol-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-malonaldehyde-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 malonaldehyde: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-naphthalene-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 naphthalene: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-naphthalene-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-paracetamol-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 paracetamol: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-paracetamol-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-salicylic-acid-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 salicylic acid: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-toluene-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 toluene: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-toluene-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-rmd17-uracil-kovacs2021 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 uracil: 1000 training configurations" ;
+    mlips:coversMaterial entity:mat-uracil-kovacs2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-3BPA-300K-kovacs2021 mlips:samplingStrategy
+    entity:sampling-bpa-md-kovacs2021 .
+
+entity:ds-3BPA-mixedT-kovacs2021 mlips:samplingStrategy
+    entity:sampling-bpa-md-kovacs2021 .
+
+entity:ds-rmd17-aspirin-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-azobenzene-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-benzene-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-ethanol-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-malonaldehyde-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-naphthalene-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-paracetamol-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-salicylic-acid-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-toluene-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:ds-rmd17-uracil-kovacs2021 mlips:samplingStrategy
+    entity:sampling-rmd17-kovacs2021 .
+
+entity:sampling-rmd17-kovacs2021 a mlips:SamplingStrategy ;
+    rdfs:label "Revised MD17 train-test splits" ;
+    rdfs:comment "The five published rMD17 splits with 1000 training configurations; the underlying MD17 trajectories were sampled from DFT molecular dynamics at 500 K." .
+
+entity:sampling-bpa-md-kovacs2021 a mlips:SamplingStrategy ;
+    rdfs:label "Dihedral-grid start points and MD at 300, 600 and 1200 K (3BPA)" ;
+    rdfs:comment "Grid over the three dihedral angles, short 0.5 ps MD with ANI-1x from each grid point (7000 configurations), then 25 ps MD at 300, 600 and 1200 K (Langevin thermostat, 1 fs); 460 configurations sampled per trajectory after 2 ps, 2300 in total, re-evaluated with DFT." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:sGDML a mlips:MLIPMethod ;
+    rdfs:label "Symmetric Gradient-Domain Machine Learning (sGDML)" ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ACE-aspirin-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 aspirin" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-aspirin-kovacs2021 ;
+    mlips:produces entity:model-ACE-aspirin-kovacs2021 .
+
+entity:model-ACE-aspirin-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for aspirin (rMD17, 1000 configurations)" .
+
+entity:run-ACE-azobenzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 azobenzene" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-azobenzene-kovacs2021 ;
+    mlips:produces entity:model-ACE-azobenzene-kovacs2021 .
+
+entity:model-ACE-azobenzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for azobenzene (rMD17, 1000 configurations)" .
+
+entity:run-ACE-benzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 benzene" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-benzene-kovacs2021 ;
+    mlips:produces entity:model-ACE-benzene-kovacs2021 .
+
+entity:model-ACE-benzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for benzene (rMD17, 1000 configurations)" .
+
+entity:run-ACE-ethanol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 ethanol" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-ethanol-kovacs2021 ;
+    mlips:produces entity:model-ACE-ethanol-kovacs2021 .
+
+entity:model-ACE-ethanol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for ethanol (rMD17, 1000 configurations)" .
+
+entity:run-ACE-malonaldehyde-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 malonaldehyde" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-malonaldehyde-kovacs2021 ;
+    mlips:produces entity:model-ACE-malonaldehyde-kovacs2021 .
+
+entity:model-ACE-malonaldehyde-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for malonaldehyde (rMD17, 1000 configurations)" .
+
+entity:run-ACE-naphthalene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 naphthalene" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-naphthalene-kovacs2021 ;
+    mlips:produces entity:model-ACE-naphthalene-kovacs2021 .
+
+entity:model-ACE-naphthalene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for naphthalene (rMD17, 1000 configurations)" .
+
+entity:run-ACE-paracetamol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 paracetamol" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-paracetamol-kovacs2021 ;
+    mlips:produces entity:model-ACE-paracetamol-kovacs2021 .
+
+entity:model-ACE-paracetamol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for paracetamol (rMD17, 1000 configurations)" .
+
+entity:run-ACE-salicylic-acid-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 salicylic acid" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-salicylic-acid-kovacs2021 ;
+    mlips:produces entity:model-ACE-salicylic-acid-kovacs2021 .
+
+entity:model-ACE-salicylic-acid-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for salicylic acid (rMD17, 1000 configurations)" .
+
+entity:run-ACE-toluene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 toluene" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-toluene-kovacs2021 ;
+    mlips:produces entity:model-ACE-toluene-kovacs2021 .
+
+entity:model-ACE-toluene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for toluene (rMD17, 1000 configurations)" .
+
+entity:run-ACE-uracil-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to rMD17 uracil" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-rmd17-uracil-kovacs2021 ;
+    mlips:produces entity:model-ACE-uracil-kovacs2021 .
+
+entity:model-ACE-uracil-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for uracil (rMD17, 1000 configurations)" .
+
+entity:run-ACE-3BPA-300K-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to the 3BPA 300 K training set" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-3BPA-300K-kovacs2021 ;
+    mlips:produces entity:model-ACE-3BPA-300K-kovacs2021 .
+
+entity:model-ACE-3BPA-300K-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for 3BPA (300 K fit)" .
+
+entity:run-ACE-3BPA-mixedT-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fit to the 3BPA mixed-T training set" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-3BPA-mixedT-kovacs2021 ;
+    mlips:produces entity:model-ACE-3BPA-mixedT-kovacs2021 .
+
+entity:model-ACE-3BPA-mixedT-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "linear ACE model for 3BPA (mixed-T fit)" .
+
+entity:run-sGDML-aspirin-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 aspirin" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-aspirin-kovacs2021 ;
+    mlips:produces entity:model-sGDML-aspirin-kovacs2021 .
+
+entity:model-sGDML-aspirin-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for aspirin (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-azobenzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 azobenzene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-azobenzene-kovacs2021 ;
+    mlips:produces entity:model-sGDML-azobenzene-kovacs2021 .
+
+entity:model-sGDML-azobenzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for azobenzene (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-benzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 benzene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-benzene-kovacs2021 ;
+    mlips:produces entity:model-sGDML-benzene-kovacs2021 .
+
+entity:model-sGDML-benzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for benzene (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-ethanol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 ethanol" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-ethanol-kovacs2021 ;
+    mlips:produces entity:model-sGDML-ethanol-kovacs2021 .
+
+entity:model-sGDML-ethanol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for ethanol (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-malonaldehyde-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 malonaldehyde" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-malonaldehyde-kovacs2021 ;
+    mlips:produces entity:model-sGDML-malonaldehyde-kovacs2021 .
+
+entity:model-sGDML-malonaldehyde-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for malonaldehyde (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-naphthalene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 naphthalene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-naphthalene-kovacs2021 ;
+    mlips:produces entity:model-sGDML-naphthalene-kovacs2021 .
+
+entity:model-sGDML-naphthalene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for naphthalene (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-paracetamol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 paracetamol" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-paracetamol-kovacs2021 ;
+    mlips:produces entity:model-sGDML-paracetamol-kovacs2021 .
+
+entity:model-sGDML-paracetamol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for paracetamol (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-salicylic-acid-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 salicylic acid" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-salicylic-acid-kovacs2021 ;
+    mlips:produces entity:model-sGDML-salicylic-acid-kovacs2021 .
+
+entity:model-sGDML-salicylic-acid-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for salicylic acid (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-toluene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 toluene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-toluene-kovacs2021 ;
+    mlips:produces entity:model-sGDML-toluene-kovacs2021 .
+
+entity:model-sGDML-toluene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for toluene (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-uracil-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to rMD17 uracil" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-rmd17-uracil-kovacs2021 ;
+    mlips:produces entity:model-sGDML-uracil-kovacs2021 .
+
+entity:model-sGDML-uracil-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for uracil (rMD17, 1000 configurations)" .
+
+entity:run-sGDML-3BPA-300K-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to the 3BPA 300 K training set" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-3BPA-300K-kovacs2021 ;
+    mlips:produces entity:model-sGDML-3BPA-300K-kovacs2021 .
+
+entity:model-sGDML-3BPA-300K-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for 3BPA (300 K fit)" .
+
+entity:run-sGDML-3BPA-mixedT-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "sGDML fit to the 3BPA mixed-T training set" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-3BPA-mixedT-kovacs2021 ;
+    mlips:produces entity:model-sGDML-3BPA-mixedT-kovacs2021 .
+
+entity:model-sGDML-3BPA-mixedT-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "sGDML model for 3BPA (mixed-T fit)" .
+
+entity:run-GAP-aspirin-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 aspirin" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-aspirin-kovacs2021 ;
+    mlips:produces entity:model-GAP-aspirin-kovacs2021 .
+
+entity:model-GAP-aspirin-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for aspirin (rMD17, 1000 configurations)" .
+
+entity:run-GAP-azobenzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 azobenzene" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-azobenzene-kovacs2021 ;
+    mlips:produces entity:model-GAP-azobenzene-kovacs2021 .
+
+entity:model-GAP-azobenzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for azobenzene (rMD17, 1000 configurations)" .
+
+entity:run-GAP-benzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 benzene" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-benzene-kovacs2021 ;
+    mlips:produces entity:model-GAP-benzene-kovacs2021 .
+
+entity:model-GAP-benzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for benzene (rMD17, 1000 configurations)" .
+
+entity:run-GAP-ethanol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 ethanol" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-ethanol-kovacs2021 ;
+    mlips:produces entity:model-GAP-ethanol-kovacs2021 .
+
+entity:model-GAP-ethanol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for ethanol (rMD17, 1000 configurations)" .
+
+entity:run-GAP-malonaldehyde-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 malonaldehyde" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-malonaldehyde-kovacs2021 ;
+    mlips:produces entity:model-GAP-malonaldehyde-kovacs2021 .
+
+entity:model-GAP-malonaldehyde-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for malonaldehyde (rMD17, 1000 configurations)" .
+
+entity:run-GAP-naphthalene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 naphthalene" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-naphthalene-kovacs2021 ;
+    mlips:produces entity:model-GAP-naphthalene-kovacs2021 .
+
+entity:model-GAP-naphthalene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for naphthalene (rMD17, 1000 configurations)" .
+
+entity:run-GAP-paracetamol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 paracetamol" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-paracetamol-kovacs2021 ;
+    mlips:produces entity:model-GAP-paracetamol-kovacs2021 .
+
+entity:model-GAP-paracetamol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for paracetamol (rMD17, 1000 configurations)" .
+
+entity:run-GAP-salicylic-acid-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 salicylic acid" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-salicylic-acid-kovacs2021 ;
+    mlips:produces entity:model-GAP-salicylic-acid-kovacs2021 .
+
+entity:model-GAP-salicylic-acid-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for salicylic acid (rMD17, 1000 configurations)" .
+
+entity:run-GAP-toluene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 toluene" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-toluene-kovacs2021 ;
+    mlips:produces entity:model-GAP-toluene-kovacs2021 .
+
+entity:model-GAP-toluene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for toluene (rMD17, 1000 configurations)" .
+
+entity:run-GAP-uracil-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to rMD17 uracil" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-rmd17-uracil-kovacs2021 ;
+    mlips:produces entity:model-GAP-uracil-kovacs2021 .
+
+entity:model-GAP-uracil-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for uracil (rMD17, 1000 configurations)" .
+
+entity:run-GAP-3BPA-300K-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to the 3BPA 300 K training set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-3BPA-300K-kovacs2021 ;
+    mlips:produces entity:model-GAP-3BPA-300K-kovacs2021 .
+
+entity:model-GAP-3BPA-300K-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for 3BPA (300 K fit)" .
+
+entity:run-GAP-3BPA-mixedT-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "GAP fit to the 3BPA mixed-T training set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-3BPA-mixedT-kovacs2021 ;
+    mlips:produces entity:model-GAP-3BPA-mixedT-kovacs2021 .
+
+entity:model-GAP-3BPA-mixedT-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "GAP model for 3BPA (mixed-T fit)" .
+
+entity:run-ANI-aspirin-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 aspirin (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-aspirin-kovacs2021 ;
+    mlips:produces entity:model-ANI-aspirin-kovacs2021 .
+
+entity:model-ANI-aspirin-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for aspirin (rMD17, 1000 configurations)" .
+
+entity:run-ANI-azobenzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 azobenzene (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-azobenzene-kovacs2021 ;
+    mlips:produces entity:model-ANI-azobenzene-kovacs2021 .
+
+entity:model-ANI-azobenzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for azobenzene (rMD17, 1000 configurations)" .
+
+entity:run-ANI-benzene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 benzene (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-benzene-kovacs2021 ;
+    mlips:produces entity:model-ANI-benzene-kovacs2021 .
+
+entity:model-ANI-benzene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for benzene (rMD17, 1000 configurations)" .
+
+entity:run-ANI-ethanol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 ethanol (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-ethanol-kovacs2021 ;
+    mlips:produces entity:model-ANI-ethanol-kovacs2021 .
+
+entity:model-ANI-ethanol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for ethanol (rMD17, 1000 configurations)" .
+
+entity:run-ANI-malonaldehyde-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 malonaldehyde (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-malonaldehyde-kovacs2021 ;
+    mlips:produces entity:model-ANI-malonaldehyde-kovacs2021 .
+
+entity:model-ANI-malonaldehyde-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for malonaldehyde (rMD17, 1000 configurations)" .
+
+entity:run-ANI-naphthalene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 naphthalene (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-naphthalene-kovacs2021 ;
+    mlips:produces entity:model-ANI-naphthalene-kovacs2021 .
+
+entity:model-ANI-naphthalene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for naphthalene (rMD17, 1000 configurations)" .
+
+entity:run-ANI-paracetamol-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 paracetamol (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-paracetamol-kovacs2021 ;
+    mlips:produces entity:model-ANI-paracetamol-kovacs2021 .
+
+entity:model-ANI-paracetamol-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for paracetamol (rMD17, 1000 configurations)" .
+
+entity:run-ANI-salicylic-acid-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 salicylic acid (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-salicylic-acid-kovacs2021 ;
+    mlips:produces entity:model-ANI-salicylic-acid-kovacs2021 .
+
+entity:model-ANI-salicylic-acid-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for salicylic acid (rMD17, 1000 configurations)" .
+
+entity:run-ANI-toluene-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 toluene (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-toluene-kovacs2021 ;
+    mlips:produces entity:model-ANI-toluene-kovacs2021 .
+
+entity:model-ANI-toluene-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for toluene (rMD17, 1000 configurations)" .
+
+entity:run-ANI-uracil-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to rMD17 uracil (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-rmd17-uracil-kovacs2021 ;
+    mlips:produces entity:model-ANI-uracil-kovacs2021 .
+
+entity:model-ANI-uracil-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for uracil (rMD17, 1000 configurations)" .
+
+entity:run-ANI-3BPA-300K-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to the 3BPA 300 K training set (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-3BPA-300K-kovacs2021 ;
+    mlips:produces entity:model-ANI-3BPA-300K-kovacs2021 .
+
+entity:model-ANI-3BPA-300K-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for 3BPA (300 K fit)" .
+
+entity:run-ANI-3BPA-mixedT-kovacs2021 a mlips:MLIPRun ;
+    rdfs:label "ANI fit to the 3BPA mixed-T training set (weights initialised from ANI-2x)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-3BPA-mixedT-kovacs2021 ;
+    mlips:produces entity:model-ANI-3BPA-mixedT-kovacs2021 .
+
+entity:model-ANI-3BPA-mixedT-kovacs2021 a mlips:TrainedModel ;
+    rdfs:label "ANI model for 3BPA (mixed-T fit)" .
+
+# Registry stub for the externally trained model ANI-2x (not trained in this paper).
+entity:run-ANI-2x a mlips:MLIPRun ;
+    rdfs:label "Training run of ANI-2x general-purpose neural network potential (external; registry stub)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:produces entity:model-ANI-2x .
+
+entity:model-ANI-2x a mlips:TrainedModel ;
+    rdfs:label "ANI-2x general-purpose neural network potential" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kovacs2021 mlips:hasResult
+    entity:result-ACE-aspirin-kovacs2021 ,
+    entity:result-ACE-azobenzene-kovacs2021 ,
+    entity:result-ACE-benzene-kovacs2021 ,
+    entity:result-ACE-ethanol-kovacs2021 ,
+    entity:result-ACE-malonaldehyde-kovacs2021 ,
+    entity:result-ACE-naphthalene-kovacs2021 ,
+    entity:result-ACE-paracetamol-kovacs2021 ,
+    entity:result-ACE-salicylic-acid-kovacs2021 ,
+    entity:result-ACE-toluene-kovacs2021 ,
+    entity:result-ACE-uracil-kovacs2021 ,
+    entity:result-ACE-3BPA-300K-300K-kovacs2021 ,
+    entity:result-ACE-3BPA-300K-600K-kovacs2021 ,
+    entity:result-ACE-3BPA-300K-1200K-kovacs2021 ,
+    entity:result-ACE-3BPA-mixedT-300K-kovacs2021 ,
+    entity:result-ACE-3BPA-mixedT-600K-kovacs2021 ,
+    entity:result-ACE-3BPA-mixedT-1200K-kovacs2021 ,
+    entity:result-sGDML-aspirin-kovacs2021 ,
+    entity:result-sGDML-azobenzene-kovacs2021 ,
+    entity:result-sGDML-benzene-kovacs2021 ,
+    entity:result-sGDML-ethanol-kovacs2021 ,
+    entity:result-sGDML-malonaldehyde-kovacs2021 ,
+    entity:result-sGDML-naphthalene-kovacs2021 ,
+    entity:result-sGDML-paracetamol-kovacs2021 ,
+    entity:result-sGDML-salicylic-acid-kovacs2021 ,
+    entity:result-sGDML-toluene-kovacs2021 ,
+    entity:result-sGDML-uracil-kovacs2021 ,
+    entity:result-sGDML-3BPA-300K-300K-kovacs2021 ,
+    entity:result-sGDML-3BPA-300K-600K-kovacs2021 ,
+    entity:result-sGDML-3BPA-300K-1200K-kovacs2021 ,
+    entity:result-sGDML-3BPA-mixedT-300K-kovacs2021 ,
+    entity:result-sGDML-3BPA-mixedT-600K-kovacs2021 ,
+    entity:result-sGDML-3BPA-mixedT-1200K-kovacs2021 ,
+    entity:result-GAP-aspirin-kovacs2021 ,
+    entity:result-GAP-azobenzene-kovacs2021 ,
+    entity:result-GAP-benzene-kovacs2021 ,
+    entity:result-GAP-ethanol-kovacs2021 ,
+    entity:result-GAP-malonaldehyde-kovacs2021 ,
+    entity:result-GAP-naphthalene-kovacs2021 ,
+    entity:result-GAP-paracetamol-kovacs2021 ,
+    entity:result-GAP-salicylic-acid-kovacs2021 ,
+    entity:result-GAP-toluene-kovacs2021 ,
+    entity:result-GAP-uracil-kovacs2021 ,
+    entity:result-GAP-3BPA-300K-300K-kovacs2021 ,
+    entity:result-GAP-3BPA-300K-600K-kovacs2021 ,
+    entity:result-GAP-3BPA-300K-1200K-kovacs2021 ,
+    entity:result-GAP-3BPA-mixedT-300K-kovacs2021 ,
+    entity:result-GAP-3BPA-mixedT-600K-kovacs2021 ,
+    entity:result-GAP-3BPA-mixedT-1200K-kovacs2021 ,
+    entity:result-ANI-aspirin-kovacs2021 ,
+    entity:result-ANI-azobenzene-kovacs2021 ,
+    entity:result-ANI-benzene-kovacs2021 ,
+    entity:result-ANI-ethanol-kovacs2021 ,
+    entity:result-ANI-malonaldehyde-kovacs2021 ,
+    entity:result-ANI-naphthalene-kovacs2021 ,
+    entity:result-ANI-paracetamol-kovacs2021 ,
+    entity:result-ANI-salicylic-acid-kovacs2021 ,
+    entity:result-ANI-toluene-kovacs2021 ,
+    entity:result-ANI-uracil-kovacs2021 ,
+    entity:result-ANI-3BPA-300K-300K-kovacs2021 ,
+    entity:result-ANI-3BPA-300K-600K-kovacs2021 ,
+    entity:result-ANI-3BPA-300K-1200K-kovacs2021 ,
+    entity:result-ANI-3BPA-mixedT-300K-kovacs2021 ,
+    entity:result-ANI-3BPA-mixedT-600K-kovacs2021 ,
+    entity:result-ANI-3BPA-mixedT-1200K-kovacs2021 ,
+    entity:result-ANI-2x-3BPA-300K-kovacs2021 ,
+    entity:result-ANI-2x-3BPA-600K-kovacs2021 ,
+    entity:result-ANI-2x-3BPA-1200K-kovacs2021 .
+
+entity:result-ACE-aspirin-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-aspirin-kovacs2021 ;
+    mlips:targetMaterial entity:mat-aspirin-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-aspirin-1-kovacs2021 ,
+        entity:metric-ACE-aspirin-2-kovacs2021 .
+
+entity:metric-ACE-aspirin-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-aspirin-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-azobenzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-azobenzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-azobenzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-azobenzene-1-kovacs2021 ,
+        entity:metric-ACE-azobenzene-2-kovacs2021 .
+
+entity:metric-ACE-azobenzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-azobenzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-benzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-benzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-benzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-benzene-1-kovacs2021 ,
+        entity:metric-ACE-benzene-2-kovacs2021 .
+
+entity:metric-ACE-benzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.04"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-benzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-ethanol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-ethanol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-ethanol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-ethanol-1-kovacs2021 ,
+        entity:metric-ACE-ethanol-2-kovacs2021 .
+
+entity:metric-ACE-ethanol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-ethanol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-malonaldehyde-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-malonaldehyde-kovacs2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-malonaldehyde-1-kovacs2021 ,
+        entity:metric-ACE-malonaldehyde-2-kovacs2021 .
+
+entity:metric-ACE-malonaldehyde-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-malonaldehyde-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-naphthalene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-naphthalene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-naphthalene-1-kovacs2021 ,
+        entity:metric-ACE-naphthalene-2-kovacs2021 .
+
+entity:metric-ACE-naphthalene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-naphthalene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-paracetamol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-paracetamol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-paracetamol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-paracetamol-1-kovacs2021 ,
+        entity:metric-ACE-paracetamol-2-kovacs2021 .
+
+entity:metric-ACE-paracetamol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-paracetamol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-salicylic-acid-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-salicylic-acid-kovacs2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-salicylic-acid-1-kovacs2021 ,
+        entity:metric-ACE-salicylic-acid-2-kovacs2021 .
+
+entity:metric-ACE-salicylic-acid-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-salicylic-acid-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-toluene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-toluene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-toluene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-toluene-1-kovacs2021 ,
+        entity:metric-ACE-toluene-2-kovacs2021 .
+
+entity:metric-ACE-toluene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-toluene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-uracil-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-uracil-kovacs2021 ;
+    mlips:targetMaterial entity:mat-uracil-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-uracil-1-kovacs2021 ,
+        entity:metric-ACE-uracil-2-kovacs2021 .
+
+entity:metric-ACE-uracil-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: linear ACE, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-uracil-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: linear ACE, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-300K-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-300K-300K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-300K-300K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-300K-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-300K-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "27.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-300K-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-300K-600K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-300K-600K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-300K-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "24"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-300K-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "64.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-300K-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-300K-1200K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-300K-1200K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-300K-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "85.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-300K-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "187"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-mixedT-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-mixedT-300K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-mixedT-300K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-mixedT-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-mixedT-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-mixedT-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-mixedT-600K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-mixedT-600K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-mixedT-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "19.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-mixedT-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "54.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-3BPA-mixedT-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-3BPA-mixedT-1200K-1-kovacs2021 ,
+        entity:metric-ACE-3BPA-mixedT-1200K-2-kovacs2021 .
+
+entity:metric-ACE-3BPA-mixedT-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: linear ACE fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "47.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-3BPA-mixedT-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: linear ACE fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "118.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-aspirin-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-aspirin-kovacs2021 ;
+    mlips:targetMaterial entity:mat-aspirin-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-aspirin-1-kovacs2021 ,
+        entity:metric-sGDML-aspirin-2-kovacs2021 .
+
+entity:metric-sGDML-aspirin-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-aspirin-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-azobenzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-azobenzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-azobenzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-azobenzene-1-kovacs2021 ,
+        entity:metric-sGDML-azobenzene-2-kovacs2021 .
+
+entity:metric-sGDML-azobenzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-azobenzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "19.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-benzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-benzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-benzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-benzene-1-kovacs2021 ,
+        entity:metric-sGDML-benzene-2-kovacs2021 .
+
+entity:metric-sGDML-benzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.06"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-benzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-ethanol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-ethanol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-ethanol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-ethanol-1-kovacs2021 ,
+        entity:metric-sGDML-ethanol-2-kovacs2021 .
+
+entity:metric-sGDML-ethanol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-ethanol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-malonaldehyde-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-malonaldehyde-kovacs2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-malonaldehyde-1-kovacs2021 ,
+        entity:metric-sGDML-malonaldehyde-2-kovacs2021 .
+
+entity:metric-sGDML-malonaldehyde-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-malonaldehyde-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-naphthalene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-naphthalene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-naphthalene-1-kovacs2021 ,
+        entity:metric-sGDML-naphthalene-2-kovacs2021 .
+
+entity:metric-sGDML-naphthalene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-naphthalene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-paracetamol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-paracetamol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-paracetamol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-paracetamol-1-kovacs2021 ,
+        entity:metric-sGDML-paracetamol-2-kovacs2021 .
+
+entity:metric-sGDML-paracetamol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-paracetamol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-salicylic-acid-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-salicylic-acid-kovacs2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-salicylic-acid-1-kovacs2021 ,
+        entity:metric-sGDML-salicylic-acid-2-kovacs2021 .
+
+entity:metric-sGDML-salicylic-acid-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-salicylic-acid-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-toluene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-toluene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-toluene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-toluene-1-kovacs2021 ,
+        entity:metric-sGDML-toluene-2-kovacs2021 .
+
+entity:metric-sGDML-toluene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-toluene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-uracil-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-uracil-kovacs2021 ;
+    mlips:targetMaterial entity:mat-uracil-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-uracil-1-kovacs2021 ,
+        entity:metric-sGDML-uracil-2-kovacs2021 .
+
+entity:metric-sGDML-uracil-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: sGDML, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-uracil-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: sGDML, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-300K-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-300K-300K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-300K-300K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-300K-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-300K-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-300K-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-300K-600K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-300K-600K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-300K-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "484.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-300K-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "439.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-300K-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-300K-1200K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-300K-1200K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-300K-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "774.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-300K-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "711.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-mixedT-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-mixedT-300K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-mixedT-300K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-mixedT-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-mixedT-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "55.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-mixedT-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-mixedT-600K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-mixedT-600K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-mixedT-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "25.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-mixedT-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "94.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sGDML-3BPA-mixedT-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sGDML-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-sGDML-3BPA-mixedT-1200K-1-kovacs2021 ,
+        entity:metric-sGDML-3BPA-mixedT-1200K-2-kovacs2021 .
+
+entity:metric-sGDML-3BPA-mixedT-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: sGDML fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "78.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-sGDML-3BPA-mixedT-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: sGDML fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "177.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-aspirin-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-aspirin-kovacs2021 ;
+    mlips:targetMaterial entity:mat-aspirin-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-aspirin-1-kovacs2021 ,
+        entity:metric-GAP-aspirin-2-kovacs2021 .
+
+entity:metric-GAP-aspirin-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-aspirin-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "44.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-azobenzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-azobenzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-azobenzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-azobenzene-1-kovacs2021 ,
+        entity:metric-GAP-azobenzene-2-kovacs2021 .
+
+entity:metric-GAP-azobenzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-azobenzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-benzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-benzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-benzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-benzene-1-kovacs2021 ,
+        entity:metric-GAP-benzene-2-kovacs2021 .
+
+entity:metric-GAP-benzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-benzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-ethanol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-ethanol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-ethanol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-ethanol-1-kovacs2021 ,
+        entity:metric-GAP-ethanol-2-kovacs2021 .
+
+entity:metric-GAP-ethanol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-ethanol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-malonaldehyde-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-malonaldehyde-kovacs2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-malonaldehyde-1-kovacs2021 ,
+        entity:metric-GAP-malonaldehyde-2-kovacs2021 .
+
+entity:metric-GAP-malonaldehyde-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-malonaldehyde-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-naphthalene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-naphthalene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-naphthalene-1-kovacs2021 ,
+        entity:metric-GAP-naphthalene-2-kovacs2021 .
+
+entity:metric-GAP-naphthalene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-naphthalene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-paracetamol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-paracetamol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-paracetamol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-paracetamol-1-kovacs2021 ,
+        entity:metric-GAP-paracetamol-2-kovacs2021 .
+
+entity:metric-GAP-paracetamol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-paracetamol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "28.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-salicylic-acid-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-salicylic-acid-kovacs2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-salicylic-acid-1-kovacs2021 ,
+        entity:metric-GAP-salicylic-acid-2-kovacs2021 .
+
+entity:metric-GAP-salicylic-acid-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-salicylic-acid-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-toluene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-toluene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-toluene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-toluene-1-kovacs2021 ,
+        entity:metric-GAP-toluene-2-kovacs2021 .
+
+entity:metric-GAP-toluene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-toluene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-uracil-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-uracil-kovacs2021 ;
+    mlips:targetMaterial entity:mat-uracil-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-uracil-1-kovacs2021 ,
+        entity:metric-GAP-uracil-2-kovacs2021 .
+
+entity:metric-GAP-uracil-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GAP, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-uracil-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GAP, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-300K-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-300K-300K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-300K-300K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-300K-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "22.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-300K-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "87.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-300K-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-300K-600K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-300K-600K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-300K-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "61.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-300K-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "151.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-300K-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-300K-1200K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-300K-1200K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-300K-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "166.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-300K-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "305.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-mixedT-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-mixedT-300K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-mixedT-300K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-mixedT-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-mixedT-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "85.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-mixedT-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-mixedT-600K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-mixedT-600K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-mixedT-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "50.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-mixedT-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "123.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GAP-3BPA-mixedT-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GAP-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-GAP-3BPA-mixedT-1200K-1-kovacs2021 ,
+        entity:metric-GAP-3BPA-mixedT-1200K-2-kovacs2021 .
+
+entity:metric-GAP-3BPA-mixedT-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: GAP fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "103"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GAP-3BPA-mixedT-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: GAP fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "217.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-aspirin-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-aspirin-kovacs2021 ;
+    mlips:targetMaterial entity:mat-aspirin-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-aspirin-1-kovacs2021 ,
+        entity:metric-ANI-aspirin-2-kovacs2021 .
+
+entity:metric-ANI-aspirin-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-aspirin-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 aspirin, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "40.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-azobenzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-azobenzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-azobenzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-azobenzene-1-kovacs2021 ,
+        entity:metric-ANI-azobenzene-2-kovacs2021 .
+
+entity:metric-ANI-azobenzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "15.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-azobenzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 azobenzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "35.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-benzene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-benzene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-benzene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-benzene-1-kovacs2021 ,
+        entity:metric-ANI-benzene-2-kovacs2021 .
+
+entity:metric-ANI-benzene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-benzene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 benzene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-ethanol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-ethanol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-ethanol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-ethanol-1-kovacs2021 ,
+        entity:metric-ANI-ethanol-2-kovacs2021 .
+
+entity:metric-ANI-ethanol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-ethanol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 ethanol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-malonaldehyde-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-malonaldehyde-kovacs2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-malonaldehyde-1-kovacs2021 ,
+        entity:metric-ANI-malonaldehyde-2-kovacs2021 .
+
+entity:metric-ANI-malonaldehyde-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-malonaldehyde-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 malonaldehyde, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-naphthalene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-naphthalene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-naphthalene-1-kovacs2021 ,
+        entity:metric-ANI-naphthalene-2-kovacs2021 .
+
+entity:metric-ANI-naphthalene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-naphthalene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 naphthalene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-paracetamol-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-paracetamol-kovacs2021 ;
+    mlips:targetMaterial entity:mat-paracetamol-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-paracetamol-1-kovacs2021 ,
+        entity:metric-ANI-paracetamol-2-kovacs2021 .
+
+entity:metric-ANI-paracetamol-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-paracetamol-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 paracetamol, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-salicylic-acid-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-salicylic-acid-kovacs2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-salicylic-acid-1-kovacs2021 ,
+        entity:metric-ANI-salicylic-acid-2-kovacs2021 .
+
+entity:metric-ANI-salicylic-acid-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-salicylic-acid-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 salicylic acid, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-toluene-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-toluene-kovacs2021 ;
+    mlips:targetMaterial entity:mat-toluene-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-toluene-1-kovacs2021 ,
+        entity:metric-ANI-toluene-2-kovacs2021 .
+
+entity:metric-ANI-toluene-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-toluene-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 toluene, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-uracil-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-uracil-kovacs2021 ;
+    mlips:targetMaterial entity:mat-uracil-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-uracil-1-kovacs2021 ,
+        entity:metric-ANI-uracil-2-kovacs2021 .
+
+entity:metric-ANI-uracil-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: ANI, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-uracil-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: ANI, rMD17 uracil, 1000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "21.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-300K-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-300K-300K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-300K-300K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-300K-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-300K-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to 300 K data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "42.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-300K-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-300K-600K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-300K-600K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-300K-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "37.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-300K-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to 300 K data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "71.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-300K-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-300K-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-300K-1200K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-300K-1200K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-300K-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "76.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-300K-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to 300 K data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "129.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-mixedT-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-mixedT-300K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-mixedT-300K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-mixedT-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "21.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-mixedT-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to mixed-T data, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "56.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-mixedT-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-mixedT-600K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-mixedT-600K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-mixedT-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "40.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-mixedT-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to mixed-T data, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "81.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-3BPA-mixedT-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-3BPA-mixedT-kovacs2021 ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-3BPA-mixedT-1200K-1-kovacs2021 ,
+        entity:metric-ANI-3BPA-mixedT-1200K-2-kovacs2021 .
+
+entity:metric-ANI-3BPA-mixedT-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: ANI fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "77.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-3BPA-mixedT-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: ANI fitted to mixed-T data, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "131"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-2x-3BPA-300K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-2x-3BPA-300K-1-kovacs2021 ,
+        entity:metric-ANI-2x-3BPA-300K-2-kovacs2021 .
+
+entity:metric-ANI-2x-3BPA-300K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: pretrained ANI-2x, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "38.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-2x-3BPA-300K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: pretrained ANI-2x, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "84.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-2x-3BPA-600K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-2x-3BPA-600K-1-kovacs2021 ,
+        entity:metric-ANI-2x-3BPA-600K-2-kovacs2021 .
+
+entity:metric-ANI-2x-3BPA-600K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: pretrained ANI-2x, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "54.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-2x-3BPA-600K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: pretrained ANI-2x, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "102.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ANI-2x-3BPA-1200K-kovacs2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-3BPA-kovacs2021 ;
+    mlips:hasAccuracyMetric entity:metric-ANI-2x-3BPA-1200K-1-kovacs2021 ,
+        entity:metric-ANI-2x-3BPA-1200K-2-kovacs2021 .
+
+entity:metric-ANI-2x-3BPA-1200K-1-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: pretrained ANI-2x, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "88.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ANI-2x-3BPA-1200K-2-kovacs2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: pretrained ANI-2x, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "139.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Fitting parameters of all models are in the Supporting Information, which is not part of the PDF read; no hyperparameter setting, loss or software is encoded.
+# - The retrained ANI models start from the ANI-2x weights (stated by the authors as a considerable advantage); schema 0.1.2 cannot link them to the registry model ANI-2x, so this is in the run labels only.
+# - The reference level of rMD17 is not restated in the paper, so the rMD17 data sets carry no reference calculation.
+# - Not encoded: the FCHL column (not trained by the authors), the literature columns of Tables 2 and 3 (PaiNN, GMsNN, DimeNet and others, trained on the original MD17), the reparametrised classical force field (not an MLIP), the combined-fit Table 4, and the extrapolation tests beyond RMSE (normal modes, dihedral scans, high-temperature stability), which are figures or have no MetricProperty.
+# - For the ANI-2x rows of Table 6 the two blocks (fit to 300 K, fit to mixed-T) repeat the same values, since ANI-2x is not refitted; they are encoded once.
+# - Which potential drove the 25 ps sampling MD of 3BPA is not stated in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
