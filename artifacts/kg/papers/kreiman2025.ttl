@@ -1,0 +1,270 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Tobias Kreiman et al. (2025). Understanding and mitigating distribution shifts for universal machine learning interatomic potentials.
+#   Digital Discovery. doi:10.1039/d5dd00260e  arXiv:2503.08674v2
+#
+# Version read: arxiv-preprint arXiv:2503.08674v2 (sha256 3c590ab8cdd44506...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 139 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the models the paper trains for its two largest
+# benchmarks and their baseline errors: a GemNet-T model trained on SPICE
+# and tested on new SPICEv2 molecules, and GemNet-OC models (plain and
+# jointly trained with an EMT prior) on the OC20 out-of-distribution
+# split. The paper's contribution, test-time radius refinement (RR) and
+# test-time training (TTT), changes a model at inference; those results
+# are given in comments. Read from the arXiv preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kreiman2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Kreiman and Krishnapriyan (2025): distribution shifts for machine learning force fields and test-time refinement" ;
+    mlips:reportedIn entity:article-kreiman2025 .
+
+entity:article-kreiman2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d5dd00260e> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Understanding and mitigating distribution shifts for universal machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0009-0002-1142-5744> ,
+        entity:person-Krishnapriyan-kreiman2025 .
+
+<https://orcid.org/0009-0002-1142-5744> a schema:Person ;
+    schema:name "Tobias Kreiman" ;
+    schema:givenName "Tobias" ;
+    schema:familyName "Kreiman" ;
+    schema:identifier <https://orcid.org/0009-0002-1142-5744> .
+
+entity:person-Krishnapriyan-kreiman2025 a schema:Person ;
+    schema:name "Aditi S. Krishnapriyan" ;
+    schema:givenName "Aditi S." ;
+    schema:familyName "Krishnapriyan" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-spicev2-kreiman2025 a mlips:MaterialSystem ;
+    rdfs:label "10k new organic molecules from SPICEv2 (not in SPICE)" ;
+    mlips:materialClass "Organic molecules" .
+
+entity:mat-spice-kreiman2025 a mlips:MaterialSystem ;
+    rdfs:label "Small organic molecules of SPICE (the MACE-OFF training subset)" ;
+    mlips:materialClass "Organic molecules" .
+
+entity:mat-oc20-kreiman2025 a mlips:MaterialSystem ;
+    rdfs:label "Adsorbate-catalyst structures of Open Catalyst 2020" ;
+    mlips:materialClass "Adsorbate-surface systems" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-spice-kreiman2025 a mlips:TrainingDataset ;
+    rdfs:label "SPICE, the 951k samples used to train MACE-OFF" ;
+    mlips:coversMaterial entity:mat-spice-kreiman2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 951000 ;
+    rdfs:comment "Size as stated ('951k samples')." .
+
+entity:ds-oc20-600k-kreiman2025 a mlips:TrainingDataset ;
+    rdfs:label "600 thousand examples of the OC20 20M split with elements supported by the EMT prior" ;
+    mlips:coversMaterial entity:mat-oc20-kreiman2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 600000 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-spice-kreiman2025 mlips:samplingStrategy
+    entity:sampling-published-kreiman2025 .
+
+entity:ds-oc20-600k-kreiman2025 mlips:samplingStrategy
+    entity:sampling-published-kreiman2025 .
+
+entity:sampling-published-kreiman2025 a mlips:SamplingStrategy ;
+    rdfs:label "Published data set used as provided" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GemNet a mlips:MLIPMethod ;
+    rdfs:label "GemNet (geometric message passing neural network)" ;
+    mlips:hasFunctionalForm entity:ff-GemNet ;
+    mlips:hasTrainingAlgorithm entity:alg-GemNet-kreiman2025 ;
+    mlips:hasHyperparameter mlips:numEpochs ,
+        entity:hp-atom-embedding-kreiman2025 ,
+        entity:hp-rbf-embedding-kreiman2025 .
+
+entity:ff-GemNet a mlips:FunctionalForm ;
+    rdfs:label "Directional graph neural network with geometric message passing over atom triplets and, in the two-hop form, quadruplets, built on spherical representations; energies are sums of atomic contributions and forces are obtained by backpropagation or, in the direct variants, predicted directly" .
+
+entity:alg-GemNet-kreiman2025 a mls:Algorithm ;
+    rdfs:label "Pre-training with a cheap prior (sGDML, GFN2-xTB or EMT labels), freezing and fine-tuning; at test time the representation is updated on the prior's labels (SGD, learning rate 1e-4, momentum 0.9, weight decay 0.001, 250 steps on the SPICEv2 benchmark)" .
+
+entity:hp-atom-embedding-kreiman2025 a mlips:Hyperparameter ;
+    rdfs:label "Atom embedding size" ;
+    mlips:hyperparameterName "atom_embedding_size" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-rbf-embedding-kreiman2025 a mlips:Hyperparameter ;
+    rdfs:label "RBF embedding size" ;
+    mlips:hyperparameterName "rbf_embedding_size" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gemnet-t-spice-numEpochs-kreiman2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "250"^^xsd:integer .
+
+entity:setting-gemnet-t-spice-atom-embedding-kreiman2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-atom-embedding-kreiman2025 ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-gemnet-t-spice-rbf-embedding-kreiman2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rbf-embedding-kreiman2025 ;
+    mlips:settingValue "32"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gemnet-t-spice-kreiman2025 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on SPICE (about 4M parameters)" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-spice-kreiman2025 ;
+    mlips:hasHyperparameterSetting entity:setting-gemnet-t-spice-numEpochs-kreiman2025 ,
+        entity:setting-gemnet-t-spice-atom-embedding-kreiman2025 ,
+        entity:setting-gemnet-t-spice-rbf-embedding-kreiman2025 ;
+    mlips:produces entity:model-gemnet-t-spice-kreiman2025 .
+
+entity:model-gemnet-t-spice-kreiman2025 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T trained on SPICE" .
+
+entity:run-gemnet-oc-kreiman2025 a mlips:MLIPRun ;
+    rdfs:label "GemNet-OC trained on 600k OC20 examples" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-oc20-600k-kreiman2025 ;
+    mlips:produces entity:model-gemnet-oc-kreiman2025 .
+
+entity:model-gemnet-oc-kreiman2025 a mlips:TrainedModel ;
+    rdfs:label "GemNet-OC (baseline)" .
+
+entity:run-gemnet-oc-joint-kreiman2025 a mlips:MLIPRun ;
+    rdfs:label "GemNet-OC jointly trained with the EMT prior on 600k OC20 examples" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-oc20-600k-kreiman2025 ;
+    mlips:produces entity:model-gemnet-oc-joint-kreiman2025 .
+
+entity:model-gemnet-oc-joint-kreiman2025 a mlips:TrainedModel ;
+    rdfs:label "GemNet-OC (joint training)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kreiman2025 mlips:hasResult
+    entity:result-gemnet-t-spicev2-kreiman2025 ,
+    entity:result-gemnet-oc-ood-kreiman2025 ,
+    entity:result-gemnet-oc-joint-ood-kreiman2025 .
+
+entity:result-gemnet-t-spicev2-kreiman2025 a mlips:BenchmarkResult ;
+    rdfs:comment "With test-time training (sGDML prior) the same benchmark gives 19.9 +/- 1.0 meV/A. For comparison the paper evaluates MACE-OFF at 26.75 +/- 0.65 meV/A (26.0 +/- 0.64 with radius refinement)." ;
+    mlips:evaluatesModel entity:model-gemnet-t-spice-kreiman2025 ;
+    mlips:targetMaterial entity:mat-spicev2-kreiman2025 ;
+    mlips:hasAccuracyMetric entity:metric-gemnet-t-spicev2-1-kreiman2025 .
+
+entity:metric-gemnet-t-spicev2-1-kreiman2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE on 10k new SPICEv2 molecules (95% confidence interval +/- 1.4)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "22.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-gemnet-oc-ood-kreiman2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gemnet-oc-kreiman2025 ;
+    mlips:targetMaterial entity:mat-oc20-kreiman2025 ;
+    mlips:hasAccuracyMetric entity:metric-gemnet-oc-ood-1-kreiman2025 ,
+        entity:metric-gemnet-oc-ood-2-kreiman2025 .
+
+entity:metric-gemnet-oc-ood-1-kreiman2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, OC20 out-of-distribution validation split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "77.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-gemnet-oc-ood-2-kreiman2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, OC20 out-of-distribution validation split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1787.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-gemnet-oc-joint-ood-kreiman2025 a mlips:BenchmarkResult ;
+    rdfs:comment "With test-time training on top: 61.42 meV/A and 1143 meV." ;
+    mlips:evaluatesModel entity:model-gemnet-oc-joint-kreiman2025 ;
+    mlips:targetMaterial entity:mat-oc20-kreiman2025 ;
+    mlips:hasAccuracyMetric entity:metric-gemnet-oc-joint-ood-1-kreiman2025 ,
+        entity:metric-gemnet-oc-joint-ood-2-kreiman2025 .
+
+entity:metric-gemnet-oc-joint-ood-1-kreiman2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, OC20 out-of-distribution validation split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "63.67"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-gemnet-oc-joint-ood-2-kreiman2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, OC20 out-of-distribution validation split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1320"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Test-time training and radius refinement produce a per-molecule modified model, which schema 0.1.2 cannot express; their errors are in result comments, not separate metrics.
+# - The MACE-OFF model evaluated (4.7M parameters, trained on 951k SPICE samples) is not named by size, so it is not linked to a kovacs2025 model. JMP on ANI-1x (Table 8), the GemNet-dT models on MD17/MD22 subsets (Tables 7 and 10) and the xTB-prior run labelled GemNet-dT (Table 6: 78.3 to 56.6 meV/A) are not encoded.
+# - GemNet-T, GemNet-dT and GemNet-OC are all encoded as the registry method GemNet (variants are not methods). Reference levels of SPICE and OC20 are not restated in the parts read, so the data sets carry no reference calculation.
+# - Read from the arXiv v2 preprint, whose title differs from the Digital Discovery article; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
