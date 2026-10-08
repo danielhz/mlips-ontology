@@ -1,0 +1,414 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Rolf David et al. (2024). ArcaNN: automated enhanced sampling generation of training sets for chemically reactive machine learning interatomic potentials.
+#   Digital Discovery. doi:10.1039/d4dd00209a  arXiv:2407.07751v2
+#
+# Version read: arxiv-preprint arXiv:2407.07751v2 (sha256 11ed820f159de98b...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 143 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SN2 example (CH3Cl + Br-) of the ArcaNN workflow:
+# the reference level, the three data-set generations named in the text
+# (initial aiMD, non-reactive NR7, reactive R5), the DeePMD-kit settings
+# shared by all trainings, and the one force error the text states as a
+# number. The Diels-Alder example and the per-cycle curves are figures;
+# see gaps. Read from the arXiv preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-david2024 a mlips:BenchmarkStudy ;
+    rdfs:label "David et al. (2024): ArcaNN, automated enhanced-sampling generation of training sets for reactive MLIPs" ;
+    mlips:reportedIn entity:article-david2024 .
+
+entity:article-david2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d4dd00209a> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "ArcaNN: automated enhanced sampling generation of training sets for chemically reactive machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0001-5338-6267> ,
+        <https://orcid.org/0000-0002-4432-9612> ,
+        <https://orcid.org/0000-0002-0378-4352> ,
+        <https://orcid.org/0009-0004-8013-0098> ,
+        entity:person-Stirnemann-david2024 ,
+        <https://orcid.org/0000-0001-5706-9939> .
+
+<https://orcid.org/0000-0001-5338-6267> a schema:Person ;
+    schema:name "Rolf David" ;
+    schema:givenName "Rolf" ;
+    schema:familyName "David" ;
+    schema:identifier <https://orcid.org/0000-0001-5338-6267> .
+
+<https://orcid.org/0000-0002-4432-9612> a schema:Person ;
+    schema:name "Miguel de la Puente" ;
+    schema:givenName "Miguel" ;
+    schema:familyName "de la Puente" ;
+    schema:identifier <https://orcid.org/0000-0002-4432-9612> .
+
+<https://orcid.org/0000-0002-0378-4352> a schema:Person ;
+    schema:name "Axel Gomez" ;
+    schema:givenName "Axel" ;
+    schema:familyName "Gomez" ;
+    schema:identifier <https://orcid.org/0000-0002-0378-4352> .
+
+<https://orcid.org/0009-0004-8013-0098> a schema:Person ;
+    schema:name "Olaia Anton" ;
+    schema:givenName "Olaia" ;
+    schema:familyName "Anton" ;
+    schema:identifier <https://orcid.org/0009-0004-8013-0098> .
+
+entity:person-Stirnemann-david2024 a schema:Person ;
+    schema:name "Guillaume Stirnemann" ;
+    schema:givenName "Guillaume" ;
+    schema:familyName "Stirnemann" .
+
+<https://orcid.org/0000-0001-5706-9939> a schema:Person ;
+    schema:name "Damien Laage" ;
+    schema:givenName "Damien" ;
+    schema:familyName "Laage" ;
+    schema:identifier <https://orcid.org/0000-0001-5706-9939> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-SN2-david2024 a mlips:MaterialSystem ;
+    rdfs:label "CH3Cl + Br- (SN2 reaction, reactant, product and reactive path)" ;
+    mlips:materialClass "Reactive molecular system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-david2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-david2024 mlips:hasDFTSettings entity:calc-settings-dft-david2024 .
+
+entity:calc-settings-dft-david2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-david2024 ;
+    mlips:xcFunctional entity:xc-BLYP-D3-david2024 ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    mlips:dftBasisSet entity:basis-TZV2P-MOLOPT-david2024 ;
+    rdfs:comment "The paper's 'reference level': BLYP-D3 with GTH pseudopotentials. CP2K is the labelling code of the ArcaNN workflow." .
+
+entity:lib-CP2K-david2024 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-BLYP-D3-david2024 a mlips:XCFunctional ;
+    rdfs:label "BLYP-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-TZV2P-MOLOPT-david2024 a mlips:DftBasisSet ;
+    rdfs:label "TZV2P-MOLOPT" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-aiMD-david2024 a mlips:TrainingDataset ;
+    rdfs:label "aiMD training data set (1000 configurations)" ;
+    mlips:coversMaterial entity:mat-SN2-david2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-dft-david2024 .
+
+entity:ds-NR7-david2024 a mlips:TrainingDataset ;
+    rdfs:label "NR7 data set after seven non-reactive cycles (1158 configurations)" ;
+    mlips:coversMaterial entity:mat-SN2-david2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1158 ;
+    mlips:hasDFTCalculation entity:calc-dft-david2024 .
+
+entity:ds-R5-david2024 a mlips:TrainingDataset ;
+    rdfs:label "R5 data set after five reactive cycles (NR7 plus 1155 structures)" ;
+    mlips:coversMaterial entity:mat-SN2-david2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-david2024 ;
+    rdfs:comment "Size given as 1155 structures added during the reactive cycles to the 1158 of NR7." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-aiMD-david2024 mlips:samplingStrategy
+    entity:sampling-aimd-david2024 .
+
+entity:ds-NR7-david2024 mlips:samplingStrategy
+    entity:sampling-aimd-david2024 ,
+    entity:sampling-nonreactive-david2024 .
+
+entity:ds-R5-david2024 mlips:samplingStrategy
+    entity:sampling-aimd-david2024 ,
+    entity:sampling-nonreactive-david2024 ,
+    entity:sampling-reactive-david2024 .
+
+entity:sampling-aimd-david2024 a mlips:SamplingStrategy ;
+    rdfs:label "Twenty short ab initio MD trajectories (2 ps, 0.5 fs step), ten from the reactant and ten from the product state; structures every 30 fs" .
+
+entity:sampling-nonreactive-david2024 a mlips:SamplingStrategy ;
+    rdfs:label "ArcaNN non-reactive cycles: committee of 3 NNPs, exploration MD with LAMMPS (unbiased, flat-bottom restraints, steered MD), candidates selected by force deviation and labelled" .
+
+entity:sampling-reactive-david2024 a mlips:SamplingStrategy ;
+    rdfs:label "ArcaNN reactive cycles: enhanced-sampling exploration (umbrella sampling, OPES, steered MD) along the reaction coordinate, candidates selected by committee force deviation" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasLossFunction entity:loss-DeePMD-david2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-david2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-embedding-net-david2024 ,
+        entity:hp-fitting-net-david2024 ,
+        mlips:learningRate ,
+        entity:hp-lr-decay-rate-david2024 ,
+        entity:hp-lr-decay-steps-david2024 ,
+        entity:hp-training-steps-david2024 ;
+    mlips:hasImplementation entity:impl-DeePMD-david2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-DeePMD-david2024 a mlips:LossFunction ;
+    rdfs:label "DeePMD loss with energy prefactor from 0.01 to 1 and force prefactor from 1000 to 1" .
+
+entity:alg-DeePMD-david2024 a mls:Algorithm ;
+    rdfs:label "Exponentially decaying learning rate from 0.001 to 1e-6; committees of 3 NNPs per ArcaNN cycle" .
+
+entity:impl-DeePMD-david2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "2.1 (DeepPot-SE)" .
+
+entity:hp-embedding-net-david2024 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-david2024 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-david2024 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-rate-david2024 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay rate" ;
+    mlips:hyperparameterName "lr_decay_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-steps-david2024 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay steps" ;
+    mlips:hyperparameterName "lr_decay_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-aiMD-cutoffRadius-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-aiMD-embedding-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-david2024 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-aiMD-fitting-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-david2024 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-aiMD-learningRate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-aiMD-lr-decay-rate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-david2024 ;
+    mlips:settingValue "0.92"^^xsd:double .
+
+entity:setting-aiMD-lr-decay-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-david2024 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-aiMD-training-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-david2024 ;
+    mlips:settingValue "400000"^^xsd:integer .
+
+entity:setting-NR7-cutoffRadius-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-NR7-embedding-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-david2024 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-NR7-fitting-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-david2024 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-NR7-learningRate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-NR7-lr-decay-rate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-david2024 ;
+    mlips:settingValue "0.92"^^xsd:double .
+
+entity:setting-NR7-lr-decay-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-david2024 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-NR7-training-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-david2024 ;
+    mlips:settingValue "400000"^^xsd:integer .
+
+entity:setting-R5-cutoffRadius-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-R5-embedding-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-david2024 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-R5-fitting-net-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-david2024 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-R5-learningRate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-R5-lr-decay-rate-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-david2024 ;
+    mlips:settingValue "0.92"^^xsd:double .
+
+entity:setting-R5-lr-decay-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-david2024 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-R5-training-steps-david2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-david2024 ;
+    mlips:settingValue "400000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-aiMD-david2024 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on the aiMD data set" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-aiMD-david2024 ;
+    mlips:hasHyperparameterSetting entity:setting-aiMD-cutoffRadius-david2024 ,
+        entity:setting-aiMD-embedding-net-david2024 ,
+        entity:setting-aiMD-fitting-net-david2024 ,
+        entity:setting-aiMD-learningRate-david2024 ,
+        entity:setting-aiMD-lr-decay-rate-david2024 ,
+        entity:setting-aiMD-lr-decay-steps-david2024 ,
+        entity:setting-aiMD-training-steps-david2024 ;
+    mlips:trainingHardware "Nvidia V100 SXM2; on average 14.67 GPU hours per ArcaNN training cycle (committee), 190.76 GPU hours in total over all cycles" ;
+    mlips:produces entity:model-aiMD-david2024 .
+
+entity:model-aiMD-david2024 a mlips:TrainedModel ;
+    rdfs:label "aiMD NNP for the SN2 reaction" .
+
+entity:run-NR7-david2024 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on the NR7 data set" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-NR7-david2024 ;
+    mlips:hasHyperparameterSetting entity:setting-NR7-cutoffRadius-david2024 ,
+        entity:setting-NR7-embedding-net-david2024 ,
+        entity:setting-NR7-fitting-net-david2024 ,
+        entity:setting-NR7-learningRate-david2024 ,
+        entity:setting-NR7-lr-decay-rate-david2024 ,
+        entity:setting-NR7-lr-decay-steps-david2024 ,
+        entity:setting-NR7-training-steps-david2024 ;
+    mlips:trainingHardware "Nvidia V100 SXM2; on average 14.67 GPU hours per ArcaNN training cycle (committee), 190.76 GPU hours in total over all cycles" ;
+    mlips:produces entity:model-NR7-david2024 .
+
+entity:model-NR7-david2024 a mlips:TrainedModel ;
+    rdfs:label "NR7 NNP for the SN2 reaction" .
+
+entity:run-R5-david2024 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on the R5 data set" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-R5-david2024 ;
+    mlips:hasHyperparameterSetting entity:setting-R5-cutoffRadius-david2024 ,
+        entity:setting-R5-embedding-net-david2024 ,
+        entity:setting-R5-fitting-net-david2024 ,
+        entity:setting-R5-learningRate-david2024 ,
+        entity:setting-R5-lr-decay-rate-david2024 ,
+        entity:setting-R5-lr-decay-steps-david2024 ,
+        entity:setting-R5-training-steps-david2024 ;
+    mlips:trainingHardware "Nvidia V100 SXM2; on average 14.67 GPU hours per ArcaNN training cycle (committee), 190.76 GPU hours in total over all cycles" ;
+    mlips:produces entity:model-R5-david2024 .
+
+entity:model-R5-david2024 a mlips:TrainedModel ;
+    rdfs:label "R5 NNP for the SN2 reaction" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-david2024 mlips:hasResult
+    entity:result-R5-test-david2024 .
+
+entity:result-R5-test-david2024 a mlips:BenchmarkResult ;
+    rdfs:comment "Approximate value from the text; the same value is given for the training data set. The component-wise RMSEs per cycle are shown in a figure only. The test structures come from umbrella sampling with the R5 NNP itself." ;
+    mlips:evaluatesModel entity:model-R5-david2024 ;
+    mlips:targetMaterial entity:mat-SN2-david2024 ;
+    mlips:hasAccuracyMetric entity:metric-R5-test-1-david2024 .
+
+entity:metric-R5-test-1-david2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on the magnitude of the forces, test data set of 1210 structures along the reactive path (stated as 'around 0.05')" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.05"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Per-cycle force RMSEs (Fig. 4A, about 0.030 to 0.034 eV/A on components), the fraction of untrustworthy structures and the free-energy profiles are figures and not encoded; the intermediate NNP generations (NR1 to NR6, R1 to R4) are not encoded as runs.
+# - The Diels-Alder example (244 initial configurations, TZV2P basis, A100 training at 3.58 GPU hours per cycle) is not encoded. Labelling and exploration costs (SI Tables S1 and S2) have no property on a data set.
+# - Each ArcaNN cycle trains a committee of three NNPs; one run per generation is encoded. The training-cost string is per cycle for the whole SN2 campaign, not per model.
+# - Read from the arXiv v2 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
