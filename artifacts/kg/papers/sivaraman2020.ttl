@@ -1,0 +1,219 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ganesh Sivaraman et al. (2020). Machine-learned interatomic potentials by active learning: amorphous and liquid hafnium dioxide.
+#   npj Computational Materials. doi:10.1038/s41524-020-00367-7  arXiv:1910.10254v1
+#
+# Version read: arxiv-preprint arXiv:1910.10254v1 (sha256 8e3d8d0a74c98ded...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 89 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one GAP for amorphous and liquid HfO2 trained on
+# configurations selected from AIMD trajectories by an unsupervised
+# clustering and Bayesian-optimisation active-learning workflow, with
+# the reference settings and the test errors stated in the text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-sivaraman2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Sivaraman et al. (2020): machine-learned interatomic potentials by active learning, amorphous and liquid hafnium dioxide (GAP)" ;
+    mlips:reportedIn entity:article-sivaraman2020 .
+
+entity:article-sivaraman2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-020-00367-7> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Machine-learned interatomic potentials by active learning: amorphous and liquid hafnium dioxide" ;
+    schema:author <https://orcid.org/0000-0001-9056-9855> ,
+        entity:person-Krishnamoorthy-sivaraman2020 ,
+        <https://orcid.org/0000-0002-4589-3813> ,
+        entity:person-Holm-sivaraman2020 ,
+        entity:person-Stan-sivaraman2020 ,
+        entity:person-Csanyi-sivaraman2020 ,
+        entity:person-Benmore-sivaraman2020 ,
+        <https://orcid.org/0000-0002-1415-6300> .
+
+<https://orcid.org/0000-0001-9056-9855> a schema:Person ;
+    schema:name "Ganesh Sivaraman" ;
+    schema:givenName "Ganesh" ;
+    schema:familyName "Sivaraman" ;
+    schema:identifier <https://orcid.org/0000-0001-9056-9855> .
+
+entity:person-Krishnamoorthy-sivaraman2020 a schema:Person ;
+    schema:name "Anand Narayanan Krishnamoorthy" ;
+    schema:givenName "Anand Narayanan" ;
+    schema:familyName "Krishnamoorthy" .
+
+<https://orcid.org/0000-0002-4589-3813> a schema:Person ;
+    schema:name "Matthias Baur" ;
+    schema:givenName "Matthias" ;
+    schema:familyName "Baur" ;
+    schema:identifier <https://orcid.org/0000-0002-4589-3813> .
+
+entity:person-Holm-sivaraman2020 a schema:Person ;
+    schema:name "Christian Holm" ;
+    schema:givenName "Christian" ;
+    schema:familyName "Holm" .
+
+entity:person-Stan-sivaraman2020 a schema:Person ;
+    schema:name "Marius Stan" ;
+    schema:givenName "Marius" ;
+    schema:familyName "Stan" .
+
+entity:person-Csanyi-sivaraman2020 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+entity:person-Benmore-sivaraman2020 a schema:Person ;
+    schema:name "Chris Benmore" ;
+    schema:givenName "Chris" ;
+    schema:familyName "Benmore" .
+
+<https://orcid.org/0000-0002-1415-6300> a schema:Person ;
+    schema:name "Álvaro Vázquez-Mayagoitia" ;
+    schema:givenName "Álvaro" ;
+    schema:familyName "Vázquez-Mayagoitia" ;
+    schema:identifier <https://orcid.org/0000-0002-1415-6300> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-HfO2-sivaraman2020 a mlips:MaterialSystem ;
+    rdfs:label "Hafnium dioxide, liquid (3600 K) and amorphous (300 K), 96-atom cells" ;
+    mlips:chemicalFormula "HfO2" ;
+    mlips:materialClass "Oxide; liquid and melt-quenched amorphous phases" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-sivaraman2020 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-sivaraman2020 mlips:hasDFTSettings entity:calc-settings-dft-sivaraman2020 .
+
+entity:calc-settings-dft-sivaraman2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "2x2x2 Monkhorst-Pack grid" ;
+    rdfs:comment "AIMD in the NVT ensemble with a 1 fs time step." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-HfO2-sivaraman2020 a mlips:TrainingDataset ;
+    rdfs:label "Active-learned HfO2 training set (combined selections from liquid, quench and amorphous AIMD)" ;
+    mlips:coversMaterial entity:mat-HfO2-sivaraman2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-sivaraman2020 ;
+    rdfs:comment "The number of selected configurations is not stated in the main text." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-HfO2-sivaraman2020 mlips:samplingStrategy
+    entity:sampling-aimd-melt-quench-sivaraman2020 ,
+    entity:sampling-cluster-active-learning-sivaraman2020 .
+
+entity:sampling-aimd-melt-quench-sivaraman2020 a mlips:SamplingStrategy ;
+    rdfs:label "AIMD melt-quench trajectories" ;
+    rdfs:comment "96 atoms (32 Hf, 64 O) packed at random with Packmol; liquid at 3600 K sampled for 12 ps, quench to 300 K at 100 K/ps (33 ps, all retained), amorphous at the experimental density for 12 ps; the final 6 ps of the liquid and amorphous runs are retained." .
+
+entity:sampling-cluster-active-learning-sivaraman2020 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning by HDBSCAN clustering with Bayesian-optimised GAP fits" ;
+    rdfs:comment "Each AIMD trajectory is partitioned into uncorrelated clusters with HDBSCAN; training and test configurations are drawn from the clusters in successive trials, a GAP is fitted with Bayesian optimisation of its hyperparameters, and sampling stops when the energy MAE on the test configurations reaches a tolerance. The selections from the individual trajectories are combined." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-sivaraman2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-GAP-sivaraman2020 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression with a SOAP descriptor plus a non-parametric two-body term (added to prevent unphysical clustering of oxygen atoms at high temperature); hyperparameters by Bayesian optimisation" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-HfO2-sivaraman2020 a mlips:MLIPRun ;
+    rdfs:label "Active-learned GAP for amorphous and liquid HfO2" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-HfO2-sivaraman2020 ;
+    mlips:produces entity:model-gap-HfO2-sivaraman2020 .
+
+entity:model-gap-HfO2-sivaraman2020 a mlips:TrainedModel ;
+    rdfs:label "GAP for amorphous and liquid HfO2 (SOAP + two-body)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-sivaraman2020 mlips:hasResult
+    entity:result-gap-HfO2-test-sivaraman2020 .
+
+entity:result-gap-HfO2-test-sivaraman2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gap-HfO2-sivaraman2020 ;
+    mlips:targetMaterial entity:mat-HfO2-sivaraman2020 ;
+    mlips:hasAccuracyMetric entity:metric-gap-HfO2-test-1-sivaraman2020 ,
+        entity:metric-gap-HfO2-test-2-sivaraman2020 .
+
+entity:metric-gap-HfO2-test-1-sivaraman2020 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy on an independent test data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gap-HfO2-test-2-sivaraman2020 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces on an independent test data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.28"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - GAP training hyperparameters are in the Supplementary Information and are not encoded; the size of the final training set is not given in the main text. The fitting software is not named in the parts read (GAP fits are normally done with QUIP); MD ran in LAMMPS.
+# - Structural validation against experiment and a classical force field (coordination numbers, bond lengths, structure factors; Table 1) has no MetricProperty.
+# - Version read: arXiv v1, whose title differs from the version of record.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
