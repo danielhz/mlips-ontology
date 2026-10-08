@@ -1,0 +1,497 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Gurjot S. Dhaliwal et al. (2022). Machine learned interatomic potentials using random features.
+#   npj Computational Materials. doi:10.1038/s41524-021-00685-4
+#
+# Version read: publisher (sha256 94534fd1a81f866a...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 153 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the random-feature potentials introduced here (random
+# Fourier features RFF, their orthogonal variant O-RFF, and random feature
+# maps RFM) and the GAP baselines the authors train for comparison on the
+# graphene data set (Table 1), plus the RFM model for diamond (Table 2).
+# Data come from libatoms.org. The tungsten model and the physical
+# properties are not encoded; see gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-dhaliwal2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Dhaliwal et al. (2022): machine learned interatomic potentials using random features" ;
+    mlips:reportedIn entity:article-dhaliwal2022 .
+
+entity:article-dhaliwal2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-021-00685-4> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "Machine learned interatomic potentials using random features" ;
+    schema:author entity:person-Dhaliwal-dhaliwal2022 ,
+        entity:person-Nair-dhaliwal2022 ,
+        <https://orcid.org/0000-0002-6644-0178> .
+
+entity:person-Dhaliwal-dhaliwal2022 a schema:Person ;
+    schema:name "Gurjot Dhaliwal" ;
+    schema:givenName "Gurjot" ;
+    schema:familyName "Dhaliwal" .
+
+entity:person-Nair-dhaliwal2022 a schema:Person ;
+    schema:name "Prasanth B. Nair" ;
+    schema:givenName "Prasanth B." ;
+    schema:familyName "Nair" .
+
+<https://orcid.org/0000-0002-6644-0178> a schema:Person ;
+    schema:name "Chandra Veer Singh" ;
+    schema:givenName "Chandra Veer" ;
+    schema:familyName "Singh" ;
+    schema:identifier <https://orcid.org/0000-0002-6644-0178> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-graphene-dhaliwal2022 a mlips:MaterialSystem ;
+    rdfs:label "Graphene" ;
+    mlips:chemicalFormula "C" ;
+    mlips:materialClass "Two-dimensional carbon" .
+
+entity:mat-diamond-dhaliwal2022 a mlips:MaterialSystem ;
+    rdfs:label "Diamond" ;
+    mlips:chemicalFormula "C" ;
+    mlips:materialClass "Carbon allotrope" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-graphene-dhaliwal2022 a mlips:TrainingDataset ;
+    rdfs:label "Graphene data set (libatoms.org; the data of the graphene GAP)" ;
+    mlips:coversMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-diamond-dhaliwal2022 a mlips:TrainingDataset ;
+    rdfs:label "Diamond data set (libatoms.org)" ;
+    mlips:coversMaterial entity:mat-diamond-dhaliwal2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-graphene-dhaliwal2022 mlips:samplingStrategy
+    entity:sampling-published-dhaliwal2022 .
+
+entity:ds-diamond-dhaliwal2022 mlips:samplingStrategy
+    entity:sampling-published-dhaliwal2022 .
+
+entity:sampling-published-dhaliwal2022 a mlips:SamplingStrategy ;
+    rdfs:label "Published GAP training data downloaded from libatoms.org (accessed 3 March 2019)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:RandomFeatures a mlips:MLIPMethod ;
+    rdfs:label "Random-feature interatomic potential (RFF/RFM)" ;
+    mlips:hasLossFunction entity:loss-RandomFeatures-dhaliwal2022 ;
+    mlips:hasTrainingAlgorithm entity:alg-RandomFeatures-dhaliwal2022 ;
+    mlips:hasHyperparameter entity:hp-descriptor-order-dhaliwal2022 ,
+        entity:hp-num-parameters-dhaliwal2022 ,
+        entity:hp-orthogonal-dhaliwal2022 ;
+    mlips:hasImplementation entity:impl-RandomFeatures-dhaliwal2022 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "O(M) per prediction, M the number of random features" ;
+    mlips:trainingComplexity "O(M^2 N), N the training-set size" .
+
+entity:loss-RandomFeatures-dhaliwal2022 a mlips:LossFunction ;
+    rdfs:label "Quadratic loss on local energies and forces with L2 regularisation lambda (set by cross-validation)" .
+
+entity:alg-RandomFeatures-dhaliwal2022 a mls:Algorithm ;
+    rdfs:label "Weights from a linear system (closed form); squared-exponential kernel approximated by random Fourier features, with frequencies optionally orthogonalised" .
+
+entity:impl-RandomFeatures-dhaliwal2022 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-RandomFeatures-dhaliwal2022 .
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasHyperparameter entity:hp-descriptor-order-dhaliwal2022 ,
+        entity:hp-num-parameters-dhaliwal2022 .
+
+entity:lib-RandomFeatures-dhaliwal2022 a mlips:Library ;
+    rdfs:label "RandomFeatures" ;
+    rdfs:comment "Authors' library, MD through ASE. https://github.com/g7dhaliwal/RandomFeatures" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-descriptor-order-dhaliwal2022 a mlips:Hyperparameter ;
+    rdfs:label "Descriptor body order used (two-body or three-body only)" ;
+    mlips:hyperparameterName "descriptor_order" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-dhaliwal2022 a mlips:Hyperparameter ;
+    rdfs:label "Number of model parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-orthogonal-dhaliwal2022 a mlips:Hyperparameter ;
+    rdfs:label "Orthogonal random frequencies" ;
+    mlips:hyperparameterName "orthogonal" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-2b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "two-body" .
+
+entity:setting-gap-2b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-rff-2b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "two-body" .
+
+entity:setting-rff-2b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-rff-2b-orthogonal-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-orthogonal-dhaliwal2022 ;
+    mlips:settingValue "no" .
+
+entity:setting-orff-2b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "two-body" .
+
+entity:setting-orff-2b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-orff-2b-orthogonal-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-orthogonal-dhaliwal2022 ;
+    mlips:settingValue "yes" .
+
+entity:setting-gap-3b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "three-body" .
+
+entity:setting-gap-3b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "250"^^xsd:integer .
+
+entity:setting-rff-3b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "three-body" .
+
+entity:setting-rff-3b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "4000"^^xsd:integer .
+
+entity:setting-rff-3b-orthogonal-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-orthogonal-dhaliwal2022 ;
+    mlips:settingValue "no" .
+
+entity:setting-orff-3b-descriptor-order-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-order-dhaliwal2022 ;
+    mlips:settingValue "three-body" .
+
+entity:setting-orff-3b-num-parameters-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-dhaliwal2022 ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-orff-3b-orthogonal-dhaliwal2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-orthogonal-dhaliwal2022 ;
+    mlips:settingValue "yes" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-2b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "GAP (2B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-2b-descriptor-order-dhaliwal2022 ,
+        entity:setting-gap-2b-num-parameters-dhaliwal2022 ;
+    mlips:produces entity:model-gap-2b-dhaliwal2022 .
+
+entity:model-gap-2b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "GAP (2B) potential for graphene" .
+
+entity:run-rff-2b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "RFF (2B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:RandomFeatures ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-rff-2b-descriptor-order-dhaliwal2022 ,
+        entity:setting-rff-2b-num-parameters-dhaliwal2022 ,
+        entity:setting-rff-2b-orthogonal-dhaliwal2022 ;
+    mlips:produces entity:model-rff-2b-dhaliwal2022 .
+
+entity:model-rff-2b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "RFF (2B) potential for graphene" .
+
+entity:run-orff-2b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "O-RFF (2B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:RandomFeatures ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-orff-2b-descriptor-order-dhaliwal2022 ,
+        entity:setting-orff-2b-num-parameters-dhaliwal2022 ,
+        entity:setting-orff-2b-orthogonal-dhaliwal2022 ;
+    mlips:produces entity:model-orff-2b-dhaliwal2022 .
+
+entity:model-orff-2b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "O-RFF (2B) potential for graphene" .
+
+entity:run-gap-3b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "GAP (3B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-3b-descriptor-order-dhaliwal2022 ,
+        entity:setting-gap-3b-num-parameters-dhaliwal2022 ;
+    mlips:produces entity:model-gap-3b-dhaliwal2022 .
+
+entity:model-gap-3b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "GAP (3B) potential for graphene" .
+
+entity:run-rff-3b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "RFF (3B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:RandomFeatures ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-rff-3b-descriptor-order-dhaliwal2022 ,
+        entity:setting-rff-3b-num-parameters-dhaliwal2022 ,
+        entity:setting-rff-3b-orthogonal-dhaliwal2022 ;
+    mlips:produces entity:model-rff-3b-dhaliwal2022 .
+
+entity:model-rff-3b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "RFF (3B) potential for graphene" .
+
+entity:run-orff-3b-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "O-RFF (3B) trained on the graphene data set" ;
+    mlips:appliesMethod entity:RandomFeatures ;
+    mlips:runsOn entity:ds-graphene-dhaliwal2022 ;
+    mlips:hasHyperparameterSetting entity:setting-orff-3b-descriptor-order-dhaliwal2022 ,
+        entity:setting-orff-3b-num-parameters-dhaliwal2022 ,
+        entity:setting-orff-3b-orthogonal-dhaliwal2022 ;
+    mlips:produces entity:model-orff-3b-dhaliwal2022 .
+
+entity:model-orff-3b-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "O-RFF (3B) potential for graphene" .
+
+entity:run-rfm-diamond-dhaliwal2022 a mlips:MLIPRun ;
+    rdfs:label "RFM trained on the diamond data set" ;
+    mlips:appliesMethod entity:RandomFeatures ;
+    mlips:runsOn entity:ds-diamond-dhaliwal2022 ;
+    mlips:produces entity:model-rfm-diamond-dhaliwal2022 .
+
+entity:model-rfm-diamond-dhaliwal2022 a mlips:TrainedModel ;
+    rdfs:label "RFM potential for diamond" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-dhaliwal2022 mlips:hasResult
+    entity:result-gap-2b-dhaliwal2022 ,
+    entity:result-rff-2b-dhaliwal2022 ,
+    entity:result-orff-2b-dhaliwal2022 ,
+    entity:result-gap-3b-dhaliwal2022 ,
+    entity:result-rff-3b-dhaliwal2022 ,
+    entity:result-orff-3b-dhaliwal2022 ,
+    entity:result-rfm-diamond-train-dhaliwal2022 ,
+    entity:result-rfm-diamond-test-dhaliwal2022 .
+
+entity:result-gap-2b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 144 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-gap-2b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-gap-2b-1-dhaliwal2022 ,
+        entity:metric-gap-2b-2-dhaliwal2022 .
+
+entity:metric-gap-2b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "52.705"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gap-2b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.234"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-rff-2b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 103 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-rff-2b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-rff-2b-1-dhaliwal2022 ,
+        entity:metric-rff-2b-2-dhaliwal2022 .
+
+entity:metric-rff-2b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "28.9459"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-rff-2b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.325"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-orff-2b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 51.4 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-orff-2b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-orff-2b-1-dhaliwal2022 ,
+        entity:metric-orff-2b-2-dhaliwal2022 .
+
+entity:metric-orff-2b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.18"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-orff-2b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.353"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-gap-3b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 6060 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-gap-3b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-gap-3b-1-dhaliwal2022 ,
+        entity:metric-gap-3b-2-dhaliwal2022 .
+
+entity:metric-gap-3b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.185"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gap-3b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.058"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-rff-3b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 4229 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-rff-3b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-rff-3b-1-dhaliwal2022 ,
+        entity:metric-rff-3b-2-dhaliwal2022 .
+
+entity:metric-rff-3b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.415"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-rff-3b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.049"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-orff-3b-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "Training time 256 s (Table 1; hardware not stated)." ;
+    mlips:evaluatesModel entity:model-orff-3b-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-graphene-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-orff-3b-1-dhaliwal2022 ,
+        entity:metric-orff-3b-2-dhaliwal2022 .
+
+entity:metric-orff-3b-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.29"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-orff-3b-2-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, graphene test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.047"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-rfm-diamond-train-dhaliwal2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-rfm-diamond-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-diamond-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-rfm-diamond-train-1-dhaliwal2022 .
+
+entity:metric-rfm-diamond-train-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, diamond training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.022"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-rfm-diamond-test-dhaliwal2022 a mlips:BenchmarkResult ;
+    rdfs:comment "The published GAP is quoted at 0.067 eV/A (training); AIREBO, AIREBO-M and Tersoff at 2.4 to 3.3 eV/A." ;
+    mlips:evaluatesModel entity:model-rfm-diamond-dhaliwal2022 ;
+    mlips:targetMaterial entity:mat-diamond-dhaliwal2022 ;
+    mlips:hasAccuracyMetric entity:metric-rfm-diamond-test-1-dhaliwal2022 .
+
+entity:metric-rfm-diamond-test-1-dhaliwal2022 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, diamond test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.024"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - RFF, O-RFF and RFM are encoded as one registry method (random-feature potential); the orthogonal variant and the descriptor order are settings. RFM uses a different feature map (for SOAP-type descriptors) than RFF; if they should be two methods, the diamond run moves to a second registry row.
+# - The GAP baselines here use two-body or three-body descriptors only, while the registry label of entity:GAP still says 'with SOAP kernel' (legacy label, listed for generalisation in METHODS.md).
+# - Reference levels, sizes and splits of the libatoms.org data sets are not restated in the paper and are not encoded. The graphene in-plane and out-of-plane force RMSEs (0.070 and 0.044 eV/A), the tungsten RFM model (errors only in figures), learning curves and the physical properties of Table 3 (lattice constants, elastic constants, phonons) are not encoded. Training times are in seconds and kept in comments because mlips:trainingDuration is in hours.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
