@@ -1,0 +1,195 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jörg Behler et al. (2011). Atom-centered symmetry functions for constructing high-dimensional neural network potentials.
+#   The Journal of Chemical Physics. doi:10.1063/1.3553717
+#
+# Version read: publisher (sha256 cee93cce8af18b7c...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 23 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper defines the atom-centered symmetry functions
+# and their derivatives and illustrates them on analytic model systems
+# only (a one-dimensional model potential, Lennard-Jones dimers and
+# trimers). One illustrative fit is encoded: the high-dimensional NN
+# trained on 36,000 Lennard-Jones trimers with three radial symmetry
+# functions (Table I, energy fit, X-15-15-1 architecture).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-behler2011 a mlips:BenchmarkStudy ;
+    rdfs:label "Behler (2011): atom-centered symmetry functions for high-dimensional neural network potentials" ;
+    mlips:reportedIn entity:article-behler2011 .
+
+entity:article-behler2011 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/1.3553717> ;
+    schema:datePublished "2011"^^xsd:gYear ;
+    schema:name "Atom-centered symmetry functions for constructing high-dimensional neural network potentials" ;
+    schema:author entity:person-Behler-behler2011 .
+
+entity:person-Behler-behler2011 a schema:Person ;
+    schema:name "Jörg Behler" ;
+    schema:givenName "Jörg" ;
+    schema:familyName "Behler" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LJ-trimers-behler2011 a mlips:MaterialSystem ;
+    rdfs:label "Lennard-Jones trimers (analytic model system)" ;
+    mlips:materialClass "Model clusters with a Lennard-Jones pair potential; not a real material" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-lj-behler2011 a mlips:ReferenceCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-lj-behler2011 mlips:hasReferenceSettings entity:calc-settings-lj-behler2011 .
+
+entity:calc-settings-lj-behler2011 a mlips:ReferenceSettings ;
+    rdfs:comment "Analytic Lennard-Jones pair potential used as the reference 'electronic structure'; no quantum-mechanical calculation is involved." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-LJ-trimers-behler2011 a mlips:TrainingDataset ;
+    rdfs:label "Lennard-Jones trimer training set (36,000 of 45,000 structures)" ;
+    mlips:coversMaterial entity:mat-LJ-trimers-behler2011 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 36000 ;
+    mlips:hasReferenceCalculation entity:calc-lj-behler2011 ;
+    rdfs:comment "45,000 trimer structures split into 36,000 for training and 9,000 for the independent test set." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+# No sampling strategy is described by the paper (see Q12).
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasHyperparameter entity:hp-hidden-layers-behler2011 ,
+        entity:hp-num-symmetry-functions-behler2011 .
+
+entity:hp-hidden-layers-behler2011 a mlips:Hyperparameter ;
+    rdfs:label "HDNNP hidden-layer architecture of the atomic network" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-symmetry-functions-behler2011 a mlips:Hyperparameter ;
+    rdfs:label "HDNNP number of symmetry functions per atom" ;
+    mlips:hyperparameterName "num_symmetry_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-nn-lj-trimers-hidden-layers-behler2011 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-behler2011 ;
+    mlips:settingValue "15-15" .
+
+entity:setting-nn-lj-trimers-num-symmetry-functions-behler2011 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-symmetry-functions-behler2011 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-nn-lj-trimers-behler2011 a mlips:MLIPRun ;
+    rdfs:label "High-dimensional NN fit to Lennard-Jones trimers: three radial G2 symmetry functions, 3-15-15-1 atomic network, energies only" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-LJ-trimers-behler2011 ;
+    mlips:hasHyperparameterSetting entity:setting-nn-lj-trimers-hidden-layers-behler2011 ,
+        entity:setting-nn-lj-trimers-num-symmetry-functions-behler2011 ;
+    mlips:produces entity:model-nn-lj-trimers-behler2011 .
+
+entity:model-nn-lj-trimers-behler2011 a mlips:TrainedModel ;
+    rdfs:label "HDNNP for Lennard-Jones trimers (symmetry function set 3, 3-15-15-1, 316 weights, energy fit)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-behler2011 mlips:hasResult
+    entity:result-nn-lj-trimers-test-behler2011 ,
+    entity:result-nn-lj-trimers-train-behler2011 .
+
+entity:result-nn-lj-trimers-test-behler2011 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nn-lj-trimers-behler2011 ;
+    mlips:targetMaterial entity:mat-LJ-trimers-behler2011 ;
+    mlips:hasAccuracyMetric entity:metric-nn-lj-trimers-test-1-behler2011 ,
+        entity:metric-nn-lj-trimers-test-2-behler2011 .
+
+entity:metric-nn-lj-trimers-test-1-behler2011 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in eV/atom: Lennard-Jones trimers, symmetry function set 3, 3-15-15-1, energy fit" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0013"^^xsd:double .
+
+entity:metric-nn-lj-trimers-test-2-behler2011 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces, in eV/Bohr: Lennard-Jones trimers, symmetry function set 3, 3-15-15-1, energy fit" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0388"^^xsd:double .
+
+entity:result-nn-lj-trimers-train-behler2011 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nn-lj-trimers-behler2011 ;
+    mlips:targetMaterial entity:mat-LJ-trimers-behler2011 ;
+    mlips:hasAccuracyMetric entity:metric-nn-lj-trimers-train-1-behler2011 ,
+        entity:metric-nn-lj-trimers-train-2-behler2011 .
+
+entity:metric-nn-lj-trimers-train-1-behler2011 a mlips:AccuracyMetric ;
+    rdfs:label "Training RMSE on energy, in eV/atom: Lennard-Jones trimers, symmetry function set 3, 3-15-15-1, energy fit" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0016"^^xsd:double .
+
+entity:metric-nn-lj-trimers-train-2-behler2011 a mlips:AccuracyMetric ;
+    rdfs:label "Training RMSE on forces, in eV/Bohr: Lennard-Jones trimers, symmetry function set 3, 3-15-15-1, energy fit" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0405"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - All numerical examples use analytic model potentials, not a material with a quantum-mechanical reference; the 'material system' and 'reference calculation' of this file are that model system. The real contribution, the definition of the symmetry functions G1-G5 with forces and stress, has no place in the protocol beyond the registry descriptor of entity:HDNNP.
+# - Table I has twelve fits (three symmetry-function sets, two architectures, energy-only and energy+force fitting); only one is encoded. The energy+force rows were not captured in full.
+# - Symmetry-function parameters are given in Bohr (G2 with eta = 1.0, 0.5, 0.2 Bohr^-2, Rs = 0, Rc = 12.0 Bohr); the cutoff is not encoded as mlips:cutoffRadius because that hyperparameter is used in Angstrom elsewhere. Errors are in eV/atom and eV/Bohr, which have no unit individuals.
+# - The training algorithm is not named in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
