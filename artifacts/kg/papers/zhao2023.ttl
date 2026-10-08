@@ -1,0 +1,222 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   J. Zhao et al. (2023). Complex Ga2O3 polymorphs explored by accurate and general-purpose machine-learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-023-01117-1  arXiv:2212.03096v2
+#
+# Version read: arxiv-preprint arXiv:2212.03096v2 (sha256 dd42b79c1dd8e384...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 178 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the two GAP models for the Ga-O system, soapGAP
+# (2b + SOAP) and tabGAP (tabulated 2b + 3b + EAM descriptors), trained
+# on one DFT database, with the VASP reference settings and the
+# regularisation scheme. Their energy and force errors are shown as
+# parity plots without printed RMSEs, so no AccuracyMetric is encoded.
+# Read from the arXiv preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhao2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhao et al. (2023): complex Ga2O3 polymorphs explored by general-purpose machine-learning interatomic potentials" ;
+    mlips:reportedIn entity:article-zhao2023 .
+
+entity:article-zhao2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-023-01117-1> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Complex Ga2O3 polymorphs explored by accurate and general-purpose machine-learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-4919-2440> ,
+        <https://orcid.org/0000-0002-4898-6150> ,
+        entity:person-He-zhao2023 ,
+        <https://orcid.org/0000-0001-6244-1942> ,
+        <https://orcid.org/0000-0002-5828-200X> ,
+        <https://orcid.org/0000-0003-3016-1588> .
+
+<https://orcid.org/0000-0002-4919-2440> a schema:Person ;
+    schema:name "Junlei Zhao" ;
+    schema:givenName "Junlei" ;
+    schema:familyName "Zhao" ;
+    schema:identifier <https://orcid.org/0000-0002-4919-2440> .
+
+<https://orcid.org/0000-0002-4898-6150> a schema:Person ;
+    schema:name "Jesper Byggmästar" ;
+    schema:givenName "Jesper" ;
+    schema:familyName "Byggmästar" ;
+    schema:identifier <https://orcid.org/0000-0002-4898-6150> .
+
+entity:person-He-zhao2023 a schema:Person ;
+    schema:name "Huan He" ;
+    schema:givenName "Huan" ;
+    schema:familyName "He" .
+
+<https://orcid.org/0000-0001-6244-1942> a schema:Person ;
+    schema:name "Kai Nordlund" ;
+    schema:givenName "Kai" ;
+    schema:familyName "Nordlund" ;
+    schema:identifier <https://orcid.org/0000-0001-6244-1942> .
+
+<https://orcid.org/0000-0002-5828-200X> a schema:Person ;
+    schema:name "Flyura Djurabekova" ;
+    schema:givenName "Flyura" ;
+    schema:familyName "Djurabekova" ;
+    schema:identifier <https://orcid.org/0000-0002-5828-200X> .
+
+<https://orcid.org/0000-0003-3016-1588> a schema:Person ;
+    schema:name "Mengyuan Hua" ;
+    schema:givenName "Mengyuan" ;
+    schema:familyName "Hua" ;
+    schema:identifier <https://orcid.org/0000-0003-3016-1588> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-GaO-zhao2023 a mlips:MaterialSystem ;
+    rdfs:label "Gallium oxide system (five Ga2O3 polymorphs beta, kappa, alpha, delta, gamma; amorphous and liquid Ga2O3; non-stoichiometric GaOx; high-energy structures)" ;
+    mlips:chemicalFormula "Ga2O3" ;
+    mlips:materialClass "Wide-band-gap oxide semiconductor" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhao2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhao2023 mlips:hasDFTSettings entity:calc-settings-dft-zhao2023 .
+
+entity:calc-settings-dft-zhao2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "700"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred grids with maximum spacing 0.15 per Angstrom" ;
+    rdfs:comment "13 (3d10 4s2 4p1) and 6 (2s2 2p4) valence electrons for Ga and O; Gaussian smearing of 0.03 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-GaO-zhao2023 a mlips:TrainingDataset ;
+    rdfs:label "Ga-O DFT database (1,630 configurations, 108,411 atomic environments)" ;
+    mlips:coversMaterial entity:mat-GaO-zhao2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1630 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhao2023 ;
+    rdfs:comment "Published at https://doi.org/10.6084/m9.figshare.21731426.v1. That virials are among the fitted quantities is detailed in the supplement and assumed here." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-GaO-zhao2023 mlips:samplingStrategy
+    entity:sampling-manual-zhao2023 .
+
+entity:sampling-manual-zhao2023 a mlips:SamplingStrategy ;
+    rdfs:label "Database built by hand over many train-and-test iterations: crystalline polymorphs (strained and thermally displaced), disordered, amorphous and liquid structures, non-stoichiometric GaOx, and high-energy short-distance structures; isolated atoms as energy references" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasLossFunction entity:loss-GAP-zhao2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-zhao2023 ;
+    mlips:hasHyperparameter entity:hp-descriptors-zhao2023 ;
+    mlips:hasImplementation entity:impl-GAP-zhao2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation ,
+        mlips:GeometryOptimization .
+
+entity:loss-GAP-zhao2023 a mlips:LossFunction ;
+    rdfs:label "Gaussian process regression with manually chosen expected errors per configuration type: 0.002 eV (energy) and 0.01 eV/A (force) for crystalline polymorphs, 0.0035 to 0.01 eV and 0.035 to 0.1 eV/A for non-stoichiometric and disordered configurations" .
+
+entity:alg-GAP-zhao2023 a mls:Algorithm ;
+    rdfs:label "Fit of the difference to external repulsive pair potentials (fitted to all-electron data); for tabGAP the low-dimensional terms are tabulated on one- and three-dimensional grids and evaluated by cubic splines" .
+
+entity:impl-GAP-zhao2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP .
+
+entity:hp-descriptors-zhao2023 a mlips:Hyperparameter ;
+    rdfs:label "Combination of GAP descriptors" ;
+    mlips:hyperparameterName "descriptors" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-soapGAP-descriptors-zhao2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhao2023 ;
+    mlips:settingValue "2b + SOAP" .
+
+entity:setting-tabGAP-descriptors-zhao2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhao2023 ;
+    mlips:settingValue "2b + 3b + EAM (tabulated)" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-soapGAP-zhao2023 a mlips:MLIPRun ;
+    rdfs:label "soapGAP training for the Ga-O system" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-GaO-zhao2023 ;
+    mlips:hasHyperparameterSetting entity:setting-soapGAP-descriptors-zhao2023 ;
+    mlips:produces entity:model-soapGAP-zhao2023 .
+
+entity:model-soapGAP-zhao2023 a mlips:TrainedModel ;
+    rdfs:label "soapGAP for Ga2O3 (GAP_2022_9_22_480_23_27_2_249)" ;
+    mlips:inferenceHardware "About 8e2 MD steps per second per atom (hardware in the supplement)" .
+
+entity:run-tabGAP-zhao2023 a mlips:MLIPRun ;
+    rdfs:label "tabGAP training for the Ga-O system" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-GaO-zhao2023 ;
+    mlips:hasHyperparameterSetting entity:setting-tabGAP-descriptors-zhao2023 ;
+    mlips:produces entity:model-tabGAP-zhao2023 .
+
+entity:model-tabGAP-zhao2023 a mlips:TrainedModel ;
+    rdfs:label "tabGAP for Ga2O3" ;
+    mlips:inferenceHardware "About 3.2e5 MD steps per second per atom, 400 times faster than soapGAP (hardware in the supplement)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: energy and force errors are given as parity plots and error distributions (Fig. 2); the only numbers in the text are a relative width (sigma_tabGAP about 2.4 sigma_soapGAP) and the +/- 0.1 eV/atom guide lines.
+# - tabGAP is encoded as a GAP run with a descriptor setting, since it is a GAP fit with low-dimensional descriptors that is tabulated afterwards. The literature also names it as a framework of its own; making it a registry method would be one row and re-pointing one run. Decision wanted, as with the other variants-as-settings cases.
+# - Cutoffs, sparse-point numbers and SOAP parameters are in the Supplementary Appendices and not encoded. Lattice parameters (Table I), phonons, thermal properties and the liquid-solid transition simulations are not encoded.
+# - The simulation-speed statements are placed in the inference-hardware strings as given. Read from the arXiv v2 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
