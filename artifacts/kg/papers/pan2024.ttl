@@ -1,0 +1,238 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jiahao Pan et al. (2024). Atomic cluster expansion interatomic potential for defects and thermodynamics of Cu–W system.
+#   Journal of Applied Physics. doi:10.1063/5.0231779  arXiv:2407.00946v1
+#
+# Version read: arxiv-preprint arXiv:2407.00946v1 (sha256 99c8564ea3a7a690...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 147 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the ACE potential for Cu-W, its VASP reference data,
+# the construction of the database, the cutoff and the energy and force
+# RMSEs stated in the text. Validation properties (phonons, melting,
+# thermal expansion, diffusion, stacking faults, interfaces, phase
+# separation) are not encoded. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-pan2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Pan et al. (2024): atomic cluster expansion potential for defects and thermodynamics of the Cu-W system" ;
+    mlips:reportedIn entity:article-pan2024 .
+
+entity:article-pan2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0231779> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Atomic cluster expansion interatomic potential for defects and thermodynamics of Cu–W system" ;
+    schema:author <https://orcid.org/0009-0003-9538-2565> ,
+        <https://orcid.org/0009-0008-3206-470X> ,
+        <https://orcid.org/0009-0005-5907-894X> ,
+        <https://orcid.org/0000-0003-4414-7111> ,
+        entity:person-Yu-pan2024 ,
+        entity:person-Shen-pan2024 .
+
+<https://orcid.org/0009-0003-9538-2565> a schema:Person ;
+    schema:name "Jiahao Pan" ;
+    schema:givenName "Jiahao" ;
+    schema:familyName "Pan" ;
+    schema:identifier <https://orcid.org/0009-0003-9538-2565> .
+
+<https://orcid.org/0009-0008-3206-470X> a schema:Person ;
+    schema:name "Huiqun Cheng" ;
+    schema:givenName "Huiqun" ;
+    schema:familyName "Cheng" ;
+    schema:identifier <https://orcid.org/0009-0008-3206-470X> .
+
+<https://orcid.org/0009-0005-5907-894X> a schema:Person ;
+    schema:name "Gaosheng Yan" ;
+    schema:givenName "Gaosheng" ;
+    schema:familyName "Yan" ;
+    schema:identifier <https://orcid.org/0009-0005-5907-894X> .
+
+<https://orcid.org/0000-0003-4414-7111> a schema:Person ;
+    schema:name "Lei Zhang" ;
+    schema:givenName "Lei" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0003-4414-7111> .
+
+entity:person-Yu-pan2024 a schema:Person ;
+    schema:name "Wenshan Yu" ;
+    schema:givenName "Wenshan" ;
+    schema:familyName "Yu" .
+
+entity:person-Shen-pan2024 a schema:Person ;
+    schema:name "Shengping Shen" ;
+    schema:givenName "Shengping" ;
+    schema:familyName "Shen" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CuW-pan2024 a mlips:MaterialSystem ;
+    rdfs:label "Copper-tungsten system (Cu, W, Cu-W solid solutions, surfaces, grain boundaries)" ;
+    mlips:chemicalFormula "Cu-W" ;
+    mlips:materialClass "Binary metallic system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-pan2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-pan2024 mlips:hasDFTSettings entity:calc-settings-dft-pan2024 .
+
+entity:calc-settings-dft-pan2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred, k-mesh spacing 0.015 per Angstrom for primitive cells and 0.03 per Angstrom otherwise (generated with Vaspkit)" ;
+    rdfs:comment "Pseudopotential type not stated in the text read." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-CuW-pan2024 a mlips:TrainingDataset ;
+    rdfs:label "Cu-W DFT database" ;
+    mlips:coversMaterial entity:mat-CuW-pan2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-pan2024 ;
+    rdfs:comment "Table I lists the configuration counts per class; the total and the train/test split were not captured. Structures more than 15 eV/atom above the ground state or with very large forces were removed before training." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-CuW-pan2024 mlips:samplingStrategy
+    entity:sampling-manual-pan2024 .
+
+entity:sampling-manual-pan2024 a mlips:SamplingStrategy ;
+    rdfs:label "Constructed configurations: Materials Project bulk phases of Cu and W, low-index surfaces, grain boundaries (Sigma 3, 5, 7, 9), fcc and bcc Cu-W solid solutions of varying composition, and random perturbations (within 5%) of volumes and positions" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-pan2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-pan2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:hasImplementation entity:impl-ACE-pan2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:loss-ACE-pan2024 a mlips:LossFunction ;
+    rdfs:label "Energy and force loss with kappa = 0.01 (weights 0.99 on energy and 0.01 on forces); higher weights for structures within 4 eV/atom above the convex hull" .
+
+entity:alg-ACE-pan2024 a mls:Algorithm ;
+    rdfs:label "Hierarchical power-order scheme that adds ACE basis functions sequentially (pacemaker)" .
+
+entity:impl-ACE-pan2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "fitted with pacemaker" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-CuW-cutoffRadius-pan2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-CuW-pan2024 a mlips:MLIPRun ;
+    rdfs:label "ACE parametrisation for Cu-W" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-CuW-pan2024 ;
+    mlips:hasHyperparameterSetting entity:setting-CuW-cutoffRadius-pan2024 ;
+    mlips:produces entity:model-CuW-pan2024 .
+
+entity:model-CuW-pan2024 a mlips:TrainedModel ;
+    rdfs:label "ACE potential for Cu-W" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-pan2024 mlips:hasResult
+    entity:result-train-pan2024 ,
+    entity:result-test-pan2024 .
+
+entity:result-train-pan2024 a mlips:BenchmarkResult ;
+    rdfs:comment "For structures within 4 eV above the convex hull: 2.56 meV/atom and 77.37 meV/A." ;
+    mlips:evaluatesModel entity:model-CuW-pan2024 ;
+    mlips:targetMaterial entity:mat-CuW-pan2024 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-pan2024 ,
+        entity:metric-train-2-pan2024 .
+
+entity:metric-train-1-pan2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-pan2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "176.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-pan2024 a mlips:BenchmarkResult ;
+    rdfs:comment "For structures within 4 eV above the convex hull: 2.71 meV/atom and 69.44 meV/A." ;
+    mlips:evaluatesModel entity:model-CuW-pan2024 ;
+    mlips:targetMaterial entity:mat-CuW-pan2024 ;
+    mlips:hasAccuracyMetric entity:metric-test-1-pan2024 ,
+        entity:metric-test-2-pan2024 .
+
+entity:metric-test-1-pan2024 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, testing set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.36"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-2-pan2024 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, testing set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "169.92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Data-set size and split are in Table I and the supplement and were not transcribed (the table is broken in the extracted text).
+# - Lattice and elastic properties, phonons, melting temperatures, thermal expansion, diffusion coefficients, stacking-fault, formation and interface energies and the phase-separation simulations are not encoded (no metric property). The implementation is recorded as the vocabulary library PACE; the text names only pacemaker.
+# - Read from the arXiv v1 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
