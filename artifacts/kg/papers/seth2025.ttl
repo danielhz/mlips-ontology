@@ -1,0 +1,285 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Aqshat Seth et al. (2025). Investigating Ionic Diffusivity in Amorphous LiPON using Machine-Learned Interatomic Potentials.
+#   ACS Materials Au. doi:10.1021/acsmaterialsau.4c00117  arXiv:2409.06242v1
+#
+# Version read: arxiv-preprint arXiv:2409.06242v1 (sha256 847b76bc2babb012...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 190 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the two NequIP models for the Li-P-O-N system (with
+# equivariant features, l_max = 2, and with scalar features only,
+# l_max = 0): VASP reference calculations, the five-part data set, and
+# the training and validation MAEs stated in the text. Amorphous LiPON
+# generation and Li diffusivities are not encoded. Read from the arXiv
+# preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-seth2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Seth et al. (2025): ionic diffusivity in amorphous LiPON using machine-learned interatomic potentials" ;
+    mlips:reportedIn entity:article-seth2025 .
+
+entity:article-seth2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acsmaterialsau.4c00117> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Investigating Ionic Diffusivity in Amorphous LiPON using Machine-Learned Interatomic Potentials" ;
+    schema:author entity:person-Seth-seth2025 ,
+        entity:person-Kulkarni-seth2025 ,
+        <https://orcid.org/0000-0002-1303-0976> .
+
+entity:person-Seth-seth2025 a schema:Person ;
+    schema:name "Aqshat Seth" ;
+    schema:givenName "Aqshat" ;
+    schema:familyName "Seth" .
+
+entity:person-Kulkarni-seth2025 a schema:Person ;
+    schema:name "Rutvij Pankaj Kulkarni" ;
+    schema:givenName "Rutvij Pankaj" ;
+    schema:familyName "Kulkarni" .
+
+<https://orcid.org/0000-0002-1303-0976> a schema:Person ;
+    schema:name "Gopalakrishnan Sai Gautam" ;
+    schema:givenName "Gopalakrishnan" ;
+    schema:familyName "Sai Gautam" ;
+    schema:identifier <https://orcid.org/0000-0002-1303-0976> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LiPON-seth2025 a mlips:MaterialSystem ;
+    rdfs:label "Li-P-O-N system: strained crystals of 19 chemical systems (Li, Li3P, Li3N, LiPN2, Li3PO4 and others), Li-rich and Li-poor defective Li3PO4, slabs, and melt-quenched amorphous structures" ;
+    mlips:chemicalFormula "Li-P-O-N" ;
+    mlips:materialClass "Amorphous solid electrolyte" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-seth2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-seth2025 mlips:hasDFTSettings entity:calc-settings-dft-seth2025 .
+
+entity:calc-settings-dft-seth2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack meshes of density 32 k-points per inverse Angstrom" ;
+    rdfs:comment "Relaxations at 520 eV; AIMD at 400 eV, and non-AIMD structures recomputed with a single SCF at 400 eV so that energy scales are comparable." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-LiPON-seth2025 a mlips:TrainingDataset ;
+    rdfs:label "LiPON data set (13,454 configurations; random 90:10 split into training and validation)" ;
+    mlips:coversMaterial entity:mat-LiPON-seth2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 13454 ;
+    mlips:hasDFTCalculation entity:calc-dft-seth2025 ;
+    rdfs:comment "The count is the whole data set before the split. The stated parts (886 + 256 + 74 + 1,219 + 11,000 = 13,435) fall 19 short of the stated total." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-LiPON-seth2025 mlips:samplingStrategy
+    entity:sampling-strain-seth2025 ,
+    entity:sampling-defects-seth2025 ,
+    entity:sampling-slabs-seth2025 ,
+    entity:sampling-meltquench-seth2025 .
+
+entity:sampling-strain-seth2025 a mlips:SamplingStrategy ;
+    rdfs:label "Hydrostatic, monoclinic and orthorhombic strains of DFT-relaxed bulk structures (886 configurations)" .
+
+entity:sampling-defects-seth2025 a mlips:SamplingStrategy ;
+    rdfs:label "Li-rich and Li-poor defective compositions by O/N substitution with charge compensation (256), and Li-rich Li7PN4-derived structures (74)" .
+
+entity:sampling-slabs-seth2025 a mlips:SamplingStrategy ;
+    rdfs:label "Slab configurations of Li, Li3P, Li2O and Li3N with 20 A vacuum (1,219)" .
+
+entity:sampling-meltquench-seth2025 a mlips:SamplingStrategy ;
+    rdfs:label "AIMD melt-quench (NVT, 2 fs step; heating to 3000 K or to 1000-2000 K depending on the compound, quench at 250 K/ps) giving 11,000 amorphous structures" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-seth2025 ;
+    mlips:hasHyperparameter entity:hp-lmax-seth2025 ;
+    mlips:hasImplementation entity:impl-NequIP-seth2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-NequIP-seth2025 a mls:Algorithm ;
+    rdfs:label "Hyperparameters optimised for the lowest force MAE on the validation set (Table S2)" .
+
+entity:impl-NequIP-seth2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP .
+
+entity:hp-lmax-seth2025 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order l_max of the features" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-l2-lmax-seth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-seth2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-l0-lmax-seth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-seth2025 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-l2-seth2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP training for LiPON with equivariant features (l_max = 2)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-LiPON-seth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-l2-lmax-seth2025 ;
+    mlips:produces entity:model-l2-seth2025 .
+
+entity:model-l2-seth2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for LiPON (l_max = 2)" .
+
+entity:run-l0-seth2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP training for LiPON with scalar features only (l_max = 0)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-LiPON-seth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-l0-lmax-seth2025 ;
+    mlips:produces entity:model-l0-seth2025 .
+
+entity:model-l0-seth2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for LiPON (l_max = 0)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-seth2025 mlips:hasResult
+    entity:result-l2-train-seth2025 ,
+    entity:result-l2-validation-seth2025 ,
+    entity:result-l0-train-seth2025 ,
+    entity:result-l0-validation-seth2025 .
+
+entity:result-l2-train-seth2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-seth2025 ;
+    mlips:targetMaterial entity:mat-LiPON-seth2025 ;
+    mlips:hasAccuracyMetric entity:metric-l2-train-1-seth2025 ,
+        entity:metric-l2-train-2-seth2025 .
+
+entity:metric-l2-train-1-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-train-2-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-l2-validation-seth2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l2-seth2025 ;
+    mlips:targetMaterial entity:mat-LiPON-seth2025 ;
+    mlips:hasAccuracyMetric entity:metric-l2-validation-1-seth2025 ,
+        entity:metric-l2-validation-2-seth2025 .
+
+entity:metric-l2-validation-1-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l2-validation-2-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-l0-train-seth2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l0-seth2025 ;
+    mlips:targetMaterial entity:mat-LiPON-seth2025 ;
+    mlips:hasAccuracyMetric entity:metric-l0-train-1-seth2025 ,
+        entity:metric-l0-train-2-seth2025 .
+
+entity:metric-l0-train-1-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "22.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l0-train-2-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "101.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-l0-validation-seth2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-l0-seth2025 ;
+    mlips:targetMaterial entity:mat-LiPON-seth2025 ;
+    mlips:hasAccuracyMetric entity:metric-l0-validation-1-seth2025 ,
+        entity:metric-l0-validation-2-seth2025 .
+
+entity:metric-l0-validation-1-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-l0-validation-2-seth2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "95.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The remaining hyperparameters (cutoff, layers, features, learning rate) are in SI Table S2 and are not encoded; both models share them.
+# - Amorphous LiPON structures from NequIP melt-quench MD, Li diffusivities and activation energies in bulk LiPON and across the Li/LiPON interface, and the comparison with experiment are not encoded.
+# - Read from the arXiv v1 preprint, whose title differs slightly from the ACS Materials Au article.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
