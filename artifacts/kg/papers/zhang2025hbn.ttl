@@ -1,0 +1,200 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Guanghao Zhang et al. (2025). Machine learning interatomic potentials for monolayer hexagonal boron nitride: Thermal transport and defect effects via deep potential molecular dynamics.
+#   Computational Materials Science. doi:10.1016/j.commatsci.2025.114452
+#
+# Version read: publisher (sha256 1832f82861b518a4...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 100 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one Deep Potential model (se_e2_a descriptor) for
+# pristine and defective monolayer h-BN built with DP-GEN active
+# learning and used for non-equilibrium MD of thermal conductivity:
+# reference settings, data set, training settings. Per-structure errors
+# are in Table S2 of the Supporting Information.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2025hbn a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2025): Deep Potential for monolayer hexagonal boron nitride, thermal transport and defect effects" ;
+    mlips:reportedIn entity:article-zhang2025hbn .
+
+entity:article-zhang2025hbn a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2025.114452> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potentials for monolayer hexagonal boron nitride: Thermal transport and defect effects via deep potential molecular dynamics" ;
+    schema:author entity:person-Zhang-zhang2025hbn ,
+        entity:person-Wang-zhang2025hbn ,
+        entity:person-Shi-zhang2025hbn ,
+        entity:person-Han-zhang2025hbn .
+
+entity:person-Zhang-zhang2025hbn a schema:Person ;
+    schema:name "Guanghao Zhang" ;
+    schema:givenName "Guanghao" ;
+    schema:familyName "Zhang" .
+
+entity:person-Wang-zhang2025hbn a schema:Person ;
+    schema:name "Zicheng Wang" ;
+    schema:givenName "Zicheng" ;
+    schema:familyName "Wang" .
+
+entity:person-Shi-zhang2025hbn a schema:Person ;
+    schema:name "Caihua Shi" ;
+    schema:givenName "Caihua" ;
+    schema:familyName "Shi" .
+
+entity:person-Han-zhang2025hbn a schema:Person ;
+    schema:name "Ye Han" ;
+    schema:givenName "Ye" ;
+    schema:familyName "Han" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-hBN-zhang2025hbn a mlips:MaterialSystem ;
+    rdfs:label "Monolayer hexagonal boron nitride: pristine, B and N monovacancies, divacancies and Stone-Wales defects" ;
+    mlips:chemicalFormula "BN" ;
+    mlips:materialClass "Two-dimensional material" ;
+    mlips:microstructuralFeature "Monovacancies (B, N), divacancies in three orientations, Stone-Wales defects in three orientations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhang2025hbn a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhang2025hbn mlips:hasDFTSettings entity:calc-settings-dft-zhang2025hbn .
+
+entity:calc-settings-dft-zhang2025hbn a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack scheme with k-point spacing 0.14 A^-1" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-hBN-zhang2025hbn a mlips:TrainingDataset ;
+    rdfs:label "h-BN Deep Potential data set (14,126 configurations)" ;
+    mlips:coversMaterial entity:mat-hBN-zhang2025hbn ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 14126 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2025hbn ;
+    rdfs:comment "6340 initial configurations plus 7786 from active-learning exploration." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-hBN-zhang2025hbn mlips:samplingStrategy
+    entity:sampling-perturbed-aimd-zhang2025hbn ,
+    entity:sampling-dpgen-zhang2025hbn .
+
+entity:sampling-perturbed-aimd-zhang2025hbn a mlips:SamplingStrategy ;
+    rdfs:label "Perturbed structures with short AIMD (initial data)" ;
+    rdfs:comment "Pristine and defective structures perturbed with the DP-GEN workflow (symmetric strain of +/- 3%), each followed by 100 steps of AIMD at 300 K: 6340 configurations." .
+
+entity:sampling-dpgen-zhang2025hbn a mlips:SamplingStrategy ;
+    rdfs:label "DP-GEN active learning with four models" ;
+    rdfs:comment "Exploration by MD in the NPT ensemble at temperatures from 200 K up to 1200 K and pressures from 1 to 10,000 bar; candidates selected by the maximum force deviation between models within trust thresholds; 7786 additional configurations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-zhang2025hbn ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-rcut-smooth-zhang2025hbn ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-DeePMD-zhang2025hbn ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:alg-DeePMD-zhang2025hbn a mls:Algorithm ;
+    rdfs:label "Learning rate decaying exponentially from 0.001 to 3.5e-8; four models with different seeds trained on the same data for DP-GEN" .
+
+entity:impl-DeePMD-zhang2025hbn a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "se_e2_a descriptor; driven by DP-GEN; MD in LAMMPS" .
+
+entity:hp-rcut-smooth-zhang2025hbn a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential smoothing start radius (Angstrom)" ;
+    mlips:hyperparameterName "rcut_smth" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-hBN-cutoffRadius-zhang2025hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-dp-hBN-rcut-smooth-zhang2025hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-zhang2025hbn ;
+    mlips:settingValue "2"^^xsd:double .
+
+entity:setting-dp-hBN-learningRate-zhang2025hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-hBN-zhang2025hbn a mlips:MLIPRun ;
+    rdfs:label "Deep Potential (se_e2_a) training for monolayer h-BN and its defects" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-hBN-zhang2025hbn ;
+    mlips:hasHyperparameterSetting entity:setting-dp-hBN-cutoffRadius-zhang2025hbn ,
+        entity:setting-dp-hBN-rcut-smooth-zhang2025hbn ,
+        entity:setting-dp-hBN-learningRate-zhang2025hbn ;
+    mlips:produces entity:model-dp-hBN-zhang2025hbn .
+
+entity:model-dp-hBN-zhang2025hbn a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for pristine and defective monolayer h-BN" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy and force RMSEs per structure type for the four DP models are in Table S2 of the Supporting Information; the main text quotes only examples (force RMSE of 106.46 meV/A for the B-vacancy structure with 'Model 1' against 124.93 meV/A with 'Model 0'; below 85 meV/A for Stone-Wales defects with 'Model 3'). Because it is not clear which of the four models is the production model, no AccuracyMetric is encoded.
+# - Embedding and fitting network sizes are given in the text but were captured only in part (fitting network of three hidden layers starting with 240, 240); they are not encoded.
+# - Thermal conductivity from non-equilibrium MD, phonon dispersion, energy-volume curves and defect formation energies are the paper's results and have no MetricProperty. Phonon dispersion with the DP model is the ground for PhononCalculation.
+# - The manifest classes this paper as 'Method/model'; it is an application of DeePMD.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
