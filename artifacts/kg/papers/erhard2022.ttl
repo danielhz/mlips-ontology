@@ -1,0 +1,191 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Linus C. Erhard et al. (2022). A machine-learned interatomic potential for silica and its relation to empirical models.
+#   npj Computational Materials. doi:10.1038/s41524-022-00768-w
+#
+# Version read: publisher (sha256 ece20107b869183c...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 171 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the GAP model for silica (two-body plus SOAP), its
+# SCAN reference calculations, the iteratively built database and the
+# fitting settings stated in the Methods. The paper validates through
+# properties against experiment and empirical potentials and prints no
+# energy or force error on a test set in the main text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-erhard2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Erhard et al. (2022): a machine-learned interatomic potential for silica and its relation to empirical models" ;
+    mlips:reportedIn entity:article-erhard2022 .
+
+entity:article-erhard2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-022-00768-w> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "A machine-learned interatomic potential for silica and its relation to empirical models" ;
+    schema:author <https://orcid.org/0000-0003-0219-5801> ,
+        entity:person-Rohrer-erhard2022 ,
+        entity:person-Albe-erhard2022 ,
+        entity:person-Deringer-erhard2022 .
+
+<https://orcid.org/0000-0003-0219-5801> a schema:Person ;
+    schema:name "Linus C. Erhard" ;
+    schema:givenName "Linus C." ;
+    schema:familyName "Erhard" ;
+    schema:identifier <https://orcid.org/0000-0003-0219-5801> .
+
+entity:person-Rohrer-erhard2022 a schema:Person ;
+    schema:name "Jochen Rohrer" ;
+    schema:givenName "Jochen" ;
+    schema:familyName "Rohrer" .
+
+entity:person-Albe-erhard2022 a schema:Person ;
+    schema:name "Karsten Albe" ;
+    schema:givenName "Karsten" ;
+    schema:familyName "Albe" .
+
+entity:person-Deringer-erhard2022 a schema:Person ;
+    schema:name "Volker L. Deringer" ;
+    schema:givenName "Volker L." ;
+    schema:familyName "Deringer" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-SiO2-erhard2022 a mlips:MaterialSystem ;
+    rdfs:label "Silica (crystalline polymorphs, liquid and amorphous SiO2)" ;
+    mlips:chemicalFormula "SiO2" ;
+    mlips:materialClass "Oxide glass former" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-scan-erhard2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-scan-erhard2022 mlips:hasDFTSettings entity:calc-settings-scan-erhard2022 .
+
+entity:calc-settings-scan-erhard2022 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:SCAN ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "900"^^xsd:double ;
+    mlips:kPointMesh "k-spacing 0.23 per Angstrom" ;
+    rdfs:comment "Final reference level. Early versions of the potential used PBEsol data computed with GPAW (700 eV cutoff, k-spacing 0.279 per Angstrom); the split of the final database between the two codes is detailed in the supplement." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-SiO2-erhard2022 a mlips:TrainingDataset ;
+    rdfs:label "Silica GAP reference database (SCAN labels)" ;
+    mlips:coversMaterial entity:mat-SiO2-erhard2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-scan-erhard2022 ;
+    rdfs:comment "Size and composition are in the Supplementary Material and were not captured; that virial stresses are fitted is assumed from GAP practice and the elastic-constant tests, not stated in the text read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-SiO2-erhard2022 mlips:samplingStrategy
+    entity:sampling-iterative-erhard2022 .
+
+entity:sampling-iterative-erhard2022 a mlips:SamplingStrategy ;
+    rdfs:label "Iterative batch fitting: MD with a fast empirical potential first, then MD with successive GAP versions (crystalline, liquid and amorphous structures), single-point DFT on batches fed back until the database is sufficient; existing structures re-labelled from PBEsol to SCAN" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-erhard2022 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numSparseConfigs ,
+        entity:hp-two-body-sparse-erhard2022 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation ,
+        mlips:GeometryOptimization .
+
+entity:alg-GAP-erhard2022 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression combining two-body descriptors and SOAP" .
+
+entity:hp-two-body-sparse-erhard2022 a mlips:Hyperparameter ;
+    rdfs:label "Sparse points per two-body descriptor (Si-Si, Si-O, O-O)" ;
+    mlips:hyperparameterName "n_sparse_2b" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-SiO2-cutoffRadius-erhard2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SiO2-numSparseConfigs-erhard2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "4060"^^xsd:integer .
+
+entity:setting-SiO2-two-body-sparse-erhard2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-two-body-sparse-erhard2022 ;
+    mlips:settingValue "15"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SiO2-erhard2022 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for silica (2-body + SOAP, SCAN data)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-SiO2-erhard2022 ;
+    mlips:hasHyperparameterSetting entity:setting-SiO2-cutoffRadius-erhard2022 ,
+        entity:setting-SiO2-numSparseConfigs-erhard2022 ,
+        entity:setting-SiO2-two-body-sparse-erhard2022 ;
+    mlips:produces entity:model-SiO2-erhard2022 .
+
+entity:model-SiO2-erhard2022 a mlips:TrainedModel ;
+    rdfs:label "GAP for silica (SiO2-GAP-22)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: the main text reports no energy or force RMSE against DFT. Accuracy is shown through ground-state volumes and bulk moduli (Table 1), RMSE and MAPE of elastic constants against experiment (Fig. 2b), phonon dispersions, the phase diagram, excess energies of amorphous models (Table 2) and high-pressure behaviour (Table 3), none of which has a metric property.
+# - numSparseConfigs is the SOAP sparse-point count (4,060); the two-body descriptors have 15 sparse points each. SOAP n_max, l_max and regularisation are in the supplement. The model name 'SiO2-GAP-22' in the label is the name commonly used for this potential and should be checked against the paper's data-availability statement.
+# - The implementation (QUIP/GAP code) is not named in the text read and is not asserted.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
