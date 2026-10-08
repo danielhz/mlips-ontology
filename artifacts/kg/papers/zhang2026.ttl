@@ -1,0 +1,364 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Wentao Zhang et al. (2026). Constructing machine learning interatomic potentials with minimum amount of ab initio data.
+#   npj Computational Materials. doi:10.1038/s41524-026-02023-y
+#
+# Version read: publisher (sha256 c75a23ce6031e00a...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 115 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the workflow of the paper applied to three solid-state
+# electrolytes (LGPS, LATP, LYC): MD with a pretrained MACE-MP-0 model
+# samples configurations, DIRECT selects a few hundred for DFT, a MACE
+# model is fine-tuned from the pretrained one, and a lightweight NEP
+# model is distilled from it. One fine-tuned MACE run and one distilled
+# NEP run per system are encoded; accuracies are reported as figures.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2026): constructing MLIPs with a minimum amount of ab initio data (pretrained-MACE sampling, fine-tuning, distillation to NEP)" ;
+    mlips:reportedIn entity:article-zhang2026 .
+
+entity:article-zhang2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-026-02023-y> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Constructing machine learning interatomic potentials with minimum amount of ab initio data" ;
+    schema:author entity:person-Zhang-zhang2026 ,
+        entity:person-Wu-zhang2026 ,
+        entity:person-Wang-zhang2026 ,
+        entity:person-Hu-zhang2026 ,
+        entity:person-Liu-zhang2026 ,
+        entity:person-WangLinWang-zhang2026 .
+
+entity:person-Zhang-zhang2026 a schema:Person ;
+    schema:name "Wentao Zhang" ;
+    schema:givenName "Wentao" ;
+    schema:familyName "Zhang" .
+
+entity:person-Wu-zhang2026 a schema:Person ;
+    schema:name "Xingxing Wu" ;
+    schema:givenName "Xingxing" ;
+    schema:familyName "Wu" .
+
+entity:person-Wang-zhang2026 a schema:Person ;
+    schema:name "Chen Wang" ;
+    schema:givenName "Chen" ;
+    schema:familyName "Wang" .
+
+entity:person-Hu-zhang2026 a schema:Person ;
+    schema:name "Siyu Hu" ;
+    schema:givenName "Siyu" ;
+    schema:familyName "Hu" .
+
+entity:person-Liu-zhang2026 a schema:Person ;
+    schema:name "Yueyang Liu" ;
+    schema:givenName "Yueyang" ;
+    schema:familyName "Liu" .
+
+entity:person-WangLinWang-zhang2026 a schema:Person ;
+    schema:name "Lin-Wang Wang" ;
+    schema:givenName "Lin-Wang" ;
+    schema:familyName "Wang" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LGPS-zhang2026 a mlips:MaterialSystem ;
+    rdfs:label "Li10GeP2S12 (LGPS) solid-state electrolyte" ;
+    mlips:chemicalFormula "Li10GeP2S12" ;
+    mlips:materialClass "Li-ion conducting solid electrolyte (bulk)" .
+
+entity:mat-LATP-zhang2026 a mlips:MaterialSystem ;
+    rdfs:label "Li1+xAlxTi2-x(PO4)3 (LATP) solid-state electrolyte" ;
+    mlips:chemicalFormula "LATP" ;
+    mlips:materialClass "Li-ion conducting solid electrolyte (bulk)" .
+
+entity:mat-LYC-zhang2026 a mlips:MaterialSystem ;
+    rdfs:label "Li3YCl6 (LYC) solid-state electrolyte" ;
+    mlips:chemicalFormula "Li3YCl6" ;
+    mlips:materialClass "Li-ion conducting solid electrolyte (bulk)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-pbe-zhang2026 a mlips:DFTCalculation .
+
+entity:calc-optb88-zhang2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-pbe-zhang2026 mlips:hasDFTSettings entity:calc-settings-pbe-zhang2026 .
+
+entity:calc-settings-pbe-zhang2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred meshes with KSPACING = 0.25 A^-1 (Gamma point only for AIMD)" ;
+    rdfs:comment "Used for LGPS and LATP." .
+
+entity:calc-optb88-zhang2026 mlips:hasDFTSettings entity:calc-settings-optb88-zhang2026 .
+
+entity:calc-settings-optb88-zhang2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-optB88-vdW-zhang2026 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred meshes with KSPACING = 0.25 A^-1 (Gamma point only for AIMD)" ;
+    rdfs:comment "Used for LYC." .
+
+entity:xc-optB88-vdW-zhang2026 a mlips:XCFunctional ;
+    rdfs:label "optB88-vdW" ;
+    rdfs:comment "optB88 van der Waals functional, adopted for LYC to correct the lattice parameters overestimated by PBE." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-LGPS-dft-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LGPS DFT training set selected by MACE-MD sampling and DIRECT" ;
+    mlips:coversMaterial entity:mat-LGPS-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-pbe-zhang2026 ;
+    rdfs:comment "A few hundred DFT calculations; the exact sizes are varied in the data-size study (Fig. 2) and not printed in the text read." .
+
+entity:ds-LGPS-distill-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LGPS distillation set labelled by the fine-tuned MACE model" ;
+    mlips:coversMaterial entity:mat-LGPS-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    rdfs:comment "Labels are MLIP predictions, not DFT; size not captured." .
+
+entity:ds-LATP-dft-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LATP DFT training set selected by MACE-MD sampling and DIRECT" ;
+    mlips:coversMaterial entity:mat-LATP-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-pbe-zhang2026 ;
+    rdfs:comment "A few hundred DFT calculations; the exact sizes are varied in the data-size study (Fig. 2) and not printed in the text read." .
+
+entity:ds-LATP-distill-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LATP distillation set labelled by the fine-tuned MACE model" ;
+    mlips:coversMaterial entity:mat-LATP-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    rdfs:comment "Labels are MLIP predictions, not DFT; size not captured." .
+
+entity:ds-LYC-dft-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LYC DFT training set selected by MACE-MD sampling and DIRECT" ;
+    mlips:coversMaterial entity:mat-LYC-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-optb88-zhang2026 ;
+    rdfs:comment "A few hundred DFT calculations; the exact sizes are varied in the data-size study (Fig. 2) and not printed in the text read." .
+
+entity:ds-LYC-distill-zhang2026 a mlips:TrainingDataset ;
+    rdfs:label "LYC distillation set labelled by the fine-tuned MACE model" ;
+    mlips:coversMaterial entity:mat-LYC-zhang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    rdfs:comment "Labels are MLIP predictions, not DFT; size not captured." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-LGPS-dft-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-direct-zhang2026 .
+
+entity:ds-LGPS-distill-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-distillation-zhang2026 .
+
+entity:ds-LATP-dft-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-direct-zhang2026 .
+
+entity:ds-LATP-distill-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-distillation-zhang2026 .
+
+entity:ds-LYC-dft-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-direct-zhang2026 .
+
+entity:ds-LYC-distill-zhang2026 mlips:samplingStrategy
+    entity:sampling-mace-md-zhang2026 ,
+    entity:sampling-distillation-zhang2026 .
+
+entity:sampling-mace-md-zhang2026 a mlips:SamplingStrategy ;
+    rdfs:label "MD with the pretrained MACE-MP-0 model" ;
+    rdfs:comment "NVT MD (Nose-Hoover) at several temperatures with the pretrained universal model generates the candidate configurations; training and validation sets come from independent MACE-MD trajectories, test sets from AIMD trajectories." .
+
+entity:sampling-direct-zhang2026 a mlips:SamplingStrategy ;
+    rdfs:label "DIRECT resampling" ;
+    rdfs:comment "Configurations are featurised with a pretrained M3GNet model, reduced by PCA (components with eigenvalue above 1) and resampled so that a few hundred structures cover the sampled configuration space; these are computed with DFT." .
+
+entity:sampling-distillation-zhang2026 a mlips:SamplingStrategy ;
+    rdfs:label "Labels from the fine-tuned MACE model (distillation)" ;
+    rdfs:comment "The NEP models are trained on data labelled by the fine-tuned MACE model." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-zhang2026 ;
+    mlips:hasImplementation entity:impl-MACE-zhang2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-MACE-zhang2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning from the pretrained MACE-MP-0 model with its settings; early stopping (validation loss checked every 200 epochs, patience 30)" .
+
+entity:impl-MACE-zhang2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+entity:NEP a mlips:MLIPMethod ;
+    rdfs:label "Neuroevolution Potential (NEP)" ;
+    mlips:hasTrainingAlgorithm entity:alg-NEP-zhang2026 ;
+    mlips:hasHyperparameter entity:hp-hidden-neurons-zhang2026 ;
+    mlips:hasImplementation entity:impl-NEP-zhang2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-NEP-zhang2026 a mls:Algorithm ;
+    rdfs:label "Default settings of the MatPL package; early stopping with validation every 1000 epochs and patience 200; ZBL outer cutoff 1.8 A" .
+
+entity:impl-NEP-zhang2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-MatPL-zhang2026 .
+
+entity:lib-MatPL-zhang2026 a mlips:Library ;
+    rdfs:label "MatPL" ;
+    rdfs:comment "Materials Potential Library (MatPL) package." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-hidden-neurons-zhang2026 a mlips:Hyperparameter ;
+    rdfs:label "NEP number of neurons in the hidden layer" ;
+    mlips:hyperparameterName "neuron" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-nep-LGPS-hidden-neurons-zhang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-neurons-zhang2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-nep-LATP-hidden-neurons-zhang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-neurons-zhang2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-nep-LYC-hidden-neurons-zhang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-neurons-zhang2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-ft-LGPS-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "MACE fine-tuned from pretrained MACE-MP-0 on the LGPS DFT set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-LGPS-dft-zhang2026 ;
+    mlips:produces entity:model-mace-ft-LGPS-zhang2026 .
+
+entity:model-mace-ft-LGPS-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Fine-tuned MACE model for LGPS" .
+
+entity:run-nep-LGPS-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "NEP distilled from the fine-tuned MACE model for LGPS" ;
+    mlips:appliesMethod entity:NEP ;
+    mlips:runsOn entity:ds-LGPS-distill-zhang2026 ;
+    mlips:hasHyperparameterSetting entity:setting-nep-LGPS-hidden-neurons-zhang2026 ;
+    mlips:produces entity:model-nep-LGPS-zhang2026 .
+
+entity:model-nep-LGPS-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Distilled NEP model for LGPS" .
+
+entity:run-mace-ft-LATP-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "MACE fine-tuned from pretrained MACE-MP-0 on the LATP DFT set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-LATP-dft-zhang2026 ;
+    mlips:produces entity:model-mace-ft-LATP-zhang2026 .
+
+entity:model-mace-ft-LATP-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Fine-tuned MACE model for LATP" .
+
+entity:run-nep-LATP-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "NEP distilled from the fine-tuned MACE model for LATP" ;
+    mlips:appliesMethod entity:NEP ;
+    mlips:runsOn entity:ds-LATP-distill-zhang2026 ;
+    mlips:hasHyperparameterSetting entity:setting-nep-LATP-hidden-neurons-zhang2026 ;
+    mlips:produces entity:model-nep-LATP-zhang2026 .
+
+entity:model-nep-LATP-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Distilled NEP model for LATP" .
+
+entity:run-mace-ft-LYC-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "MACE fine-tuned from pretrained MACE-MP-0 on the LYC DFT set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-LYC-dft-zhang2026 ;
+    mlips:produces entity:model-mace-ft-LYC-zhang2026 .
+
+entity:model-mace-ft-LYC-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Fine-tuned MACE model for LYC" .
+
+entity:run-nep-LYC-zhang2026 a mlips:MLIPRun ;
+    rdfs:label "NEP distilled from the fine-tuned MACE model for LYC" ;
+    mlips:appliesMethod entity:NEP ;
+    mlips:runsOn entity:ds-LYC-distill-zhang2026 ;
+    mlips:hasHyperparameterSetting entity:setting-nep-LYC-hidden-neurons-zhang2026 ;
+    mlips:produces entity:model-nep-LYC-zhang2026 .
+
+entity:model-nep-LYC-zhang2026 a mlips:TrainedModel ;
+    rdfs:label "Distilled NEP model for LYC" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric is encoded: errors against training-set size (total-energy RMSE, force RMSE, CI-NEB relative-energy RMSE, stable simulation time) are figures. The text prints only the out-of-the-box accuracy of the pretrained MACE-MP-0 averaged over the three systems (RMSE 0.25 eV in total energy for cells of 73 atoms on average, 0.16 eV/A in forces, after aligning the mean energy), and relative errors (22.8% on transition-state relative energies, 60.8% on Li diffusion coefficients).
+# - The pretrained model is 'MACE-MP-0' without a named release, so it is not linked to a registry model; the fine-tuned models start from it, which schema 0.1.2 cannot express.
+# - MACE and NEP models trained from scratch on the small data sets (found accurate but unstable in MD) are part of the comparison and are not encoded as runs.
+# - The distillation data sets carry no reference calculation because their labels come from the fine-tuned MACE model; mlips:datasetProvenance InHouse is used for lack of a better value.
+# - NEP is a new registry method first used here. Ionic conductivities, diffusion coefficients and RDFs have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
