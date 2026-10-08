@@ -1,0 +1,272 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jesper Byggmästar et al. (2019). Machine-learning interatomic potential for radiation damage and defects in tungsten.
+#   Physical review. B./Physical review. B. doi:10.1103/physrevb.100.144105  arXiv:1908.07330v2
+#
+# Version read: arxiv-preprint arXiv:1908.07330v2 (sha256 16325553c80ee423...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 59 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one GAP for tungsten aimed at radiation damage: a SOAP
+# many-body term plus a two-body term on top of an external screened
+# Coulomb pair potential, with the training database of Table II, the
+# input parameters of Table I and the reference settings. Validation is
+# by properties; training errors are stated only as bounds.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-byggmastar2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Byggmastar et al. (2019): machine-learning interatomic potential (GAP) for radiation damage and defects in tungsten" ;
+    mlips:reportedIn entity:article-byggmastar2019 .
+
+entity:article-byggmastar2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.100.144105> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Machine-learning interatomic potential for radiation damage and defects in tungsten" ;
+    schema:author <https://orcid.org/0000-0002-4898-6150> ,
+        entity:person-Hamedani-byggmastar2019 ,
+        entity:person-Nordlund-byggmastar2019 ,
+        entity:person-Djurabekova-byggmastar2019 .
+
+<https://orcid.org/0000-0002-4898-6150> a schema:Person ;
+    schema:name "J. Byggmästar" ;
+    schema:givenName "J." ;
+    schema:familyName "Byggmästar" ;
+    schema:identifier <https://orcid.org/0000-0002-4898-6150> .
+
+entity:person-Hamedani-byggmastar2019 a schema:Person ;
+    schema:name "A. Hamedani" ;
+    schema:givenName "A." ;
+    schema:familyName "Hamedani" .
+
+entity:person-Nordlund-byggmastar2019 a schema:Person ;
+    schema:name "K. Nordlund" ;
+    schema:givenName "K." ;
+    schema:familyName "Nordlund" .
+
+entity:person-Djurabekova-byggmastar2019 a schema:Person ;
+    schema:name "F. Djurabekova" ;
+    schema:givenName "F." ;
+    schema:familyName "Djurabekova" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-W-byggmastar2019 a mlips:MaterialSystem ;
+    rdfs:label "Tungsten: bcc bulk, other crystal structures, vacancies, self-interstitials, surfaces, liquid and short-range configurations" ;
+    mlips:chemicalFormula "W" ;
+    mlips:materialClass "Elemental bcc refractory metal" ;
+    mlips:microstructuralFeature "Mono-, di- and tri-vacancies; single and di-self-interstitials; (100), (110), (111), (112) surfaces; disordered surfaces" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-byggmastar2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-byggmastar2019 mlips:hasDFTSettings entity:calc-settings-dft-byggmastar2019 .
+
+entity:calc-settings-dft-byggmastar2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack grids with KSPACING = 0.15 A^-1 (e.g. 5x5x5 for a 54-atom bcc cell)" ;
+    rdfs:comment "VASP 5.4.4 with the W_sv PAW potential (14 valence electrons 5s2 5p6 5d4 6s2); first-order Methfessel-Paxton smearing of 0.1 eV. Same settings for training and validation data." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-W-byggmastar2019 a mlips:TrainingDataset ;
+    rdfs:label "Tungsten GAP training database (3749 structures, 42,410 atoms)" ;
+    mlips:coversMaterial entity:mat-W-byggmastar2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 3749 ;
+    mlips:hasDFTCalculation entity:calc-dft-byggmastar2019 ;
+    rdfs:comment "Table II; the GAP is trained on the differences between DFT and the external screened Coulomb pair potential." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-W-byggmastar2019 mlips:samplingStrategy
+    entity:sampling-distorted-cells-byggmastar2019 ,
+    entity:sampling-defects-md-byggmastar2019 ,
+    entity:sampling-surfaces-byggmastar2019 ,
+    entity:sampling-liquid-byggmastar2019 ,
+    entity:sampling-short-range-byggmastar2019 .
+
+entity:sampling-distorted-cells-byggmastar2019 a mlips:SamplingStrategy ;
+    rdfs:label "Distorted crystal unit cells" ;
+    rdfs:comment "2496 distorted bcc unit cells and 100 each of fcc, hcp, A15, C15, diamond and simple cubic; virial stresses are trained only for these." .
+
+entity:sampling-defects-md-byggmastar2019 a mlips:SamplingStrategy ;
+    rdfs:label "Defect configurations from MD with an early GAP" ;
+    rdfs:comment "Vacancies (single, di-, tri-) and self-interstitials (single, di-) sampled from MD at 500-1000 K using an early version of the GAP; high-temperature bcc cells." .
+
+entity:sampling-surfaces-byggmastar2019 a mlips:SamplingStrategy ;
+    rdfs:label "bcc surfaces and disordered surfaces" ;
+    rdfs:comment "(100), (110), (111) and (112) slabs of 12 atoms; 24 disordered surface cells of 128 or 144 atoms." .
+
+entity:sampling-liquid-byggmastar2019 a mlips:SamplingStrategy ;
+    rdfs:label "Liquid configurations at a range of densities" ;
+    rdfs:comment "46 liquid cells of 128 atoms." .
+
+entity:sampling-short-range-byggmastar2019 a mlips:SamplingStrategy ;
+    rdfs:label "Short-range configurations, dimers and the isolated atom" ;
+    rdfs:comment "100 short-range structures (53-55 atoms), 13 dimers and one isolated atom, for the repulsive part of the potential." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasLossFunction entity:loss-GAP-byggmastar2019 ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-byggmastar2019 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-cutoff-transition-width-byggmastar2019 ,
+        entity:hp-delta-byggmastar2019 ,
+        mlips:numSparseConfigs ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        entity:hp-sigma-atom-byggmastar2019 ,
+        entity:hp-zeta-byggmastar2019 ;
+    mlips:hasImplementation entity:impl-GAP-byggmastar2019 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation ,
+        mlips:NudgedElasticBand ,
+        mlips:GeometryOptimization .
+
+entity:loss-GAP-byggmastar2019 a mlips:LossFunction ;
+    rdfs:label "Gaussian process regression with per-structure-type regularisation: sigma_energy = 1 meV/atom and sigma_force = 0.04 eV/A for most structures, 10 meV/atom and 0.4 eV/A (0.2 eV/A for disordered surfaces) for liquid and short-range structures; sigma_virial = 0.04 eV for distorted unit cells only" .
+
+entity:alg-GAP-byggmastar2019 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression; 4000 SOAP sparse points chosen by CUR decomposition and 20 uniformly spaced two-body sparse points" .
+
+entity:impl-GAP-byggmastar2019 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP ;
+    mlips:version "GAP trained with QUIP; MD in LAMMPS compiled with QUIP" .
+
+entity:hp-zeta-byggmastar2019 a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel exponent zeta" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-atom-byggmastar2019 a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width (Angstrom)" ;
+    mlips:hyperparameterName "sigma_atom" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-cutoff-transition-width-byggmastar2019 a mlips:Hyperparameter ;
+    rdfs:label "Width of the cutoff region (Angstrom)" ;
+    mlips:hyperparameterName "R_delta_cut" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-delta-byggmastar2019 a mlips:Hyperparameter ;
+    rdfs:label "GAP energy scale delta of the SOAP term (eV)" ;
+    mlips:hyperparameterName "delta" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-W-cutoffRadius-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-gap-W-cutoff-transition-width-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-byggmastar2019 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-gap-W-delta-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-delta-byggmastar2019 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-gap-W-numSparseConfigs-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "4000"^^xsd:integer .
+
+entity:setting-gap-W-numRadialBasis-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-W-numAngularBasis-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-W-sigma-atom-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-byggmastar2019 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-gap-W-zeta-byggmastar2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-byggmastar2019 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-W-byggmastar2019 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for tungsten (SOAP + two-body descriptors on a screened Coulomb pair potential)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-W-byggmastar2019 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-W-cutoffRadius-byggmastar2019 ,
+        entity:setting-gap-W-cutoff-transition-width-byggmastar2019 ,
+        entity:setting-gap-W-delta-byggmastar2019 ,
+        entity:setting-gap-W-numSparseConfigs-byggmastar2019 ,
+        entity:setting-gap-W-numRadialBasis-byggmastar2019 ,
+        entity:setting-gap-W-numAngularBasis-byggmastar2019 ,
+        entity:setting-gap-W-sigma-atom-byggmastar2019 ,
+        entity:setting-gap-W-zeta-byggmastar2019 ;
+    mlips:produces entity:model-gap-W-byggmastar2019 .
+
+entity:model-gap-W-byggmastar2019 a mlips:TrainedModel ;
+    rdfs:label "GAP for radiation damage and defects in tungsten" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Training RMSEs are given only as bounds ('well below 1 meV/atom and 0.1 eV/A for most crystalline structures, a few meV/atom and around 0.3-0.4 eV/A for liquid and short-range structures'); no AccuracyMetric is encoded.
+# - The settings are those of the SOAP term. The two-body term (cutoff 5 A, delta = 10 eV, 20 uniform sparse points) and the external screened Coulomb potential (cutoff range 1 to 2.2 A) are not encoded as settings.
+# - Property validation (lattice and elastic constants, defect formation and migration energies, surface energies, melting point, thermal expansion, threshold displacement energies, cascade simulations) has no MetricProperty. Molecular statics, NEB and phonon calculations were run through ASE and phonopy with the GAP.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
