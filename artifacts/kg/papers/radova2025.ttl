@@ -1,0 +1,507 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Mariia Radova et al. (2025). Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning.
+#   npj Computational Materials. doi:10.1038/s41524-025-01727-x  arXiv:2502.15582v3
+#
+# Version read: arxiv-preprint arXiv:2502.15582v3 (sha256 8670a63d2e464ac3...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 172 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the four H2/Cu models compared in Table I: the frozen
+# transfer-learned MACE-MP-f4 model on 10% of the data, the ACE surrogate
+# fitted to its predictions (ACE-f 10%), and the from-scratch ACE and
+# MACE models on the full DFT database, with settings, errors and
+# evaluation times. Learning curves, other freeze depths and the Ti-Al-V
+# application are figures; see gaps. Read from the arXiv preprint (v3).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-radova2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Radova et al. (2025): fine-tuning foundation models of interatomic potentials with frozen transfer learning" ;
+    mlips:reportedIn entity:article-radova2025 .
+
+entity:article-radova2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01727-x> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Fine-tuning foundation models of materials interatomic potentials with frozen transfer learning" ;
+    schema:author entity:person-Radova-radova2025 ,
+        entity:person-Stark-radova2025 ,
+        entity:person-Allen-radova2025 ,
+        entity:person-Maurer-radova2025 ,
+        entity:person-Bartok-radova2025 .
+
+entity:person-Radova-radova2025 a schema:Person ;
+    schema:name "Mariia Radova" ;
+    schema:givenName "Mariia" ;
+    schema:familyName "Radova" .
+
+entity:person-Stark-radova2025 a schema:Person ;
+    schema:name "Wojciech G. Stark" ;
+    schema:givenName "Wojciech G." ;
+    schema:familyName "Stark" .
+
+entity:person-Allen-radova2025 a schema:Person ;
+    schema:name "Connor S. Allen" ;
+    schema:givenName "Connor S." ;
+    schema:familyName "Allen" .
+
+entity:person-Maurer-radova2025 a schema:Person ;
+    schema:name "Reinhard J. Maurer" ;
+    schema:givenName "Reinhard J." ;
+    schema:familyName "Maurer" .
+
+entity:person-Bartok-radova2025 a schema:Person ;
+    schema:name "Albert P. Bartók" ;
+    schema:givenName "Albert P." ;
+    schema:familyName "Bartók" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CuH-radova2025 a mlips:MaterialSystem ;
+    rdfs:label "H2 on copper surfaces (Cu(111), (100), (110), (211)) and clean copper slabs" ;
+    mlips:chemicalFormula "H2/Cu" ;
+    mlips:materialClass "Gas-surface system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-radova2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-radova2025 mlips:hasDFTSettings entity:calc-settings-dft-radova2025 .
+
+entity:calc-settings-dft-radova2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional entity:xc-SRP48-radova2025 ;
+    rdfs:comment "Level of the published H2/Cu database (stark2023); settings are given there." .
+
+entity:xc-SRP48-radova2025 a mlips:XCFunctional ;
+    rdfs:label "SRP48" ;
+    rdfs:comment "52% PBE and 48% RPBE." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-full-radova2025 a mlips:TrainingDataset ;
+    rdfs:label "H2/Cu training set, 100% (3376 configurations)" ;
+    mlips:coversMaterial entity:mat-CuH-radova2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3376 ;
+    mlips:hasDFTCalculation entity:calc-dft-radova2025 .
+
+entity:ds-ten-radova2025 a mlips:TrainingDataset ;
+    rdfs:label "H2/Cu training set, 10% subset" ;
+    mlips:coversMaterial entity:mat-CuH-radova2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-radova2025 ;
+    rdfs:comment "Size not stated as a number (20% is given as 664 configurations)." .
+
+entity:ds-surrogate-radova2025 a mlips:TrainingDataset ;
+    rdfs:label "Surrogate database labelled by MACE-MP-f4 10% (2200 structures)" ;
+    mlips:coversMaterial entity:mat-CuH-radova2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2200 ;
+    rdfs:comment "Labels are predictions of the MACE-MP-f4 10% model, not quantum-mechanical calculations; no reference calculation is attached." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-full-radova2025 mlips:samplingStrategy
+    entity:sampling-published-radova2025 .
+
+entity:ds-ten-radova2025 mlips:samplingStrategy
+    entity:sampling-published-radova2025 .
+
+entity:ds-surrogate-radova2025 mlips:samplingStrategy
+    entity:sampling-surrogate-radova2025 .
+
+entity:sampling-published-radova2025 a mlips:SamplingStrategy ;
+    rdfs:label "Published H2/Cu database (4230 structures from reactive scattering MD with committee-uncertainty adaptive sampling) used as provided; random subsets for the low-data runs" .
+
+entity:sampling-surrogate-radova2025 a mlips:SamplingStrategy ;
+    rdfs:label "600 scattering trajectories run with the MACE-MP-f4 10% model (4 surfaces, 3 surface temperatures, 2 rovibrational states, 5 collision energies), 2000 configurations chosen by k-means clustering, plus 50 NEB structures per surface" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-radova2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-radova2025 ;
+    mlips:hasHyperparameter entity:hp-initialisation-radova2025 ,
+        mlips:cutoffRadius ,
+        mlips:bodyOrder ,
+        entity:hp-model-size-radova2025 ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-radova2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-MACE-radova2025 a mlips:LossFunction ;
+    rdfs:label "Force and energy weights 100 and 1 for the first 1200 epochs, then 1000 and 100 for the last 300 (transfer models)" .
+
+entity:alg-MACE-radova2025 a mls:Algorithm ;
+    rdfs:label "Frozen transfer learning (mace-freeze): parameters of the lower layers of the foundation model are fixed and the rest fine-tuned" .
+
+entity:impl-MACE-radova2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-radova2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:bodyOrder ,
+        entity:hp-polynomial-degrees-radova2025 ;
+    mlips:hasImplementation entity:impl-ACE-radova2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-ACE-radova2025 a mlips:LossFunction ;
+    rdfs:label "Linear least squares with energy and force weights 0.54 and 0.01" .
+
+entity:impl-ACE-radova2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-ACEpotentials_jl-radova2025 .
+
+entity:lib-ACEpotentials_jl-radova2025 a mlips:Library ;
+    rdfs:label "ACEpotentials.jl" ;
+    rdfs:comment "Version 0.8.2 (fork at https://github.com/wgst/ACEpotentials.jl)." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-initialisation-radova2025 a mlips:Hyperparameter ;
+    rdfs:label "Foundation model and number of frozen layers" ;
+    mlips:hyperparameterName "initialisation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-model-size-radova2025 a mlips:Hyperparameter ;
+    rdfs:label "MACE model size (irreps)" ;
+    mlips:hyperparameterName "model_size" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-polynomial-degrees-radova2025 a mlips:Hyperparameter ;
+    rdfs:label "ACE polynomial degrees per correlation order" ;
+    mlips:hyperparameterName "polynomial_degrees" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mace-mp-f4-10-initialisation-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-radova2025 ;
+    mlips:settingValue "MACE-MP 'small' foundation model, freeze parameter 4" .
+
+entity:setting-mace-mp-f4-10-cutoffRadius-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-mace-mp-f4-10-bodyOrder-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-mace-mp-f4-10-model-size-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-radova2025 ;
+    mlips:settingValue "128x0e" .
+
+entity:setting-mace-mp-f4-10-learningRate-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-mace-mp-f4-10-batchSize-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mace-mp-f4-10-numEpochs-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1500"^^xsd:integer .
+
+entity:setting-ace-f-10-cutoffRadius-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ace-f-10-bodyOrder-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ace-f-10-polynomial-degrees-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-polynomial-degrees-radova2025 ;
+    mlips:settingValue "18, 12, 10, 8" .
+
+entity:setting-mace-fs-initialisation-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-radova2025 ;
+    mlips:settingValue "from scratch" .
+
+entity:setting-mace-fs-cutoffRadius-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mace-fs-bodyOrder-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-mace-fs-model-size-radova2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-radova2025 ;
+    mlips:settingValue "16x0e" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-mp-f4-10-radova2025 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP 'small' with four frozen layers fine-tuned on 10% of the H2/Cu data" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ten-radova2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mp-f4-10-initialisation-radova2025 ,
+        entity:setting-mace-mp-f4-10-cutoffRadius-radova2025 ,
+        entity:setting-mace-mp-f4-10-bodyOrder-radova2025 ,
+        entity:setting-mace-mp-f4-10-model-size-radova2025 ,
+        entity:setting-mace-mp-f4-10-learningRate-radova2025 ,
+        entity:setting-mace-mp-f4-10-batchSize-radova2025 ,
+        entity:setting-mace-mp-f4-10-numEpochs-radova2025 ;
+    mlips:produces entity:model-mace-mp-f4-10-radova2025 .
+
+entity:model-mace-mp-f4-10-radova2025 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-f4 10%" ;
+    mlips:inferenceHardware "Single AMD EPYC 7742 (Rome) 2.25 GHz core; 372.6 ms per energy and 390.5 ms per force evaluation" .
+
+entity:run-ace-f-10-radova2025 a mlips:MLIPRun ;
+    rdfs:label "Linear ACE surrogate fitted to MACE-MP-f4 10% predictions" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-surrogate-radova2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ace-f-10-cutoffRadius-radova2025 ,
+        entity:setting-ace-f-10-bodyOrder-radova2025 ,
+        entity:setting-ace-f-10-polynomial-degrees-radova2025 ;
+    mlips:produces entity:model-ace-f-10-radova2025 .
+
+entity:model-ace-f-10-radova2025 a mlips:TrainedModel ;
+    rdfs:label "ACE-f 10%" ;
+    mlips:inferenceHardware "Single AMD EPYC 7742 (Rome) 2.25 GHz core; 9.6 ms per energy and 22.6 ms per force evaluation" .
+
+entity:run-ace-fs-radova2025 a mlips:MLIPRun ;
+    rdfs:label "ACE trained from scratch on the full H2/Cu DFT database" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-full-radova2025 ;
+    mlips:produces entity:model-ace-fs-radova2025 .
+
+entity:model-ace-fs-radova2025 a mlips:TrainedModel ;
+    rdfs:label "ACE (from scratch)" ;
+    mlips:inferenceHardware "Single AMD EPYC 7742 (Rome) 2.25 GHz core; 9.1 ms per energy and 20.7 ms per force evaluation" .
+
+entity:run-mace-fs-radova2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained from scratch on the full H2/Cu DFT database" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-full-radova2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-fs-initialisation-radova2025 ,
+        entity:setting-mace-fs-cutoffRadius-radova2025 ,
+        entity:setting-mace-fs-bodyOrder-radova2025 ,
+        entity:setting-mace-fs-model-size-radova2025 ;
+    mlips:produces entity:model-mace-fs-radova2025 .
+
+entity:model-mace-fs-radova2025 a mlips:TrainedModel ;
+    rdfs:label "MACE (from scratch)" ;
+    mlips:inferenceHardware "Single AMD EPYC 7742 (Rome) 2.25 GHz core; 60.0 ms per energy and force evaluation" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-radova2025 mlips:hasResult
+    entity:result-mace-mp-f4-10-radova2025 ,
+    entity:result-ace-f-10-radova2025 ,
+    entity:result-ace-fs-radova2025 ,
+    entity:result-mace-fs-radova2025 .
+
+entity:result-mace-mp-f4-10-radova2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Forces on H atoms only: MAE 4.3, RMSE 17.1 meV/A." ;
+    mlips:evaluatesModel entity:model-mace-mp-f4-10-radova2025 ;
+    mlips:targetMaterial entity:mat-CuH-radova2025 ;
+    mlips:hasAccuracyMetric entity:metric-mace-mp-f4-10-1-radova2025 ,
+        entity:metric-mace-mp-f4-10-2-radova2025 ,
+        entity:metric-mace-mp-f4-10-3-radova2025 ,
+        entity:metric-mace-mp-f4-10-4-radova2025 .
+
+entity:metric-mace-mp-f4-10-1-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-mace-mp-f4-10-2-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "13.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-mace-mp-f4-10-3-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-mace-mp-f4-10-4-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ace-f-10-radova2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Forces on H atoms only: MAE 9.0, RMSE 17.7 meV/A. The text speaks of these errors 'combined with' the MACE-MP-f4 10% errors, so they appear to be measured against the surrogate labels rather than DFT; to be confirmed." ;
+    mlips:evaluatesModel entity:model-ace-f-10-radova2025 ;
+    mlips:targetMaterial entity:mat-CuH-radova2025 ;
+    mlips:hasAccuracyMetric entity:metric-ace-f-10-1-radova2025 ,
+        entity:metric-ace-f-10-2-radova2025 ,
+        entity:metric-ace-f-10-3-radova2025 ,
+        entity:metric-ace-f-10-4-radova2025 .
+
+entity:metric-ace-f-10-1-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-f-10-2-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-f-10-3-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-ace-f-10-4-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ace-fs-radova2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Forces on H atoms only: MAE 28.5, RMSE 47.6 meV/A." ;
+    mlips:evaluatesModel entity:model-ace-fs-radova2025 ;
+    mlips:targetMaterial entity:mat-CuH-radova2025 ;
+    mlips:hasAccuracyMetric entity:metric-ace-fs-1-radova2025 ,
+        entity:metric-ace-fs-2-radova2025 ,
+        entity:metric-ace-fs-3-radova2025 ,
+        entity:metric-ace-fs-4-radova2025 .
+
+entity:metric-ace-fs-1-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-fs-2-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "13.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-fs-3-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-ace-fs-4-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mace-fs-radova2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Forces on H atoms only: MAE 17.7, RMSE 32.4 meV/A." ;
+    mlips:evaluatesModel entity:model-mace-fs-radova2025 ;
+    mlips:targetMaterial entity:mat-CuH-radova2025 ;
+    mlips:hasAccuracyMetric entity:metric-mace-fs-1-radova2025 ,
+        entity:metric-mace-fs-2-radova2025 ,
+        entity:metric-mace-fs-3-radova2025 ,
+        entity:metric-mace-fs-4-radova2025 .
+
+entity:metric-mace-fs-1-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-mace-fs-2-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "15.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-mace-fs-3-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-mace-fs-4-radova2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table I gives energies in meV without saying per atom or per cell, and does not name the evaluation set; values are encoded with the unit meV as printed. Correlation orders are encoded as bodyOrder = order + 1 (MACE-MP 'small' order 3, from-scratch MACE order 2, ACE order 4).
+# - The foundation model is named only as MACE-MP 'small' (no release), so no registry model is linked; the fine-tuning relation is a string-valued setting. The from-scratch ACE and MACE models come from the group's earlier work and their full settings are not restated.
+# - Not encoded: freeze depths f0, f3, f5, f6 and the 'medium' and 'large' variants, learning curves (2% to 100% of the data), delta-learning models, sticking probabilities and minimum-energy paths, and the whole Ti-Al-V application (CASTEP, PBE, ultrasoft pseudopotentials, 800 eV; errors only as learning curves).
+# - Read from the arXiv v3 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
