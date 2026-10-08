@@ -1,0 +1,405 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ivan  Sergeyevich Novikov et al. (2020). The MLIP package: moment tensor potentials with MPI and active learning.
+#   Machine Learning Science and Technology. doi:10.1088/2632-2153/abc9fe  arXiv:2007.08555v1
+#
+# Version read: arxiv-preprint arXiv:2007.08555v1 (sha256 25419b71075293b1...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 46 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MLIP software paper and its three worked examples
+# as far as they are stated in numbers: (1) an ensemble of five level-16
+# MTPs for bcc molybdenum with training and validation errors (Table 1),
+# (2) the stage-1 actively learned MTP for the melting point of
+# aluminium, (3) the actively learned MTP for the Ag-Pd convex hull with
+# its training-set errors.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-novikov2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Novikov et al. (2020): the MLIP package, moment tensor potentials with MPI and active learning" ;
+    mlips:reportedIn entity:article-novikov2020 .
+
+entity:article-novikov2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/2632-2153/abc9fe> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "The MLIP package: moment tensor potentials with MPI and active learning" ;
+    schema:author entity:person-Novikov-novikov2020 ,
+        entity:person-Gubaev-novikov2020 ,
+        entity:person-Podryabinkin-novikov2020 ,
+        <https://orcid.org/0000-0002-7497-5594> .
+
+entity:person-Novikov-novikov2020 a schema:Person ;
+    schema:name "Ivan S Novikov" ;
+    schema:givenName "Ivan S" ;
+    schema:familyName "Novikov" .
+
+entity:person-Gubaev-novikov2020 a schema:Person ;
+    schema:name "Konstantin Gubaev" ;
+    schema:givenName "Konstantin" ;
+    schema:familyName "Gubaev" .
+
+entity:person-Podryabinkin-novikov2020 a schema:Person ;
+    schema:name "Evgeny V Podryabinkin" ;
+    schema:givenName "Evgeny V" ;
+    schema:familyName "Podryabinkin" .
+
+<https://orcid.org/0000-0002-7497-5594> a schema:Person ;
+    schema:name "Alexander V Shapeev" ;
+    schema:givenName "Alexander V" ;
+    schema:familyName "Shapeev" ;
+    schema:identifier <https://orcid.org/0000-0002-7497-5594> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Mo-novikov2020 a mlips:MaterialSystem ;
+    rdfs:label "bcc molybdenum" ;
+    mlips:chemicalFormula "Mo" ;
+    mlips:materialClass "Elemental bcc transition metal" .
+
+entity:mat-Al-novikov2020 a mlips:MaterialSystem ;
+    rdfs:label "Aluminium, solid (fcc) and liquid" ;
+    mlips:chemicalFormula "Al" ;
+    mlips:materialClass "Elemental fcc metal; solid-liquid coexistence for the melting point" .
+
+entity:mat-AgPd-novikov2020 a mlips:MaterialSystem ;
+    rdfs:label "Ag-Pd binary alloys Ag(1-x)Pd(x): candidate structures on fcc, bcc and hcp lattices" ;
+    mlips:chemicalFormula "Ag-Pd" ;
+    mlips:materialClass "Binary alloy; crystal structures with up to 12 atoms" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-mo-dft-novikov2020 a mlips:DFTCalculation .
+
+entity:calc-al-dft-novikov2020 a mlips:DFTCalculation .
+
+entity:calc-agpd-dft-novikov2020 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-mo-dft-novikov2020 mlips:hasDFTSettings entity:calc-settings-mo-dft-novikov2020 .
+
+entity:calc-settings-mo-dft-novikov2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred mesh with KSPACING = 0.114" ;
+    rdfs:comment "Training and test sets of the mlearn repository (Zuo et al.) recomputed with slightly higher convergence parameters; the functional is not named in the parts read." .
+
+entity:calc-al-dft-novikov2020 mlips:hasDFTSettings entity:calc-settings-al-dft-novikov2020 .
+
+entity:calc-settings-al-dft-novikov2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:energyCutoff "410"^^xsd:double ;
+    mlips:kPointMesh "Gamma point only (stage 1, low-fidelity)" ;
+    rdfs:comment "Low-fidelity DFT used during active learning on MD; a second, high-fidelity stage is described later in the paper." .
+
+entity:calc-agpd-dft-novikov2020 mlips:hasDFTSettings entity:calc-settings-agpd-dft-novikov2020 .
+
+entity:calc-settings-agpd-dft-novikov2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    rdfs:comment "Settings for the Ag-Pd example were not captured from the parts read." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Mo-novikov2020 a mlips:TrainingDataset ;
+    rdfs:label "Molybdenum training set (mlearn, filtered and recomputed)" ;
+    mlips:coversMaterial entity:mat-Mo-novikov2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-mo-dft-novikov2020 ;
+    rdfs:comment "The size is not stated in this paper; the data are those of zuo2020 recomputed." .
+
+entity:ds-Al-novikov2020 a mlips:TrainingDataset ;
+    rdfs:label "Aluminium stage-1 active-learning training set (low-fidelity DFT)" ;
+    mlips:coversMaterial entity:mat-Al-novikov2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-al-dft-novikov2020 ;
+    rdfs:comment "Starts from 10 configurations; the final size was not captured." .
+
+entity:ds-AgPd-novikov2020 a mlips:TrainingDataset ;
+    rdfs:label "Ag-Pd active-learning training set (442 configurations)" ;
+    mlips:coversMaterial entity:mat-AgPd-novikov2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 442 ;
+    mlips:hasDFTCalculation entity:calc-agpd-dft-novikov2020 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Mo-novikov2020 mlips:samplingStrategy
+    entity:sampling-mlearn-Mo-novikov2020 .
+
+entity:ds-Al-novikov2020 mlips:samplingStrategy
+    entity:sampling-al-initial-md-novikov2020 ,
+    entity:sampling-al-active-md-novikov2020 .
+
+entity:ds-AgPd-novikov2020 mlips:samplingStrategy
+    entity:sampling-agpd-active-relaxation-novikov2020 .
+
+entity:sampling-mlearn-Mo-novikov2020 a mlips:SamplingStrategy ;
+    rdfs:label "Mo configurations of the mlearn repository" ;
+    rdfs:comment "Training and test sets of Zuo et al., filtered to remove configurations with a minimal interatomic distance below 1.9 A." .
+
+entity:sampling-al-initial-md-novikov2020 a mlips:SamplingStrategy ;
+    rdfs:label "Initial AIMD seed for aluminium" ;
+    rdfs:comment "A 90 fs VASP NVT-MD trajectory from an ideal 108-atom fcc cell (lattice parameter 4.1 A), every tenth configuration kept: 10 configurations." .
+
+entity:sampling-al-active-md-novikov2020 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning on MD with the D-optimality (MaxVol) query strategy" ;
+    rdfs:comment "Extrapolative configurations met during MD are selected by the extrapolation grade, computed with DFT and added; training and selection repeat until MD runs without extrapolation." .
+
+entity:sampling-agpd-active-relaxation-novikov2020 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning on structure relaxations" ;
+    rdfs:comment "39k candidate Ag-Pd crystal structures with up to 12 atoms are relaxed with the MTP; relaxations that meet extrapolative configurations feed the selection. Started from an empty training set; all relaxations finished at the 5th iteration." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-novikov2020 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-novikov2020 ;
+    mlips:hasHyperparameter mlips:momentLevel ,
+        mlips:cutoffRadius ,
+        mlips:minInteratomicDistance ,
+        mlips:numRadialBasis ;
+    mlips:hasImplementation entity:impl-MTP-novikov2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-MTP-novikov2020 a mlips:LossFunction ;
+    rdfs:label "Weighted least squares on energies, forces and stresses with the default weights w_e = 1, w_f = 0.01, w_s = 0.001 and the default scaling" .
+
+entity:alg-MTP-novikov2020 a mls:Algorithm ;
+    rdfs:label "Fitting with the mlp train command from random initial parameters; active learning with the D-optimality (MaxVol) extrapolation grade" .
+
+entity:impl-MTP-novikov2020 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP ;
+    mlips:version "MLIP package with MPI parallelisation; LAMMPS interface for MD" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mtp-Mo-momentLevel-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-Mo-cutoffRadius-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-mtp-Mo-minInteratomicDistance-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:minInteratomicDistance ;
+    mlips:settingValue "1.9"^^xsd:double .
+
+entity:setting-mtp-Mo-numRadialBasis-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-mtp-Al-momentLevel-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-Al-cutoffRadius-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-Al-minInteratomicDistance-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:minInteratomicDistance ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mtp-Al-numRadialBasis-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-mtp-AgPd-momentLevel-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-AgPd-cutoffRadius-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-AgPd-minInteratomicDistance-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:minInteratomicDistance ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mtp-AgPd-numRadialBasis-novikov2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mtp-Mo-novikov2020 a mlips:MLIPRun ;
+    rdfs:label "Ensemble of five MTPs (level 16) for bcc molybdenum" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Mo-novikov2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Mo-momentLevel-novikov2020 ,
+        entity:setting-mtp-Mo-cutoffRadius-novikov2020 ,
+        entity:setting-mtp-Mo-minInteratomicDistance-novikov2020 ,
+        entity:setting-mtp-Mo-numRadialBasis-novikov2020 ;
+    mlips:produces entity:model-mtp-Mo-novikov2020 .
+
+entity:model-mtp-Mo-novikov2020 a mlips:TrainedModel ;
+    rdfs:label "MTP ensemble for bcc Mo (five level-16 potentials with different random initialisation)" .
+
+entity:run-mtp-Al-novikov2020 a mlips:MLIPRun ;
+    rdfs:label "Actively learned MTP (level 16) for aluminium, stage 1" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Al-novikov2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Al-momentLevel-novikov2020 ,
+        entity:setting-mtp-Al-cutoffRadius-novikov2020 ,
+        entity:setting-mtp-Al-minInteratomicDistance-novikov2020 ,
+        entity:setting-mtp-Al-numRadialBasis-novikov2020 ;
+    mlips:produces entity:model-mtp-Al-novikov2020 .
+
+entity:model-mtp-Al-novikov2020 a mlips:TrainedModel ;
+    rdfs:label "MTP for solid and liquid aluminium (stage 1, low-fidelity DFT)" .
+
+entity:run-mtp-AgPd-novikov2020 a mlips:MLIPRun ;
+    rdfs:label "Actively learned MTP (level 16) for Ag-Pd" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-AgPd-novikov2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-AgPd-momentLevel-novikov2020 ,
+        entity:setting-mtp-AgPd-cutoffRadius-novikov2020 ,
+        entity:setting-mtp-AgPd-minInteratomicDistance-novikov2020 ,
+        entity:setting-mtp-AgPd-numRadialBasis-novikov2020 ;
+    mlips:produces entity:model-mtp-AgPd-novikov2020 .
+
+entity:model-mtp-AgPd-novikov2020 a mlips:TrainedModel ;
+    rdfs:label "MTP for the Ag-Pd convex hull" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-novikov2020 mlips:hasResult
+    entity:result-mtp-Mo-validation-novikov2020 ,
+    entity:result-mtp-Mo-training-novikov2020 ,
+    entity:result-mtp-AgPd-training-novikov2020 .
+
+entity:result-mtp-Mo-validation-novikov2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-Mo-novikov2020 ;
+    mlips:targetMaterial entity:mat-Mo-novikov2020 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-Mo-validation-1-novikov2020 ,
+        entity:metric-mtp-Mo-validation-2-novikov2020 ,
+        entity:metric-mtp-Mo-validation-3-novikov2020 .
+
+entity:metric-mtp-Mo-validation-1-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMS error on energy, mean over the ensemble of five MTPs (+/- 1.12, 95% interval)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mtp-Mo-validation-2-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMS error on forces, mean over the ensemble (+/- 6; 12.6%)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "180"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-mtp-Mo-validation-3-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMS error on stress, mean over the ensemble (+/- 0.09; 4.4%)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.46"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-mtp-Mo-training-novikov2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-Mo-novikov2020 ;
+    mlips:targetMaterial entity:mat-Mo-novikov2020 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-Mo-training-1-novikov2020 ,
+        entity:metric-mtp-Mo-training-2-novikov2020 ,
+        entity:metric-mtp-Mo-training-3-novikov2020 .
+
+entity:metric-mtp-Mo-training-1-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Training RMS error on energy, mean over the ensemble of five MTPs (+/- 2.10)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.54"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mtp-Mo-training-2-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Training RMS error on forces, mean over the ensemble (+/- 4; 12.3%)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "175"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-mtp-Mo-training-3-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "Training RMS error on stress, mean over the ensemble (+/- 0.04; 4.4%)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.46"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-mtp-AgPd-training-novikov2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-AgPd-novikov2020 ;
+    mlips:targetMaterial entity:mat-AgPd-novikov2020 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-AgPd-training-1-novikov2020 ,
+        entity:metric-mtp-AgPd-training-2-novikov2020 .
+
+entity:metric-mtp-AgPd-training-1-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy over the final training set of 442 configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mtp-AgPd-training-2-novikov2020 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy over the final training set of 442 configurations" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The Mo run stands for an ensemble of five potentials; the errors are ensemble means and their 95% intervals are in the metric labels.
+# - The Ag-Pd potential is 'the same potential as in Section 5.2' (level 16, cutoff 5 A, mindist 2 A, radial basis size 6); its DFT settings and the later, high-fidelity stage of the aluminium example were not read in full, so the Al run has no errors and no final training-set size.
+# - The exchange-correlation functional is not named in the parts read for any of the three examples.
+# - Property results (elastic constants of Mo in Table 2, the melting point of Al, the Ag-Pd convex hull) have no MetricProperty.
+# - The manifest classes this paper as 'Training/reliability'; it is the MLIP software paper.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
