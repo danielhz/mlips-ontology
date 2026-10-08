@@ -1,0 +1,250 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Justin S. Smith et al. (2018). Less is more: Sampling chemical space with active learning.
+#   The Journal of Chemical Physics. doi:10.1063/1.5023802  arXiv:1801.09319v2
+#
+# Version read: arxiv-preprint arXiv:1801.09319v2 (sha256 d706bc0a1d3bc0c4...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 31 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the ANI-1x data set built by query-by-committee active
+# learning, the final ANI-1x (AL6) model, and its errors on the complete
+# COMP6 benchmark suite (Table S1) and on its own test set (Table S11).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-smith2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Smith et al. (2018): Less is more, sampling chemical space with active learning (ANI-1x and the COMP6 benchmark)" ;
+    mlips:reportedIn entity:article-smith2018 .
+
+entity:article-smith2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/1.5023802> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Less is more: Sampling chemical space with active learning" ;
+    schema:author <https://orcid.org/0000-0001-7314-7896> ,
+        entity:person-Nebgen-smith2018 ,
+        <https://orcid.org/0000-0002-9001-9973> ,
+        <https://orcid.org/0000-0001-7581-8497> ,
+        entity:person-Roitberg-smith2018 .
+
+<https://orcid.org/0000-0001-7314-7896> a schema:Person ;
+    schema:name "Justin S. Smith" ;
+    schema:givenName "Justin S." ;
+    schema:familyName "Smith" ;
+    schema:identifier <https://orcid.org/0000-0001-7314-7896> .
+
+entity:person-Nebgen-smith2018 a schema:Person ;
+    schema:name "Ben Nebgen" ;
+    schema:givenName "Ben" ;
+    schema:familyName "Nebgen" .
+
+<https://orcid.org/0000-0002-9001-9973> a schema:Person ;
+    schema:name "Nicholas Lubbers" ;
+    schema:givenName "Nicholas" ;
+    schema:familyName "Lubbers" ;
+    schema:identifier <https://orcid.org/0000-0002-9001-9973> .
+
+<https://orcid.org/0000-0001-7581-8497> a schema:Person ;
+    schema:name "Olexandr Isayev" ;
+    schema:givenName "Olexandr" ;
+    schema:familyName "Isayev" ;
+    schema:identifier <https://orcid.org/0000-0001-7581-8497> .
+
+entity:person-Roitberg-smith2018 a schema:Person ;
+    schema:name "Adrian E. Roitberg" ;
+    schema:givenName "Adrian E." ;
+    schema:familyName "Roitberg" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-organic-CHNO-smith2018 a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules with C, H, N, O (ANI-1x training domain)" ;
+    mlips:materialClass "Small organic molecules, dimers, amino acids and dipeptides; equilibrium and non-equilibrium conformations" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q174211> .
+
+entity:mat-COMP6-smith2018 a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark suite (S66x8, ANI-MD, GDB7to9, GDB10to13, Tripeptides, DrugBank)" ;
+    mlips:materialClass "Organic and biochemical molecules with C, H, N, O; mean size 17 to 75 atoms, up to 312 atoms; non-equilibrium conformations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-smith2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-smith2018 mlips:hasDFTSettings entity:calc-settings-dft-smith2018 .
+
+entity:calc-settings-dft-smith2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:Gaussian ;
+    mlips:xcFunctional mlips:omegaB97X ;
+    mlips:dftBasisSet entity:basis-6-31G-d-smith2018 ;
+    rdfs:comment "omegaB97x/6-31G(d) as implemented in Gaussian 09, for the training data and for all COMP6 benchmark conformations." .
+
+entity:basis-6-31G-d-smith2018 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(d)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ANI-1x-smith2018 a mlips:TrainingDataset ;
+    rdfs:label "ANI-1x (5,496,771 conformations of 63,865 molecules)" ;
+    mlips:coversMaterial entity:mat-organic-CHNO-smith2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 5496771 ;
+    mlips:hasDFTCalculation entity:calc-dft-smith2018 ;
+    rdfs:comment "Built from ANI-1 plus active learning over GDB-1 to 9 molecules, GDB-1 to 6 dimers, amino acids, dipeptides and ChEMBL molecules; mean 15 atoms per molecule." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ANI-1x-smith2018 mlips:samplingStrategy
+    entity:sampling-qbc-active-learning-smith2018 ,
+    entity:sampling-dnms-smith2018 ,
+    entity:sampling-md-dimers-smith2018 .
+
+entity:sampling-qbc-active-learning-smith2018 a mlips:SamplingStrategy ;
+    rdfs:label "Query-by-committee active learning" ;
+    rdfs:comment "An ensemble of ANI models scores candidate conformations; those on which the ensemble disagrees are computed with DFT and added. 37 active-learning cycles lead to ANI-1x." .
+
+entity:sampling-dnms-smith2018 a mlips:SamplingStrategy ;
+    rdfs:label "Diverse normal mode sampling" ;
+    rdfs:comment "Normal mode sampling of optimised molecules with a diversity selection of the generated non-equilibrium conformations." .
+
+entity:sampling-md-dimers-smith2018 a mlips:SamplingStrategy ;
+    rdfs:label "MD-generated dimer sampling" ;
+    rdfs:comment "Molecules placed at random in a box and run with MD; the box is fragmented into dimer pairs within a cutoff and each pair is tested by query by committee." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-ANI-smith2018 ;
+    mlips:hasHyperparameter mlips:learningRate ,
+        mlips:numLayers .
+
+entity:alg-ANI-smith2018 a mls:Algorithm ;
+    rdfs:label "Adam; initial learning rate 0.001, early stopping after 75 epochs without validation improvement, restart with the learning rate halved, termination below 1e-5; ensembles from a 5-fold cross-validation split" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ani-1x-learningRate-smith2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ani-1x-numLayers-smith2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ani-1x-smith2018 a mlips:MLIPRun ;
+    rdfs:label "ANI-1x (AL6) training on the ANI-1x data set" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-ANI-1x-smith2018 ;
+    mlips:hasHyperparameterSetting entity:setting-ani-1x-learningRate-smith2018 ,
+        entity:setting-ani-1x-numLayers-smith2018 ;
+    mlips:produces entity:model-ani-1x-smith2018 .
+
+entity:model-ani-1x-smith2018 a mlips:TrainedModel ;
+    rdfs:label "ANI-1x (AL6; 389,376 parameters per network, input size 386)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-smith2018 mlips:hasResult
+    entity:result-ani-1x-test-smith2018 ,
+    entity:result-ani-1x-comp6-smith2018 .
+
+entity:result-ani-1x-test-smith2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ani-1x-smith2018 ;
+    mlips:targetMaterial entity:mat-organic-CHNO-smith2018 ;
+    mlips:hasAccuracyMetric entity:metric-ani-1x-test-1-smith2018 .
+
+entity:metric-ani-1x-test-1-smith2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test-set RMSE on potential energy: ANI-1x (Table S11)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.7"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:result-ani-1x-comp6-smith2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ani-1x-smith2018 ;
+    mlips:targetMaterial entity:mat-COMP6-smith2018 ;
+    mlips:hasAccuracyMetric entity:metric-ani-1x-comp6-1-smith2018 ,
+        entity:metric-ani-1x-comp6-2-smith2018 ,
+        entity:metric-ani-1x-comp6-3-smith2018 ,
+        entity:metric-ani-1x-comp6-4-smith2018 .
+
+entity:metric-ani-1x-comp6-1-smith2018 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on potential energies, complete COMP6 suite: ANI-1x, mean over the ensemble networks (Table S1)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.93"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-ani-1x-comp6-2-smith2018 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on potential energies, complete COMP6 suite: ANI-1x, mean over the ensemble networks (Table S1)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.37"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-ani-1x-comp6-3-smith2018 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on force components, complete COMP6 suite: ANI-1x, mean over the ensemble networks (Table S1)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.09"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:metric-ani-1x-comp6-4-smith2018 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components, complete COMP6 suite: ANI-1x, mean over the ensemble networks (Table S1)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.29"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table S1 values are means over the networks of the ensemble (column mu); the standard deviations and the conformer-energy-difference errors (Delta E: MAE 1.85, RMSE 2.95 kcal/mol) are not encoded.
+# - The intermediate active-learning models AL1 to AL5 and the ensemble retrained on the original ANI-1 data (Tables S1 and S11) are not encoded, nor are the per-benchmark tables S2 to S10 and the energy-range tables S12 to S17.
+# - The atomic-environment-vector parameters are 'provided with the released ANI-1x model' and not printed; the hidden-layer widths are not printed either, only that each network has three hidden layers. The loss function and the software are not named in the parts read.
+# - The registry method entity:ANI is new; the earlier ANI papers in the KG (smith2017, smith2019ccx) still use per-paper method IRIs (see METHODS.md).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
