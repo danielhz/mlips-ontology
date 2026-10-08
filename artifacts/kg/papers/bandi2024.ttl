@@ -1,0 +1,310 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Sasaank Bandi et al. (2024). Benchmarking machine learning interatomic potentials via phonon anharmonicity.
+#   Machine Learning Science and Technology. doi:10.1088/2632-2153/ad674a  arXiv:2402.18891v1
+#
+# Version read: arxiv-preprint arXiv:2402.18891v1 (sha256 9f5163efbefab90c...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 122 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: three MLIPs (GAP, a Behler-Parrinello NN with n2p2, and
+# NequIP) trained for fluorite ThO2 and benchmarked on the irreducible
+# derivatives of the potential energy surface (harmonic to quartic
+# phonon interactions). Two training sets are used: IDMD (configurations
+# evaluated with an anharmonic Taylor-series Hamiltonian built from DFT)
+# and DFTMD (DFT molecular dynamics). The benchmark metric is not an
+# energy or force error.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-bandi2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Bandi et al. (2024): benchmarking MLIPs via phonon anharmonicity (GAP, BPNN and NequIP for ThO2)" ;
+    mlips:reportedIn entity:article-bandi2024 .
+
+entity:article-bandi2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/2632-2153/ad674a> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Benchmarking machine learning interatomic potentials via phonon anharmonicity" ;
+    schema:author <https://orcid.org/0009-0002-8854-4215> ,
+        entity:person-Jiang-bandi2024 ,
+        <https://orcid.org/0000-0003-3812-2751> .
+
+<https://orcid.org/0009-0002-8854-4215> a schema:Person ;
+    schema:name "Sasaank Bandi" ;
+    schema:givenName "Sasaank" ;
+    schema:familyName "Bandi" ;
+    schema:identifier <https://orcid.org/0009-0002-8854-4215> .
+
+entity:person-Jiang-bandi2024 a schema:Person ;
+    schema:name "Chao Jiang" ;
+    schema:givenName "Chao" ;
+    schema:familyName "Jiang" .
+
+<https://orcid.org/0000-0003-3812-2751> a schema:Person ;
+    schema:name "Chris A Marianetti" ;
+    schema:givenName "Chris A" ;
+    schema:familyName "Marianetti" ;
+    schema:identifier <https://orcid.org/0000-0003-3812-2751> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-ThO2-bandi2024 a mlips:MaterialSystem ;
+    rdfs:label "Thorium dioxide in the fluorite structure" ;
+    mlips:chemicalFormula "ThO2" ;
+    mlips:materialClass "Actinide oxide (fluorite); anharmonic lattice dynamics" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-bandi2024 a mlips:DFTCalculation .
+
+entity:calc-taylor-bandi2024 a mlips:ReferenceCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-bandi2024 mlips:hasDFTSettings entity:calc-settings-dft-bandi2024 .
+
+entity:calc-settings-dft-bandi2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:LDA ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred 10x10x10 mesh for the primitive cell (scaled for supercells)" ;
+    rdfs:comment "The functional is read as the local density approximation from a sentence broken across columns in the extracted text ('using the local ... cutoff energy was set to 500 eV'); forces converged within 0.02 eV/A. Irreducible derivatives by finite differences." .
+
+entity:calc-taylor-bandi2024 mlips:hasReferenceSettings entity:calc-settings-taylor-bandi2024 .
+
+entity:calc-settings-taylor-bandi2024 a mlips:ReferenceSettings ;
+    rdfs:comment "Anharmonic vibrational Hamiltonian of ThO2: a Taylor series of the Born-Oppenheimer surface in irreducible derivatives up to fourth order, constructed from the DFT calculations; a noiseless reference for the IDMD data set." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-IDMD-bandi2024 a mlips:TrainingDataset ;
+    rdfs:label "IDMD data set for ThO2" ;
+    mlips:coversMaterial entity:mat-ThO2-bandi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-taylor-bandi2024 ;
+    rdfs:comment "Size not captured." .
+
+entity:ds-DFTMD-bandi2024 a mlips:TrainingDataset ;
+    rdfs:label "DFTMD data set for ThO2" ;
+    mlips:coversMaterial entity:mat-ThO2-bandi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-bandi2024 ;
+    rdfs:comment "Size not captured." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-IDMD-bandi2024 mlips:samplingStrategy
+    entity:sampling-idmd-bandi2024 .
+
+entity:ds-DFTMD-bandi2024 mlips:samplingStrategy
+    entity:sampling-dftmd-bandi2024 .
+
+entity:sampling-idmd-bandi2024 a mlips:SamplingStrategy ;
+    rdfs:label "MD on the irreducible-derivative (Taylor series) Hamiltonian (IDMD)" ;
+    rdfs:comment "Configurations from molecular dynamics evaluated with the anharmonic Taylor-series potential; a noiseless data set of known interaction order." .
+
+entity:sampling-dftmd-bandi2024 a mlips:SamplingStrategy ;
+    rdfs:label "DFT molecular dynamics (DFTMD)" ;
+    rdfs:comment "Configurations from ab initio MD, a typical MLIP training set containing interactions of all orders." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:hasImplementation entity:impl-GAP-bandi2024 ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:impl-GAP-bandi2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP .
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:angularCutoff ,
+        entity:hp-hidden-layers-bandi2024 ;
+    mlips:hasImplementation entity:impl-HDNNP-bandi2024 ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:impl-HDNNP-bandi2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-n2p2-bandi2024 .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ;
+    mlips:hasImplementation entity:impl-NequIP-bandi2024 ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:impl-NequIP-bandi2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP .
+
+entity:lib-n2p2-bandi2024 a mlips:Library ;
+    rdfs:label "n2p2" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-hidden-layers-bandi2024 a mlips:Hyperparameter ;
+    rdfs:label "Hidden-layer architecture of the atomic networks" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-IDMD-cutoffRadius-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-bpnn-IDMD-cutoffRadius-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-bpnn-IDMD-angularCutoff-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-bpnn-IDMD-hidden-layers-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-bandi2024 ;
+    mlips:settingValue "21-21" .
+
+entity:setting-nequip-IDMD-cutoffRadius-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-nequip-IDMD-numLayers-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-bpnn-DFTMD-cutoffRadius-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-bpnn-DFTMD-angularCutoff-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-bpnn-DFTMD-hidden-layers-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-bandi2024 ;
+    mlips:settingValue "21-21" .
+
+entity:setting-nequip-DFTMD-cutoffRadius-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-nequip-DFTMD-numLayers-bandi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-IDMD-bandi2024 a mlips:MLIPRun ;
+    rdfs:label "GAP (two-body + three-body + SOAP) trained on IDMD" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-IDMD-bandi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-IDMD-cutoffRadius-bandi2024 ;
+    mlips:produces entity:model-gap-IDMD-bandi2024 .
+
+entity:model-gap-IDMD-bandi2024 a mlips:TrainedModel ;
+    rdfs:label "GAP for ThO2 (IDMD)" .
+
+entity:run-bpnn-IDMD-bandi2024 a mlips:MLIPRun ;
+    rdfs:label "BPNN (n2p2) trained on IDMD" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-IDMD-bandi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-bpnn-IDMD-cutoffRadius-bandi2024 ,
+        entity:setting-bpnn-IDMD-angularCutoff-bandi2024 ,
+        entity:setting-bpnn-IDMD-hidden-layers-bandi2024 ;
+    mlips:produces entity:model-bpnn-IDMD-bandi2024 .
+
+entity:model-bpnn-IDMD-bandi2024 a mlips:TrainedModel ;
+    rdfs:label "BPNN for ThO2 (IDMD)" .
+
+entity:run-nequip-IDMD-bandi2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on IDMD" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-IDMD-bandi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-IDMD-cutoffRadius-bandi2024 ,
+        entity:setting-nequip-IDMD-numLayers-bandi2024 ;
+    mlips:produces entity:model-nequip-IDMD-bandi2024 .
+
+entity:model-nequip-IDMD-bandi2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP for ThO2 (IDMD)" .
+
+entity:run-bpnn-DFTMD-bandi2024 a mlips:MLIPRun ;
+    rdfs:label "BPNN (n2p2) trained on DFTMD" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-DFTMD-bandi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-bpnn-DFTMD-cutoffRadius-bandi2024 ,
+        entity:setting-bpnn-DFTMD-angularCutoff-bandi2024 ,
+        entity:setting-bpnn-DFTMD-hidden-layers-bandi2024 ;
+    mlips:produces entity:model-bpnn-DFTMD-bandi2024 .
+
+entity:model-bpnn-DFTMD-bandi2024 a mlips:TrainedModel ;
+    rdfs:label "BPNN for ThO2 (DFTMD)" .
+
+entity:run-nequip-DFTMD-bandi2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on DFTMD" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-DFTMD-bandi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-DFTMD-cutoffRadius-bandi2024 ,
+        entity:setting-nequip-DFTMD-numLayers-bandi2024 ;
+    mlips:produces entity:model-nequip-DFTMD-bandi2024 .
+
+entity:model-nequip-DFTMD-bandi2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP for ThO2 (DFTMD)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The benchmark metric is the root mean squared error of the irreducible derivatives divided by their average magnitude, per interaction order (Table I); it is neither an energy nor a force error and has no MetricProperty. No AccuracyMetric is encoded.
+# - The GAP cutoff setting is that of the SOAP descriptor (4 A); the two- and three-body terms use 6 A. For the BPNN, the radial symmetry-function cutoff (10 A) is encoded as cutoffRadius and the angular one (6 A) as angularCutoff; input layers have 41 (Th) and 46 (O) symmetry functions. For NequIP, 'four interaction blocks' is encoded as numLayers.
+# - GAP was trained on IDMD only. The reading of the functional as LDA should be confirmed against the PDF.
+# - Phonon dispersion, lifetimes and thermal conductivity derived from the potentials are the downstream comparisons (figures).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
