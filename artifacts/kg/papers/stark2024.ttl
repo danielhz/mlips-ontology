@@ -1,0 +1,499 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Wojciech G. Stark et al. (2024). Benchmarking of machine learning interatomic potentials for reactive hydrogen dynamics at metal surfaces.
+#   Machine Learning Science and Technology. doi:10.1088/2632-2153/ad5f11  arXiv:2403.15334v1
+#
+# Version read: arxiv-preprint arXiv:2403.15334v1 (sha256 fa0e4ed52dd82ad8...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 111 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the four optimised models (PaiNN, REANN, ACE, MACE)
+# trained on one database of H2 on four copper facets, with their model
+# parameters and the averaged test errors over all structures (last rows
+# of Table I; means over five models with different random splits).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-stark2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Stark et al. (2024): benchmarking of MLIPs for reactive hydrogen dynamics at metal surfaces (H2 on copper)" ;
+    mlips:reportedIn entity:article-stark2024 .
+
+entity:article-stark2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/2632-2153/ad5f11> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Benchmarking of machine learning interatomic potentials for reactive hydrogen dynamics at metal surfaces" ;
+    schema:author <https://orcid.org/0000-0001-6279-2638> ,
+        <https://orcid.org/0000-0003-1845-0387> ,
+        <https://orcid.org/0000-0001-6915-9851> ,
+        <https://orcid.org/0000-0002-4601-0461> ,
+        <https://orcid.org/0000-0003-2696-5436> ,
+        <https://orcid.org/0000-0002-8180-2034> ,
+        <https://orcid.org/0000-0002-3004-785X> .
+
+<https://orcid.org/0000-0001-6279-2638> a schema:Person ;
+    schema:name "Wojciech G Stark" ;
+    schema:givenName "Wojciech G" ;
+    schema:familyName "Stark" ;
+    schema:identifier <https://orcid.org/0000-0001-6279-2638> .
+
+<https://orcid.org/0000-0003-1845-0387> a schema:Person ;
+    schema:name "Cas van der Oord" ;
+    schema:givenName "Cas" ;
+    schema:familyName "van der Oord" ;
+    schema:identifier <https://orcid.org/0000-0003-1845-0387> .
+
+<https://orcid.org/0000-0001-6915-9851> a schema:Person ;
+    schema:name "Ilyes Batatia" ;
+    schema:givenName "Ilyes" ;
+    schema:familyName "Batatia" ;
+    schema:identifier <https://orcid.org/0000-0001-6915-9851> .
+
+<https://orcid.org/0000-0002-4601-0461> a schema:Person ;
+    schema:name "Yaolong Zhang" ;
+    schema:givenName "Yaolong" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0002-4601-0461> .
+
+<https://orcid.org/0000-0003-2696-5436> a schema:Person ;
+    schema:name "Bin Jiang" ;
+    schema:givenName "Bin" ;
+    schema:familyName "Jiang" ;
+    schema:identifier <https://orcid.org/0000-0003-2696-5436> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0002-3004-785X> a schema:Person ;
+    schema:name "Reinhard J Maurer" ;
+    schema:givenName "Reinhard J" ;
+    schema:familyName "Maurer" ;
+    schema:identifier <https://orcid.org/0000-0002-3004-785X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-H2Cu-stark2024 a mlips:MaterialSystem ;
+    rdfs:label "H2 on Cu(111), Cu(100), Cu(110) and Cu(211): clean surface slabs and H2/Cu structures (3x3, six-layer slabs)" ;
+    mlips:chemicalFormula "H2/Cu" ;
+    mlips:materialClass "Molecule-metal surface system for reactive scattering" ;
+    mlips:microstructuralFeature "Four copper facets; dissociative chemisorption of H2" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-stark2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-stark2024 mlips:hasDFTSettings entity:calc-settings-dft-stark2024 .
+
+entity:calc-settings-dft-stark2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional entity:xc-SRP48-stark2024 ;
+    mlips:dftBasisSet entity:basis-FHI-aims-tight-default-basis-stark2024 ;
+    mlips:kPointMesh "12x12x1" .
+
+entity:xc-SRP48-stark2024 a mlips:XCFunctional ;
+    rdfs:label "SRP48" ;
+    rdfs:comment "Specific reaction parameter functional: 52% PBE and 48% RPBE." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-FHI-aims-tight-default-basis-stark2024 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'tight' default basis" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-H2Cu-stark2024 a mlips:TrainingDataset ;
+    rdfs:label "H2/Cu database (4230 data points; 3381 for training)" ;
+    mlips:coversMaterial entity:mat-H2Cu-stark2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3381 ;
+    mlips:hasDFTCalculation entity:calc-dft-stark2024 ;
+    rdfs:comment "1685 Cu-only surface structures sampled at 300, 600 and 900 K and 2545 H2/Cu structures. Each model is trained five times on a random 3381 and tested on a random 423 of the 4230 structures; ten non-zero-spin structures are removed from the test sets." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-H2Cu-stark2024 mlips:samplingStrategy
+    entity:sampling-adaptive-schnet-stark2024 .
+
+entity:sampling-adaptive-schnet-stark2024 a mlips:SamplingStrategy ;
+    rdfs:label "Adaptive sampling with an iteratively refined SchNet MLIP" ;
+    rdfs:comment "Dynamics simulations with the current model; structures that are poorly represented are added and the model is retrained (database of an earlier paper of the group). None of the four benchmarked models took part in the sampling." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:PaiNN a mlips:MLIPMethod ;
+    rdfs:label "PaiNN (polarizable atom interaction neural network)" ;
+    mlips:hasLossFunction entity:loss-PaiNN-stark2024 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:cutoffRadius ;
+    mlips:hasImplementation entity:impl-PaiNN-stark2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-PaiNN-stark2024 a mlips:LossFunction ;
+    rdfs:label "Combined loss with energy weight 0.05 and force weight 0.95" .
+
+entity:impl-PaiNN-stark2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SchNetPack-stark2024 .
+
+entity:REANN a mlips:MLIPMethod ;
+    rdfs:label "REANN (recursively embedded atom neural network)" ;
+    mlips:hasLossFunction entity:loss-REANN-stark2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ;
+    mlips:hasImplementation entity:impl-REANN-stark2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-REANN-stark2024 a mlips:LossFunction ;
+    rdfs:label "Energy weight 0.1 throughout; force weight reduced from 50 to 0.5 during training" .
+
+entity:impl-REANN-stark2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-REANN-stark2024 .
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-stark2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:bodyOrder ;
+    mlips:hasImplementation entity:impl-ACE-stark2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-ACE-stark2024 a mlips:LossFunction ;
+    rdfs:label "Combined loss with energy weight 0.5 and force weight 0.5" .
+
+entity:impl-ACE-stark2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-ACEpotentials_jl-stark2024 .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-stark2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:bodyOrder ,
+        mlips:numLayers ,
+        mlips:numFeatures ;
+    mlips:hasImplementation entity:impl-MACE-stark2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand .
+
+entity:loss-MACE-stark2024 a mlips:LossFunction ;
+    rdfs:label "Energy and force weights 5 and 95 initially, changed to 1000 and 1 after 1200 epochs" .
+
+entity:impl-MACE-stark2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "0.2.0 (MACE-JAX also tested)" .
+
+entity:lib-SchNetPack-stark2024 a mlips:Library ;
+    rdfs:label "SchNetPack" ;
+    rdfs:comment "SchNetPack version 2.0.0." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-REANN-stark2024 a mlips:Library ;
+    rdfs:label "REANN" ;
+    rdfs:comment "REANN code version 0.1 (https://github.com/zhangylch/REANN); atomic-energy and orbital-coefficient networks of 16x16x16, 9 primitive GTOs." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-ACEpotentials_jl-stark2024 a mlips:Library ;
+    rdfs:label "ACEpotentials.jl" ;
+    rdfs:comment "ACEpotentials.jl version 0.6.3; polynomial degrees 18, 12, 10 and 8 for correlation orders 1 to 4." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-PaiNN-numLayers-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-PaiNN-numFeatures-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-PaiNN-cutoffRadius-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-REANN-cutoffRadius-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-REANN-numLayers-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-ACE-cutoffRadius-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ACE-bodyOrder-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MACE-cutoffRadius-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-bodyOrder-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-numLayers-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-numFeatures-stark2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-PaiNN-stark2024 a mlips:MLIPRun ;
+    rdfs:label "Final optimised PaiNN model trained on the H2/Cu database" ;
+    mlips:appliesMethod entity:PaiNN ;
+    mlips:runsOn entity:ds-H2Cu-stark2024 ;
+    mlips:hasHyperparameterSetting entity:setting-PaiNN-numLayers-stark2024 ,
+        entity:setting-PaiNN-numFeatures-stark2024 ,
+        entity:setting-PaiNN-cutoffRadius-stark2024 ;
+    mlips:produces entity:model-PaiNN-stark2024 .
+
+entity:model-PaiNN-stark2024 a mlips:TrainedModel ;
+    rdfs:label "PaiNN model for H2 on copper surfaces (mean of five models)" .
+
+entity:run-REANN-stark2024 a mlips:MLIPRun ;
+    rdfs:label "Final optimised REANN model trained on the H2/Cu database" ;
+    mlips:appliesMethod entity:REANN ;
+    mlips:runsOn entity:ds-H2Cu-stark2024 ;
+    mlips:hasHyperparameterSetting entity:setting-REANN-cutoffRadius-stark2024 ,
+        entity:setting-REANN-numLayers-stark2024 ;
+    mlips:produces entity:model-REANN-stark2024 .
+
+entity:model-REANN-stark2024 a mlips:TrainedModel ;
+    rdfs:label "REANN model for H2 on copper surfaces (mean of five models)" .
+
+entity:run-ACE-stark2024 a mlips:MLIPRun ;
+    rdfs:label "Final optimised ACE model trained on the H2/Cu database" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-H2Cu-stark2024 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-cutoffRadius-stark2024 ,
+        entity:setting-ACE-bodyOrder-stark2024 ;
+    mlips:produces entity:model-ACE-stark2024 .
+
+entity:model-ACE-stark2024 a mlips:TrainedModel ;
+    rdfs:label "ACE model for H2 on copper surfaces (mean of five models)" .
+
+entity:run-MACE-stark2024 a mlips:MLIPRun ;
+    rdfs:label "Final optimised MACE model trained on the H2/Cu database" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-H2Cu-stark2024 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-cutoffRadius-stark2024 ,
+        entity:setting-MACE-bodyOrder-stark2024 ,
+        entity:setting-MACE-numLayers-stark2024 ,
+        entity:setting-MACE-numFeatures-stark2024 ;
+    mlips:produces entity:model-MACE-stark2024 .
+
+entity:model-MACE-stark2024 a mlips:TrainedModel ;
+    rdfs:label "MACE model for H2 on copper surfaces (mean of five models)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-stark2024 mlips:hasResult
+    entity:result-PaiNN-all-stark2024 ,
+    entity:result-REANN-all-stark2024 ,
+    entity:result-ACE-all-stark2024 ,
+    entity:result-MACE-all-stark2024 .
+
+entity:result-PaiNN-all-stark2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-stark2024 ;
+    mlips:targetMaterial entity:mat-H2Cu-stark2024 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-all-1-stark2024 ,
+        entity:metric-PaiNN-all-2-stark2024 ,
+        entity:metric-PaiNN-all-3-stark2024 ,
+        entity:metric-PaiNN-all-4-stark2024 .
+
+entity:metric-PaiNN-all-1-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy over all H2/Cu structures: PaiNN (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-all-2-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy over all H2/Cu structures: PaiNN (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-all-3-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces over all atoms: PaiNN (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-PaiNN-all-4-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces over all atoms: PaiNN (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-REANN-all-stark2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-REANN-stark2024 ;
+    mlips:targetMaterial entity:mat-H2Cu-stark2024 ;
+    mlips:hasAccuracyMetric entity:metric-REANN-all-1-stark2024 ,
+        entity:metric-REANN-all-2-stark2024 ,
+        entity:metric-REANN-all-3-stark2024 ,
+        entity:metric-REANN-all-4-stark2024 .
+
+entity:metric-REANN-all-1-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy over all H2/Cu structures: REANN (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "18.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-REANN-all-2-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy over all H2/Cu structures: REANN (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "12.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-REANN-all-3-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces over all atoms: REANN (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-REANN-all-4-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces over all atoms: REANN (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-all-stark2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-stark2024 ;
+    mlips:targetMaterial entity:mat-H2Cu-stark2024 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-all-1-stark2024 ,
+        entity:metric-ACE-all-2-stark2024 ,
+        entity:metric-ACE-all-3-stark2024 ,
+        entity:metric-ACE-all-4-stark2024 .
+
+entity:metric-ACE-all-1-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy over all H2/Cu structures: ACE (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "18.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-all-2-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy over all H2/Cu structures: ACE (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "12"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-all-3-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces over all atoms: ACE (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-ACE-all-4-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces over all atoms: ACE (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-all-stark2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-stark2024 ;
+    mlips:targetMaterial entity:mat-H2Cu-stark2024 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-all-1-stark2024 ,
+        entity:metric-MACE-all-2-stark2024 ,
+        entity:metric-MACE-all-3-stark2024 ,
+        entity:metric-MACE-all-4-stark2024 .
+
+entity:metric-MACE-all-1-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy over all H2/Cu structures: MACE (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-all-2-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy over all H2/Cu structures: MACE (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-all-3-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces over all atoms: MACE (mean of five models)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "15.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-MACE-all-4-stark2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces over all atoms: MACE (mean of five models)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Evaluation times of the models (CPU and GPU) are compared in figures; the
+# final models were chosen to evaluate in roughly 100 ms or less.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Only the 'All' rows of Table I are encoded. The per-facet energy errors (H2 on Cu(111), (100), (110), (211)), the per-facet and hydrogen-only force errors, and the standard deviations over the five models are left out.
+# - Energy errors are printed in meV (per structure). For MACE the 'correlation order of 2' is encoded as mlips:bodyOrder 2 and 'hidden_irreps 16x0e' as numFeatures 16; for ACE 'correlation order of 4' as bodyOrder 4; for REANN the three message-passing loops as numLayers 3.
+# - PaiNN and REANN are new registry methods first used here. Sticking probabilities from MD, minimum-energy paths from climbing-image NEB and phonon band structures have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
