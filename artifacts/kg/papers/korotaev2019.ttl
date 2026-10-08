@@ -1,0 +1,542 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Pavel Yu. Korotaev et al. (2019). Accessing thermal conductivity of complex compounds by machine learning interatomic potentials.
+#   Physical review. B./Physical review. B. doi:10.1103/physrevb.100.144308
+#
+# Version read: publisher (sha256 f9188832da2de9fd...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 155 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the actively learned MTPs for the skutterudite CoSb3
+# (one per temperature, plus four independent repeats at 300 K), their
+# VASP reference calculations, active training sets and the validation
+# errors of Tables I and II. Lattice thermal conductivities are not
+# encoded (no metric property).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-korotaev2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Korotaev et al. (2019): thermal conductivity of complex compounds by machine learning interatomic potentials (CoSb3)" ;
+    mlips:reportedIn entity:article-korotaev2019 .
+
+entity:article-korotaev2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.100.144308> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Accessing thermal conductivity of complex compounds by machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-2617-6341> ,
+        <https://orcid.org/0000-0002-4652-6863> ,
+        entity:person-Yanilkin-korotaev2019 ,
+        <https://orcid.org/0000-0002-7497-5594> .
+
+<https://orcid.org/0000-0002-2617-6341> a schema:Person ;
+    schema:name "Pavel Korotaev" ;
+    schema:givenName "Pavel" ;
+    schema:familyName "Korotaev" ;
+    schema:identifier <https://orcid.org/0000-0002-2617-6341> .
+
+<https://orcid.org/0000-0002-4652-6863> a schema:Person ;
+    schema:name "Ivan Novoselov" ;
+    schema:givenName "Ivan" ;
+    schema:familyName "Novoselov" ;
+    schema:identifier <https://orcid.org/0000-0002-4652-6863> .
+
+entity:person-Yanilkin-korotaev2019 a schema:Person ;
+    schema:name "Aleksey Yanilkin" ;
+    schema:givenName "Aleksey" ;
+    schema:familyName "Yanilkin" .
+
+<https://orcid.org/0000-0002-7497-5594> a schema:Person ;
+    schema:name "Alexander Shapeev" ;
+    schema:givenName "Alexander" ;
+    schema:familyName "Shapeev" ;
+    schema:identifier <https://orcid.org/0000-0002-7497-5594> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CoSb3-korotaev2019 a mlips:MaterialSystem ;
+    rdfs:label "Skutterudite CoSb3 (2x2x2 supercell Co32Sb96, 128 atoms)" ;
+    mlips:chemicalFormula "CoSb3" ;
+    mlips:materialClass "Thermoelectric skutterudite" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-korotaev2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-korotaev2019 mlips:hasDFTSettings entity:calc-settings-dft-korotaev2019 .
+
+entity:calc-settings-dft-korotaev2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "450"^^xsd:double ;
+    mlips:kPointMesh "2x2x2 Gamma-centred grid" ;
+    rdfs:comment "VASP 5.4.1; Co 3d7 4s2 and Sb 5s2 5p3 valence electrons; experimental lattice constants at each temperature." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-300K-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 300 K (271 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 271 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-500K-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 500 K (717 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 717 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-700K-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 700 K (652 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 652 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-300K-1-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 300 K (MTP-1) (838 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 838 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-300K-2-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 300 K (MTP-2) (778 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 778 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-300K-3-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 300 K (MTP-3) (897 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 897 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+entity:ds-300K-4-korotaev2019 a mlips:TrainingDataset ;
+    rdfs:label "Active training set for CoSb3 at 300 K (MTP-4) (579 configurations)" ;
+    mlips:coversMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 579 ;
+    mlips:hasDFTCalculation entity:calc-dft-korotaev2019 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-300K-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-500K-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-700K-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-300K-1-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-300K-2-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-300K-3-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:ds-300K-4-korotaev2019 mlips:samplingStrategy
+    entity:sampling-active-korotaev2019 .
+
+entity:sampling-active-korotaev2019 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning: pretraining on about 100 AIMD steps, then classical MD with the MTP on independent systems with selection by extrapolation grade, repeated selection to remove correlated configurations, DFT on the selected set, retraining until no configuration is selected" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-korotaev2019 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-korotaev2019 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-MTP-korotaev2019 a mlips:LossFunction ;
+    rdfs:label "Weighted errors in energies, forces and stresses with relative weights 1, 0.1 and 0.1" .
+
+entity:alg-MTP-korotaev2019 a mls:Algorithm ;
+    rdfs:label "Active learning with selection by extrapolation grade" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-300K-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-500K-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-700K-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-300K-1-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-300K-2-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-300K-3-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-300K-4-cutoffRadius-korotaev2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-300K-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 300 K" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-300K-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-300K-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-300K-korotaev2019 .
+
+entity:model-300K-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 300 K" .
+
+entity:run-500K-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 500 K" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-500K-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-500K-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-500K-korotaev2019 .
+
+entity:model-500K-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 500 K" .
+
+entity:run-700K-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 700 K" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-700K-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-700K-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-700K-korotaev2019 .
+
+entity:model-700K-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 700 K" .
+
+entity:run-300K-1-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 300 K (MTP-1)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-300K-1-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-300K-1-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-300K-1-korotaev2019 .
+
+entity:model-300K-1-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 300 K (MTP-1)" .
+
+entity:run-300K-2-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 300 K (MTP-2)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-300K-2-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-300K-2-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-300K-2-korotaev2019 .
+
+entity:model-300K-2-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 300 K (MTP-2)" .
+
+entity:run-300K-3-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 300 K (MTP-3)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-300K-3-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-300K-3-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-300K-3-korotaev2019 .
+
+entity:model-300K-3-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 300 K (MTP-3)" .
+
+entity:run-300K-4-korotaev2019 a mlips:MLIPRun ;
+    rdfs:label "MTP training for CoSb3 at 300 K (MTP-4)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-300K-4-korotaev2019 ;
+    mlips:hasHyperparameterSetting entity:setting-300K-4-cutoffRadius-korotaev2019 ;
+    mlips:produces entity:model-300K-4-korotaev2019 .
+
+entity:model-300K-4-korotaev2019 a mlips:TrainedModel ;
+    rdfs:label "MTP for CoSb3 at 300 K (MTP-4)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-korotaev2019 mlips:hasResult
+    entity:result-300K-korotaev2019 ,
+    entity:result-500K-korotaev2019 ,
+    entity:result-700K-korotaev2019 ,
+    entity:result-300K-1-korotaev2019 ,
+    entity:result-300K-2-korotaev2019 ,
+    entity:result-300K-3-korotaev2019 ,
+    entity:result-300K-4-korotaev2019 .
+
+entity:result-300K-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-300K-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-300K-1-korotaev2019 ,
+        entity:metric-300K-2-korotaev2019 ,
+        entity:metric-300K-3-korotaev2019 .
+
+entity:metric-300K-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.08"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-300K-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-300K-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.29"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-500K-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-500K-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-500K-1-korotaev2019 ,
+        entity:metric-500K-2-korotaev2019 ,
+        entity:metric-500K-3-korotaev2019 .
+
+entity:metric-500K-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.13"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-500K-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "34"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-500K-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.29"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-700K-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-700K-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-700K-1-korotaev2019 ,
+        entity:metric-700K-2-korotaev2019 ,
+        entity:metric-700K-3-korotaev2019 .
+
+entity:metric-700K-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.56"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-700K-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "53.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-700K-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 250 random AIMD configurations not in the training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.25"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-300K-1-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-300K-1-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-300K-1-1-korotaev2019 ,
+        entity:metric-300K-1-2-korotaev2019 ,
+        entity:metric-300K-1-3-korotaev2019 .
+
+entity:metric-300K-1-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-300K-1-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-300K-1-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.32"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-300K-2-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-300K-2-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-300K-2-1-korotaev2019 ,
+        entity:metric-300K-2-2-korotaev2019 ,
+        entity:metric-300K-2-3-korotaev2019 .
+
+entity:metric-300K-2-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-300K-2-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-300K-2-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.27"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-300K-3-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-300K-3-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-300K-3-1-korotaev2019 ,
+        entity:metric-300K-3-2-korotaev2019 ,
+        entity:metric-300K-3-3-korotaev2019 .
+
+entity:metric-300K-3-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.14"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-300K-3-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-300K-3-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.27"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-300K-4-korotaev2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-300K-4-korotaev2019 ;
+    mlips:targetMaterial entity:mat-CoSb3-korotaev2019 ;
+    mlips:hasAccuracyMetric entity:metric-300K-4-1-korotaev2019 ,
+        entity:metric-300K-4-2-korotaev2019 ,
+        entity:metric-300K-4-3-korotaev2019 .
+
+entity:metric-300K-4-1-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute energy error per atom, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.22"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-300K-4-2-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average absolute force error, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-300K-4-3-korotaev2019 a mlips:AccuracyMetric ;
+    rdfs:label "Average error of the diagonal stress component, 400 random AIMD configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.23"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The tables give 'average errors' defined through absolute differences; they are encoded as MAE. The stress error is defined as sigma_MTP - sigma_DFT for the diagonal component, without an absolute value in the caption; it is encoded as MAE on that reading.
+# - The MTP level (size of the basis) and the software version were not found in the text read; only the 6.2 A cutoff is encoded. The 700 K energy error (2.56 meV/atom) is much larger than at 300 and 500 K, as printed.
+# - Lattice thermal conductivities from the Boltzmann transport equation and Green-Kubo MD (Table II last column, Fig. 6) and phonon dispersions are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
