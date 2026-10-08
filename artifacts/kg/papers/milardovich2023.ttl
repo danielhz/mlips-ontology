@@ -1,0 +1,217 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Diego Milardovich et al. (2023). Machine learning interatomic potential for silicon-nitride (Si3N4) by active learning.
+#   The Journal of Chemical Physics. doi:10.1063/5.0146753
+#
+# Version read: submittedVersion (sha256 a03e04767817e821...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 120 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one GAP (SOAP descriptor) for amorphous and crystalline
+# Si3N4 built by iterative active learning with melt-and-quench MD
+# (structure types added per iteration in Table II), with the reference
+# level and the test MAEs stated in the text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-milardovich2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Milardovich et al. (2023): machine learning interatomic potential (GAP) for silicon nitride (Si3N4) by active learning" ;
+    mlips:reportedIn entity:article-milardovich2023 .
+
+entity:article-milardovich2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0146753> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potential for silicon-nitride (Si3N4) by active learning" ;
+    schema:author <https://orcid.org/0000-0003-2453-1693> ,
+        <https://orcid.org/0000-0002-9996-2589> ,
+        <https://orcid.org/0000-0002-8631-5681> ,
+        <https://orcid.org/0000-0003-2453-507X> ,
+        <https://orcid.org/0000-0001-9056-9855> ,
+        <https://orcid.org/0000-0001-6536-2238> .
+
+<https://orcid.org/0000-0003-2453-1693> a schema:Person ;
+    schema:name "Diego Milardovich" ;
+    schema:givenName "Diego" ;
+    schema:familyName "Milardovich" ;
+    schema:identifier <https://orcid.org/0000-0003-2453-1693> .
+
+<https://orcid.org/0000-0002-9996-2589> a schema:Person ;
+    schema:name "Christoph Wilhelmer" ;
+    schema:givenName "Christoph" ;
+    schema:familyName "Wilhelmer" ;
+    schema:identifier <https://orcid.org/0000-0002-9996-2589> .
+
+<https://orcid.org/0000-0002-8631-5681> a schema:Person ;
+    schema:name "Dominic Waldhoer" ;
+    schema:givenName "Dominic" ;
+    schema:familyName "Waldhoer" ;
+    schema:identifier <https://orcid.org/0000-0002-8631-5681> .
+
+<https://orcid.org/0000-0003-2453-507X> a schema:Person ;
+    schema:name "Lukas Cvitkovich" ;
+    schema:givenName "Lukas" ;
+    schema:familyName "Cvitkovich" ;
+    schema:identifier <https://orcid.org/0000-0003-2453-507X> .
+
+<https://orcid.org/0000-0001-9056-9855> a schema:Person ;
+    schema:name "Ganesh Sivaraman" ;
+    schema:givenName "Ganesh" ;
+    schema:familyName "Sivaraman" ;
+    schema:identifier <https://orcid.org/0000-0001-9056-9855> .
+
+<https://orcid.org/0000-0001-6536-2238> a schema:Person ;
+    schema:name "Tibor Grasser" ;
+    schema:givenName "Tibor" ;
+    schema:familyName "Grasser" ;
+    schema:identifier <https://orcid.org/0000-0001-6536-2238> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Si3N4-milardovich2023 a mlips:MaterialSystem ;
+    rdfs:label "Silicon nitride: amorphous Si3N4 at several densities, alpha- and beta-Si3N4, and bulk Si" ;
+    mlips:chemicalFormula "Si3N4" ;
+    mlips:materialClass "Nitride ceramic; amorphous and crystalline phases" ;
+    mlips:microstructuralFeature "Under- and over-coordinated Si defects in the amorphous network" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-milardovich2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-milardovich2023 mlips:hasDFTSettings entity:calc-settings-dft-milardovich2023 .
+
+entity:calc-settings-dft-milardovich2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-milardovich2023 ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "PBE in CP2K; basis sets and pseudopotentials are named in the paper but were not captured from the extracted text." .
+
+entity:lib-CP2K-milardovich2023 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Si3N4-milardovich2023 a mlips:TrainingDataset ;
+    rdfs:label "Si3N4 GAP training data set (built over twelve active-learning iterations)" ;
+    mlips:coversMaterial entity:mat-Si3N4-milardovich2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-milardovich2023 ;
+    rdfs:comment "The total number of configurations is not stated in the text read; Table II lists the additions per iteration. Stresses were computed only for the last five iterations." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Si3N4-milardovich2023 mlips:samplingStrategy
+    entity:sampling-empirical-seed-milardovich2023 ,
+    entity:sampling-active-melt-quench-milardovich2023 .
+
+entity:sampling-empirical-seed-milardovich2023 a mlips:SamplingStrategy ;
+    rdfs:label "Initial sampling with an empirical potential" ;
+    rdfs:comment "An inexpensive empirical potential provides the initial sample of the potential energy surface (avoiding an initial DFT MD); the structures are recomputed with DFT." .
+
+entity:sampling-active-melt-quench-milardovich2023 a mlips:SamplingStrategy ;
+    rdfs:label "Iterative active learning by melt-and-quench MD with the current GAP" ;
+    rdfs:comment "After each melt-and-quench MD with the current GAP the final snapshots are recomputed with DFT and added, and the GAP is retrained. Twelve iterations add, among others, non-homogeneous amorphous Si3N4 (39), bulk Si (87), amorphous Si3N4 (101), amorphous Si3N4 with under-coordinated (60) and over-coordinated (49) Si, vibrations of beta-Si3N4 (82) and amorphous Si3N4 at 2.71 g/cm3 (141) (Table II)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasLossFunction entity:loss-GAP-milardovich2023 ;
+    mlips:hasHyperparameter mlips:numRadialBasis ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-GAP-milardovich2023 a mlips:LossFunction ;
+    rdfs:label "Gaussian process regression with per-structure-type regularisation (sigma) for energies, forces and stresses, from 0.01 / 0.1 for non-homogeneous amorphous structures down to 0.0005 / 0.005 / 0.005 for under-coordinated amorphous and geometry-optimised structures (Table III)" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-Si3N4-numRadialBasis-milardovich2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-Si3N4-milardovich2023 a mlips:MLIPRun ;
+    rdfs:label "Active-learned GAP for Si3N4 (final iteration)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Si3N4-milardovich2023 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Si3N4-numRadialBasis-milardovich2023 ;
+    mlips:produces entity:model-gap-Si3N4-milardovich2023 .
+
+entity:model-gap-Si3N4-milardovich2023 a mlips:TrainedModel ;
+    rdfs:label "GAP for amorphous and crystalline Si3N4" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-milardovich2023 mlips:hasResult
+    entity:result-gap-Si3N4-test-milardovich2023 .
+
+entity:result-gap-Si3N4-test-milardovich2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gap-Si3N4-milardovich2023 ;
+    mlips:targetMaterial entity:mat-Si3N4-milardovich2023 ;
+    mlips:hasAccuracyMetric entity:metric-gap-Si3N4-test-1-milardovich2023 ,
+        entity:metric-gap-Si3N4-test-2-milardovich2023 .
+
+entity:metric-gap-Si3N4-test-1-milardovich2023 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy against DFT for the structures of the testing data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gap-Si3N4-test-2-milardovich2023 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces against DFT for the structures of the testing data set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.26"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Of the GAP parameters (Table I: cutoff, cutoff transition width, n_max, l_max, sparse points) only n_max = 8 survived text extraction legibly; the table needs to be read from the PDF. The fitting software (QUIP, possibly with the turbo-SOAP descriptor) is not named in the parts read.
+# - Structural validation of the melt-and-quench amorphous models (coordination statistics, radial distribution, vibrational density of states) has no MetricProperty.
+# - The version read is the submitted manuscript (submittedVersion).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
