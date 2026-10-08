@@ -1,0 +1,246 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Benjamin W. J. Chen et al. (2023). Accelerating explicit solvent models of heterogeneous catalysts with machine learning interatomic potentials.
+#   Chemical Science. doi:10.1039/d3sc02482b
+#
+# Version read: publisher (sha256 fdc87922ec8d52f9...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 116 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: an actively learned moment tensor potential driving
+# 'MLaMD' simulations of explicitly solvated copper surfaces. Encoded:
+# the MTP for solvated clean Cu(111) trained on the fly, with the errors
+# on configurations sampled from the production runs (Fig. 4b, values
+# quoted in the text), and the preliminary comparison of MTP, SchNet and
+# ANI on a bulk-water training set (runs only; errors are a figure).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-chen2023solvent a mlips:BenchmarkStudy ;
+    rdfs:label "Chen et al. (2023): accelerating explicit solvent models of heterogeneous catalysts with MLIPs (on-the-fly MTP)" ;
+    mlips:reportedIn entity:article-chen2023solvent .
+
+entity:article-chen2023solvent a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d3sc02482b> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Accelerating explicit solvent models of heterogeneous catalysts with machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0003-3695-727X> ,
+        <https://orcid.org/0000-0003-1698-692X> ,
+        <https://orcid.org/0000-0003-4628-0215> .
+
+<https://orcid.org/0000-0003-3695-727X> a schema:Person ;
+    schema:name "Benjamin W. J. Chen" ;
+    schema:givenName "Benjamin W. J." ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0003-3695-727X> .
+
+<https://orcid.org/0000-0003-1698-692X> a schema:Person ;
+    schema:name "Xinglong Zhang" ;
+    schema:givenName "Xinglong" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0003-1698-692X> .
+
+<https://orcid.org/0000-0003-4628-0215> a schema:Person ;
+    schema:name "Jia Zhang" ;
+    schema:givenName "Jia" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0003-4628-0215> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-water-chen2023solvent a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water (100 H2O molecules at three densities)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+entity:mat-CuH2O-chen2023solvent a mlips:MaterialSystem ;
+    rdfs:label "Clean Cu(111) surface solvated with explicit water" ;
+    mlips:chemicalFormula "Cu/H2O" ;
+    mlips:materialClass "Solid-liquid interface of a heterogeneous catalyst" ;
+    mlips:microstructuralFeature "Cu(111) slab with an explicit water film; adsorbates in further systems" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-chen2023solvent a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-chen2023solvent mlips:hasDFTSettings entity:calc-settings-dft-chen2023solvent .
+
+entity:calc-settings-dft-chen2023solvent a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-RPBE-D3-chen2023solvent ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    rdfs:comment "Plane-wave cutoff of 400 eV, except 800 eV for bulk water to minimise Pulay stresses." .
+
+entity:xc-RPBE-D3-chen2023solvent a mlips:XCFunctional ;
+    rdfs:label "RPBE-D3" ;
+    rdfs:comment "Hammer et al. revision of PBE with Grimme's D3 dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-water-T1-chen2023solvent a mlips:TrainingDataset ;
+    rdfs:label "Bulk water training set T1 (800 configurations)" ;
+    mlips:coversMaterial entity:mat-water-chen2023solvent ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 800 ;
+    mlips:hasDFTCalculation entity:calc-dft-chen2023solvent .
+
+entity:ds-CuH2O-chen2023solvent a mlips:TrainingDataset ;
+    rdfs:label "On-the-fly training set for solvated Cu(111)" ;
+    mlips:coversMaterial entity:mat-CuH2O-chen2023solvent ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-chen2023solvent ;
+    rdfs:comment "The size of the actively learned training set was not captured." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-water-T1-chen2023solvent mlips:samplingStrategy
+    entity:sampling-water-aimd-chen2023solvent .
+
+entity:ds-CuH2O-chen2023solvent mlips:samplingStrategy
+    entity:sampling-on-the-fly-chen2023solvent .
+
+entity:sampling-water-aimd-chen2023solvent a mlips:SamplingStrategy ;
+    rdfs:label "AIMD of bulk water at three densities" ;
+    rdfs:comment "Training set T1: 800 configurations from AIMD of 100 H2O molecules at densities of 0.91, 1.00 and a third value." .
+
+entity:sampling-on-the-fly-chen2023solvent a mlips:SamplingStrategy ;
+    rdfs:label "On-the-fly active learning during MLaMD" ;
+    rdfs:comment "Equilibration runs ramped from 450 K to 100 K in 500 ps, eight replicas in parallel sharing and updating one MLIP; extrapolative configurations are computed with DFT and added to the training database, which then serves the production runs." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-chen2023solvent ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-MTP-chen2023solvent a mls:Algorithm ;
+    rdfs:label "Active learning on the fly during MD with replicas sharing one potential" .
+
+entity:SchNet a mlips:MLIPMethod ;
+    rdfs:label "SchNet (continuous-filter convolutional deep neural network)" .
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mtp-water-chen2023solvent a mlips:MLIPRun ;
+    rdfs:label "MTP trained on the bulk-water set T1" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-water-T1-chen2023solvent ;
+    mlips:produces entity:model-mtp-water-chen2023solvent .
+
+entity:model-mtp-water-chen2023solvent a mlips:TrainedModel ;
+    rdfs:label "MTP for bulk water (T1)" .
+
+entity:run-schnet-water-chen2023solvent a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on the bulk-water set T1" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-water-T1-chen2023solvent ;
+    mlips:produces entity:model-schnet-water-chen2023solvent .
+
+entity:model-schnet-water-chen2023solvent a mlips:TrainedModel ;
+    rdfs:label "SchNet for bulk water (T1)" .
+
+entity:run-ani-water-chen2023solvent a mlips:MLIPRun ;
+    rdfs:label "ANI trained on the bulk-water set T1" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-water-T1-chen2023solvent ;
+    mlips:produces entity:model-ani-water-chen2023solvent .
+
+entity:model-ani-water-chen2023solvent a mlips:TrainedModel ;
+    rdfs:label "ANI for bulk water (T1)" .
+
+entity:run-mtp-CuH2O-chen2023solvent a mlips:MLIPRun ;
+    rdfs:label "MTP trained on the fly for solvated clean Cu(111)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CuH2O-chen2023solvent ;
+    mlips:produces entity:model-mtp-CuH2O-chen2023solvent .
+
+entity:model-mtp-CuH2O-chen2023solvent a mlips:TrainedModel ;
+    rdfs:label "On-the-fly MTP for solvated Cu(111)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-chen2023solvent mlips:hasResult
+    entity:result-mtp-CuH2O-production-chen2023solvent .
+
+entity:result-mtp-CuH2O-production-chen2023solvent a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-CuH2O-chen2023solvent ;
+    mlips:targetMaterial entity:mat-CuH2O-chen2023solvent ;
+    mlips:hasAccuracyMetric entity:metric-mtp-CuH2O-production-1-chen2023solvent ,
+        entity:metric-mtp-CuH2O-production-2-chen2023solvent .
+
+entity:metric-mtp-CuH2O-production-1-chen2023solvent a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy for 160 configurations sampled at 25 ps intervals from the eight production MLaMD replicas (Fig. 4b)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.87"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mtp-CuH2O-production-2-chen2023solvent a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces for 160 configurations sampled from the eight production MLaMD replicas (Fig. 4b)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.041"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The RMSEs of MTP, SchNet and ANI on the bulk-water test sets E1 and E3-E7 (Fig. 1a) are a figure; the three bulk-water runs carry no metric. MTP level, cutoffs and the software used (the MLIP package and LAMMPS are the usual tools; PLUMED for metadynamics) were not captured.
+# - Further systems (adsorbates on solvated Cu surfaces, binding and free energies from MLaMD-based metadynamics) each have their own on-the-fly potential; they are not encoded. Binding energies, RDFs and free-energy surfaces have no MetricProperty. Metadynamics is not a SimulationType individual.
+# - The third water density of the T1 set and the sizes of the test sets are in Table S1 of the supplement.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
