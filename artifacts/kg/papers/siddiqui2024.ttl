@@ -1,0 +1,200 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Anas Siddiqui et al. (2024). Machine-learned interatomic potentials for transition metal dichalcogenide Mo1−xWxS2−2ySe2y alloys.
+#   npj Computational Materials. doi:10.1038/s41524-024-01357-9
+#
+# Version read: acceptedVersion (sha256 4c94f53f86800db6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 179 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MACE potential for monolayer quaternary
+# transition-metal dichalcogenide alloys: Quantum ESPRESSO reference
+# calculations, the 1470-configuration training set and its construction,
+# and the training settings. The test errors are in the supplement; the
+# main text gives only phonon-frequency errors. Read from the accepted
+# version.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-siddiqui2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Siddiqui and Hine (2024): machine-learned interatomic potentials for Mo(1-x)W(x)S(2-2y)Se(2y) alloys" ;
+    mlips:reportedIn entity:article-siddiqui2024 .
+
+entity:article-siddiqui2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01357-9> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Machine-learned interatomic potentials for transition metal dichalcogenide Mo1−xWxS2−2ySe2y alloys" ;
+    schema:author <https://orcid.org/0009-0009-3974-3788> ,
+        <https://orcid.org/0000-0001-5613-3679> .
+
+<https://orcid.org/0009-0009-3974-3788> a schema:Person ;
+    schema:name "Anas Siddiqui" ;
+    schema:givenName "Anas" ;
+    schema:familyName "Siddiqui" ;
+    schema:identifier <https://orcid.org/0009-0009-3974-3788> .
+
+<https://orcid.org/0000-0001-5613-3679> a schema:Person ;
+    schema:name "Nicholas D. M. Hine" ;
+    schema:givenName "Nicholas D. M." ;
+    schema:familyName "Hine" ;
+    schema:identifier <https://orcid.org/0000-0001-5613-3679> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-TMD-siddiqui2024 a mlips:MaterialSystem ;
+    rdfs:label "Monolayer Mo(1-x)W(x)S(2-2y)Se(2y) alloys over 49 compositions (x and y from 0 to 1)" ;
+    mlips:chemicalFormula "Mo1-xWxS2-2ySe2y" ;
+    mlips:materialClass "Two-dimensional transition-metal dichalcogenide alloys" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-siddiqui2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-siddiqui2024 mlips:hasDFTSettings entity:calc-settings-dft-siddiqui2024 .
+
+entity:calc-settings-dft-siddiqui2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional entity:xc-optB88-vdW-OPTB88-siddiqui2024 ;
+    mlips:pseudopotentialType mlips:Ultrasoft ;
+    mlips:kPointMesh "2x2x1" ;
+    rdfs:comment "Kinetic-energy cutoff 50 Ry and charge-density cutoff 450 Ry (stated in Ry, not converted); single-point calculations on 6x6 supercells." .
+
+entity:xc-optB88-vdW-OPTB88-siddiqui2024 a mlips:XCFunctional ;
+    rdfs:label "optB88-vdW (OPTB88)" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-TMD-siddiqui2024 a mlips:TrainingDataset ;
+    rdfs:label "TMD alloy data set (1470 configurations; 1397 for training, 73 for validation)" ;
+    mlips:coversMaterial entity:mat-TMD-siddiqui2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1470 ;
+    mlips:hasDFTCalculation entity:calc-dft-siddiqui2024 ;
+    rdfs:comment "The count is the whole set before the 95% / 5% split; an independent test set is described in the supplement." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-TMD-siddiqui2024 mlips:samplingStrategy
+    entity:sampling-sw-md-siddiqui2024 ,
+    entity:sampling-alloying-siddiqui2024 .
+
+entity:sampling-sw-md-siddiqui2024 a mlips:SamplingStrategy ;
+    rdfs:label "Langevin MD of a 6x6 MoS2 supercell with a Stillinger-Weber potential at five strains (-2% to 2%), snapshots every 5 ps with the temperature raised by 200 K after each (100 to 1100 K): 30 MoS2 snapshots" .
+
+entity:sampling-alloying-siddiqui2024 a mlips:SamplingStrategy ;
+    rdfs:label "Each snapshot converted into random alloy configurations by substituting Mo by W and S by Se at random and rescaling lattice parameter and layer thickness, for 49 compositions" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-siddiqui2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-siddiqui2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        mlips:batchSize ,
+        mlips:numEpochs ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-MACE-siddiqui2024 ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:loss-MACE-siddiqui2024 a mlips:LossFunction ;
+    rdfs:label "Weighted average of energy, force and stress errors with weights 1, 100 and 10" .
+
+entity:alg-MACE-siddiqui2024 a mls:Algorithm ;
+    rdfs:label "AMSGrad variant of Adam" .
+
+entity:impl-MACE-siddiqui2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-TMD-cutoffRadius-siddiqui2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-TMD-numLayers-siddiqui2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-TMD-batchSize-siddiqui2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-TMD-numEpochs-siddiqui2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-TMD-learningRate-siddiqui2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-TMD-siddiqui2024 a mlips:MLIPRun ;
+    rdfs:label "MACE training for Mo(1-x)W(x)S(2-2y)Se(2y) alloys" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-TMD-siddiqui2024 ;
+    mlips:hasHyperparameterSetting entity:setting-TMD-cutoffRadius-siddiqui2024 ,
+        entity:setting-TMD-numLayers-siddiqui2024 ,
+        entity:setting-TMD-batchSize-siddiqui2024 ,
+        entity:setting-TMD-numEpochs-siddiqui2024 ,
+        entity:setting-TMD-learningRate-siddiqui2024 ;
+    mlips:produces entity:model-TMD-siddiqui2024 .
+
+entity:model-TMD-siddiqui2024 a mlips:TrainedModel ;
+    rdfs:label "MACE potential for Mo-W-S-Se monolayer alloys" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: the main text announces mean absolute errors on an independent test set but the sentence continues past the part read and the details are in Supplementary Note 3; to be filled from the PDF. Phonon-frequency errors against DFT (MAE below 1 cm^-1, maximum below 3 cm^-1 for the four pure monolayers) have no metric property.
+# - The exchange-correlation functional is written 'OPTB88' in the paper and recorded as a paper-local value. Other MACE hyperparameters are in Supplementary Table 1. Vibrational densities of states and Raman spectra of the alloys are not encoded.
+# - Read from the accepted version, not the version of record.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
