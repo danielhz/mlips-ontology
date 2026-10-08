@@ -1,0 +1,924 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jia Bi et al. (2026). Scalar-pathway fidelity improves physical accuracy in short-range equivariant interatomic potentials.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2606.15892  arXiv:2606.15892v1
+#
+# Version read: arxiv-preprint arXiv:2606.15892v1 (sha256 f4a1f29b19aa1e11...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 94 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the controlled comparison of Table S1: Allegro, NequIP
+# and MACE, each trained with and without the paper's scalar-pathway
+# correction (PAN + PGS modules), on metallic Ag, covalent Si and a
+# LiF/Li-F subset of MPtrj: 18 runs with energy and force MAEs (means
+# over five seeds). The many ablations and molecular benchmarks of the
+# supplement are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-bi2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Bi et al. (2026): scalar-pathway fidelity improves physical accuracy in short-range equivariant interatomic potentials (PAN + PGS)" ;
+    mlips:reportedIn entity:article-bi2026 .
+
+entity:article-bi2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2606.15892> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Scalar-pathway fidelity improves physical accuracy in short-range equivariant interatomic potentials" ;
+    schema:author entity:person-Bi-bi2026 ,
+        entity:person-Elena-bi2026 ,
+        entity:person-Pinilla-bi2026 .
+
+entity:person-Bi-bi2026 a schema:Person ;
+    schema:name "Jia Bi" ;
+    schema:givenName "Jia" ;
+    schema:familyName "Bi" .
+
+entity:person-Elena-bi2026 a schema:Person ;
+    schema:name "Alin Marin Elena" ;
+    schema:givenName "Alin Marin" ;
+    schema:familyName "Elena" .
+
+entity:person-Pinilla-bi2026 a schema:Person ;
+    schema:name "Samuel Pinilla" ;
+    schema:givenName "Samuel" ;
+    schema:familyName "Pinilla" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Ag-bi2026 a mlips:MaterialSystem ;
+    rdfs:label "Silver: bulk fcc, strained, defective, surface and high-temperature configurations" ;
+    mlips:chemicalFormula "Ag" ;
+    mlips:materialClass "Elemental fcc metal" .
+
+entity:mat-Si-bi2026 a mlips:MaterialSystem ;
+    rdfs:label "Silicon (public Silicon MLIP data sets)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental covalent semiconductor" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+entity:mat-LiF-bi2026 a mlips:MaterialSystem ;
+    rdfs:label "Li-F-containing compounds (LiF and other chemistries containing Li and F), subset of MPtrj" ;
+    mlips:chemicalFormula "Li-F" ;
+    mlips:materialClass "Short-range ionic materials" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-ag-dft-bi2026 a mlips:DFTCalculation .
+
+entity:calc-mptrj-dft-bi2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-ag-dft-bi2026 mlips:hasDFTSettings entity:calc-settings-ag-dft-bi2026 .
+
+entity:calc-settings-ag-dft-bi2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    rdfs:comment "Author-generated Ag data; convergence parameters, smearing and k-point rules are in Supplementary Table S13 (not read)." .
+
+entity:calc-mptrj-dft-bi2026 mlips:hasDFTSettings entity:calc-settings-mptrj-dft-bi2026 .
+
+entity:calc-settings-mptrj-dft-bi2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    rdfs:comment "Materials Project GGA/GGA+U static and relaxation trajectories (MPtrj)." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Ag-bi2026 a mlips:TrainingDataset ;
+    rdfs:label "Ag data set (4.6 x 10^4 configurations)" ;
+    mlips:coversMaterial entity:mat-Ag-bi2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 46000 ;
+    mlips:hasDFTCalculation entity:calc-ag-dft-bi2026 .
+
+entity:ds-Si-bi2026 a mlips:TrainingDataset ;
+    rdfs:label "Silicon data set (3.4 x 10^4 configurations)" ;
+    mlips:coversMaterial entity:mat-Si-bi2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 34000 .
+
+entity:ds-LiF-bi2026 a mlips:TrainingDataset ;
+    rdfs:label "LiF/Li-F subset of MPtrj (3.9 x 10^4 configurations)" ;
+    mlips:coversMaterial entity:mat-LiF-bi2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 39000 ;
+    mlips:hasDFTCalculation entity:calc-mptrj-dft-bi2026 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Ag-bi2026 mlips:samplingStrategy
+    entity:sampling-ag-configs-bi2026 .
+
+entity:ds-Si-bi2026 mlips:samplingStrategy
+    entity:sampling-si-public-bi2026 .
+
+entity:ds-LiF-bi2026 mlips:samplingStrategy
+    entity:sampling-mptrj-filter-bi2026 .
+
+entity:sampling-ag-configs-bi2026 a mlips:SamplingStrategy ;
+    rdfs:label "Bulk, strained, defective, surface and high-temperature Ag configurations" ;
+    rdfs:comment "Duplicates removed before an 80/10/10 train/validation/test split." .
+
+entity:sampling-si-public-bi2026 a mlips:SamplingStrategy ;
+    rdfs:label "Public silicon MLIP data sets" ;
+    rdfs:comment "Release-provided splits where available, otherwise 80/10/10 with a fixed seed; no stress labels." .
+
+entity:sampling-mptrj-filter-bi2026 a mlips:SamplingStrategy ;
+    rdfs:label "MPtrj configurations whose formula contains both Li and F" ;
+    rdfs:comment "Configurations more than 1.5 eV/atom above the ground state removed; 80/10/10 split at the configuration level." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-bi2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-bi2026 ;
+    mlips:hasHyperparameter entity:hp-scalar-pathway-bi2026 ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-MACE-bi2026 .
+
+entity:loss-MACE-bi2026 a mlips:LossFunction ;
+    rdfs:label "L1 loss on energy, forces and stress with weights w_E = 1.0, w_F = 10.0 and w_sigma = 10.0 (0 without stress labels)" .
+
+entity:alg-MACE-bi2026 a mls:Algorithm ;
+    rdfs:label "AdamW, initial learning rate 8e-3, weight decay 1e-8, ReduceLROnPlateau (patience 5, factor 0.5), EMA decay 0.99999, stochastic weight averaging after epoch 30, batch size 4, gradient clipping at 100" .
+
+entity:impl-MACE-bi2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "ASE-MACE framework, float64" .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter entity:hp-scalar-pathway-bi2026 .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasHyperparameter entity:hp-scalar-pathway-bi2026 .
+
+entity:hp-scalar-pathway-bi2026 a mlips:Hyperparameter ;
+    rdfs:label "Scalar-pathway treatment (baseline, or with the PAN and PGS modules)" ;
+    mlips:hyperparameterName "scalar_pathway" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Allegro-Ag-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-Allegro-Ag-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-NequIP-Ag-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-NequIP-Ag-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-Ag-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-MACE-Ag-base-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-Ag-base-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MACE-Ag-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-Ag-panpgs-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-Ag-panpgs-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-Allegro-Si-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-Allegro-Si-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-NequIP-Si-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-NequIP-Si-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-Si-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-MACE-Si-base-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-Si-base-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MACE-Si-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-Si-panpgs-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-Si-panpgs-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-Allegro-LiF-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-Allegro-LiF-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-NequIP-LiF-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-NequIP-LiF-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-LiF-base-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "baseline" .
+
+entity:setting-MACE-LiF-base-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-LiF-base-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MACE-LiF-panpgs-scalar-pathway-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-scalar-pathway-bi2026 ;
+    mlips:settingValue "PAN+PGS" .
+
+entity:setting-MACE-LiF-panpgs-learningRate-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.008"^^xsd:double .
+
+entity:setting-MACE-LiF-panpgs-batchSize-bi2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Allegro-Ag-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on the Ag data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Ag-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-Ag-base-bi2026 .
+
+entity:model-Allegro-Ag-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for Ag (mean of five seeds)" .
+
+entity:run-Allegro-Ag-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+PAN+PGS trained on the Ag data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Ag-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-Ag-panpgs-bi2026 .
+
+entity:model-Allegro-Ag-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+PAN+PGS model for Ag (mean of five seeds)" .
+
+entity:run-NequIP-Ag-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on the Ag data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Ag-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-Ag-base-bi2026 .
+
+entity:model-NequIP-Ag-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for Ag (mean of five seeds)" .
+
+entity:run-NequIP-Ag-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP+PAN+PGS trained on the Ag data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Ag-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-Ag-panpgs-bi2026 .
+
+entity:model-NequIP-Ag-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP+PAN+PGS model for Ag (mean of five seeds)" .
+
+entity:run-MACE-Ag-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the Ag data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Ag-base-scalar-pathway-bi2026 ,
+        entity:setting-MACE-Ag-base-learningRate-bi2026 ,
+        entity:setting-MACE-Ag-base-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-Ag-base-bi2026 .
+
+entity:model-MACE-Ag-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE model for Ag (mean of five seeds)" .
+
+entity:run-MACE-Ag-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE+PAN+PGS trained on the Ag data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Ag-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Ag-panpgs-scalar-pathway-bi2026 ,
+        entity:setting-MACE-Ag-panpgs-learningRate-bi2026 ,
+        entity:setting-MACE-Ag-panpgs-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-Ag-panpgs-bi2026 .
+
+entity:model-MACE-Ag-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE+PAN+PGS model for Ag (mean of five seeds)" .
+
+entity:run-Allegro-Si-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on the Si data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Si-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-Si-base-bi2026 .
+
+entity:model-Allegro-Si-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for Si (mean of five seeds)" .
+
+entity:run-Allegro-Si-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+PAN+PGS trained on the Si data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Si-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-Si-panpgs-bi2026 .
+
+entity:model-Allegro-Si-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+PAN+PGS model for Si (mean of five seeds)" .
+
+entity:run-NequIP-Si-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on the Si data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Si-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-Si-base-bi2026 .
+
+entity:model-NequIP-Si-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for Si (mean of five seeds)" .
+
+entity:run-NequIP-Si-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP+PAN+PGS trained on the Si data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Si-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-Si-panpgs-bi2026 .
+
+entity:model-NequIP-Si-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP+PAN+PGS model for Si (mean of five seeds)" .
+
+entity:run-MACE-Si-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the Si data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Si-base-scalar-pathway-bi2026 ,
+        entity:setting-MACE-Si-base-learningRate-bi2026 ,
+        entity:setting-MACE-Si-base-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-Si-base-bi2026 .
+
+entity:model-MACE-Si-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE model for Si (mean of five seeds)" .
+
+entity:run-MACE-Si-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE+PAN+PGS trained on the Si data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Si-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Si-panpgs-scalar-pathway-bi2026 ,
+        entity:setting-MACE-Si-panpgs-learningRate-bi2026 ,
+        entity:setting-MACE-Si-panpgs-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-Si-panpgs-bi2026 .
+
+entity:model-MACE-Si-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE+PAN+PGS model for Si (mean of five seeds)" .
+
+entity:run-Allegro-LiF-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on the LiF data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-LiF-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-LiF-base-bi2026 .
+
+entity:model-Allegro-LiF-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for LiF (mean of five seeds)" .
+
+entity:run-Allegro-LiF-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+PAN+PGS trained on the LiF data set" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-LiF-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-Allegro-LiF-panpgs-bi2026 .
+
+entity:model-Allegro-LiF-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+PAN+PGS model for LiF (mean of five seeds)" .
+
+entity:run-NequIP-LiF-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on the LiF data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-LiF-base-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-LiF-base-bi2026 .
+
+entity:model-NequIP-LiF-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for LiF (mean of five seeds)" .
+
+entity:run-NequIP-LiF-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP+PAN+PGS trained on the LiF data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-LiF-panpgs-scalar-pathway-bi2026 ;
+    mlips:produces entity:model-NequIP-LiF-panpgs-bi2026 .
+
+entity:model-NequIP-LiF-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP+PAN+PGS model for LiF (mean of five seeds)" .
+
+entity:run-MACE-LiF-base-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the LiF data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-LiF-base-scalar-pathway-bi2026 ,
+        entity:setting-MACE-LiF-base-learningRate-bi2026 ,
+        entity:setting-MACE-LiF-base-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-LiF-base-bi2026 .
+
+entity:model-MACE-LiF-base-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE model for LiF (mean of five seeds)" .
+
+entity:run-MACE-LiF-panpgs-bi2026 a mlips:MLIPRun ;
+    rdfs:label "MACE+PAN+PGS trained on the LiF data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-LiF-bi2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-LiF-panpgs-scalar-pathway-bi2026 ,
+        entity:setting-MACE-LiF-panpgs-learningRate-bi2026 ,
+        entity:setting-MACE-LiF-panpgs-batchSize-bi2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPUs, float64 precision" ;
+    mlips:produces entity:model-MACE-LiF-panpgs-bi2026 .
+
+entity:model-MACE-LiF-panpgs-bi2026 a mlips:TrainedModel ;
+    rdfs:label "MACE+PAN+PGS model for LiF (mean of five seeds)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-bi2026 mlips:hasResult
+    entity:result-Allegro-Ag-base-bi2026 ,
+    entity:result-Allegro-Ag-panpgs-bi2026 ,
+    entity:result-NequIP-Ag-base-bi2026 ,
+    entity:result-NequIP-Ag-panpgs-bi2026 ,
+    entity:result-MACE-Ag-base-bi2026 ,
+    entity:result-MACE-Ag-panpgs-bi2026 ,
+    entity:result-Allegro-Si-base-bi2026 ,
+    entity:result-Allegro-Si-panpgs-bi2026 ,
+    entity:result-NequIP-Si-base-bi2026 ,
+    entity:result-NequIP-Si-panpgs-bi2026 ,
+    entity:result-MACE-Si-base-bi2026 ,
+    entity:result-MACE-Si-panpgs-bi2026 ,
+    entity:result-Allegro-LiF-base-bi2026 ,
+    entity:result-Allegro-LiF-panpgs-bi2026 ,
+    entity:result-NequIP-LiF-base-bi2026 ,
+    entity:result-NequIP-LiF-panpgs-bi2026 ,
+    entity:result-MACE-LiF-base-bi2026 ,
+    entity:result-MACE-LiF-panpgs-bi2026 .
+
+entity:result-Allegro-Ag-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-Ag-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-Ag-base-1-bi2026 ,
+        entity:metric-Allegro-Ag-base-2-bi2026 .
+
+entity:metric-Allegro-Ag-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-Ag-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-Ag-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-Ag-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-Ag-panpgs-1-bi2026 ,
+        entity:metric-Allegro-Ag-panpgs-2-bi2026 .
+
+entity:metric-Allegro-Ag-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.59"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-Ag-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "33.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-Ag-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-Ag-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-Ag-base-1-bi2026 ,
+        entity:metric-NequIP-Ag-base-2-bi2026 .
+
+entity:metric-NequIP-Ag-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.61"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-Ag-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "37.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-Ag-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-Ag-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-Ag-panpgs-1-bi2026 ,
+        entity:metric-NequIP-Ag-panpgs-2-bi2026 .
+
+entity:metric-NequIP-Ag-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.32"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-Ag-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-Ag-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-Ag-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-Ag-base-1-bi2026 ,
+        entity:metric-MACE-Ag-base-2-bi2026 .
+
+entity:metric-MACE-Ag-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.39"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-Ag-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "35.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-Ag-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-Ag-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Ag-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-Ag-panpgs-1-bi2026 ,
+        entity:metric-MACE-Ag-panpgs-2-bi2026 .
+
+entity:metric-MACE-Ag-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.12"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-Ag-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE+PAN+PGS, Ag (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "27.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-Si-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-Si-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-Si-base-1-bi2026 ,
+        entity:metric-Allegro-Si-base-2-bi2026 .
+
+entity:metric-Allegro-Si-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-Si-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "58.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-Si-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-Si-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-Si-panpgs-1-bi2026 ,
+        entity:metric-Allegro-Si-panpgs-2-bi2026 .
+
+entity:metric-Allegro-Si-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.85"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-Si-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "47.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-Si-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-Si-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-Si-base-1-bi2026 ,
+        entity:metric-NequIP-Si-base-2-bi2026 .
+
+entity:metric-NequIP-Si-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-Si-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "51.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-Si-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-Si-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-Si-panpgs-1-bi2026 ,
+        entity:metric-NequIP-Si-panpgs-2-bi2026 .
+
+entity:metric-NequIP-Si-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.29"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-Si-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-Si-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-Si-base-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-Si-base-1-bi2026 ,
+        entity:metric-MACE-Si-base-2-bi2026 .
+
+entity:metric-MACE-Si-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.41"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-Si-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "47.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-Si-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-Si-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-Si-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-Si-panpgs-1-bi2026 ,
+        entity:metric-MACE-Si-panpgs-2-bi2026 .
+
+entity:metric-MACE-Si-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-Si-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE+PAN+PGS, Si (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "35.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-LiF-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-LiF-base-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-LiF-base-1-bi2026 ,
+        entity:metric-Allegro-LiF-base-2-bi2026 .
+
+entity:metric-Allegro-LiF-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.23"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-LiF-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "64.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-LiF-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-LiF-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-LiF-panpgs-1-bi2026 ,
+        entity:metric-Allegro-LiF-panpgs-2-bi2026 .
+
+entity:metric-Allegro-LiF-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-LiF-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "52.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-LiF-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-LiF-base-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-LiF-base-1-bi2026 ,
+        entity:metric-NequIP-LiF-base-2-bi2026 .
+
+entity:metric-NequIP-LiF-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.62"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-LiF-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "58.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-LiF-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-LiF-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-LiF-panpgs-1-bi2026 ,
+        entity:metric-NequIP-LiF-panpgs-2-bi2026 .
+
+entity:metric-NequIP-LiF-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.93"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-LiF-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "47.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-LiF-base-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-LiF-base-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-LiF-base-1-bi2026 ,
+        entity:metric-MACE-LiF-base-2-bi2026 .
+
+entity:metric-MACE-LiF-base-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.09"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-LiF-base-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "54"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-LiF-panpgs-bi2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-LiF-panpgs-bi2026 ;
+    mlips:targetMaterial entity:mat-LiF-bi2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-LiF-panpgs-1-bi2026 ,
+        entity:metric-MACE-LiF-panpgs-2-bi2026 .
+
+entity:metric-MACE-LiF-panpgs-1-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.41"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-LiF-panpgs-2-bi2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE+PAN+PGS, LiF (mean of five seeds)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "39.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# MACE-family models were trained on NVIDIA A100 GPUs; the paper reports
+# relative cost only (PAN+PGS adds about 5% inference FLOPs and 1.03-1.05x
+# parameters over baseline MACE; Table S14).
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The PAN and PGS modules are a modification inside the scalar readout pathway of an existing architecture; the corrected models are encoded under the same registry methods (MACE, NequIP, Allegro) with a paper-local 'scalar-pathway' setting, in line with METHODS.md rule 3. If the modification becomes a named method in the literature it will need registry rows.
+# - Cutoff, radial basis, irreps and depth are 'held fixed' across variants but their values were not captured; the AdamW settings are stated for the MACE family and are not assumed for Allegro and NequIP.
+# - numConfigurations are the rounded totals given in the text (4.6, 3.4 and 3.9 x 10^4), before the 80/10/10 split. The reference level of the public silicon data is not restated.
+# - Not encoded: standard deviations over the five seeds, stress MAEs, the PAN-only and PGS-only ablations, capacity-matched controls, the grouped-split check, rMD17 / MD17 results (Tables S2, S3), class-resolved Ag errors, and the MD and physical-property tests.
+# - Preprint only (arXiv v1, June 2026); authors from DataCite, without ORCIDs.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
