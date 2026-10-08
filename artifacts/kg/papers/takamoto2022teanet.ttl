@@ -1,0 +1,412 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   So Takamoto et al. (2022). TeaNet: Universal neural network interatomic potential inspired by iterative electronic relaxations.
+#   Computational Materials Science. doi:10.1016/j.commatsci.2022.111280  arXiv:1912.01398v2
+#
+# Version read: arxiv-preprint arXiv:1912.01398v2 (sha256 a42f466b2da7afba...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 64 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the TeaNet architecture (introduced here) and the four
+# networks of 2, 4, 8 and 16 layers trained on the authors' data set of
+# highly disordered structures of the elements H to Ar, with the test
+# errors of Table 2.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-takamoto2022teanet a mlips:BenchmarkStudy ;
+    rdfs:label "Takamoto, Izumi and Li (2022): TeaNet, a universal neural network interatomic potential inspired by iterative electronic relaxations" ;
+    mlips:reportedIn entity:article-takamoto2022teanet .
+
+entity:article-takamoto2022teanet a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2022.111280> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "TeaNet: Universal neural network interatomic potential inspired by iterative electronic relaxations" ;
+    schema:author <https://orcid.org/0000-0001-5739-6497> ,
+        entity:person-Izumi-takamoto2022teanet ,
+        <https://orcid.org/0000-0002-7841-8058> .
+
+<https://orcid.org/0000-0001-5739-6497> a schema:Person ;
+    schema:name "So Takamoto" ;
+    schema:givenName "So" ;
+    schema:familyName "Takamoto" ;
+    schema:identifier <https://orcid.org/0000-0001-5739-6497> .
+
+entity:person-Izumi-takamoto2022teanet a schema:Person ;
+    schema:name "Satoshi Izumi" ;
+    schema:givenName "Satoshi" ;
+    schema:familyName "Izumi" .
+
+<https://orcid.org/0000-0002-7841-8058> a schema:Person ;
+    schema:name "Ju Li" ;
+    schema:givenName "Ju" ;
+    schema:familyName "Li" ;
+    schema:identifier <https://orcid.org/0000-0002-7841-8058> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-H-to-Ar-takamoto2022teanet a mlips:MaterialSystem ;
+    rdfs:label "Disordered multi-element structures of the first three rows of the periodic table (H to Ar)" ;
+    mlips:materialClass "Highly disordered systems of tens of atoms with random element choice and ratio, plus heated Materials Project molecules; most configurations far from stable" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-takamoto2022teanet a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-takamoto2022teanet mlips:hasDFTSettings entity:calc-settings-dft-takamoto2022teanet .
+
+entity:calc-settings-dft-takamoto2022teanet a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:kPointMesh "One k-point" ;
+    rdfs:comment "Fast settings to maximise the number of data points: PREC = Medium (which sets the energy cutoff), Gaussian smearing of width 0.2 eV, spin polarisation considered; identical settings for all structures." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-H-to-Ar-takamoto2022teanet a mlips:TrainingDataset ;
+    rdfs:label "TeaNet data set of disordered H-to-Ar structures (about 294,000 structures)" ;
+    mlips:coversMaterial entity:mat-H-to-Ar-takamoto2022teanet ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 294000 ;
+    mlips:hasDFTCalculation entity:calc-dft-takamoto2022teanet ;
+    rdfs:comment "The paper gives the size as 'approximately 294,000 structures' with about 7,375,000 force components; 200 randomly selected structures (4962 x 3 force components) form the test set." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-H-to-Ar-takamoto2022teanet mlips:samplingStrategy
+    entity:sampling-melt-quench-md-takamoto2022teanet ,
+    entity:sampling-heated-molecules-takamoto2022teanet .
+
+entity:sampling-melt-quench-md-takamoto2022teanet a mlips:SamplingStrategy ;
+    rdfs:label "High-temperature melt and short anneal by classical MD of random compositions" ;
+    rdfs:comment "A box filled with tens of atoms of randomly selected elements (H to Ar) is heated to about 10,000 K, melted for about 100 fs, cooled to a set temperature (up to 5,000 K) and annealed for another 100 fs (1 fs time step); repeated for various temperatures and volumes." .
+
+entity:sampling-heated-molecules-takamoto2022teanet a mlips:SamplingStrategy ;
+    rdfs:label "Heated molecules of the Materials Project molecule data set" ;
+    rdfs:comment "Molecular structures heated up to 3,000 K." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:TeaNet a mlips:MLIPMethod ;
+    rdfs:label "TeaNet (tensor embedded atom network)" ;
+    mlips:hasFunctionalForm entity:ff-TeaNet ;
+    mlips:hasLossFunction entity:loss-TeaNet-takamoto2022teanet ;
+    mlips:hasTrainingAlgorithm entity:alg-TeaNet-takamoto2022teanet ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        entity:hp-tensor-features-takamoto2022teanet ,
+        mlips:cutoffRadius ,
+        mlips:batchSize ,
+        mlips:learningRate .
+
+entity:ff-TeaNet a mlips:FunctionalForm ;
+    rdfs:label "Graph convolutional network whose message passing carries scalar, vector and rank-2 tensor values on atoms and bonds, motivated by rewriting the embedded-atom and bond-order (Tersoff-type) potentials as graph convolutions and by iterative electronic relaxation; energies are sums of atomic contributions and forces come from backpropagation" .
+
+entity:loss-TeaNet-takamoto2022teanet a mlips:LossFunction ;
+    rdfs:label "Combined absolute loss on energies and atomic forces" .
+
+entity:alg-TeaNet-takamoto2022teanet a mls:Algorithm ;
+    rdfs:label "Adam; parameters of all intermediate layers tied in the initial stage; final stage by stochastic gradient descent with learning rate 0.1; 450,000 (initial), 450,000 (main) and 20,000 (final) iterations" .
+
+entity:hp-tensor-features-takamoto2022teanet a mlips:Hyperparameter ;
+    rdfs:label "TeaNet length of the vector and rank-2 tensor arrays" ;
+    mlips:hyperparameterName "tensor_features" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-teanet-2-numLayers-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-teanet-2-numFeatures-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-teanet-2-tensor-features-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-features-takamoto2022teanet ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-teanet-2-cutoffRadius-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-teanet-2-batchSize-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-teanet-2-learningRate-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+entity:setting-teanet-4-numLayers-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-teanet-4-numFeatures-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-teanet-4-tensor-features-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-features-takamoto2022teanet ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-teanet-4-cutoffRadius-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-teanet-4-batchSize-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-teanet-4-learningRate-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+entity:setting-teanet-8-numLayers-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-teanet-8-numFeatures-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-teanet-8-tensor-features-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-features-takamoto2022teanet ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-teanet-8-cutoffRadius-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-teanet-8-batchSize-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-teanet-8-learningRate-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+entity:setting-teanet-16-numLayers-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-teanet-16-numFeatures-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-teanet-16-tensor-features-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-features-takamoto2022teanet ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-teanet-16-cutoffRadius-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-teanet-16-batchSize-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-teanet-16-learningRate-takamoto2022teanet a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.1"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-teanet-2-takamoto2022teanet a mlips:MLIPRun ;
+    rdfs:label "TeaNet training with 2 layers" ;
+    mlips:appliesMethod entity:TeaNet ;
+    mlips:runsOn entity:ds-H-to-Ar-takamoto2022teanet ;
+    mlips:hasHyperparameterSetting entity:setting-teanet-2-numLayers-takamoto2022teanet ,
+        entity:setting-teanet-2-numFeatures-takamoto2022teanet ,
+        entity:setting-teanet-2-tensor-features-takamoto2022teanet ,
+        entity:setting-teanet-2-cutoffRadius-takamoto2022teanet ,
+        entity:setting-teanet-2-batchSize-takamoto2022teanet ,
+        entity:setting-teanet-2-learningRate-takamoto2022teanet ;
+    mlips:produces entity:model-teanet-2-takamoto2022teanet .
+
+entity:model-teanet-2-takamoto2022teanet a mlips:TrainedModel ;
+    rdfs:label "TeaNet, 2 layers (about 87,000 parameters)" .
+
+entity:run-teanet-4-takamoto2022teanet a mlips:MLIPRun ;
+    rdfs:label "TeaNet training with 4 layers" ;
+    mlips:appliesMethod entity:TeaNet ;
+    mlips:runsOn entity:ds-H-to-Ar-takamoto2022teanet ;
+    mlips:hasHyperparameterSetting entity:setting-teanet-4-numLayers-takamoto2022teanet ,
+        entity:setting-teanet-4-numFeatures-takamoto2022teanet ,
+        entity:setting-teanet-4-tensor-features-takamoto2022teanet ,
+        entity:setting-teanet-4-cutoffRadius-takamoto2022teanet ,
+        entity:setting-teanet-4-batchSize-takamoto2022teanet ,
+        entity:setting-teanet-4-learningRate-takamoto2022teanet ;
+    mlips:produces entity:model-teanet-4-takamoto2022teanet .
+
+entity:model-teanet-4-takamoto2022teanet a mlips:TrainedModel ;
+    rdfs:label "TeaNet, 4 layers (about 235,000 parameters)" .
+
+entity:run-teanet-8-takamoto2022teanet a mlips:MLIPRun ;
+    rdfs:label "TeaNet training with 8 layers" ;
+    mlips:appliesMethod entity:TeaNet ;
+    mlips:runsOn entity:ds-H-to-Ar-takamoto2022teanet ;
+    mlips:hasHyperparameterSetting entity:setting-teanet-8-numLayers-takamoto2022teanet ,
+        entity:setting-teanet-8-numFeatures-takamoto2022teanet ,
+        entity:setting-teanet-8-tensor-features-takamoto2022teanet ,
+        entity:setting-teanet-8-cutoffRadius-takamoto2022teanet ,
+        entity:setting-teanet-8-batchSize-takamoto2022teanet ,
+        entity:setting-teanet-8-learningRate-takamoto2022teanet ;
+    mlips:produces entity:model-teanet-8-takamoto2022teanet .
+
+entity:model-teanet-8-takamoto2022teanet a mlips:TrainedModel ;
+    rdfs:label "TeaNet, 8 layers (about 529,000 parameters)" .
+
+entity:run-teanet-16-takamoto2022teanet a mlips:MLIPRun ;
+    rdfs:label "TeaNet training with 16 layers" ;
+    mlips:appliesMethod entity:TeaNet ;
+    mlips:runsOn entity:ds-H-to-Ar-takamoto2022teanet ;
+    mlips:hasHyperparameterSetting entity:setting-teanet-16-numLayers-takamoto2022teanet ,
+        entity:setting-teanet-16-numFeatures-takamoto2022teanet ,
+        entity:setting-teanet-16-tensor-features-takamoto2022teanet ,
+        entity:setting-teanet-16-cutoffRadius-takamoto2022teanet ,
+        entity:setting-teanet-16-batchSize-takamoto2022teanet ,
+        entity:setting-teanet-16-learningRate-takamoto2022teanet ;
+    mlips:produces entity:model-teanet-16-takamoto2022teanet .
+
+entity:model-teanet-16-takamoto2022teanet a mlips:TrainedModel ;
+    rdfs:label "TeaNet, 16 layers (about 1,120,000 parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-takamoto2022teanet mlips:hasResult
+    entity:result-teanet-2-takamoto2022teanet ,
+    entity:result-teanet-4-takamoto2022teanet ,
+    entity:result-teanet-8-takamoto2022teanet ,
+    entity:result-teanet-16-takamoto2022teanet .
+
+entity:result-teanet-2-takamoto2022teanet a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-teanet-2-takamoto2022teanet ;
+    mlips:targetMaterial entity:mat-H-to-Ar-takamoto2022teanet ;
+    mlips:hasAccuracyMetric entity:metric-teanet-2-1-takamoto2022teanet ,
+        entity:metric-teanet-2-2-takamoto2022teanet .
+
+entity:metric-teanet-2-1-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TeaNet with 2 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "32.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-teanet-2-2-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TeaNet with 2 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.213"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-teanet-4-takamoto2022teanet a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-teanet-4-takamoto2022teanet ;
+    mlips:targetMaterial entity:mat-H-to-Ar-takamoto2022teanet ;
+    mlips:hasAccuracyMetric entity:metric-teanet-4-1-takamoto2022teanet ,
+        entity:metric-teanet-4-2-takamoto2022teanet .
+
+entity:metric-teanet-4-1-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TeaNet with 4 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-teanet-4-2-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TeaNet with 4 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.167"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-teanet-8-takamoto2022teanet a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-teanet-8-takamoto2022teanet ;
+    mlips:targetMaterial entity:mat-H-to-Ar-takamoto2022teanet ;
+    mlips:hasAccuracyMetric entity:metric-teanet-8-1-takamoto2022teanet ,
+        entity:metric-teanet-8-2-takamoto2022teanet .
+
+entity:metric-teanet-8-1-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TeaNet with 8 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "21.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-teanet-8-2-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TeaNet with 8 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.143"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-teanet-16-takamoto2022teanet a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-teanet-16-takamoto2022teanet ;
+    mlips:targetMaterial entity:mat-H-to-Ar-takamoto2022teanet ;
+    mlips:hasAccuracyMetric entity:metric-teanet-16-1-takamoto2022teanet ,
+        entity:metric-teanet-16-2-takamoto2022teanet .
+
+entity:metric-teanet-16-1-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: TeaNet with 16 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "19.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-teanet-16-2-takamoto2022teanet a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: TeaNet with 16 layers" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.142"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The learning rate 0.1 is that of the final stochastic-gradient-descent stage, the only value stated; the Adam learning rate of the main stage is not given.
+# - Table 3 (ablations of the four-layer network) and the appendix experiments on QM9 and on the Materials Project molecule data set are not encoded.
+# - The materials applications (hydrocarbon geometries, lattice constants and cohesive energies of metals and semiconductors, amorphous SiO2, water, proton diffusion; Table 4 and figures) have no MetricProperty; that MD was run with the potential is clear from these sections, but the simulation code and conditions were not captured, so supportsSimulation is not asserted.
+# - The plane-wave cutoff is given only through PREC = Medium and is not encoded as a number.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
