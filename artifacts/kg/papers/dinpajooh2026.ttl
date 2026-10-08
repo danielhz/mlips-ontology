@@ -1,0 +1,482 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Mohammadhasan Dinpajooh et al. (2026). Modeling the behavior of concentrated aqueous HNO3 using machine learning interatomic potentials.
+#   The Journal of Chemical Physics. doi:10.1063/5.0303907
+#
+# Version read: publisher (sha256 eb8d1a869bdc6a7f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 185 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the two custom Deep Potential models for aqueous nitric
+# acid (BLYP-D2 and PBE-D3 levels), built with the ArcaNN iterative
+# workflow, with reference calculations, training sets, settings and the
+# test errors stated for the BLYP-D2 model; and the MACE model fine-tuned
+# from MACE-MP0 on the stage-1 configurations. Structural and
+# thermodynamic results are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-dinpajooh2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Dinpajooh et al. (2026): modeling concentrated aqueous HNO3 using machine learning interatomic potentials" ;
+    mlips:reportedIn entity:article-dinpajooh2026 .
+
+entity:article-dinpajooh2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0303907> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Modeling the behavior of concentrated aqueous HNO3 using machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-1547-0334> ,
+        <https://orcid.org/0000-0003-3590-2031> ,
+        <https://orcid.org/0000-0002-0336-1480> ,
+        <https://orcid.org/0000-0002-1842-7884> ,
+        <https://orcid.org/0000-0002-0350-2941> ,
+        <https://orcid.org/0000-0002-0378-4352> ,
+        <https://orcid.org/0000-0003-1378-5241> ,
+        <https://orcid.org/0000-0002-9291-7208> .
+
+<https://orcid.org/0000-0002-1547-0334> a schema:Person ;
+    schema:name "Mohammadhasan Dinpajooh" ;
+    schema:givenName "Mohammadhasan" ;
+    schema:familyName "Dinpajooh" ;
+    schema:identifier <https://orcid.org/0000-0002-1547-0334> .
+
+<https://orcid.org/0000-0003-3590-2031> a schema:Person ;
+    schema:name "Michael D. Lacount" ;
+    schema:givenName "Michael D." ;
+    schema:familyName "Lacount" ;
+    schema:identifier <https://orcid.org/0000-0003-3590-2031> .
+
+<https://orcid.org/0000-0002-0336-1480> a schema:Person ;
+    schema:name "Scott E. Muller" ;
+    schema:givenName "Scott E." ;
+    schema:familyName "Muller" ;
+    schema:identifier <https://orcid.org/0000-0002-0336-1480> .
+
+<https://orcid.org/0000-0002-1842-7884> a schema:Person ;
+    schema:name "Neil J. Henson" ;
+    schema:givenName "Neil J." ;
+    schema:familyName "Henson" ;
+    schema:identifier <https://orcid.org/0000-0002-1842-7884> .
+
+<https://orcid.org/0000-0002-0350-2941> a schema:Person ;
+    schema:name "Daniel Mejia-Rodriguez" ;
+    schema:givenName "Daniel" ;
+    schema:familyName "Mejia-Rodriguez" ;
+    schema:identifier <https://orcid.org/0000-0002-0350-2941> .
+
+<https://orcid.org/0000-0002-0378-4352> a schema:Person ;
+    schema:name "Axel Gomez" ;
+    schema:givenName "Axel" ;
+    schema:familyName "Gomez" ;
+    schema:identifier <https://orcid.org/0000-0002-0378-4352> .
+
+<https://orcid.org/0000-0003-1378-5241> a schema:Person ;
+    schema:name "Christopher J. Mundy" ;
+    schema:givenName "Christopher J." ;
+    schema:familyName "Mundy" ;
+    schema:identifier <https://orcid.org/0000-0003-1378-5241> .
+
+<https://orcid.org/0000-0002-9291-7208> a schema:Person ;
+    schema:name "Andrew M. Ritzmann" ;
+    schema:givenName "Andrew M." ;
+    schema:familyName "Ritzmann" ;
+    schema:identifier <https://orcid.org/0000-0002-9291-7208> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-HNO3aq-dinpajooh2026 a mlips:MaterialSystem ;
+    rdfs:label "Aqueous nitric acid solutions (about 2 to 4 M in training; associated and dissociated HNO3)" ;
+    mlips:chemicalFormula "HNO3 + H2O" ;
+    mlips:materialClass "Aqueous electrolyte solution" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-blyp-dinpajooh2026 a mlips:DFTCalculation .
+
+entity:calc-pbe-dinpajooh2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-blyp-dinpajooh2026 mlips:hasDFTSettings entity:calc-settings-blyp-dinpajooh2026 .
+
+entity:calc-settings-blyp-dinpajooh2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-dinpajooh2026 ;
+    mlips:xcFunctional entity:xc-BLYP-D2-dinpajooh2026 ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    mlips:dftBasisSet entity:basis-TZV2P-MOLOPT-dinpajooh2026 ;
+    rdfs:comment "Goedecker-Teter-Hutter pseudopotentials; Grimme D2 dispersion; SCF convergence 1e-6." .
+
+entity:calc-pbe-dinpajooh2026 mlips:hasDFTSettings entity:calc-settings-pbe-dinpajooh2026 .
+
+entity:calc-settings-pbe-dinpajooh2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-dinpajooh2026 ;
+    mlips:xcFunctional entity:xc-PBE-D3-dinpajooh2026 ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    rdfs:comment "Second reference level: energies and forces recomputed on the same snapshots. Basis and pseudopotentials are assumed to follow the BLYP-D2 setup and are not restated in the text read." .
+
+entity:lib-CP2K-dinpajooh2026 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    rdfs:comment "QuickStep module; Gaussian and plane-wave scheme with an 800 Ry density cutoff." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-BLYP-D2-dinpajooh2026 a mlips:XCFunctional ;
+    rdfs:label "BLYP-D2" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-TZV2P-MOLOPT-dinpajooh2026 a mlips:DftBasisSet ;
+    rdfs:label "TZV2P MOLOPT" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:lib-CP2K-dinpajooh2026 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-PBE-D3-dinpajooh2026 a mlips:XCFunctional ;
+    rdfs:label "PBE-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-blyp-dinpajooh2026 a mlips:TrainingDataset ;
+    rdfs:label "HNO3 training set at the BLYP-D2 level (2941 configurations)" ;
+    mlips:coversMaterial entity:mat-HNO3aq-dinpajooh2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 2941 ;
+    mlips:hasDFTCalculation entity:calc-blyp-dinpajooh2026 .
+
+entity:ds-pbe-dinpajooh2026 a mlips:TrainingDataset ;
+    rdfs:label "HNO3 training set at the PBE-D3 level (the 2941 snapshots recomputed plus 11 new candidates)" ;
+    mlips:coversMaterial entity:mat-HNO3aq-dinpajooh2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2952 ;
+    mlips:hasDFTCalculation entity:calc-pbe-dinpajooh2026 ;
+    rdfs:comment "2952 is the sum of the two stated numbers." .
+
+entity:ds-stage1-dinpajooh2026 a mlips:TrainingDataset ;
+    rdfs:label "Stage-1 (NVT) configurations at the BLYP-D2 level, used to fine-tune MACE-MP0" ;
+    mlips:coversMaterial entity:mat-HNO3aq-dinpajooh2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-blyp-dinpajooh2026 ;
+    rdfs:comment "Size not stated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-blyp-dinpajooh2026 mlips:samplingStrategy
+    entity:sampling-initial-dinpajooh2026 ,
+    entity:sampling-arcann-dinpajooh2026 .
+
+entity:ds-pbe-dinpajooh2026 mlips:samplingStrategy
+    entity:sampling-initial-dinpajooh2026 ,
+    entity:sampling-arcann-dinpajooh2026 .
+
+entity:ds-stage1-dinpajooh2026 mlips:samplingStrategy
+    entity:sampling-initial-dinpajooh2026 ,
+    entity:sampling-arcann-dinpajooh2026 .
+
+entity:sampling-initial-dinpajooh2026 a mlips:SamplingStrategy ;
+    rdfs:label "About 800 configurations selected at random from earlier ab initio MD of 2-4 M HNO3" .
+
+entity:sampling-arcann-dinpajooh2026 a mlips:SamplingStrategy ;
+    rdfs:label "ArcaNN iterations in three stages (NVT at 298 K; a volume scan with box lengths 14 to 17 A; NpT at 298 K and 1 bar): exploration MD in LAMMPS with and without OPES enhanced sampling on protonation and dimerisation, candidates with force deviation between 0.2 and 0.7 eV/A over three models, labelled with CP2K" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-dinpajooh2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-rcut-smooth-dinpajooh2026 ,
+        entity:hp-embedding-net-dinpajooh2026 ,
+        entity:hp-fitting-net-dinpajooh2026 ,
+        mlips:learningRate ,
+        entity:hp-lr-decay-rate-dinpajooh2026 ,
+        entity:hp-lr-decay-steps-dinpajooh2026 ,
+        entity:hp-training-steps-dinpajooh2026 ;
+    mlips:hasImplementation entity:impl-DeePMD-dinpajooh2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-DeePMD-dinpajooh2026 a mls:Algorithm ;
+    rdfs:label "Learning rate decaying exponentially from 0.001 to 1e-6; ensembles of three models with different seeds in each ArcaNN iteration" .
+
+entity:impl-DeePMD-dinpajooh2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-dinpajooh2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-dinpajooh2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-dinpajooh2026 ,
+        mlips:cutoffRadius ,
+        mlips:numFeatures ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-dinpajooh2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-MACE-dinpajooh2026 a mlips:LossFunction ;
+    rdfs:label "Energy-force loss with forces weighted ten times the energies (no virial or stress data)" .
+
+entity:alg-MACE-dinpajooh2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning from the foundation model on a single GPU; stochastic weight averaging after 400 epochs and exponential moving average" .
+
+entity:impl-MACE-dinpajooh2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+entity:hp-rcut-smooth-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential smoothing cutoff (Angstrom)" ;
+    mlips:hyperparameterName "rcut_smth" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-embedding-net-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-rate-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay rate" ;
+    mlips:hyperparameterName "lr_decay_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-steps-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay steps" ;
+    mlips:hyperparameterName "lr_decay_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-initialisation-dinpajooh2026 a mlips:Hyperparameter ;
+    rdfs:label "Foundation model the fine-tuning starts from" ;
+    mlips:hyperparameterName "initialisation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-blyp-cutoffRadius-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-dp-blyp-rcut-smooth-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-dinpajooh2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-dp-blyp-embedding-net-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-dinpajooh2026 ;
+    mlips:settingValue "20-40-80" .
+
+entity:setting-dp-blyp-fitting-net-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-dinpajooh2026 ;
+    mlips:settingValue "240-240-240-240" .
+
+entity:setting-dp-blyp-learningRate-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-dp-blyp-lr-decay-rate-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-dinpajooh2026 ;
+    mlips:settingValue "0.98"^^xsd:double .
+
+entity:setting-dp-blyp-lr-decay-steps-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-dinpajooh2026 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-dp-blyp-training-steps-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-dinpajooh2026 ;
+    mlips:settingValue "2000000"^^xsd:integer .
+
+entity:setting-dp-pbe-cutoffRadius-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-dp-pbe-rcut-smooth-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-dinpajooh2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-dp-pbe-embedding-net-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-dinpajooh2026 ;
+    mlips:settingValue "20-40-80" .
+
+entity:setting-dp-pbe-fitting-net-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-dinpajooh2026 ;
+    mlips:settingValue "240-240-240-240" .
+
+entity:setting-dp-pbe-learningRate-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-dp-pbe-lr-decay-rate-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-dinpajooh2026 ;
+    mlips:settingValue "0.98"^^xsd:double .
+
+entity:setting-dp-pbe-lr-decay-steps-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-dinpajooh2026 ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-dp-pbe-training-steps-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-dinpajooh2026 ;
+    mlips:settingValue "2000000"^^xsd:integer .
+
+entity:setting-mace-ft-initialisation-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-dinpajooh2026 ;
+    mlips:settingValue "MACE-MP0 foundation model" .
+
+entity:setting-mace-ft-cutoffRadius-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mace-ft-numFeatures-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-mace-ft-learningRate-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-mace-ft-batchSize-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-mace-ft-numEpochs-dinpajooh2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-blyp-dinpajooh2026 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training for aqueous HNO3 at the BLYP-D2 level" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-blyp-dinpajooh2026 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-blyp-cutoffRadius-dinpajooh2026 ,
+        entity:setting-dp-blyp-rcut-smooth-dinpajooh2026 ,
+        entity:setting-dp-blyp-embedding-net-dinpajooh2026 ,
+        entity:setting-dp-blyp-fitting-net-dinpajooh2026 ,
+        entity:setting-dp-blyp-learningRate-dinpajooh2026 ,
+        entity:setting-dp-blyp-lr-decay-rate-dinpajooh2026 ,
+        entity:setting-dp-blyp-lr-decay-steps-dinpajooh2026 ,
+        entity:setting-dp-blyp-training-steps-dinpajooh2026 ;
+    mlips:produces entity:model-dp-blyp-dinpajooh2026 .
+
+entity:model-dp-blyp-dinpajooh2026 a mlips:TrainedModel ;
+    rdfs:label "BLYP-D2 DeepMD MLIP for aqueous HNO3" .
+
+entity:run-dp-pbe-dinpajooh2026 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training for aqueous HNO3 at the PBE-D3 level" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-pbe-dinpajooh2026 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-pbe-cutoffRadius-dinpajooh2026 ,
+        entity:setting-dp-pbe-rcut-smooth-dinpajooh2026 ,
+        entity:setting-dp-pbe-embedding-net-dinpajooh2026 ,
+        entity:setting-dp-pbe-fitting-net-dinpajooh2026 ,
+        entity:setting-dp-pbe-learningRate-dinpajooh2026 ,
+        entity:setting-dp-pbe-lr-decay-rate-dinpajooh2026 ,
+        entity:setting-dp-pbe-lr-decay-steps-dinpajooh2026 ,
+        entity:setting-dp-pbe-training-steps-dinpajooh2026 ;
+    mlips:produces entity:model-dp-pbe-dinpajooh2026 .
+
+entity:model-dp-pbe-dinpajooh2026 a mlips:TrainedModel ;
+    rdfs:label "PBE-D3 DeepMD MLIP for aqueous HNO3" .
+
+entity:run-mace-ft-dinpajooh2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP0 fine-tuned on the stage-1 HNO3 configurations" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-stage1-dinpajooh2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-ft-initialisation-dinpajooh2026 ,
+        entity:setting-mace-ft-cutoffRadius-dinpajooh2026 ,
+        entity:setting-mace-ft-numFeatures-dinpajooh2026 ,
+        entity:setting-mace-ft-learningRate-dinpajooh2026 ,
+        entity:setting-mace-ft-batchSize-dinpajooh2026 ,
+        entity:setting-mace-ft-numEpochs-dinpajooh2026 ;
+    mlips:produces entity:model-mace-ft-dinpajooh2026 .
+
+entity:model-mace-ft-dinpajooh2026 a mlips:TrainedModel ;
+    rdfs:label "Fine-tuned MACE-MP0 for aqueous HNO3" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-dinpajooh2026 mlips:hasResult
+    entity:result-dp-blyp-test-dinpajooh2026 .
+
+entity:result-dp-blyp-test-dinpajooh2026 a mlips:BenchmarkResult ;
+    rdfs:comment "Stated as 1.2e-1 eV/A and 6.71e-3 eV per atom." ;
+    mlips:evaluatesModel entity:model-dp-blyp-dinpajooh2026 ;
+    mlips:targetMaterial entity:mat-HNO3aq-dinpajooh2026 ;
+    mlips:hasAccuracyMetric entity:metric-dp-blyp-test-1-dinpajooh2026 ,
+        entity:metric-dp-blyp-test-2-dinpajooh2026 .
+
+entity:metric-dp-blyp-test-1-dinpajooh2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on configurations from independent MD simulations (test set)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.12"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-dp-blyp-test-2-dinpajooh2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE per atom on the test set (eV/atom)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00671"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy RMSE is in eV per atom (no vocabulary unit; in the label). No error is printed for the PBE-D3 model or the fine-tuned MACE model in the text read. The fitting net is described once as 'four layers of 240 neurons'; that reading is encoded.
+# - The MACE-MP0 release used as the starting point is not specified, so no registry model is linked; zero-shot MACE-MP0 and MACE-OFF23 are compared through structural properties only.
+# - Radial distribution functions, densities, degree of dissociation and pKa, XPS spectra and the computational-efficiency comparison are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
