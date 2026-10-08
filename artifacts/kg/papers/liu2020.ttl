@@ -1,0 +1,279 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yuanbin Liu et al. (2020). Machine learning interatomic potential developed for molecular simulations on thermal properties of β-Ga2O3.
+#   The Journal of Chemical Physics. doi:10.1063/5.0027643
+#
+# Version read: publisher (sha256 57b73f0290c85121...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 193 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SOAP-GAP model for beta-Ga2O3: VASP reference
+# calculations, the iteratively built training database, the
+# hyperparameters of Table I and the test-set energy and force RMSEs.
+# Phonons, thermal expansion and thermal conductivity are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-liu2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Liu et al. (2020): machine learning interatomic potential for thermal properties of beta-Ga2O3" ;
+    mlips:reportedIn entity:article-liu2020 .
+
+entity:article-liu2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0027643> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Machine learning interatomic potential developed for molecular simulations on thermal properties of β-Ga2O3" ;
+    schema:author entity:person-Liu-liu2020 ,
+        <https://orcid.org/0000-0002-3678-827X> ,
+        <https://orcid.org/0000-0003-3974-0391> ,
+        entity:person-LiuLinHua-liu2020 ,
+        entity:person-Csanyi-liu2020 ,
+        <https://orcid.org/0000-0003-3588-972X> .
+
+entity:person-Liu-liu2020 a schema:Person ;
+    schema:name "Yuan-Bin Liu" ;
+    schema:givenName "Yuan-Bin" ;
+    schema:familyName "Liu" .
+
+<https://orcid.org/0000-0002-3678-827X> a schema:Person ;
+    schema:name "Jia-Yue Yang" ;
+    schema:givenName "Jia-Yue" ;
+    schema:familyName "Yang" ;
+    schema:identifier <https://orcid.org/0000-0002-3678-827X> .
+
+<https://orcid.org/0000-0003-3974-0391> a schema:Person ;
+    schema:name "Gong-Ming Xin" ;
+    schema:givenName "Gong-Ming" ;
+    schema:familyName "Xin" ;
+    schema:identifier <https://orcid.org/0000-0003-3974-0391> .
+
+entity:person-LiuLinHua-liu2020 a schema:Person ;
+    schema:name "Lin-Hua Liu" ;
+    schema:givenName "Lin-Hua" ;
+    schema:familyName "Liu" .
+
+entity:person-Csanyi-liu2020 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+<https://orcid.org/0000-0003-3588-972X> a schema:Person ;
+    schema:name "Bing-Yang Cao" ;
+    schema:givenName "Bing-Yang" ;
+    schema:familyName "Cao" ;
+    schema:identifier <https://orcid.org/0000-0003-3588-972X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Ga2O3-liu2020 a mlips:MaterialSystem ;
+    rdfs:label "beta-Ga2O3 (2x2x2 supercell of 160 atoms, at volumetric strains of -4% to 4%)" ;
+    mlips:chemicalFormula "Ga2O3" ;
+    mlips:materialClass "Wide-band-gap oxide semiconductor" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-liu2020 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-liu2020 mlips:hasDFTSettings entity:calc-settings-dft-liu2020 .
+
+entity:calc-settings-dft-liu2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "1x4x2 mesh for the 160-atom supercells (4x16x8 for the 20-atom unit cell)" ;
+    rdfs:comment "Gaussian smearing of 0.1 eV; SCF halting criterion 1e-7 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Ga2O3-liu2020 a mlips:TrainingDataset ;
+    rdfs:label "beta-Ga2O3 database (801 training and 90 testing configurations of 160 atoms)" ;
+    mlips:coversMaterial entity:mat-Ga2O3-liu2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 801 ;
+    mlips:hasDFTCalculation entity:calc-dft-liu2020 ;
+    rdfs:comment "384,480 training and 43,200 testing force components." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Ga2O3-liu2020 mlips:samplingStrategy
+    entity:sampling-aimd-liu2020 ,
+    entity:sampling-gapmd-liu2020 .
+
+entity:sampling-aimd-liu2020 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD of the relaxed cell at 300 to 1500 K, 800 snapshots at 40 fs intervals, for the initial GAP" .
+
+entity:sampling-gapmd-liu2020 a mlips:SamplingStrategy ;
+    rdfs:label "NVT MD with preliminary GAP models at uniform lattice strains from -4% to 4% and 100 to 1000 K, sampled every 445 fs and recomputed with single-point DFT; a few iterations" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasLossFunction entity:loss-GAP-liu2020 ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-liu2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-cutoff-transition-width-liu2020 ,
+        entity:hp-zeta-liu2020 ,
+        entity:hp-sigma-atom-liu2020 ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:numSparseConfigs ;
+    mlips:hasImplementation entity:impl-GAP-liu2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:loss-GAP-liu2020 a mlips:LossFunction ;
+    rdfs:label "Gaussian process regression with expected errors 0.0001 eV/atom (energy), 0.01 eV/A (force) and 0.01 eV/atom (virial)" .
+
+entity:alg-GAP-liu2020 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression with 5000 representative points chosen by CUR" .
+
+entity:impl-GAP-liu2020 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP .
+
+entity:hp-cutoff-transition-width-liu2020 a mlips:Hyperparameter ;
+    rdfs:label "Width of the cutoff transition region (Angstrom)" ;
+    mlips:hyperparameterName "cutoff_transition_width" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-atom-liu2020 a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width sigma_at (Angstrom)" ;
+    mlips:hyperparameterName "atom_sigma" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-zeta-liu2020 a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel exponent zeta" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Ga2O3-cutoffRadius-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-Ga2O3-cutoff-transition-width-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-liu2020 ;
+    mlips:settingValue "1"^^xsd:double .
+
+entity:setting-Ga2O3-zeta-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-liu2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-Ga2O3-sigma-atom-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-liu2020 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-Ga2O3-numRadialBasis-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-Ga2O3-numAngularBasis-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Ga2O3-numSparseConfigs-liu2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Ga2O3-liu2020 a mlips:MLIPRun ;
+    rdfs:label "SOAP-GAP training for beta-Ga2O3" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Ga2O3-liu2020 ;
+    mlips:hasHyperparameterSetting entity:setting-Ga2O3-cutoffRadius-liu2020 ,
+        entity:setting-Ga2O3-cutoff-transition-width-liu2020 ,
+        entity:setting-Ga2O3-zeta-liu2020 ,
+        entity:setting-Ga2O3-sigma-atom-liu2020 ,
+        entity:setting-Ga2O3-numRadialBasis-liu2020 ,
+        entity:setting-Ga2O3-numAngularBasis-liu2020 ,
+        entity:setting-Ga2O3-numSparseConfigs-liu2020 ;
+    mlips:produces entity:model-Ga2O3-liu2020 .
+
+entity:model-Ga2O3-liu2020 a mlips:TrainedModel ;
+    rdfs:label "GAP for beta-Ga2O3" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-liu2020 mlips:hasResult
+    entity:result-test-liu2020 .
+
+entity:result-test-liu2020 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Ga2O3-liu2020 ;
+    mlips:targetMaterial entity:mat-Ga2O3-liu2020 ;
+    mlips:hasAccuracyMetric entity:metric-test-1-liu2020 ,
+        entity:metric-test-2-liu2020 ,
+        entity:metric-test-3-liu2020 .
+
+entity:metric-test-1-liu2020 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, testing data set (eV/atom)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0003"^^xsd:double .
+
+entity:metric-test-2-liu2020 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on Ga atoms, testing data set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.05"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-test-3-liu2020 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on O atoms, testing data set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.038"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy RMSE is in eV per atom (no vocabulary unit; in the label). The convergence study with 50 to 600 training structures (Fig. 3) and the force-locality tests are figures and are not encoded.
+# - n_max = 10 and l_max = 6 are encoded as numRadialBasis and numAngularBasis. Lattice parameters, phonon dispersion, thermal expansion and the lattice thermal conductivity from Green-Kubo MD are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
