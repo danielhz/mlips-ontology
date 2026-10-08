@@ -39,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check cq cq-check clean
 
 all: release
 
@@ -191,6 +191,15 @@ wikidata-fetch: | $(VENV_STAMP)
 
 wikidata-check: | $(VENV_STAMP)
 	$(PY) artifacts/scripts/check_wikidata_types.py
+
+# === Method-identity gate ===
+#
+# Checks every per-paper KG encoded after 2026-10-08 against
+# artifacts/kg/methods-registry.csv (canonical method and pretrained-model
+# IRIs); the convention is artifacts/kg/METHODS.md.
+
+methods-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/check_methods.py
 
 # === DaRUS deposit packaging ===
 #
