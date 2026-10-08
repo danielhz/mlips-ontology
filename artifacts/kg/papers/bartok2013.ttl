@@ -1,0 +1,153 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Albert P. Bartók et al. (2013). On representing chemical environments.
+#   Physical Review B. doi:10.1103/physrevb.87.184115  arXiv:1209.3140v3
+#
+# Version read: arxiv-preprint arXiv:1209.3140v3 (sha256 747fe9d5b749712e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 21 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper compares descriptors of atomic environments
+# (bond-order parameters, power spectrum, bispectrum, angular Fourier
+# series, Behler-Parrinello symmetry functions) and introduces SOAP. As a
+# final test it fits GAP models to silicon clusters Si3-Si19 from
+# tight-binding MD; that fit is encoded. All errors are given as figures.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-bartok2013 a mlips:BenchmarkStudy ;
+    rdfs:label "Bartok, Kondor and Csanyi (2013): on representing chemical environments (SOAP and other descriptors)" ;
+    mlips:reportedIn entity:article-bartok2013 .
+
+entity:article-bartok2013 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.87.184115> ;
+    schema:datePublished "2013"^^xsd:gYear ;
+    schema:name "On representing chemical environments" ;
+    schema:author entity:person-Bartok-bartok2013 ,
+        entity:person-Kondor-bartok2013 ,
+        entity:person-Csanyi-bartok2013 .
+
+entity:person-Bartok-bartok2013 a schema:Person ;
+    schema:name "Albert P. Bartók" ;
+    schema:givenName "Albert P." ;
+    schema:familyName "Bartók" .
+
+entity:person-Kondor-bartok2013 a schema:Person ;
+    schema:name "Risi Kondor" ;
+    schema:givenName "Risi" ;
+    schema:familyName "Kondor" .
+
+entity:person-Csanyi-bartok2013 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Si-clusters-bartok2013 a mlips:MaterialSystem ;
+    rdfs:label "Silicon clusters Si3 to Si19" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Gas-phase elemental clusters" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-tb-bartok2013 a mlips:ReferenceCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-tb-bartok2013 mlips:hasReferenceSettings entity:calc-settings-tb-bartok2013 .
+
+entity:calc-settings-tb-bartok2013 a mlips:ReferenceSettings ;
+    rdfs:comment "Tight-binding model (ref. 59 of the paper); training and test configurations come from tight-binding molecular dynamics. No DFT is used." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Si-clusters-bartok2013 a mlips:TrainingDataset ;
+    rdfs:label "Si3-Si19 cluster training set (largest: 720 configurations, 8000 atomic environments)" ;
+    mlips:coversMaterial entity:mat-Si-clusters-bartok2013 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 720 ;
+    mlips:hasReferenceCalculation entity:calc-tb-bartok2013 ;
+    rdfs:comment "The largest of four nested training sets; on average about 40 configurations per cluster size." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Si-clusters-bartok2013 mlips:samplingStrategy
+    entity:sampling-tb-md-bartok2013 .
+
+entity:sampling-tb-md-bartok2013 a mlips:SamplingStrategy ;
+    rdfs:label "Tight-binding molecular dynamics at 500 K to 2000 K" ;
+    rdfs:comment "Cluster configurations taken from tight-binding MD trajectories; four training sets of 2000, 4000, 6000 and 8000 atomic environments (180, 360, 540 and 720 unique cluster configurations); independent test set of 12000 atomic environments." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-soap-Si-clusters-bartok2013 a mlips:MLIPRun ;
+    rdfs:label "GAP fit with the SOAP kernel to Si3-Si19 clusters (largest training set)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Si-clusters-bartok2013 ;
+    mlips:produces entity:model-gap-soap-Si-clusters-bartok2013 .
+
+entity:model-gap-soap-Si-clusters-bartok2013 a mlips:TrainedModel ;
+    rdfs:label "SOAP-GAP for silicon clusters Si3-Si19" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The manifest classes this paper as 'Application/model instance'; it is a methods paper on descriptors. Its central results (reconstruction experiments on completeness and faithfulness of descriptors) are outside the protocol.
+# - The RMS energy (meV/atom) and force (eV/A) errors of the GAP fits are plotted against database size and descriptor (Fig. 14) and not printed, so no AccuracyMetric is encoded. Fits with the angular Fourier series, the SO(3) power spectrum and the SO(4) bispectrum are compared in the same figure and are not encoded as separate runs.
+# - A second GAP model for bulk silicon (randomly displaced atoms in randomly distorted two-atom cells) is used only to show elastic constants against the angular band limit (Fig. 15); its reference method and size are not stated.
+# - GAP hyperparameters (cutoff, band limits, kernel exponent, sparse points) for the cluster fit are not stated in the parts read; the reconstruction tests use a 9 A cutoff.
+# - The reference is a tight-binding model, encoded as a generic mlips:ReferenceCalculation.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
