@@ -1,0 +1,1128 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Linfeng Zhang et al. (2018). Deep Potential Molecular Dynamics: A Scalable Model with the Accuracy of Quantum Mechanics.
+#   Physical Review Letters. doi:10.1103/physrevlett.120.143001  arXiv:1707.09571v2
+#
+# Version read: arxiv-preprint arXiv:1707.09571v2 (sha256 41c4cf3b07ec173a...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 17 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the original DeePMD model and its twelve fits: liquid
+# water and three ice Ih conditions (PBE0+TS, path-integral or classical
+# AIMD) and eight organic molecules (PBE+TS AIMD data of
+# quantum-machine.org), with the errors of Tables I and II.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2018): Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:reportedIn entity:article-zhang2018 .
+
+entity:article-zhang2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevlett.120.143001> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Deep Potential Molecular Dynamics: A Scalable Model with the Accuracy of Quantum Mechanics" ;
+    schema:author entity:person-Zhang-zhang2018 ,
+        entity:person-Han-zhang2018 ,
+        entity:person-Wang-zhang2018 ,
+        entity:person-Car-zhang2018 ,
+        entity:person-E-zhang2018 .
+
+entity:person-Zhang-zhang2018 a schema:Person ;
+    schema:name "Linfeng Zhang" ;
+    schema:givenName "Linfeng" ;
+    schema:familyName "Zhang" .
+
+entity:person-Han-zhang2018 a schema:Person ;
+    schema:name "Jiequn Han" ;
+    schema:givenName "Jiequn" ;
+    schema:familyName "Han" .
+
+entity:person-Wang-zhang2018 a schema:Person ;
+    schema:name "Han Wang" ;
+    schema:givenName "Han" ;
+    schema:familyName "Wang" .
+
+entity:person-Car-zhang2018 a schema:Person ;
+    schema:name "Roberto Car" ;
+    schema:givenName "Roberto" ;
+    schema:familyName "Car" .
+
+entity:person-E-zhang2018 a schema:Person ;
+    schema:name "Weinan E" ;
+    schema:givenName "Weinan" ;
+    schema:familyName "E" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-liquid-water-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Liquid water at 1 bar and 300 K (path-integral AIMD, 64 H2O)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+entity:mat-ice-b-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Ice Ih at 1 bar and 273 K (path-integral AIMD, 96 H2O)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Proton-disordered molecular crystal (ice Ih)" .
+
+entity:mat-ice-c-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Ice Ih at 1 bar and 330 K (classical AIMD, 96 D2O)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Proton-disordered molecular crystal (ice Ih)" .
+
+entity:mat-ice-d-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Ice Ih at 2.13 kbar and 238 K (classical AIMD, 96 D2O)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Proton-disordered molecular crystal (ice Ih)" .
+
+entity:mat-benzene-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-uracil-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-naphthalene-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-aspirin-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-salicylic-acid-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-ethanol-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-zhang2018 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-water-dft-zhang2018 a mlips:DFTCalculation .
+
+entity:calc-mol-dft-zhang2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-water-dft-zhang2018 mlips:hasDFTSettings entity:calc-settings-water-dft-zhang2018 .
+
+entity:calc-settings-water-dft-zhang2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional entity:xc-PBE0-TS-zhang2018 ;
+    rdfs:comment "Car-Parrinello MD (CPMD) codes of Quantum ESPRESSO, time step 0.48 fs, Parrinello-Rahman variable cell; path-integral runs through i-PI with 8 beads (generalized Langevin equation with coloured noise), classical runs with a Nose-Hoover thermostat." .
+
+entity:calc-mol-dft-zhang2018 mlips:hasDFTSettings entity:calc-settings-mol-dft-zhang2018 .
+
+entity:calc-settings-mol-dft-zhang2018 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-PBE-TS-zhang2018 ;
+    rdfs:comment "Classical AIMD trajectories with the PBE+TS functional, taken from quantum-machine.org; code and settings are not given in this paper." .
+
+entity:xc-PBE0-TS-zhang2018 a mlips:XCFunctional ;
+    rdfs:label "PBE0+TS" ;
+    rdfs:comment "PBE0 hybrid functional with Tkatchenko-Scheffler dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:xc-PBE-TS-zhang2018 a mlips:XCFunctional ;
+    rdfs:label "PBE+TS" ;
+    rdfs:comment "PBE functional with Tkatchenko-Scheffler dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-liquid-water-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of liquid water" ;
+    mlips:coversMaterial entity:mat-liquid-water-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-water-dft-zhang2018 ;
+    rdfs:comment "95000 of 105000 snapshots selected at random for training." .
+
+entity:ds-ice-b-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 19500 snapshots of ice b" ;
+    mlips:coversMaterial entity:mat-ice-b-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 19500 ;
+    mlips:hasDFTCalculation entity:calc-water-dft-zhang2018 ;
+    rdfs:comment "19500 of 24000 snapshots selected at random for training." .
+
+entity:ds-ice-c-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 9500 snapshots of ice c" ;
+    mlips:coversMaterial entity:mat-ice-c-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 9500 ;
+    mlips:hasDFTCalculation entity:calc-water-dft-zhang2018 ;
+    rdfs:comment "9500 of 12000 snapshots selected at random for training." .
+
+entity:ds-ice-d-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 9500 snapshots of ice d" ;
+    mlips:coversMaterial entity:mat-ice-d-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 9500 ;
+    mlips:hasDFTCalculation entity:calc-water-dft-zhang2018 ;
+    rdfs:comment "9500 of 12000 snapshots selected at random for training." .
+
+entity:ds-benzene-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of benzene" ;
+    mlips:coversMaterial entity:mat-benzene-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-uracil-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of uracil" ;
+    mlips:coversMaterial entity:mat-uracil-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-naphthalene-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of naphthalene" ;
+    mlips:coversMaterial entity:mat-naphthalene-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-aspirin-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of aspirin" ;
+    mlips:coversMaterial entity:mat-aspirin-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-salicylic-acid-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of salicylic acid" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-malonaldehyde-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of malonaldehyde" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-ethanol-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of ethanol" ;
+    mlips:coversMaterial entity:mat-ethanol-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+entity:ds-toluene-zhang2018 a mlips:TrainingDataset ;
+    rdfs:label "DeePMD training set: 95000 snapshots of toluene" ;
+    mlips:coversMaterial entity:mat-toluene-zhang2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 95000 ;
+    mlips:hasDFTCalculation entity:calc-mol-dft-zhang2018 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-liquid-water-zhang2018 mlips:samplingStrategy
+    entity:sampling-pi-aimd-zhang2018 .
+
+entity:ds-ice-b-zhang2018 mlips:samplingStrategy
+    entity:sampling-pi-aimd-zhang2018 .
+
+entity:ds-ice-c-zhang2018 mlips:samplingStrategy
+    entity:sampling-classical-aimd-zhang2018 .
+
+entity:ds-ice-d-zhang2018 mlips:samplingStrategy
+    entity:sampling-classical-aimd-zhang2018 .
+
+entity:ds-benzene-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-uracil-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-naphthalene-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-aspirin-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-salicylic-acid-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-malonaldehyde-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-ethanol-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:ds-toluene-zhang2018 mlips:samplingStrategy
+    entity:sampling-md17-aimd-zhang2018 .
+
+entity:sampling-pi-aimd-zhang2018 a mlips:SamplingStrategy ;
+    rdfs:label "Path-integral AIMD (NPT)" ;
+    rdfs:comment "Snapshots drawn at random along equilibrated path-integral AIMD trajectories (liquid water 6.2 ps, ice Ih (b) 1.5 ps); the remaining snapshots are used for testing." .
+
+entity:sampling-classical-aimd-zhang2018 a mlips:SamplingStrategy ;
+    rdfs:label "Classical AIMD (NPT)" ;
+    rdfs:comment "Snapshots drawn at random along equilibrated classical AIMD trajectories of 6.0 ps (ice Ih (c) and (d)); the remaining snapshots are used for testing." .
+
+entity:sampling-md17-aimd-zhang2018 a mlips:SamplingStrategy ;
+    rdfs:label "Classical AIMD of gas-phase molecules (quantum-machine.org)" ;
+    rdfs:comment "95000 snapshots per molecule drawn at random from the published AIMD database; the remaining snapshots are used for testing." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasLossFunction entity:loss-DeePMD-zhang2018 ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-zhang2018 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        entity:hp-hidden-layers-zhang2018 ,
+        entity:hp-training-steps-zhang2018 ,
+        entity:hp-lr-decay-rate-zhang2018 ,
+        entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:hasImplementation entity:impl-DeePMD-zhang2018 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ;
+    mlips:inferenceComplexity "Linear in the number of atoms" .
+
+entity:loss-DeePMD-zhang2018 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of squared errors in energy per atom, forces and virial per atom with tunable prefactors (p_e, p_f, p_xi); p_e and p_xi are increased and p_f decreased during training, evolving linearly with the learning rate; p_xi = 0 when no virial data are available" .
+
+entity:alg-DeePMD-zhang2018 a mls:Algorithm ;
+    rdfs:label "Adam (beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8) with exponentially decaying learning rate" .
+
+entity:impl-DeePMD-zhang2018 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-TensorFlow-r1_0-interfaced-with-in-house-C-codes-zhang2018 .
+
+entity:lib-TensorFlow-r1_0-interfaced-with-in-house-C-codes-zhang2018 a mlips:Library ;
+    rdfs:label "TensorFlow r1.0 interfaced with in-house C++ codes" ;
+    rdfs:comment "The implementation used in this paper; predates the DeePMD-kit package." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-hidden-layers-zhang2018 a mlips:Hyperparameter ;
+    rdfs:label "DeePMD hidden-layer widths of the atomic network" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-zhang2018 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-rate-zhang2018 a mlips:Hyperparameter ;
+    rdfs:label "Exponential learning-rate decay rate" ;
+    mlips:hyperparameterName "decay_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-steps-zhang2018 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay step" ;
+    mlips:hyperparameterName "decay_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-liquid-water-cutoffRadius-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-liquid-water-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-liquid-water-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-liquid-water-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-liquid-water-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-liquid-water-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "4000000"^^xsd:integer .
+
+entity:setting-liquid-water-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "20000"^^xsd:integer .
+
+entity:setting-ice-b-cutoffRadius-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-ice-b-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-ice-b-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ice-b-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ice-b-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-ice-c-cutoffRadius-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-ice-c-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-ice-c-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ice-c-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ice-c-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-ice-d-cutoffRadius-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-ice-d-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-ice-d-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ice-d-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ice-d-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-benzene-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-benzene-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-benzene-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-benzene-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-benzene-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-benzene-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-uracil-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-uracil-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-uracil-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-uracil-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-uracil-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-uracil-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-naphthalene-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-naphthalene-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-naphthalene-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-naphthalene-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-naphthalene-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-naphthalene-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-aspirin-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-aspirin-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-aspirin-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-aspirin-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-aspirin-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-aspirin-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-salicylic-acid-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-salicylic-acid-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-salicylic-acid-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-salicylic-acid-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-salicylic-acid-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-salicylic-acid-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-malonaldehyde-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-malonaldehyde-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-malonaldehyde-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-malonaldehyde-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-malonaldehyde-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-malonaldehyde-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-ethanol-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-ethanol-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ethanol-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ethanol-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-ethanol-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-ethanol-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+entity:setting-toluene-hidden-layers-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2018 ;
+    mlips:settingValue "240-120-60-30-10" .
+
+entity:setting-toluene-learningRate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-toluene-batchSize-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-toluene-lr-decay-rate-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-zhang2018 ;
+    mlips:settingValue "0.95"^^xsd:double .
+
+entity:setting-toluene-training-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2018 ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-toluene-lr-decay-steps-zhang2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-steps-zhang2018 ;
+    mlips:settingValue "40000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-liquid-water-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on liquid water" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-liquid-water-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-liquid-water-cutoffRadius-zhang2018 ,
+        entity:setting-liquid-water-hidden-layers-zhang2018 ,
+        entity:setting-liquid-water-learningRate-zhang2018 ,
+        entity:setting-liquid-water-batchSize-zhang2018 ,
+        entity:setting-liquid-water-lr-decay-rate-zhang2018 ,
+        entity:setting-liquid-water-training-steps-zhang2018 ,
+        entity:setting-liquid-water-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-liquid-water-zhang2018 .
+
+entity:model-liquid-water-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for Liquid water at 1 bar and 300 K (path-integral AIMD, 64 H2O)" .
+
+entity:run-ice-b-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on ice b" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-ice-b-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-ice-b-cutoffRadius-zhang2018 ,
+        entity:setting-ice-b-hidden-layers-zhang2018 ,
+        entity:setting-ice-b-learningRate-zhang2018 ,
+        entity:setting-ice-b-batchSize-zhang2018 ,
+        entity:setting-ice-b-lr-decay-rate-zhang2018 ;
+    mlips:produces entity:model-ice-b-zhang2018 .
+
+entity:model-ice-b-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for Ice Ih at 1 bar and 273 K (path-integral AIMD, 96 H2O)" .
+
+entity:run-ice-c-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on ice c" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-ice-c-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-ice-c-cutoffRadius-zhang2018 ,
+        entity:setting-ice-c-hidden-layers-zhang2018 ,
+        entity:setting-ice-c-learningRate-zhang2018 ,
+        entity:setting-ice-c-batchSize-zhang2018 ,
+        entity:setting-ice-c-lr-decay-rate-zhang2018 ;
+    mlips:produces entity:model-ice-c-zhang2018 .
+
+entity:model-ice-c-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for Ice Ih at 1 bar and 330 K (classical AIMD, 96 D2O)" .
+
+entity:run-ice-d-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on ice d" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-ice-d-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-ice-d-cutoffRadius-zhang2018 ,
+        entity:setting-ice-d-hidden-layers-zhang2018 ,
+        entity:setting-ice-d-learningRate-zhang2018 ,
+        entity:setting-ice-d-batchSize-zhang2018 ,
+        entity:setting-ice-d-lr-decay-rate-zhang2018 ;
+    mlips:produces entity:model-ice-d-zhang2018 .
+
+entity:model-ice-d-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for Ice Ih at 2.13 kbar and 238 K (classical AIMD, 96 D2O)" .
+
+entity:run-benzene-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on benzene" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-benzene-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-benzene-hidden-layers-zhang2018 ,
+        entity:setting-benzene-learningRate-zhang2018 ,
+        entity:setting-benzene-batchSize-zhang2018 ,
+        entity:setting-benzene-lr-decay-rate-zhang2018 ,
+        entity:setting-benzene-training-steps-zhang2018 ,
+        entity:setting-benzene-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-benzene-zhang2018 .
+
+entity:model-benzene-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the benzene molecule" .
+
+entity:run-uracil-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on uracil" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-uracil-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-uracil-hidden-layers-zhang2018 ,
+        entity:setting-uracil-learningRate-zhang2018 ,
+        entity:setting-uracil-batchSize-zhang2018 ,
+        entity:setting-uracil-lr-decay-rate-zhang2018 ,
+        entity:setting-uracil-training-steps-zhang2018 ,
+        entity:setting-uracil-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-uracil-zhang2018 .
+
+entity:model-uracil-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the uracil molecule" .
+
+entity:run-naphthalene-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on naphthalene" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-naphthalene-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-naphthalene-hidden-layers-zhang2018 ,
+        entity:setting-naphthalene-learningRate-zhang2018 ,
+        entity:setting-naphthalene-batchSize-zhang2018 ,
+        entity:setting-naphthalene-lr-decay-rate-zhang2018 ,
+        entity:setting-naphthalene-training-steps-zhang2018 ,
+        entity:setting-naphthalene-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-naphthalene-zhang2018 .
+
+entity:model-naphthalene-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the naphthalene molecule" .
+
+entity:run-aspirin-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on aspirin" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-aspirin-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-aspirin-hidden-layers-zhang2018 ,
+        entity:setting-aspirin-learningRate-zhang2018 ,
+        entity:setting-aspirin-batchSize-zhang2018 ,
+        entity:setting-aspirin-lr-decay-rate-zhang2018 ,
+        entity:setting-aspirin-training-steps-zhang2018 ,
+        entity:setting-aspirin-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-aspirin-zhang2018 .
+
+entity:model-aspirin-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the aspirin molecule" .
+
+entity:run-salicylic-acid-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on salicylic acid" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-salicylic-acid-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-salicylic-acid-hidden-layers-zhang2018 ,
+        entity:setting-salicylic-acid-learningRate-zhang2018 ,
+        entity:setting-salicylic-acid-batchSize-zhang2018 ,
+        entity:setting-salicylic-acid-lr-decay-rate-zhang2018 ,
+        entity:setting-salicylic-acid-training-steps-zhang2018 ,
+        entity:setting-salicylic-acid-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-salicylic-acid-zhang2018 .
+
+entity:model-salicylic-acid-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the salicylic acid molecule" .
+
+entity:run-malonaldehyde-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on malonaldehyde" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-malonaldehyde-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-malonaldehyde-hidden-layers-zhang2018 ,
+        entity:setting-malonaldehyde-learningRate-zhang2018 ,
+        entity:setting-malonaldehyde-batchSize-zhang2018 ,
+        entity:setting-malonaldehyde-lr-decay-rate-zhang2018 ,
+        entity:setting-malonaldehyde-training-steps-zhang2018 ,
+        entity:setting-malonaldehyde-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-malonaldehyde-zhang2018 .
+
+entity:model-malonaldehyde-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the malonaldehyde molecule" .
+
+entity:run-ethanol-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on ethanol" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-ethanol-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-ethanol-hidden-layers-zhang2018 ,
+        entity:setting-ethanol-learningRate-zhang2018 ,
+        entity:setting-ethanol-batchSize-zhang2018 ,
+        entity:setting-ethanol-lr-decay-rate-zhang2018 ,
+        entity:setting-ethanol-training-steps-zhang2018 ,
+        entity:setting-ethanol-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-ethanol-zhang2018 .
+
+entity:model-ethanol-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the ethanol molecule" .
+
+entity:run-toluene-zhang2018 a mlips:MLIPRun ;
+    rdfs:label "DeePMD training on toluene" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-toluene-zhang2018 ;
+    mlips:hasHyperparameterSetting entity:setting-toluene-hidden-layers-zhang2018 ,
+        entity:setting-toluene-learningRate-zhang2018 ,
+        entity:setting-toluene-batchSize-zhang2018 ,
+        entity:setting-toluene-lr-decay-rate-zhang2018 ,
+        entity:setting-toluene-training-steps-zhang2018 ,
+        entity:setting-toluene-lr-decay-steps-zhang2018 ;
+    mlips:produces entity:model-toluene-zhang2018 .
+
+entity:model-toluene-zhang2018 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for the toluene molecule" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zhang2018 mlips:hasResult
+    entity:result-liquid-water-zhang2018 ,
+    entity:result-ice-b-zhang2018 ,
+    entity:result-ice-c-zhang2018 ,
+    entity:result-ice-d-zhang2018 ,
+    entity:result-benzene-zhang2018 ,
+    entity:result-uracil-zhang2018 ,
+    entity:result-naphthalene-zhang2018 ,
+    entity:result-aspirin-zhang2018 ,
+    entity:result-salicylic-acid-zhang2018 ,
+    entity:result-malonaldehyde-zhang2018 ,
+    entity:result-ethanol-zhang2018 ,
+    entity:result-toluene-zhang2018 .
+
+entity:result-liquid-water-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-liquid-water-zhang2018 ;
+    mlips:targetMaterial entity:mat-liquid-water-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-liquid-water-1-zhang2018 ,
+        entity:metric-liquid-water-2-zhang2018 .
+
+entity:metric-liquid-water-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in meV per molecule: DeePMD, liquid water" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1"^^xsd:double .
+
+entity:metric-liquid-water-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces: DeePMD, liquid water" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "40.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ice-b-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ice-b-zhang2018 ;
+    mlips:targetMaterial entity:mat-ice-b-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-ice-b-1-zhang2018 ,
+        entity:metric-ice-b-2-zhang2018 .
+
+entity:metric-ice-b-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in meV per molecule: DeePMD, ice b" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double .
+
+entity:metric-ice-b-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces: DeePMD, ice b" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ice-c-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ice-c-zhang2018 ;
+    mlips:targetMaterial entity:mat-ice-c-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-ice-c-1-zhang2018 ,
+        entity:metric-ice-c-2-zhang2018 .
+
+entity:metric-ice-c-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in meV per molecule: DeePMD, ice c" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double .
+
+entity:metric-ice-c-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces: DeePMD, ice c" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ice-d-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ice-d-zhang2018 ;
+    mlips:targetMaterial entity:mat-ice-d-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-ice-d-1-zhang2018 ,
+        entity:metric-ice-d-2-zhang2018 .
+
+entity:metric-ice-d-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in meV per molecule: DeePMD, ice d" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double .
+
+entity:metric-ice-d-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces: DeePMD, ice d" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-benzene-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-benzene-zhang2018 ;
+    mlips:targetMaterial entity:mat-benzene-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-benzene-1-zhang2018 ,
+        entity:metric-benzene-2-zhang2018 .
+
+entity:metric-benzene-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-benzene-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-uracil-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-uracil-zhang2018 ;
+    mlips:targetMaterial entity:mat-uracil-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-uracil-1-zhang2018 ,
+        entity:metric-uracil-2-zhang2018 .
+
+entity:metric-uracil-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-uracil-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-naphthalene-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-naphthalene-zhang2018 ;
+    mlips:targetMaterial entity:mat-naphthalene-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-naphthalene-1-zhang2018 ,
+        entity:metric-naphthalene-2-zhang2018 .
+
+entity:metric-naphthalene-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-naphthalene-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-aspirin-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-aspirin-zhang2018 ;
+    mlips:targetMaterial entity:mat-aspirin-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-aspirin-1-zhang2018 ,
+        entity:metric-aspirin-2-zhang2018 .
+
+entity:metric-aspirin-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-aspirin-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "19.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-salicylic-acid-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-salicylic-acid-zhang2018 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-salicylic-acid-1-zhang2018 ,
+        entity:metric-salicylic-acid-2-zhang2018 .
+
+entity:metric-salicylic-acid-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-salicylic-acid-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-malonaldehyde-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-malonaldehyde-zhang2018 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-malonaldehyde-1-zhang2018 ,
+        entity:metric-malonaldehyde-2-zhang2018 .
+
+entity:metric-malonaldehyde-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-malonaldehyde-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ethanol-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ethanol-zhang2018 ;
+    mlips:targetMaterial entity:mat-ethanol-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-ethanol-1-zhang2018 ,
+        entity:metric-ethanol-2-zhang2018 .
+
+entity:metric-ethanol-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ethanol-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-toluene-zhang2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-toluene-zhang2018 ;
+    mlips:targetMaterial entity:mat-toluene-zhang2018 ;
+    mlips:hasAccuracyMetric entity:metric-toluene-1-zhang2018 ,
+        entity:metric-toluene-2-zhang2018 .
+
+entity:metric-toluene-1-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DeePMD, toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-toluene-2-zhang2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DeePMD, toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "8.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper states that the prefactor schedule "reduces the total training
+# time to a few core hours in all the test cases", and compares the cost of
+# DeePMD, AIMD and TIP3P in CPU core seconds/step/molecule in a figure
+# (Fig. 5); no numeric value is printed.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Virial RMSEs of Table I (2.0 and 1.5 meV per molecule for liquid water and ice Ih (b)) are not encoded: a virial error is not a stress error and has no MetricProperty.
+# - Energy RMSEs of Table I are normalised per molecule (meV per H2O), which has no unit individual; mlips:hasUnit is omitted and the unit is in the label.
+# - Rc = 6.0 A applies to water and ices. For the molecules Rc is 'large enough to include all the atoms' and no value is given, so no cutoff setting is encoded for them.
+# - The number of training steps and the decay step are stated for liquid water and for the molecules, not for the three ice models.
+# - The registry method entity:DeePMD covers this original local-frame formulation and the later smooth edition; the legacy form label in wang2018dpkit carries the layer widths of this paper.
+# - Plane-wave cutoff, pseudopotentials and k-point sampling of the reference AIMD are not given in the paper.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
