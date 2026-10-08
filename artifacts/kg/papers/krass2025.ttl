@@ -1,0 +1,123 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Hendrik Kraß et al. (2025). MOFSimBench: evaluating universal machine learning interatomic potentials in metal-organic framework molecular modeling.
+#   npj Computational Materials. doi:10.1038/s41524-025-01872-3  arXiv:2507.11806v1
+#
+# Version read: arxiv-preprint arXiv:2507.11806v1 (sha256 15580745345a3882...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 142 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: bibliographic facts only. MOFSimBench evaluates over 20
+# pretrained universal MLIPs on tasks for nanoporous materials (structure
+# optimisation, MD stability, bulk modulus, heat capacity, guest-host
+# interaction energies). The paper trains no model, and its scores are
+# task metrics, none of them an energy, force or stress error on a
+# reference set that schema 0.1.2 can carry. Read from the arXiv preprint
+# (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-krass2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Krass et al. (2025): MOFSimBench, evaluating universal MLIPs for metal-organic framework modelling" ;
+    mlips:reportedIn entity:article-krass2025 .
+
+entity:article-krass2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01872-3> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "MOFSimBench: evaluating universal machine learning interatomic potentials in metal-organic framework molecular modeling" ;
+    schema:author entity:person-Kra-krass2025 ,
+        entity:person-Huang-krass2025 ,
+        entity:person-Moosavi-krass2025 .
+
+entity:person-Kra-krass2025 a schema:Person ;
+    schema:name "Hendrik Kraß" ;
+    schema:givenName "Hendrik" ;
+    schema:familyName "Kraß" .
+
+entity:person-Huang-krass2025 a schema:Person ;
+    schema:name "Ju Huang" ;
+    schema:givenName "Ju" ;
+    schema:familyName "Huang" .
+
+entity:person-Moosavi-krass2025 a schema:Person ;
+    schema:name "Seyed Mohamad Moosavi" ;
+    schema:givenName "Seyed Mohamad" ;
+    schema:familyName "Moosavi" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+# No material system is characterised by the paper (see Q12).
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+# No training dataset is characterised by the paper (see Q12).
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+# No sampling strategy is described by the paper (see Q12).
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+# No MLIP method is trained or evaluated by the paper (see Q12).
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# No training run or trained model is reported by the paper (see Q12).
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - A pure evaluation of pretrained models: nothing to encode as MLIPRun, and the benchmark quantities (volume change on optimisation, MD stability, bulk-modulus and heat-capacity errors, interaction-energy MAE on GoldDAC) have no MetricProperty. With more metric properties (v0.2.0 proposal) the per-model tables could be linked to registry models; the releases of the roughly 20 models would have to be pinned from the paper's model table first.
+# - The interaction-energy errors on the 312 GoldDAC structures are energy differences, not total-energy errors, and are given per model in figures; they were left out and not forced into EnergyProperty.
+# - Structure sets: 4 prototypical MOFs, 96 main structures (MOFs, zeolites, COFs), 13 Cu MOFs, 231 heat-capacity structures, 312 GoldDAC structures. Code: https://github.com/AI4ChemS/mofsim-bench. Read from arXiv v1; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
