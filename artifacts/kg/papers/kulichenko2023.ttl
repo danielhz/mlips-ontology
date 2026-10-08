@@ -1,0 +1,385 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Maksim Kulichenko et al. (2023). Uncertainty-driven dynamics for active learning of interatomic potentials.
+#   Nature Computational Science. doi:10.1038/s43588-023-00406-5
+#
+# Version read: publisher (sha256 e4e317d2dbf060bd...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 130 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the uncertainty-driven dynamics active-learning scheme
+# (MD biased towards regions of high ensemble uncertainty) demonstrated
+# with ANI potentials for glycine. Four ANI models are compared, trained
+# on data sets collected by UDD-AL at 350 K and by plain MD-AL at 350,
+# 600 and 1,000 K; their architecture and training settings are encoded.
+# Errors on the 50 ns test set are given as a bound and in figures.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kulichenko2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Kulichenko et al. (2023): uncertainty-driven dynamics for active learning of interatomic potentials (UDD-AL, ANI for glycine)" ;
+    mlips:reportedIn entity:article-kulichenko2023 .
+
+entity:article-kulichenko2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s43588-023-00406-5> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Uncertainty-driven dynamics for active learning of interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-6194-3008> ,
+        entity:person-Barros-kulichenko2023 ,
+        entity:person-Lubbers-kulichenko2023 ,
+        entity:person-Li-kulichenko2023 ,
+        entity:person-Messerly-kulichenko2023 ,
+        <https://orcid.org/0000-0001-5547-3647> ,
+        <https://orcid.org/0000-0001-7314-7896> ,
+        <https://orcid.org/0000-0001-5310-3263> .
+
+<https://orcid.org/0000-0002-6194-3008> a schema:Person ;
+    schema:name "Maksim Kulichenko" ;
+    schema:givenName "Maksim" ;
+    schema:familyName "Kulichenko" ;
+    schema:identifier <https://orcid.org/0000-0002-6194-3008> .
+
+entity:person-Barros-kulichenko2023 a schema:Person ;
+    schema:name "Kipton Barros" ;
+    schema:givenName "Kipton" ;
+    schema:familyName "Barros" .
+
+entity:person-Lubbers-kulichenko2023 a schema:Person ;
+    schema:name "Nicholas Lubbers" ;
+    schema:givenName "Nicholas" ;
+    schema:familyName "Lubbers" .
+
+entity:person-Li-kulichenko2023 a schema:Person ;
+    schema:name "Ying Wai Li" ;
+    schema:givenName "Ying Wai" ;
+    schema:familyName "Li" .
+
+entity:person-Messerly-kulichenko2023 a schema:Person ;
+    schema:name "Richard Messerly" ;
+    schema:givenName "Richard" ;
+    schema:familyName "Messerly" .
+
+<https://orcid.org/0000-0001-5547-3647> a schema:Person ;
+    schema:name "Sergei Tretiak" ;
+    schema:givenName "Sergei" ;
+    schema:familyName "Tretiak" ;
+    schema:identifier <https://orcid.org/0000-0001-5547-3647> .
+
+<https://orcid.org/0000-0001-7314-7896> a schema:Person ;
+    schema:name "Justin S. Smith" ;
+    schema:givenName "Justin S." ;
+    schema:familyName "Smith" ;
+    schema:identifier <https://orcid.org/0000-0001-7314-7896> .
+
+<https://orcid.org/0000-0001-5310-3263> a schema:Person ;
+    schema:name "Benjamin Nebgen" ;
+    schema:givenName "Benjamin" ;
+    schema:familyName "Nebgen" ;
+    schema:identifier <https://orcid.org/0000-0001-5310-3263> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-glycine-kulichenko2023 a mlips:MaterialSystem ;
+    rdfs:label "Glycine molecule, conformational space including proton-transfer and rotation paths" ;
+    mlips:chemicalFormula "C2H5NO2" ;
+    mlips:materialClass "Amino acid (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-kulichenko2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-kulichenko2023 mlips:hasDFTSettings entity:calc-settings-dft-kulichenko2023 .
+
+entity:calc-settings-dft-kulichenko2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-PSI4-kulichenko2023 ;
+    mlips:xcFunctional entity:xc-omegaB97X-D-kulichenko2023 ;
+    mlips:dftBasisSet entity:basis-cc-pVTZ-kulichenko2023 ;
+    rdfs:comment "omegaB97X-D/cc-pVTZ as implemented in PSI4." .
+
+entity:lib-PSI4-kulichenko2023 a mlips:Library ;
+    rdfs:label "PSI4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-omegaB97X-D-kulichenko2023 a mlips:XCFunctional ;
+    rdfs:label "omegaB97X-D" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-cc-pVTZ-kulichenko2023 a mlips:DftBasisSet ;
+    rdfs:label "cc-pVTZ" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-udd-350K-kulichenko2023 a mlips:TrainingDataset ;
+    rdfs:label "Glycine training set collected by UDD-AL at 350 K" ;
+    mlips:coversMaterial entity:mat-glycine-kulichenko2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-kulichenko2023 ;
+    rdfs:comment "Split 14:1:1 into training, validation and test; size not captured." .
+
+entity:ds-md-350K-kulichenko2023 a mlips:TrainingDataset ;
+    rdfs:label "Glycine training set collected by MD-AL at 350 K" ;
+    mlips:coversMaterial entity:mat-glycine-kulichenko2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-kulichenko2023 ;
+    rdfs:comment "Split 14:1:1; size not captured." .
+
+entity:ds-md-600K-kulichenko2023 a mlips:TrainingDataset ;
+    rdfs:label "Glycine training set collected by MD-AL at 600 K" ;
+    mlips:coversMaterial entity:mat-glycine-kulichenko2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-kulichenko2023 ;
+    rdfs:comment "Split 14:1:1; size not captured." .
+
+entity:ds-md-1000K-kulichenko2023 a mlips:TrainingDataset ;
+    rdfs:label "Glycine training set collected by MD-AL at 1,000 K" ;
+    mlips:coversMaterial entity:mat-glycine-kulichenko2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-kulichenko2023 ;
+    rdfs:comment "Split 14:1:1; size not captured." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-udd-350K-kulichenko2023 mlips:samplingStrategy
+    entity:sampling-udd-al-kulichenko2023 .
+
+entity:ds-md-350K-kulichenko2023 mlips:samplingStrategy
+    entity:sampling-md-al-kulichenko2023 .
+
+entity:ds-md-600K-kulichenko2023 mlips:samplingStrategy
+    entity:sampling-md-al-kulichenko2023 .
+
+entity:ds-md-1000K-kulichenko2023 mlips:samplingStrategy
+    entity:sampling-md-al-kulichenko2023 .
+
+entity:sampling-udd-al-kulichenko2023 a mlips:SamplingStrategy ;
+    rdfs:label "Uncertainty-driven dynamics active learning (UDD-AL) at 350 K" ;
+    rdfs:comment "MD with an ensemble of eight ANI networks on a potential modified by a bias that favours regions of large ensemble disagreement; configurations above an uncertainty criterion are computed with DFT and added. Seeds: 25 near-equilibrium glycine geometries." .
+
+entity:sampling-md-al-kulichenko2023 a mlips:SamplingStrategy ;
+    rdfs:label "Plain MD active learning (MD-AL) at fixed temperature" ;
+    rdfs:comment "Unbiased MD with the ensemble at 350 K, 600 K or 1,000 K; uncertain configurations are computed with DFT and added." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-ANI-kulichenko2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:angularCutoff ,
+        entity:hp-nn-architecture-kulichenko2023 ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-ANI-kulichenko2023 a mls:Algorithm ;
+    rdfs:label "Adam; initial learning rate 0.001, batch size 32, early stopping after 50 epochs without validation improvement, restart with the learning rate halved, termination below 1e-5; ensembles from an eightfold cross-validation split" .
+
+entity:hp-nn-architecture-kulichenko2023 a mlips:Hyperparameter ;
+    rdfs:label "ANI atomic network architecture" ;
+    mlips:hyperparameterName "nn_architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ani-udd-350K-cutoffRadius-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.6"^^xsd:double .
+
+entity:setting-ani-udd-350K-angularCutoff-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "3.5"^^xsd:double .
+
+entity:setting-ani-udd-350K-nn-architecture-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-kulichenko2023 ;
+    mlips:settingValue "768:32:16:8:1" .
+
+entity:setting-ani-udd-350K-learningRate-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ani-udd-350K-batchSize-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-ani-md-350K-cutoffRadius-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.6"^^xsd:double .
+
+entity:setting-ani-md-350K-angularCutoff-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "3.5"^^xsd:double .
+
+entity:setting-ani-md-350K-nn-architecture-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-kulichenko2023 ;
+    mlips:settingValue "768:32:16:8:1" .
+
+entity:setting-ani-md-350K-learningRate-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ani-md-350K-batchSize-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-ani-md-600K-cutoffRadius-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.6"^^xsd:double .
+
+entity:setting-ani-md-600K-angularCutoff-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "3.5"^^xsd:double .
+
+entity:setting-ani-md-600K-nn-architecture-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-kulichenko2023 ;
+    mlips:settingValue "768:32:16:8:1" .
+
+entity:setting-ani-md-600K-learningRate-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ani-md-600K-batchSize-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-ani-md-1000K-cutoffRadius-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.6"^^xsd:double .
+
+entity:setting-ani-md-1000K-angularCutoff-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:angularCutoff ;
+    mlips:settingValue "3.5"^^xsd:double .
+
+entity:setting-ani-md-1000K-nn-architecture-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-kulichenko2023 ;
+    mlips:settingValue "768:32:16:8:1" .
+
+entity:setting-ani-md-1000K-learningRate-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-ani-md-1000K-batchSize-kulichenko2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "32"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ani-udd-350K-kulichenko2023 a mlips:MLIPRun ;
+    rdfs:label "ANI ensemble trained on the 350 K UDD-AL data set" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-udd-350K-kulichenko2023 ;
+    mlips:hasHyperparameterSetting entity:setting-ani-udd-350K-cutoffRadius-kulichenko2023 ,
+        entity:setting-ani-udd-350K-angularCutoff-kulichenko2023 ,
+        entity:setting-ani-udd-350K-nn-architecture-kulichenko2023 ,
+        entity:setting-ani-udd-350K-learningRate-kulichenko2023 ,
+        entity:setting-ani-udd-350K-batchSize-kulichenko2023 ;
+    mlips:trainingHardware "NVIDIA TITAN V GPUs; final models averaged 695 epochs at about 0.098 s per epoch" ;
+    mlips:produces entity:model-ani-udd-350K-kulichenko2023 .
+
+entity:model-ani-udd-350K-kulichenko2023 a mlips:TrainedModel ;
+    rdfs:label "ANI glycine model, 350 K UDD-AL" .
+
+entity:run-ani-md-350K-kulichenko2023 a mlips:MLIPRun ;
+    rdfs:label "ANI ensemble trained on the 350 K MD-AL data set" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-md-350K-kulichenko2023 ;
+    mlips:hasHyperparameterSetting entity:setting-ani-md-350K-cutoffRadius-kulichenko2023 ,
+        entity:setting-ani-md-350K-angularCutoff-kulichenko2023 ,
+        entity:setting-ani-md-350K-nn-architecture-kulichenko2023 ,
+        entity:setting-ani-md-350K-learningRate-kulichenko2023 ,
+        entity:setting-ani-md-350K-batchSize-kulichenko2023 ;
+    mlips:produces entity:model-ani-md-350K-kulichenko2023 .
+
+entity:model-ani-md-350K-kulichenko2023 a mlips:TrainedModel ;
+    rdfs:label "ANI glycine model, 350 K MD-AL" .
+
+entity:run-ani-md-600K-kulichenko2023 a mlips:MLIPRun ;
+    rdfs:label "ANI ensemble trained on the 600 K MD-AL data set" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-md-600K-kulichenko2023 ;
+    mlips:hasHyperparameterSetting entity:setting-ani-md-600K-cutoffRadius-kulichenko2023 ,
+        entity:setting-ani-md-600K-angularCutoff-kulichenko2023 ,
+        entity:setting-ani-md-600K-nn-architecture-kulichenko2023 ,
+        entity:setting-ani-md-600K-learningRate-kulichenko2023 ,
+        entity:setting-ani-md-600K-batchSize-kulichenko2023 ;
+    mlips:produces entity:model-ani-md-600K-kulichenko2023 .
+
+entity:model-ani-md-600K-kulichenko2023 a mlips:TrainedModel ;
+    rdfs:label "ANI glycine model, 600 K MD-AL" .
+
+entity:run-ani-md-1000K-kulichenko2023 a mlips:MLIPRun ;
+    rdfs:label "ANI ensemble trained on the 1,000 K MD-AL data set" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-md-1000K-kulichenko2023 ;
+    mlips:hasHyperparameterSetting entity:setting-ani-md-1000K-cutoffRadius-kulichenko2023 ,
+        entity:setting-ani-md-1000K-angularCutoff-kulichenko2023 ,
+        entity:setting-ani-md-1000K-nn-architecture-kulichenko2023 ,
+        entity:setting-ani-md-1000K-learningRate-kulichenko2023 ,
+        entity:setting-ani-md-1000K-batchSize-kulichenko2023 ;
+    mlips:produces entity:model-ani-md-1000K-kulichenko2023 .
+
+entity:model-ani-md-1000K-kulichenko2023 a mlips:TrainedModel ;
+    rdfs:label "ANI glycine model, 1,000 K MD-AL" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Final models: on average 695 training epochs at about 0.098 s per epoch
+# on NVIDIA TITAN V GPUs (trainingHardware on the UDD-AL model; the
+# statement covers all final models).
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Accuracy on the 50 ns MD test set is stated as an energy RMSE 'of less than 0.3 kcal/mol' for all models, with the 350 K MD-AL model about 0.11 kcal/mol lower than the others; no value per model is printed, so no AccuracyMetric is encoded. The errors along conformational scans (proton transfer, rotations, bond scans) are figures.
+# - The radial cutoff (4.6 A, 32 shifts) is encoded as cutoffRadius and the angular cutoff (3.5 A) as angularCutoff; the descriptor has 768 elements for four atom types.
+# - The acetylacetone demonstration uses the pretrained ANI-1x model (the model of smith2018) in MD; it is not encoded because no result is attached to it.
+# - The uncertainty bias itself (magnitude and width of the bias potential) has no place in schema 0.1.2. Software for the ANI training is not named in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
