@@ -1,0 +1,322 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ralf Drautz et al. (2019). Atomic cluster expansion for accurate and transferable interatomic potentials.
+#   Physical review. B./Physical review. B. doi:10.1103/physrevb.99.014104
+#
+# Version read: publisher (sha256 5f069f678aa2be56...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 11 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the ACE method (introduced here) and its demonstration
+# for Cu: the DFT reference set of clusters and periodic structures and
+# the two nonlinear ACE parametrisations with Kmax = 3 on the PBE data
+# (clu1-4+bulk and clu1-15+bulk), with their energy RMSEs.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-drautz2019 a mlips:BenchmarkStudy ;
+    rdfs:label "Drautz (2019): atomic cluster expansion (ACE), demonstrated for copper" ;
+    mlips:reportedIn entity:article-drautz2019 .
+
+entity:article-drautz2019 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevb.99.014104> ;
+    schema:datePublished "2019"^^xsd:gYear ;
+    schema:name "Atomic cluster expansion for accurate and transferable interatomic potentials" ;
+    schema:author entity:person-Drautz-drautz2019 .
+
+entity:person-Drautz-drautz2019 a schema:Person ;
+    schema:name "Ralf Drautz" ;
+    schema:givenName "Ralf" ;
+    schema:familyName "Drautz" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Cu-drautz2019 a mlips:MaterialSystem ;
+    rdfs:label "Copper: small clusters (1 to 15 atoms) and periodic bulk structures over a wide range of interatomic distances" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "Elemental fcc metal; clusters and periodic structures, nonmagnetic" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-pbe-drautz2019 a mlips:DFTCalculation .
+
+entity:calc-lda-drautz2019 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-pbe-drautz2019 mlips:hasDFTSettings entity:calc-settings-pbe-drautz2019 .
+
+entity:calc-settings-pbe-drautz2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:dftBasisSet entity:basis-FHI-aims-tight-settings-drautz2019 ;
+    rdfs:comment "Strict self-consistency settings, Gaussian smearing of 0.10 eV, nonmagnetic." .
+
+entity:calc-lda-drautz2019 mlips:hasDFTSettings entity:calc-settings-lda-drautz2019 .
+
+entity:calc-settings-lda-drautz2019 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional mlips:LDA ;
+    mlips:dftBasisSet entity:basis-FHI-aims-tight-settings-drautz2019 ;
+    rdfs:comment "An identical second reference set with the local-density approximation; strict self-consistency settings, Gaussian smearing of 0.10 eV, nonmagnetic." .
+
+entity:basis-FHI-aims-tight-settings-drautz2019 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'tight' settings" ;
+    rdfs:comment "Tight basis settings that include 40 basis functions per Cu atom." ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:basis-FHI-aims-tight-settings-drautz2019 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'tight' settings" ;
+    rdfs:comment "Tight basis settings that include 40 basis functions per Cu atom." ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-clu1-4-bulk-drautz2019 a mlips:TrainingDataset ;
+    rdfs:label "clu1-4+bulk (PBE): clusters with one to four atoms and all periodic structures" ;
+    mlips:coversMaterial entity:mat-Cu-drautz2019 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-pbe-drautz2019 ;
+    rdfs:comment "Subset of the reference set of 55,289 clusters and periodic structures (computed with PBE and with LDA, more than 100,000 DFT calculations in total). The size of the subset is not stated." .
+
+entity:ds-clu1-15-bulk-drautz2019 a mlips:TrainingDataset ;
+    rdfs:label "clu1-15+bulk (PBE): clu1-4+bulk plus random clusters with 5 to 15 atoms" ;
+    mlips:coversMaterial entity:mat-Cu-drautz2019 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-pbe-drautz2019 ;
+    rdfs:comment "Adds about 11,000 clusters with 5 to 15 atoms. The size of the subset is not stated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-clu1-4-bulk-drautz2019 mlips:samplingStrategy
+    entity:sampling-small-clusters-drautz2019 ,
+    entity:sampling-lattice-clusters-drautz2019 ,
+    entity:sampling-periodic-drautz2019 .
+
+entity:ds-clu1-15-bulk-drautz2019 mlips:samplingStrategy
+    entity:sampling-small-clusters-drautz2019 ,
+    entity:sampling-lattice-clusters-drautz2019 ,
+    entity:sampling-random-clusters-drautz2019 ,
+    entity:sampling-periodic-drautz2019 .
+
+entity:sampling-small-clusters-drautz2019 a mlips:SamplingStrategy ;
+    rdfs:label "Systematic sampling of two-, three- and four-atom clusters" ;
+    rdfs:comment "Interatomic distances from 0.7 r_s to 3.0 r_s with r_s = 2.54 A; 609, 4322 and 20,932 converged PBE calculations for two, three and four atoms." .
+
+entity:sampling-lattice-clusters-drautz2019 a mlips:SamplingStrategy ;
+    rdfs:label "Clusters of two to six atoms cut from fcc, bcc, hcp and diamond lattices" ;
+    rdfs:comment "Shortest bond varied between 0.7 r_s and 3.0 r_s." .
+
+entity:sampling-random-clusters-drautz2019 a mlips:SamplingStrategy ;
+    rdfs:label "Random clusters of 3 to 15 atoms" ;
+    rdfs:comment "No atom closer than 0.7 r_s to another and none more than 2.5 r_s from all others; about 11,000 clusters with 5 to 15 atoms enter the clu1-15+bulk set." .
+
+entity:sampling-periodic-drautz2019 a mlips:SamplingStrategy ;
+    rdfs:label "Periodic structures with uniform sampling of interatomic distances" ;
+    rdfs:comment "A few standard structures (fcc, hcp, bcc, diamond, hexagonal diamond, simple hexagonal, simple cubic) and mostly random structures with one or two atoms per cell, smallest distance from 0.8 r_s to 3.0 r_s. No molecular dynamics was used, deliberately." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-drautz2019 ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-drautz2019 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-Kmax-drautz2019 ,
+        entity:hp-lambda-drautz2019 ,
+        entity:hp-nmax-per-order-drautz2019 ,
+        mlips:numAngularBasis .
+
+entity:loss-ACE-drautz2019 a mlips:LossFunction ;
+    rdfs:label "Energy-only weighted least squares with structure weights that scale with the energy above the lowest-energy structure (shift parameter 0.2) and two small regularisation terms (alpha_1 = 1e-10, alpha_2 = 1e-14)" .
+
+entity:alg-ACE-drautz2019 a mls:Algorithm ;
+    rdfs:label "Levenberg-Marquardt as implemented in MINPACK; hierarchical optimisation, adding parameters in small steps from two-body to higher body order" .
+
+entity:hp-Kmax-drautz2019 a mlips:Hyperparameter ;
+    rdfs:label "ACE maximum order K of the cluster expansion (K + 1 body interactions)" ;
+    mlips:hyperparameterName "K_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lambda-drautz2019 a mlips:Hyperparameter ;
+    rdfs:label "ACE radial basis exponential decay parameter lambda" ;
+    mlips:hyperparameterName "lambda" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-nmax-per-order-drautz2019 a mlips:Hyperparameter ;
+    rdfs:label "ACE number of radial functions n_max per expansion order (two-, three-, four-body)" ;
+    mlips:hyperparameterName "n_max" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ace-clu1-4-cutoffRadius-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.75"^^xsd:double .
+
+entity:setting-ace-clu1-4-Kmax-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-Kmax-drautz2019 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-ace-clu1-4-lambda-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lambda-drautz2019 ;
+    mlips:settingValue "5.25"^^xsd:double .
+
+entity:setting-ace-clu1-4-nmax-per-order-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nmax-per-order-drautz2019 ;
+    mlips:settingValue "8 / 6 / 6" .
+
+entity:setting-ace-clu1-4-numAngularBasis-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-ace-clu1-15-cutoffRadius-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.75"^^xsd:double .
+
+entity:setting-ace-clu1-15-Kmax-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-Kmax-drautz2019 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-ace-clu1-15-lambda-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lambda-drautz2019 ;
+    mlips:settingValue "5.25"^^xsd:double .
+
+entity:setting-ace-clu1-15-nmax-per-order-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nmax-per-order-drautz2019 ;
+    mlips:settingValue "8 / 6 / 6" .
+
+entity:setting-ace-clu1-15-numAngularBasis-drautz2019 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ace-clu1-4-drautz2019 a mlips:MLIPRun ;
+    rdfs:label "Nonlinear ACE parametrisation for Cu on clu1-4+bulk (PBE), Kmax = 3" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-clu1-4-bulk-drautz2019 ;
+    mlips:hasHyperparameterSetting entity:setting-ace-clu1-4-cutoffRadius-drautz2019 ,
+        entity:setting-ace-clu1-4-Kmax-drautz2019 ,
+        entity:setting-ace-clu1-4-lambda-drautz2019 ,
+        entity:setting-ace-clu1-4-nmax-per-order-drautz2019 ,
+        entity:setting-ace-clu1-4-numAngularBasis-drautz2019 ;
+    mlips:produces entity:model-ace-clu1-4-drautz2019 .
+
+entity:model-ace-clu1-4-drautz2019 a mlips:TrainedModel ;
+    rdfs:label "Nonlinear ACE for Cu (Kmax = 3), clu1-4+bulk PBE" .
+
+entity:run-ace-clu1-15-drautz2019 a mlips:MLIPRun ;
+    rdfs:label "Nonlinear ACE parametrisation for Cu on clu1-15+bulk (PBE), Kmax = 3" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-clu1-15-bulk-drautz2019 ;
+    mlips:hasHyperparameterSetting entity:setting-ace-clu1-15-cutoffRadius-drautz2019 ,
+        entity:setting-ace-clu1-15-Kmax-drautz2019 ,
+        entity:setting-ace-clu1-15-lambda-drautz2019 ,
+        entity:setting-ace-clu1-15-nmax-per-order-drautz2019 ,
+        entity:setting-ace-clu1-15-numAngularBasis-drautz2019 ;
+    mlips:produces entity:model-ace-clu1-15-drautz2019 .
+
+entity:model-ace-clu1-15-drautz2019 a mlips:TrainedModel ;
+    rdfs:label "Nonlinear ACE for Cu (Kmax = 3), clu1-15+bulk PBE" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-drautz2019 mlips:hasResult
+    entity:result-ace-clu1-4-drautz2019 ,
+    entity:result-ace-clu1-15-drautz2019 .
+
+entity:result-ace-clu1-4-drautz2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ace-clu1-4-drautz2019 ;
+    mlips:targetMaterial entity:mat-Cu-drautz2019 ;
+    mlips:hasAccuracyMetric entity:metric-ace-clu1-4-1-drautz2019 ,
+        entity:metric-ace-clu1-4-2-drautz2019 .
+
+entity:metric-ace-clu1-4-1-drautz2019 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE(1): energy per atom over structures within 1 eV/atom of the lowest-energy structure, clu1-4+bulk PBE (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-clu1-4-2-drautz2019 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE(0): energy per atom over structures with energy below zero, clu1-4+bulk PBE (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-ace-clu1-15-drautz2019 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ace-clu1-15-drautz2019 ;
+    mlips:targetMaterial entity:mat-Cu-drautz2019 ;
+    mlips:hasAccuracyMetric entity:metric-ace-clu1-15-1-drautz2019 ,
+        entity:metric-ace-clu1-15-2-drautz2019 .
+
+entity:metric-ace-clu1-15-1-drautz2019 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE(1): energy per atom over structures within 1 eV/atom of the lowest-energy structure, clu1-15+bulk PBE (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ace-clu1-15-2-drautz2019 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE(0): energy per atom over structures with energy below zero, clu1-15+bulk PBE (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# During parametrisation the energy evaluation takes on the order of 1e-6 s
+# per atom (basis functions pre-computed) and the force evaluation about
+# 1e-4 s per atom; no hardware is named, so neither is encoded as a
+# property.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The errors are fitting errors on energies per atom and are printed in meV; whether a held-out test set underlies Fig. 4 is not stated (Fig. 6 shows train and test Boltzmann-averaged errors).
+# - The LDA parametrisations are said to give numbers 'very close' to PBE; no value is printed, so no LDA run is encoded. The LDA reference calculation is declared but not attached to a data set.
+# - The linear ACE fits to two-, three- and four-atom clusters (Fig. 3, RMSE below 1 meV) are reported as curves and not encoded.
+# - l_max = 3 for the three- and four-body terms is encoded as mlips:numAngularBasis; K_max = 3 (four-body) is kept as a paper-local hyperparameter rather than mlips:bodyOrder.
+# - Only energies were used in the fit; no simulation with the potential is demonstrated, so no supportsSimulation is asserted.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
