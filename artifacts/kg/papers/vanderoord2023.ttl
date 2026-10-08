@@ -1,0 +1,268 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Cas van der Oord et al. (2023). Hyperactive learning for data-driven interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-023-01104-6  arXiv:2210.04225v2
+#
+# Version read: arxiv-preprint arXiv:2210.04225v2 (sha256 24426ddacbd2b74d...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 124 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the hyperactive learning scheme (MD biased towards
+# model uncertainty with a committee of linear ACE models fitted by
+# Bayesian regression) and two of its demonstration potentials: the ACE
+# for the AlSi10 alloy and the ACE for polyethylene glycol (PEG). The
+# error tables did not survive text extraction cleanly and are not
+# encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-vanderoord2023 a mlips:BenchmarkStudy ;
+    rdfs:label "van der Oord et al. (2023): hyperactive learning (HAL) for data-driven interatomic potentials" ;
+    mlips:reportedIn entity:article-vanderoord2023 .
+
+entity:article-vanderoord2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-023-01104-6> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Hyperactive learning for data-driven interatomic potentials" ;
+    schema:author entity:person-vanderOord-vanderoord2023 ,
+        entity:person-Sachs-vanderoord2023 ,
+        entity:person-Kovacs-vanderoord2023 ,
+        entity:person-Ortner-vanderoord2023 ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+entity:person-vanderOord-vanderoord2023 a schema:Person ;
+    schema:name "Cas van der Oord" ;
+    schema:givenName "Cas" ;
+    schema:familyName "van der Oord" .
+
+entity:person-Sachs-vanderoord2023 a schema:Person ;
+    schema:name "Matthias Sachs" ;
+    schema:givenName "Matthias" ;
+    schema:familyName "Sachs" .
+
+entity:person-Kovacs-vanderoord2023 a schema:Person ;
+    schema:name "Dávid Péter Kovács" ;
+    schema:givenName "Dávid Péter" ;
+    schema:familyName "Kovács" .
+
+entity:person-Ortner-vanderoord2023 a schema:Person ;
+    schema:name "Christoph Ortner" ;
+    schema:givenName "Christoph" ;
+    schema:familyName "Ortner" .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-AlSi10-vanderoord2023 a mlips:MaterialSystem ;
+    rdfs:label "AlSi10 alloy (Al with 9.7 weight percent Si; 32-atom fcc cells with 29 Al and 3 Si), solid and liquid" ;
+    mlips:chemicalFormula "Al-Si" ;
+    mlips:materialClass "Aluminium-silicon casting alloy" .
+
+entity:mat-PEG-vanderoord2023 a mlips:MaterialSystem ;
+    rdfs:label "Polyethylene glycol oligomers, PEG(n=2) and longer units in vacuum" ;
+    mlips:materialClass "Organic polymer units (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-alsi-dft-vanderoord2023 a mlips:DFTCalculation .
+
+entity:calc-peg-dft-vanderoord2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-alsi-dft-vanderoord2023 mlips:hasDFTSettings entity:calc-settings-alsi-dft-vanderoord2023 .
+
+entity:calc-settings-alsi-dft-vanderoord2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:CASTEP ;
+    mlips:energyCutoff "300"^^xsd:double ;
+    mlips:kPointMesh "k-point spacing 0.04 A^-1" ;
+    rdfs:comment "0.1 eV smearing; the functional and pseudopotentials are named in a sentence that was cut in the extracted text." .
+
+entity:calc-peg-dft-vanderoord2023 mlips:hasDFTSettings entity:calc-settings-peg-dft-vanderoord2023 .
+
+entity:calc-settings-peg-dft-vanderoord2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional mlips:omegaB97X ;
+    mlips:dftBasisSet entity:basis-6-31G-d-vanderoord2023 .
+
+entity:basis-6-31G-d-vanderoord2023 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(d)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-AlSi10-vanderoord2023 a mlips:TrainingDataset ;
+    rdfs:label "HAL-generated AlSi10 database" ;
+    mlips:coversMaterial entity:mat-AlSi10-vanderoord2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-alsi-dft-vanderoord2023 ;
+    rdfs:comment "Final size not captured." .
+
+entity:ds-PEG-vanderoord2023 a mlips:TrainingDataset ;
+    rdfs:label "HAL-generated PEG database" ;
+    mlips:coversMaterial entity:mat-PEG-vanderoord2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-peg-dft-vanderoord2023 ;
+    rdfs:comment "Final size not captured (Table III lists databases of 200 to 250 configurations)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-AlSi10-vanderoord2023 mlips:samplingStrategy
+    entity:sampling-alsi-initial-vanderoord2023 ,
+    entity:sampling-hal-vanderoord2023 .
+
+entity:ds-PEG-vanderoord2023 mlips:samplingStrategy
+    entity:sampling-peg-initial-vanderoord2023 ,
+    entity:sampling-hal-vanderoord2023 .
+
+entity:sampling-hal-vanderoord2023 a mlips:SamplingStrategy ;
+    rdfs:label "Hyperactive learning (uncertainty-biased MD with a model committee)" ;
+    rdfs:comment "MD on the mean potential of a committee of linear ACE models with a biasing force towards larger predicted uncertainty; configurations whose relative force uncertainty exceeds a tolerance are evaluated with DFT and added, and the model is refitted." .
+
+entity:sampling-alsi-initial-vanderoord2023 a mlips:SamplingStrategy ;
+    rdfs:label "Initial random-alloy configurations" ;
+    rdfs:comment "Ten 32-atom fcc configurations (29 Al, 3 Si) with lattice constants from 3.80 to 4.04 A." .
+
+entity:sampling-peg-initial-vanderoord2023 a mlips:SamplingStrategy ;
+    rdfs:label "Initial PEG(n=2) configurations from ANI-2x MD" ;
+    rdfs:comment "20 PEG(n=2) polymers from 500 K NVT MD with the general-purpose ANI-2x force field, sampled every 7 ps." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-vanderoord2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:bodyOrder ,
+        entity:hp-polynomial-degree-vanderoord2023 ,
+        entity:hp-loss-weight-energy-vanderoord2023 ,
+        entity:hp-loss-weight-force-vanderoord2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-ACE-vanderoord2023 a mls:Algorithm ;
+    rdfs:label "Linear ACE fitted by Bayesian ridge regression or automatic relevance determination (ARD); a committee drawn from the posterior provides the uncertainty used for biasing and selection" .
+
+entity:hp-polynomial-degree-vanderoord2023 a mlips:Hyperparameter ;
+    rdfs:label "ACE maximum polynomial degree" ;
+    mlips:hyperparameterName "polynomial_degree" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-loss-weight-energy-vanderoord2023 a mlips:Hyperparameter ;
+    rdfs:label "Energy weight w_E" ;
+    mlips:hyperparameterName "w_E" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-loss-weight-force-vanderoord2023 a mlips:Hyperparameter ;
+    rdfs:label "Force weight w_F" ;
+    mlips:hyperparameterName "w_F" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ace-PEG-cutoffRadius-vanderoord2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-ace-PEG-bodyOrder-vanderoord2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-ace-PEG-polynomial-degree-vanderoord2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-polynomial-degree-vanderoord2023 ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-ace-PEG-loss-weight-energy-vanderoord2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-energy-vanderoord2023 ;
+    mlips:settingValue "15"^^xsd:double .
+
+entity:setting-ace-PEG-loss-weight-force-vanderoord2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-force-vanderoord2023 ;
+    mlips:settingValue "1"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ace-AlSi10-vanderoord2023 a mlips:MLIPRun ;
+    rdfs:label "ACE for AlSi10 trained on the HAL-generated database (ARD fit)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-AlSi10-vanderoord2023 ;
+    mlips:produces entity:model-ace-AlSi10-vanderoord2023 .
+
+entity:model-ace-AlSi10-vanderoord2023 a mlips:TrainedModel ;
+    rdfs:label "ACE for AlSi10 (HAL)" .
+
+entity:run-ace-PEG-vanderoord2023 a mlips:MLIPRun ;
+    rdfs:label "ACE for PEG trained on the HAL-generated database" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-PEG-vanderoord2023 ;
+    mlips:hasHyperparameterSetting entity:setting-ace-PEG-cutoffRadius-vanderoord2023 ,
+        entity:setting-ace-PEG-bodyOrder-vanderoord2023 ,
+        entity:setting-ace-PEG-polynomial-degree-vanderoord2023 ,
+        entity:setting-ace-PEG-loss-weight-energy-vanderoord2023 ,
+        entity:setting-ace-PEG-loss-weight-force-vanderoord2023 ;
+    mlips:produces entity:model-ace-PEG-vanderoord2023 .
+
+entity:model-ace-PEG-vanderoord2023 a mlips:TrainedModel ;
+    rdfs:label "ACE for polyethylene glycol (HAL)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Tables II (train/test errors of the AlSi10 models for several ARD tolerances) and III (train and test errors in meV and meV/A for the PEG databases) are garbled in the extracted text (columns and footnote marks cannot be assigned reliably); no AccuracyMetric is encoded. They should be read from the PDF.
+# - The silicon-diamond example (error correlation, convergence of elastic moduli, Table I) is not encoded; its reference settings were not captured.
+# - Nested sampling of the AlSi10 phase diagram (melting temperature against Thermo-Calc) and the PEG(n=200) bulk density prediction have no MetricProperty; nested sampling is not a SimulationType individual.
+# - For PEG the correlation order nu = 3 is encoded as mlips:bodyOrder 3 and the outer cutoff 4.5 A as cutoffRadius (inner cutoff 0.5 A and the auxiliary pair basis with cutoff 5.5 A are left out). The ACE software (ACE1.jl / ACEpotentials.jl) is not named in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
