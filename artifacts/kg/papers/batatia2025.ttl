@@ -1,0 +1,578 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ilyes Batatia et al. (2025). The design space of E(3)-equivariant atom-centred interatomic potentials.
+#   Nature Machine Intelligence. doi:10.1038/s42256-024-00956-x  arXiv:2205.06643v2
+#
+# Version read: arxiv-preprint arXiv:2205.06643v2 (sha256 50dd938e81dd300e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 16 (Overview/taxonomy). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the BOTNet method (introduced here within the
+# Multi-ACE framework) and the benchmark models the authors train:
+# BOTNet and NequIP on 3BPA (500 configurations at 300 K; Table IX) and
+# BOTNet, NequIP and linear ACE on acetylacetone (500 configurations at
+# 300 K; Table X), with test RMSEs at each temperature. The design-space
+# ablations (Tables III to VII) and rMD17 (Table VIII) are not encoded.
+# The manifest files the paper under 'Overview/taxonomy'; it also
+# reports original results. Read from the arXiv preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-batatia2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Batatia et al. (2025): the design space of E(3)-equivariant atom-centred interatomic potentials" ;
+    mlips:reportedIn entity:article-batatia2025 .
+
+entity:article-batatia2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s42256-024-00956-x> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "The design space of E(3)-equivariant atom-centred interatomic potentials" ;
+    schema:author entity:person-Batatia-batatia2025 ,
+        <https://orcid.org/0000-0002-8826-2712> ,
+        entity:person-Kovacs-batatia2025 ,
+        entity:person-Musaelian-batatia2025 ,
+        entity:person-Simm-batatia2025 ,
+        entity:person-Drautz-batatia2025 ,
+        entity:person-Ortner-batatia2025 ,
+        <https://orcid.org/0000-0002-0638-539X> ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+entity:person-Batatia-batatia2025 a schema:Person ;
+    schema:name "Ilyes Batatia" ;
+    schema:givenName "Ilyes" ;
+    schema:familyName "Batatia" .
+
+<https://orcid.org/0000-0002-8826-2712> a schema:Person ;
+    schema:name "Simon Batzner" ;
+    schema:givenName "Simon" ;
+    schema:familyName "Batzner" ;
+    schema:identifier <https://orcid.org/0000-0002-8826-2712> .
+
+entity:person-Kovacs-batatia2025 a schema:Person ;
+    schema:name "Dávid Péter Kovács" ;
+    schema:givenName "Dávid Péter" ;
+    schema:familyName "Kovács" .
+
+entity:person-Musaelian-batatia2025 a schema:Person ;
+    schema:name "Albert Musaelian" ;
+    schema:givenName "Albert" ;
+    schema:familyName "Musaelian" .
+
+entity:person-Simm-batatia2025 a schema:Person ;
+    schema:name "Gregor N. C. Simm" ;
+    schema:givenName "Gregor N. C." ;
+    schema:familyName "Simm" .
+
+entity:person-Drautz-batatia2025 a schema:Person ;
+    schema:name "Ralf Drautz" ;
+    schema:givenName "Ralf" ;
+    schema:familyName "Drautz" .
+
+entity:person-Ortner-batatia2025 a schema:Person ;
+    schema:name "Christoph Ortner" ;
+    schema:givenName "Christoph" ;
+    schema:familyName "Ortner" .
+
+<https://orcid.org/0000-0002-0638-539X> a schema:Person ;
+    schema:name "Boris Kozinsky" ;
+    schema:givenName "Boris" ;
+    schema:familyName "Kozinsky" ;
+    schema:identifier <https://orcid.org/0000-0002-0638-539X> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-3BPA-batatia2025 a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA), flexible drug-like molecule" ;
+    mlips:chemicalFormula "C12H12N2O" ;
+    mlips:materialClass "Organic molecule" .
+
+entity:mat-acac-batatia2025 a mlips:MaterialSystem ;
+    rdfs:label "Acetylacetone" ;
+    mlips:chemicalFormula "C5H8O2" ;
+    mlips:materialClass "Organic molecule" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-acac-dft-batatia2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-acac-dft-batatia2025 mlips:hasDFTSettings entity:calc-settings-acac-dft-batatia2025 .
+
+entity:calc-settings-acac-dft-batatia2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:dftBasisSet entity:basis-def2-SVP-batatia2025 ;
+    rdfs:comment "PBE with D3 dispersion correction, VeryTightSCF settings." .
+
+entity:basis-def2-SVP-batatia2025 a mlips:DftBasisSet ;
+    rdfs:label "def2-SVP" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-3BPA-batatia2025 a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set (500 configurations sampled at 300 K)" ;
+    mlips:coversMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 500 ;
+    rdfs:comment "Reference level of the published 3BPA data is not restated in the part read." .
+
+entity:ds-acac-batatia2025 a mlips:TrainingDataset ;
+    rdfs:label "Acetylacetone training set (500 configurations sampled at 300 K)" ;
+    mlips:coversMaterial entity:mat-acac-batatia2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 500 ;
+    mlips:hasDFTCalculation entity:calc-acac-dft-batatia2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-3BPA-batatia2025 mlips:samplingStrategy
+    entity:sampling-3bpa-batatia2025 .
+
+entity:ds-acac-batatia2025 mlips:samplingStrategy
+    entity:sampling-acac-batatia2025 .
+
+entity:sampling-3bpa-batatia2025 a mlips:SamplingStrategy ;
+    rdfs:label "Published 3BPA data: snapshots from MD at 300 K (training); test sets at 300, 600 and 1200 K and a DFT dihedral scan" .
+
+entity:sampling-acac-batatia2025 a mlips:SamplingStrategy ;
+    rdfs:label "Long Langevin MD at 300 K at the GFN2-xTB level, sampled every 1 ps and recomputed with DFT; test sets at 300 K and 600 K" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:BOTNet a mlips:MLIPMethod ;
+    rdfs:label "BOTNet (body-ordered tensor network)" ;
+    mlips:hasHyperparameter entity:hp-num-parameters-batatia2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter entity:hp-num-parameters-batatia2025 .
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasHyperparameter entity:hp-num-parameters-batatia2025 .
+
+entity:hp-num-parameters-batatia2025 a mlips:Hyperparameter ;
+    rdfs:label "Number of model parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-BOTNet-acac-num-parameters-batatia2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-batatia2025 ;
+    mlips:settingValue "2756416"^^xsd:integer .
+
+entity:setting-NequIP-acac-num-parameters-batatia2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-batatia2025 ;
+    mlips:settingValue "3190488"^^xsd:integer .
+
+entity:setting-ACE-acac-num-parameters-batatia2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-batatia2025 ;
+    mlips:settingValue "35594"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-BOTNet-3BPA-batatia2025 a mlips:MLIPRun ;
+    rdfs:label "BOTNet trained on 3BPA (300 K)" ;
+    mlips:appliesMethod entity:BOTNet ;
+    mlips:runsOn entity:ds-3BPA-batatia2025 ;
+    mlips:produces entity:model-BOTNet-3BPA-batatia2025 .
+
+entity:model-BOTNet-3BPA-batatia2025 a mlips:TrainedModel ;
+    rdfs:label "BOTNet model for 3BPA" .
+
+entity:run-NequIP-3BPA-batatia2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on 3BPA (300 K)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-3BPA-batatia2025 ;
+    mlips:produces entity:model-NequIP-3BPA-batatia2025 .
+
+entity:model-NequIP-3BPA-batatia2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for 3BPA" .
+
+entity:run-BOTNet-acac-batatia2025 a mlips:MLIPRun ;
+    rdfs:label "BOTNet trained on acetylacetone (300 K)" ;
+    mlips:appliesMethod entity:BOTNet ;
+    mlips:runsOn entity:ds-acac-batatia2025 ;
+    mlips:hasHyperparameterSetting entity:setting-BOTNet-acac-num-parameters-batatia2025 ;
+    mlips:produces entity:model-BOTNet-acac-batatia2025 .
+
+entity:model-BOTNet-acac-batatia2025 a mlips:TrainedModel ;
+    rdfs:label "BOTNet model for acetylacetone" .
+
+entity:run-NequIP-acac-batatia2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on acetylacetone (300 K)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-acac-batatia2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-acac-num-parameters-batatia2025 ;
+    mlips:produces entity:model-NequIP-acac-batatia2025 .
+
+entity:model-NequIP-acac-batatia2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for acetylacetone" .
+
+entity:run-ACE-acac-batatia2025 a mlips:MLIPRun ;
+    rdfs:label "Linear ACE trained on acetylacetone (300 K)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-acac-batatia2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-acac-num-parameters-batatia2025 ;
+    mlips:produces entity:model-ACE-acac-batatia2025 .
+
+entity:model-ACE-acac-batatia2025 a mlips:TrainedModel ;
+    rdfs:label "Linear ACE model for acetylacetone" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-batatia2025 mlips:hasResult
+    entity:result-BOTNet-3BPA-300-batatia2025 ,
+    entity:result-BOTNet-3BPA-600-batatia2025 ,
+    entity:result-BOTNet-3BPA-1200-batatia2025 ,
+    entity:result-BOTNet-3BPA-dih-batatia2025 ,
+    entity:result-NequIP-3BPA-300-batatia2025 ,
+    entity:result-NequIP-3BPA-600-batatia2025 ,
+    entity:result-NequIP-3BPA-1200-batatia2025 ,
+    entity:result-NequIP-3BPA-dih-batatia2025 ,
+    entity:result-BOTNet-acac-300-batatia2025 ,
+    entity:result-BOTNet-acac-600-batatia2025 ,
+    entity:result-NequIP-acac-300-batatia2025 ,
+    entity:result-NequIP-acac-600-batatia2025 ,
+    entity:result-ACE-acac-300-batatia2025 ,
+    entity:result-ACE-acac-600-batatia2025 .
+
+entity:result-BOTNet-3BPA-300-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-3BPA-300-1-batatia2025 ,
+        entity:metric-BOTNet-3BPA-300-2-batatia2025 .
+
+entity:metric-BOTNet-3BPA-300-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-3BPA-300-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-BOTNet-3BPA-600-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-3BPA-600-1-batatia2025 ,
+        entity:metric-BOTNet-3BPA-600-2-batatia2025 .
+
+entity:metric-BOTNet-3BPA-600-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-3BPA-600-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-BOTNet-3BPA-1200-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-3BPA-1200-1-batatia2025 ,
+        entity:metric-BOTNet-3BPA-1200-2-batatia2025 .
+
+entity:metric-BOTNet-3BPA-1200-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 1200 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "39.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-3BPA-1200-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 1200 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "81.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-BOTNet-3BPA-dih-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-3BPA-dih-1-batatia2025 ,
+        entity:metric-BOTNet-3BPA-dih-2-batatia2025 .
+
+entity:metric-BOTNet-3BPA-dih-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA dihedral-scan test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-3BPA-dih-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA dihedral-scan test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-3BPA-300-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-3BPA-300-1-batatia2025 ,
+        entity:metric-NequIP-3BPA-300-2-batatia2025 .
+
+entity:metric-NequIP-3BPA-300-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-3BPA-300-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-3BPA-600-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-3BPA-600-1-batatia2025 ,
+        entity:metric-NequIP-3BPA-600-2-batatia2025 .
+
+entity:metric-NequIP-3BPA-600-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-3BPA-600-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-3BPA-1200-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-3BPA-1200-1-batatia2025 ,
+        entity:metric-NequIP-3BPA-1200-2-batatia2025 .
+
+entity:metric-NequIP-3BPA-1200-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA 1200 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "49.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-3BPA-1200-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA 1200 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "97.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-3BPA-dih-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-3BPA-batatia2025 ;
+    mlips:targetMaterial entity:mat-3BPA-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-3BPA-dih-1-batatia2025 ,
+        entity:metric-NequIP-3BPA-dih-2-batatia2025 .
+
+entity:metric-NequIP-3BPA-dih-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, 3BPA dihedral-scan test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-3BPA-dih-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, 3BPA dihedral-scan test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-BOTNet-acac-300-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-acac-300-1-batatia2025 ,
+        entity:metric-BOTNet-acac-300-2-batatia2025 .
+
+entity:metric-BOTNet-acac-300-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.89"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-acac-300-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-BOTNet-acac-600-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-BOTNet-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-BOTNet-acac-600-1-batatia2025 ,
+        entity:metric-BOTNet-acac-600-2-batatia2025 .
+
+entity:metric-BOTNet-acac-600-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-BOTNet-acac-600-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-acac-300-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-acac-300-1-batatia2025 ,
+        entity:metric-NequIP-acac-300-2-batatia2025 .
+
+entity:metric-NequIP-acac-300-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-acac-300-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-acac-600-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-acac-600-1-batatia2025 ,
+        entity:metric-NequIP-acac-600-2-batatia2025 .
+
+entity:metric-NequIP-acac-600-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.04"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-acac-600-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "27.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-acac-300-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-acac-300-1-batatia2025 ,
+        entity:metric-ACE-acac-300-2-batatia2025 .
+
+entity:metric-ACE-acac-300-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-acac-300-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 300 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ACE-acac-600-batatia2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ACE-acac-batatia2025 ;
+    mlips:targetMaterial entity:mat-acac-batatia2025 ;
+    mlips:hasAccuracyMetric entity:metric-ACE-acac-600-1-batatia2025 ,
+        entity:metric-ACE-acac-600-2-batatia2025 .
+
+entity:metric-ACE-acac-600-1-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-ACE-acac-600-2-batatia2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, acetylacetone 600 K test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table IX also lists linear ACE, sGDML, GAP, a classical force field, ANI and ANI-2x on 3BPA; these are values of the 3BPA paper (kovacs2021 in this KG) and are not repeated here. BOTNet and NequIP values are means over three runs (standard deviations in brackets in the paper, not encoded). Whether the linear ACE of Table X was fitted for this paper is assumed from the parameter count given there.
+# - Energy errors are total-energy errors in meV as printed. Model hyperparameters (cutoffs, channels, l_max, layers) are spread over the design-space sections and were not captured; only the parameter counts of Table X are encoded.
+# - Not encoded: the ablation tables on 3BPA (chemical embedding size, non-linearities, self-connection, normalisation; Tables III to VII), rMD17 (Table VIII, ten molecules, BOTNet and NequIP against literature models), the dihedral-scan and hydrogen-transfer energy profiles, and the Multi-ACE classification of published models (Tables I and II), which is taxonomy rather than a result.
+# - Read from the arXiv v2 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
