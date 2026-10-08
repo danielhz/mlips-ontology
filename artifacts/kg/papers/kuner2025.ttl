@@ -1,0 +1,317 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Matthew C. Kuner et al. (2025). MP-ALOE: an r2SCAN dataset for universal machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-025-01834-9  arXiv:2507.05559v1
+#
+# Version read: arxiv-preprint arXiv:2507.05559v1 (sha256 6078b776b54307d2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 29 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MP-ALOE data set (909,792 r2SCAN frames from 303,264
+# relaxations, built by active learning) and the three MACE models the
+# paper compares: trained on MP-ALOE, on MatPES, and on both. Metrics
+# encoded: cohesive-energy MAE after relaxation of WBM structures and
+# off-equilibrium force MAE on displaced WBM supercells.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kuner2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Kuner et al. (2025): MP-ALOE, an r2SCAN data set for universal MLIPs, with MACE models trained on it" ;
+    mlips:reportedIn entity:article-kuner2025 .
+
+entity:article-kuner2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01834-9> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "MP-ALOE: an r2SCAN dataset for universal machine learning interatomic potentials" ;
+    schema:author entity:person-Kuner-kuner2025 ,
+        entity:person-Kaplan-kuner2025 ,
+        entity:person-Persson-kuner2025 ,
+        entity:person-Asta-kuner2025 ,
+        entity:person-Chrzan-kuner2025 .
+
+entity:person-Kuner-kuner2025 a schema:Person ;
+    schema:name "Matthew C. Kuner" ;
+    schema:givenName "Matthew C." ;
+    schema:familyName "Kuner" .
+
+entity:person-Kaplan-kuner2025 a schema:Person ;
+    schema:name "Aaron D. Kaplan" ;
+    schema:givenName "Aaron D." ;
+    schema:familyName "Kaplan" .
+
+entity:person-Persson-kuner2025 a schema:Person ;
+    schema:name "Kristin A. Persson" ;
+    schema:givenName "Kristin A." ;
+    schema:familyName "Persson" .
+
+entity:person-Asta-kuner2025 a schema:Person ;
+    schema:name "Mark Asta" ;
+    schema:givenName "Mark" ;
+    schema:familyName "Asta" .
+
+entity:person-Chrzan-kuner2025 a schema:Person ;
+    schema:name "Daryl C. Chrzan" ;
+    schema:givenName "Daryl C." ;
+    schema:familyName "Chrzan" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mp-aloe-kuner2025 a mlips:MaterialSystem ;
+    rdfs:label "MP-ALOE chemical space: binary and ternary inorganic structures over 89 elements" ;
+    mlips:materialClass "Hypothetical inorganic crystals from elemental substitution into 817 ICSD / Materials Project prototypes of 2 to 8 atoms; mostly off-equilibrium frames" .
+
+entity:mat-wbm-kuner2025 a mlips:MaterialSystem ;
+    rdfs:label "WBM test structures (about 1000 relaxed with r2SCAN, and their displaced supercells)" ;
+    mlips:materialClass "Inorganic crystals from the WBM data set, near equilibrium and with atoms displaced by 5% of the average interatomic distance" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-kuner2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-kuner2025 mlips:hasDFTSettings entity:calc-settings-dft-kuner2025 .
+
+entity:calc-settings-dft-kuner2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-r2SCAN-kuner2025 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "680"^^xsd:double ;
+    mlips:kPointMesh "KSPACING = 0.2" ;
+    rdfs:comment "Further inputs as in the pymatgen MP24RelaxSet. Two stages: a static PBE calculation whose WAVECAR seeds an r2SCAN relaxation of exactly three ionic steps. The workflow converged for 82% of structures; run with atomate2." .
+
+entity:xc-r2SCAN-kuner2025 a mlips:XCFunctional ;
+    rdfs:label "r2SCAN" ;
+    rdfs:comment "Regularised-restored SCAN meta-GGA." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mp-aloe-kuner2025 a mlips:TrainingDataset ;
+    rdfs:label "MP-ALOE (909,792 r2SCAN frames from 303,264 structure relaxations)" ;
+    mlips:coversMaterial entity:mat-mp-aloe-kuner2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 909792 ;
+    mlips:hasDFTCalculation entity:calc-dft-kuner2025 ;
+    rdfs:comment "Mean cohesive energy -3.65 eV/atom. Models use a 90-5-5 train-validation-test split." .
+
+entity:ds-matpes-kuner2025 a mlips:TrainingDataset ;
+    rdfs:label "MatPES r2SCAN data set" ;
+    mlips:coversMaterial entity:mat-mp-aloe-kuner2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Sampled from 300 K MD of mostly near-stable Materials Project structures; computed with DFT parameters directly compatible with MP-ALOE. Its size is not stated in the parts read." .
+
+entity:ds-combined-kuner2025 a mlips:TrainingDataset ;
+    rdfs:label "MP-ALOE + MatPES combined" ;
+    mlips:coversMaterial entity:mat-mp-aloe-kuner2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-kuner2025 ;
+    rdfs:comment "Structures sourced from the Materials Project that appear in both data sets are de-duplicated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mp-aloe-kuner2025 mlips:samplingStrategy
+    entity:sampling-prototype-substitution-kuner2025 ,
+    entity:sampling-rattle-scale-kuner2025 ,
+    entity:sampling-qbc-kuner2025 ,
+    entity:sampling-direct-kuner2025 ,
+    entity:sampling-relaxation-frames-kuner2025 .
+
+entity:sampling-prototype-substitution-kuner2025 a mlips:SamplingStrategy ;
+    rdfs:label "Elemental substitution into prototype structures" ;
+    rdfs:comment "Unbiased substitution of the 89 elements into 817 prototypes (660 binary, 157 ternary), over 100 million candidate structures." .
+
+entity:sampling-rattle-scale-kuner2025 a mlips:SamplingStrategy ;
+    rdfs:label "Random atomic displacement and lattice scaling" ;
+    rdfs:comment "Applied to the candidates to broaden the distribution of forces and stresses." .
+
+entity:sampling-qbc-kuner2025 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning by query by committee" ;
+    rdfs:comment "Structures in poorly covered parts of the PES are selected with an ensemble of three MACE potentials; the loop is repeated." .
+
+entity:sampling-direct-kuner2025 a mlips:SamplingStrategy ;
+    rdfs:label "DIRECT down-sampling" ;
+    rdfs:comment "Selected structures are down-sampled with the DIRECT method before DFT." .
+
+entity:sampling-relaxation-frames-kuner2025 a mlips:SamplingStrategy ;
+    rdfs:label "Three-step r2SCAN relaxation frames" ;
+    rdfs:comment "Each selected structure contributes the three ionic steps of its r2SCAN relaxation." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasHyperparameter mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-kuner2025 ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:impl-MACE-kuner2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "inputs (nearly) identical to the 'large' MACE-MP-0a model released with v0.3.6 of the MACE package; isolated-atom energies recomputed with r2SCAN" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mace-mp-aloe-numEpochs-kuner2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-mace-matpes-numEpochs-kuner2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-mace-combined-numEpochs-kuner2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "100"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-mp-aloe-kuner2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MP-ALOE" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-mp-aloe-kuner2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mp-aloe-numEpochs-kuner2025 ;
+    mlips:produces entity:model-mace-mp-aloe-kuner2025 .
+
+entity:model-mace-mp-aloe-kuner2025 a mlips:TrainedModel ;
+    rdfs:label "MACE (5,725,072 parameters) trained on MP-ALOE" .
+
+entity:run-mace-matpes-kuner2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MatPES" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-matpes-kuner2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-matpes-numEpochs-kuner2025 ;
+    mlips:produces entity:model-mace-matpes-kuner2025 .
+
+entity:model-mace-matpes-kuner2025 a mlips:TrainedModel ;
+    rdfs:label "MACE (5,725,072 parameters) trained on MatPES" .
+
+entity:run-mace-combined-kuner2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MP-ALOE + MatPES" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-combined-kuner2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-combined-numEpochs-kuner2025 ;
+    mlips:produces entity:model-mace-combined-kuner2025 .
+
+entity:model-mace-combined-kuner2025 a mlips:TrainedModel ;
+    rdfs:label "MACE (5,725,072 parameters) trained on MP-ALOE + MatPES" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kuner2025 mlips:hasResult
+    entity:result-mp-aloe-kuner2025 ,
+    entity:result-matpes-kuner2025 ,
+    entity:result-combined-kuner2025 .
+
+entity:result-mp-aloe-kuner2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-mp-aloe-kuner2025 ;
+    mlips:targetMaterial entity:mat-wbm-kuner2025 ;
+    mlips:hasAccuracyMetric entity:metric-mp-aloe-1-kuner2025 ,
+        entity:metric-mp-aloe-2-kuner2025 .
+
+entity:metric-mp-aloe-1-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on cohesive energy after relaxing about 1000 perturbed WBM structures: MACE trained on MP-ALOE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "64"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mp-aloe-2-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on off-equilibrium forces of displaced WBM supercells: MACE trained on MP-ALOE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.19"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-matpes-kuner2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-matpes-kuner2025 ;
+    mlips:targetMaterial entity:mat-wbm-kuner2025 ;
+    mlips:hasAccuracyMetric entity:metric-matpes-1-kuner2025 ,
+        entity:metric-matpes-2-kuner2025 .
+
+entity:metric-matpes-1-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on cohesive energy after relaxing about 1000 perturbed WBM structures: MACE trained on MatPES" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "48"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-matpes-2-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on off-equilibrium forces of displaced WBM supercells: MACE trained on MatPES" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.15"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-combined-kuner2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-combined-kuner2025 ;
+    mlips:targetMaterial entity:mat-wbm-kuner2025 ;
+    mlips:hasAccuracyMetric entity:metric-combined-1-kuner2025 ,
+        entity:metric-combined-2-kuner2025 .
+
+entity:metric-combined-1-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on cohesive energy after relaxing about 1000 perturbed WBM structures: MACE trained on MP-ALOE + MatPES" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-combined-2-kuner2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on off-equilibrium forces of displaced WBM supercells: MACE trained on MP-ALOE + MatPES" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.14"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The cohesive-energy MAE is measured after each model relaxes the structure itself (structures perturbed by 0.1 A from the r2SCAN-relaxed geometry), so it is not a fixed-geometry energy error; it is encoded as an energy MAE with that stated in the label.
+# - Not encoded for lack of a MetricProperty: fingerprint distance of relaxed structures, the EV-scan physicality scores of Table I (with MACE-MP-0a as a reference point), the force R^2 values, and the MD-stability and thermal-conductivity benchmarks.
+# - Architecture hyperparameters are given only by reference to MACE-MP-0a 'large'; only the 100 epochs and the parameter count are stated. During active learning three such models with different random splits are trained per iteration; the three runs here are the final comparison models.
+# - The MatPES data set is declared without a reference calculation of its own; the paper says its DFT parameters are directly compatible with MP-ALOE.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
