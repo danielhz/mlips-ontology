@@ -1,0 +1,1112 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yunxing Zuo et al. (2020). Performance and Cost Assessment of Machine Learning Interatomic Potentials.
+#   The Journal of Physical Chemistry A. doi:10.1021/acs.jpca.9b08723  arXiv:1906.08888v4
+#
+# Version read: arxiv-preprint arXiv:1906.08888v4 (sha256 f7b77cf829cff17e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 8 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a benchmark that trains five ML-IAPs (GAP, MTP, the
+# Behler-Parrinello NNP, linear SNAP and quadratic SNAP) on one
+# consistently generated DFT data set per element (Ni, Cu, Li, Mo, Si,
+# Ge): 30 runs / models, each with its optimised cutoff radius (Table I)
+# and the per-method parameters of Tables S7, S9 and S10.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zuo2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Zuo et al. (2020): performance and cost assessment of GAP, MTP, NNP, SNAP and qSNAP on Li, Mo, Ni, Cu, Si and Ge" ;
+    mlips:reportedIn entity:article-zuo2020 .
+
+entity:article-zuo2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jpca.9b08723> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Performance and Cost Assessment of Machine Learning Interatomic Potentials" ;
+    schema:author <https://orcid.org/0000-0002-2734-7720> ,
+        <https://orcid.org/0000-0001-8008-7043> ,
+        entity:person-Li-zuo2020 ,
+        entity:person-Deng-zuo2020 ,
+        <https://orcid.org/0000-0002-1501-5550> ,
+        <https://orcid.org/0000-0002-1220-1542> ,
+        entity:person-Csanyi-zuo2020 ,
+        entity:person-Shapeev-zuo2020 ,
+        entity:person-Thompson-zuo2020 ,
+        entity:person-Wood-zuo2020 ,
+        <https://orcid.org/0000-0001-5726-2587> .
+
+<https://orcid.org/0000-0002-2734-7720> a schema:Person ;
+    schema:name "Yunxing Zuo" ;
+    schema:givenName "Yunxing" ;
+    schema:familyName "Zuo" ;
+    schema:identifier <https://orcid.org/0000-0002-2734-7720> .
+
+<https://orcid.org/0000-0001-8008-7043> a schema:Person ;
+    schema:name "Chi Chen" ;
+    schema:givenName "Chi" ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0001-8008-7043> .
+
+entity:person-Li-zuo2020 a schema:Person ;
+    schema:name "Xiangguo Li" ;
+    schema:givenName "Xiangguo" ;
+    schema:familyName "Li" .
+
+entity:person-Deng-zuo2020 a schema:Person ;
+    schema:name "Zhi Deng" ;
+    schema:givenName "Zhi" ;
+    schema:familyName "Deng" .
+
+<https://orcid.org/0000-0002-1501-5550> a schema:Person ;
+    schema:name "Yiming Chen" ;
+    schema:givenName "Yiming" ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0002-1501-5550> .
+
+<https://orcid.org/0000-0002-1220-1542> a schema:Person ;
+    schema:name "Jörg Behler" ;
+    schema:givenName "Jörg" ;
+    schema:familyName "Behler" ;
+    schema:identifier <https://orcid.org/0000-0002-1220-1542> .
+
+entity:person-Csanyi-zuo2020 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+entity:person-Shapeev-zuo2020 a schema:Person ;
+    schema:name "Alexander V. Shapeev" ;
+    schema:givenName "Alexander V." ;
+    schema:familyName "Shapeev" .
+
+entity:person-Thompson-zuo2020 a schema:Person ;
+    schema:name "Aidan P. Thompson" ;
+    schema:givenName "Aidan P." ;
+    schema:familyName "Thompson" .
+
+entity:person-Wood-zuo2020 a schema:Person ;
+    schema:name "Mitchell A. Wood" ;
+    schema:givenName "Mitchell A." ;
+    schema:familyName "Wood" .
+
+<https://orcid.org/0000-0001-5726-2587> a schema:Person ;
+    schema:name "Shyue Ping Ong" ;
+    schema:givenName "Shyue Ping" ;
+    schema:familyName "Ong" ;
+    schema:identifier <https://orcid.org/0000-0001-5726-2587> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Ni-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Ni (fcc ground state)" ;
+    mlips:chemicalFormula "Ni" ;
+    mlips:materialClass "fcc transition metal" .
+
+entity:mat-Cu-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Cu (fcc ground state)" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "fcc transition metal" .
+
+entity:mat-Li-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Li (bcc ground state)" ;
+    mlips:chemicalFormula "Li" ;
+    mlips:materialClass "bcc main-group metal" .
+
+entity:mat-Mo-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Mo (bcc ground state)" ;
+    mlips:chemicalFormula "Mo" ;
+    mlips:materialClass "bcc transition metal" .
+
+entity:mat-Si-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Si (diamond cubic ground state)" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "diamond cubic group-IV semiconductor" .
+
+entity:mat-Ge-zuo2020 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Ge (diamond cubic ground state)" ;
+    mlips:chemicalFormula "Ge" ;
+    mlips:materialClass "diamond cubic group-IV semiconductor" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zuo2020 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zuo2020 mlips:hasDFTSettings entity:calc-settings-dft-zuo2020 .
+
+entity:calc-settings-dft-zuo2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "4x4x4 for the Mo, Ni, Cu, Si and Ge supercells, 3x3x3 for the Li supercells; AIMD with a single Gamma point, snapshots recomputed statically with the same parameters as the rest of the data" ;
+    rdfs:comment "VASP 5.4.1; electronic energy converged to 1e-5 eV and force components to 0.02 eV/A. AIMD runs were non-spin-polarized." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Ni-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Ni DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Ni-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+entity:ds-Cu-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Cu DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Cu-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+entity:ds-Li-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Li DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Li-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+entity:ds-Mo-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Mo DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Mo-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+entity:ds-Si-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Si DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Si-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+entity:ds-Ge-zuo2020 a mlips:TrainingDataset ;
+    rdfs:label "Ge DFT data set of Zuo et al. (ground state, strained cells, slabs, AIMD and vacancy-AIMD snapshots)" ;
+    mlips:coversMaterial entity:mat-Ge-zuo2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-zuo2020 ;
+    rdfs:comment "Apportioned into training and test sets with a 90:10 split. Published with the code and the optimised models at https://github.com/materialsvirtuallab/mlearn." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Ni-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:ds-Cu-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:ds-Li-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:ds-Mo-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:ds-Si-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:ds-Ge-zuo2020 mlips:samplingStrategy
+    entity:sampling-ground-state-zuo2020 ,
+    entity:sampling-strain-zuo2020 ,
+    entity:sampling-slab-zuo2020 ,
+    entity:sampling-aimd-zuo2020 ,
+    entity:sampling-aimd-vacancy-zuo2020 .
+
+entity:sampling-ground-state-zuo2020 a mlips:SamplingStrategy ;
+    rdfs:label "Ground-state crystal" ;
+    rdfs:comment "The ground-state crystal of each element." .
+
+entity:sampling-strain-zuo2020 a mlips:SamplingStrategy ;
+    rdfs:label "Homogeneous strain sampling" ;
+    rdfs:comment "Strains of -10% to 10% at 2% intervals applied to the bulk supercell in six different modes (3x3x3, 3x3x3 and 2x2x2 supercells of the conventional bcc, fcc and diamond cells)." .
+
+entity:sampling-slab-zuo2020 a mlips:SamplingStrategy ;
+    rdfs:label "Surface (slab) enumeration" ;
+    rdfs:comment "Slab structures up to a maximum Miller index of three, as obtained from the Crystalium database." .
+
+entity:sampling-aimd-zuo2020 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling (NVT AIMD of bulk supercells)" ;
+    rdfs:comment "NVT AIMD at 300 K and at 0.5x, 0.9x, 1.5x and 2.0x the melting point of each element; 20 snapshots per simulation at 0.1 ps intervals, unless otherwise stated." .
+
+entity:sampling-aimd-vacancy-zuo2020 a mlips:SamplingStrategy ;
+    rdfs:label "Vibrational sampling of a single-vacancy supercell (NVT AIMD)" ;
+    rdfs:comment "NVT AIMD of the bulk supercell with a single vacancy at 300 K and 2.0x the melting point; 40 snapshots per simulation at 0.1 ps intervals, unless otherwise stated." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-zuo2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        entity:hp-sigma-energy-zuo2020 ,
+        entity:hp-sigma-force-zuo2020 ,
+        entity:hp-zeta-zuo2020 ;
+    mlips:hasImplementation entity:impl-GAP-zuo2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms; cost linear in the number of kernels (Table S11)" .
+
+entity:alg-GAP-zuo2020 a mls:Algorithm ;
+    rdfs:label "Gaussian process regression on a set of representative atomic environments; hyperparameters by grid search" .
+
+entity:impl-GAP-zuo2020 a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-zuo2020 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-zuo2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:momentLevel ,
+        entity:hp-num-free-parameters-zuo2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms (Table S11)" .
+
+entity:loss-MTP-zuo2020 a mlips:LossFunction ;
+    rdfs:label "Weighted fit to energies and forces (energy weight 1.00, force weight 0.01)" .
+
+entity:alg-MTP-zuo2020 a mls:Algorithm ;
+    rdfs:label "Fit with a maximum of 500 / 1000 / 2000 iterations for <=16 / 20 / 24 polynomial powers; hyperparameters chosen by reproducing elastic constants and the phonon spectrum" .
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-HDNNP-zuo2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms (Table S11)" .
+
+entity:alg-HDNNP-zuo2020 a mls:Algorithm ;
+    rdfs:label "Kalman filter for the network weights; grid search over the symmetry-function hyperparameters" .
+
+entity:SNAP a mlips:MLIPMethod ;
+    rdfs:label "Spectral Neighbor Analysis Potential (SNAP)" ;
+    mlips:hasFunctionalForm entity:ff-SNAP ;
+    mlips:hasTrainingAlgorithm entity:alg-SNAP-zuo2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms (Table S11)" .
+
+entity:ff-SNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components of the atomic neighbour density" .
+
+entity:alg-SNAP-zuo2020 a mls:Algorithm ;
+    rdfs:label "Alternating two-step fit: linear model fit (inner loop), hyperparameters by differential evolution against material properties such as elastic tensors (outer loop)" .
+
+entity:qSNAP a mlips:MLIPMethod ;
+    rdfs:label "Quadratic Spectral Neighbor Analysis Potential (qSNAP)" ;
+    mlips:hasFunctionalForm entity:ff-qSNAP ;
+    mlips:hasTrainingAlgorithm entity:alg-qSNAP-zuo2020 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-jmax-zuo2020 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ;
+    mlips:inferenceComplexity "Linear in the number of atoms (Table S11)" .
+
+entity:ff-qSNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components plus all their distinct pairwise products" .
+
+entity:alg-qSNAP-zuo2020 a mls:Algorithm ;
+    rdfs:label "Same alternating two-step fit as for linear SNAP (linear fit inside, differential evolution outside)" .
+
+entity:hp-sigma-energy-zuo2020 a mlips:Hyperparameter ;
+    rdfs:label "GAP regularisation: expected energy error sigma_energy (eV/atom)" ;
+    mlips:hyperparameterName "sigma_energy" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-force-zuo2020 a mlips:Hyperparameter ;
+    rdfs:label "GAP regularisation: expected force error sigma_force (eV/A)" ;
+    mlips:hyperparameterName "sigma_force" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-zeta-zuo2020 a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel exponent zeta" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-jmax-zuo2020 a mlips:Hyperparameter ;
+    rdfs:label "Bispectrum band limit Jmax, as tabulated" ;
+    mlips:hyperparameterName "J_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-free-parameters-zuo2020 a mlips:Hyperparameter ;
+    rdfs:label "MTP number of free parameters" ;
+    mlips:hyperparameterName "num_free_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-Ni-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-gap-Ni-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Ni-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Ni-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Ni-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Ni-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Cu-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-gap-Cu-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Cu-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Cu-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Cu-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Cu-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Li-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.8"^^xsd:double .
+
+entity:setting-gap-Li-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Li-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Li-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Li-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Li-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Mo-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-gap-Mo-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Mo-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Mo-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Mo-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Mo-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Si-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.4"^^xsd:double .
+
+entity:setting-gap-Si-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Si-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Si-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Si-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Si-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-gap-Ge-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.4"^^xsd:double .
+
+entity:setting-gap-Ge-numRadialBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Ge-numAngularBasis-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-Ge-sigma-energy-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-energy-zuo2020 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-gap-Ge-sigma-force-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-force-zuo2020 ;
+    mlips:settingValue "0.05"^^xsd:double .
+
+entity:setting-gap-Ge-zeta-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-zuo2020 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-mtp-Ni-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-mtp-Ni-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-mtp-Ni-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "329"^^xsd:integer .
+
+entity:setting-mtp-Cu-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-mtp-Cu-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-mtp-Cu-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "329"^^xsd:integer .
+
+entity:setting-mtp-Li-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.1"^^xsd:double .
+
+entity:setting-mtp-Li-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-Li-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "125"^^xsd:integer .
+
+entity:setting-mtp-Mo-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-mtp-Mo-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-mtp-Mo-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "329"^^xsd:integer .
+
+entity:setting-mtp-Si-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.7"^^xsd:double .
+
+entity:setting-mtp-Si-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "24"^^xsd:integer .
+
+entity:setting-mtp-Si-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "913"^^xsd:integer .
+
+entity:setting-mtp-Ge-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.1"^^xsd:double .
+
+entity:setting-mtp-Ge-momentLevel-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "24"^^xsd:integer .
+
+entity:setting-mtp-Ge-num-free-parameters-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-free-parameters-zuo2020 ;
+    mlips:settingValue "913"^^xsd:integer .
+
+entity:setting-nnp-Ni-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-nnp-Cu-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.1"^^xsd:double .
+
+entity:setting-nnp-Li-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-nnp-Mo-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-nnp-Si-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-nnp-Ge-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.6"^^xsd:double .
+
+entity:setting-snap-Ni-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-snap-Cu-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.1"^^xsd:double .
+
+entity:setting-snap-Li-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.1"^^xsd:double .
+
+entity:setting-snap-Mo-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.6"^^xsd:double .
+
+entity:setting-snap-Si-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.9"^^xsd:double .
+
+entity:setting-snap-Ge-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-qsnap-Ni-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.8"^^xsd:double .
+
+entity:setting-qsnap-Ni-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-qsnap-Cu-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "3.9"^^xsd:double .
+
+entity:setting-qsnap-Cu-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-qsnap-Li-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.1"^^xsd:double .
+
+entity:setting-qsnap-Li-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-qsnap-Mo-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.2"^^xsd:double .
+
+entity:setting-qsnap-Mo-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-qsnap-Si-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.8"^^xsd:double .
+
+entity:setting-qsnap-Si-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-qsnap-Ge-cutoffRadius-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.9"^^xsd:double .
+
+entity:setting-qsnap-Ge-jmax-zuo2020 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-zuo2020 ;
+    mlips:settingValue "6"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-Ni-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Ni" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Ni-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Ni-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Ni-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Ni-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Ni-sigma-energy-zuo2020 ,
+        entity:setting-gap-Ni-sigma-force-zuo2020 ,
+        entity:setting-gap-Ni-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Ni-zuo2020 .
+
+entity:model-gap-Ni-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Ni" .
+
+entity:run-gap-Cu-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Cu" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Cu-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Cu-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Cu-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Cu-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Cu-sigma-energy-zuo2020 ,
+        entity:setting-gap-Cu-sigma-force-zuo2020 ,
+        entity:setting-gap-Cu-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Cu-zuo2020 .
+
+entity:model-gap-Cu-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Cu" .
+
+entity:run-gap-Li-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Li" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Li-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Li-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Li-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Li-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Li-sigma-energy-zuo2020 ,
+        entity:setting-gap-Li-sigma-force-zuo2020 ,
+        entity:setting-gap-Li-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Li-zuo2020 .
+
+entity:model-gap-Li-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Li" .
+
+entity:run-gap-Mo-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Mo" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Mo-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Mo-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Mo-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Mo-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Mo-sigma-energy-zuo2020 ,
+        entity:setting-gap-Mo-sigma-force-zuo2020 ,
+        entity:setting-gap-Mo-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Mo-zuo2020 .
+
+entity:model-gap-Mo-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Mo" ;
+    mlips:inferenceHardware "LAMMPS on a single CPU core of an Intel i7-6850k 3.6 GHz; cost in s per MD step for 432 to 11664 Mo atoms in Table S11" .
+
+entity:run-gap-Si-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Si" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Si-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Si-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Si-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Si-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Si-sigma-energy-zuo2020 ,
+        entity:setting-gap-Si-sigma-force-zuo2020 ,
+        entity:setting-gap-Si-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Si-zuo2020 .
+
+entity:model-gap-Si-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Si" .
+
+entity:run-gap-Ge-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "GAP fit for Ge" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-Ge-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-Ge-cutoffRadius-zuo2020 ,
+        entity:setting-gap-Ge-numRadialBasis-zuo2020 ,
+        entity:setting-gap-Ge-numAngularBasis-zuo2020 ,
+        entity:setting-gap-Ge-sigma-energy-zuo2020 ,
+        entity:setting-gap-Ge-sigma-force-zuo2020 ,
+        entity:setting-gap-Ge-zeta-zuo2020 ;
+    mlips:produces entity:model-gap-Ge-zuo2020 .
+
+entity:model-gap-Ge-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised GAP model for Ge" .
+
+entity:run-mtp-Ni-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Ni" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Ni-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Ni-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Ni-momentLevel-zuo2020 ,
+        entity:setting-mtp-Ni-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Ni-zuo2020 .
+
+entity:model-mtp-Ni-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Ni" .
+
+entity:run-mtp-Cu-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Cu" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Cu-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Cu-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Cu-momentLevel-zuo2020 ,
+        entity:setting-mtp-Cu-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Cu-zuo2020 .
+
+entity:model-mtp-Cu-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Cu" .
+
+entity:run-mtp-Li-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Li" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Li-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Li-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Li-momentLevel-zuo2020 ,
+        entity:setting-mtp-Li-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Li-zuo2020 .
+
+entity:model-mtp-Li-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Li" .
+
+entity:run-mtp-Mo-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Mo" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Mo-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Mo-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Mo-momentLevel-zuo2020 ,
+        entity:setting-mtp-Mo-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Mo-zuo2020 .
+
+entity:model-mtp-Mo-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Mo" ;
+    mlips:inferenceHardware "LAMMPS on a single CPU core of an Intel i7-6850k 3.6 GHz; cost in s per MD step for 432 to 11664 Mo atoms in Table S11" .
+
+entity:run-mtp-Si-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Si" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Si-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Si-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Si-momentLevel-zuo2020 ,
+        entity:setting-mtp-Si-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Si-zuo2020 .
+
+entity:model-mtp-Si-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Si" .
+
+entity:run-mtp-Ge-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Ge" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Ge-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-Ge-cutoffRadius-zuo2020 ,
+        entity:setting-mtp-Ge-momentLevel-zuo2020 ,
+        entity:setting-mtp-Ge-num-free-parameters-zuo2020 ;
+    mlips:produces entity:model-mtp-Ge-zuo2020 .
+
+entity:model-mtp-Ge-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised MTP model for Ge" .
+
+entity:run-nnp-Ni-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Ni" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Ni-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Ni-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Ni-zuo2020 .
+
+entity:model-nnp-Ni-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Ni" .
+
+entity:run-nnp-Cu-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Cu" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Cu-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Cu-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Cu-zuo2020 .
+
+entity:model-nnp-Cu-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Cu" .
+
+entity:run-nnp-Li-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Li" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Li-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Li-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Li-zuo2020 .
+
+entity:model-nnp-Li-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Li" .
+
+entity:run-nnp-Mo-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Mo" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Mo-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Mo-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Mo-zuo2020 .
+
+entity:model-nnp-Mo-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Mo" ;
+    mlips:inferenceHardware "LAMMPS on a single CPU core of an Intel i7-6850k 3.6 GHz; cost in s per MD step for 432 to 11664 Mo atoms in Table S11" .
+
+entity:run-nnp-Si-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Si" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Si-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Si-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Si-zuo2020 .
+
+entity:model-nnp-Si-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Si" .
+
+entity:run-nnp-Ge-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "NNP fit for Ge" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-Ge-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-nnp-Ge-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-nnp-Ge-zuo2020 .
+
+entity:model-nnp-Ge-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised NNP model for Ge" .
+
+entity:run-snap-Ni-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Ni" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Ni-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Ni-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Ni-zuo2020 .
+
+entity:model-snap-Ni-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Ni" .
+
+entity:run-snap-Cu-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Cu" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Cu-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Cu-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Cu-zuo2020 .
+
+entity:model-snap-Cu-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Cu" .
+
+entity:run-snap-Li-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Li" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Li-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Li-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Li-zuo2020 .
+
+entity:model-snap-Li-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Li" .
+
+entity:run-snap-Mo-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Mo" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Mo-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Mo-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Mo-zuo2020 .
+
+entity:model-snap-Mo-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Mo" ;
+    mlips:inferenceHardware "LAMMPS on a single CPU core of an Intel i7-6850k 3.6 GHz; cost in s per MD step for 432 to 11664 Mo atoms in Table S11" .
+
+entity:run-snap-Si-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Si" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Si-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Si-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Si-zuo2020 .
+
+entity:model-snap-Si-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Si" .
+
+entity:run-snap-Ge-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "SNAP fit for Ge" ;
+    mlips:appliesMethod entity:SNAP ;
+    mlips:runsOn entity:ds-Ge-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-snap-Ge-cutoffRadius-zuo2020 ;
+    mlips:produces entity:model-snap-Ge-zuo2020 .
+
+entity:model-snap-Ge-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised SNAP model for Ge" .
+
+entity:run-qsnap-Ni-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Ni" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Ni-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Ni-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Ni-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Ni-zuo2020 .
+
+entity:model-qsnap-Ni-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Ni" .
+
+entity:run-qsnap-Cu-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Cu" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Cu-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Cu-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Cu-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Cu-zuo2020 .
+
+entity:model-qsnap-Cu-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Cu" .
+
+entity:run-qsnap-Li-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Li" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Li-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Li-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Li-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Li-zuo2020 .
+
+entity:model-qsnap-Li-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Li" .
+
+entity:run-qsnap-Mo-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Mo" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Mo-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Mo-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Mo-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Mo-zuo2020 .
+
+entity:model-qsnap-Mo-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Mo" ;
+    mlips:inferenceHardware "LAMMPS on a single CPU core of an Intel i7-6850k 3.6 GHz; cost in s per MD step for 432 to 11664 Mo atoms in Table S11" .
+
+entity:run-qsnap-Si-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Si" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Si-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Si-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Si-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Si-zuo2020 .
+
+entity:model-qsnap-Si-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Si" .
+
+entity:run-qsnap-Ge-zuo2020 a mlips:MLIPRun ;
+    rdfs:label "qSNAP fit for Ge" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-Ge-zuo2020 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-Ge-cutoffRadius-zuo2020 ,
+        entity:setting-qsnap-Ge-jmax-zuo2020 ;
+    mlips:produces entity:model-qsnap-Ge-zuo2020 .
+
+entity:model-qsnap-Ge-zuo2020 a mlips:TrainedModel ;
+    rdfs:label "Optimised qSNAP model for Ge" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Table S11 gives the cost in seconds per MD step for 432, 2000, 5488 and
+# 11664 Mo atoms (LAMMPS, one core of an Intel i7-6850k 3.6 GHz); recorded as
+# inferenceHardware on the five Mo models and as inferenceComplexity on the
+# methods. No per-atom time is stated as such and no training cost is given.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The energy and force MAEs of all 30 models (Figure 3) and the Delta-EOS values (Figure 5a) are given only as figures; no value is printed in the text, so no AccuracyMetric is encoded. The repository cited by the paper (mlearn) may carry the numbers.
+# - Table II (lattice parameter, elastic constants, bulk modulus, vacancy formation and migration energies per model) has no MetricProperty in schema 0.1.2 and is not encoded.
+# - Cutoff radii follow main-text Table I. The SI disagrees in places: Table S7 lists GAP cutoffs of 4.1 (Cu) and 5.1 (Si) against 3.9 and 5.4 in Table I, and the first page of Table S8 lists SNAP cutoffs of 3.8 (Cu), 5.2 (Mo), 5.0 (Ge) against 4.1, 4.6, 5.5 in Table I and on its own continuation pages.
+# - Data set sizes per element are not stated in the text (only the 90:10 split and, for Mo, 'about 100 training structures' for the optimal models and up to about 800 in the convergence study).
+# - The '# of polynomial powers' of Table S10 is encoded as mlips:momentLevel. Jmax for linear SNAP is not tabulated (Table S8 lists coefficients only); for qSNAP the Table S9 value is encoded as stated, without deciding whether it denotes J or 2J.
+# - NNP hidden-layer sizes and GAP kernel counts appear only as figure annotations and are not encoded. The software used for the NNP and MTP fits is not named; SNAP/qSNAP and all timings ran in LAMMPS.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
