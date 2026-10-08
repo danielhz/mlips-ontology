@@ -1,0 +1,429 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Tsz Wai Ko et al. (2021). A fourth-generation high-dimensional neural network potential with accurate electrostatics including non-local charge transfer.
+#   Nature Communications. doi:10.1038/s41467-020-20427-2  arXiv:2009.06484v1
+#
+# Version read: arxiv-preprint arXiv:2009.06484v1 (sha256 22c87745a39bf448...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 105 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the 4G-HDNNP method (introduced here) and its first
+# benchmark, the organic molecules C10H2 and C10H3+, for which second-,
+# third- and fourth-generation HDNNPs are trained on one data set and
+# compared on the DFT-optimised structures (Table I). The Ag3, NaCl
+# cluster and Au2-MgO(001) examples are described in the gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ko2021 a mlips:BenchmarkStudy ;
+    rdfs:label "Ko et al. (2021): a fourth-generation high-dimensional neural network potential with accurate electrostatics including non-local charge transfer" ;
+    mlips:reportedIn entity:article-ko2021 .
+
+entity:article-ko2021 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-020-20427-2> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "A fourth-generation high-dimensional neural network potential with accurate electrostatics including non-local charge transfer" ;
+    schema:author <https://orcid.org/0000-0002-0802-9559> ,
+        <https://orcid.org/0000-0003-4970-575X> ,
+        entity:person-Goedecker-ko2021 ,
+        <https://orcid.org/0000-0002-1220-1542> .
+
+<https://orcid.org/0000-0002-0802-9559> a schema:Person ;
+    schema:name "Tsz Wai Ko" ;
+    schema:givenName "Tsz Wai" ;
+    schema:familyName "Ko" ;
+    schema:identifier <https://orcid.org/0000-0002-0802-9559> .
+
+<https://orcid.org/0000-0003-4970-575X> a schema:Person ;
+    schema:name "Jonas A. Finkler" ;
+    schema:givenName "Jonas A." ;
+    schema:familyName "Finkler" ;
+    schema:identifier <https://orcid.org/0000-0003-4970-575X> .
+
+entity:person-Goedecker-ko2021 a schema:Person ;
+    schema:name "Stefan Goedecker" ;
+    schema:givenName "Stefan" ;
+    schema:familyName "Goedecker" .
+
+<https://orcid.org/0000-0002-1220-1542> a schema:Person ;
+    schema:name "Jörg Behler" ;
+    schema:givenName "Jörg" ;
+    schema:familyName "Behler" ;
+    schema:identifier <https://orcid.org/0000-0002-1220-1542> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-C10H2-ko2021 a mlips:MaterialSystem ;
+    rdfs:label "C10H2 molecule (DFT-optimised structure)" ;
+    mlips:chemicalFormula "C10H2" ;
+    mlips:materialClass "Linear organic molecule (gas phase)" .
+
+entity:mat-C10H3plus-ko2021 a mlips:MaterialSystem ;
+    rdfs:label "C10H3+ cation (protonated C10H2, DFT-optimised structure)" ;
+    mlips:chemicalFormula "C10H3+" ;
+    mlips:materialClass "Organic cation (gas phase) with long-range charge redistribution" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ko2021 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ko2021 mlips:hasDFTSettings entity:calc-settings-dft-ko2021 .
+
+entity:calc-settings-dft-ko2021 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:dftBasisSet entity:basis-FHI-aims-light-settings-ko2021 ;
+    rdfs:comment "All-electron FHI-aims (version 171221_1); reference atomic charges from Hirshfeld population analysis." .
+
+entity:basis-FHI-aims-light-settings-ko2021 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'light' settings" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-C10-ko2021 a mlips:TrainingDataset ;
+    rdfs:label "C10H2 / C10H3+ data set (90% training split)" ;
+    mlips:coversMaterial entity:mat-C10H2-ko2021 ,
+        entity:mat-C10H3plus-ko2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-ko2021 ;
+    rdfs:comment "The paper gives the numbers of reference data points as 5000 for the NaCl cluster and for Au2-MgO, 'while the Ag3 clusters and the organic molecule it is 10019 and 11013, respectively', i.e. 11,013 for this data set; ji2026 quotes 11,013 for the Ag3 set instead, so the number is not encoded. 90% training, 10% test. Atomic charges are also fitted." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-C10-ko2021 mlips:samplingStrategy
+    entity:sampling-bomd-300K-ko2021 .
+
+entity:sampling-bomd-300K-ko2021 a mlips:SamplingStrategy ;
+    rdfs:label "Born-Oppenheimer MD at 300 K plus geometry-relaxation paths" ;
+    rdfs:comment "5000 steps at 0.5 fs in the NVT ensemble (Nose-Hoover) for each system, plus the trajectory of the DFT geometry relaxations (converged to 0.001 eV/A)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-hidden-layers-ko2021 ;
+    mlips:hasImplementation entity:impl-HDNNP-ko2021 .
+
+entity:impl-HDNNP-ko2021 a mlips:Implementation ;
+    mlips:implementedIn mlips:RuNNer .
+
+entity:3G-HDNNP a mlips:MLIPMethod ;
+    rdfs:label "Third-generation high-dimensional neural network potential (3G-HDNNP)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasFunctionalForm entity:ff-3G-HDNNP ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-hidden-layers-ko2021 ;
+    mlips:hasImplementation entity:impl-3G-HDNNP-ko2021 .
+
+entity:ff-3G-HDNNP a mlips:FunctionalForm ;
+    rdfs:label "Short-range atomic neural networks plus long-range electrostatics from environment-dependent atomic charges predicted by a second set of atomic neural networks" .
+
+entity:impl-3G-HDNNP-ko2021 a mlips:Implementation ;
+    mlips:implementedIn mlips:RuNNer .
+
+entity:4G-HDNNP a mlips:MLIPMethod ;
+    rdfs:label "Fourth-generation high-dimensional neural network potential (4G-HDNNP)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasFunctionalForm entity:ff-4G-HDNNP ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-hidden-layers-ko2021 ;
+    mlips:hasImplementation entity:impl-4G-HDNNP-ko2021 ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:ff-4G-HDNNP a mlips:FunctionalForm ;
+    rdfs:label "Atomic neural networks predict environment-dependent electronegativities; a global charge equilibration gives the atomic charges, which enter the electrostatic energy and, as additional inputs, the short-range atomic neural networks, so that non-local charge transfer is captured" .
+
+entity:impl-4G-HDNNP-ko2021 a mlips:Implementation ;
+    mlips:implementedIn mlips:RuNNer .
+
+entity:hp-hidden-layers-ko2021 a mlips:Hyperparameter ;
+    rdfs:label "Hidden-layer architecture of the atomic neural networks" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-2G-cutoffRadius-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.23"^^xsd:double .
+
+entity:setting-2G-hidden-layers-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-ko2021 ;
+    mlips:settingValue "15-15" .
+
+entity:setting-3G-cutoffRadius-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.23"^^xsd:double .
+
+entity:setting-3G-hidden-layers-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-ko2021 ;
+    mlips:settingValue "15-15" .
+
+entity:setting-4G-cutoffRadius-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.23"^^xsd:double .
+
+entity:setting-4G-hidden-layers-ko2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-ko2021 ;
+    mlips:settingValue "15-15" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-2G-ko2021 a mlips:MLIPRun ;
+    rdfs:label "2G-HDNNP trained on the C10H2 / C10H3+ data set" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-C10-ko2021 ;
+    mlips:hasHyperparameterSetting entity:setting-2G-cutoffRadius-ko2021 ,
+        entity:setting-2G-hidden-layers-ko2021 ;
+    mlips:produces entity:model-2G-ko2021 .
+
+entity:model-2G-ko2021 a mlips:TrainedModel ;
+    rdfs:label "2G-HDNNP for C10H2 / C10H3+" .
+
+entity:run-3G-ko2021 a mlips:MLIPRun ;
+    rdfs:label "3G-HDNNP trained on the C10H2 / C10H3+ data set" ;
+    mlips:appliesMethod entity:3G-HDNNP ;
+    mlips:runsOn entity:ds-C10-ko2021 ;
+    mlips:hasHyperparameterSetting entity:setting-3G-cutoffRadius-ko2021 ,
+        entity:setting-3G-hidden-layers-ko2021 ;
+    mlips:produces entity:model-3G-ko2021 .
+
+entity:model-3G-ko2021 a mlips:TrainedModel ;
+    rdfs:label "3G-HDNNP for C10H2 / C10H3+" .
+
+entity:run-4G-ko2021 a mlips:MLIPRun ;
+    rdfs:label "4G-HDNNP trained on the C10H2 / C10H3+ data set" ;
+    mlips:appliesMethod entity:4G-HDNNP ;
+    mlips:runsOn entity:ds-C10-ko2021 ;
+    mlips:hasHyperparameterSetting entity:setting-4G-cutoffRadius-ko2021 ,
+        entity:setting-4G-hidden-layers-ko2021 ;
+    mlips:produces entity:model-4G-ko2021 .
+
+entity:model-4G-ko2021 a mlips:TrainedModel ;
+    rdfs:label "4G-HDNNP for C10H2 / C10H3+" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ko2021 mlips:hasResult
+    entity:result-2G-C10H2-ko2021 ,
+    entity:result-3G-unscaled-C10H2-ko2021 ,
+    entity:result-3G-scaled-C10H2-ko2021 ,
+    entity:result-4G-C10H2-ko2021 ,
+    entity:result-2G-C10H3plus-ko2021 ,
+    entity:result-3G-unscaled-C10H3plus-ko2021 ,
+    entity:result-3G-scaled-C10H3plus-ko2021 ,
+    entity:result-4G-C10H3plus-ko2021 .
+
+entity:result-2G-C10H2-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-2G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H2-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-2G-C10H2-1-ko2021 ,
+        entity:metric-2G-C10H2-2-ko2021 .
+
+entity:metric-2G-C10H2-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H2 structure: 2G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.684"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-2G-C10H2-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H2 structure: 2G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.095"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-3G-unscaled-C10H2-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-3G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H2-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-3G-unscaled-C10H2-1-ko2021 ,
+        entity:metric-3G-unscaled-C10H2-2-ko2021 .
+
+entity:metric-3G-unscaled-C10H2-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H2 structure: 3G-HDNNP (unscaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.255"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-3G-unscaled-C10H2-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H2 structure: 3G-HDNNP (unscaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.43"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-3G-scaled-C10H2-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-3G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H2-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-3G-scaled-C10H2-1-ko2021 ,
+        entity:metric-3G-scaled-C10H2-2-ko2021 .
+
+entity:metric-3G-scaled-C10H2-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H2 structure: 3G-HDNNP (scaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.193"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-3G-scaled-C10H2-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H2 structure: 3G-HDNNP (scaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.138"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-4G-C10H2-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-4G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H2-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-4G-C10H2-1-ko2021 ,
+        entity:metric-4G-C10H2-2-ko2021 .
+
+entity:metric-4G-C10H2-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H2 structure: 4G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.463"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-4G-C10H2-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H2 structure: 4G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.032"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-2G-C10H3plus-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-2G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H3plus-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-2G-C10H3plus-1-ko2021 ,
+        entity:metric-2G-C10H3plus-2-ko2021 .
+
+entity:metric-2G-C10H3plus-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H3+ structure: 2G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.922"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-2G-C10H3plus-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H3+ structure: 2G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.127"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-3G-unscaled-C10H3plus-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-3G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H3plus-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-3G-unscaled-C10H3plus-1-ko2021 ,
+        entity:metric-3G-unscaled-C10H3plus-2-ko2021 .
+
+entity:metric-3G-unscaled-C10H3plus-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H3+ structure: 3G-HDNNP (unscaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.046"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-3G-unscaled-C10H3plus-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H3+ structure: 3G-HDNNP (unscaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.658"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-3G-scaled-C10H3plus-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-3G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H3plus-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-3G-scaled-C10H3plus-1-ko2021 ,
+        entity:metric-3G-scaled-C10H3plus-2-ko2021 .
+
+entity:metric-3G-scaled-C10H3plus-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H3+ structure: 3G-HDNNP (scaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.425"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-3G-scaled-C10H3plus-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H3+ structure: 3G-HDNNP (scaled charges)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.259"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-4G-C10H3plus-ko2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-4G-ko2021 ;
+    mlips:targetMaterial entity:mat-C10H3plus-ko2021 ;
+    mlips:hasAccuracyMetric entity:metric-4G-C10H3plus-1-ko2021 ,
+        entity:metric-4G-C10H3plus-2-ko2021 .
+
+entity:metric-4G-C10H3plus-1-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy error on the DFT-optimised C10H3+ structure: 4G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.176"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-4G-C10H3plus-2-ko2021 a mlips:AccuracyMetric ;
+    rdfs:label "Mean force error on the DFT-optimised C10H3+ structure: 4G-HDNNP" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.042"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table I gives the errors on one DFT-optimised structure per molecule ('energy error' and 'mean errors' of forces), not test-set statistics; they are encoded as MAE with that stated in the labels. The test-set RMSEs of the paper are in the Supporting Information. Charge errors (in 10^-3 e) have no MetricProperty.
+# - '3G-HDNNP (unscaled)' and '(scaled)' are two treatments of the predicted charges of one 3G model and are encoded as two results on it.
+# - The three other benchmark systems (Ag3 +/- clusters, Na8/9Cl8+ clusters, Au2 on doped and undoped MgO(001); 5000, 5000 and about 10,000 reference points) are not encoded: their errors are in figures or in the SI. These data sets are the ones later reused by ji2025 and ji2026.
+# - Symmetry-function parameters are in the SI (cutoffs of 8-10 Bohr depending on the system; the 4.23 A stated for C10H2 is encoded). The screening radii of the short-range electrostatics and the Gaussian charge widths are not encoded.
+# - 2G-HDNNP is encoded under the registry method entity:HDNNP; 3G and 4G are separate registry methods because the functional form differs (METHODS.md rule 3).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
