@@ -1,0 +1,254 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Eslam Ibrahim et al. (2023). Atomic cluster expansion for a general-purpose interatomic potential of magnesium.
+#   Physical Review Materials. doi:10.1103/physrevmaterials.7.113801  arXiv:2305.03577v1
+#
+# Version read: arxiv-preprint arXiv:2305.03577v1 (sha256 bd480dee974e47df...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 146 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the ACE parametrisation for Mg, its FHI-aims reference
+# data, training set, settings and the energy and force MAEs stated in
+# the text. Materials properties (elastic constants, defects, phonons,
+# phase diagram) are not encoded. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ibrahim2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Ibrahim et al. (2023): atomic cluster expansion for a general-purpose interatomic potential of magnesium" ;
+    mlips:reportedIn entity:article-ibrahim2023 .
+
+entity:article-ibrahim2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/physrevmaterials.7.113801> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Atomic cluster expansion for a general-purpose interatomic potential of magnesium" ;
+    schema:author <https://orcid.org/0009-0009-9570-8901> ,
+        entity:person-Lysogorskiy-ibrahim2023 ,
+        <https://orcid.org/0000-0001-8216-2254> ,
+        <https://orcid.org/0000-0001-7101-8804> .
+
+<https://orcid.org/0009-0009-9570-8901> a schema:Person ;
+    schema:name "Eslam Ibrahim" ;
+    schema:givenName "Eslam" ;
+    schema:familyName "Ibrahim" ;
+    schema:identifier <https://orcid.org/0009-0009-9570-8901> .
+
+entity:person-Lysogorskiy-ibrahim2023 a schema:Person ;
+    schema:name "Yury Lysogorskiy" ;
+    schema:givenName "Yury" ;
+    schema:familyName "Lysogorskiy" .
+
+<https://orcid.org/0000-0001-8216-2254> a schema:Person ;
+    schema:name "Matous Mrovec" ;
+    schema:givenName "Matous" ;
+    schema:familyName "Mrovec" ;
+    schema:identifier <https://orcid.org/0000-0001-8216-2254> .
+
+<https://orcid.org/0000-0001-7101-8804> a schema:Person ;
+    schema:name "Ralf Drautz" ;
+    schema:givenName "Ralf" ;
+    schema:familyName "Drautz" ;
+    schema:identifier <https://orcid.org/0000-0001-7101-8804> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Mg-ibrahim2023 a mlips:MaterialSystem ;
+    rdfs:label "Magnesium (bulk phases, defects, surfaces, small clusters)" ;
+    mlips:chemicalFormula "Mg" ;
+    mlips:materialClass "Elemental metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ibrahim2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ibrahim2023 mlips:hasDFTSettings entity:calc-settings-dft-ibrahim2023 .
+
+entity:calc-settings-dft-ibrahim2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:dftBasisSet entity:basis-FHI-aims-tight-settings-ibrahim2023 ;
+    mlips:kPointMesh "k-mesh density of 0.175 per inverse Angstrom" ;
+    rdfs:comment "All-electron; Gaussian smearing of 0.1 eV." .
+
+entity:basis-FHI-aims-tight-settings-ibrahim2023 a mlips:DftBasisSet ;
+    rdfs:label "FHI-aims 'tight' settings" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Mg-ibrahim2023 a mlips:TrainingDataset ;
+    rdfs:label "Mg training set (40,000 structures, 738,705 atoms; 5,000 structures for testing)" ;
+    mlips:coversMaterial entity:mat-Mg-ibrahim2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 40000 ;
+    mlips:hasDFTCalculation entity:calc-dft-ibrahim2023 ;
+    rdfs:comment "Selected from more than 120 thousand DFT reference calculations." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Mg-ibrahim2023 mlips:samplingStrategy
+    entity:sampling-manual-ibrahim2023 .
+
+entity:sampling-manual-ibrahim2023 a mlips:SamplingStrategy ;
+    rdfs:label "Constructed configurations: bulk structures over a wide volume range (nearest-neighbour distance 0.7 to 3.0 of equilibrium hcp), supercells with displaced atoms, point and planar defects, surfaces, random clusters of 2 to 5 atoms; no liquid configurations" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-ibrahim2023 ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-ibrahim2023 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-num-basis-functions-ibrahim2023 ,
+        entity:hp-num-parameters-ibrahim2023 ;
+    mlips:hasImplementation entity:impl-ACE-ibrahim2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation ,
+        mlips:ThermodynamicIntegration .
+
+entity:loss-ACE-ibrahim2023 a mlips:LossFunction ;
+    rdfs:label "Energies and forces with energy-based structure weights (75% of the weight on structures within 1 eV of the lowest-energy structure)" .
+
+entity:alg-ACE-ibrahim2023 a mls:Algorithm ;
+    rdfs:label "Successive hierarchical basis extension with power-order ranking (Pacemaker); Finnis-Sinclair-type mildly non-linear embedding with two atomic properties" .
+
+entity:impl-ACE-ibrahim2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "fitted with Pacemaker; run with PACE in LAMMPS" .
+
+entity:hp-num-basis-functions-ibrahim2023 a mlips:Hyperparameter ;
+    rdfs:label "Number of ACE basis functions" ;
+    mlips:hyperparameterName "num_basis_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-ibrahim2023 a mlips:Hyperparameter ;
+    rdfs:label "Number of fitted parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Mg-cutoffRadius-ibrahim2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8.2"^^xsd:double .
+
+entity:setting-Mg-num-basis-functions-ibrahim2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-basis-functions-ibrahim2023 ;
+    mlips:settingValue "724"^^xsd:integer .
+
+entity:setting-Mg-num-parameters-ibrahim2023 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-ibrahim2023 ;
+    mlips:settingValue "2528"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Mg-ibrahim2023 a mlips:MLIPRun ;
+    rdfs:label "ACE parametrisation for Mg" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-Mg-ibrahim2023 ;
+    mlips:hasHyperparameterSetting entity:setting-Mg-cutoffRadius-ibrahim2023 ,
+        entity:setting-Mg-num-basis-functions-ibrahim2023 ,
+        entity:setting-Mg-num-parameters-ibrahim2023 ;
+    mlips:produces entity:model-Mg-ibrahim2023 .
+
+entity:model-Mg-ibrahim2023 a mlips:TrainedModel ;
+    rdfs:label "ACE potential for Mg" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ibrahim2023 mlips:hasResult
+    entity:result-train-ibrahim2023 ,
+    entity:result-test-ibrahim2023 .
+
+entity:result-train-ibrahim2023 a mlips:BenchmarkResult ;
+    rdfs:comment "For structures within 1 eV of the ground state: 4.7 meV/atom and 29.4 meV/A." ;
+    mlips:evaluatesModel entity:model-Mg-ibrahim2023 ;
+    mlips:targetMaterial entity:mat-Mg-ibrahim2023 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-ibrahim2023 ,
+        entity:metric-train-2-ibrahim2023 .
+
+entity:metric-train-1-ibrahim2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, complete training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-ibrahim2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, complete training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-test-ibrahim2023 a mlips:BenchmarkResult ;
+    rdfs:comment "For structures within 1 eV of the ground state: 4.9 meV/atom and 29.8 meV/A." ;
+    mlips:evaluatesModel entity:model-Mg-ibrahim2023 ;
+    mlips:targetMaterial entity:mat-Mg-ibrahim2023 ;
+    mlips:hasAccuracyMetric entity:metric-test-1-ibrahim2023 ,
+        entity:metric-test-2-ibrahim2023 .
+
+entity:metric-test-1-ibrahim2023 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, test set (5,000 structures)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-test-2-ibrahim2023 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, test set (5,000 structures)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Lattice and elastic constants (Table I), surface and stacking-fault energies (Tables II and III), phonons, hcp-bcc transition pressure, melting temperature and the P-T phase diagram are not encoded (no metric property). The supported simulation types are read from these applications (free energies by thermodynamic integration, phonon spectra, MD and statics).
+# - The implementation is recorded as the vocabulary library PACE; the fit was done with Pacemaker. Read from the arXiv v1 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
