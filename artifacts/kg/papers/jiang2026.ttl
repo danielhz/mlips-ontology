@@ -1,0 +1,242 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yuanyuan Jiang et al. (2026). Concentration–transferable deep potential molecular dynamics: unraveling component–structure–transport in molten LiF–BeF 2 –EuF 2.
+#   Physical Chemistry Chemical Physics. doi:10.1039/d6cp01507g
+#
+# Version read: publisher (sha256 6939aa32d461b7c6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 43 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one Deep Potential (DeepPot-SE) model for molten
+# FLiBe + EuF2 trained on first-principles MD at three EuF2
+# concentrations and used for large-scale DPMD across five
+# concentrations at 823 K; reference settings, training settings and the
+# test RMSEs in energy and force.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-jiang2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Jiang et al. (2026): concentration-transferable Deep Potential MD of molten LiF-BeF2-EuF2" ;
+    mlips:reportedIn entity:article-jiang2026 .
+
+entity:article-jiang2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d6cp01507g> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Concentration–transferable deep potential molecular dynamics: unraveling component–structure–transport in molten LiF–BeF 2 –EuF 2" ;
+    schema:author entity:person-Jiang-jiang2026 ,
+        <https://orcid.org/0000-0002-2250-0300> ,
+        <https://orcid.org/0000-0002-8847-1047> .
+
+entity:person-Jiang-jiang2026 a schema:Person ;
+    schema:name "Yuanyuan Jiang" ;
+    schema:givenName "Yuanyuan" ;
+    schema:familyName "Jiang" .
+
+<https://orcid.org/0000-0002-2250-0300> a schema:Person ;
+    schema:name "Xuejiao Li" ;
+    schema:givenName "Xuejiao" ;
+    schema:familyName "Li" ;
+    schema:identifier <https://orcid.org/0000-0002-2250-0300> .
+
+<https://orcid.org/0000-0002-8847-1047> a schema:Person ;
+    schema:name "Yu Gong" ;
+    schema:givenName "Yu" ;
+    schema:familyName "Gong" ;
+    schema:identifier <https://orcid.org/0000-0002-8847-1047> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-FLiBeEu-jiang2026 a mlips:MaterialSystem ;
+    rdfs:label "Molten LiF-BeF2-EuF2 (FLiBeEu) at 823 K, 0.50 to 6.25 mol% EuF2" ;
+    mlips:chemicalFormula "LiF-BeF2-EuF2" ;
+    mlips:materialClass "Molten fluoride salt with a lanthanide fission-product solute" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-jiang2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-jiang2026 mlips:hasDFTSettings entity:calc-settings-dft-jiang2026 .
+
+entity:calc-settings-dft-jiang2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "550"^^xsd:double ;
+    mlips:kPointMesh "1x1x1" ;
+    rdfs:comment "First-principles MD with DFT-D3 dispersion corrections; valence configurations Li 1s2 2s1, Be 2s2, F 2s2 2p5, Eu 5p6 6s2. Spin-polarised DFT+U (U - J = 5) with Eu 4f electrons was also tested; the paper states that FPMD data containing 4f electrons are excluded from the training data set." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-FLiBeEu-jiang2026 a mlips:TrainingDataset ;
+    rdfs:label "FLiBeEu first-principles MD data set (60,000 configurations)" ;
+    mlips:coversMaterial entity:mat-FLiBeEu-jiang2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 60000 ;
+    mlips:hasDFTCalculation entity:calc-dft-jiang2026 ;
+    rdfs:comment "Randomly shuffled and split into training (80%), validation (10%) and testing (10%) subsets." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-FLiBeEu-jiang2026 mlips:samplingStrategy
+    entity:sampling-fpmd-jiang2026 .
+
+entity:sampling-fpmd-jiang2026 a mlips:SamplingStrategy ;
+    rdfs:label "First-principles MD in NPT and NVT ensembles" ;
+    rdfs:comment "For each of three EuF2 concentrations (2.17, 4.26, 6.25 mol%; 30 Li, 15 Be, 62-66 F, 1-3 Eu atoms), 10,000 NPT steps followed by 10,000 NVT steps with a 1 fs time step; all trajectory frames are used without filtering." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasLossFunction entity:loss-DeePMD-jiang2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-embedding-net-jiang2026 ,
+        entity:hp-fitting-net-jiang2026 ,
+        entity:hp-training-steps-jiang2026 ,
+        entity:hp-sel-jiang2026 ;
+    mlips:hasImplementation entity:impl-DeePMD-jiang2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-DeePMD-jiang2026 a mlips:LossFunction ;
+    rdfs:label "DeePMD-kit loss with prefactors P_e from 0.02 to 1, P_f from 1000 to 1 and P_v = 0" .
+
+entity:impl-DeePMD-jiang2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "DeepPot-SE descriptor; run in LAMMPS through the DeePMD-kit interface" .
+
+entity:hp-embedding-net-jiang2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-jiang2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-jiang2026 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sel-jiang2026 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential maximum number of neighbours per atom type" ;
+    mlips:hyperparameterName "sel" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-FLiBeEu-cutoffRadius-jiang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:double .
+
+entity:setting-dp-FLiBeEu-embedding-net-jiang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-jiang2026 ;
+    mlips:settingValue "25-50-100" .
+
+entity:setting-dp-FLiBeEu-fitting-net-jiang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-jiang2026 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-dp-FLiBeEu-training-steps-jiang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-jiang2026 ;
+    mlips:settingValue "1000000"^^xsd:integer .
+
+entity:setting-dp-FLiBeEu-sel-jiang2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sel-jiang2026 ;
+    mlips:settingValue "80"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-FLiBeEu-jiang2026 a mlips:MLIPRun ;
+    rdfs:label "DeepPot-SE training for molten FLiBeEu" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-FLiBeEu-jiang2026 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-FLiBeEu-cutoffRadius-jiang2026 ,
+        entity:setting-dp-FLiBeEu-embedding-net-jiang2026 ,
+        entity:setting-dp-FLiBeEu-fitting-net-jiang2026 ,
+        entity:setting-dp-FLiBeEu-training-steps-jiang2026 ,
+        entity:setting-dp-FLiBeEu-sel-jiang2026 ;
+    mlips:produces entity:model-dp-FLiBeEu-jiang2026 .
+
+entity:model-dp-FLiBeEu-jiang2026 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for molten LiF-BeF2-EuF2" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-jiang2026 mlips:hasResult
+    entity:result-dp-FLiBeEu-jiang2026 .
+
+entity:result-dp-FLiBeEu-jiang2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-dp-FLiBeEu-jiang2026 ;
+    mlips:targetMaterial entity:mat-FLiBeEu-jiang2026 ;
+    mlips:hasAccuracyMetric entity:metric-dp-FLiBeEu-1-jiang2026 ,
+        entity:metric-dp-FLiBeEu-2-jiang2026 .
+
+entity:metric-dp-FLiBeEu-1-jiang2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy with respect to FPMD, in eV/atom (printed as (1.51 +/- 0.31) x 10^-3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00151"^^xsd:double .
+
+entity:metric-dp-FLiBeEu-2-jiang2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces with respect to FPMD (printed as (6.72 +/- 1.22) x 10^-2)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0672"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The exponents and the plus/minus signs of the RMSE values are lost in the extracted text ('1.51 0.31 10 3 eV atom 1'); they are read as (1.51 +/- 0.31) x 10^-3 eV/atom and (6.72 +/- 1.22) x 10^-2 eV/A. Worth a look at the PDF.
+# - Energy RMSE is in eV/atom (no unit individual; mlips:hasUnit omitted, value not converted).
+# - Whether the final training data come from the DFT+U runs with 4f electrons or from runs without them is stated ambiguously (both are described); the reference settings node records both statements.
+# - The learning-rate schedule and the smoothing radius are in the supplementary information. Transport and structure results (self-diffusion coefficients, viscosity, RDFs, coordination numbers) have no MetricProperty.
+# - The manifest classes this paper as 'Method/model'; it is an application of DeePMD.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
