@@ -1,0 +1,336 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Bowen Deng et al. (2025). Systematic softening in universal machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-024-01500-6
+#
+# Version read: publisher (sha256 e133a45fe86c4d20...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 22 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a benchmark of three pretrained universal MLIPs
+# (M3GNet 2021.2.8, CHGNet v0.3.0, MACE-MP-0 2023.12.03; Table 1), none of
+# them trained here, and two CHGNet fine-tuning experiments on
+# Li6Zn2In2(IO3)16 (mp-973966). Only the force MAEs on the mp-973966
+# high-energy configurations are expressible as metrics.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-deng2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Deng et al. (2025): systematic softening in universal MLIPs (M3GNet, CHGNet, MACE-MP-0)" ;
+    mlips:reportedIn entity:article-deng2025 .
+
+entity:article-deng2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01500-6> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Systematic softening in universal machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0003-4085-381X> ,
+        <https://orcid.org/0000-0002-7946-4232> ,
+        <https://orcid.org/0000-0003-1921-1628> ,
+        <https://orcid.org/0000-0001-5233-3462> ,
+        <https://orcid.org/0000-0001-8805-1547> ,
+        <https://orcid.org/0000-0001-5372-9450> ,
+        <https://orcid.org/0000-0003-1974-028X> ,
+        <https://orcid.org/0000-0003-2495-5509> ,
+        <https://orcid.org/0000-0001-9275-3605> .
+
+<https://orcid.org/0000-0003-4085-381X> a schema:Person ;
+    schema:name "Bowen Deng" ;
+    schema:givenName "Bowen" ;
+    schema:familyName "Deng" ;
+    schema:identifier <https://orcid.org/0000-0003-4085-381X> .
+
+<https://orcid.org/0000-0002-7946-4232> a schema:Person ;
+    schema:name "Yunyeong Choi" ;
+    schema:givenName "Yunyeong" ;
+    schema:familyName "Choi" ;
+    schema:identifier <https://orcid.org/0000-0002-7946-4232> .
+
+<https://orcid.org/0000-0003-1921-1628> a schema:Person ;
+    schema:name "Peichen Zhong" ;
+    schema:givenName "Peichen" ;
+    schema:familyName "Zhong" ;
+    schema:identifier <https://orcid.org/0000-0003-1921-1628> .
+
+<https://orcid.org/0000-0001-5233-3462> a schema:Person ;
+    schema:name "Janosh Riebesell" ;
+    schema:givenName "Janosh" ;
+    schema:familyName "Riebesell" ;
+    schema:identifier <https://orcid.org/0000-0001-5233-3462> .
+
+<https://orcid.org/0000-0001-8805-1547> a schema:Person ;
+    schema:name "Shashwat Anand" ;
+    schema:givenName "Shashwat" ;
+    schema:familyName "Anand" ;
+    schema:identifier <https://orcid.org/0000-0001-8805-1547> .
+
+<https://orcid.org/0000-0001-5372-9450> a schema:Person ;
+    schema:name "Zhuohan Li" ;
+    schema:givenName "Zhuohan" ;
+    schema:familyName "Li" ;
+    schema:identifier <https://orcid.org/0000-0001-5372-9450> .
+
+<https://orcid.org/0000-0003-1974-028X> a schema:Person ;
+    schema:name "KyuJung Jun" ;
+    schema:givenName "KyuJung" ;
+    schema:familyName "Jun" ;
+    schema:identifier <https://orcid.org/0000-0003-1974-028X> .
+
+<https://orcid.org/0000-0003-2495-5509> a schema:Person ;
+    schema:name "Kristin A. Persson" ;
+    schema:givenName "Kristin A." ;
+    schema:familyName "Persson" ;
+    schema:identifier <https://orcid.org/0000-0003-2495-5509> .
+
+<https://orcid.org/0000-0001-9275-3605> a schema:Person ;
+    schema:name "Gerbrand Ceder" ;
+    schema:givenName "Gerbrand" ;
+    schema:familyName "Ceder" ;
+    schema:identifier <https://orcid.org/0000-0001-9275-3605> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LiZnInIO-deng2025 a mlips:MaterialSystem ;
+    rdfs:label "Li6Zn2In2(IO3)16 (Materials Project mp-973966)" ;
+    mlips:chemicalFormula "Li6Zn2In2(IO3)16" ;
+    mlips:materialClass "Quaternary iodate; high-energy configurations from a 1000 K ab initio MD trajectory" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-deng2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-deng2025 mlips:hasDFTSettings entity:calc-settings-dft-deng2025 .
+
+entity:calc-settings-dft-deng2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:pseudopotentialType mlips:PAW ;
+    rdfs:comment "Settings generated with the pymatgen MPRelaxSet for compatibility with Materials Project calculations; converged to at least 1e-5 eV in total energy (electronic steps) and 0.02 eV/A in forces (ionic steps). The functional is not named in the Methods." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ft-10-deng2025 a mlips:TrainingDataset ;
+    rdfs:label "CHGNet fine-tuning set: 10 structures of mp-973966" ;
+    mlips:coversMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 10 ;
+    mlips:hasDFTCalculation entity:calc-dft-deng2025 ;
+    rdfs:comment "Train-validation ratio 9:1, so 9 of the 10 structures are used for gradient back-propagation." .
+
+entity:ds-ft-1-deng2025 a mlips:TrainingDataset ;
+    rdfs:label "CHGNet linear-correction set: one high-energy configuration of mp-973966" ;
+    mlips:coversMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:coversProperty mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1 ;
+    mlips:hasDFTCalculation entity:calc-dft-deng2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ft-10-deng2025 mlips:samplingStrategy
+    entity:sampling-aimd-1000K-deng2025 .
+
+entity:ds-ft-1-deng2025 mlips:samplingStrategy
+    entity:sampling-aimd-1000K-deng2025 .
+
+entity:sampling-aimd-1000K-deng2025 a mlips:SamplingStrategy ;
+    rdfs:label "High-temperature ab initio MD sampling (1000 K)" ;
+    rdfs:comment "Configurations of mp-973966 taken from a DFT ab initio MD trajectory (Jun et al.); 100 structures reserved as the test set." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
+    mlips:hasLossFunction entity:loss-CHGNet-deng2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-CHGNet-deng2025 ;
+    mlips:hasHyperparameter mlips:learningRate ,
+        mlips:numEpochs ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation ,
+        mlips:MolecularDynamics .
+
+entity:loss-CHGNet-deng2025 a mlips:LossFunction ;
+    rdfs:label "Mean squared error on energy, force and stress with loss fractions 0.1 / 100 / 0.1 (fine-tuning)" .
+
+entity:alg-CHGNet-deng2025 a mls:Algorithm ;
+    rdfs:label "Adam, learning rate 1e-3 with cosine decay to 1e-5 over 100 epochs (fine-tuning); checkpoint with the best validation force MAE" .
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-chgnet-ft10-learningRate-deng2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-chgnet-ft10-numEpochs-deng2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "100"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-chgnet-ft10-deng2025 a mlips:MLIPRun ;
+    rdfs:label "Fine-tuning of pretrained CHGNet v0.3.0 on 10 structures of mp-973966 (all parameters)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-ft-10-deng2025 ;
+    mlips:hasHyperparameterSetting entity:setting-chgnet-ft10-learningRate-deng2025 ,
+        entity:setting-chgnet-ft10-numEpochs-deng2025 ;
+    mlips:produces entity:model-chgnet-ft10-deng2025 .
+
+entity:model-chgnet-ft10-deng2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 fine-tuned on 10 structures of mp-973966" .
+
+entity:run-chgnet-linear-deng2025 a mlips:MLIPRun ;
+    rdfs:label "Linear correction of pretrained CHGNet v0.3.0 on one configuration of mp-973966 (one scalar linear layer trained, all other weights frozen)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-ft-1-deng2025 ;
+    mlips:produces entity:model-chgnet-linear-deng2025 .
+
+entity:model-chgnet-linear-deng2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 with a one-parameter linear correction for mp-973966" .
+
+# entity:model-m3gnet-chen2022 (M3GNet-MPF-2021.2.8) is evaluated here; its run and model are declared in papers/chen2022.ttl.
+
+# Registry stub for the externally trained model CHGNet-0.3.0 (not trained in this paper).
+entity:run-CHGNet-0_3_0 a mlips:MLIPRun ;
+    rdfs:label "Training run of CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:produces entity:model-CHGNet-0_3_0 .
+
+entity:model-CHGNet-0_3_0 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model MACE-MP-0-2023.12.03 (not trained in this paper).
+entity:run-MACE-MP-0-2023_12_03 a mlips:MLIPRun ;
+    rdfs:label "Training run of MACE-MP-0 release 2023.12.03 (4.69M parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:produces entity:model-MACE-MP-0-2023_12_03 .
+
+entity:model-MACE-MP-0-2023_12_03 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 release 2023.12.03 (4.69M parameters, trained on MPtrj)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-deng2025 mlips:hasResult
+    entity:result-m3gnet-forces-deng2025 ,
+    entity:result-chgnet-forces-deng2025 ,
+    entity:result-mace-forces-deng2025 ,
+    entity:result-chgnet-linear-forces-deng2025 ,
+    entity:result-chgnet-ft10-forces-deng2025 .
+
+entity:result-m3gnet-forces-deng2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-chen2022 ;
+    mlips:targetMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-forces-1-deng2025 .
+
+entity:metric-m3gnet-forces-1-deng2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE of pretrained M3GNet on high-energy configurations of mp-973966 (Fig. 5a)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.22"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-chgnet-forces-deng2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CHGNet-0_3_0 ;
+    mlips:targetMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-forces-1-deng2025 .
+
+entity:metric-chgnet-forces-1-deng2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE of pretrained CHGNet v0.3.0 on high-energy configurations of mp-973966 (Fig. 5a)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.19"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-mace-forces-deng2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-MP-0-2023_12_03 ;
+    mlips:targetMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:hasAccuracyMetric entity:metric-mace-forces-1-deng2025 .
+
+entity:metric-mace-forces-1-deng2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE of pretrained MACE-MP-0 on high-energy configurations of mp-973966 (Fig. 5a)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.176"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-chgnet-linear-forces-deng2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-chgnet-linear-deng2025 ;
+    mlips:targetMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-linear-forces-1-deng2025 .
+
+entity:metric-chgnet-linear-forces-1-deng2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test force MAE of linearly corrected CHGNet on mp-973966 (Fig. 6a, left)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.166"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-chgnet-ft10-forces-deng2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-chgnet-ft10-deng2025 ;
+    mlips:targetMaterial entity:mat-LiZnInIO-deng2025 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-ft10-forces-1-deng2025 .
+
+entity:metric-chgnet-ft10-forces-1-deng2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test force MAE of CHGNet fine-tuned on 10 structures of mp-973966 (Fig. 6a, right)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.125"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The headline benchmarks have no MetricProperty in schema 0.1.2 and are not encoded: surface-energy MAE over 147 surfaces (MACE 0.032 eV/A^2), point-defect energies (134 defects), ion-migration barriers (MAE 0.34 / 0.39 / 0.49 eV for MACE / CHGNet / M3GNet), maximum phonon-frequency ratios (229 materials) and the PES softening scale (e.g. 0.859 for CHGNet on mp-973966, 0.965 after linear correction).
+# - The three pretrained models are registry models: M3GNet 2021.2.8 is the model of chen2022; CHGNet v0.3.0 (412.5K parameters) is not the 400,438-parameter model of deng2023 and MACE-MP-0 2023.12.03 (4.69M parameters) is not the 0b3 checkpoint of batatia2024mp0, so both are registry stubs here.
+# - Schema 0.1.2 cannot say that the two fine-tuned models derive from pretrained CHGNet v0.3.0; this is stated in their labels only.
+# - The linearly corrected MAE (cMAE 0.184 / 0.162 / 0.155 eV/A) is a derived quantity and is not encoded. The 1000-compound WBM study is reported as distributions only.
+# - The fine-tuning data come from the ab initio MD trajectory of Jun et al. (ref. 62); that the reference settings above also apply to it is implied by the Methods, not stated.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
