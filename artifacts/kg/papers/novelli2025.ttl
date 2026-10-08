@@ -1,0 +1,242 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Pietro Novelli et al. (2025). Fast and Fourier features for transfer learning of interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-025-01779-z  arXiv:2505.05652v1
+#
+# Version read: arxiv-preprint arXiv:2505.05652v1 (sha256 f2731de9be3e2bca...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 136 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the franken method (introduced here) and the one model
+# whose errors the text states as numbers: bulk water (RPBE+D3 data of the
+# paper's ref. 68) trained on 8 structures with the MACE-MP-0 (L = 0)
+# backbone. The TM23 comparison and the Pt(111)/water learning curves are
+# given as figures; see gaps. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-novelli2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Novelli et al. (2025): franken, random Fourier features for transfer learning of interatomic potentials" ;
+    mlips:reportedIn entity:article-novelli2025 .
+
+entity:article-novelli2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01779-z> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Fast and Fourier features for transfer learning of interatomic potentials" ;
+    schema:author entity:person-Novelli-novelli2025 ,
+        entity:person-Meanti-novelli2025 ,
+        entity:person-Buigues-novelli2025 ,
+        entity:person-Rosasco-novelli2025 ,
+        entity:person-Parrinello-novelli2025 ,
+        entity:person-Pontil-novelli2025 ,
+        entity:person-Bonati-novelli2025 .
+
+entity:person-Novelli-novelli2025 a schema:Person ;
+    schema:name "Pietro Novelli" ;
+    schema:givenName "Pietro" ;
+    schema:familyName "Novelli" .
+
+entity:person-Meanti-novelli2025 a schema:Person ;
+    schema:name "Giacomo Meanti" ;
+    schema:givenName "Giacomo" ;
+    schema:familyName "Meanti" .
+
+entity:person-Buigues-novelli2025 a schema:Person ;
+    schema:name "Pedro J. Buigues" ;
+    schema:givenName "Pedro J." ;
+    schema:familyName "Buigues" .
+
+entity:person-Rosasco-novelli2025 a schema:Person ;
+    schema:name "Lorenzo Rosasco" ;
+    schema:givenName "Lorenzo" ;
+    schema:familyName "Rosasco" .
+
+entity:person-Parrinello-novelli2025 a schema:Person ;
+    schema:name "Michele Parrinello" ;
+    schema:givenName "Michele" ;
+    schema:familyName "Parrinello" .
+
+entity:person-Pontil-novelli2025 a schema:Person ;
+    schema:name "Massimiliano Pontil" ;
+    schema:givenName "Massimiliano" ;
+    schema:familyName "Pontil" .
+
+entity:person-Bonati-novelli2025 a schema:Person ;
+    schema:name "Luigi Bonati" ;
+    schema:givenName "Luigi" ;
+    schema:familyName "Bonati" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-water-novelli2025 a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-novelli2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-novelli2025 mlips:hasDFTSettings entity:calc-settings-dft-novelli2025 .
+
+entity:calc-settings-dft-novelli2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-RPBE-D3-novelli2025 ;
+    rdfs:comment "Level of the published water data set (the paper's ref. 68); the present paper names VASP for the data acquisition (replica-exchange MD and on-the-fly learning)." .
+
+entity:xc-RPBE-D3-novelli2025 a mlips:XCFunctional ;
+    rdfs:label "RPBE+D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-water8-novelli2025 a mlips:TrainingDataset ;
+    rdfs:label "8 structures drawn at random from the 1495-structure bulk-water set (validation on an independent 189-structure set)" ;
+    mlips:coversMaterial entity:mat-water-novelli2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 8 ;
+    mlips:hasDFTCalculation entity:calc-dft-novelli2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-water8-novelli2025 mlips:samplingStrategy
+    entity:sampling-published-novelli2025 .
+
+entity:sampling-published-novelli2025 a mlips:SamplingStrategy ;
+    rdfs:label "Random subset of a published data set built by replica-exchange MD and Bayesian on-the-fly learning" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:franken a mlips:MLIPMethod ;
+    rdfs:label "franken (random Fourier features on descriptors of a pretrained graph neural network)" ;
+    mlips:hasLossFunction entity:loss-franken-novelli2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-franken-novelli2025 ;
+    mlips:hasHyperparameter entity:hp-num-random-features-novelli2025 ,
+        entity:hp-backbone-novelli2025 ;
+    mlips:hasImplementation entity:impl-franken-novelli2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-franken-novelli2025 a mlips:LossFunction ;
+    rdfs:label "Convex combination (1 - alpha) l_E + alpha l_F of squared energy and force errors with L2 regularisation lambda; alpha in [0.01, 0.5, 0.99] and lambda in [1e-6 ... 1e-11] chosen by grid search" .
+
+entity:alg-franken-novelli2025 a mls:Algorithm ;
+    rdfs:label "Closed-form (ridge-regression) solution on random Fourier features of a multiscale Gaussian kernel; covariance computed on GPUs, parallel over several GPUs" .
+
+entity:impl-franken-novelli2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-franken-novelli2025 .
+
+entity:lib-franken-novelli2025 a mlips:Library ;
+    rdfs:label "franken" ;
+    rdfs:comment "PyTorch package with custom CUDA kernels; MACE and SevenNet backbones; ASE and (for MACE backbones) LAMMPS interfaces. https://github.com/CSML-IIT-UCL/franken" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-num-random-features-novelli2025 a mlips:Hyperparameter ;
+    rdfs:label "Number of random Fourier features" ;
+    mlips:hyperparameterName "num_random_features" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-backbone-novelli2025 a mlips:Hyperparameter ;
+    rdfs:label "Pretrained GNN backbone providing the atomic descriptors" ;
+    mlips:hyperparameterName "backbone" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-water8-num-random-features-novelli2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-random-features-novelli2025 ;
+    mlips:settingValue "8192"^^xsd:integer .
+
+entity:setting-water8-backbone-novelli2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-backbone-novelli2025 ;
+    mlips:settingValue "MACE-MP0 (L = 0), node features up to the second interaction block" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-water8-novelli2025 a mlips:MLIPRun ;
+    rdfs:label "franken trained on 8 bulk-water structures" ;
+    mlips:appliesMethod entity:franken ;
+    mlips:runsOn entity:ds-water8-novelli2025 ;
+    mlips:hasHyperparameterSetting entity:setting-water8-num-random-features-novelli2025 ,
+        entity:setting-water8-backbone-novelli2025 ;
+    mlips:produces entity:model-water8-novelli2025 .
+
+entity:model-water8-novelli2025 a mlips:TrainedModel ;
+    rdfs:label "franken model for bulk water (8 training structures)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-novelli2025 mlips:hasResult
+    entity:result-water8-novelli2025 .
+
+entity:result-water8-novelli2025 a mlips:BenchmarkResult ;
+    rdfs:comment "Values as stated in the text; the kernel reference of the data-set paper reaches 27 meV/A and 0.3 meV/atom with the full training set." ;
+    mlips:evaluatesModel entity:model-water8-novelli2025 ;
+    mlips:targetMaterial entity:mat-water-novelli2025 ;
+    mlips:hasAccuracyMetric entity:metric-water8-1-novelli2025 ,
+        entity:metric-water8-2-novelli2025 .
+
+entity:metric-water8-1-novelli2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on the bulk-water test set with 8 training structures" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "30"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-water8-2-novelli2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE on the bulk-water test set with 8 training structures" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The backbone is a pretrained MACE-MP-0 invariant model whose release is not specified; under schema 0.1.2 there is no relation from a model to the model it is built on, so the backbone is a string-valued setting and no registry model is linked.
+# - TM23 (27 transition metals, 2700 training structures each; franken against FLARE and NequIP baselines) is reported as figures (force MAE per element, training times of minutes); the Pt(111)/water learning curves (48,041 PBE+D3 configurations, 10 to 30,000 samples, 1024 to 24,576 random features) are a figure with values in cells. Neither is encoded.
+# - Larger water training sets (up to 1495), other backbones (MACE-MP-0 L = 1, MACE-OFF, SevenNet-0), RDF and diffusion errors, and inference timings (Table S1) are not encoded.
+# - Read from the arXiv v1 preprint; the arXiv id was matched by title and author, not by DOI link. The manifest classes the paper as 'Application/model instance'; it introduces a method.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
