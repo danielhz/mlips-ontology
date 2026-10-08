@@ -1,0 +1,411 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Xu Huang et al. (2025). Cross-functional transferability in foundation machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-025-01796-y  arXiv:2504.05565v1
+#
+# Version read: arxiv-preprint arXiv:2504.05565v1 (sha256 668217e4dad6b27b...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 88 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the four CHGNet models trained or fine-tuned on the
+# MP-r2SCAN data set to compare strategies for moving a GGA/GGA+U
+# pretrained universal potential to r2SCAN (training from scratch;
+# transfer learning with trainable, frozen, or refitted atomic reference
+# energies), with the test errors of Table I.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-huang2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Huang et al. (2025): cross-functional transferability in foundation MLIPs (CHGNet from GGA/GGA+U to r2SCAN)" ;
+    mlips:reportedIn entity:article-huang2025 .
+
+entity:article-huang2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01796-y> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Cross-functional transferability in foundation machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0009-0002-2260-5150> ,
+        <https://orcid.org/0000-0003-4085-381X> ,
+        <https://orcid.org/0000-0003-1921-1628> ,
+        <https://orcid.org/0000-0003-3439-4856> ,
+        <https://orcid.org/0000-0003-2495-5509> ,
+        <https://orcid.org/0000-0001-9275-3605> .
+
+<https://orcid.org/0009-0002-2260-5150> a schema:Person ;
+    schema:name "Xu Huang" ;
+    schema:givenName "Xu" ;
+    schema:familyName "Huang" ;
+    schema:identifier <https://orcid.org/0009-0002-2260-5150> .
+
+<https://orcid.org/0000-0003-4085-381X> a schema:Person ;
+    schema:name "Bowen Deng" ;
+    schema:givenName "Bowen" ;
+    schema:familyName "Deng" ;
+    schema:identifier <https://orcid.org/0000-0003-4085-381X> .
+
+<https://orcid.org/0000-0003-1921-1628> a schema:Person ;
+    schema:name "Peichen Zhong" ;
+    schema:givenName "Peichen" ;
+    schema:familyName "Zhong" ;
+    schema:identifier <https://orcid.org/0000-0003-1921-1628> .
+
+<https://orcid.org/0000-0003-3439-4856> a schema:Person ;
+    schema:name "Aaron D. Kaplan" ;
+    schema:givenName "Aaron D." ;
+    schema:familyName "Kaplan" ;
+    schema:identifier <https://orcid.org/0000-0003-3439-4856> .
+
+<https://orcid.org/0000-0003-2495-5509> a schema:Person ;
+    schema:name "Kristin A. Persson" ;
+    schema:givenName "Kristin A." ;
+    schema:familyName "Persson" ;
+    schema:identifier <https://orcid.org/0000-0003-2495-5509> .
+
+<https://orcid.org/0000-0001-9275-3605> a schema:Person ;
+    schema:name "Gerbrand Ceder" ;
+    schema:givenName "Gerbrand" ;
+    schema:familyName "Ceder" ;
+    schema:identifier <https://orcid.org/0000-0001-9275-3605> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mp-r2scan-huang2025 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project crystals computed with r2SCAN (MP-r2SCAN)" ;
+    mlips:materialClass "Universal inorganic crystals; structure-optimisation and static trajectories" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-huang2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-huang2025 mlips:hasDFTSettings entity:calc-settings-dft-huang2025 .
+
+entity:calc-settings-dft-huang2025 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-r2SCAN-huang2025 ;
+    rdfs:comment "Materials Project r2SCAN structure-optimisation and static calculations (retrieved March 2024); code and settings are those of the Materials Project and are not restated." .
+
+entity:xc-r2SCAN-huang2025 a mlips:XCFunctional ;
+    rdfs:label "r2SCAN" ;
+    rdfs:comment "Regularised-restored SCAN meta-GGA." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-mp-r2scan-huang2025 a mlips:TrainingDataset ;
+    rdfs:label "MP-r2SCAN training split (190,560 structures of 27,943 materials)" ;
+    mlips:coversMaterial entity:mat-mp-r2scan-huang2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 190560 ;
+    mlips:hasDFTCalculation entity:calc-dft-huang2025 ;
+    rdfs:comment "Validation: 23,888 structures of 3,492 materials; test: 23,799 structures of 3,492 materials. Magnetic moments are also trained." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-mp-r2scan-huang2025 mlips:samplingStrategy
+    entity:sampling-mp-r2scan-trajectories-huang2025 .
+
+entity:sampling-mp-r2scan-trajectories-huang2025 a mlips:SamplingStrategy ;
+    rdfs:label "Filtered Materials Project r2SCAN trajectories" ;
+    rdfs:comment "All r2SCAN optimisation and static trajectories per material ID, filtered as for MPtrj: final-frame energies within 20 meV/atom of the primary task, unconverged or incomplete structures removed, structures more than 1 eV/atom above or 10 meV/atom below the ThermoDoc relaxed structures removed, duplicates removed. Split about 8:1:1 by material ID." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
+    mlips:hasLossFunction entity:loss-CHGNet-huang2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-CHGNet-huang2025 ;
+    mlips:hasHyperparameter entity:hp-atomref-strategy-huang2025 ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        mlips:numEpochs .
+
+entity:loss-CHGNet-huang2025 a mlips:LossFunction ;
+    rdfs:label "Huber loss with energy : force : stress : magmom ratio of 3 : 1 : 0.1 : 1" .
+
+entity:alg-CHGNet-huang2025 a mls:Algorithm ;
+    rdfs:label "Learning rate 1e-3 with cosine decay to 1e-5 in 50 epochs; batch size 64; other settings as for the pretrained CHGNet" .
+
+entity:hp-atomref-strategy-huang2025 a mlips:Hyperparameter ;
+    rdfs:label "Treatment of the atomic reference energies (AtomRef) and of the initial weights" ;
+    mlips:hyperparameterName "atomref_strategy" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-method-1-atomref-strategy-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-atomref-strategy-huang2025 ;
+    mlips:settingValue "r2SCAN AtomRef fitted and frozen; GNN weights randomly initialised" .
+
+entity:setting-method-1-batchSize-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-method-1-learningRate-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-method-1-numEpochs-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-method-2-atomref-strategy-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-atomref-strategy-huang2025 ;
+    mlips:settingValue "start from GGA/GGA+U-pretrained CHGNet; GNN weights and AtomRef trainable" .
+
+entity:setting-method-2-batchSize-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-method-2-learningRate-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-method-2-numEpochs-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-method-3-atomref-strategy-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-atomref-strategy-huang2025 ;
+    mlips:settingValue "start from GGA/GGA+U-pretrained CHGNet; AtomRef frozen at the GGA/GGA+U values" .
+
+entity:setting-method-3-batchSize-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-method-3-learningRate-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-method-3-numEpochs-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-method-4-atomref-strategy-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-atomref-strategy-huang2025 ;
+    mlips:settingValue "start from GGA/GGA+U-pretrained CHGNet; AtomRef replaced by the fitted r2SCAN AtomRef" .
+
+entity:setting-method-4-batchSize-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-method-4-learningRate-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-method-4-numEpochs-huang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-method-1-huang2025 a mlips:MLIPRun ;
+    rdfs:label "CHGNet trained from scratch on MP-r2SCAN (Method 1)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mp-r2scan-huang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-method-1-atomref-strategy-huang2025 ,
+        entity:setting-method-1-batchSize-huang2025 ,
+        entity:setting-method-1-learningRate-huang2025 ,
+        entity:setting-method-1-numEpochs-huang2025 ;
+    mlips:produces entity:model-method-1-huang2025 .
+
+entity:model-method-1-huang2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet r2SCAN, Method 1 (from scratch)" .
+
+entity:run-method-2-huang2025 a mlips:MLIPRun ;
+    rdfs:label "CHGNet transfer learning to MP-r2SCAN with trainable AtomRef (Method 2)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mp-r2scan-huang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-method-2-atomref-strategy-huang2025 ,
+        entity:setting-method-2-batchSize-huang2025 ,
+        entity:setting-method-2-learningRate-huang2025 ,
+        entity:setting-method-2-numEpochs-huang2025 ;
+    mlips:produces entity:model-method-2-huang2025 .
+
+entity:model-method-2-huang2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet r2SCAN, Method 2 (TL, trainable AtomRef)" .
+
+entity:run-method-3-huang2025 a mlips:MLIPRun ;
+    rdfs:label "CHGNet transfer learning to MP-r2SCAN with frozen GGA/GGA+U AtomRef (Method 3)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mp-r2scan-huang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-method-3-atomref-strategy-huang2025 ,
+        entity:setting-method-3-batchSize-huang2025 ,
+        entity:setting-method-3-learningRate-huang2025 ,
+        entity:setting-method-3-numEpochs-huang2025 ;
+    mlips:produces entity:model-method-3-huang2025 .
+
+entity:model-method-3-huang2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet r2SCAN, Method 3 (TL, frozen AtomRef)" .
+
+entity:run-method-4-huang2025 a mlips:MLIPRun ;
+    rdfs:label "CHGNet transfer learning to MP-r2SCAN with refitted r2SCAN AtomRef (Method 4)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:runsOn entity:ds-mp-r2scan-huang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-method-4-atomref-strategy-huang2025 ,
+        entity:setting-method-4-batchSize-huang2025 ,
+        entity:setting-method-4-learningRate-huang2025 ,
+        entity:setting-method-4-numEpochs-huang2025 ;
+    mlips:produces entity:model-method-4-huang2025 .
+
+entity:model-method-4-huang2025 a mlips:TrainedModel ;
+    rdfs:label "CHGNet r2SCAN, Method 4 (TL, r2SCAN AtomRef)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-huang2025 mlips:hasResult
+    entity:result-method-1-huang2025 ,
+    entity:result-method-2-huang2025 ,
+    entity:result-method-3-huang2025 ,
+    entity:result-method-4-huang2025 .
+
+entity:result-method-1-huang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-method-1-huang2025 ;
+    mlips:targetMaterial entity:mat-mp-r2scan-huang2025 ;
+    mlips:hasAccuracyMetric entity:metric-method-1-1-huang2025 ,
+        entity:metric-method-1-2-huang2025 ,
+        entity:metric-method-1-3-huang2025 .
+
+entity:metric-method-1-1-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Method 1 (from scratch)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-method-1-2-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Method 1 (from scratch)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-method-1-3-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: Method 1 (from scratch)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.239"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-method-2-huang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-method-2-huang2025 ;
+    mlips:targetMaterial entity:mat-mp-r2scan-huang2025 ;
+    mlips:hasAccuracyMetric entity:metric-method-2-1-huang2025 ,
+        entity:metric-method-2-2-huang2025 ,
+        entity:metric-method-2-3-huang2025 .
+
+entity:metric-method-2-1-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Method 2 (TL, trainable AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-method-2-2-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Method 2 (TL, trainable AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "54"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-method-2-3-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: Method 2 (TL, trainable AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.266"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-method-3-huang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-method-3-huang2025 ;
+    mlips:targetMaterial entity:mat-mp-r2scan-huang2025 ;
+    mlips:hasAccuracyMetric entity:metric-method-3-1-huang2025 ,
+        entity:metric-method-3-2-huang2025 ,
+        entity:metric-method-3-3-huang2025 .
+
+entity:metric-method-3-1-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Method 3 (TL, frozen AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-method-3-2-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Method 3 (TL, frozen AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "52"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-method-3-3-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on stress: Method 3 (TL, frozen AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.257"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-method-4-huang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-method-4-huang2025 ;
+    mlips:targetMaterial entity:mat-mp-r2scan-huang2025 ;
+    mlips:hasAccuracyMetric entity:metric-method-4-1-huang2025 ,
+        entity:metric-method-4-2-huang2025 .
+
+entity:metric-method-4-1-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Method 4 (TL, r2SCAN AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-method-4-2-huang2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Method 4 (TL, r2SCAN AtomRef)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "38"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The stress MAE of Method 4 is printed as '167' GPa in the preprint's Table I against 0.239-0.266 for the other methods; it is almost certainly 0.167, but it is left out rather than corrected. Check against the version of record.
+# - Which pretrained CHGNet release the transfer-learning runs start from is not named ('the GGA/GGA+U-pretrained CHGNet'); the starting model is not linked to a registry model, and schema 0.1.2 could not express the link anyway.
+# - Magnetic-moment, decomposition-energy and formation-energy MAEs of Table I have no MetricProperty. The data-scaling study is a figure.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
