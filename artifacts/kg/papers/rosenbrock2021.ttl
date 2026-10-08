@@ -1,0 +1,347 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Conrad W. Rosenbrock et al. (2021). Machine-learned interatomic potentials for alloys and alloy phase diagrams.
+#   npj Computational Materials. doi:10.1038/s41524-020-00477-2  arXiv:1906.07816v2
+#
+# Version read: arxiv-preprint arXiv:1906.07816v2 (sha256 2993eb34f62bc456...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 72 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SOAP-GAP and the MTP for the Ag-Pd alloy, both
+# trained on the same active-learning data set of 774 configurations,
+# with the fitting parameters of Table I and the validation errors on
+# about 6000 liquid configurations (Table IIIa).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-rosenbrock2021 a mlips:BenchmarkStudy ;
+    rdfs:label "Rosenbrock et al. (2021): machine-learned interatomic potentials for alloys and alloy phase diagrams (GAP and MTP for Ag-Pd)" ;
+    mlips:reportedIn entity:article-rosenbrock2021 .
+
+entity:article-rosenbrock2021 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-020-00477-2> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "Machine-learned interatomic potentials for alloys and alloy phase diagrams" ;
+    schema:author <https://orcid.org/0000-0002-8770-6043> ,
+        entity:person-Gubaev-rosenbrock2021 ,
+        <https://orcid.org/0000-0002-7497-5594> ,
+        entity:person-Partay-rosenbrock2021 ,
+        <https://orcid.org/0000-0002-6532-1337> ,
+        entity:person-Csanyi-rosenbrock2021 ,
+        entity:person-Hart-rosenbrock2021 .
+
+<https://orcid.org/0000-0002-8770-6043> a schema:Person ;
+    schema:name "Conrad W. Rosenbrock" ;
+    schema:givenName "Conrad W." ;
+    schema:familyName "Rosenbrock" ;
+    schema:identifier <https://orcid.org/0000-0002-8770-6043> .
+
+entity:person-Gubaev-rosenbrock2021 a schema:Person ;
+    schema:name "Konstantin Gubaev" ;
+    schema:givenName "Konstantin" ;
+    schema:familyName "Gubaev" .
+
+<https://orcid.org/0000-0002-7497-5594> a schema:Person ;
+    schema:name "Alexander V. Shapeev" ;
+    schema:givenName "Alexander V." ;
+    schema:familyName "Shapeev" ;
+    schema:identifier <https://orcid.org/0000-0002-7497-5594> .
+
+entity:person-Partay-rosenbrock2021 a schema:Person ;
+    schema:name "Livia B. Pártay" ;
+    schema:givenName "Livia B." ;
+    schema:familyName "Pártay" .
+
+<https://orcid.org/0000-0002-6532-1337> a schema:Person ;
+    schema:name "Noam Bernstein" ;
+    schema:givenName "Noam" ;
+    schema:familyName "Bernstein" ;
+    schema:identifier <https://orcid.org/0000-0002-6532-1337> .
+
+entity:person-Csanyi-rosenbrock2021 a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" .
+
+entity:person-Hart-rosenbrock2021 a schema:Person ;
+    schema:name "Gus L. W. Hart" ;
+    schema:givenName "Gus L. W." ;
+    schema:familyName "Hart" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-AgPd-rosenbrock2021 a mlips:MaterialSystem ;
+    rdfs:label "Ag-Pd binary alloy: fcc-derived superstructures of up to 12 atoms per cell (training) and liquid configurations at 25, 50 and 75 at.% Ag (validation)" ;
+    mlips:chemicalFormula "Ag-Pd" ;
+    mlips:materialClass "Binary fcc alloy; solid solutions, ordered superstructures and liquid" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-rosenbrock2021 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-rosenbrock2021 mlips:hasDFTSettings entity:calc-settings-dft-rosenbrock2021 .
+
+entity:calc-settings-dft-rosenbrock2021 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:kPointMesh "Mueller (WMM) scheme with MINDISTANCE = 65 for the final training set (MINDISTANCE = 55 during active learning); 4x4x4 Monkhorst-Pack for the liquid validation snapshots" ;
+    rdfs:comment "PREC = Accurate; EDIFF = 1e-8 for the final training set (1e-4 during active learning). The plane-wave cutoff is not stated for the training set (ENCUT = 400 is stated for the phonon displacement calculations)." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-AgPd-rosenbrock2021 a mlips:TrainingDataset ;
+    rdfs:label "Ag-Pd active-learning data set (774 configurations)" ;
+    mlips:coversMaterial entity:mat-AgPd-rosenbrock2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 774 ;
+    mlips:hasDFTCalculation entity:calc-dft-rosenbrock2021 ;
+    rdfs:comment "Validation: a separate liquid data set of about 6000 configurations from VASP MD at 2766, 3063 and 3360 K (32-atom cells, snapshots every 50 fs)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-AgPd-rosenbrock2021 mlips:samplingStrategy
+    entity:sampling-active-learning-relaxation-rosenbrock2021 .
+
+entity:sampling-active-learning-relaxation-rosenbrock2021 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning while relaxing enumerated structures" ;
+    rdfs:comment "An MTP is trained on the fly while relaxing all enumerated structures with cell sizes up to 12 atoms (10,850 structures); the final active-learning data set has 774 configurations, recomputed with tighter DFT settings." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-GAP-rosenbrock2021 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-cutoff-transition-width-rosenbrock2021 ,
+        entity:hp-delta-rosenbrock2021 ,
+        mlips:numSparseConfigs ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        entity:hp-zeta-rosenbrock2021 ,
+        entity:hp-sigma-atom-rosenbrock2021 ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:alg-GAP-rosenbrock2021 a mls:Algorithm ;
+    rdfs:label "Sparse Gaussian process regression with a two-body term (Gaussian kernel, cutoff 6.0 A, 25 basis functions) and a SOAP many-body term" .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-rosenbrock2021 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-rosenbrock2021 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-num-fitting-parameters-rosenbrock2021 ;
+    mlips:supportsSimulation mlips:PhononCalculation ,
+        mlips:MolecularDynamics .
+
+entity:loss-MTP-rosenbrock2021 a mlips:LossFunction ;
+    rdfs:label "Weighted fit with force weight 5e-3 A^2 and stress weight 5e-4 relative to the energy" .
+
+entity:alg-MTP-rosenbrock2021 a mls:Algorithm ;
+    rdfs:label "BFGS, 500 iterations; training set built by on-the-fly active learning" .
+
+entity:hp-zeta-rosenbrock2021 a mlips:Hyperparameter ;
+    rdfs:label "SOAP kernel exponent zeta" ;
+    mlips:hyperparameterName "zeta" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-sigma-atom-rosenbrock2021 a mlips:Hyperparameter ;
+    rdfs:label "SOAP atomic Gaussian width (Angstrom)" ;
+    mlips:hyperparameterName "sigma_atom" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-delta-rosenbrock2021 a mlips:Hyperparameter ;
+    rdfs:label "GAP energy scale delta of the SOAP term (eV)" ;
+    mlips:hyperparameterName "delta" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-cutoff-transition-width-rosenbrock2021 a mlips:Hyperparameter ;
+    rdfs:label "Cutoff transition width (Angstrom)" ;
+    mlips:hyperparameterName "cutoff_transition_width" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-fitting-parameters-rosenbrock2021 a mlips:Hyperparameter ;
+    rdfs:label "MTP number of fitting parameters" ;
+    mlips:hyperparameterName "fitting_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gap-AgPd-cutoffRadius-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-gap-AgPd-cutoff-transition-width-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-cutoff-transition-width-rosenbrock2021 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-gap-AgPd-delta-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-delta-rosenbrock2021 ;
+    mlips:settingValue "0.2"^^xsd:double .
+
+entity:setting-gap-AgPd-numSparseConfigs-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numSparseConfigs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-gap-AgPd-numRadialBasis-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-AgPd-numAngularBasis-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-gap-AgPd-zeta-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-zeta-rosenbrock2021 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-gap-AgPd-sigma-atom-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-sigma-atom-rosenbrock2021 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-mtp-AgPd-cutoffRadius-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-mtp-AgPd-numRadialBasis-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-mtp-AgPd-num-fitting-parameters-rosenbrock2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-fitting-parameters-rosenbrock2021 ;
+    mlips:settingValue "188"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gap-AgPd-rosenbrock2021 a mlips:MLIPRun ;
+    rdfs:label "SOAP-GAP fit for Ag-Pd (two-body + SOAP)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-AgPd-rosenbrock2021 ;
+    mlips:hasHyperparameterSetting entity:setting-gap-AgPd-cutoffRadius-rosenbrock2021 ,
+        entity:setting-gap-AgPd-cutoff-transition-width-rosenbrock2021 ,
+        entity:setting-gap-AgPd-delta-rosenbrock2021 ,
+        entity:setting-gap-AgPd-numSparseConfigs-rosenbrock2021 ,
+        entity:setting-gap-AgPd-numRadialBasis-rosenbrock2021 ,
+        entity:setting-gap-AgPd-numAngularBasis-rosenbrock2021 ,
+        entity:setting-gap-AgPd-zeta-rosenbrock2021 ,
+        entity:setting-gap-AgPd-sigma-atom-rosenbrock2021 ;
+    mlips:produces entity:model-gap-AgPd-rosenbrock2021 .
+
+entity:model-gap-AgPd-rosenbrock2021 a mlips:TrainedModel ;
+    rdfs:label "SOAP-GAP for Ag-Pd" .
+
+entity:run-mtp-AgPd-rosenbrock2021 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Ag-Pd" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-AgPd-rosenbrock2021 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-AgPd-cutoffRadius-rosenbrock2021 ,
+        entity:setting-mtp-AgPd-numRadialBasis-rosenbrock2021 ,
+        entity:setting-mtp-AgPd-num-fitting-parameters-rosenbrock2021 ;
+    mlips:produces entity:model-mtp-AgPd-rosenbrock2021 .
+
+entity:model-mtp-AgPd-rosenbrock2021 a mlips:TrainedModel ;
+    rdfs:label "MTP for Ag-Pd (188 fitting parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-rosenbrock2021 mlips:hasResult
+    entity:result-gap-liquid-rosenbrock2021 ,
+    entity:result-mtp-liquid-rosenbrock2021 .
+
+entity:result-gap-liquid-rosenbrock2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gap-AgPd-rosenbrock2021 ;
+    mlips:targetMaterial entity:mat-AgPd-rosenbrock2021 ;
+    mlips:hasAccuracyMetric entity:metric-gap-liquid-1-rosenbrock2021 ,
+        entity:metric-gap-liquid-2-rosenbrock2021 .
+
+entity:metric-gap-liquid-1-rosenbrock2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMS error on energy against about 6000 liquid configurations: GAP (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "15.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-gap-liquid-2-rosenbrock2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMS error on forces against about 6000 liquid configurations: GAP" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "224"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mtp-liquid-rosenbrock2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-AgPd-rosenbrock2021 ;
+    mlips:targetMaterial entity:mat-AgPd-rosenbrock2021 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-liquid-1-rosenbrock2021 ,
+        entity:metric-mtp-liquid-2-rosenbrock2021 .
+
+entity:metric-mtp-liquid-1-rosenbrock2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMS error on energy against about 6000 liquid configurations: MTP (printed in meV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "10.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-mtp-liquid-2-rosenbrock2021 a mlips:AccuracyMetric ;
+    rdfs:label "RMS error on forces against about 6000 liquid configurations: MTP" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "241"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The energy RMS errors are printed in meV; whether they are per atom is not stated. Virial RMS errors (8.3 and 12.7 meV/A^3) are not encoded (no MetricProperty for virials, no unit).
+# - The GAP settings are those of the SOAP term; the two-body term (cutoff 6.0 A, transition width 1.0 A, delta 2.0 eV, 25 basis functions, Gaussian kernel with length scale 1.0) is not encoded. The MTP level is not stated; Table Ib gives radial functions 4, radial basis size 6 and 188 fitting parameters.
+# - Phonon-dispersion RMSEs (Table IIIb), the nested-sampling phase diagram computed with the MTP, and the transition-pathway comparison have no MetricProperty. Nested sampling is not one of the SimulationType individuals, so it is not asserted; phonon calculations (phonopy) with both potentials and on-the-fly MD with the MTP are.
+# - A second, augmented MTP training set (on-the-fly MD from 67 near-hull structures in 32-64 atom supercells) is described; the potential used for the phase diagram was not disentangled from the one validated in Table III.
+# - The fitting software is not named in the parts read (GAP and MTP are normally fitted with QUIP and MLIP).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
