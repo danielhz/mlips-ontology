@@ -1,0 +1,645 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yaolong Zhang et al. (2025). Node-equivariant message passing for efficient and accurate machine learning interatomic potentials.
+#   Chemical Science. doi:10.1039/d5sc07248d  arXiv:2508.16086v2
+#
+# Version read: arxiv-preprint arXiv:2508.16086v2 (sha256 72339c250a7efe27...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 90 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the NEMP method (introduced here) and its benchmark
+# fits with the settings of the Methods section: 3BPA (Table I), liquid
+# water (Table II), ANI-1x evaluated on COMP6 (Table III) and HME21
+# (Table IV). Values of other models in the tables are quoted from the
+# literature and are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2025node a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang and Guo (2025): node-equivariant message passing (NEMP) for efficient and accurate MLIPs" ;
+    mlips:reportedIn entity:article-zhang2025node .
+
+entity:article-zhang2025node a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d5sc07248d> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Node-equivariant message passing for efficient and accurate machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-4601-0461> ,
+        <https://orcid.org/0000-0001-9901-053X> .
+
+<https://orcid.org/0000-0002-4601-0461> a schema:Person ;
+    schema:name "Yaolong Zhang" ;
+    schema:givenName "Yaolong" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0002-4601-0461> .
+
+<https://orcid.org/0000-0001-9901-053X> a schema:Person ;
+    schema:name "Hua Guo" ;
+    schema:givenName "Hua" ;
+    schema:familyName "Guo" ;
+    schema:identifier <https://orcid.org/0000-0001-9901-053X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-3BPA-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA) molecule" ;
+    mlips:materialClass "Flexible drug-like organic molecule (gas phase)" .
+
+entity:mat-water-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+entity:mat-organic-CHNO-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules with C, H, N, O (ANI-1x training domain)" ;
+    mlips:materialClass "Small organic molecules" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q174211> .
+
+entity:mat-HME21-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "HME21 multi-element structures" ;
+    mlips:materialClass "High-temperature multi-element inorganic structures (HME21 data set)" .
+
+entity:mat-ANI-MD-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: ANI-MD" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-DrugBank-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: DrugBank" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-GDB7-9-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: GDB7-9" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-GDB10-13-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: GDB10-13" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-S66x8-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: S66x8" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-Tripeptides-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: Tripeptides" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+entity:mat-COMP6-total-zhang2025node a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark: all subsets together" ;
+    mlips:materialClass "Organic and biochemical molecules (COMP6)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-3BPA-zhang2025node a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set (300 K configurations)" ;
+    mlips:coversMaterial entity:mat-3BPA-zhang2025node ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-water-zhang2025node a mlips:TrainingDataset ;
+    rdfs:label "Liquid water data set" ;
+    mlips:coversMaterial entity:mat-water-zhang2025node ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-ANI-1x-zhang2025node a mlips:TrainingDataset ;
+    rdfs:label "ANI-1x data set (subset used for training)" ;
+    mlips:coversMaterial entity:mat-organic-CHNO-zhang2025node ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Table III notes that the ANI-1x model used ten times more training data than the other models, i.e. NEMP was trained on a subset; its size was not captured." .
+
+entity:ds-HME21-zhang2025node a mlips:TrainingDataset ;
+    rdfs:label "HME21 data set" ;
+    mlips:coversMaterial entity:mat-HME21-zhang2025node ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-3BPA-zhang2025node mlips:samplingStrategy
+    entity:sampling-published-benchmark-zhang2025node .
+
+entity:ds-water-zhang2025node mlips:samplingStrategy
+    entity:sampling-published-benchmark-zhang2025node .
+
+entity:ds-ANI-1x-zhang2025node mlips:samplingStrategy
+    entity:sampling-published-benchmark-zhang2025node .
+
+entity:ds-HME21-zhang2025node mlips:samplingStrategy
+    entity:sampling-published-benchmark-zhang2025node .
+
+entity:sampling-published-benchmark-zhang2025node a mlips:SamplingStrategy ;
+    rdfs:label "Published benchmark data set with its standard split" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NEMP a mlips:MLIPMethod ;
+    rdfs:label "Node-Equivariant Message Passing (NEMP)" ;
+    mlips:hasTrainingAlgorithm entity:alg-NEMP-zhang2025node ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        entity:hp-L-max-sph-zhang2025node ,
+        mlips:numAngularBasis ,
+        mlips:cutoffRadius ,
+        mlips:batchSize ,
+        mlips:learningRate .
+
+entity:alg-NEMP-zhang2025node a mls:Algorithm ;
+    rdfs:label "Learning-rate warm-up followed by reduction on plateau of the validation loss down to 1e-5 (factors and patience per data set)" .
+
+entity:hp-L-max-sph-zhang2025node a mlips:Hyperparameter ;
+    rdfs:label "NEMP maximal angular momentum L_max of the spherical harmonics" ;
+    mlips:hyperparameterName "L_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-nemp-3BPA-numLayers-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-3BPA-numFeatures-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nemp-3BPA-L-max-sph-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-L-max-sph-zhang2025node ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-3BPA-numAngularBasis-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-3BPA-cutoffRadius-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nemp-3BPA-batchSize-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nemp-3BPA-learningRate-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.2"^^xsd:double .
+
+entity:setting-nemp-water-numLayers-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-water-numFeatures-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nemp-water-L-max-sph-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-L-max-sph-zhang2025node ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-water-numAngularBasis-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-water-cutoffRadius-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-nemp-water-batchSize-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nemp-water-learningRate-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-nemp-ANI-1x-numLayers-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-ANI-1x-numFeatures-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nemp-ANI-1x-L-max-sph-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-L-max-sph-zhang2025node ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-ANI-1x-numAngularBasis-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-ANI-1x-cutoffRadius-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nemp-ANI-1x-batchSize-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nemp-ANI-1x-learningRate-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-nemp-HME21-numLayers-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-nemp-HME21-numFeatures-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-nemp-HME21-L-max-sph-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-L-max-sph-zhang2025node ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-HME21-numAngularBasis-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-HME21-cutoffRadius-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nemp-HME21-batchSize-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nemp-HME21-learningRate-zhang2025node a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-nemp-3BPA-zhang2025node a mlips:MLIPRun ;
+    rdfs:label "NEMP trained on 3BPA (300 K)" ;
+    mlips:appliesMethod entity:NEMP ;
+    mlips:runsOn entity:ds-3BPA-zhang2025node ;
+    mlips:hasHyperparameterSetting entity:setting-nemp-3BPA-numLayers-zhang2025node ,
+        entity:setting-nemp-3BPA-numFeatures-zhang2025node ,
+        entity:setting-nemp-3BPA-L-max-sph-zhang2025node ,
+        entity:setting-nemp-3BPA-numAngularBasis-zhang2025node ,
+        entity:setting-nemp-3BPA-cutoffRadius-zhang2025node ,
+        entity:setting-nemp-3BPA-batchSize-zhang2025node ,
+        entity:setting-nemp-3BPA-learningRate-zhang2025node ;
+    mlips:produces entity:model-nemp-3BPA-zhang2025node .
+
+entity:model-nemp-3BPA-zhang2025node a mlips:TrainedModel ;
+    rdfs:label "NEMP 3BPA model" .
+
+entity:run-nemp-water-zhang2025node a mlips:MLIPRun ;
+    rdfs:label "NEMP trained on liquid water" ;
+    mlips:appliesMethod entity:NEMP ;
+    mlips:runsOn entity:ds-water-zhang2025node ;
+    mlips:hasHyperparameterSetting entity:setting-nemp-water-numLayers-zhang2025node ,
+        entity:setting-nemp-water-numFeatures-zhang2025node ,
+        entity:setting-nemp-water-L-max-sph-zhang2025node ,
+        entity:setting-nemp-water-numAngularBasis-zhang2025node ,
+        entity:setting-nemp-water-cutoffRadius-zhang2025node ,
+        entity:setting-nemp-water-batchSize-zhang2025node ,
+        entity:setting-nemp-water-learningRate-zhang2025node ;
+    mlips:produces entity:model-nemp-water-zhang2025node .
+
+entity:model-nemp-water-zhang2025node a mlips:TrainedModel ;
+    rdfs:label "NEMP liquid water model" .
+
+entity:run-nemp-ANI-1x-zhang2025node a mlips:MLIPRun ;
+    rdfs:label "NEMP trained on ANI-1x" ;
+    mlips:appliesMethod entity:NEMP ;
+    mlips:runsOn entity:ds-ANI-1x-zhang2025node ;
+    mlips:hasHyperparameterSetting entity:setting-nemp-ANI-1x-numLayers-zhang2025node ,
+        entity:setting-nemp-ANI-1x-numFeatures-zhang2025node ,
+        entity:setting-nemp-ANI-1x-L-max-sph-zhang2025node ,
+        entity:setting-nemp-ANI-1x-numAngularBasis-zhang2025node ,
+        entity:setting-nemp-ANI-1x-cutoffRadius-zhang2025node ,
+        entity:setting-nemp-ANI-1x-batchSize-zhang2025node ,
+        entity:setting-nemp-ANI-1x-learningRate-zhang2025node ;
+    mlips:produces entity:model-nemp-ANI-1x-zhang2025node .
+
+entity:model-nemp-ANI-1x-zhang2025node a mlips:TrainedModel ;
+    rdfs:label "NEMP ANI-1x model" .
+
+entity:run-nemp-HME21-zhang2025node a mlips:MLIPRun ;
+    rdfs:label "NEMP trained on HME21" ;
+    mlips:appliesMethod entity:NEMP ;
+    mlips:runsOn entity:ds-HME21-zhang2025node ;
+    mlips:hasHyperparameterSetting entity:setting-nemp-HME21-numLayers-zhang2025node ,
+        entity:setting-nemp-HME21-numFeatures-zhang2025node ,
+        entity:setting-nemp-HME21-L-max-sph-zhang2025node ,
+        entity:setting-nemp-HME21-numAngularBasis-zhang2025node ,
+        entity:setting-nemp-HME21-cutoffRadius-zhang2025node ,
+        entity:setting-nemp-HME21-batchSize-zhang2025node ,
+        entity:setting-nemp-HME21-learningRate-zhang2025node ;
+    mlips:produces entity:model-nemp-HME21-zhang2025node .
+
+entity:model-nemp-HME21-zhang2025node a mlips:TrainedModel ;
+    rdfs:label "NEMP HME21 model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zhang2025node mlips:hasResult
+    entity:result-nemp-3BPA-300K-zhang2025node ,
+    entity:result-nemp-3BPA-600K-zhang2025node ,
+    entity:result-nemp-3BPA-1200K-zhang2025node ,
+    entity:result-nemp-water-zhang2025node ,
+    entity:result-nemp-ANI-MD-zhang2025node ,
+    entity:result-nemp-DrugBank-zhang2025node ,
+    entity:result-nemp-GDB7-9-zhang2025node ,
+    entity:result-nemp-GDB10-13-zhang2025node ,
+    entity:result-nemp-S66x8-zhang2025node ,
+    entity:result-nemp-Tripeptides-zhang2025node ,
+    entity:result-nemp-COMP6-total-zhang2025node ,
+    entity:result-nemp-HME21-zhang2025node .
+
+entity:result-nemp-3BPA-300K-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-3BPA-zhang2025node ;
+    mlips:targetMaterial entity:mat-3BPA-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-3BPA-300K-1-zhang2025node ,
+        entity:metric-nemp-3BPA-300K-2-zhang2025node .
+
+entity:metric-nemp-3BPA-300K-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: NEMP, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nemp-3BPA-300K-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: NEMP, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nemp-3BPA-600K-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-3BPA-zhang2025node ;
+    mlips:targetMaterial entity:mat-3BPA-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-3BPA-600K-1-zhang2025node ,
+        entity:metric-nemp-3BPA-600K-2-zhang2025node .
+
+entity:metric-nemp-3BPA-600K-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: NEMP, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nemp-3BPA-600K-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: NEMP, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nemp-3BPA-1200K-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-3BPA-zhang2025node ;
+    mlips:targetMaterial entity:mat-3BPA-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-3BPA-1200K-1-zhang2025node ,
+        entity:metric-nemp-3BPA-1200K-2-zhang2025node .
+
+entity:metric-nemp-3BPA-1200K-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: NEMP, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "33.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nemp-3BPA-1200K-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: NEMP, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "67.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nemp-water-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-water-zhang2025node ;
+    mlips:targetMaterial entity:mat-water-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-water-1-zhang2025node ,
+        entity:metric-nemp-water-2-zhang2025node .
+
+entity:metric-nemp-water-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy per water molecule, in meV/H2O: NEMP, liquid water" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.3"^^xsd:double .
+
+entity:metric-nemp-water-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: NEMP, liquid water" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "37.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nemp-ANI-MD-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-ANI-MD-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-ANI-MD-1-zhang2025node ,
+        entity:metric-nemp-ANI-MD-2-zhang2025node .
+
+entity:metric-nemp-ANI-MD-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 ANI-MD" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.86"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-ANI-MD-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 ANI-MD" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.46"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-DrugBank-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-DrugBank-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-DrugBank-1-zhang2025node ,
+        entity:metric-nemp-DrugBank-2-zhang2025node .
+
+entity:metric-nemp-DrugBank-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 DrugBank" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.65"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-DrugBank-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 DrugBank" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.34"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-GDB7-9-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-GDB7-9-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-GDB7-9-1-zhang2025node ,
+        entity:metric-nemp-GDB7-9-2-zhang2025node .
+
+entity:metric-nemp-GDB7-9-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 GDB7-9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.24"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-GDB7-9-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 GDB7-9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.24"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-GDB10-13-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-GDB10-13-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-GDB10-13-1-zhang2025node ,
+        entity:metric-nemp-GDB10-13-2-zhang2025node .
+
+entity:metric-nemp-GDB10-13-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 GDB10-13" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.53"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-GDB10-13-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 GDB10-13" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.46"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-S66x8-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-S66x8-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-S66x8-1-zhang2025node ,
+        entity:metric-nemp-S66x8-2-zhang2025node .
+
+entity:metric-nemp-S66x8-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 S66x8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.45"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-S66x8-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 S66x8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.17"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-Tripeptides-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-Tripeptides-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-Tripeptides-1-zhang2025node ,
+        entity:metric-nemp-Tripeptides-2-zhang2025node .
+
+entity:metric-nemp-Tripeptides-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 Tripeptides" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.67"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-Tripeptides-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 Tripeptides" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.34"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-COMP6-total-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-ANI-1x-zhang2025node ;
+    mlips:targetMaterial entity:mat-COMP6-total-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-COMP6-total-1-zhang2025node ,
+        entity:metric-nemp-COMP6-total-2-zhang2025node .
+
+entity:metric-nemp-COMP6-total-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on total energy: NEMP trained on ANI-1x, COMP6 COMP6-total" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.48"^^xsd:double ;
+    mlips:hasUnit unit:KiloCAL-PER-MOL .
+
+entity:metric-nemp-COMP6-total-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP trained on ANI-1x, COMP6 COMP6-total" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.39"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-nemp-HME21-zhang2025node a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nemp-HME21-zhang2025node ;
+    mlips:targetMaterial entity:mat-HME21-zhang2025node ;
+    mlips:hasAccuracyMetric entity:metric-nemp-HME21-1-zhang2025node ,
+        entity:metric-nemp-HME21-2-zhang2025node .
+
+entity:metric-nemp-HME21-1-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: NEMP, HME21" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-nemp-HME21-2-zhang2025node a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: NEMP, HME21" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "144.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Table I has a 'Time' row (NequIP 103.5, MACE 24.5, NEMP 2.4) whose unit
+# and hardware are in the text that was not read; it is not encoded.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - learningRate is the peak value after warm-up (e.g. 0.01 to 0.2 for 3BPA); the decay factors and patience are in the algorithm label. l_max of the tensor product is encoded as numAngularBasis and L_max of the spherical harmonics as a paper-local hyperparameter; 'channels' as numFeatures and 'MP layers' as numLayers.
+# - In Table III the row labels read 'GDB 7-9 (E)' etc. while each cell holds an 'E/F' pair; both numbers are encoded as energy and force MAEs, following the caption.
+# - Data-set sizes and reference levels are not restated in the parts read. The NEMP-small water model, the EMLP application (16 channels, cutoff 5.0 A) and the efficiency benchmarks are not encoded.
+# - Loss function and software are not stated in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
