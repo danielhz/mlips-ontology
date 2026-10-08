@@ -1,0 +1,233 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Xiaoguo Gong et al. (2024). An accurate and transferable machine learning interatomic potential for nickel.
+#   Communications Materials. doi:10.1038/s43246-024-00603-3  arXiv:2312.17596v2
+#
+# Version read: arxiv-preprint arXiv:2312.17596v2 (sha256 6650a503dec5b18f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 121 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one Deep Potential (DeepPot-SE) for nickel trained on
+# spin-polarised DFT data generated with DP-GEN and a 'specialization'
+# set for cohesive properties (Table S2), with reference and training
+# settings. Validation is entirely by material properties.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-gong2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Gong et al. (2024): an accurate and transferable machine learning interatomic potential for nickel (DP-Ni)" ;
+    mlips:reportedIn entity:article-gong2024 .
+
+entity:article-gong2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s43246-024-00603-3> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "An accurate and transferable machine learning interatomic potential for nickel" ;
+    schema:author <https://orcid.org/0000-0002-0513-2104> ,
+        entity:person-Li-gong2024 ,
+        entity:person-Pattamatta-gong2024 ,
+        <https://orcid.org/0000-0003-1692-2512> ,
+        <https://orcid.org/0000-0001-6038-020X> .
+
+<https://orcid.org/0000-0002-0513-2104> a schema:Person ;
+    schema:name "Xiaoguo Gong" ;
+    schema:givenName "Xiaoguo" ;
+    schema:familyName "Gong" ;
+    schema:identifier <https://orcid.org/0000-0002-0513-2104> .
+
+entity:person-Li-gong2024 a schema:Person ;
+    schema:name "Zhuoyuan Li" ;
+    schema:givenName "Zhuoyuan" ;
+    schema:familyName "Li" .
+
+entity:person-Pattamatta-gong2024 a schema:Person ;
+    schema:name "A. S. L. Subrahmanyam Pattamatta" ;
+    schema:givenName "A. S. L. Subrahmanyam" ;
+    schema:familyName "Pattamatta" .
+
+<https://orcid.org/0000-0003-1692-2512> a schema:Person ;
+    schema:name "Tongqi Wen" ;
+    schema:givenName "Tongqi" ;
+    schema:familyName "Wen" ;
+    schema:identifier <https://orcid.org/0000-0003-1692-2512> .
+
+<https://orcid.org/0000-0001-6038-020X> a schema:Person ;
+    schema:name "David J. Srolovitz" ;
+    schema:givenName "David J." ;
+    schema:familyName "Srolovitz" ;
+    schema:identifier <https://orcid.org/0000-0001-6038-020X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Ni-gong2024 a mlips:MaterialSystem ;
+    rdfs:label "Nickel: fcc, hcp and bcc bulk and surfaces over wide temperature and pressure ranges" ;
+    mlips:chemicalFormula "Ni" ;
+    mlips:materialClass "Elemental fcc ferromagnetic metal" ;
+    mlips:microstructuralFeature "{100}, {110}, {111} surfaces (fcc, bcc) and {0001}, {10-10} surfaces (hcp); point defects, grain boundaries and stacking faults in the validation" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-gong2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-gong2024 mlips:hasDFTSettings entity:calc-settings-dft-gong2024 .
+
+entity:calc-settings-dft-gong2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "600"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack grids with 0.1 A^-1 spacing" ;
+    rdfs:comment "Spin-polarised (magnetic) calculations for ground states and AIMD; Ni 3d8 4s2 valence; Methfessel-Paxton smearing of 0.12 eV; convergence 1e-6 eV/atom in energy and 1e-3 eV/A in forces." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Ni-gong2024 a mlips:TrainingDataset ;
+    rdfs:label "DP-Ni training data (initialisation, DP-GEN bulk and surface, cohesive-energy specialization)" ;
+    mlips:coversMaterial entity:mat-Ni-gong2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1867 ;
+    mlips:hasDFTCalculation entity:calc-dft-gong2024 ;
+    rdfs:comment "Table S2 counts data sets: 108 initialisation + 1140 DP-GEN bulk + 602 DP-GEN surface + 17 cohesive-energy sets (weight 10; the paper's total of 2020 counts these as 170). numConfigurations is the unweighted sum of the four counts; the table speaks of 'datasets', so the number of individual configurations may be larger." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Ni-gong2024 mlips:samplingStrategy
+    entity:sampling-initial-aimd-gong2024 ,
+    entity:sampling-dpgen-gong2024 ,
+    entity:sampling-specialization-gong2024 .
+
+entity:sampling-initial-aimd-gong2024 a mlips:SamplingStrategy ;
+    rdfs:label "Short AIMD of scaled and perturbed supercells" ;
+    rdfs:comment "2x2x2 bcc, fcc and hcp supercells scaled by 0.96 to 1.06 and randomly perturbed (cell vectors by up to 3%, atoms by up to 0.01 A); two AIMD steps each at 100 K (NVT): 108 configurations." .
+
+entity:sampling-dpgen-gong2024 a mlips:SamplingStrategy ;
+    rdfs:label "DP-GEN exploration of bulk and surface structures" ;
+    rdfs:comment "DPMD in LAMMPS from 50 K to 3283.2 K (1.9 times the melting point), NPT at 0.001 to 50 kbar for bulk and NVT for surfaces; four DP models per iteration select configurations for spin-polarised DFT. 1140 bulk and 602 surface data sets." .
+
+entity:sampling-specialization-gong2024 a mlips:SamplingStrategy ;
+    rdfs:label "Specialization set for cohesive properties" ;
+    rdfs:comment "170 configurations from the cohesive-energy curve (17 distinct structures), each weighted 10 times in the final training." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasLossFunction entity:loss-DeePMD-gong2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-gong2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-fitting-net-gong2024 ,
+        mlips:learningRate ,
+        entity:hp-training-steps-gong2024 ;
+    mlips:hasImplementation entity:impl-DeePMD-gong2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:loss-DeePMD-gong2024 a mlips:LossFunction ;
+    rdfs:label "DeePMD loss with prefactors p_e from 0.02 to 2, p_f from 1000 to 1 and p_v = 0" .
+
+entity:alg-DeePMD-gong2024 a mls:Algorithm ;
+    rdfs:label "Learning rate decaying exponentially from 1e-3 to 5e-8; four models with different random initialisation per DP-GEN step" .
+
+entity:impl-DeePMD-gong2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "DeepPot-SE, driven by DP-GEN; MD in LAMMPS" .
+
+entity:hp-fitting-net-gong2024 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_neuron" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-gong2024 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps per DP-GEN training" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-Ni-cutoffRadius-gong2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-dp-Ni-fitting-net-gong2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-gong2024 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-dp-Ni-learningRate-gong2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-dp-Ni-training-steps-gong2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-gong2024 ;
+    mlips:settingValue "400000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-Ni-gong2024 a mlips:MLIPRun ;
+    rdfs:label "DeepPot-SE training for nickel (DP-Ni)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-Ni-gong2024 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-Ni-cutoffRadius-gong2024 ,
+        entity:setting-dp-Ni-fitting-net-gong2024 ,
+        entity:setting-dp-Ni-learningRate-gong2024 ,
+        entity:setting-dp-Ni-training-steps-gong2024 ;
+    mlips:produces entity:model-dp-Ni-gong2024 .
+
+entity:model-dp-Ni-gong2024 a mlips:TrainedModel ;
+    rdfs:label "DP-Ni: Deep Potential for nickel" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No energy or force RMSE/MAE is printed (the keyword search finds none); the potential is validated on lattice parameters, elastic constants, cohesive and decohesive energies, surface, vacancy, interstitial, stacking-fault and grain-boundary energies, phonon spectra, ideal strength and the fcc-to-hcp transformation under tension (Tables I, II, S1), none of which has a MetricProperty.
+# - The paper says 'the training step consists of 400,000 epochs'; in DeePMD-kit this is the number of training steps and is encoded as such.
+# - The embedding network size is not stated in the parts read. Structure optimisation (conjugate gradient), MD and phonon calculations with DP-Ni in LAMMPS are the grounds for the simulation types.
+# - Version read: arXiv v2, whose title ('A Magnetic Machine Learning Interatomic Potential for Nickel') differs from the version of record.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
