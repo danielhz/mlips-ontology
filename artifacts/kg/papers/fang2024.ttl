@@ -1,0 +1,200 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Shiang Fang et al. (2024). Phonon predictions with E(3)-equivariant graph neural networks.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2403.11347  arXiv:2403.11347v1
+#
+# Version read: arxiv-preprint arXiv:2403.11347v1 (sha256 f55b10ea8b8211a0...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 77 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper derives phonons and molecular vibrations
+# from second derivatives (Hessians) of E(3)-equivariant energy models
+# and shows that Hessian data improve training. The energy models it
+# trains are encoded as far as the main text describes them: a NequIP
+# model for silicon on supercell force data, and NequIP and MACE models
+# on the universal-IAP (Materials Project) data set. Hyperparameters and
+# the authors' own PBEsol data set are in the methods and supplement.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-fang2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Fang et al. (2024): phonon predictions with E(3)-equivariant graph neural networks (phonax)" ;
+    mlips:reportedIn entity:article-fang2024 .
+
+entity:article-fang2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2403.11347> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Phonon predictions with E(3)-equivariant graph neural networks" ;
+    schema:author entity:person-Fang-fang2024 ,
+        entity:person-Geiger-fang2024 ,
+        entity:person-Checkelsky-fang2024 ,
+        entity:person-Smidt-fang2024 .
+
+entity:person-Fang-fang2024 a schema:Person ;
+    schema:name "Shiang Fang" ;
+    schema:givenName "Shiang" ;
+    schema:familyName "Fang" .
+
+entity:person-Geiger-fang2024 a schema:Person ;
+    schema:name "Mario Geiger" ;
+    schema:givenName "Mario" ;
+    schema:familyName "Geiger" .
+
+entity:person-Checkelsky-fang2024 a schema:Person ;
+    schema:name "Joseph G. Checkelsky" ;
+    schema:givenName "Joseph G." ;
+    schema:familyName "Checkelsky" .
+
+entity:person-Smidt-fang2024 a schema:Person ;
+    schema:name "Tess Smidt" ;
+    schema:givenName "Tess" ;
+    schema:familyName "Smidt" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Si-fang2024 a mlips:MaterialSystem ;
+    rdfs:label "Silicon in the diamond structure (mp-149), supercells from 1x1x1 to 3x3x3" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Elemental semiconductor" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q670> .
+
+entity:mat-universal-fang2024 a mlips:MaterialSystem ;
+    rdfs:label "Crystals of the universal-IAP data set (non-equilibrium structures from the Materials Project)" ;
+    mlips:materialClass "Universal inorganic crystals" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-uiap-dft-fang2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-uiap-dft-fang2024 mlips:hasDFTSettings entity:calc-settings-uiap-dft-fang2024 .
+
+entity:calc-settings-uiap-dft-fang2024 a mlips:DFTSettings ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "The universal-IAP data set is derived with the PBE functional (stated to contrast with the PBEsol phonon database); code and settings are not restated." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Si-fang2024 a mlips:TrainingDataset ;
+    rdfs:label "Silicon supercell energy and force data" ;
+    mlips:coversMaterial entity:mat-Si-fang2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    rdfs:comment "Sizes and DFT settings are in the methods section, which was not read." .
+
+entity:ds-universal-IAP-fang2024 a mlips:TrainingDataset ;
+    rdfs:label "Universal interatomic potentials data set (universal-IAP) of Chen and Ong" ;
+    mlips:coversMaterial entity:mat-universal-fang2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-uiap-dft-fang2024 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Si-fang2024 mlips:samplingStrategy
+    entity:sampling-supercell-perturbations-fang2024 .
+
+entity:ds-universal-IAP-fang2024 mlips:samplingStrategy
+    entity:sampling-mp-nonequilibrium-fang2024 .
+
+entity:sampling-supercell-perturbations-fang2024 a mlips:SamplingStrategy ;
+    rdfs:label "Perturbed supercells of increasing size" ;
+    rdfs:comment "Energy and force data from supercells from the primitive 1x1x1 cell to 3x3x3; alternatively the 1x1x1 force data augmented with Hessian data." .
+
+entity:sampling-mp-nonequilibrium-fang2024 a mlips:SamplingStrategy ;
+    rdfs:label "Non-equilibrium structures from Materials Project relaxations (universal-IAP data set)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-nequip-Si-fang2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP energy model for silicon trained on supercell force data" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Si-fang2024 ;
+    mlips:produces entity:model-nequip-Si-fang2024 .
+
+entity:model-nequip-Si-fang2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for diamond silicon (phonon demonstration)" .
+
+entity:run-nequip-universal-fang2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP energy model trained on the universal-IAP data set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-universal-IAP-fang2024 ;
+    mlips:produces entity:model-nequip-universal-fang2024 .
+
+entity:model-nequip-universal-fang2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP universal-IAP energy model" .
+
+entity:run-mace-universal-fang2024 a mlips:MLIPRun ;
+    rdfs:label "MACE energy model trained on the universal-IAP data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-universal-IAP-fang2024 ;
+    mlips:produces entity:model-mace-universal-fang2024 .
+
+entity:model-mace-universal-fang2024 a mlips:TrainedModel ;
+    rdfs:label "MACE universal-IAP energy model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No energy or force error is printed in the main text; accuracy is reported as relative phonon-frequency errors and learning curves (figures), which have no MetricProperty.
+# - Model hyperparameters are in the supplement. The paper also generates its own PBEsol energy and force data set from the Materials Project phonon database and trains on it, pretrains an energy model for molecules, and fine-tunes on Hessians and vibrational spectra (ethanol, propane, benzene); these were not read in enough detail to encode.
+# - Training on Hessian data is the paper's main methodological point; schema 0.1.2 has no mlips:CoveredProperty for Hessians or force constants.
+# - The phonon predictions come from the phonax code (second derivatives of the energy model), asserted here as PhononCalculation for both methods. Preprint only (arXiv v1); authors from DataCite, without ORCIDs.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
