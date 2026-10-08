@@ -1,0 +1,287 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Kangyu Zhang et al. (2020). Physically inspired atom-centered symmetry functions for the construction of high dimensional neural network potential energy surfaces.
+#   Computational Materials Science. doi:10.1016/j.commatsci.2020.110071
+#
+# Version read: publisher (sha256 f1f8de73c2e035cd...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 32 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the atomistic neural network (AtNN, Behler-Parrinello
+# type) potential for the solid electrolyte Li10GeP2S12 built with the
+# paper's physically inspired ACSFs, the comparison fit with the original
+# ACSFs, and the energy errors of Table 3. The QM9 formation-enthalpy
+# comparison is reported as a figure.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2020acsf a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2021): physically inspired atom-centered symmetry functions, with a neural network PES for Li10GeP2S12" ;
+    mlips:reportedIn entity:article-zhang2020acsf .
+
+entity:article-zhang2020acsf a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2020.110071> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Physically inspired atom-centered symmetry functions for the construction of high dimensional neural network potential energy surfaces" ;
+    schema:author entity:person-Zhang-zhang2020acsf ,
+        entity:person-Yin-zhang2020acsf ,
+        entity:person-Liu-zhang2020acsf .
+
+entity:person-Zhang-zhang2020acsf a schema:Person ;
+    schema:name "Kangyu Zhang" ;
+    schema:givenName "Kangyu" ;
+    schema:familyName "Zhang" .
+
+entity:person-Yin-zhang2020acsf a schema:Person ;
+    schema:name "Lichang Yin" ;
+    schema:givenName "Lichang" ;
+    schema:familyName "Yin" .
+
+entity:person-Liu-zhang2020acsf a schema:Person ;
+    schema:name "Gang Liu" ;
+    schema:givenName "Gang" ;
+    schema:familyName "Liu" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-LGPS-zhang2020acsf a mlips:MaterialSystem ;
+    rdfs:label "Li10GeP2S12 (LGPS) solid electrolyte, 50-atom unit cell" ;
+    mlips:chemicalFormula "Li10GeP2S12" ;
+    mlips:materialClass "Crystalline sulfide superionic Li-ion conductor" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhang2020acsf a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhang2020acsf mlips:hasDFTSettings entity:calc-settings-dft-zhang2020acsf .
+
+entity:calc-settings-dft-zhang2020acsf a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "2x2x1 Gamma-centred Monkhorst-Pack mesh for the single-point labels; the sampling AIMD used 450 eV and a single Gamma point" .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-LGPS-zhang2020acsf a mlips:TrainingDataset ;
+    rdfs:label "Li10GeP2S12 training set (3600 of 4000 AIMD structures)" ;
+    mlips:coversMaterial entity:mat-LGPS-zhang2020acsf ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 3600 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020acsf ;
+    rdfs:comment "400 structures held out for testing." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-LGPS-zhang2020acsf mlips:samplingStrategy
+    entity:sampling-aimd-nvt-zhang2020acsf .
+
+entity:sampling-aimd-nvt-zhang2020acsf a mlips:SamplingStrategy ;
+    rdfs:label "NVT ab initio MD at 400, 600, 800, 1000 and 1200 K" ;
+    rdfs:comment "Five trajectories of 40 ps with a 1 fs time step; structures extracted every 50 fs, 4000 in total, then recomputed with the higher-accuracy settings." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-HDNNP-zhang2020acsf ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-hidden-layers-zhang2020acsf ,
+        entity:hp-lbfgs-iterations-zhang2020acsf ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-HDNNP-zhang2020acsf a mls:Algorithm ;
+    rdfs:label "Limited-memory BFGS (L-BFGS); final PES is an ensemble of four networks with different architectures whose energies are averaged" .
+
+entity:hp-hidden-layers-zhang2020acsf a mlips:Hyperparameter ;
+    rdfs:label "Hidden-layer structure of the atomic networks" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lbfgs-iterations-zhang2020acsf a mlips:Hyperparameter ;
+    rdfs:label "Number of L-BFGS iterations" ;
+    mlips:hyperparameterName "iterations" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-atnn-new-300-cutoffRadius-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-atnn-new-300-lbfgs-iterations-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lbfgs-iterations-zhang2020acsf ;
+    mlips:settingValue "300"^^xsd:integer .
+
+entity:setting-atnn-original-300-cutoffRadius-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-atnn-original-300-lbfgs-iterations-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lbfgs-iterations-zhang2020acsf ;
+    mlips:settingValue "300"^^xsd:integer .
+
+entity:setting-atnn-final-cutoffRadius-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-atnn-final-hidden-layers-zhang2020acsf a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-zhang2020acsf ;
+    mlips:settingValue "PES 1: Li 100,80,60; Ge and P shared 80,80; S 100,80,60. PES 3: 60,60 (Table 2; PES 2 and PES 4 rows are incomplete in the extracted text)" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-atnn-new-300-zhang2020acsf a mlips:MLIPRun ;
+    rdfs:label "AtNN PES for Li10GeP2S12 with the physically inspired ACSFs, 300 L-BFGS iterations (comparison fit)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-LGPS-zhang2020acsf ;
+    mlips:hasHyperparameterSetting entity:setting-atnn-new-300-cutoffRadius-zhang2020acsf ,
+        entity:setting-atnn-new-300-lbfgs-iterations-zhang2020acsf ;
+    mlips:produces entity:model-atnn-new-300-zhang2020acsf .
+
+entity:model-atnn-new-300-zhang2020acsf a mlips:TrainedModel ;
+    rdfs:label "AtNN PES for Li10GeP2S12, physically inspired ACSFs (300 iterations)" .
+
+entity:run-atnn-original-300-zhang2020acsf a mlips:MLIPRun ;
+    rdfs:label "AtNN PES for Li10GeP2S12 with the original ACSFs, 300 L-BFGS iterations (comparison fit)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-LGPS-zhang2020acsf ;
+    mlips:hasHyperparameterSetting entity:setting-atnn-original-300-cutoffRadius-zhang2020acsf ,
+        entity:setting-atnn-original-300-lbfgs-iterations-zhang2020acsf ;
+    mlips:produces entity:model-atnn-original-300-zhang2020acsf .
+
+entity:model-atnn-original-300-zhang2020acsf a mlips:TrainedModel ;
+    rdfs:label "AtNN PES for Li10GeP2S12, original ACSFs (300 iterations)" .
+
+entity:run-atnn-final-zhang2020acsf a mlips:MLIPRun ;
+    rdfs:label "Final AtNN PES for Li10GeP2S12 with the physically inspired ACSFs (ensemble of four architectures)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-LGPS-zhang2020acsf ;
+    mlips:hasHyperparameterSetting entity:setting-atnn-final-cutoffRadius-zhang2020acsf ,
+        entity:setting-atnn-final-hidden-layers-zhang2020acsf ;
+    mlips:produces entity:model-atnn-final-zhang2020acsf .
+
+entity:model-atnn-final-zhang2020acsf a mlips:TrainedModel ;
+    rdfs:label "AtNN PES for Li10GeP2S12 (final, physically inspired ACSFs)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zhang2020acsf mlips:hasResult
+    entity:result-new-300-test-zhang2020acsf ,
+    entity:result-original-300-test-zhang2020acsf ,
+    entity:result-final-test-zhang2020acsf .
+
+entity:result-new-300-test-zhang2020acsf a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-atnn-new-300-zhang2020acsf ;
+    mlips:targetMaterial entity:mat-LGPS-zhang2020acsf ;
+    mlips:hasAccuracyMetric entity:metric-new-300-test-1-zhang2020acsf ,
+        entity:metric-new-300-test-2-zhang2020acsf .
+
+entity:metric-new-300-test-1-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: physically inspired ACSFs, 300 iterations" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "55.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-new-300-test-2-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: physically inspired ACSFs, 300 iterations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-original-300-test-zhang2020acsf a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-atnn-original-300-zhang2020acsf ;
+    mlips:targetMaterial entity:mat-LGPS-zhang2020acsf ;
+    mlips:hasAccuracyMetric entity:metric-original-300-test-1-zhang2020acsf ,
+        entity:metric-original-300-test-2-zhang2020acsf .
+
+entity:metric-original-300-test-1-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: original ACSFs, 300 iterations" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "56.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-original-300-test-2-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: original ACSFs, 300 iterations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.99"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-final-test-zhang2020acsf a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-atnn-final-zhang2020acsf ;
+    mlips:targetMaterial entity:mat-LGPS-zhang2020acsf ;
+    mlips:hasAccuracyMetric entity:metric-final-test-1-zhang2020acsf ,
+        entity:metric-final-test-2-zhang2020acsf .
+
+entity:metric-final-test-1-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: final AtNN PES" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "53.65"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-final-test-2-zhang2020acsf a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: final AtNN PES" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "27.24"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Force errors of Table 3 are NOT encoded: the columns are headed 'Force RMSE, Force MAE' but the printed pairs (e.g. test set 39.52 and 86.00 meV/A for the new ACSFs, 27.99 and 71.56 for the final PES) have the 'RMSE' smaller than the 'MAE', which cannot be; the column order needs checking against the source before these are used.
+# - Training-set errors and maximum residuals of Table 3 are not encoded.
+# - The QM9 test (5-fold cross-validated MAE of formation enthalpies, AtNN with two hidden layers of 100 neurons) is shown only as a figure.
+# - The ACSF parameters of Table 1 (eta, lambda, zeta, radius types, alpha) are not encoded; only the 4.5 A neighbour cutoff is. The number of iterations of the final fit is not stated.
+# - Property results from MD in LAMMPS (Li-ion conductivity 1.54 mS/cm at 300 K, activation barrier 202 meV) have no MetricProperty.
+# - The software used for the AtNN is not named in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
