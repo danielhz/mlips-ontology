@@ -1,0 +1,252 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Sungwoo Kang et al. (2024). How graph neural network interatomic potentials extrapolate: Role of the message-passing algorithm.
+#   The Journal of Chemical Physics. doi:10.1063/5.0234287  arXiv:2405.00290v3
+#
+# Version read: arxiv-preprint arXiv:2405.00290v3 (sha256 89f4d01ebb9e8bc2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 166 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the two DFT-based experiments: a SevenNet (NequIP
+# architecture) model trained on MD of crystalline SrO and tested on
+# crystal/disorder cells, and a SevenNet model for the Au2 on (doped) MgO
+# set of the 4G-HDNNP paper. The point-charge toy models and the
+# theoretical analysis are not encoded. Read from the arXiv preprint (v3).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kang2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Kang (2024): how graph neural network interatomic potentials extrapolate, the role of message passing" ;
+    mlips:reportedIn entity:article-kang2024 .
+
+entity:article-kang2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0234287> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "How graph neural network interatomic potentials extrapolate: Role of the message-passing algorithm" ;
+    schema:author <https://orcid.org/0000-0001-8177-8815> .
+
+<https://orcid.org/0000-0001-8177-8815> a schema:Person ;
+    schema:name "Sungwoo Kang" ;
+    schema:givenName "Sungwoo" ;
+    schema:familyName "Kang" ;
+    schema:identifier <https://orcid.org/0000-0001-8177-8815> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-SrO-kang2024 a mlips:MaterialSystem ;
+    rdfs:label "Crystalline SrO (32 Sr + 32 O supercell)" ;
+    mlips:chemicalFormula "SrO" ;
+    mlips:materialClass "Ionic oxide" .
+
+entity:mat-SrO-test-kang2024 a mlips:MaterialSystem ;
+    rdfs:label "SrO cells with a fixed crystalline centre in a disordered surrounding (72 Sr + 72 O)" ;
+    mlips:chemicalFormula "SrO" ;
+    mlips:materialClass "Ionic oxide" .
+
+entity:mat-AuMgO-kang2024 a mlips:MaterialSystem ;
+    rdfs:label "Au2 cluster on undoped and Al-doped MgO(001)" ;
+    mlips:chemicalFormula "Au2/MgO" ;
+    mlips:materialClass "Supported metal cluster" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-kang2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-kang2024 mlips:hasDFTSettings entity:calc-settings-dft-kang2024 .
+
+entity:calc-settings-dft-kang2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Gamma point for the training cells; a single (1/4, 1/4, 1/4) k-point for the test cells" ;
+    rdfs:comment "The author notes these settings are below Materials Project convergence (deviation of 0.012 eV/A in forces for SrO)." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-SrO-kang2024 a mlips:TrainingDataset ;
+    rdfs:label "SrO crystal MD training set" ;
+    mlips:coversMaterial entity:mat-SrO-kang2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-kang2024 ;
+    rdfs:comment "Train/validation split 9:1; the number of configurations is not stated (three 10 ps runs sampled every 20 fs)." .
+
+entity:ds-AuMgO-kang2024 a mlips:TrainingDataset ;
+    rdfs:label "Au2 on MgO(001) training set of the 4G-HDNNP study (the paper's ref. 9)" ;
+    mlips:coversMaterial entity:mat-AuMgO-kang2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-SrO-kang2024 mlips:samplingStrategy
+    entity:sampling-md-kang2024 .
+
+entity:ds-AuMgO-kang2024 mlips:samplingStrategy
+    entity:sampling-published-kang2024 .
+
+entity:sampling-md-kang2024 a mlips:SamplingStrategy ;
+    rdfs:label "NVT ab initio MD of crystalline SrO for 10 ps each at 1000, 1600 and 2500 K, sampled every 20 fs" .
+
+entity:sampling-published-kang2024 a mlips:SamplingStrategy ;
+    rdfs:label "Published training set (random displacements of Au2/MgO configurations, half undoped and half Al-doped substrate) used as provided" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        entity:hp-lmax-kang2024 ,
+        mlips:numFeatures ,
+        mlips:cutoffRadius ,
+        mlips:numRadialBasis ;
+    mlips:hasImplementation entity:impl-NequIP-kang2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-NequIP-kang2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SevenNet-kang2024 .
+
+entity:lib-SevenNet-kang2024 a mlips:Library ;
+    rdfs:label "SevenNet" ;
+    rdfs:comment "SevenNet code with the NequIP architecture; MD in LAMMPS. Inputs at https://doi.org/10.6084/m9.figshare.26496160.v2" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-lmax-kang2024 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order l_max" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-SrO-numLayers-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-SrO-lmax-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-kang2024 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-SrO-cutoffRadius-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SrO-numRadialBasis-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-AuMgO-numLayers-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-AuMgO-lmax-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-kang2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-AuMgO-numFeatures-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-AuMgO-cutoffRadius-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-AuMgO-numRadialBasis-kang2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SrO-kang2024 a mlips:MLIPRun ;
+    rdfs:label "SevenNet (NequIP architecture) trained on crystalline SrO MD" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SrO-kang2024 ;
+    mlips:hasHyperparameterSetting entity:setting-SrO-numLayers-kang2024 ,
+        entity:setting-SrO-lmax-kang2024 ,
+        entity:setting-SrO-cutoffRadius-kang2024 ,
+        entity:setting-SrO-numRadialBasis-kang2024 ;
+    mlips:produces entity:model-SrO-kang2024 .
+
+entity:model-SrO-kang2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet model for SrO" .
+
+entity:run-AuMgO-kang2024 a mlips:MLIPRun ;
+    rdfs:label "SevenNet (NequIP architecture) trained on the Au2/MgO set" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-AuMgO-kang2024 ;
+    mlips:hasHyperparameterSetting entity:setting-AuMgO-numLayers-kang2024 ,
+        entity:setting-AuMgO-lmax-kang2024 ,
+        entity:setting-AuMgO-numFeatures-kang2024 ,
+        entity:setting-AuMgO-cutoffRadius-kang2024 ,
+        entity:setting-AuMgO-numRadialBasis-kang2024 ;
+    mlips:produces entity:model-AuMgO-kang2024 .
+
+entity:model-AuMgO-kang2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet model for Au2 on (doped) MgO" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kang2024 mlips:hasResult
+    entity:result-SrO-centre-kang2024 .
+
+entity:result-SrO-centre-kang2024 a mlips:BenchmarkResult ;
+    rdfs:comment "Not a test-set force RMSE over all atoms: it measures the force that reaches the centre atom from beyond the 5 A cutoff. The pretrained SevenNet-0 gives 0.119 eV/A on the same trajectory (release not specified, so not linked)." ;
+    mlips:evaluatesModel entity:model-SrO-kang2024 ;
+    mlips:targetMaterial entity:mat-SrO-test-kang2024 ;
+    mlips:hasAccuracyMetric entity:metric-SrO-centre-1-kang2024 .
+
+entity:metric-SrO-centre-1-kang2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE of the force on the centre atom of the fixed crystalline region (R_fix = 5.82 A), crystal/disorder MD at 4000 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.076"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The 0.076 eV/A value is quoted in the text as 'the value shown in Fig. 8(c)' and taken as the R_fix = 5.82 A point; the dependence on R_fix is a figure. The Au-MgO test (forces on Au atoms against DFT and the 4G-HDNNP) is a figure and has no metric.
+# - Not encoded: the point-charge toy models (SevenNet and MACE, 5 layers; an analytic reference, not a quantum-mechanical one), the atomic-energy mapping analysis and the Sr metal test of SevenNet-0. Table 1 compares these toy settings with SevenNet-0 and MACE-MP-0.
+# - numFeatures of the SrO model is not stated. Read from the arXiv v3 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
