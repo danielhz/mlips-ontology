@@ -1,0 +1,258 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Huan Liu et al. (2021). High-temperature phonon transport properties of SnSe from machine-learning interatomic potential.
+#   Journal of Physics Condensed Matter. doi:10.1088/1361-648x/ac13fd
+#
+# Version read: publisher (sha256 d1578feac82da6f3...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 138 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the actively learned MTP for SnSe (Pnma and Cmcm
+# phases), its reference DFT, training set, hyperparameters and the
+# energy, force and stress RMSEs of Table 1. Thermal conductivities and
+# phonon properties are not encoded (no metric property).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-liu2021 a mlips:BenchmarkStudy ;
+    rdfs:label "Liu et al. (2021): high-temperature phonon transport of SnSe from a moment tensor potential" ;
+    mlips:reportedIn entity:article-liu2021 .
+
+entity:article-liu2021 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/1361-648x/ac13fd> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "High-temperature phonon transport properties of SnSe from machine-learning interatomic potential" ;
+    schema:author entity:person-Liu-liu2021 ,
+        entity:person-Qian-liu2021 ,
+        entity:person-Bao-liu2021 ,
+        <https://orcid.org/0000-0003-0023-0378> ,
+        <https://orcid.org/0000-0003-3803-3951> .
+
+entity:person-Liu-liu2021 a schema:Person ;
+    schema:name "Huan Liu" ;
+    schema:givenName "Huan" ;
+    schema:familyName "Liu" .
+
+entity:person-Qian-liu2021 a schema:Person ;
+    schema:name "Xin Qian" ;
+    schema:givenName "Xin" ;
+    schema:familyName "Qian" .
+
+entity:person-Bao-liu2021 a schema:Person ;
+    schema:name "Hua Bao" ;
+    schema:givenName "Hua" ;
+    schema:familyName "Bao" .
+
+<https://orcid.org/0000-0003-0023-0378> a schema:Person ;
+    schema:name "C Y Zhao" ;
+    schema:givenName "C Y" ;
+    schema:familyName "Zhao" ;
+    schema:identifier <https://orcid.org/0000-0003-0023-0378> .
+
+<https://orcid.org/0000-0003-3803-3951> a schema:Person ;
+    schema:name "Xiaokun Gu" ;
+    schema:givenName "Xiaokun" ;
+    schema:familyName "Gu" ;
+    schema:identifier <https://orcid.org/0000-0003-3803-3951> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-SnSe-liu2021 a mlips:MaterialSystem ;
+    rdfs:label "Tin selenide (Pnma and Cmcm phases)" ;
+    mlips:chemicalFormula "SnSe" ;
+    mlips:materialClass "Thermoelectric chalcogenide" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-liu2021 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-liu2021 mlips:hasDFTSettings entity:calc-settings-dft-liu2021 .
+
+entity:calc-settings-dft-liu2021 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    rdfs:comment "Sn 4d, 5s, 5p and Se 4s, 4p electrons as valence. The k-point sampling was not found in the text read." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-SnSe-liu2021 a mlips:TrainingDataset ;
+    rdfs:label "SnSe training set (443 configurations)" ;
+    mlips:coversMaterial entity:mat-SnSe-liu2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 443 ;
+    mlips:hasDFTCalculation entity:calc-dft-liu2021 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-SnSe-liu2021 mlips:samplingStrategy
+    entity:sampling-initial-liu2021 ,
+    entity:sampling-active-liu2021 .
+
+entity:sampling-initial-liu2021 a mlips:SamplingStrategy ;
+    rdfs:label "Initial set: 125 strained Pnma unit cells at 0 K, 10 Pnma 4x4x1 supercell configurations and 10 Cmcm configurations from ab initio MD" .
+
+entity:sampling-active-liu2021 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning on the fly (extrapolation grade, MaxVol selection) during LAMMPS MD of 4x4x1 and 4x4x2 supercells at 300 to 800 K, in three rounds" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-liu2021 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-liu2021 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:momentLevel ,
+        mlips:numRadialBasis ;
+    mlips:hasImplementation entity:impl-MTP-liu2021 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:loss-MTP-liu2021 a mlips:LossFunction ;
+    rdfs:label "Weighted least squares on energies, forces and stresses with weights C_E = 1, C_F = 0.01 and C_S = 0.001 (defaults)" .
+
+entity:alg-MTP-liu2021 a mls:Algorithm ;
+    rdfs:label "Active learning with the extrapolation grade and MaxVol selection; refit after each round" .
+
+entity:impl-MTP-liu2021 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-SnSe-cutoffRadius-liu2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.6"^^xsd:double .
+
+entity:setting-SnSe-momentLevel-liu2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "14"^^xsd:integer .
+
+entity:setting-SnSe-numRadialBasis-liu2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-SnSe-liu2021 a mlips:MLIPRun ;
+    rdfs:label "MTP training for SnSe (level 14)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-SnSe-liu2021 ;
+    mlips:hasHyperparameterSetting entity:setting-SnSe-cutoffRadius-liu2021 ,
+        entity:setting-SnSe-momentLevel-liu2021 ,
+        entity:setting-SnSe-numRadialBasis-liu2021 ;
+    mlips:produces entity:model-SnSe-liu2021 .
+
+entity:model-SnSe-liu2021 a mlips:TrainedModel ;
+    rdfs:label "MTP for SnSe" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-liu2021 mlips:hasResult
+    entity:result-train-liu2021 ,
+    entity:result-test-liu2021 .
+
+entity:result-train-liu2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SnSe-liu2021 ;
+    mlips:targetMaterial entity:mat-SnSe-liu2021 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-liu2021 ,
+        entity:metric-train-2-liu2021 ,
+        entity:metric-train-3-liu2021 .
+
+entity:metric-train-1-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE per atom, train set (eV/atom)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0012"^^xsd:double .
+
+entity:metric-train-2-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, train set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.067"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-train-3-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, train set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.088"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-test-liu2021 a mlips:BenchmarkResult ;
+    rdfs:comment "As printed in Table 1: the test-set force RMSE (0.012) is well below the train-set value (0.067); to be checked against the PDF. The composition of the test set is not described in the text read." ;
+    mlips:evaluatesModel entity:model-SnSe-liu2021 ;
+    mlips:targetMaterial entity:mat-SnSe-liu2021 ;
+    mlips:hasAccuracyMetric entity:metric-test-1-liu2021 ,
+        entity:metric-test-2-liu2021 ,
+        entity:metric-test-3-liu2021 .
+
+entity:metric-test-1-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE per atom, test set (eV/atom)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0017"^^xsd:double .
+
+entity:metric-test-2-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.012"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-test-3-liu2021 a mlips:AccuracyMetric ;
+    rdfs:label "Stress RMSE, test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.079"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The energy RMSE is stated in eV per atom, for which the vocabulary has no unit; the unit is in the metric label and the value is not converted.
+# - The text says the RMSEs are over the 443 actively learned configurations, while Table 1 has train and test columns; how the test set was formed was not found.
+# - The MLIP package is inferred from the method and the MaxVol/extrapolation-grade workflow with LAMMPS; no version is given. Lattice constants (Table 2), phonon dispersions and the Green-Kubo thermal conductivities (Table 3) are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
