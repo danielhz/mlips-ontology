@@ -1,0 +1,276 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Suyeon Ju et al. (2025). Application of pretrained universal machine-learning interatomic potential for physicochemical simulation of liquid electrolytes in Li-ion batteries.
+#   Digital Discovery. doi:10.1039/d5dd00025d  arXiv:2501.05211v1
+#
+# Version read: arxiv-preprint arXiv:2501.05211v1 (sha256 c6c8ccecd7aa57ea...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 131 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: an application of the pretrained SevenNet-0 model (with
+# a D3 dispersion correction added) to carbonate solvents and Li-salt
+# electrolytes, and one fine-tuned model (SevenNet-FT) trained on 150
+# structures to correct liquid densities. Encoded: the molecular energy
+# check of the pretrained model and the fine-tuning run with its
+# retention-test errors.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ju2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Ju et al. (2025): pretrained universal MLIP (SevenNet-0) for physicochemical simulation of liquid electrolytes in Li-ion batteries" ;
+    mlips:reportedIn entity:article-ju2025 .
+
+entity:article-ju2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d5dd00025d> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Application of pretrained universal machine-learning interatomic potential for physicochemical simulation of liquid electrolytes in Li-ion batteries" ;
+    schema:author <https://orcid.org/0000-0001-7033-8769> ,
+        <https://orcid.org/0009-0003-7152-7774> ,
+        <https://orcid.org/0009-0004-5787-2659> ,
+        <https://orcid.org/0009-0008-8690-935X> ,
+        <https://orcid.org/0000-0003-2529-4247> ,
+        <https://orcid.org/0000-0003-3958-0922> .
+
+<https://orcid.org/0000-0001-7033-8769> a schema:Person ;
+    schema:name "Suyeon Ju" ;
+    schema:givenName "Suyeon" ;
+    schema:familyName "Ju" ;
+    schema:identifier <https://orcid.org/0000-0001-7033-8769> .
+
+<https://orcid.org/0009-0003-7152-7774> a schema:Person ;
+    schema:name "Jinmu You" ;
+    schema:givenName "Jinmu" ;
+    schema:familyName "You" ;
+    schema:identifier <https://orcid.org/0009-0003-7152-7774> .
+
+<https://orcid.org/0009-0004-5787-2659> a schema:Person ;
+    schema:name "Gijin Kim" ;
+    schema:givenName "Gijin" ;
+    schema:familyName "Kim" ;
+    schema:identifier <https://orcid.org/0009-0004-5787-2659> .
+
+<https://orcid.org/0009-0008-8690-935X> a schema:Person ;
+    schema:name "Yutack Park" ;
+    schema:givenName "Yutack" ;
+    schema:familyName "Park" ;
+    schema:identifier <https://orcid.org/0009-0008-8690-935X> .
+
+<https://orcid.org/0000-0003-2529-4247> a schema:Person ;
+    schema:name "Hyungmin An" ;
+    schema:givenName "Hyungmin" ;
+    schema:familyName "An" ;
+    schema:identifier <https://orcid.org/0000-0003-2529-4247> .
+
+<https://orcid.org/0000-0003-3958-0922> a schema:Person ;
+    schema:name "Seungwu Han" ;
+    schema:givenName "Seungwu" ;
+    schema:familyName "Han" ;
+    schema:identifier <https://orcid.org/0000-0003-3958-0922> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-electrolyte-molecules-ju2025 a mlips:MaterialSystem ;
+    rdfs:label "Single molecules of Li-ion battery electrolytes: cyclic and linear carbonates, esters, fluorinated solvents and anions (e.g. EC, VC, DMC, EMC, PF6-, FSI-)" ;
+    mlips:materialClass "Organic solvent molecules and salt anions (gas phase)" .
+
+entity:mat-electrolyte-solvents-ju2025 a mlips:MaterialSystem ;
+    rdfs:label "Liquid electrolyte solvents with scaled intermolecular distances (fine-tuning domain)" ;
+    mlips:materialClass "Organic molecular liquids" .
+
+entity:mat-mptrj-CHO-ju2025 a mlips:MaterialSystem ;
+    rdfs:label "Structures containing O, C and H filtered from the SevenNet-0 training set" ;
+    mlips:materialClass "Inorganic and organic-containing crystals from MPtrj" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ju2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ju2025 mlips:hasDFTSettings entity:calc-settings-dft-ju2025 .
+
+entity:calc-settings-dft-ju2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-PBE-D3-BJ-ju2025 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    rdfs:comment "Dipole correction in all directions for molecules; relaxation until forces are below 0.02 eV/A. Plane-wave cutoff and k-points were not captured." .
+
+entity:xc-PBE-D3-BJ-ju2025 a mlips:XCFunctional ;
+    rdfs:label "PBE-D3(BJ)" ;
+    rdfs:comment "PBE with Grimme's D3 dispersion correction and Becke-Johnson damping; dispersion and coordination cutoff radii of 50.2 and 20.0 A." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ft-150-ju2025 a mlips:TrainingDataset ;
+    rdfs:label "SevenNet-FT fine-tuning set (150 structures)" ;
+    mlips:coversMaterial entity:mat-electrolyte-solvents-ju2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 150 ;
+    mlips:hasDFTCalculation entity:calc-dft-ju2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ft-150-ju2025 mlips:samplingStrategy
+    entity:sampling-scaled-liquids-ju2025 .
+
+entity:sampling-scaled-liquids-ju2025 a mlips:SamplingStrategy ;
+    rdfs:label "Liquid structures with scaled intermolecular distances" ;
+    rdfs:comment "Liquid configurations whose intermolecular distances are scaled by factors of 0.9 and 1.1 at fixed intramolecular geometry (among others): 150 structures for fine-tuning." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-ju2025 ;
+    mlips:hasHyperparameter mlips:learningRate ,
+        mlips:numEpochs ,
+        entity:hp-loss-weight-stress-ju2025 ;
+    mlips:hasImplementation entity:impl-NequIP-ju2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:alg-NequIP-ju2025 a mls:Algorithm ;
+    rdfs:label "Fine-tuning with the SevenNet-0 parameters; learning rate decreasing linearly from 1e-4 to 1e-6 over 600 epochs; stress loss weight raised from 0.01 to 1.0" .
+
+entity:impl-NequIP-ju2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SevenNet-ju2025 .
+
+entity:lib-SevenNet-ju2025 a mlips:Library ;
+    rdfs:label "SevenNet" ;
+    rdfs:comment "SevenNet with an in-house CUDA implementation of the D3(BJ) dispersion correction; ASE for static calculations and LAMMPS for MD." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-loss-weight-stress-ju2025 a mlips:Hyperparameter ;
+    rdfs:label "Stress loss weight" ;
+    mlips:hyperparameterName "stress_loss_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-sevennet-ft-learningRate-ju2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0001"^^xsd:double .
+
+entity:setting-sevennet-ft-numEpochs-ju2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "600"^^xsd:integer .
+
+entity:setting-sevennet-ft-loss-weight-stress-ju2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-stress-ju2025 ;
+    mlips:settingValue "1"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-sevennet-ft-ju2025 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-FT: fine-tuning of pretrained SevenNet-0 on 150 electrolyte structures" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ft-150-ju2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sevennet-ft-learningRate-ju2025 ,
+        entity:setting-sevennet-ft-numEpochs-ju2025 ,
+        entity:setting-sevennet-ft-loss-weight-stress-ju2025 ;
+    mlips:produces entity:model-sevennet-ft-ju2025 .
+
+entity:model-sevennet-ft-ju2025 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-FT (fine-tuned SevenNet-0, checkpoint after 50 epochs)" .
+
+# Registry stub for the externally trained model SevenNet-0 (not trained in this paper).
+entity:run-SevenNet-0 a mlips:MLIPRun ;
+    rdfs:label "Training run of SevenNet-0 (842k parameters, trained on MPtrj)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:produces entity:model-SevenNet-0 .
+
+entity:model-SevenNet-0 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 (842k parameters, trained on MPtrj)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ju2025 mlips:hasResult
+    entity:result-sevennet0-molecules-ju2025 ,
+    entity:result-sevennet-ft-retention-ju2025 .
+
+entity:result-sevennet0-molecules-ju2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SevenNet-0 ;
+    mlips:targetMaterial entity:mat-electrolyte-molecules-ju2025 ;
+    mlips:hasAccuracyMetric entity:metric-sevennet0-molecules-1-ju2025 .
+
+entity:metric-sevennet0-molecules-1-ju2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on per-atom energies of relaxed single molecules against DFT relaxation: pretrained SevenNet-0 with D3 (largest deviation 51 meV/atom, for VC)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-sevennet-ft-retention-ju2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sevennet-ft-ju2025 ;
+    mlips:targetMaterial entity:mat-mptrj-CHO-ju2025 ;
+    mlips:hasAccuracyMetric entity:metric-sevennet-ft-retention-1-ju2025 ,
+        entity:metric-sevennet-ft-retention-2-ju2025 ,
+        entity:metric-sevennet-ft-retention-3-ju2025 .
+
+entity:metric-sevennet-ft-retention-1-ju2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy, in eV/atom, on a retention test set of 19,072 O/C/H-containing structures from the SevenNet-0 training set: SevenNet-FT" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.032"^^xsd:double .
+
+entity:metric-sevennet-ft-retention-2-ju2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces on the retention test set of 19,072 structures: SevenNet-FT" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.086"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-sevennet-ft-retention-3-ju2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on stress, in kbar, on the retention test set of 19,072 structures: SevenNet-FT" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.57"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The pretrained model is identified as SevenNet-0 trained on MPtrj ('dispersion interactions absent in the MPtrj dataset'), i.e. the registry model 'SevenNet-0 trained on MPtrj' (the stub first written for loew2025), not the MPF-trained SevenNet-0 of park2024. The paper also quotes MAEs of 0.011 eV/atom, 0.041 eV/A and 2.78 kbar for SevenNet-0, apparently on its own training data; the sentence was cut in the text read and they are not encoded.
+# - The fine-tuned model starts from the registry model; schema 0.1.2 cannot express that. Energy in eV/atom and stress in kbar have no unit individuals (mlips:hasUnit omitted). The run uses 600 scheduled epochs; the reported checkpoint is after 50 epochs.
+# - Liquid densities, solvation-shell structures, diffusivities, conductivities and viscosities are the paper's results and have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
