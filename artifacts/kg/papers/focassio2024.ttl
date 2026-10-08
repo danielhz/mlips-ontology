@@ -1,0 +1,1411 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Bruno Focassio et al. (2024). Performance Assessment of Universal Machine Learning Interatomic Potentials: Challenges and Directions for Materials’ Surfaces.
+#   ACS Applied Materials & Interfaces. doi:10.1021/acsami.4c03815  arXiv:2403.04217v2
+#
+# Version read: arxiv-preprint arXiv:2403.04217v2 (sha256 51bf14c13e25906d...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 101 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the comparison of Table S1 for Ni, Cu, Li, Mo, Si, Ge:
+# three pretrained universal models (registry stubs), MACE and M3GNet
+# fine-tuned and trained from scratch on the [Ong21] data (the data of
+# zuo2020), per-element NequIP and MTP fits on [Ong21] and on the unary
+# MPtrj subset (MPtrj*), and the MTP models published with zuo2020.
+# RMSEs are aggregated over the bulk and the surface structures of the
+# six elements.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-focassio2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Focassio et al. (2024): universal MLIPs on Materials Project surfaces (MACE-MP-0, CHGNet, M3GNet, fine-tuned and specialised models)" ;
+    mlips:reportedIn entity:article-focassio2024 .
+
+entity:article-focassio2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acsami.4c03815> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Performance Assessment of Universal Machine Learning Interatomic Potentials: Challenges and Directions for Materials’ Surfaces" ;
+    schema:author <https://orcid.org/0000-0003-4811-7729> ,
+        <https://orcid.org/0000-0002-1874-5612> ,
+        <https://orcid.org/0000-0003-3129-8682> .
+
+<https://orcid.org/0000-0003-4811-7729> a schema:Person ;
+    schema:name "Bruno Focassio" ;
+    schema:givenName "Bruno" ;
+    schema:familyName "Focassio" ;
+    schema:identifier <https://orcid.org/0000-0003-4811-7729> .
+
+<https://orcid.org/0000-0002-1874-5612> a schema:Person ;
+    schema:name "Luis Paulo M. Freitas" ;
+    schema:givenName "Luis Paulo" ;
+    schema:familyName "M. Freitas" ;
+    schema:identifier <https://orcid.org/0000-0002-1874-5612> .
+
+<https://orcid.org/0000-0003-3129-8682> a schema:Person ;
+    schema:name "Gabriel R. Schleder" ;
+    schema:givenName "Gabriel R." ;
+    schema:familyName "Schleder" ;
+    schema:identifier <https://orcid.org/0000-0003-3129-8682> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-bulk-set-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Bulk structures of Ni, Cu, Li, Mo, Si and Ge (parents of the Materials Project surface set)" ;
+    mlips:materialClass "Unary bulk crystals" .
+
+entity:mat-surface-set-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Surface slabs of Ni, Cu, Li, Mo, Si and Ge from the Materials Project surface data set (Crystalium)" ;
+    mlips:materialClass "Unary surface slabs" ;
+    mlips:microstructuralFeature "Free surfaces of several Miller indices" .
+
+entity:mat-Ni-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Ni" ;
+    mlips:chemicalFormula "Ni" ;
+    mlips:materialClass "Unary fcc material" .
+
+entity:mat-Cu-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Cu" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "Unary fcc material" .
+
+entity:mat-Li-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Li" ;
+    mlips:chemicalFormula "Li" ;
+    mlips:materialClass "Unary bcc material" .
+
+entity:mat-Mo-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Mo" ;
+    mlips:chemicalFormula "Mo" ;
+    mlips:materialClass "Unary bcc material" .
+
+entity:mat-Si-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Si" ;
+    mlips:chemicalFormula "Si" ;
+    mlips:materialClass "Unary diamond cubic material" .
+
+entity:mat-Ge-focassio2024 a mlips:MaterialSystem ;
+    rdfs:label "Elemental Ge" ;
+    mlips:chemicalFormula "Ge" ;
+    mlips:materialClass "Unary diamond cubic material" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ong21-all-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] training data for Ni, Cu, Li, Mo, Si and Ge together (1402 structures)" ;
+    mlips:coversMaterial entity:mat-Ni-focassio2024 ,
+        entity:mat-Cu-focassio2024 ,
+        entity:mat-Li-focassio2024 ,
+        entity:mat-Mo-focassio2024 ,
+        entity:mat-Si-focassio2024 ,
+        entity:mat-Ge-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1402 ;
+    rdfs:comment "The paper states 1402 structures for fine-tuning; this equals the sum of the per-element training counts (263 + 262 + 241 + 194 + 214 + 228)." .
+
+entity:ds-ong21-Ni-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Ni data (263 training / 31 test structures)" ;
+    mlips:coversMaterial entity:mat-Ni-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 263 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Ni-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Ni subset (96 structures)" ;
+    mlips:coversMaterial entity:mat-Ni-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 96 .
+
+entity:ds-ong21-Cu-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Cu data (262 training / 31 test structures)" ;
+    mlips:coversMaterial entity:mat-Cu-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 262 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Cu-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Cu subset (55 structures)" ;
+    mlips:coversMaterial entity:mat-Cu-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 55 .
+
+entity:ds-ong21-Li-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Li data (241 training / 29 test structures)" ;
+    mlips:coversMaterial entity:mat-Li-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 241 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Li-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Li subset (83 structures)" ;
+    mlips:coversMaterial entity:mat-Li-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 83 .
+
+entity:ds-ong21-Mo-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Mo data (194 training / 23 test structures)" ;
+    mlips:coversMaterial entity:mat-Mo-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 194 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Mo-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Mo subset (25 structures)" ;
+    mlips:coversMaterial entity:mat-Mo-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 25 .
+
+entity:ds-ong21-Si-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Si data (214 training / 25 test structures)" ;
+    mlips:coversMaterial entity:mat-Si-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 214 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Si-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Si subset (559 structures)" ;
+    mlips:coversMaterial entity:mat-Si-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 559 .
+
+entity:ds-ong21-Ge-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "[Ong21] Ge data (228 training / 25 test structures)" ;
+    mlips:coversMaterial entity:mat-Ge-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 228 ;
+    rdfs:comment "Split 90:10 into training and validation for the NequIP fits." .
+
+entity:ds-mptrj-Ge-focassio2024 a mlips:TrainingDataset ;
+    rdfs:label "MPtrj* Ge subset (225 structures)" ;
+    mlips:coversMaterial entity:mat-Ge-focassio2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 225 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ong21-all-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-ong21-Ni-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Ni-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:ds-ong21-Cu-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Cu-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:ds-ong21-Li-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Li-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:ds-ong21-Mo-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Mo-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:ds-ong21-Si-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Si-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:ds-ong21-Ge-focassio2024 mlips:samplingStrategy
+    entity:sampling-ong21-focassio2024 .
+
+entity:ds-mptrj-Ge-focassio2024 mlips:samplingStrategy
+    entity:sampling-mptrj-unary-focassio2024 .
+
+entity:sampling-ong21-focassio2024 a mlips:SamplingStrategy ;
+    rdfs:label "Structures of the [Ong21] data set (Zuo et al. 2020)" ;
+    rdfs:comment "Ground state, strained cells, slabs and AIMD snapshots as generated by Zuo et al.; taken from the maml package." .
+
+entity:sampling-mptrj-unary-focassio2024 a mlips:SamplingStrategy ;
+    rdfs:label "Unary structures filtered from MPtrj" ;
+    rdfs:comment "Materials Project relaxation-trajectory frames of single-element structures; the entire subset is used for training." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-focassio2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        entity:hp-max-L-focassio2024 ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-focassio2024 .
+
+entity:loss-MACE-focassio2024 a mlips:LossFunction ;
+    rdfs:label "Huber loss on energy, forces and stress with weights lambda_E = 1, lambda_F = 10, lambda_sigma = 100 (from-scratch model)" .
+
+entity:impl-MACE-focassio2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "training scripts of https://github.com/ACEsuit/mace" .
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:hasLossFunction entity:loss-M3GNet-focassio2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-M3GNet-focassio2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numFeatures ,
+        mlips:learningRate ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-M3GNet-focassio2024 .
+
+entity:loss-M3GNet-focassio2024 a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta = 0.01) with a 1 : 1 : 0.1 weight ratio for energy (eV/atom), force (eV/A) and stress (GPa) (from-scratch model)" .
+
+entity:alg-M3GNet-focassio2024 a mls:Algorithm ;
+    rdfs:label "Adam, initial rate 1e-3 with cosine decay to 1% of the initial value in 100 epochs; 200 epochs with a patience of 50 epochs on the validation loss" .
+
+entity:impl-M3GNet-focassio2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-matgl-focassio2024 .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-focassio2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-focassio2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numFeatures ,
+        mlips:numAngularBasis ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-NequIP-focassio2024 .
+
+entity:loss-NequIP-focassio2024 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of per-atom energy MSE and force MSE with weights 4 and 1" .
+
+entity:alg-NequIP-focassio2024 a mls:Algorithm ;
+    rdfs:label "Adam in AMSGrad mode without weight decay; hyperparameters by grid search over cutoff (4-7 A), number of features (32, 64) and lmax (1, 2)" .
+
+entity:impl-NequIP-focassio2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP ;
+    mlips:version "https://github.com/mir-group/nequip" .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-focassio2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-focassio2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:momentLevel ,
+        mlips:numRadialBasis ;
+    mlips:hasImplementation entity:impl-MTP-focassio2024 .
+
+entity:loss-MTP-focassio2024 a mlips:LossFunction ;
+    rdfs:label "Weighted fit with energy weight 1.0 and force weight 0.01" .
+
+entity:alg-MTP-focassio2024 a mls:Algorithm ;
+    rdfs:label "Maximum of 500 / 1000 / 2000 iterations for <=16 / 20 / 24 polynomial powers; cutoff and number of polynomial powers by grid search" .
+
+entity:impl-MTP-focassio2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP .
+
+entity:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" .
+
+entity:lib-matgl-focassio2024 a mlips:Library ;
+    rdfs:label "matgl" ;
+    rdfs:comment "https://github.com/materialsvirtuallab/matgl" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-max-L-focassio2024 a mlips:Hyperparameter ;
+    rdfs:label "MACE maximum equivariance order L of the messages" ;
+    mlips:hyperparameterName "max_L" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mace-ft-numEpochs-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-m3gnet-ft-numEpochs-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-mace-scratch-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-mace-scratch-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-mace-scratch-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-mace-scratch-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-mace-scratch-max-L-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-L-focassio2024 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-m3gnet-scratch-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-m3gnet-scratch-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-m3gnet-scratch-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-m3gnet-scratch-numEpochs-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ni-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-nequip-ong21-Ni-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ni-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ni-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Ni-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ni-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-mptrj-Ni-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ni-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ni-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Ni-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Ni-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.3"^^xsd:double .
+
+entity:setting-mtp-mptrj-Ni-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Ni-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-ong21-Cu-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-nequip-ong21-Cu-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-ong21-Cu-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Cu-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Cu-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Cu-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-nequip-mptrj-Cu-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Cu-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Cu-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Cu-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Cu-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.3"^^xsd:double .
+
+entity:setting-mtp-mptrj-Cu-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "18"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Cu-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-ong21-Li-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-nequip-ong21-Li-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-ong21-Li-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Li-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Li-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Li-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-mptrj-Li-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Li-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Li-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Li-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Li-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.2"^^xsd:double .
+
+entity:setting-mtp-mptrj-Li-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "22"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Li-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-ong21-Mo-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-nequip-ong21-Mo-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-ong21-Mo-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Mo-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Mo-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Mo-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-nequip-mptrj-Mo-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Mo-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Mo-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Mo-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Mo-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:double .
+
+entity:setting-mtp-mptrj-Mo-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "24"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Mo-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-ong21-Si-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-ong21-Si-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-ong21-Si-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Si-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Si-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Si-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-mptrj-Si-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Si-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Si-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Si-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Si-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.7"^^xsd:double .
+
+entity:setting-mtp-mptrj-Si-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "18"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Si-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ge-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-nequip-ong21-Ge-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ge-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-ong21-Ge-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-ong21-Ge-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ge-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-nequip-mptrj-Ge-numFeatures-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ge-numAngularBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-mptrj-Ge-learningRate-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-nequip-mptrj-Ge-batchSize-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Ge-cutoffRadius-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.2"^^xsd:double .
+
+entity:setting-mtp-mptrj-Ge-momentLevel-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-mptrj-Ge-numRadialBasis-focassio2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-ft-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "Fine-tuning of MACE-MP-0 (L=2, 2024-01-07) on the [Ong21] data" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ong21-all-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-ft-numEpochs-focassio2024 ;
+    mlips:trainingHardware "Single NVIDIA Tesla P100 16 GB GPU; 14 hours on average" ;
+    mlips:produces entity:model-mace-ft-focassio2024 .
+
+entity:model-mace-ft-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MACE [FT]: MACE-MP-0 L=2 fine-tuned on [Ong21]" .
+
+entity:run-m3gnet-ft-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "Fine-tuning of M3GNet-DIRECT on the [Ong21] data" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-ong21-all-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-m3gnet-ft-numEpochs-focassio2024 ;
+    mlips:trainingHardware "Single NVIDIA Tesla P100 16 GB GPU; 3 hours on average" ;
+    mlips:produces entity:model-m3gnet-ft-focassio2024 .
+
+entity:model-m3gnet-ft-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "M3GNet [FT]: M3GNet-DIRECT fine-tuned on [Ong21]" .
+
+entity:run-mace-scratch-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MACE trained from scratch on the [Ong21] data" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ong21-all-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-scratch-cutoffRadius-focassio2024 ,
+        entity:setting-mace-scratch-numAngularBasis-focassio2024 ,
+        entity:setting-mace-scratch-numFeatures-focassio2024 ,
+        entity:setting-mace-scratch-numRadialBasis-focassio2024 ,
+        entity:setting-mace-scratch-max-L-focassio2024 ;
+    mlips:produces entity:model-mace-scratch-focassio2024 .
+
+entity:model-mace-scratch-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MACE [Ong21]" .
+
+entity:run-m3gnet-scratch-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "M3GNet trained from scratch on the [Ong21] data" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-ong21-all-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-m3gnet-scratch-cutoffRadius-focassio2024 ,
+        entity:setting-m3gnet-scratch-numFeatures-focassio2024 ,
+        entity:setting-m3gnet-scratch-learningRate-focassio2024 ,
+        entity:setting-m3gnet-scratch-numEpochs-focassio2024 ;
+    mlips:produces entity:model-m3gnet-scratch-focassio2024 .
+
+entity:model-m3gnet-scratch-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "M3GNet [Ong21]" .
+
+entity:run-nequip-ong21-Ni-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Ni on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Ni-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Ni-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Ni-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Ni-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Ni-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Ni-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Ni-focassio2024 .
+
+entity:model-nequip-ong21-Ni-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Ni" .
+
+entity:run-nequip-mptrj-Ni-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Ni on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Ni-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Ni-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Ni-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Ni-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Ni-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Ni-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Ni-focassio2024 .
+
+entity:model-nequip-mptrj-Ni-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Ni" .
+
+entity:run-mtp-mptrj-Ni-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Ni on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Ni-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Ni-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Ni-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Ni-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Ni-focassio2024 .
+
+entity:model-mtp-mptrj-Ni-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Ni" .
+
+entity:run-nequip-ong21-Cu-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Cu on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Cu-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Cu-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Cu-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Cu-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Cu-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Cu-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Cu-focassio2024 .
+
+entity:model-nequip-ong21-Cu-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Cu" .
+
+entity:run-nequip-mptrj-Cu-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Cu on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Cu-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Cu-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Cu-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Cu-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Cu-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Cu-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Cu-focassio2024 .
+
+entity:model-nequip-mptrj-Cu-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Cu" .
+
+entity:run-mtp-mptrj-Cu-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Cu on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Cu-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Cu-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Cu-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Cu-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Cu-focassio2024 .
+
+entity:model-mtp-mptrj-Cu-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Cu" .
+
+entity:run-nequip-ong21-Li-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Li on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Li-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Li-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Li-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Li-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Li-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Li-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Li-focassio2024 .
+
+entity:model-nequip-ong21-Li-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Li" .
+
+entity:run-nequip-mptrj-Li-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Li on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Li-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Li-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Li-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Li-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Li-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Li-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Li-focassio2024 .
+
+entity:model-nequip-mptrj-Li-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Li" .
+
+entity:run-mtp-mptrj-Li-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Li on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Li-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Li-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Li-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Li-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Li-focassio2024 .
+
+entity:model-mtp-mptrj-Li-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Li" .
+
+entity:run-nequip-ong21-Mo-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Mo on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Mo-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Mo-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Mo-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Mo-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Mo-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Mo-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Mo-focassio2024 .
+
+entity:model-nequip-ong21-Mo-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Mo" .
+
+entity:run-nequip-mptrj-Mo-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Mo on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Mo-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Mo-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Mo-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Mo-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Mo-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Mo-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Mo-focassio2024 .
+
+entity:model-nequip-mptrj-Mo-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Mo" .
+
+entity:run-mtp-mptrj-Mo-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Mo on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Mo-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Mo-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Mo-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Mo-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Mo-focassio2024 .
+
+entity:model-mtp-mptrj-Mo-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Mo" .
+
+entity:run-nequip-ong21-Si-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Si on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Si-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Si-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Si-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Si-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Si-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Si-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Si-focassio2024 .
+
+entity:model-nequip-ong21-Si-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Si" .
+
+entity:run-nequip-mptrj-Si-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Si on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Si-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Si-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Si-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Si-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Si-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Si-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Si-focassio2024 .
+
+entity:model-nequip-mptrj-Si-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Si" .
+
+entity:run-mtp-mptrj-Si-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Si on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Si-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Si-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Si-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Si-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Si-focassio2024 .
+
+entity:model-mtp-mptrj-Si-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Si" .
+
+entity:run-nequip-ong21-Ge-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Ge on [Ong21]" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ong21-Ge-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-ong21-Ge-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-ong21-Ge-numFeatures-focassio2024 ,
+        entity:setting-nequip-ong21-Ge-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-ong21-Ge-learningRate-focassio2024 ,
+        entity:setting-nequip-ong21-Ge-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-ong21-Ge-focassio2024 .
+
+entity:model-nequip-ong21-Ge-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [Ong21] model for Ge" .
+
+entity:run-nequip-mptrj-Ge-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP fit for Ge on MPtrj*" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mptrj-Ge-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-mptrj-Ge-cutoffRadius-focassio2024 ,
+        entity:setting-nequip-mptrj-Ge-numFeatures-focassio2024 ,
+        entity:setting-nequip-mptrj-Ge-numAngularBasis-focassio2024 ,
+        entity:setting-nequip-mptrj-Ge-learningRate-focassio2024 ,
+        entity:setting-nequip-mptrj-Ge-batchSize-focassio2024 ;
+    mlips:produces entity:model-nequip-mptrj-Ge-focassio2024 .
+
+entity:model-nequip-mptrj-Ge-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP [MPtrj*] model for Ge" .
+
+entity:run-mtp-mptrj-Ge-focassio2024 a mlips:MLIPRun ;
+    rdfs:label "MTP fit for Ge on MPtrj*" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-mptrj-Ge-focassio2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-mptrj-Ge-cutoffRadius-focassio2024 ,
+        entity:setting-mtp-mptrj-Ge-momentLevel-focassio2024 ,
+        entity:setting-mtp-mptrj-Ge-numRadialBasis-focassio2024 ;
+    mlips:produces entity:model-mtp-mptrj-Ge-focassio2024 .
+
+entity:model-mtp-mptrj-Ge-focassio2024 a mlips:TrainedModel ;
+    rdfs:label "MTP [MPtrj*] model for Ge" .
+
+# Registry stub for the externally trained model MACE-MP-0-L2-2024.01.07 (not trained in this paper).
+entity:run-MACE-MP-0-L2-2024_01_07 a mlips:MLIPRun ;
+    rdfs:label "Training run of MACE-MP-0 L=2 release 2024-01-07-mace-128-L2 (5.7M parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:produces entity:model-MACE-MP-0-L2-2024_01_07 .
+
+entity:model-MACE-MP-0-L2-2024_01_07 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 L=2 release 2024-01-07-mace-128-L2 (5.7M parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model CHGNet-0.3.0 (not trained in this paper).
+entity:run-CHGNet-0_3_0 a mlips:MLIPRun ;
+    rdfs:label "Training run of CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:produces entity:model-CHGNet-0_3_0 .
+
+entity:model-CHGNet-0_3_0 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model M3GNet-DIRECT (not trained in this paper).
+entity:run-M3GNet-DIRECT a mlips:MLIPRun ;
+    rdfs:label "Training run of M3GNet 2021.2.8-DIRECT (1.1M parameters, trained on MPF with DIRECT sampling) (external; registry stub)" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:produces entity:model-M3GNet-DIRECT .
+
+entity:model-M3GNet-DIRECT a mlips:TrainedModel ;
+    rdfs:label "M3GNet 2021.2.8-DIRECT (1.1M parameters, trained on MPF with DIRECT sampling)" .
+
+# entity:model-mtp-Ni-zuo2020 (MTP-Ni-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+# entity:model-mtp-Cu-zuo2020 (MTP-Cu-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+# entity:model-mtp-Li-zuo2020 (MTP-Li-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+# entity:model-mtp-Mo-zuo2020 (MTP-Mo-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+# entity:model-mtp-Si-zuo2020 (MTP-Si-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+# entity:model-mtp-Ge-zuo2020 (MTP-Ge-zuo2020) is evaluated here; its run and model are declared in papers/zuo2020.ttl.
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-focassio2024 mlips:hasResult
+    entity:result-mace-uip-bulk-focassio2024 ,
+    entity:result-mace-uip-surface-focassio2024 ,
+    entity:result-chgnet-uip-bulk-focassio2024 ,
+    entity:result-chgnet-uip-surface-focassio2024 ,
+    entity:result-m3gnet-uip-bulk-focassio2024 ,
+    entity:result-m3gnet-uip-surface-focassio2024 ,
+    entity:result-mace-ft-bulk-focassio2024 ,
+    entity:result-mace-ft-surface-focassio2024 ,
+    entity:result-m3gnet-ft-bulk-focassio2024 ,
+    entity:result-m3gnet-ft-surface-focassio2024 ,
+    entity:result-mace-scratch-bulk-focassio2024 ,
+    entity:result-mace-scratch-surface-focassio2024 ,
+    entity:result-m3gnet-scratch-bulk-focassio2024 ,
+    entity:result-m3gnet-scratch-surface-focassio2024 ,
+    entity:result-nequip-ong21-bulk-focassio2024 ,
+    entity:result-nequip-ong21-surface-focassio2024 ,
+    entity:result-mtp-ong21-bulk-focassio2024 ,
+    entity:result-mtp-ong21-surface-focassio2024 ,
+    entity:result-mtp-mptrj-bulk-focassio2024 ,
+    entity:result-mtp-mptrj-surface-focassio2024 ,
+    entity:result-nequip-mptrj-bulk-focassio2024 ,
+    entity:result-nequip-mptrj-surface-focassio2024 .
+
+entity:result-mace-uip-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-MP-0-L2-2024_01_07 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-uip-bulk-1-focassio2024 .
+
+entity:metric-mace-uip-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE-MP-0 (L=2), pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0856"^^xsd:double .
+
+entity:result-mace-uip-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-MP-0-L2-2024_01_07 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-uip-surface-1-focassio2024 .
+
+entity:metric-mace-uip-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE-MP-0 (L=2), pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0455"^^xsd:double .
+
+entity:result-chgnet-uip-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CHGNet-0_3_0 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-uip-bulk-1-focassio2024 .
+
+entity:metric-chgnet-uip-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: CHGNet v0.3.0, pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0791"^^xsd:double .
+
+entity:result-chgnet-uip-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CHGNet-0_3_0 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-uip-surface-1-focassio2024 .
+
+entity:metric-chgnet-uip-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: CHGNet v0.3.0, pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0386"^^xsd:double .
+
+entity:result-m3gnet-uip-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-DIRECT ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-uip-bulk-1-focassio2024 .
+
+entity:metric-m3gnet-uip-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet-DIRECT, pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0084"^^xsd:double .
+
+entity:result-m3gnet-uip-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-DIRECT ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-uip-surface-1-focassio2024 .
+
+entity:metric-m3gnet-uip-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet-DIRECT, pretrained" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0704"^^xsd:double .
+
+entity:result-mace-ft-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-ft-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-ft-bulk-1-focassio2024 .
+
+entity:metric-mace-ft-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE [FT]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0464"^^xsd:double .
+
+entity:result-mace-ft-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-ft-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-ft-surface-1-focassio2024 .
+
+entity:metric-mace-ft-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE [FT]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0139"^^xsd:double .
+
+entity:result-m3gnet-ft-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-ft-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-ft-bulk-1-focassio2024 .
+
+entity:metric-m3gnet-ft-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet [FT]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0399"^^xsd:double .
+
+entity:result-m3gnet-ft-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-ft-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-ft-surface-1-focassio2024 .
+
+entity:metric-m3gnet-ft-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet [FT]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.059"^^xsd:double .
+
+entity:result-mace-scratch-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-scratch-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-scratch-bulk-1-focassio2024 .
+
+entity:metric-mace-scratch-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE [Ong21]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0372"^^xsd:double .
+
+entity:result-mace-scratch-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-scratch-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-scratch-surface-1-focassio2024 .
+
+entity:metric-mace-scratch-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MACE [Ong21]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.058"^^xsd:double .
+
+entity:result-m3gnet-scratch-bulk-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-scratch-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-scratch-bulk-1-focassio2024 .
+
+entity:metric-m3gnet-scratch-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet [Ong21]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0448"^^xsd:double .
+
+entity:result-m3gnet-scratch-surface-focassio2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-scratch-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-scratch-surface-1-focassio2024 .
+
+entity:metric-m3gnet-scratch-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: M3GNet [Ong21]" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0859"^^xsd:double .
+
+entity:result-nequip-ong21-bulk-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-nequip-ong21-Ni-focassio2024 ,
+        entity:model-nequip-ong21-Cu-focassio2024 ,
+        entity:model-nequip-ong21-Li-focassio2024 ,
+        entity:model-nequip-ong21-Mo-focassio2024 ,
+        entity:model-nequip-ong21-Si-focassio2024 ,
+        entity:model-nequip-ong21-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-ong21-bulk-1-focassio2024 .
+
+entity:metric-nequip-ong21-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: NequIP [Ong21], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0378"^^xsd:double .
+
+entity:result-nequip-ong21-surface-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-nequip-ong21-Ni-focassio2024 ,
+        entity:model-nequip-ong21-Cu-focassio2024 ,
+        entity:model-nequip-ong21-Li-focassio2024 ,
+        entity:model-nequip-ong21-Mo-focassio2024 ,
+        entity:model-nequip-ong21-Si-focassio2024 ,
+        entity:model-nequip-ong21-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-ong21-surface-1-focassio2024 .
+
+entity:metric-nequip-ong21-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: NequIP [Ong21], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0542"^^xsd:double .
+
+entity:result-mtp-ong21-bulk-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-mtp-Ni-zuo2020 ,
+        entity:model-mtp-Cu-zuo2020 ,
+        entity:model-mtp-Li-zuo2020 ,
+        entity:model-mtp-Mo-zuo2020 ,
+        entity:model-mtp-Si-zuo2020 ,
+        entity:model-mtp-Ge-zuo2020 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-ong21-bulk-1-focassio2024 .
+
+entity:metric-mtp-ong21-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MTP [Ong21], six per-element models of Zuo et al." ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0371"^^xsd:double .
+
+entity:result-mtp-ong21-surface-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-mtp-Ni-zuo2020 ,
+        entity:model-mtp-Cu-zuo2020 ,
+        entity:model-mtp-Li-zuo2020 ,
+        entity:model-mtp-Mo-zuo2020 ,
+        entity:model-mtp-Si-zuo2020 ,
+        entity:model-mtp-Ge-zuo2020 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-ong21-surface-1-focassio2024 .
+
+entity:metric-mtp-ong21-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MTP [Ong21], six per-element models of Zuo et al." ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0537"^^xsd:double .
+
+entity:result-mtp-mptrj-bulk-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-mtp-mptrj-Ni-focassio2024 ,
+        entity:model-mtp-mptrj-Cu-focassio2024 ,
+        entity:model-mtp-mptrj-Li-focassio2024 ,
+        entity:model-mtp-mptrj-Mo-focassio2024 ,
+        entity:model-mtp-mptrj-Si-focassio2024 ,
+        entity:model-mtp-mptrj-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-mptrj-bulk-1-focassio2024 .
+
+entity:metric-mtp-mptrj-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MTP [MPtrj*], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0187"^^xsd:double .
+
+entity:result-mtp-mptrj-surface-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-mtp-mptrj-Ni-focassio2024 ,
+        entity:model-mtp-mptrj-Cu-focassio2024 ,
+        entity:model-mtp-mptrj-Li-focassio2024 ,
+        entity:model-mtp-mptrj-Mo-focassio2024 ,
+        entity:model-mtp-mptrj-Si-focassio2024 ,
+        entity:model-mtp-mptrj-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-mtp-mptrj-surface-1-focassio2024 .
+
+entity:metric-mtp-mptrj-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: MTP [MPtrj*], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.937"^^xsd:double .
+
+entity:result-nequip-mptrj-bulk-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-nequip-mptrj-Ni-focassio2024 ,
+        entity:model-nequip-mptrj-Cu-focassio2024 ,
+        entity:model-nequip-mptrj-Li-focassio2024 ,
+        entity:model-nequip-mptrj-Mo-focassio2024 ,
+        entity:model-nequip-mptrj-Si-focassio2024 ,
+        entity:model-nequip-mptrj-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-bulk-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-mptrj-bulk-1-focassio2024 .
+
+entity:metric-nequip-mptrj-bulk-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on bulk total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: NequIP [MPtrj*], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0182"^^xsd:double .
+
+entity:result-nequip-mptrj-surface-focassio2024 a mlips:BenchmarkResult ;
+    rdfs:comment "One RMSE aggregated over the structures of all six elements; the result is linked to each of the six per-element models." ;
+    mlips:evaluatesModel entity:model-nequip-mptrj-Ni-focassio2024 ,
+        entity:model-nequip-mptrj-Cu-focassio2024 ,
+        entity:model-nequip-mptrj-Li-focassio2024 ,
+        entity:model-nequip-mptrj-Mo-focassio2024 ,
+        entity:model-nequip-mptrj-Si-focassio2024 ,
+        entity:model-nequip-mptrj-Ge-focassio2024 ;
+    mlips:targetMaterial entity:mat-surface-set-focassio2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-mptrj-surface-1-focassio2024 .
+
+entity:metric-nequip-mptrj-surface-1-focassio2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on surface total energy, in eV/atom, over structures of Ni, Cu, Li, Mo, Si, Ge: NequIP [MPtrj*], six per-element models" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.088"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Fine-tuning ran on a single NVIDIA Tesla P100 16 GB GPU and took 14 hours
+# on average for MACE and 3 hours for M3GNet with 1402 structures
+# (trainingHardware). No inference cost is reported in the parts read.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The surface-energy RMSE column of Table S1 (J/m^2) has no MetricProperty and is not encoded; only the bulk and surface total-energy RMSEs are.
+# - Energy RMSEs are printed in eV/atom, for which the vocabulary has no unit; mlips:hasUnit is omitted and the unit is in the label (values are not converted to meV/atom).
+# - For the per-element families (NequIP and MTP on [Ong21] and MPtrj*) the paper gives one RMSE over all six elements; the result is linked to all six models, since schema 0.1.2 has no node for a set of models.
+# - MTP [Ong21] are the six MTP models published with zuo2020 (registry models model-mtp-<El>-zuo2020), reused here, not refitted.
+# - The reference DFT settings are not restated in this paper (Materials Project data and the data of Zuo et al.), so the data sets carry no reference calculation; the [Ong21] settings are in zuo2020.
+# - MACE from scratch: '4-body messages in each layer' and 'three hidden layers of 64 hidden units' are not encoded as settings; the fine-tuning runs state only the maximum of 200 epochs (patience 50).
+# - The MACE [FT] and M3GNet [FT] models start from the pretrained registry models; schema 0.1.2 cannot express that relation.
+# - The universal models were also evaluated on all 1497 Materials Project surfaces of 73 elements; those results are given as figures.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
