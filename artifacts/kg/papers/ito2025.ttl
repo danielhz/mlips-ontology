@@ -1,0 +1,437 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Kazuma Ito et al. (2025). Predicting hydrogen diffusion in nickel–manganese random alloys using machine learning interatomic potentials.
+#   Communications Materials. doi:10.1038/s43246-025-00924-x
+#
+# Version read: publisher (sha256 9006a95dbb397a02...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 184 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the final Deep Potential for Ni-Mn-H built with the
+# GeNNIP4MD iterative workflow: VASP reference calculations, the initial
+# and actively generated training data (Table 1), model settings and the
+# fitting RMSEs for the whole set and per subset. Hydrogen diffusion
+# coefficients are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ito2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Ito et al. (2025): hydrogen diffusion in Ni-Mn random alloys using machine learning interatomic potentials" ;
+    mlips:reportedIn entity:article-ito2025 .
+
+entity:article-ito2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s43246-025-00924-x> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Predicting hydrogen diffusion in nickel–manganese random alloys using machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-3456-1055> ,
+        <https://orcid.org/0009-0001-4856-0934> ,
+        entity:person-Iwasaki-ito2025 ,
+        entity:person-Sakai-ito2025 ,
+        entity:person-Yamamura-ito2025 ,
+        entity:person-Omura-ito2025 ,
+        entity:person-Yamabe-ito2025 ,
+        entity:person-Matsunaga-ito2025 .
+
+<https://orcid.org/0000-0002-3456-1055> a schema:Person ;
+    schema:name "Kazuma Ito" ;
+    schema:givenName "Kazuma" ;
+    schema:familyName "Ito" ;
+    schema:identifier <https://orcid.org/0000-0002-3456-1055> .
+
+<https://orcid.org/0009-0001-4856-0934> a schema:Person ;
+    schema:name "Naoki Matsumura" ;
+    schema:givenName "Naoki" ;
+    schema:familyName "Matsumura" ;
+    schema:identifier <https://orcid.org/0009-0001-4856-0934> .
+
+entity:person-Iwasaki-ito2025 a schema:Person ;
+    schema:name "Yuto Iwasaki" ;
+    schema:givenName "Yuto" ;
+    schema:familyName "Iwasaki" .
+
+entity:person-Sakai-ito2025 a schema:Person ;
+    schema:name "Yasufumi Sakai" ;
+    schema:givenName "Yasufumi" ;
+    schema:familyName "Sakai" .
+
+entity:person-Yamamura-ito2025 a schema:Person ;
+    schema:name "Misaho Yamamura" ;
+    schema:givenName "Misaho" ;
+    schema:familyName "Yamamura" .
+
+entity:person-Omura-ito2025 a schema:Person ;
+    schema:name "Tomohiko Omura" ;
+    schema:givenName "Tomohiko" ;
+    schema:familyName "Omura" .
+
+entity:person-Yamabe-ito2025 a schema:Person ;
+    schema:name "Junichiro Yamabe" ;
+    schema:givenName "Junichiro" ;
+    schema:familyName "Yamabe" .
+
+entity:person-Matsunaga-ito2025 a schema:Person ;
+    schema:name "Hisao Matsunaga" ;
+    schema:givenName "Hisao" ;
+    schema:familyName "Matsunaga" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-NiMnH-ito2025 a mlips:MaterialSystem ;
+    rdfs:label "Hydrogen in fcc Ni and random Ni-Mn alloys (all training subsets)" ;
+    mlips:chemicalFormula "Ni-Mn-H" ;
+    mlips:materialClass "Hydrogen in metallic alloys" .
+
+entity:mat-NiH-ito2025 a mlips:MaterialSystem ;
+    rdfs:label "fcc Ni with 0-2 H atoms in solid solution (32 host atoms)" ;
+    mlips:chemicalFormula "Ni-H" ;
+    mlips:materialClass "Hydrogen in metals" .
+
+entity:mat-NiMn125H-ito2025 a mlips:MaterialSystem ;
+    rdfs:label "Random Ni-12.5 at.% Mn alloy with 0-2 H atoms (SQS, 32 host atoms)" ;
+    mlips:chemicalFormula "Ni-Mn-H" ;
+    mlips:materialClass "Hydrogen in metallic alloys" .
+
+entity:mat-NiMn25H-ito2025 a mlips:MaterialSystem ;
+    rdfs:label "Random Ni-25.0 at.% Mn alloy with 0-2 H atoms (SQS, 32 host atoms)" ;
+    mlips:chemicalFormula "Ni-Mn-H" ;
+    mlips:materialClass "Hydrogen in metallic alloys" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ito2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ito2025 mlips:hasDFTSettings entity:calc-settings-dft-ito2025 .
+
+entity:calc-settings-dft-ito2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack mesh equivalent to 8x8x8 for the conventional Ni cell (KSPACING 0.13)" ;
+    rdfs:comment "Spin-polarised; 4s and 3d valence electrons for Ni and Mn; Methfessel-Paxton smearing of 0.1 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-all-ito2025 a mlips:TrainingDataset ;
+    rdfs:label "Final Ni-Mn-H training data set (17,777 structures, 592,435 local atomic environments)" ;
+    mlips:coversMaterial entity:mat-NiMnH-ito2025 ,
+        entity:mat-NiH-ito2025 ,
+        entity:mat-NiMn125H-ito2025 ,
+        entity:mat-NiMn25H-ito2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 17777 ;
+    mlips:hasDFTCalculation entity:calc-dft-ito2025 ;
+    rdfs:comment "Initial data set: 568 (Ni), 729 (Ni-12.5Mn) and 756 (Ni-25Mn) frames; GeNNIP4MD data set: 596, 2,438 and 12,690 frames." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-all-ito2025 mlips:samplingStrategy
+    entity:sampling-initial-ito2025 ,
+    entity:sampling-gennip-ito2025 .
+
+entity:sampling-initial-ito2025 a mlips:SamplingStrategy ;
+    rdfs:label "Initial data: AIMD (NVT at equilibrium and 2% expanded volume, and NPT, at 600 and 1200 K) of 2x2x2 supercells with 0-2 H, plus relaxation snapshots with H in each octahedral site" .
+
+entity:sampling-gennip-ito2025 a mlips:SamplingStrategy ;
+    rdfs:label "GeNNIP4MD iterations (20): NVT MD with one of four DP models at 300-1000 K over several SQS configurations and volumes; candidates with maximum force deviation between 0.10 and 0.25 eV/A; similarity-based selection in a densMAP projection of hidden-layer features down to 900 structures per round; DFT labelling" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-ito2025 ;
+    mlips:hasHyperparameter entity:hp-descriptor-type-ito2025 ,
+        mlips:cutoffRadius ,
+        entity:hp-embedding-net-ito2025 ,
+        entity:hp-axis-neurons-ito2025 ,
+        entity:hp-fitting-net-ito2025 ,
+        mlips:learningRate ,
+        entity:hp-training-steps-ito2025 ;
+    mlips:hasImplementation entity:impl-DeePMD-ito2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-DeePMD-ito2025 a mls:Algorithm ;
+    rdfs:label "Learning rate decaying from 1e-3 to 1e-8; hyperbolic-tangent activations; four models with different seeds per iteration" .
+
+entity:impl-DeePMD-ito2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "2.2.8" .
+
+entity:hp-descriptor-type-ito2025 a mlips:Hyperparameter ;
+    rdfs:label "DeePMD-kit descriptor type" ;
+    mlips:hyperparameterName "descriptor" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-embedding-net-ito2025 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-ito2025 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-axis-neurons-ito2025 a mlips:Hyperparameter ;
+    rdfs:label "Number of axis neurons" ;
+    mlips:hyperparameterName "axis_neuron" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-ito2025 a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-final-descriptor-type-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptor-type-ito2025 ;
+    mlips:settingValue "se_e2_a" .
+
+entity:setting-final-cutoffRadius-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-final-embedding-net-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-ito2025 ;
+    mlips:settingValue "20-40-80" .
+
+entity:setting-final-axis-neurons-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-axis-neurons-ito2025 ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-final-fitting-net-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-ito2025 ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-final-learningRate-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-final-training-steps-ito2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-ito2025 ;
+    mlips:settingValue "2000000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-final-ito2025 a mlips:MLIPRun ;
+    rdfs:label "Final Deep Potential training for Ni-Mn-H on the accumulated data set" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-all-ito2025 ;
+    mlips:hasHyperparameterSetting entity:setting-final-descriptor-type-ito2025 ,
+        entity:setting-final-cutoffRadius-ito2025 ,
+        entity:setting-final-embedding-net-ito2025 ,
+        entity:setting-final-axis-neurons-ito2025 ,
+        entity:setting-final-fitting-net-ito2025 ,
+        entity:setting-final-learningRate-ito2025 ,
+        entity:setting-final-training-steps-ito2025 ;
+    mlips:produces entity:model-final-ito2025 .
+
+entity:model-final-ito2025 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential for Ni-Mn-H (GeNNIP4MD)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ito2025 mlips:hasResult
+    entity:result-all-ito2025 ,
+    entity:result-init-Ni-ito2025 ,
+    entity:result-init-NiMn125-ito2025 ,
+    entity:result-init-NiMn25-ito2025 ,
+    entity:result-gen-Ni-ito2025 ,
+    entity:result-gen-NiMn125-ito2025 ,
+    entity:result-gen-NiMn25-ito2025 .
+
+entity:result-all-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiMnH-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-all-1-ito2025 ,
+        entity:metric-all-2-ito2025 .
+
+entity:metric-all-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, whole training data set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-all-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, whole training data set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "68.41"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-init-Ni-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiH-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-init-Ni-1-ito2025 ,
+        entity:metric-init-Ni-2-ito2025 .
+
+entity:metric-init-Ni-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, initial data set, Ni with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-init-Ni-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, initial data set, Ni with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.67"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-init-NiMn125-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiMn125H-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-init-NiMn125-1-ito2025 ,
+        entity:metric-init-NiMn125-2-ito2025 .
+
+entity:metric-init-NiMn125-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, initial data set, Ni-12.5 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.32"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-init-NiMn125-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, initial data set, Ni-12.5 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "32.99"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-init-NiMn25-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiMn25H-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-init-NiMn25-1-ito2025 ,
+        entity:metric-init-NiMn25-2-ito2025 .
+
+entity:metric-init-NiMn25-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, initial data set, Ni-25.0 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-init-NiMn25-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, initial data set, Ni-25.0 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "57.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-gen-Ni-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiH-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-gen-Ni-1-ito2025 ,
+        entity:metric-gen-Ni-2-ito2025 .
+
+entity:metric-gen-Ni-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, GeNNIP4MD data set, Ni with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gen-Ni-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, GeNNIP4MD data set, Ni with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.84"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-gen-NiMn125-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiMn125H-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-gen-NiMn125-1-ito2025 ,
+        entity:metric-gen-NiMn125-2-ito2025 .
+
+entity:metric-gen-NiMn125-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, GeNNIP4MD data set, Ni-12.5 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.63"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gen-NiMn125-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, GeNNIP4MD data set, Ni-12.5 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "50.15"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-gen-NiMn25-ito2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-final-ito2025 ;
+    mlips:targetMaterial entity:mat-NiMn25H-ito2025 ;
+    mlips:hasAccuracyMetric entity:metric-gen-NiMn25-1-ito2025 ,
+        entity:metric-gen-NiMn25-2-ito2025 .
+
+entity:metric-gen-NiMn25-1-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, GeNNIP4MD data set, Ni-25.0 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.15"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gen-NiMn25-2-ito2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, GeNNIP4MD data set, Ni-25.0 at.% Mn with 0-2 H" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "74.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table 1 gives fitting errors on the training data per subset ('fitting errors of the constructed deep potentials'); they are all attributed to the final model. No separate test-set error was found in the text read.
+# - The final training uses two million steps (800,000 during the iterations); the learning-rate schedule is stated for the 800,000-step runs. A hybrid se_e2_a + se_e3 descriptor was tested and not adopted (Supplementary Note 3).
+# - Hydrogen diffusion coefficients against experiment, the site-occupancy analysis and the validation against DFT for migration energies are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
