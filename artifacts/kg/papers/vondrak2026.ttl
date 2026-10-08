@@ -1,0 +1,300 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Martin Vondrák et al. (2026). Integrating Charge Equilibration with Equivariant Machine-Learning Interatomic Potentials.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.6c00553
+#
+# Version read: publisher (sha256 ef232f343215c2c6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 150 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MACE-QEq method (introduced here) and the models of
+# the two applications: charged oxygen vacancies in wurtzite ZnO (HSE06
+# data) and water models trained on clusters only (RPBE data), trained
+# from scratch, fine-tuned from MACE-OFF23, and compared with short-range
+# MACE. All accuracies are shown as figures (error densities, learning
+# curves), so no AccuracyMetric is encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-vondrak2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Vondrak et al. (2026): integrating charge equilibration with equivariant MLIPs (MACE-QEq)" ;
+    mlips:reportedIn entity:article-vondrak2026 .
+
+entity:article-vondrak2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.6c00553> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Integrating Charge Equilibration with Equivariant Machine-Learning Interatomic Potentials" ;
+    schema:author entity:person-Vondrak-vondrak2026 ,
+        <https://orcid.org/0009-0005-9863-6422> ,
+        <https://orcid.org/0000-0002-8180-2034> ,
+        <https://orcid.org/0000-0001-8473-8659> ,
+        <https://orcid.org/0000-0002-0862-5289> .
+
+entity:person-Vondrak-vondrak2026 a schema:Person ;
+    schema:name "Martin Vondrák" ;
+    schema:givenName "Martin" ;
+    schema:familyName "Vondrák" .
+
+<https://orcid.org/0009-0005-9863-6422> a schema:Person ;
+    schema:name "William J. Baldwin" ;
+    schema:givenName "William J." ;
+    schema:familyName "Baldwin" ;
+    schema:identifier <https://orcid.org/0009-0005-9863-6422> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0001-8473-8659> a schema:Person ;
+    schema:name "Karsten Reuter" ;
+    schema:givenName "Karsten" ;
+    schema:familyName "Reuter" ;
+    schema:identifier <https://orcid.org/0000-0001-8473-8659> .
+
+<https://orcid.org/0000-0002-0862-5289> a schema:Person ;
+    schema:name "Johannes T. Margraf" ;
+    schema:givenName "Johannes T." ;
+    schema:familyName "Margraf" ;
+    schema:identifier <https://orcid.org/0000-0002-0862-5289> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-ZnO-vondrak2026 a mlips:MaterialSystem ;
+    rdfs:label "Wurtzite ZnO supercells with one oxygen vacancy (neutral or doubly positive)" ;
+    mlips:chemicalFormula "ZnO" ;
+    mlips:materialClass "Defective oxide semiconductor" .
+
+entity:mat-clusters-vondrak2026 a mlips:MaterialSystem ;
+    rdfs:label "Water clusters of up to 11 molecules with net charge -1, 0 or +1" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular clusters" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-hse-vondrak2026 a mlips:DFTCalculation .
+
+entity:calc-rpbe-vondrak2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-hse-vondrak2026 mlips:hasDFTSettings entity:calc-settings-hse-vondrak2026 .
+
+entity:calc-settings-hse-vondrak2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional mlips:HSE06 ;
+    rdfs:comment "Hybrid-functional data for the ZnO vacancy structures; basis settings are in the SI." .
+
+entity:calc-rpbe-vondrak2026 mlips:hasDFTSettings entity:calc-settings-rpbe-vondrak2026 .
+
+entity:calc-settings-rpbe-vondrak2026 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-RPBE-vondrak2026 ;
+    rdfs:comment "Level of the reused water-cluster data (from the authors' previous work and a published data set); code and basis not stated in the text read." .
+
+entity:xc-RPBE-vondrak2026 a mlips:XCFunctional ;
+    rdfs:label "RPBE" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ZnO-vondrak2026 a mlips:TrainingDataset ;
+    rdfs:label "ZnO oxygen-vacancy data set (1907 structures)" ;
+    mlips:coversMaterial entity:mat-ZnO-vondrak2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1907 ;
+    mlips:hasDFTCalculation entity:calc-hse-vondrak2026 ;
+    rdfs:comment "The text gives 717 NEB structures and 1591 MD structures next to the total of 1907; the parts do not add up as extracted and should be checked against the PDF. Hirshfeld charges are available as an optional target (EFQ fits)." .
+
+entity:ds-clusters-vondrak2026 a mlips:TrainingDataset ;
+    rdfs:label "Up to 1000 randomly selected water clusters (validation on 1000 further clusters)" ;
+    mlips:coversMaterial entity:mat-clusters-vondrak2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-rpbe-vondrak2026 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ZnO-vondrak2026 mlips:samplingStrategy
+    entity:sampling-al-vondrak2026 .
+
+entity:ds-clusters-vondrak2026 mlips:samplingStrategy
+    entity:sampling-reused-vondrak2026 .
+
+entity:sampling-al-vondrak2026 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning with three MD cycles, plus nudged-elastic-band configurations of the oxygen-hopping path perpendicular to the basal plane in 3x3x2 and 3x3x3 supercells" .
+
+entity:sampling-reused-vondrak2026 a mlips:SamplingStrategy ;
+    rdfs:label "Random selection from a previously published water-cluster data set" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE-QEq a mlips:MLIPMethod ;
+    rdfs:label "MACE-QEq (MACE with charge equilibration)" ;
+    mlips:hasLossFunction entity:loss-MACE-QEq-vondrak2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-QEq-vondrak2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-vondrak2026 ,
+        entity:hp-targets-vondrak2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:GeometryOptimization .
+
+entity:loss-MACE-QEq-vondrak2026 a mlips:LossFunction ;
+    rdfs:label "Energies and forces (EF fits, charges left as latent variables); a variant adds reference partial charges (EFQ fits) and is found less accurate" .
+
+entity:alg-MACE-QEq-vondrak2026 a mls:Algorithm ;
+    rdfs:label "Self-consistent charge equilibration with a total-charge constraint inside the model; optional fine-tuning from a pretrained short-range MACE with new readout heads for electronegativity and hardness" .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasHyperparameter entity:hp-initialisation-vondrak2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:hp-initialisation-vondrak2026 a mlips:Hyperparameter ;
+    rdfs:label "Weight initialisation" ;
+    mlips:hyperparameterName "initialisation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-targets-vondrak2026 a mlips:Hyperparameter ;
+    rdfs:label "Training targets" ;
+    mlips:hyperparameterName "targets" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ZnO-EF-targets-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-targets-vondrak2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-ZnO-EFQ-targets-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-targets-vondrak2026 ;
+    mlips:settingValue "energies, forces and partial charges" .
+
+entity:setting-water-qeq-initialisation-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-vondrak2026 ;
+    mlips:settingValue "from scratch" .
+
+entity:setting-water-qeq-targets-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-targets-vondrak2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-water-qeq-ft-initialisation-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-vondrak2026 ;
+    mlips:settingValue "pretrained MACE-OFF23 foundation model" .
+
+entity:setting-water-qeq-ft-targets-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-targets-vondrak2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-water-mace-initialisation-vondrak2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-vondrak2026 ;
+    mlips:settingValue "from scratch" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ZnO-EF-vondrak2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-QEq fitted to energies and forces for ZnO oxygen vacancies" ;
+    mlips:appliesMethod entity:MACE-QEq ;
+    mlips:runsOn entity:ds-ZnO-vondrak2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ZnO-EF-targets-vondrak2026 ;
+    mlips:produces entity:model-ZnO-EF-vondrak2026 .
+
+entity:model-ZnO-EF-vondrak2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-QEq (EF-fitted) for ZnO oxygen vacancies" .
+
+entity:run-ZnO-EFQ-vondrak2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-QEq fitted to energies, forces and charges for ZnO oxygen vacancies" ;
+    mlips:appliesMethod entity:MACE-QEq ;
+    mlips:runsOn entity:ds-ZnO-vondrak2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ZnO-EFQ-targets-vondrak2026 ;
+    mlips:produces entity:model-ZnO-EFQ-vondrak2026 .
+
+entity:model-ZnO-EFQ-vondrak2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-QEq (EFQ-fitted) for ZnO oxygen vacancies" .
+
+entity:run-water-qeq-vondrak2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-QEq trained from scratch on water clusters" ;
+    mlips:appliesMethod entity:MACE-QEq ;
+    mlips:runsOn entity:ds-clusters-vondrak2026 ;
+    mlips:hasHyperparameterSetting entity:setting-water-qeq-initialisation-vondrak2026 ,
+        entity:setting-water-qeq-targets-vondrak2026 ;
+    mlips:produces entity:model-water-qeq-vondrak2026 .
+
+entity:model-water-qeq-vondrak2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-QEq for water (from scratch, 1000 clusters)" .
+
+entity:run-water-qeq-ft-vondrak2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-QEq fine-tuned from MACE-OFF23 on water clusters" ;
+    mlips:appliesMethod entity:MACE-QEq ;
+    mlips:runsOn entity:ds-clusters-vondrak2026 ;
+    mlips:hasHyperparameterSetting entity:setting-water-qeq-ft-initialisation-vondrak2026 ,
+        entity:setting-water-qeq-ft-targets-vondrak2026 ;
+    mlips:produces entity:model-water-qeq-ft-vondrak2026 .
+
+entity:model-water-qeq-ft-vondrak2026 a mlips:TrainedModel ;
+    rdfs:label "FT-MACE-QEq for water (1000 clusters)" .
+
+entity:run-water-mace-vondrak2026 a mlips:MLIPRun ;
+    rdfs:label "Short-range MACE trained from scratch on water clusters" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-clusters-vondrak2026 ;
+    mlips:hasHyperparameterSetting entity:setting-water-mace-initialisation-vondrak2026 ;
+    mlips:produces entity:model-water-mace-vondrak2026 .
+
+entity:model-water-mace-vondrak2026 a mlips:TrainedModel ;
+    rdfs:label "Short-range MACE for water (1000 clusters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: energy-error densities for ZnO (Fig. 6) and the water learning curves (Fig. 10; RMSE on 157 bulk cells and on protonated, deprotonated and neutral clusters, mean of three models) are figures without printed values. Migration barriers, charge-state relaxations and radial distribution functions are not encoded.
+# - MACE-QEq is registered as a method of its own (a different functional form: charge equilibration on top of MACE), in line with CACE-LES next to CACE. Schema 0.1.2 cannot say that it derives from MACE or that the fine-tuned model starts from MACE-OFF23; the MACE-OFF23 size is not specified, so the base model is a string-valued setting.
+# - Model hyperparameters (cutoff, channels, layers) are in the SI and not encoded. Each water learning-curve point averages three models on different training subsets; one run per model type at 1000 clusters is encoded. A fine-tuned short-range MACE is also discussed and not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
