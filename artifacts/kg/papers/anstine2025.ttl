@@ -1,0 +1,231 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Dylan M. Anstine et al. (2025). AIMNet2: a neural network potential to meet your neutral, charged, organic, and elemental-organic needs.
+#   Chemical Science. doi:10.1039/d4sc08572h
+#
+# Version read: publisher (sha256 209409d0bb20afbf...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 174 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the AIMNet2 method (introduced here) and its two
+# pretrained models, at the omegaB97M-D3/def2-TZVPP and B97-3c levels,
+# with the reference calculations, the distilled training set, the
+# sampling and the training settings. The paper's benchmarks are on
+# derived quantities (conformer and interaction energies, torsion
+# profiles, geometries), so no AccuracyMetric is encoded; see gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-anstine2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Anstine et al. (2025): AIMNet2, a neural network potential for neutral, charged, organic and elemental-organic molecules" ;
+    mlips:reportedIn entity:article-anstine2025 .
+
+entity:article-anstine2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1039/d4sc08572h> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "AIMNet2: a neural network potential to meet your neutral, charged, organic, and elemental-organic needs" ;
+    schema:author entity:person-Anstine-anstine2025 ,
+        entity:person-Zubatyuk-anstine2025 ,
+        <https://orcid.org/0000-0001-7581-8497> .
+
+entity:person-Anstine-anstine2025 a schema:Person ;
+    schema:name "Dylan M. Anstine" ;
+    schema:givenName "Dylan M." ;
+    schema:familyName "Anstine" .
+
+entity:person-Zubatyuk-anstine2025 a schema:Person ;
+    schema:name "Roman Zubatyuk" ;
+    schema:givenName "Roman" ;
+    schema:familyName "Zubatyuk" .
+
+<https://orcid.org/0000-0001-7581-8497> a schema:Person ;
+    schema:name "Olexandr Isayev" ;
+    schema:givenName "Olexandr" ;
+    schema:familyName "Isayev" ;
+    schema:identifier <https://orcid.org/0000-0001-7581-8497> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-molecules-anstine2025 a mlips:MaterialSystem ;
+    rdfs:label "Organic and elemental-organic molecules of 14 elements (H, B, C, N, O, F, Si, P, S, Cl, As, Se, Br, I), neutral and charged, and small molecular clusters" ;
+    mlips:materialClass "Organic and elemental-organic molecules" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-wb97m-anstine2025 a mlips:DFTCalculation .
+
+entity:calc-b973c-anstine2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-wb97m-anstine2025 mlips:hasDFTSettings entity:calc-settings-wb97m-anstine2025 .
+
+entity:calc-settings-wb97m-anstine2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional entity:xc-omegaB97M-D3-anstine2025 ;
+    mlips:dftBasisSet entity:basis-def2-TZVPP-anstine2025 ;
+    rdfs:comment "ORCA 5. Reference data are used in training without the dispersion correction; a two-body D3 term is added in the final model." .
+
+entity:calc-b973c-anstine2025 mlips:hasDFTSettings entity:calc-settings-b973c-anstine2025 .
+
+entity:calc-settings-b973c-anstine2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional entity:xc-B97-3c-anstine2025 ;
+    rdfs:comment "ORCA 5; composite method used to label the whole master set of about 1.2e8 conformers before distillation." .
+
+entity:xc-omegaB97M-D3-anstine2025 a mlips:XCFunctional ;
+    rdfs:label "omegaB97M-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVPP-anstine2025 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVPP" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:xc-B97-3c-anstine2025 a mlips:XCFunctional ;
+    rdfs:label "B97-3c" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-wb97m-anstine2025 a mlips:TrainingDataset ;
+    rdfs:label "Distilled AIMNet2 training set at the omegaB97M-D3/def2-TZVPP level (about 2e7 samples)" ;
+    mlips:coversMaterial entity:mat-molecules-anstine2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-wb97m-anstine2025 ;
+    rdfs:comment "Size given only approximately (about 2 x 10^7 of a master set of about 1.2 x 10^8). Partial charges, dipoles and quadrupoles are further training targets." .
+
+entity:ds-b973c-anstine2025 a mlips:TrainingDataset ;
+    rdfs:label "Distilled AIMNet2 training set at the B97-3c level" ;
+    mlips:coversMaterial entity:mat-molecules-anstine2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-b973c-anstine2025 ;
+    rdfs:comment "That the B97-3c model is trained on the same distilled subset is implied (the text speaks of pretrained models at both levels), not stated with a size." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-wb97m-anstine2025 mlips:samplingStrategy
+    entity:sampling-explore-anstine2025 ,
+    entity:sampling-distill-anstine2025 .
+
+entity:ds-b973c-anstine2025 mlips:samplingStrategy
+    entity:sampling-explore-anstine2025 ,
+    entity:sampling-distill-anstine2025 .
+
+entity:sampling-explore-anstine2025 a mlips:SamplingStrategy ;
+    rdfs:label "Molecules from ChEMBL and PubChem with tautomers and protonation states; geometry optimisation, torsion scans, MD and metadynamics with GFN2-xTB and QMDFF; MD of small molecular clusters with preliminary models; structures added from the ANI-1x, ANI-2x and OrbNet data sets" .
+
+entity:sampling-distill-anstine2025 a mlips:SamplingStrategy ;
+    rdfs:label "Data distillation with query by committee: starting from 1e5 random samples, batches of 1e5 structures predicted above three times the current training error (energy or force) are added until the model describes the whole master set" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:AIMNet2 a mlips:MLIPMethod ;
+    rdfs:label "AIMNet2 (atoms-in-molecules neural network potential with learned charges and explicit long-range terms)" ;
+    mlips:hasLossFunction entity:loss-AIMNet2-anstine2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-AIMNet2-anstine2025 ;
+    mlips:hasHyperparameter mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:MolecularDynamics .
+
+entity:loss-AIMNet2-anstine2025 a mlips:LossFunction ;
+    rdfs:label "Weighted multi-target MSE: w_E = 1.0 (energy, scaled by the square root of the number of atoms), w_F = 0.2 (forces), w_D = 0.05 (dipole), w_Q = 0.02 (quadrupole)" .
+
+entity:alg-AIMNet2-anstine2025 a mls:Algorithm ;
+    rdfs:label "AdamW with reduce-on-plateau schedule; multi-GPU data-parallel training; final ensembles of four models retrained from scratch" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-wb97m-batchSize-anstine2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2048"^^xsd:integer .
+
+entity:setting-wb97m-numEpochs-anstine2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-b973c-batchSize-anstine2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2048"^^xsd:integer .
+
+entity:setting-b973c-numEpochs-anstine2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-wb97m-anstine2025 a mlips:MLIPRun ;
+    rdfs:label "AIMNet2 training at the omegaB97M-D3/def2-TZVPP level" ;
+    mlips:appliesMethod entity:AIMNet2 ;
+    mlips:runsOn entity:ds-wb97m-anstine2025 ;
+    mlips:hasHyperparameterSetting entity:setting-wb97m-batchSize-anstine2025 ,
+        entity:setting-wb97m-numEpochs-anstine2025 ;
+    mlips:trainingHardware "8 Nvidia V100 GPUs" ;
+    mlips:produces entity:model-wb97m-anstine2025 .
+
+entity:model-wb97m-anstine2025 a mlips:TrainedModel ;
+    rdfs:label "AIMNet2 (omegaB97M-D3)" .
+
+entity:run-b973c-anstine2025 a mlips:MLIPRun ;
+    rdfs:label "AIMNet2 training at the B97-3c level" ;
+    mlips:appliesMethod entity:AIMNet2 ;
+    mlips:runsOn entity:ds-b973c-anstine2025 ;
+    mlips:hasHyperparameterSetting entity:setting-b973c-batchSize-anstine2025 ,
+        entity:setting-b973c-numEpochs-anstine2025 ;
+    mlips:trainingHardware "8 Nvidia V100 GPUs" ;
+    mlips:produces entity:model-b973c-anstine2025 .
+
+entity:model-b973c-anstine2025 a mlips:TrainedModel ;
+    rdfs:label "AIMNet2 (B97-3c)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: the benchmarks are on relative or derived quantities. TorsionNet500 torsion-profile energies (Table 1): AIMNet2 MAE 0.32 and RMSE 0.47 kcal/mol; ANI-2x 1.30 and 1.90; B97-3c 0.29 and 0.43; OrbNet Denali 0.12 and 0.18. GMTKN55 and NCI Atlas interaction energies (about 1 to 2 kcal/mol RMSE), conformer searches and crystal-geometry RMSDs are figures. These were not forced into EnergyProperty, as elsewhere in this run; the ANI-2x row would link to the registry model ANI-2x if relative-energy metrics become encodable.
+# - batchSize is the effective combined batch size (8 batches in parallel); numEpochs is the upper end of the stated convergence range (400 to 500 epochs). Architecture hyperparameters (cutoffs, feature sizes, number of message passes) were not captured from the text read.
+# - AIMNet2 is registered as a new method; it descends from AIMNet and AIMNet-NSE, which are not in the registry. Each pretrained model is an ensemble of four networks, encoded as one model.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
