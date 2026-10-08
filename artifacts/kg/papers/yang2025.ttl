@@ -1,0 +1,981 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ziduo Yang et al. (2025). Efficient equivariant model for machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-025-01535-3  arXiv:2311.02869v7
+#
+# Version read: arxiv-preprint arXiv:2311.02869v7 (sha256 d706cfa607a03309...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 112 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the LEIGNN method (introduced here) and the comparison
+# of Table 1: LEIGNN and seven baseline models (CGCNN, SchNet, MACE,
+# PaiNN, PaiNN Direct, DimeNet++, GemNet-dT), all trained by the authors
+# on the same OC20-200K subset and tested on the four external OC20
+# validation sets (S2EF energy and force MAEs).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-yang2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Yang et al. (2025): efficient equivariant model for MLIPs (LEIGNN)" ;
+    mlips:reportedIn entity:article-yang2025 .
+
+entity:article-yang2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01535-3> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Efficient equivariant model for machine learning interatomic potentials" ;
+    schema:author entity:person-Yang-yang2025 ,
+        entity:person-Wang-yang2025 ,
+        entity:person-Li-yang2025 ,
+        entity:person-Lv-yang2025 ,
+        <https://orcid.org/0000-0001-9213-9832> ,
+        <https://orcid.org/0000-0001-6198-5753> .
+
+entity:person-Yang-yang2025 a schema:Person ;
+    schema:name "Ziduo Yang" ;
+    schema:givenName "Ziduo" ;
+    schema:familyName "Yang" .
+
+entity:person-Wang-yang2025 a schema:Person ;
+    schema:name "Xian Wang" ;
+    schema:givenName "Xian" ;
+    schema:familyName "Wang" .
+
+entity:person-Li-yang2025 a schema:Person ;
+    schema:name "Yifan Li" ;
+    schema:givenName "Yifan" ;
+    schema:familyName "Li" .
+
+entity:person-Lv-yang2025 a schema:Person ;
+    schema:name "Qiujie Lv" ;
+    schema:givenName "Qiujie" ;
+    schema:familyName "Lv" .
+
+<https://orcid.org/0000-0001-9213-9832> a schema:Person ;
+    schema:name "Calvin Yu-Chian Chen" ;
+    schema:givenName "Calvin Yu-Chian" ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0001-9213-9832> .
+
+<https://orcid.org/0000-0001-6198-5753> a schema:Person ;
+    schema:name "Lei Shen" ;
+    schema:givenName "Lei" ;
+    schema:familyName "Shen" ;
+    schema:identifier <https://orcid.org/0000-0001-6198-5753> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-oc20-yang2025 a mlips:MaterialSystem ;
+    rdfs:label "OC20 adsorbate-catalyst systems (training domain of the OC20-200K subset)" ;
+    mlips:materialClass "Heterogeneous-catalysis slab + adsorbate systems" .
+
+entity:mat-val-id-yang2025 a mlips:MaterialSystem ;
+    rdfs:label "OC20 S2EF external validation set: in domain" ;
+    mlips:materialClass "Slab + adsorbate systems (about 1 million data points)" .
+
+entity:mat-val-ood-ads-yang2025 a mlips:MaterialSystem ;
+    rdfs:label "OC20 S2EF external validation set: out-of-domain adsorbate" ;
+    mlips:materialClass "Slab + adsorbate systems (about 1 million data points)" .
+
+entity:mat-val-ood-cat-yang2025 a mlips:MaterialSystem ;
+    rdfs:label "OC20 S2EF external validation set: out-of-domain catalyst" ;
+    mlips:materialClass "Slab + adsorbate systems (about 1 million data points)" .
+
+entity:mat-val-ood-both-yang2025 a mlips:MaterialSystem ;
+    rdfs:label "OC20 S2EF external validation set: out-of-domain adsorbate and catalyst" ;
+    mlips:materialClass "Slab + adsorbate systems (about 1 million data points)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-oc20-200k-yang2025 a mlips:TrainingDataset ;
+    rdfs:label "OC20-200K (200,000 structures; 80% for training)" ;
+    mlips:coversMaterial entity:mat-oc20-yang2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 200000 ;
+    rdfs:comment "numConfigurations is the subset size before the 8:2 split. Energies are adsorption energies; the OC20 reference level (RPBE, VASP) is described in chanussot2021." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-oc20-200k-yang2025 mlips:samplingStrategy
+    entity:sampling-oc20-200k-yang2025 .
+
+entity:sampling-oc20-200k-yang2025 a mlips:SamplingStrategy ;
+    rdfs:label "OC20-200K subset" ;
+    rdfs:comment "200,000 structures of the OC20 S2EF data, split 8:2 into training and internal validation sets; the internal validation set selects the best model." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:LEIGNN a mlips:MLIPMethod ;
+    rdfs:label "LEIGNN (lightweight equivariant interaction graph neural network)" ;
+    mlips:hasLossFunction entity:loss-LEIGNN-yang2025 ;
+    mlips:hasImplementation entity:impl-LEIGNN-yang2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-LEIGNN-yang2025 a mlips:LossFunction ;
+    rdfs:label "Weighted sum of absolute errors of energy and force components (weights alpha and beta)" .
+
+entity:impl-LEIGNN-yang2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-LEIGNN-PyTorch-yang2025 .
+
+entity:CGCNN a mlips:MLIPMethod ;
+    rdfs:label "Crystal Graph Convolutional Neural Network (CGCNN)" .
+
+entity:SchNet a mlips:MLIPMethod ;
+    rdfs:label "SchNet (continuous-filter convolutional deep neural network)" .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" .
+
+entity:PaiNN a mlips:MLIPMethod ;
+    rdfs:label "PaiNN (polarizable atom interaction neural network)" ;
+    mlips:hasHyperparameter entity:hp-force-mode-yang2025 .
+
+entity:DimeNet a mlips:MLIPMethod ;
+    rdfs:label "DimeNet / DimeNet++ (directional message passing neural network)" .
+
+entity:GemNet a mlips:MLIPMethod ;
+    rdfs:label "GemNet (geometric message passing neural network)" ;
+    mlips:hasFunctionalForm entity:ff-GemNet ;
+    mlips:hasHyperparameter entity:hp-variant-yang2025 .
+
+entity:ff-GemNet a mlips:FunctionalForm ;
+    rdfs:label "Directional graph neural network with geometric message passing over atom triplets and, in the two-hop form, quadruplets, built on spherical representations; energies are sums of atomic contributions and forces are obtained by backpropagation or, in the direct variants, predicted directly" .
+
+entity:lib-LEIGNN-PyTorch-yang2025 a mlips:Library ;
+    rdfs:label "LEIGNN (PyTorch)" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-force-mode-yang2025 a mlips:Hyperparameter ;
+    rdfs:label "Force prediction mode (energy derivative or direct prediction)" ;
+    mlips:hyperparameterName "force_mode" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-variant-yang2025 a mlips:Hyperparameter ;
+    rdfs:label "GemNet variant (two-hop Q or one-hop T message passing; d = direct force prediction)" ;
+    mlips:hyperparameterName "variant" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-PaiNN-force-mode-yang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-mode-yang2025 ;
+    mlips:settingValue "energy-conserving forces" .
+
+entity:setting-PaiNN-Direct-force-mode-yang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-mode-yang2025 ;
+    mlips:settingValue "direct force prediction" .
+
+entity:setting-GemNet-dT-variant-yang2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-yang2025 ;
+    mlips:settingValue "GemNet-dT" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-CGCNN-yang2025 a mlips:MLIPRun ;
+    rdfs:label "CGCNN trained on OC20-200K" ;
+    mlips:appliesMethod entity:CGCNN ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:produces entity:model-CGCNN-yang2025 .
+
+entity:model-CGCNN-yang2025 a mlips:TrainedModel ;
+    rdfs:label "CGCNN OC20-200K model" .
+
+entity:run-SchNet-yang2025 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on OC20-200K" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:produces entity:model-SchNet-yang2025 .
+
+entity:model-SchNet-yang2025 a mlips:TrainedModel ;
+    rdfs:label "SchNet OC20-200K model" .
+
+entity:run-MACE-yang2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on OC20-200K" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:produces entity:model-MACE-yang2025 .
+
+entity:model-MACE-yang2025 a mlips:TrainedModel ;
+    rdfs:label "MACE OC20-200K model" .
+
+entity:run-PaiNN-yang2025 a mlips:MLIPRun ;
+    rdfs:label "PaiNN trained on OC20-200K" ;
+    mlips:appliesMethod entity:PaiNN ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-PaiNN-force-mode-yang2025 ;
+    mlips:produces entity:model-PaiNN-yang2025 .
+
+entity:model-PaiNN-yang2025 a mlips:TrainedModel ;
+    rdfs:label "PaiNN OC20-200K model" .
+
+entity:run-PaiNN-Direct-yang2025 a mlips:MLIPRun ;
+    rdfs:label "PaiNN Direct trained on OC20-200K" ;
+    mlips:appliesMethod entity:PaiNN ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-PaiNN-Direct-force-mode-yang2025 ;
+    mlips:produces entity:model-PaiNN-Direct-yang2025 .
+
+entity:model-PaiNN-Direct-yang2025 a mlips:TrainedModel ;
+    rdfs:label "PaiNN Direct OC20-200K model" .
+
+entity:run-DimeNet-yang2025 a mlips:MLIPRun ;
+    rdfs:label "DimeNet++ trained on OC20-200K" ;
+    mlips:appliesMethod entity:DimeNet ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:produces entity:model-DimeNet-yang2025 .
+
+entity:model-DimeNet-yang2025 a mlips:TrainedModel ;
+    rdfs:label "DimeNet++ OC20-200K model" .
+
+entity:run-GemNet-dT-yang2025 a mlips:MLIPRun ;
+    rdfs:label "GemNet-dT trained on OC20-200K" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:hasHyperparameterSetting entity:setting-GemNet-dT-variant-yang2025 ;
+    mlips:produces entity:model-GemNet-dT-yang2025 .
+
+entity:model-GemNet-dT-yang2025 a mlips:TrainedModel ;
+    rdfs:label "GemNet-dT OC20-200K model" .
+
+entity:run-LEIGNN-yang2025 a mlips:MLIPRun ;
+    rdfs:label "LEIGNN trained on OC20-200K" ;
+    mlips:appliesMethod entity:LEIGNN ;
+    mlips:runsOn entity:ds-oc20-200k-yang2025 ;
+    mlips:trainingHardware "NVIDIA GeForce RTX A4000 (16 GB)" ;
+    mlips:produces entity:model-LEIGNN-yang2025 .
+
+entity:model-LEIGNN-yang2025 a mlips:TrainedModel ;
+    rdfs:label "LEIGNN OC20-200K model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-yang2025 mlips:hasResult
+    entity:result-CGCNN-id-yang2025 ,
+    entity:result-CGCNN-ood-ads-yang2025 ,
+    entity:result-CGCNN-ood-cat-yang2025 ,
+    entity:result-CGCNN-ood-both-yang2025 ,
+    entity:result-SchNet-id-yang2025 ,
+    entity:result-SchNet-ood-ads-yang2025 ,
+    entity:result-SchNet-ood-cat-yang2025 ,
+    entity:result-SchNet-ood-both-yang2025 ,
+    entity:result-MACE-id-yang2025 ,
+    entity:result-MACE-ood-ads-yang2025 ,
+    entity:result-MACE-ood-cat-yang2025 ,
+    entity:result-MACE-ood-both-yang2025 ,
+    entity:result-PaiNN-id-yang2025 ,
+    entity:result-PaiNN-ood-ads-yang2025 ,
+    entity:result-PaiNN-ood-cat-yang2025 ,
+    entity:result-PaiNN-ood-both-yang2025 ,
+    entity:result-PaiNN-Direct-id-yang2025 ,
+    entity:result-PaiNN-Direct-ood-ads-yang2025 ,
+    entity:result-PaiNN-Direct-ood-cat-yang2025 ,
+    entity:result-PaiNN-Direct-ood-both-yang2025 ,
+    entity:result-DimeNet-id-yang2025 ,
+    entity:result-DimeNet-ood-ads-yang2025 ,
+    entity:result-DimeNet-ood-cat-yang2025 ,
+    entity:result-DimeNet-ood-both-yang2025 ,
+    entity:result-GemNet-dT-id-yang2025 ,
+    entity:result-GemNet-dT-ood-ads-yang2025 ,
+    entity:result-GemNet-dT-ood-cat-yang2025 ,
+    entity:result-GemNet-dT-ood-both-yang2025 ,
+    entity:result-LEIGNN-id-yang2025 ,
+    entity:result-LEIGNN-ood-ads-yang2025 ,
+    entity:result-LEIGNN-ood-cat-yang2025 ,
+    entity:result-LEIGNN-ood-both-yang2025 .
+
+entity:result-CGCNN-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-id-1-yang2025 ,
+        entity:metric-CGCNN-id-2-yang2025 .
+
+entity:metric-CGCNN-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: CGCNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1111"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-CGCNN-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: CGCNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CGCNN-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-ood-ads-1-yang2025 ,
+        entity:metric-CGCNN-ood-ads-2-yang2025 .
+
+entity:metric-CGCNN-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: CGCNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1261"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-CGCNN-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: CGCNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "80.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CGCNN-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-ood-cat-1-yang2025 ,
+        entity:metric-CGCNN-ood-cat-2-yang2025 .
+
+entity:metric-CGCNN-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: CGCNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1097"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-CGCNN-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: CGCNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "74.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CGCNN-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CGCNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-CGCNN-ood-both-1-yang2025 ,
+        entity:metric-CGCNN-ood-both-2-yang2025 .
+
+entity:metric-CGCNN-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: CGCNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1383"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-CGCNN-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: CGCNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "91.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-id-1-yang2025 ,
+        entity:metric-SchNet-id-2-yang2025 .
+
+entity:metric-SchNet-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: SchNet trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "975"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: SchNet trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "59.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-ood-ads-1-yang2025 ,
+        entity:metric-SchNet-ood-ads-2-yang2025 .
+
+entity:metric-SchNet-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: SchNet trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1077"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: SchNet trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "66.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-ood-cat-1-yang2025 ,
+        entity:metric-SchNet-ood-cat-2-yang2025 .
+
+entity:metric-SchNet-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: SchNet trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "975"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: SchNet trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "59.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-ood-both-1-yang2025 ,
+        entity:metric-SchNet-ood-both-2-yang2025 .
+
+entity:metric-SchNet-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: SchNet trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1204"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: SchNet trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "77.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-id-1-yang2025 ,
+        entity:metric-MACE-id-2-yang2025 .
+
+entity:metric-MACE-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: MACE trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "565"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: MACE trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "51.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-ood-ads-1-yang2025 ,
+        entity:metric-MACE-ood-ads-2-yang2025 .
+
+entity:metric-MACE-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: MACE trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "657"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: MACE trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "59.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-ood-cat-1-yang2025 ,
+        entity:metric-MACE-ood-cat-2-yang2025 .
+
+entity:metric-MACE-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: MACE trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "589"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: MACE trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "51.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-ood-both-1-yang2025 ,
+        entity:metric-MACE-ood-both-2-yang2025 .
+
+entity:metric-MACE-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: MACE trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "802"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: MACE trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "68.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-id-1-yang2025 ,
+        entity:metric-PaiNN-id-2-yang2025 .
+
+entity:metric-PaiNN-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "482"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "52.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-ood-ads-1-yang2025 ,
+        entity:metric-PaiNN-ood-ads-2-yang2025 .
+
+entity:metric-PaiNN-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "570"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "58.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-ood-cat-1-yang2025 ,
+        entity:metric-PaiNN-ood-cat-2-yang2025 .
+
+entity:metric-PaiNN-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "499"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "52.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-ood-both-1-yang2025 ,
+        entity:metric-PaiNN-ood-both-2-yang2025 .
+
+entity:metric-PaiNN-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "704"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "74"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-Direct-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-Direct-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-Direct-id-1-yang2025 ,
+        entity:metric-PaiNN-Direct-id-2-yang2025 .
+
+entity:metric-PaiNN-Direct-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN Direct trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "457"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-Direct-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN Direct trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-Direct-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-Direct-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-Direct-ood-ads-1-yang2025 ,
+        entity:metric-PaiNN-Direct-ood-ads-2-yang2025 .
+
+entity:metric-PaiNN-Direct-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN Direct trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "571"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-Direct-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN Direct trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "53.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-Direct-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-Direct-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-Direct-ood-cat-1-yang2025 ,
+        entity:metric-PaiNN-Direct-ood-cat-2-yang2025 .
+
+entity:metric-PaiNN-Direct-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN Direct trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "497"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-Direct-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN Direct trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-PaiNN-Direct-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-PaiNN-Direct-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-PaiNN-Direct-ood-both-1-yang2025 ,
+        entity:metric-PaiNN-Direct-ood-both-2-yang2025 .
+
+entity:metric-PaiNN-Direct-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: PaiNN Direct trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "689"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-PaiNN-Direct-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: PaiNN Direct trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "63.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-id-1-yang2025 ,
+        entity:metric-DimeNet-id-2-yang2025 .
+
+entity:metric-DimeNet-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: DimeNet++ trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "497"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: DimeNet++ trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "48.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-ood-ads-1-yang2025 ,
+        entity:metric-DimeNet-ood-ads-2-yang2025 .
+
+entity:metric-DimeNet-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: DimeNet++ trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "547"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: DimeNet++ trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "55.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-ood-cat-1-yang2025 ,
+        entity:metric-DimeNet-ood-cat-2-yang2025 .
+
+entity:metric-DimeNet-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: DimeNet++ trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "522"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: DimeNet++ trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "48.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-ood-both-1-yang2025 ,
+        entity:metric-DimeNet-ood-both-2-yang2025 .
+
+entity:metric-DimeNet-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: DimeNet++ trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "671"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: DimeNet++ trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "65.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GemNet-dT-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GemNet-dT-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-GemNet-dT-id-1-yang2025 ,
+        entity:metric-GemNet-dT-id-2-yang2025 .
+
+entity:metric-GemNet-dT-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: GemNet-dT trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "443"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GemNet-dT-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: GemNet-dT trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GemNet-dT-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GemNet-dT-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-GemNet-dT-ood-ads-1-yang2025 ,
+        entity:metric-GemNet-dT-ood-ads-2-yang2025 .
+
+entity:metric-GemNet-dT-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: GemNet-dT trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "516"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GemNet-dT-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: GemNet-dT trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GemNet-dT-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GemNet-dT-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-GemNet-dT-ood-cat-1-yang2025 ,
+        entity:metric-GemNet-dT-ood-cat-2-yang2025 .
+
+entity:metric-GemNet-dT-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: GemNet-dT trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "548"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GemNet-dT-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: GemNet-dT trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-GemNet-dT-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-GemNet-dT-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-GemNet-dT-ood-both-1-yang2025 ,
+        entity:metric-GemNet-dT-ood-both-2-yang2025 .
+
+entity:metric-GemNet-dT-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: GemNet-dT trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "717"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-GemNet-dT-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: GemNet-dT trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "55.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-LEIGNN-id-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-LEIGNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-id-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-LEIGNN-id-1-yang2025 ,
+        entity:metric-LEIGNN-id-2-yang2025 .
+
+entity:metric-LEIGNN-id-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: LEIGNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "415"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-LEIGNN-id-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: LEIGNN trained on OC20-200K, in domain" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-LEIGNN-ood-ads-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-LEIGNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-ads-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-LEIGNN-ood-ads-1-yang2025 ,
+        entity:metric-LEIGNN-ood-ads-2-yang2025 .
+
+entity:metric-LEIGNN-ood-ads-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: LEIGNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "502"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-LEIGNN-ood-ads-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: LEIGNN trained on OC20-200K, out-of-domain adsorbate" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "49.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-LEIGNN-ood-cat-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-LEIGNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-cat-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-LEIGNN-ood-cat-1-yang2025 ,
+        entity:metric-LEIGNN-ood-cat-2-yang2025 .
+
+entity:metric-LEIGNN-ood-cat-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: LEIGNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "452"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-LEIGNN-ood-cat-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: LEIGNN trained on OC20-200K, out-of-domain catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-LEIGNN-ood-both-yang2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-LEIGNN-yang2025 ;
+    mlips:targetMaterial entity:mat-val-ood-both-yang2025 ;
+    mlips:hasAccuracyMetric entity:metric-LEIGNN-ood-both-1-yang2025 ,
+        entity:metric-LEIGNN-ood-both-2-yang2025 .
+
+entity:metric-LEIGNN-ood-both-1-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE: LEIGNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "613"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-LEIGNN-ood-both-2-yang2025 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE: LEIGNN trained on OC20-200K, out-of-domain adsorbate and catalyst" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "58.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Experiments ran on an NVIDIA GeForce RTX A4000 (16 GB). Training time,
+# inference time, parameter counts and FLOPs are compared in Figure 4
+# (LEIGNN about ten times faster than GemNet-dT and MACE); no number is
+# printed.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Hyperparameters of all eight models are in the Supplementary Material (Section 3) and are not encoded, nor are the loss weights alpha and beta.
+# - 'PaiNN Direct' is PaiNN with direct force prediction and is encoded under entity:PaiNN with a 'force-mode' setting; GemNet-dT under entity:GemNet with its variant setting; DimeNet++ under entity:DimeNet.
+# - The ablation study (Table 2, OC20-50K and OC20-200K), the MD17 and ISO17 comparisons of the supplement, and the MD simulation benchmark of Table 3 are not encoded.
+# - Energy MAEs are in meV per structure (adsorption energies). The four validation sets are modelled as material systems so that errors group by split, as in chanussot2021 (whose nodes are not reused; they are paper-local).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
