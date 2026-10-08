@@ -1,0 +1,313 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Prashanth Srinivasan et al. (2025). Atomic cluster expansion interatomic potentials for lithium: Investigating the solid and liquid phases.
+#   Physical review. B./Physical review. B. doi:10.1103/q4nm-qyk4
+#
+# Version read: publisher (sha256 afa4c1391a8e0a43...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 176 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the primary ACE potential for Li (Finnis-Sinclair-type
+# expansion, up to four-body terms): VASP reference calculations, the
+# training set of solid and liquid configurations (Table I), the
+# parametrisation (Table II) and the fitting errors on training and
+# validation sets (Table III). The comparison potentials of the
+# discussion (other cutoffs and body orders) and the properties are not
+# encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-srinivasan2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Srinivasan et al. (2025): atomic cluster expansion potentials for lithium, solid and liquid phases" ;
+    mlips:reportedIn entity:article-srinivasan2025 .
+
+entity:article-srinivasan2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/q4nm-qyk4> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Atomic cluster expansion interatomic potentials for lithium: Investigating the solid and liquid phases" ;
+    schema:author <https://orcid.org/0000-0002-9199-4340> ,
+        <https://orcid.org/0009-0003-5125-1125> ,
+        <https://orcid.org/0009-0004-5429-3221> ,
+        <https://orcid.org/0000-0003-4533-666X> ,
+        <https://orcid.org/0000-0001-8935-1744> ,
+        <https://orcid.org/0000-0001-6061-9946> .
+
+<https://orcid.org/0000-0002-9199-4340> a schema:Person ;
+    schema:name "Prashanth Srinivasan" ;
+    schema:givenName "Prashanth" ;
+    schema:familyName "Srinivasan" ;
+    schema:identifier <https://orcid.org/0000-0002-9199-4340> .
+
+<https://orcid.org/0009-0003-5125-1125> a schema:Person ;
+    schema:name "Siddharth Puri" ;
+    schema:givenName "Siddharth" ;
+    schema:familyName "Puri" ;
+    schema:identifier <https://orcid.org/0009-0003-5125-1125> .
+
+<https://orcid.org/0009-0004-5429-3221> a schema:Person ;
+    schema:name "Karen Pacho Dominguez" ;
+    schema:givenName "Karen" ;
+    schema:familyName "Pacho Dominguez" ;
+    schema:identifier <https://orcid.org/0009-0004-5429-3221> .
+
+<https://orcid.org/0000-0003-4533-666X> a schema:Person ;
+    schema:name "Andrew P. Horsfield" ;
+    schema:givenName "Andrew P." ;
+    schema:familyName "Horsfield" ;
+    schema:identifier <https://orcid.org/0000-0003-4533-666X> .
+
+<https://orcid.org/0000-0001-8935-1744> a schema:Person ;
+    schema:name "Mark R. Gilbert" ;
+    schema:givenName "Mark R." ;
+    schema:familyName "Gilbert" ;
+    schema:identifier <https://orcid.org/0000-0001-8935-1744> .
+
+<https://orcid.org/0000-0001-6061-9946> a schema:Person ;
+    schema:name "Duc Nguyen-Manh" ;
+    schema:givenName "Duc" ;
+    schema:familyName "Nguyen-Manh" ;
+    schema:identifier <https://orcid.org/0000-0001-6061-9946> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Li-srinivasan2025 a mlips:MaterialSystem ;
+    rdfs:label "Lithium (bcc, fcc, hcp and 9R solid phases with vacancies, a self-interstitial and surfaces; liquid)" ;
+    mlips:chemicalFormula "Li" ;
+    mlips:materialClass "Elemental metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-srinivasan2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-srinivasan2025 mlips:hasDFTSettings entity:calc-settings-dft-srinivasan2025 .
+
+entity:calc-settings-dft-srinivasan2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "450"^^xsd:double ;
+    mlips:kPointMesh "4x4x4 grid for 128-atom supercells" ;
+    rdfs:comment "One valence electron for Li; Methfessel-Paxton smearing of 0.1 eV. An LDA variant is compared in the supplement." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Li-srinivasan2025 a mlips:TrainingDataset ;
+    rdfs:label "Li training set (2500 liquid and 4700 solid snapshots)" ;
+    mlips:coversMaterial entity:mat-Li-srinivasan2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-srinivasan2025 ;
+    rdfs:comment "The total (7200) is the sum of the two stated parts. The validation set is the final 1000 steps of each AIMD run." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Li-srinivasan2025 mlips:samplingStrategy
+    entity:sampling-static-srinivasan2025 ,
+    entity:sampling-aimd-srinivasan2025 .
+
+entity:sampling-static-srinivasan2025 a mlips:SamplingStrategy ;
+    rdfs:label "0 K static calculations: 100 volumes for each of the bcc, fcc, 9R and hcp phases" .
+
+entity:sampling-aimd-srinivasan2025 a mlips:SamplingStrategy ;
+    rdfs:label "NVT ab initio MD (2000 steps of 0.5 fs) at 400 K for bulk, defective and surface solid structures at several volumes and at 600-1400 K for the liquid at five volumes each; first 1000 steps for training (one configuration in ten, one in five for fcc), last 1000 for validation" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-srinivasan2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:bodyOrder ,
+        entity:hp-nmax-per-order-srinivasan2025 ,
+        entity:hp-lmax-per-order-srinivasan2025 ,
+        entity:hp-num-parameters-srinivasan2025 ;
+    mlips:hasImplementation entity:impl-ACE-srinivasan2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-ACE-srinivasan2025 a mls:Algorithm ;
+    rdfs:label "Single-shot fit with BFGS (Pacemaker); Finnis-Sinclair-type energy expansion with spherical Bessel radial functions" .
+
+entity:impl-ACE-srinivasan2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "fitted with Pacemaker; MD with the PACE library in LAMMPS" .
+
+entity:hp-num-parameters-srinivasan2025 a mlips:Hyperparameter ;
+    rdfs:label "Total number of fitted parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-nmax-per-order-srinivasan2025 a mlips:Hyperparameter ;
+    rdfs:label "n_max per body-order index T" ;
+    mlips:hyperparameterName "nmax_per_order" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lmax-per-order-srinivasan2025 a mlips:Hyperparameter ;
+    rdfs:label "l_max per body-order index T" ;
+    mlips:hyperparameterName "lmax_per_order" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Li-cutoffRadius-srinivasan2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-Li-bodyOrder-srinivasan2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-Li-nmax-per-order-srinivasan2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nmax-per-order-srinivasan2025 ;
+    mlips:settingValue "15 / 6 / 4" .
+
+entity:setting-Li-lmax-per-order-srinivasan2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-per-order-srinivasan2025 ;
+    mlips:settingValue "0 / 3 / 3" .
+
+entity:setting-Li-num-parameters-srinivasan2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-srinivasan2025 ;
+    mlips:settingValue "1166"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Li-srinivasan2025 a mlips:MLIPRun ;
+    rdfs:label "ACE parametrisation for lithium (primary potential)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-Li-srinivasan2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Li-cutoffRadius-srinivasan2025 ,
+        entity:setting-Li-bodyOrder-srinivasan2025 ,
+        entity:setting-Li-nmax-per-order-srinivasan2025 ,
+        entity:setting-Li-lmax-per-order-srinivasan2025 ,
+        entity:setting-Li-num-parameters-srinivasan2025 ;
+    mlips:produces entity:model-Li-srinivasan2025 .
+
+entity:model-Li-srinivasan2025 a mlips:TrainedModel ;
+    rdfs:label "ACE potential for Li" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-srinivasan2025 mlips:hasResult
+    entity:result-train-srinivasan2025 ,
+    entity:result-validation-srinivasan2025 .
+
+entity:result-train-srinivasan2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Li-srinivasan2025 ;
+    mlips:targetMaterial entity:mat-Li-srinivasan2025 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-srinivasan2025 ,
+        entity:metric-train-2-srinivasan2025 ,
+        entity:metric-train-3-srinivasan2025 ,
+        entity:metric-train-4-srinivasan2025 .
+
+entity:metric-train-1-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.79"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-3-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, training set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "11.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-train-4-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, training set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.38"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-validation-srinivasan2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Li-srinivasan2025 ;
+    mlips:targetMaterial entity:mat-Li-srinivasan2025 ;
+    mlips:hasAccuracyMetric entity:metric-validation-1-srinivasan2025 ,
+        entity:metric-validation-2-srinivasan2025 ,
+        entity:metric-validation-3-srinivasan2025 ,
+        entity:metric-validation-4-srinivasan2025 .
+
+entity:metric-validation-1-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE, validation set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.64"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-validation-2-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.82"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-validation-3-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE, validation set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-validation-4-srinivasan2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE, validation set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The loss weights between energies and forces were not found in the text read. Table III is read as RMSE row (1.81, 1.64, 11.8, 13.17) and MAE row (0.79, 0.82, 6.38, 6.17) in the column order training, validation for energy then force.
+# - The additional ACE potentials of the discussion (Table VI: other cutoffs, body orders and n_max, and a linear expansion) with their errors and costs are not encoded. 0 K phase properties (Table IV), defect energies (Table V), phonons, melting curve, liquid structure, viscosity and diffusion are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
