@@ -1,0 +1,1370 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Gil Harari et al. (2026). Beyond Adam: SOAP and Muon for Faster, Label-Efficient Training of Machine Learning Interatomic Potentials.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2607.02499  arXiv:2607.02499v1
+#
+# Version read: arxiv-preprint arXiv:2607.02499v1 (sha256 e4a973b7cce6aa81...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 170 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the 16 training configurations of Table 1: Allegro on
+# solid-state CsH2PO4 (CDP) and NequIP on liquid water, each trained with
+# four optimisers (AdamW, Muon, SOAP, SOAP-Muon) on energies and forces
+# or on energies only, with the architecture settings of Table 3 and the
+# test MAEs. The optimiser is a run setting. Intermediate force-label
+# fractions and MD observables are not encoded. Preprint only (arXiv v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-harari2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Harari et al. (2026): beyond Adam, SOAP and Muon optimisers for faster, label-efficient MLIP training" ;
+    mlips:reportedIn entity:article-harari2026 .
+
+entity:article-harari2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2607.02499> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Beyond Adam: SOAP and Muon for Faster, Label-Efficient Training of Machine Learning Interatomic Potentials" ;
+    schema:author entity:person-Harari-harari2026 ,
+        entity:person-Zimmermann-harari2026 ,
+        entity:person-Kulseng-harari2026 ,
+        entity:person-Zichi-harari2026 ,
+        entity:person-Tan-harari2026 ,
+        entity:person-Descoteaux-harari2026 ,
+        entity:person-Kozinsky-harari2026 .
+
+entity:person-Harari-harari2026 a schema:Person ;
+    schema:name "Gil Harari" ;
+    schema:givenName "Gil" ;
+    schema:familyName "Harari" .
+
+entity:person-Zimmermann-harari2026 a schema:Person ;
+    schema:name "Yoel Zimmermann" ;
+    schema:givenName "Yoel" ;
+    schema:familyName "Zimmermann" .
+
+entity:person-Kulseng-harari2026 a schema:Person ;
+    schema:name "Ola Tangen Kulseng" ;
+    schema:givenName "Ola Tangen" ;
+    schema:familyName "Kulseng" .
+
+entity:person-Zichi-harari2026 a schema:Person ;
+    schema:name "Laura Zichi" ;
+    schema:givenName "Laura" ;
+    schema:familyName "Zichi" .
+
+entity:person-Tan-harari2026 a schema:Person ;
+    schema:name "Chuin Wei Tan" ;
+    schema:givenName "Chuin Wei" ;
+    schema:familyName "Tan" .
+
+entity:person-Descoteaux-harari2026 a schema:Person ;
+    schema:name "Marc L. Descoteaux" ;
+    schema:givenName "Marc L." ;
+    schema:familyName "Descoteaux" .
+
+entity:person-Kozinsky-harari2026 a schema:Person ;
+    schema:name "Boris Kozinsky" ;
+    schema:givenName "Boris" ;
+    schema:familyName "Kozinsky" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CDP-harari2026 a mlips:MaterialSystem ;
+    rdfs:label "Solid-state CsH2PO4 (CDP)" ;
+    mlips:chemicalFormula "CsH2PO4" ;
+    mlips:materialClass "Solid acid proton conductor" .
+
+entity:mat-water-harari2026 a mlips:MaterialSystem ;
+    rdfs:label "Liquid water" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-CDP-harari2026 a mlips:TrainingDataset ;
+    rdfs:label "CDP data set of the Allegro study cited by the paper (Wang et al., 2025)" ;
+    mlips:coversMaterial entity:mat-CDP-harari2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-water-harari2026 a mlips:TrainingDataset ;
+    rdfs:label "Water data set used with NequIP, following Batzner et al. (2022)" ;
+    mlips:coversMaterial entity:mat-water-harari2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-CDP-harari2026 mlips:samplingStrategy
+    entity:sampling-published-harari2026 .
+
+entity:ds-water-harari2026 mlips:samplingStrategy
+    entity:sampling-published-harari2026 .
+
+entity:sampling-published-harari2026 a mlips:SamplingStrategy ;
+    rdfs:label "Published data set used as provided" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasLossFunction entity:loss-Allegro-harari2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-Allegro-harari2026 ;
+    mlips:hasHyperparameter entity:hp-optimizer-harari2026 ,
+        entity:hp-training-targets-harari2026 ,
+        mlips:cutoffRadius ,
+        mlips:numLayers ,
+        entity:hp-lmax-harari2026 ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-Allegro-harari2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-Allegro-harari2026 a mlips:LossFunction ;
+    rdfs:label "Per-frame squared energy error plus masked squared force error with fixed coefficients (ratio tuned among 1:1, 1:10 and 1:100 at full force supervision)" .
+
+entity:alg-Allegro-harari2026 a mls:Algorithm ;
+    rdfs:label "AdamW, Muon, SOAP or SOAP-Muon with a cosine-annealing schedule; early stopping; five seeds" .
+
+entity:impl-Allegro-harari2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:Allegro .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-harari2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-harari2026 ;
+    mlips:hasHyperparameter entity:hp-optimizer-harari2026 ,
+        entity:hp-training-targets-harari2026 ,
+        mlips:cutoffRadius ,
+        mlips:numLayers ,
+        entity:hp-lmax-harari2026 ,
+        mlips:numFeatures ,
+        mlips:numRadialBasis ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-NequIP-harari2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-NequIP-harari2026 a mlips:LossFunction ;
+    rdfs:label "Per-frame squared energy error plus masked squared force error with fixed coefficients (ratio tuned among 1:1, 1:10 and 1:100 at full force supervision)" .
+
+entity:alg-NequIP-harari2026 a mls:Algorithm ;
+    rdfs:label "AdamW, Muon, SOAP or SOAP-Muon with a reduce-on-plateau schedule; early stopping; five seeds" .
+
+entity:impl-NequIP-harari2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP .
+
+entity:hp-optimizer-harari2026 a mlips:Hyperparameter ;
+    rdfs:label "Optimiser" ;
+    mlips:hyperparameterName "optimizer" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-targets-harari2026 a mlips:Hyperparameter ;
+    rdfs:label "Training targets" ;
+    mlips:hyperparameterName "training_targets" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lmax-harari2026 a mlips:Hyperparameter ;
+    rdfs:label "Maximum rotation order l_max" ;
+    mlips:hyperparameterName "lmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-Allegro-CDP-EF-AdamW-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "AdamW" .
+
+entity:setting-Allegro-CDP-EF-AdamW-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-Allegro-CDP-EF-AdamW-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-EF-AdamW-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-AdamW-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-AdamW-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-AdamW-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-AdamW-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-AdamW-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "AdamW" .
+
+entity:setting-NequIP-water-EF-AdamW-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-NequIP-water-EF-AdamW-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-EF-AdamW-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-AdamW-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-AdamW-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-AdamW-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-AdamW-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "Muon" .
+
+entity:setting-Allegro-CDP-EF-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-Allegro-CDP-EF-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-EF-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "Muon" .
+
+entity:setting-NequIP-water-EF-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-NequIP-water-EF-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-EF-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP" .
+
+entity:setting-Allegro-CDP-EF-SOAP-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-Allegro-CDP-EF-SOAP-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-EF-SOAP-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP" .
+
+entity:setting-NequIP-water-EF-SOAP-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-NequIP-water-EF-SOAP-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-EF-SOAP-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP-Muon" .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-EF-SOAP-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP-Muon" .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies and forces" .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-EF-SOAP-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-AdamW-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "AdamW" .
+
+entity:setting-Allegro-CDP-E-AdamW-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-Allegro-CDP-E-AdamW-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-E-AdamW-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-AdamW-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-AdamW-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-AdamW-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-AdamW-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-E-AdamW-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "AdamW" .
+
+entity:setting-NequIP-water-E-AdamW-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-NequIP-water-E-AdamW-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-E-AdamW-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-E-AdamW-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-E-AdamW-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-E-AdamW-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-E-AdamW-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "Muon" .
+
+entity:setting-Allegro-CDP-E-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-Allegro-CDP-E-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-E-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-E-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "Muon" .
+
+entity:setting-NequIP-water-E-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-NequIP-water-E-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-E-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-E-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-E-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-E-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-E-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP" .
+
+entity:setting-Allegro-CDP-E-SOAP-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-Allegro-CDP-E-SOAP-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-E-SOAP-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP" .
+
+entity:setting-NequIP-water-E-SOAP-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-NequIP-water-E-SOAP-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-E-SOAP-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP-Muon" .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-Allegro-CDP-E-SOAP-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-Muon-optimizer-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-optimizer-harari2026 ;
+    mlips:settingValue "SOAP-Muon" .
+
+entity:setting-NequIP-water-E-SOAP-Muon-training-targets-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-targets-harari2026 ;
+    mlips:settingValue "energies only" .
+
+entity:setting-NequIP-water-E-SOAP-Muon-cutoffRadius-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-NequIP-water-E-SOAP-Muon-numLayers-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-Muon-lmax-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lmax-harari2026 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-Muon-numFeatures-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-Muon-numRadialBasis-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-NequIP-water-E-SOAP-Muon-numEpochs-harari2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-Allegro-CDP-EF-AdamW-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies and forces with AdamW" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-EF-AdamW-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-EF-AdamW-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-EF-AdamW-harari2026 .
+
+entity:model-Allegro-CDP-EF-AdamW-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies and forces, AdamW)" .
+
+entity:run-NequIP-water-EF-AdamW-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies and forces with AdamW" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-EF-AdamW-optimizer-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-training-targets-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-numLayers-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-lmax-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-EF-AdamW-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-EF-AdamW-harari2026 .
+
+entity:model-NequIP-water-EF-AdamW-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies and forces, AdamW)" .
+
+entity:run-Allegro-CDP-EF-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies and forces with Muon" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-EF-Muon-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-EF-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-EF-Muon-harari2026 .
+
+entity:model-Allegro-CDP-EF-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies and forces, Muon)" .
+
+entity:run-NequIP-water-EF-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies and forces with Muon" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-EF-Muon-optimizer-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-training-targets-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-numLayers-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-lmax-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-EF-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-EF-Muon-harari2026 .
+
+entity:model-NequIP-water-EF-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies and forces, Muon)" .
+
+entity:run-Allegro-CDP-EF-SOAP-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies and forces with SOAP" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-EF-SOAP-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-EF-SOAP-harari2026 .
+
+entity:model-Allegro-CDP-EF-SOAP-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies and forces, SOAP)" .
+
+entity:run-NequIP-water-EF-SOAP-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies and forces with SOAP" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-EF-SOAP-optimizer-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-training-targets-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-numLayers-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-lmax-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-EF-SOAP-harari2026 .
+
+entity:model-NequIP-water-EF-SOAP-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies and forces, SOAP)" .
+
+entity:run-Allegro-CDP-EF-SOAP-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies and forces with SOAP-Muon" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-EF-SOAP-Muon-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-EF-SOAP-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-EF-SOAP-Muon-harari2026 .
+
+entity:model-Allegro-CDP-EF-SOAP-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies and forces, SOAP-Muon)" .
+
+entity:run-NequIP-water-EF-SOAP-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies and forces with SOAP-Muon" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-EF-SOAP-Muon-optimizer-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-training-targets-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-numLayers-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-lmax-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-EF-SOAP-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-EF-SOAP-Muon-harari2026 .
+
+entity:model-NequIP-water-EF-SOAP-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies and forces, SOAP-Muon)" .
+
+entity:run-Allegro-CDP-E-AdamW-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies only with AdamW" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-E-AdamW-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-E-AdamW-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-E-AdamW-harari2026 .
+
+entity:model-Allegro-CDP-E-AdamW-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies only, AdamW)" .
+
+entity:run-NequIP-water-E-AdamW-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies only with AdamW" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-E-AdamW-optimizer-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-training-targets-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-numLayers-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-lmax-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-E-AdamW-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-E-AdamW-harari2026 .
+
+entity:model-NequIP-water-E-AdamW-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies only, AdamW)" .
+
+entity:run-Allegro-CDP-E-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies only with Muon" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-E-Muon-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-E-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-E-Muon-harari2026 .
+
+entity:model-Allegro-CDP-E-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies only, Muon)" .
+
+entity:run-NequIP-water-E-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies only with Muon" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-E-Muon-optimizer-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-training-targets-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-numLayers-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-lmax-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-E-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-E-Muon-harari2026 .
+
+entity:model-NequIP-water-E-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies only, Muon)" .
+
+entity:run-Allegro-CDP-E-SOAP-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies only with SOAP" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-E-SOAP-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-E-SOAP-harari2026 .
+
+entity:model-Allegro-CDP-E-SOAP-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies only, SOAP)" .
+
+entity:run-NequIP-water-E-SOAP-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies only with SOAP" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-E-SOAP-optimizer-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-training-targets-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-numLayers-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-lmax-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-E-SOAP-harari2026 .
+
+entity:model-NequIP-water-E-SOAP-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies only, SOAP)" .
+
+entity:run-Allegro-CDP-E-SOAP-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on CDP trained on energies only with SOAP-Muon" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CDP-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CDP-E-SOAP-Muon-optimizer-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-training-targets-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-cutoffRadius-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-numLayers-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-lmax-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-numFeatures-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-numRadialBasis-harari2026 ,
+        entity:setting-Allegro-CDP-E-SOAP-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-Allegro-CDP-E-SOAP-Muon-harari2026 .
+
+entity:model-Allegro-CDP-E-SOAP-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro for CDP (energies only, SOAP-Muon)" .
+
+entity:run-NequIP-water-E-SOAP-Muon-harari2026 a mlips:MLIPRun ;
+    rdfs:label "NequIP on water trained on energies only with SOAP-Muon" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-harari2026 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-water-E-SOAP-Muon-optimizer-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-training-targets-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-cutoffRadius-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-numLayers-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-lmax-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-numFeatures-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-numRadialBasis-harari2026 ,
+        entity:setting-NequIP-water-E-SOAP-Muon-numEpochs-harari2026 ;
+    mlips:trainingHardware "NVIDIA A100-SXM4-80GB or H200 GPUs" ;
+    mlips:produces entity:model-NequIP-water-E-SOAP-Muon-harari2026 .
+
+entity:model-NequIP-water-E-SOAP-Muon-harari2026 a mlips:TrainedModel ;
+    rdfs:label "NequIP for water (energies only, SOAP-Muon)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-harari2026 mlips:hasResult
+    entity:result-Allegro-CDP-EF-AdamW-harari2026 ,
+    entity:result-NequIP-water-EF-AdamW-harari2026 ,
+    entity:result-Allegro-CDP-EF-Muon-harari2026 ,
+    entity:result-NequIP-water-EF-Muon-harari2026 ,
+    entity:result-Allegro-CDP-EF-SOAP-harari2026 ,
+    entity:result-NequIP-water-EF-SOAP-harari2026 ,
+    entity:result-Allegro-CDP-EF-SOAP-Muon-harari2026 ,
+    entity:result-NequIP-water-EF-SOAP-Muon-harari2026 ,
+    entity:result-Allegro-CDP-E-AdamW-harari2026 ,
+    entity:result-NequIP-water-E-AdamW-harari2026 ,
+    entity:result-Allegro-CDP-E-Muon-harari2026 ,
+    entity:result-NequIP-water-E-Muon-harari2026 ,
+    entity:result-Allegro-CDP-E-SOAP-harari2026 ,
+    entity:result-NequIP-water-E-SOAP-harari2026 ,
+    entity:result-Allegro-CDP-E-SOAP-Muon-harari2026 ,
+    entity:result-NequIP-water-E-SOAP-Muon-harari2026 .
+
+entity:result-Allegro-CDP-EF-AdamW-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-EF-AdamW-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-EF-AdamW-1-harari2026 ,
+        entity:metric-Allegro-CDP-EF-AdamW-2-harari2026 .
+
+entity:metric-Allegro-CDP-EF-AdamW-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.628"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-EF-AdamW-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "32.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-EF-AdamW-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-EF-AdamW-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-EF-AdamW-1-harari2026 ,
+        entity:metric-NequIP-water-EF-AdamW-2-harari2026 .
+
+entity:metric-NequIP-water-EF-AdamW-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.773"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-EF-AdamW-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-EF-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-EF-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-EF-Muon-1-harari2026 ,
+        entity:metric-Allegro-CDP-EF-Muon-2-harari2026 .
+
+entity:metric-Allegro-CDP-EF-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.581"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-EF-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-EF-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-EF-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-EF-Muon-1-harari2026 ,
+        entity:metric-NequIP-water-EF-Muon-2-harari2026 .
+
+entity:metric-NequIP-water-EF-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.53"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-EF-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-EF-SOAP-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-EF-SOAP-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-EF-SOAP-1-harari2026 ,
+        entity:metric-Allegro-CDP-EF-SOAP-2-harari2026 .
+
+entity:metric-Allegro-CDP-EF-SOAP-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.569"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-EF-SOAP-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "29.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-EF-SOAP-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-EF-SOAP-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-EF-SOAP-1-harari2026 ,
+        entity:metric-NequIP-water-EF-SOAP-2-harari2026 .
+
+entity:metric-NequIP-water-EF-SOAP-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.604"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-EF-SOAP-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-EF-SOAP-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-EF-SOAP-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-EF-SOAP-Muon-1-harari2026 ,
+        entity:metric-Allegro-CDP-EF-SOAP-Muon-2-harari2026 .
+
+entity:metric-Allegro-CDP-EF-SOAP-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.582"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-EF-SOAP-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "27.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-EF-SOAP-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-EF-SOAP-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-EF-SOAP-Muon-1-harari2026 ,
+        entity:metric-NequIP-water-EF-SOAP-Muon-2-harari2026 .
+
+entity:metric-NequIP-water-EF-SOAP-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.59"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-EF-SOAP-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-E-AdamW-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-E-AdamW-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-E-AdamW-1-harari2026 ,
+        entity:metric-Allegro-CDP-E-AdamW-2-harari2026 .
+
+entity:metric-Allegro-CDP-E-AdamW-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.16"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-E-AdamW-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "503"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-E-AdamW-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-E-AdamW-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-E-AdamW-1-harari2026 ,
+        entity:metric-NequIP-water-E-AdamW-2-harari2026 .
+
+entity:metric-NequIP-water-E-AdamW-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-E-AdamW-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "306"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-E-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-E-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-E-Muon-1-harari2026 ,
+        entity:metric-Allegro-CDP-E-Muon-2-harari2026 .
+
+entity:metric-Allegro-CDP-E-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-E-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "281"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-E-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-E-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-E-Muon-1-harari2026 ,
+        entity:metric-NequIP-water-E-Muon-2-harari2026 .
+
+entity:metric-NequIP-water-E-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.37"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-E-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "591"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-E-SOAP-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-E-SOAP-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-E-SOAP-1-harari2026 ,
+        entity:metric-Allegro-CDP-E-SOAP-2-harari2026 .
+
+entity:metric-Allegro-CDP-E-SOAP-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.03"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-E-SOAP-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "214"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-E-SOAP-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-E-SOAP-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-E-SOAP-1-harari2026 ,
+        entity:metric-NequIP-water-E-SOAP-2-harari2026 .
+
+entity:metric-NequIP-water-E-SOAP-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.38"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-E-SOAP-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "236"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-CDP-E-SOAP-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-CDP-E-SOAP-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-CDP-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-CDP-E-SOAP-Muon-1-harari2026 ,
+        entity:metric-Allegro-CDP-E-SOAP-Muon-2-harari2026 .
+
+entity:metric-Allegro-CDP-E-SOAP-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-Allegro-CDP-E-SOAP-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "201"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-water-E-SOAP-Muon-harari2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-water-E-SOAP-Muon-harari2026 ;
+    mlips:targetMaterial entity:mat-water-harari2026 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-water-E-SOAP-Muon-1-harari2026 ,
+        entity:metric-NequIP-water-E-SOAP-Muon-2-harari2026 .
+
+entity:metric-NequIP-water-E-SOAP-Muon-1-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Energy test MAE, mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.77"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-NequIP-water-E-SOAP-Muon-2-harari2026 a mlips:AccuracyMetric ;
+    rdfs:label "Force test MAE (forces not in the training objective), mean of 5 seeds" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "269"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Schema 0.1.2 has no run-level optimiser property (v0.2.0 proposal in METHODS.md), so the optimiser and the training targets are paper-local string settings. Standard deviations over the five seeds (Table 1) are not encoded; one run per configuration stands for the five seeds.
+# - The data sets are reused from the cited Allegro (CDP) and NequIP (water) studies; sizes, splits and reference levels are not restated in the text read, so the data-set nodes carry no reference calculation. For the Allegro model, 'number of scalar features' (32, with 32 tensor features) is encoded as numFeatures; numEpochs is the maximum.
+# - Runs with 5%, 10%, 50% and 75% force labels (Figure 1, Table 5), optimiser hyperparameters (Table 4), wall-clock comparisons and MD observables are not encoded.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
