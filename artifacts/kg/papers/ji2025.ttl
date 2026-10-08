@@ -1,0 +1,531 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Y.-P. Ji et al. (2025). Machine-Learning Interatomic Potentials for Long-Range Systems.
+#   Physical Review Letters. doi:10.1103/ssp9-7s81  arXiv:2502.04668v3
+#
+# Version read: arxiv-preprint arXiv:2502.04668v3 (sha256 cd99f043352358f2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 83 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SOG-Net method (introduced here) and the six
+# molecular-dimer fits whose force RMSEs the main text prints (dimer
+# classes CC, CP, PP, CA, PA, AA from the BioFragment Database). The toy
+# NaCl electrolyte, molten NaCl, the charged-system benchmarks of
+# Table I, the dipeptide and the water tests are described in the gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ji2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Ji et al. (2025): machine-learning interatomic potentials for long-range systems (SOG-Net)" ;
+    mlips:reportedIn entity:article-ji2025 .
+
+entity:article-ji2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1103/ssp9-7s81> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Machine-Learning Interatomic Potentials for Long-Range Systems" ;
+    schema:author <https://orcid.org/0009-0000-6789-4385> ,
+        <https://orcid.org/0000-0003-0247-4149> ,
+        <https://orcid.org/0000-0001-7645-4998> .
+
+<https://orcid.org/0009-0000-6789-4385> a schema:Person ;
+    schema:name "Yajie Ji" ;
+    schema:givenName "Yajie" ;
+    schema:familyName "Ji" ;
+    schema:identifier <https://orcid.org/0009-0000-6789-4385> .
+
+<https://orcid.org/0000-0003-0247-4149> a schema:Person ;
+    schema:name "Jiuyang Liang" ;
+    schema:givenName "Jiuyang" ;
+    schema:familyName "Liang" ;
+    schema:identifier <https://orcid.org/0000-0003-0247-4149> .
+
+<https://orcid.org/0000-0001-7645-4998> a schema:Person ;
+    schema:name "Zhenli Xu" ;
+    schema:givenName "Zhenli" ;
+    schema:familyName "Xu" ;
+    schema:identifier <https://orcid.org/0000-0001-7645-4998> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-dimer-CC-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, charged-charged (CC) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+entity:mat-dimer-CP-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, charged-polar (CP) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+entity:mat-dimer-PP-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, polar-polar (PP) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+entity:mat-dimer-CA-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, charged-apolar (CA) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+entity:mat-dimer-PA-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, polar-apolar (PA) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+entity:mat-dimer-AA-ji2025 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers, apolar-apolar (AA) class, separations of about 5 to 15 A" ;
+    mlips:materialClass "Molecular dimers of relaxed charged, polar or apolar molecules in a 30 A periodic box" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ji2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ji2025 mlips:hasDFTSettings entity:calc-settings-dft-ji2025 .
+
+entity:calc-settings-dft-ji2025 a mlips:DFTSettings ;
+    mlips:xcFunctional mlips:HSE06 ;
+    rdfs:comment "BioFragment Database data computed with the HSE06 hybrid functional (the paper: 'with a high fraction of exact exchange'); code and basis are not restated." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-dimer-CC-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, charged-charged class" ;
+    mlips:coversMaterial entity:mat-dimer-CC-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+entity:ds-dimer-CP-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, charged-polar class" ;
+    mlips:coversMaterial entity:mat-dimer-CP-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+entity:ds-dimer-PP-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, polar-polar class" ;
+    mlips:coversMaterial entity:mat-dimer-PP-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+entity:ds-dimer-CA-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, charged-apolar class" ;
+    mlips:coversMaterial entity:mat-dimer-CA-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+entity:ds-dimer-PA-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, polar-apolar class" ;
+    mlips:coversMaterial entity:mat-dimer-PA-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+entity:ds-dimer-AA-ji2025 a mlips:TrainingDataset ;
+    rdfs:label "BioFragment dimer data, apolar-apolar class" ;
+    mlips:coversMaterial entity:mat-dimer-AA-ji2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-ji2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-dimer-CC-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:ds-dimer-CP-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:ds-dimer-PP-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:ds-dimer-CA-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:ds-dimer-PA-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:ds-dimer-AA-ji2025 mlips:samplingStrategy
+    entity:sampling-separation-scan-ji2025 .
+
+entity:sampling-separation-scan-ji2025 a mlips:SamplingStrategy ;
+    rdfs:label "Dimer separation scan, random 9:1 split" ;
+    rdfs:comment "Dimer pairs at separations from about 5 A to 15 A; for each molecular pair the data are split at random into training and test sets 9:1." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:SOG-Net a mlips:MLIPMethod ;
+    rdfs:label "SOG-Net (sum-of-Gaussians neural network for long-range interactions)" ;
+    mlips:hasFunctionalForm entity:ff-SOG-Net ;
+    mlips:hasTrainingAlgorithm entity:alg-SOG-Net-ji2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-num-gaussians-ji2025 ,
+        entity:hp-latent-layers-ji2025 ,
+        entity:hp-fourier-grid-ji2025 ,
+        mlips:learningRate ;
+    mlips:inferenceComplexity "CPU time of the full model 10% to 40% above the short-range model, depending on system size (fast Fourier evaluation of the long-range part)" .
+
+entity:ff-SOG-Net a mlips:FunctionalForm ;
+    rdfs:label "Short-range descriptor network (core-shell Deep-Potential-type descriptors) plus a long-range energy from latent variables convolved with a learnable sum-of-Gaussians multiplier in Fourier space" .
+
+entity:alg-SOG-Net-ji2025 a mls:Algorithm ;
+    rdfs:label "Adam, initial learning rate 0.001 decaying by a factor of 0.98 every 10 epochs; three stages starting with batch size 2 and 800 epochs, both doubling at each stage" .
+
+entity:hp-num-gaussians-ji2025 a mlips:Hyperparameter ;
+    rdfs:label "SOG-Net number of Gaussians M" ;
+    mlips:hyperparameterName "M" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-latent-layers-ji2025 a mlips:Hyperparameter ;
+    rdfs:label "SOG-Net number of layers of latent variables" ;
+    mlips:hyperparameterName "P" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fourier-grid-ji2025 a mlips:Hyperparameter ;
+    rdfs:label "SOG-Net number of Fourier grid points per dimension" ;
+    mlips:hyperparameterName "N_FFT" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-sog-CC-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-CC-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-CC-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-CC-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-CC-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-sog-CP-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-CP-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-CP-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-CP-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-CP-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-sog-PP-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-PP-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-PP-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-PP-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-PP-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-sog-CA-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-CA-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-CA-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-CA-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-CA-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-sog-PA-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-PA-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-PA-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-PA-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-PA-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-sog-AA-cutoffRadius-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-sog-AA-num-gaussians-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2025 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-sog-AA-latent-layers-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-layers-ji2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-sog-AA-fourier-grid-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fourier-grid-ji2025 ;
+    mlips:settingValue "31"^^xsd:integer .
+
+entity:setting-sog-AA-learningRate-ji2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-sog-CC-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on charged-charged dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-CC-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-CC-cutoffRadius-ji2025 ,
+        entity:setting-sog-CC-num-gaussians-ji2025 ,
+        entity:setting-sog-CC-latent-layers-ji2025 ,
+        entity:setting-sog-CC-fourier-grid-ji2025 ,
+        entity:setting-sog-CC-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-CC-ji2025 .
+
+entity:model-sog-CC-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for CC dimers" .
+
+entity:run-sog-CP-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on charged-polar dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-CP-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-CP-cutoffRadius-ji2025 ,
+        entity:setting-sog-CP-num-gaussians-ji2025 ,
+        entity:setting-sog-CP-latent-layers-ji2025 ,
+        entity:setting-sog-CP-fourier-grid-ji2025 ,
+        entity:setting-sog-CP-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-CP-ji2025 .
+
+entity:model-sog-CP-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for CP dimers" .
+
+entity:run-sog-PP-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on polar-polar dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-PP-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-PP-cutoffRadius-ji2025 ,
+        entity:setting-sog-PP-num-gaussians-ji2025 ,
+        entity:setting-sog-PP-latent-layers-ji2025 ,
+        entity:setting-sog-PP-fourier-grid-ji2025 ,
+        entity:setting-sog-PP-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-PP-ji2025 .
+
+entity:model-sog-PP-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for PP dimers" .
+
+entity:run-sog-CA-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on charged-apolar dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-CA-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-CA-cutoffRadius-ji2025 ,
+        entity:setting-sog-CA-num-gaussians-ji2025 ,
+        entity:setting-sog-CA-latent-layers-ji2025 ,
+        entity:setting-sog-CA-fourier-grid-ji2025 ,
+        entity:setting-sog-CA-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-CA-ji2025 .
+
+entity:model-sog-CA-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for CA dimers" .
+
+entity:run-sog-PA-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on polar-apolar dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-PA-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-PA-cutoffRadius-ji2025 ,
+        entity:setting-sog-PA-num-gaussians-ji2025 ,
+        entity:setting-sog-PA-latent-layers-ji2025 ,
+        entity:setting-sog-PA-fourier-grid-ji2025 ,
+        entity:setting-sog-PA-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-PA-ji2025 .
+
+entity:model-sog-PA-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for PA dimers" .
+
+entity:run-sog-AA-ji2025 a mlips:MLIPRun ;
+    rdfs:label "SOG-Net trained on apolar-apolar dimers" ;
+    mlips:appliesMethod entity:SOG-Net ;
+    mlips:runsOn entity:ds-dimer-AA-ji2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sog-AA-cutoffRadius-ji2025 ,
+        entity:setting-sog-AA-num-gaussians-ji2025 ,
+        entity:setting-sog-AA-latent-layers-ji2025 ,
+        entity:setting-sog-AA-fourier-grid-ji2025 ,
+        entity:setting-sog-AA-learningRate-ji2025 ;
+    mlips:produces entity:model-sog-AA-ji2025 .
+
+entity:model-sog-AA-ji2025 a mlips:TrainedModel ;
+    rdfs:label "SOG-Net model for AA dimers" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ji2025 mlips:hasResult
+    entity:result-sog-CC-ji2025 ,
+    entity:result-sog-CP-ji2025 ,
+    entity:result-sog-PP-ji2025 ,
+    entity:result-sog-CA-ji2025 ,
+    entity:result-sog-PA-ji2025 ,
+    entity:result-sog-AA-ji2025 .
+
+entity:result-sog-CC-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-CC-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-CC-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-CC-1-ji2025 .
+
+entity:metric-sog-CC-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, CC dimers (short-range-only model: 64.3)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sog-CP-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-CP-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-CP-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-CP-1-ji2025 .
+
+entity:metric-sog-CP-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, CP dimers (short-range-only model: 35.4)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sog-PP-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-PP-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-PP-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-PP-1-ji2025 .
+
+entity:metric-sog-PP-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, PP dimers (short-range-only model: 32.0)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sog-CA-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-CA-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-CA-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-CA-1-ji2025 .
+
+entity:metric-sog-CA-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, CA dimers (short-range-only model: 26.8)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sog-PA-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-PA-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-PA-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-PA-1-ji2025 .
+
+entity:metric-sog-PA-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, PA dimers (short-range-only model: 2.26)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-sog-AA-ji2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sog-AA-ji2025 ;
+    mlips:targetMaterial entity:mat-dimer-AA-ji2025 ;
+    mlips:hasAccuracyMetric entity:metric-sog-AA-1-ji2025 .
+
+entity:metric-sog-AA-1-ji2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces over the whole data set: SOG-Net, AA dimers (short-range-only model: 1.13)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.06"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The force RMSEs are stated 'across the whole dataset' (training and test together). The short-range-only comparison models (64.3 / 35.4 / 32.0 / 26.8 / 2.26 / 1.13 meV/A for CC / CP / PP / CA / PA / AA) are in the metric labels but not encoded as runs: they use the paper's own core-shell short-range network without the long-range layer, which has no registry method. Energy RMSEs are only in figure insets.
+# - N_FFT is printed as '313', read as 31 grid points per dimension (31^3); worth a check against the PDF.
+# - Not encoded: the toy NaCl electrolyte (Coulomb + Lennard-Jones reference, up to 4000 training configurations), molten bulk NaCl (Table S1, percentage errors), Table I (SOG-Net against CC-ACE, 4G-HDNNP and CACE-LR on charged systems, with a CACE short-range part), the polar dipeptide (Table S2) and the liquid-water tests; their values were not read.
+# - The registry now has entity:SOG-Net (this paper) and entity:CACE-SOG (ji2026, the same long-range layer on a CACE short-range model); schema 0.1.2 cannot relate them.
+# - The manifest classes this paper as 'Application/model instance'; it is a method paper. The DOI 10.1103/ssp9-7s81 is the Physical Review Letters DOI.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
