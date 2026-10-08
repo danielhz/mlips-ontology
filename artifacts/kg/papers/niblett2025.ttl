@@ -1,0 +1,288 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Samuel P. Niblett et al. (2025). Transferability of Data Sets between Machine-Learned Interatomic Potential Algorithms.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.5c00272  arXiv:2409.05590v1
+#
+# Version read: arxiv-preprint arXiv:2409.05590v1 (sha256 a6bd95a48be108e2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 135 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the ablation in which DeePMD and MACE models are trained
+# on four subsets of a training set originally built for a GAP model of
+# the EC:EMC liquid mixture. Model quality is judged by trajectory
+# stability, density and diffusivity, not by energy or force errors, so no
+# AccuracyMetric is encoded. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-niblett2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Niblett et al. (2025): transferability of data sets between MLIP algorithms (EC:EMC electrolyte solvent)" ;
+    mlips:reportedIn entity:article-niblett2025 .
+
+entity:article-niblett2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.5c00272> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Transferability of Data Sets between Machine-Learned Interatomic Potential Algorithms" ;
+    schema:author <https://orcid.org/0000-0003-0337-0464> ,
+        entity:person-Kourtis-niblett2025 ,
+        <https://orcid.org/0000-0002-3963-5076> ,
+        <https://orcid.org/0000-0001-5572-192X> ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0003-0337-0464> a schema:Person ;
+    schema:name "Samuel P. Niblett" ;
+    schema:givenName "Samuel P." ;
+    schema:familyName "Niblett" ;
+    schema:identifier <https://orcid.org/0000-0003-0337-0464> .
+
+entity:person-Kourtis-niblett2025 a schema:Person ;
+    schema:name "Panagiotis Kourtis" ;
+    schema:givenName "Panagiotis" ;
+    schema:familyName "Kourtis" .
+
+<https://orcid.org/0000-0002-3963-5076> a schema:Person ;
+    schema:name "Ioan-Bogdan Magdău" ;
+    schema:givenName "Ioan-Bogdan" ;
+    schema:familyName "Magdău" ;
+    schema:identifier <https://orcid.org/0000-0002-3963-5076> .
+
+<https://orcid.org/0000-0001-5572-192X> a schema:Person ;
+    schema:name "Clare P. Grey" ;
+    schema:givenName "Clare P." ;
+    schema:familyName "Grey" ;
+    schema:identifier <https://orcid.org/0000-0001-5572-192X> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-ECEMC-niblett2025 a mlips:MaterialSystem ;
+    rdfs:label "Ethylene carbonate : ethyl methyl carbonate liquid mixture" ;
+    mlips:materialClass "Organic liquid (battery electrolyte solvent)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-niblett2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-niblett2025 mlips:hasDFTSettings entity:calc-settings-dft-niblett2025 .
+
+entity:calc-settings-dft-niblett2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:CASTEP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:Ultrasoft ;
+    mlips:energyCutoff "800"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack 1x1x1" ;
+    rdfs:comment "PBE with the D2 dispersion correction (G06 keyword); standard CASTEP ultrasoft pseudopotentials." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-opls-niblett2025 a mlips:TrainingDataset ;
+    rdfs:label "OPLS only: 200 liquid configurations from OPLS-AA molecular dynamics (4 EC + 8 EMC)" ;
+    mlips:coversMaterial entity:mat-ECEMC-niblett2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 200 ;
+    mlips:hasDFTCalculation entity:calc-dft-niblett2025 .
+
+entity:ds-opls-sm-niblett2025 a mlips:TrainingDataset ;
+    rdfs:label "OPLS+SM: OPLS liquid configurations plus 600 isolated EC and EMC molecules" ;
+    mlips:coversMaterial entity:mat-ECEMC-niblett2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 800 ;
+    mlips:hasDFTCalculation entity:calc-dft-niblett2025 .
+
+entity:ds-opls-vs-niblett2025 a mlips:TrainingDataset ;
+    rdfs:label "OPLS+VS: OPLS liquid configurations plus 20 volume-scan configurations" ;
+    mlips:coversMaterial entity:mat-ECEMC-niblett2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 220 ;
+    mlips:hasDFTCalculation entity:calc-dft-niblett2025 .
+
+entity:ds-full-niblett2025 a mlips:TrainingDataset ;
+    rdfs:label "Full: all four configuration types of the GAP training set, about 1000 configurations" ;
+    mlips:coversMaterial entity:mat-ECEMC-niblett2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dft-niblett2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-opls-niblett2025 mlips:samplingStrategy
+    entity:sampling-oplsmd-niblett2025 .
+
+entity:ds-opls-sm-niblett2025 mlips:samplingStrategy
+    entity:sampling-oplsmd-niblett2025 ,
+    entity:sampling-single-niblett2025 .
+
+entity:ds-opls-vs-niblett2025 mlips:samplingStrategy
+    entity:sampling-oplsmd-niblett2025 ,
+    entity:sampling-volscan-niblett2025 .
+
+entity:ds-full-niblett2025 mlips:samplingStrategy
+    entity:sampling-oplsmd-niblett2025 ,
+    entity:sampling-single-niblett2025 ,
+    entity:sampling-volscan-niblett2025 ,
+    entity:sampling-gapiter-niblett2025 .
+
+entity:sampling-oplsmd-niblett2025 a mlips:SamplingStrategy ;
+    rdfs:label "Classical molecular dynamics with the OPLS-AA force field (NPT at elevated temperature and pressure, NVT at 300-400 K), no ab initio MD" .
+
+entity:sampling-single-niblett2025 a mlips:SamplingStrategy ;
+    rdfs:label "Isolated EC and EMC molecules in near-equilibrium configurations" .
+
+entity:sampling-volscan-niblett2025 a mlips:SamplingStrategy ;
+    rdfs:label "Volume scans: frames of a GAP-MD trajectory isotropically expanded or contracted with rigid molecules" .
+
+entity:sampling-gapiter-niblett2025 a mlips:SamplingStrategy ;
+    rdfs:label "Twelve generations of iterative training with the GAP model (5-20 configurations with anomalous density or diffusivity per generation)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-DeePMD-opls-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "DeePMD trained on the OPLS only subset" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-opls-niblett2025 ;
+    mlips:produces entity:model-DeePMD-opls-niblett2025 .
+
+entity:model-DeePMD-opls-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for EC:EMC (OPLS only)" .
+
+entity:run-DeePMD-opls-sm-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "DeePMD trained on the OPLS+SM subset" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-opls-sm-niblett2025 ;
+    mlips:produces entity:model-DeePMD-opls-sm-niblett2025 .
+
+entity:model-DeePMD-opls-sm-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for EC:EMC (OPLS+SM)" .
+
+entity:run-DeePMD-opls-vs-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "DeePMD trained on the OPLS+VS subset" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-opls-vs-niblett2025 ;
+    mlips:produces entity:model-DeePMD-opls-vs-niblett2025 .
+
+entity:model-DeePMD-opls-vs-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for EC:EMC (OPLS+VS)" .
+
+entity:run-DeePMD-full-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "DeePMD trained on the Full subset" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-full-niblett2025 ;
+    mlips:produces entity:model-DeePMD-full-niblett2025 .
+
+entity:model-DeePMD-full-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "DeePMD model for EC:EMC (Full)" .
+
+entity:run-MACE-opls-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the OPLS only subset" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-opls-niblett2025 ;
+    mlips:produces entity:model-MACE-opls-niblett2025 .
+
+entity:model-MACE-opls-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "MACE model for EC:EMC (OPLS only)" .
+
+entity:run-MACE-opls-sm-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the OPLS+SM subset" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-opls-sm-niblett2025 ;
+    mlips:produces entity:model-MACE-opls-sm-niblett2025 .
+
+entity:model-MACE-opls-sm-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "MACE model for EC:EMC (OPLS+SM)" .
+
+entity:run-MACE-opls-vs-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the OPLS+VS subset" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-opls-vs-niblett2025 ;
+    mlips:produces entity:model-MACE-opls-vs-niblett2025 .
+
+entity:model-MACE-opls-vs-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "MACE model for EC:EMC (OPLS+VS)" .
+
+entity:run-MACE-full-niblett2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on the Full subset" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-full-niblett2025 ;
+    mlips:produces entity:model-MACE-full-niblett2025 .
+
+entity:model-MACE-full-niblett2025 a mlips:TrainedModel ;
+    rdfs:label "MACE model for EC:EMC (Full)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: the paper argues that prediction errors on fixed configurations are a weak test and reports trajectory stability, liquid density and self-diffusivity instead (the only error figure is a 'typical training error of 10 meV/Ang' used to set the active-learning threshold).
+# - The subsets are parts of the published GAP training set of the paper's ref. [28]; the stored properties are assumed to be energies and forces (the DeePMD force error is mentioned). Subset sizes are sums of the stated parts; the Full set is given only as 'around 1000 configurations'.
+# - The DeePMD active-learning continuation (committees of 5 models, 25 new CASTEP configurations per generation), the original GAP model, the hyperparameters of the DeePMD and MACE models, and the transfer to unseen molecules are not encoded.
+# - Pretrained MACE-MP-0 (with D3) and MACE-OFF are tested for liquid stability and density only; the releases are not specified, so no registry model is linked.
+# - Read from the arXiv v1 preprint, whose title differs from the JCTC article ('Transferability of datasets between Machine-Learning Interaction Potentials'); the arXiv id was matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
