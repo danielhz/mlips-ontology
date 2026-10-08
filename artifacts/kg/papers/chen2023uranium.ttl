@@ -1,0 +1,204 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Hongjian Chen et al. (2023). Development of a machine-learning interatomic potential for uranium under the moment tensor potential framework.
+#   Computational Materials Science. doi:10.1016/j.commatsci.2023.112376
+#
+# Version read: publisher (sha256 2fb3f1c5a7b48497...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 73 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one actively learned MTP for uranium trained on DFT+U
+# data, with the reference settings, the active-learning procedure and
+# the training-set RMSEs in energy and force stated in the text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-chen2023uranium a mlips:BenchmarkStudy ;
+    rdfs:label "Chen et al. (2023): machine-learning interatomic potential for uranium under the moment tensor potential framework" ;
+    mlips:reportedIn entity:article-chen2023uranium .
+
+entity:article-chen2023uranium a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2023.112376> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Development of a machine-learning interatomic potential for uranium under the moment tensor potential framework" ;
+    schema:author entity:person-Chen-chen2023uranium ,
+        entity:person-Yuan-chen2023uranium ,
+        entity:person-Geng-chen2023uranium ,
+        entity:person-Hu-chen2023uranium ,
+        <https://orcid.org/0000-0002-2682-9584> .
+
+entity:person-Chen-chen2023uranium a schema:Person ;
+    schema:name "Hongjian Chen" ;
+    schema:givenName "Hongjian" ;
+    schema:familyName "Chen" .
+
+entity:person-Yuan-chen2023uranium a schema:Person ;
+    schema:name "Dingwang Yuan" ;
+    schema:givenName "Dingwang" ;
+    schema:familyName "Yuan" .
+
+entity:person-Geng-chen2023uranium a schema:Person ;
+    schema:name "Huayun Geng" ;
+    schema:givenName "Huayun" ;
+    schema:familyName "Geng" .
+
+entity:person-Hu-chen2023uranium a schema:Person ;
+    schema:name "Wangyu Hu" ;
+    schema:givenName "Wangyu" ;
+    schema:familyName "Hu" .
+
+<https://orcid.org/0000-0002-2682-9584> a schema:Person ;
+    schema:name "Bowen Huang" ;
+    schema:givenName "Bowen" ;
+    schema:familyName "Huang" ;
+    schema:identifier <https://orcid.org/0000-0002-2682-9584> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-U-chen2023uranium a mlips:MaterialSystem ;
+    rdfs:label "Uranium: alpha-U (orthorhombic) and gamma-U (bcc) across temperature and pressure" ;
+    mlips:chemicalFormula "U" ;
+    mlips:materialClass "Elemental actinide metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-chen2023uranium a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-chen2023uranium mlips:hasDFTSettings entity:calc-settings-dft-chen2023uranium .
+
+entity:calc-settings-dft-chen2023uranium a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack meshes with spacing 2 pi x 0.05 A^-1" ;
+    rdfs:comment "DFT+U in the form of Dudarev et al. with U_eff = 1.24 eV for all uranium structures; PAW potential with 6s2 6p6 7s2 5f3 6d1 valence." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-U-chen2023uranium a mlips:TrainingDataset ;
+    rdfs:label "Uranium DFT+U active-learning training set" ;
+    mlips:coversMaterial entity:mat-U-chen2023uranium ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-dft-chen2023uranium ;
+    rdfs:comment "The number of configurations is not stated in the parts read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-U-chen2023uranium mlips:samplingStrategy
+    entity:sampling-aimd-seed-chen2023uranium ,
+    entity:sampling-active-learning-md-chen2023uranium .
+
+entity:sampling-aimd-seed-chen2023uranium a mlips:SamplingStrategy ;
+    rdfs:label "AIMD seed trajectory" ;
+    rdfs:comment "1000 time steps of ab initio MD of alpha-U at 300 K and 0 GPa; a pre-trained MTP is fitted to randomly selected structures." .
+
+entity:sampling-active-learning-md-chen2023uranium a mlips:SamplingStrategy ;
+    rdfs:label "Active learning on MD with the D-optimality criterion" ;
+    rdfs:comment "MD with the current MTP at 300 K and 0 GPa and then at different temperatures and pressures; structures selected by the extrapolation grade are computed with DFT+U and added until no structure is added." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-chen2023uranium ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-chen2023uranium ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:loss-MTP-chen2023uranium a mlips:LossFunction ;
+    rdfs:label "Weighted least squares on energies, forces and virial stresses with weights 1, 0.01 and 0.001" .
+
+entity:alg-MTP-chen2023uranium a mls:Algorithm ;
+    rdfs:label "Active learning (D-optimality / extrapolation grade) following Shapeev and co-workers" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mtp-U-chen2023uranium a mlips:MLIPRun ;
+    rdfs:label "Actively learned MTP training for uranium" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-U-chen2023uranium ;
+    mlips:produces entity:model-mtp-U-chen2023uranium .
+
+entity:model-mtp-U-chen2023uranium a mlips:TrainedModel ;
+    rdfs:label "MTP for uranium (DFT+U reference)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-chen2023uranium mlips:hasResult
+    entity:result-mtp-U-training-chen2023uranium .
+
+entity:result-mtp-U-training-chen2023uranium a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mtp-U-chen2023uranium ;
+    mlips:targetMaterial entity:mat-U-chen2023uranium ;
+    mlips:hasAccuracyMetric entity:metric-mtp-U-training-1-chen2023uranium ,
+        entity:metric-mtp-U-training-2-chen2023uranium .
+
+entity:metric-mtp-U-training-1-chen2023uranium a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy over the configurations collected in the training stage" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mtp-U-training-2-chen2023uranium a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on the x component of forces over the training configurations (y: 0.072, z: 0.073 eV/A)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.075"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The errors are on the configurations collected during training (Fig. 1), not on a held-out test set. Force RMSEs are given per Cartesian direction (0.075 / 0.072 / 0.073 eV/A); the x value is encoded and the others are in the label.
+# - The MTP level, cutoff radius and radial basis size are not stated in the parts read; neither is the software (the MLIP package is implied by the cited active-learning method, LAMMPS is named for MD).
+# - Property validation (lattice constants, elastic constants, vacancy formation energy, phonon frequencies, thermal conductivity, heat capacity, the alpha-gamma transformation; Tables 1 and 2) has no MetricProperty.
+# - The manifest classes this paper as 'Method/model'; it is an application of the MTP method.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
