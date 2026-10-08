@@ -1,0 +1,359 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Ji Qi et al. (2024). Robust training of machine learning interatomic potentials with dimensionality reduction and stratified sampling.
+#   npj Computational Materials. doi:10.1038/s41524-024-01227-4  arXiv:2307.13710v1
+#
+# Version read: arxiv-preprint arXiv:2307.13710v1 (sha256 b5da06ff1a5f5e0e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 39 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the DIRECT sampling strategy and the models trained to
+# demonstrate it: the M3GNet universal potential refitted on the DIRECT
+# set and on the manually sampled (MS) set of MPF.2021.2.8.All
+# (M3GNet-DIRECT is the registry model that later papers evaluate), and
+# two moment tensor potentials for Ti-H fitted on DIRECT-selected and on
+# active-learning structures.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-qi2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Qi et al. (2024): robust MLIP training with dimensionality-reduced encoded clusters with stratified (DIRECT) sampling" ;
+    mlips:reportedIn entity:article-qi2024 .
+
+entity:article-qi2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01227-4> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Robust training of machine learning interatomic potentials with dimensionality reduction and stratified sampling" ;
+    schema:author <https://orcid.org/0000-0001-5808-9931> ,
+        <https://orcid.org/0000-0002-0802-9559> ,
+        entity:person-Wood-qi2024 ,
+        entity:person-Pham-qi2024 ,
+        <https://orcid.org/0000-0001-5726-2587> .
+
+<https://orcid.org/0000-0001-5808-9931> a schema:Person ;
+    schema:name "Ji Qi" ;
+    schema:givenName "Ji" ;
+    schema:familyName "Qi" ;
+    schema:identifier <https://orcid.org/0000-0001-5808-9931> .
+
+<https://orcid.org/0000-0002-0802-9559> a schema:Person ;
+    schema:name "Tsz Wai Ko" ;
+    schema:givenName "Tsz Wai" ;
+    schema:familyName "Ko" ;
+    schema:identifier <https://orcid.org/0000-0002-0802-9559> .
+
+entity:person-Wood-qi2024 a schema:Person ;
+    schema:name "Brandon C. Wood" ;
+    schema:givenName "Brandon C." ;
+    schema:familyName "Wood" .
+
+entity:person-Pham-qi2024 a schema:Person ;
+    schema:name "Tuan Anh Pham" ;
+    schema:givenName "Tuan Anh" ;
+    schema:familyName "Pham" .
+
+<https://orcid.org/0000-0001-5726-2587> a schema:Person ;
+    schema:name "Shyue Ping Ong" ;
+    schema:givenName "Shyue Ping" ;
+    schema:familyName "Ong" ;
+    schema:identifier <https://orcid.org/0000-0001-5726-2587> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mpf-qi2024 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project relaxation structures over 89 elements (MPF.2021.2.8.All)" ;
+    mlips:materialClass "Universal inorganic crystals; all ionic steps of first and second relaxations" .
+
+entity:mat-TiH-qi2024 a mlips:MaterialSystem ;
+    rdfs:label "Titanium hydrides TiHn (0 <= n <= 2): HCP, BCC and FCC supercells" ;
+    mlips:chemicalFormula "TiHn" ;
+    mlips:materialClass "Metal hydride; solid solutions and hydrides at high temperature" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-mpf-dft-qi2024 a mlips:DFTCalculation .
+
+entity:calc-tih-dft-qi2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-mpf-dft-qi2024 mlips:hasDFTSettings entity:calc-settings-mpf-dft-qi2024 .
+
+entity:calc-settings-mpf-dft-qi2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "Materials Project relaxation data. The 13,614 structures with forces over 10 eV/A were recomputed with spin-polarised self-consistent calculations (EDIFF 1e-5 eV, KSPACING 0.35 A^-1, at most 100 electronic steps), of which over 83% converged; all other settings as for Materials Project static calculations." .
+
+entity:calc-tih-dft-qi2024 mlips:hasDFTSettings entity:calc-settings-tih-dft-qi2024 .
+
+entity:calc-settings-tih-dft-qi2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "Single Gamma point for AIMD; k-grid density of at least 100 per A^-3 for the self-consistent calculations" ;
+    rdfs:comment "Spin-polarised; electronic convergence 1e-4 eV, at most 100 electronic steps." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-direct-set-qi2024 a mlips:TrainingDataset ;
+    rdfs:label "MPF.2021.2.8.All DIRECT set (185,670 structures)" ;
+    mlips:coversMaterial entity:mat-mpf-qi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 185670 ;
+    mlips:hasDFTCalculation entity:calc-mpf-dft-qi2024 ;
+    rdfs:comment "At most 20 structures from each of 20,044 clusters. 90:5:5 train:validation:test split; isolated atoms of all 89 elements added to the training set." .
+
+entity:ds-ms-set-qi2024 a mlips:TrainingDataset ;
+    rdfs:label "MPF.2021.2.8.All manually sampled (MS) set (185,877 structures)" ;
+    mlips:coversMaterial entity:mat-mpf-qi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 185877 ;
+    mlips:hasDFTCalculation entity:calc-mpf-dft-qi2024 ;
+    rdfs:comment "90:5:5 train:validation:test split." .
+
+entity:ds-tih-direct-qi2024 a mlips:TrainingDataset ;
+    rdfs:label "Ti-H DIRECT training set (947 structures)" ;
+    mlips:coversMaterial entity:mat-TiH-qi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 947 ;
+    mlips:hasDFTCalculation entity:calc-tih-dft-qi2024 ;
+    rdfs:comment "954 structures selected, 947 static DFT calculations converged." .
+
+entity:ds-tih-al-qi2024 a mlips:TrainingDataset ;
+    rdfs:label "Ti-H active-learning training set" ;
+    mlips:coversMaterial entity:mat-TiH-qi2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-tih-dft-qi2024 ;
+    rdfs:comment "The paper gives 2,063 configurations in the caption of Figure 6 and 2,077 structures in the text; the size is left out." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-direct-set-qi2024 mlips:samplingStrategy
+    entity:sampling-direct-qi2024 .
+
+entity:ds-ms-set-qi2024 mlips:samplingStrategy
+    entity:sampling-manual-qi2024 .
+
+entity:ds-tih-direct-qi2024 mlips:samplingStrategy
+    entity:sampling-m3gnet-md-qi2024 ,
+    entity:sampling-direct-qi2024 .
+
+entity:ds-tih-al-qi2024 mlips:samplingStrategy
+    entity:sampling-mtp-al-qi2024 .
+
+entity:sampling-direct-qi2024 a mlips:SamplingStrategy ;
+    rdfs:label "DIRECT sampling" ;
+    rdfs:comment "Structures are featurised with the M3GNet formation-energy model (128-D vector), reduced by PCA (components with eigenvalue above 1 kept, weighted by explained variance), clustered with BIRCH, and k structures are drawn from each cluster by stratified sampling." .
+
+entity:sampling-manual-qi2024 a mlips:SamplingStrategy ;
+    rdfs:label "Manual sampling of relaxation trajectories (MS)" ;
+    rdfs:comment "First and middle ionic steps of the first relaxation and the last step of the second relaxation, following Chen and Ong." .
+
+entity:sampling-m3gnet-md-qi2024 a mlips:SamplingStrategy ;
+    rdfs:label "MD with the M3GNet-DIRECT universal potential" ;
+    rdfs:comment "Multi-temperature NpT MD over 274 scenarios of hydrogen composition, about 274,000 snapshots, from which DIRECT selects one structure from each of 954 clusters." .
+
+entity:sampling-mtp-al-qi2024 a mlips:SamplingStrategy ;
+    rdfs:label "MTP active learning" ;
+    rdfs:comment "Active learning with the protocol of Gubaev et al. over the same 274 MD scenarios, extrapolation-grade thresholds gamma_break = gamma_select = 3, 15 iterations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:hasLossFunction entity:loss-M3GNet-qi2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-M3GNet-qi2024 ;
+    mlips:hasHyperparameter mlips:numFeatures ,
+        mlips:learningRate ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-M3GNet-qi2024 a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta = 0.01) with a 1 : 1 : 0.1 weight ratio for energy (eV/atom), force (eV/A) and stress (GPa)" .
+
+entity:alg-M3GNet-qi2024 a mls:Algorithm ;
+    rdfs:label "Adam, initial rate 1e-3 with cosine decay to 1e-5 in 100 epochs; training stopped when the validation metric does not improve for 40 epochs" .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasLossFunction entity:loss-MTP-qi2024 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:momentLevel ;
+    mlips:hasImplementation entity:impl-MTP-qi2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-MTP-qi2024 a mlips:LossFunction ;
+    rdfs:label "Weighted fit with weights 1, 0.01 and 0 for energies, forces and stresses" .
+
+entity:impl-MTP-qi2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP ;
+    mlips:version "with LAMMPS and the maml Python package" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-m3gnet-direct-numFeatures-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-m3gnet-direct-learningRate-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-m3gnet-ms-numFeatures-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-m3gnet-ms-learningRate-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-mtp-direct-cutoffRadius-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-direct-momentLevel-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-mtp-al-cutoffRadius-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-al-momentLevel-qi2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-M3GNet-DIRECT a mlips:MLIPRun ;
+    rdfs:label "Training run of M3GNet 2021.2.8-DIRECT (1.1M parameters, trained on MPF with DIRECT sampling)" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-direct-set-qi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-m3gnet-direct-numFeatures-qi2024 ,
+        entity:setting-m3gnet-direct-learningRate-qi2024 ;
+    mlips:produces entity:model-M3GNet-DIRECT .
+
+entity:model-M3GNet-DIRECT a mlips:TrainedModel ;
+    rdfs:label "M3GNet 2021.2.8-DIRECT (1.1M parameters, trained on MPF with DIRECT sampling)" .
+
+entity:run-m3gnet-ms-qi2024 a mlips:MLIPRun ;
+    rdfs:label "M3GNet universal potential refitted on the MS set" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-ms-set-qi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-m3gnet-ms-numFeatures-qi2024 ,
+        entity:setting-m3gnet-ms-learningRate-qi2024 ;
+    mlips:produces entity:model-m3gnet-ms-qi2024 .
+
+entity:model-m3gnet-ms-qi2024 a mlips:TrainedModel ;
+    rdfs:label "M3GNet-MS (refit of this work, 128-dimensional embeddings)" .
+
+entity:run-mtp-direct-qi2024 a mlips:MLIPRun ;
+    rdfs:label "MTP for Ti-H fitted on the DIRECT set" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-tih-direct-qi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-direct-cutoffRadius-qi2024 ,
+        entity:setting-mtp-direct-momentLevel-qi2024 ;
+    mlips:produces entity:model-mtp-direct-qi2024 .
+
+entity:model-mtp-direct-qi2024 a mlips:TrainedModel ;
+    rdfs:label "MTP-DIRECT for Ti-H" .
+
+entity:run-mtp-al-qi2024 a mlips:MLIPRun ;
+    rdfs:label "MTP for Ti-H fitted on the active-learning set" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-tih-al-qi2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-al-cutoffRadius-qi2024 ,
+        entity:setting-mtp-al-momentLevel-qi2024 ;
+    mlips:produces entity:model-mtp-al-qi2024 .
+
+entity:model-mtp-al-qi2024 a mlips:TrainedModel ;
+    rdfs:label "MTP-AL for Ti-H" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-qi2024 mlips:hasResult
+    entity:result-m3gnet-direct-qi2024 .
+
+entity:result-m3gnet-direct-qi2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-M3GNet-DIRECT ;
+    mlips:targetMaterial entity:mat-mpf-qi2024 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-direct-1-qi2024 ,
+        entity:metric-m3gnet-direct-2-qi2024 ,
+        entity:metric-m3gnet-direct-3-qi2024 .
+
+entity:metric-m3gnet-direct-1-qi2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy, in eV/atom: M3GNet-DIRECT, average over the DIRECT and MS test sets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.041"^^xsd:double .
+
+entity:metric-m3gnet-direct-2-qi2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: M3GNet-DIRECT, average over the DIRECT and MS test sets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.101"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-m3gnet-direct-3-qi2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on stresses: M3GNet-DIRECT, average over the DIRECT and MS test sets" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.54"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Per-test-set errors of M3GNet-DIRECT and M3GNet-MS (Figure 4) and the MTP-DIRECT / MTP-AL errors on 400 AIMD test structures (Figure 7; stated only as 'below 10 eV/atom [sic] and 0.15 eV/A') are given as figures or bounds; only the averaged M3GNet-DIRECT MAEs printed in the text are encoded.
+# - Energy MAE is printed in eV/atom, for which the vocabulary has no unit; mlips:hasUnit is omitted (value not converted).
+# - The doubling of the atom-embedding and MLP dimensions from 64 to 128 is encoded as mlips:numFeatures 128; other M3GNet settings are 'the same as the original M3GNet UP' and not restated.
+# - M3GNet-DIRECT is the registry model entity:model-M3GNet-DIRECT; this file declares its registry run with data set and settings, and focassio2024 (encoded earlier) carries the stub of the same run.
+# - The hypothetical O- and S-containing compound tests (energy above hull after relaxation) and the coverage scores of the sampling have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
