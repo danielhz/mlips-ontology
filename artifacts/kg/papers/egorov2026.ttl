@@ -1,0 +1,235 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   A. D. Egorov et al. (2026). A general-purpose atomic cluster expansion interatomic potential for niobium.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2607.00540  arXiv:2607.00540v1
+#
+# Version read: arxiv-preprint arXiv:2607.00540v1 (sha256 2da9ec4a45129567...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 106 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one nonlinear ACE (800 basis functions) for niobium
+# trained with pacemaker on the GAP database of Byggmastar et al.
+# extended by 147 structures, with reference settings, training settings
+# and the training and test MAEs. The benchmark against other potentials
+# (GAP, MTPs, EAM, XMEAM, GRACE-2L-OAM) is by properties.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-egorov2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Egorov et al. (2026): a general-purpose atomic cluster expansion interatomic potential for niobium" ;
+    mlips:reportedIn entity:article-egorov2026 .
+
+entity:article-egorov2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2607.00540> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "A general-purpose atomic cluster expansion interatomic potential for niobium" ;
+    schema:author entity:person-Egorov-egorov2026 ,
+        entity:person-Drautz-egorov2026 ,
+        entity:person-Hammerschmidt-egorov2026 .
+
+entity:person-Egorov-egorov2026 a schema:Person ;
+    schema:name "Aleksei Egorov" ;
+    schema:givenName "Aleksei" ;
+    schema:familyName "Egorov" .
+
+entity:person-Drautz-egorov2026 a schema:Person ;
+    schema:name "Ralf Drautz" ;
+    schema:givenName "Ralf" ;
+    schema:familyName "Drautz" .
+
+entity:person-Hammerschmidt-egorov2026 a schema:Person ;
+    schema:name "Thomas Hammerschmidt" ;
+    schema:givenName "Thomas" ;
+    schema:familyName "Hammerschmidt" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Nb-egorov2026 a mlips:MaterialSystem ;
+    rdfs:label "Niobium: bcc bulk, defects, surfaces, liquid, and the fcc, hcp, A15 and sigma phases over wide volume ranges" ;
+    mlips:chemicalFormula "Nb" ;
+    mlips:materialClass "Elemental bcc refractory metal" ;
+    mlips:microstructuralFeature "Vacancies, screw dislocations, grain boundaries, surfaces; fracture" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-egorov2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-egorov2026 mlips:hasDFTSettings entity:calc-settings-dft-egorov2026 .
+
+entity:calc-settings-dft-egorov2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    mlips:kPointMesh "k-point spacing 0.15 A^-1" ;
+    rdfs:comment "Settings identical to the original GAP work of Byggmastar et al.; spin polarisation included, Gaussian smearing of 0.1 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Nb-egorov2026 a mlips:TrainingDataset ;
+    rdfs:label "Niobium ACE database (4,130 structures)" ;
+    mlips:coversMaterial entity:mat-Nb-egorov2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 4130 ;
+    mlips:hasDFTCalculation entity:calc-dft-egorov2026 ;
+    rdfs:comment "Randomly split into 90% for training and 10% for testing." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Nb-egorov2026 mlips:samplingStrategy
+    entity:sampling-gap-db-egorov2026 ,
+    entity:sampling-ev-extension-egorov2026 .
+
+entity:sampling-gap-db-egorov2026 a mlips:SamplingStrategy ;
+    rdfs:label "Niobium GAP database of Byggmastar et al." ;
+    rdfs:comment "The published DFT database used to train the niobium GAP (3,983 of the 4,130 structures)." .
+
+entity:sampling-ev-extension-egorov2026 a mlips:SamplingStrategy ;
+    rdfs:label "Added energy-volume structures" ;
+    rdfs:comment "147 structures generated by the authors for bcc, hcp, fcc, sigma and A15 over wide volume ranges, so that the model stays robust under large volume changes such as in fracture." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-egorov2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-num-basis-functions-egorov2026 ;
+    mlips:hasImplementation entity:impl-ACE-egorov2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:NudgedElasticBand ,
+        mlips:PhononCalculation ,
+        mlips:GeometryOptimization .
+
+entity:loss-ACE-egorov2026 a mlips:LossFunction ;
+    rdfs:label "Relative weights of 0.7 for energies and 0.3 for forces" .
+
+entity:impl-ACE-egorov2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "trained with the pacemaker package; nonlinear ACE with Finnis-Sinclair embedding" .
+
+entity:hp-num-basis-functions-egorov2026 a mlips:Hyperparameter ;
+    rdfs:label "ACE number of basis functions" ;
+    mlips:hyperparameterName "num_basis_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-ace-Nb-cutoffRadius-egorov2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-ace-Nb-num-basis-functions-egorov2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-basis-functions-egorov2026 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-ace-Nb-egorov2026 a mlips:MLIPRun ;
+    rdfs:label "Nonlinear ACE (800 basis functions) training for niobium" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-Nb-egorov2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ace-Nb-cutoffRadius-egorov2026 ,
+        entity:setting-ace-Nb-num-basis-functions-egorov2026 ;
+    mlips:produces entity:model-ace-Nb-egorov2026 .
+
+entity:model-ace-Nb-egorov2026 a mlips:TrainedModel ;
+    rdfs:label "General-purpose ACE for niobium (800 basis functions)" ;
+    mlips:inferenceHardware "Speed benchmark: 1000 NVT MD steps at 100 K in LAMMPS on an Intel Xeon E5-1620 v4 CPU at 3.5 GHz, 128-atom bcc cell (result shown as a figure)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-egorov2026 mlips:hasResult
+    entity:result-ace-Nb-test-egorov2026 ,
+    entity:result-ace-Nb-train-egorov2026 .
+
+entity:result-ace-Nb-test-egorov2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ace-Nb-egorov2026 ;
+    mlips:targetMaterial entity:mat-Nb-egorov2026 ;
+    mlips:hasAccuracyMetric entity:metric-ace-Nb-test-1-egorov2026 ,
+        entity:metric-ace-Nb-test-2-egorov2026 .
+
+entity:metric-ace-Nb-test-1-egorov2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: 800-basis-function ACE for Nb" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-ace-Nb-test-2-egorov2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: 800-basis-function ACE for Nb" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "49.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ace-Nb-train-egorov2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ace-Nb-egorov2026 ;
+    mlips:targetMaterial entity:mat-Nb-egorov2026 ;
+    mlips:hasAccuracyMetric entity:metric-ace-Nb-train-1-egorov2026 ,
+        entity:metric-ace-Nb-train-2-egorov2026 .
+
+entity:metric-ace-Nb-train-1-egorov2026 a mlips:AccuracyMetric ;
+    rdfs:label "Training MAE on energy: 800-basis-function ACE for Nb" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-ace-Nb-train-2-egorov2026 a mlips:AccuracyMetric ;
+    rdfs:label "Training MAE on forces: 800-basis-function ACE for Nb" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.91"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The comparison with other potentials (the GAP of Byggmastar et al., two MTPs, EAM, XMEAM and the pretrained GRACE-2L-OAM of lysogorskiy2026) is on properties: energy-volume curves, elastic constants, phonons, surface energies, vacancy formation and migration, Peierls barriers, grain-boundary energies, speed. None has a MetricProperty, and GRACE-2L-OAM is therefore not linked as an evaluated registry model.
+# - The 147 added structures and the 3,983 database structures are one data-set node with provenance Augmented. Further pacemaker settings (radial basis, body order, optimiser) were not captured.
+# - The fracture application (crack simulations with more than 810,000 atoms) has no MetricProperty; MD in LAMMPS, NEB in ASE, phonon and relaxation calculations with the ACE are the grounds for the simulation types.
+# - Preprint only (arXiv v1, July 2026); authors from DataCite, without ORCIDs. The manifest classes it as 'Method/model'; it is an application of ACE.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
