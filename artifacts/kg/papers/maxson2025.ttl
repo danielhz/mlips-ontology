@@ -1,0 +1,1704 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Tristan Maxson et al. (2025). MS25: Materials Science-Focused Benchmark Data Set for Machine Learning Interatomic Potentials.
+#   Journal of Chemical Information and Modeling. doi:10.1021/acs.jcim.5c01262
+#
+# Version read: publisher (sha256 99296decd0b092f2...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 65 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the MS25 benchmark: six systems (MgO surface, liquid
+# water, CHA zeolite, a surface reaction, a high-entropy alloy, Zr-O),
+# two of them in two sizes, and the five MLIP architectures trained from
+# scratch on each with optimised hyperparameters (Tables 1-5 and 7):
+# 40 runs. Errors are shown as figures; the one pair of values printed
+# in the text is encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-maxson2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Maxson et al. (2025): MS25, a materials-science-focused benchmark data set for MLIPs, with MACE, NequIP, Allegro, ANI and MTP models" ;
+    mlips:reportedIn entity:article-maxson2025 .
+
+entity:article-maxson2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jcim.5c01262> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "MS25: Materials Science-Focused Benchmark Data Set for Machine Learning Interatomic Potentials" ;
+    schema:author <https://orcid.org/0000-0002-7668-8986> ,
+        <https://orcid.org/0000-0002-1914-3306> ,
+        <https://orcid.org/0000-0003-1698-692X> ,
+        <https://orcid.org/0000-0003-3695-727X> ,
+        <https://orcid.org/0000-0002-4218-1570> .
+
+<https://orcid.org/0000-0002-7668-8986> a schema:Person ;
+    schema:name "Tristan Maxson" ;
+    schema:givenName "Tristan" ;
+    schema:familyName "Maxson" ;
+    schema:identifier <https://orcid.org/0000-0002-7668-8986> .
+
+<https://orcid.org/0000-0002-1914-3306> a schema:Person ;
+    schema:name "Ademola Soyemi" ;
+    schema:givenName "Ademola" ;
+    schema:familyName "Soyemi" ;
+    schema:identifier <https://orcid.org/0000-0002-1914-3306> .
+
+<https://orcid.org/0000-0003-1698-692X> a schema:Person ;
+    schema:name "Xinglong Zhang" ;
+    schema:givenName "Xinglong" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0003-1698-692X> .
+
+<https://orcid.org/0000-0003-3695-727X> a schema:Person ;
+    schema:name "Benjamin W. J. Chen" ;
+    schema:givenName "Benjamin W. J." ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0003-3695-727X> .
+
+<https://orcid.org/0000-0002-4218-1570> a schema:Person ;
+    schema:name "Tibor Szilvási" ;
+    schema:givenName "Tibor" ;
+    schema:familyName "Szilvási" ;
+    schema:identifier <https://orcid.org/0000-0002-4218-1570> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-MgO-2x2-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "MgO(100) surface, 2x2x4 slab" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-MgO-4x4-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "MgO(100) surface, 4x4x4 slab" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-Water-64-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water, 64 molecules" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-Water-192-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water, 192 molecules" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-CHA-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "CHA zeolite framework" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-Reaction-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "Methane C-H bond cleavage on Pt(111)" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-HEA-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+entity:mat-ZrO-maxson2025 a mlips:MaterialSystem ;
+    rdfs:label "Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:materialClass "MS25 benchmark system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-mgo-maxson2025 a mlips:DFTCalculation .
+
+entity:calc-water-maxson2025 a mlips:DFTCalculation .
+
+entity:calc-cha-maxson2025 a mlips:DFTCalculation .
+
+entity:calc-rxn-maxson2025 a mlips:DFTCalculation .
+
+entity:calc-eam-maxson2025 a mlips:ReferenceCalculation .
+
+entity:calc-zro-maxson2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-mgo-maxson2025 mlips:hasDFTSettings entity:calc-settings-mgo-maxson2025 .
+
+entity:calc-settings-mgo-maxson2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-PBE-D3-maxson2025 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack (3, 3, 1) for the 2x2 slab and (1, 1, 1) for the 4x4 slab" ;
+    rdfs:comment "VASP 6.3.2, PAW potentials version 54, Gaussian smearing 0.1 eV, dipole corrections." .
+
+entity:calc-water-maxson2025 mlips:hasDFTSettings entity:calc-settings-water-maxson2025 .
+
+entity:calc-settings-water-maxson2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-maxson2025 ;
+    mlips:xcFunctional entity:xc-RPBE-D3-0-maxson2025 ;
+    mlips:dftBasisSet entity:basis-DZVP-MOLOPT-SR-GTH-maxson2025 ;
+    mlips:kPointMesh "Gamma point only" ;
+    rdfs:comment "CP2K 2024.1 with GTH-PBE pseudopotentials, plane-wave cutoff 1200 Ry, orbital transformation method." .
+
+entity:calc-cha-maxson2025 mlips:hasDFTSettings entity:calc-settings-cha-maxson2025 .
+
+entity:calc-settings-cha-maxson2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-maxson2025 ;
+    mlips:xcFunctional entity:xc-RPBE-D3-maxson2025 ;
+    mlips:kPointMesh "Gamma point only" ;
+    rdfs:comment "CP2K 2024.1 with GTH-PBE pseudopotentials, plane-wave cutoff 1000 Ry, orbital transformation method." .
+
+entity:calc-rxn-maxson2025 mlips:hasDFTSettings entity:calc-settings-rxn-maxson2025 .
+
+entity:calc-settings-rxn-maxson2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-PBE-D4-maxson2025 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    rdfs:comment "VASP 6.3.2, PAW potentials version 54, Gaussian smearing 0.2 eV, dipole corrections." .
+
+entity:calc-eam-maxson2025 mlips:hasReferenceSettings entity:calc-settings-eam-maxson2025 .
+
+entity:calc-settings-eam-maxson2025 a mlips:ReferenceSettings ;
+    mlips:usedReferenceCode entity:lib-LAMMPS-maxson2025 ;
+    rdfs:comment "Embedded-atom-model calculations in LAMMPS with the FeNiCrCoCu-with-ZBL potential; a classical potential is the reference for the HEA set." .
+
+entity:calc-zro-maxson2025 mlips:hasDFTSettings entity:calc-settings-zro-maxson2025 .
+
+entity:calc-settings-zro-maxson2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "500"^^xsd:double ;
+    rdfs:comment "VASP 5.4.4, PAW potentials version 52 (Zr_sv); data generated in a previously published work." .
+
+entity:xc-PBE-D3-maxson2025 a mlips:XCFunctional ;
+    rdfs:label "PBE-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:lib-CP2K-maxson2025 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-RPBE-D3-0-maxson2025 a mlips:XCFunctional ;
+    rdfs:label "RPBE-D3(0)" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-DZVP-MOLOPT-SR-GTH-maxson2025 a mlips:DftBasisSet ;
+    rdfs:label "DZVP-MOLOPT-SR-GTH" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+entity:lib-CP2K-maxson2025 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-RPBE-D3-maxson2025 a mlips:XCFunctional ;
+    rdfs:label "RPBE-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:xc-PBE-D4-maxson2025 a mlips:XCFunctional ;
+    rdfs:label "PBE-D4" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:lib-LAMMPS-maxson2025 a mlips:Library ;
+    rdfs:label "LAMMPS" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-MgO-2x2-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 MgO(100) surface, 2x2x4 slab: 1000-point training split" ;
+    mlips:coversMaterial entity:mat-MgO-2x2-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-mgo-maxson2025 .
+
+entity:ds-MgO-4x4-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 MgO(100) surface, 4x4x4 slab: 1000-point training split" ;
+    mlips:coversMaterial entity:mat-MgO-4x4-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-mgo-maxson2025 .
+
+entity:ds-Water-64-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 Bulk liquid water, 64 molecules: 1000-point training split" ;
+    mlips:coversMaterial entity:mat-Water-64-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-water-maxson2025 .
+
+entity:ds-Water-192-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 Bulk liquid water, 192 molecules: 1000-point training split" ;
+    mlips:coversMaterial entity:mat-Water-192-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-water-maxson2025 .
+
+entity:ds-CHA-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 CHA zeolite framework: 1000-point training split" ;
+    mlips:coversMaterial entity:mat-CHA-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-cha-maxson2025 .
+
+entity:ds-Reaction-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 Methane C-H bond cleavage on Pt(111): 1000-point training split" ;
+    mlips:coversMaterial entity:mat-Reaction-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-rxn-maxson2025 .
+
+entity:ds-HEA-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 FeNiCrCoCu high-entropy alloy (EAM reference): 1000-point training split" ;
+    mlips:coversMaterial entity:mat-HEA-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-eam-maxson2025 .
+
+entity:ds-ZrO-maxson2025 a mlips:TrainingDataset ;
+    rdfs:label "MS25 Zr-O chemical space (amorphous Zr-containing oxides): 1000-point training split" ;
+    mlips:coversMaterial entity:mat-ZrO-maxson2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasDFTCalculation entity:calc-zro-maxson2025 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-MgO-2x2-maxson2025 mlips:samplingStrategy
+    entity:sampling-aimd-maxson2025 .
+
+entity:ds-MgO-4x4-maxson2025 mlips:samplingStrategy
+    entity:sampling-aimd-maxson2025 .
+
+entity:ds-Water-64-maxson2025 mlips:samplingStrategy
+    entity:sampling-mlip-md-maxson2025 .
+
+entity:ds-Water-192-maxson2025 mlips:samplingStrategy
+    entity:sampling-mlip-md-maxson2025 .
+
+entity:ds-CHA-maxson2025 mlips:samplingStrategy
+    entity:sampling-mlip-md-maxson2025 .
+
+entity:ds-Reaction-maxson2025 mlips:samplingStrategy
+    entity:sampling-aimd-maxson2025 .
+
+entity:ds-HEA-maxson2025 mlips:samplingStrategy
+    entity:sampling-eam-md-maxson2025 .
+
+entity:ds-ZrO-maxson2025 mlips:samplingStrategy
+    entity:sampling-zro-mixed-maxson2025 .
+
+entity:sampling-aimd-maxson2025 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD (NVT) with decorrelated sampling" ;
+    rdfs:comment "MgO: Nose-Hoover NVT, frames at least 25 fs apart; Reaction: Blue Moon constrained MD along the C-H bond length (SHAKE), frames at least 10 fs apart." .
+
+entity:sampling-mlip-md-maxson2025 a mlips:SamplingStrategy ;
+    rdfs:label "MD with an intermediate Allegro MLIP, relabelled with DFT" ;
+    rdfs:comment "Water and CHA: an Allegro model trained on initial DFT structures samples configurations (at 300 K over a distribution of volumes) at least 30 ps (water) or 50 ps (CHA) apart; DFT single points form the data set." .
+
+entity:sampling-eam-md-maxson2025 a mlips:SamplingStrategy ;
+    rdfs:label "EAM MD over random compositions and temperatures" ;
+    rdfs:comment "HEA: configurations at least 5 ps apart across an even distribution of temperatures, compositions chosen at random." .
+
+entity:sampling-zro-mixed-maxson2025 a mlips:SamplingStrategy ;
+    rdfs:label "Random structure generation, MD, rattling, dimer search and contour exploration" ;
+    rdfs:comment "Zr-O data of a previously published work." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-maxson2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-MACE-maxson2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-NequIP-maxson2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-NequIP-maxson2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:NequIP ;
+    mlips:version "MD in LAMMPS with pair_nequip" .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ,
+        mlips:batchSize ;
+    mlips:hasImplementation entity:impl-Allegro-maxson2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-Allegro-maxson2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:Allegro ;
+    mlips:version "run in LAMMPS (12 December 2023 development version, CUDA 12.0, PyTorch 2.0.1)" .
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-nn-architecture-maxson2025 ,
+        mlips:batchSize ,
+        entity:hp-force-coefficient-maxson2025 ,
+        mlips:numEpochs ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:momentLevel ,
+        mlips:numRadialBasis ,
+        mlips:numEpochs ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:hp-nn-architecture-maxson2025 a mlips:Hyperparameter ;
+    rdfs:label "ANI atomic network architecture (hidden-layer widths)" ;
+    mlips:hyperparameterName "nn_architecture" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-force-coefficient-maxson2025 a mlips:Hyperparameter ;
+    rdfs:label "Force coefficient in the loss" ;
+    mlips:hyperparameterName "force_coefficient" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-NequIP-MgO-2x2-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-NequIP-MgO-2x2-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-MgO-2x2-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-NequIP-MgO-2x2-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-MgO-2x2-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Allegro-MgO-2x2-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-Allegro-MgO-2x2-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-Allegro-MgO-2x2-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-MgO-2x2-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MACE-MgO-2x2-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-MgO-2x2-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-MACE-MgO-2x2-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-MgO-2x2-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2200"^^xsd:integer .
+
+entity:setting-ANI-MgO-2x2-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ANI-MgO-2x2-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96-64-32-16" .
+
+entity:setting-ANI-MgO-2x2-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-MgO-2x2-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-MgO-2x2-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2700"^^xsd:integer .
+
+entity:setting-MTP-MgO-2x2-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MTP-MgO-2x2-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-MgO-2x2-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MTP-MgO-2x2-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "3000"^^xsd:integer .
+
+entity:setting-NequIP-MgO-4x4-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-NequIP-MgO-4x4-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-MgO-4x4-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-NequIP-MgO-4x4-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-MgO-4x4-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Allegro-MgO-4x4-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-Allegro-MgO-4x4-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-Allegro-MgO-4x4-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-MgO-4x4-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MACE-MgO-4x4-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-MgO-4x4-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-MACE-MgO-4x4-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-MgO-4x4-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "650"^^xsd:integer .
+
+entity:setting-ANI-MgO-4x4-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ANI-MgO-4x4-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96-64-32-16" .
+
+entity:setting-ANI-MgO-4x4-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-MgO-4x4-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-MgO-4x4-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "700"^^xsd:integer .
+
+entity:setting-MTP-MgO-4x4-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MTP-MgO-4x4-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-MgO-4x4-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MTP-MgO-4x4-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "550"^^xsd:integer .
+
+entity:setting-NequIP-Water-64-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-NequIP-Water-64-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-Water-64-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-NequIP-Water-64-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-Water-64-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-Allegro-Water-64-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-Water-64-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-Allegro-Water-64-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Water-64-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-MACE-Water-64-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Water-64-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-MACE-Water-64-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-Water-64-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1100"^^xsd:integer .
+
+entity:setting-ANI-Water-64-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-ANI-Water-64-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96" .
+
+entity:setting-ANI-Water-64-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-ANI-Water-64-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-Water-64-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "700"^^xsd:integer .
+
+entity:setting-MTP-Water-64-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-MTP-Water-64-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-MTP-Water-64-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-MTP-Water-64-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1800"^^xsd:integer .
+
+entity:setting-NequIP-Water-192-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-NequIP-Water-192-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-Water-192-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-NequIP-Water-192-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-Water-192-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-Allegro-Water-192-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-Water-192-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-Allegro-Water-192-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Water-192-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-MACE-Water-192-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Water-192-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-MACE-Water-192-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-Water-192-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ANI-Water-192-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-ANI-Water-192-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96" .
+
+entity:setting-ANI-Water-192-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-ANI-Water-192-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-Water-192-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "180"^^xsd:integer .
+
+entity:setting-MTP-Water-192-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-MTP-Water-192-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "20"^^xsd:integer .
+
+entity:setting-MTP-Water-192-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-MTP-Water-192-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-NequIP-CHA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-NequIP-CHA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-CHA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-NequIP-CHA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-Allegro-CHA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-Allegro-CHA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-CHA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-CHA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-CHA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-CHA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-CHA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-MACE-CHA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-CHA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2100"^^xsd:integer .
+
+entity:setting-ANI-CHA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ANI-CHA-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "192-96-32" .
+
+entity:setting-ANI-CHA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-CHA-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-ANI-CHA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-MTP-CHA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MTP-CHA-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-CHA-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MTP-CHA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1800"^^xsd:integer .
+
+entity:setting-NequIP-Reaction-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-NequIP-Reaction-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-Reaction-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-NequIP-Reaction-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-Reaction-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Allegro-Reaction-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-Allegro-Reaction-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "96"^^xsd:integer .
+
+entity:setting-Allegro-Reaction-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Reaction-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MACE-Reaction-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-Reaction-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-MACE-Reaction-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-Reaction-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1700"^^xsd:integer .
+
+entity:setting-ANI-Reaction-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ANI-Reaction-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96-64-32-16" .
+
+entity:setting-ANI-Reaction-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-Reaction-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-ANI-Reaction-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "3800"^^xsd:integer .
+
+entity:setting-MTP-Reaction-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MTP-Reaction-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-Reaction-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-MTP-Reaction-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "3000"^^xsd:integer .
+
+entity:setting-NequIP-HEA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-NequIP-HEA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-NequIP-HEA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-NequIP-HEA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-HEA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-Allegro-HEA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-HEA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-Allegro-HEA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-MACE-HEA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-MACE-HEA-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-HEA-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-MACE-HEA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MACE-HEA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2600"^^xsd:integer .
+
+entity:setting-ANI-HEA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-ANI-HEA-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "160-128-96" .
+
+entity:setting-ANI-HEA-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-HEA-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-HEA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-MTP-HEA-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-MTP-HEA-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-HEA-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MTP-HEA-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "900"^^xsd:integer .
+
+entity:setting-NequIP-ZrO-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-NequIP-ZrO-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-NequIP-ZrO-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-NequIP-ZrO-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-Allegro-ZrO-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-Allegro-ZrO-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-Allegro-ZrO-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-Allegro-ZrO-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-MACE-ZrO-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MACE-ZrO-numAngularBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-MACE-ZrO-numFeatures-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-MACE-ZrO-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MACE-ZrO-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "3100"^^xsd:integer .
+
+entity:setting-ANI-ZrO-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-ANI-ZrO-nn-architecture-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-nn-architecture-maxson2025 ;
+    mlips:settingValue "192-160-128" .
+
+entity:setting-ANI-ZrO-batchSize-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-ANI-ZrO-force-coefficient-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-coefficient-maxson2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-ANI-ZrO-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "10000"^^xsd:integer .
+
+entity:setting-MTP-ZrO-cutoffRadius-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-MTP-ZrO-momentLevel-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "26"^^xsd:integer .
+
+entity:setting-MTP-ZrO-numRadialBasis-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-MTP-ZrO-numEpochs-maxson2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-NequIP-MgO-2x2-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 MgO(100) surface, 2x2x4 slab" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-MgO-2x2-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-MgO-2x2-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-MgO-2x2-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-MgO-2x2-numFeatures-maxson2025 ,
+        entity:setting-NequIP-MgO-2x2-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-MgO-2x2-maxson2025 .
+
+entity:model-NequIP-MgO-2x2-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, MgO(100) surface, 2x2x4 slab" .
+
+entity:run-Allegro-MgO-2x2-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 MgO(100) surface, 2x2x4 slab" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-MgO-2x2-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-MgO-2x2-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-MgO-2x2-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-MgO-2x2-numFeatures-maxson2025 ,
+        entity:setting-Allegro-MgO-2x2-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-MgO-2x2-maxson2025 .
+
+entity:model-Allegro-MgO-2x2-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, MgO(100) surface, 2x2x4 slab" .
+
+entity:run-MACE-MgO-2x2-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 MgO(100) surface, 2x2x4 slab" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-MgO-2x2-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-MgO-2x2-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-MgO-2x2-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-MgO-2x2-numFeatures-maxson2025 ,
+        entity:setting-MACE-MgO-2x2-batchSize-maxson2025 ,
+        entity:setting-MACE-MgO-2x2-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-MgO-2x2-maxson2025 .
+
+entity:model-MACE-MgO-2x2-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, MgO(100) surface, 2x2x4 slab" .
+
+entity:run-ANI-MgO-2x2-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 MgO(100) surface, 2x2x4 slab" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-MgO-2x2-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-MgO-2x2-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-MgO-2x2-nn-architecture-maxson2025 ,
+        entity:setting-ANI-MgO-2x2-batchSize-maxson2025 ,
+        entity:setting-ANI-MgO-2x2-force-coefficient-maxson2025 ,
+        entity:setting-ANI-MgO-2x2-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-MgO-2x2-maxson2025 .
+
+entity:model-ANI-MgO-2x2-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, MgO(100) surface, 2x2x4 slab" .
+
+entity:run-MTP-MgO-2x2-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 MgO(100) surface, 2x2x4 slab" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-MgO-2x2-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-MgO-2x2-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-MgO-2x2-momentLevel-maxson2025 ,
+        entity:setting-MTP-MgO-2x2-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-MgO-2x2-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-MgO-2x2-maxson2025 .
+
+entity:model-MTP-MgO-2x2-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, MgO(100) surface, 2x2x4 slab" .
+
+entity:run-NequIP-MgO-4x4-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 MgO(100) surface, 4x4x4 slab" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-MgO-4x4-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-MgO-4x4-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-MgO-4x4-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-MgO-4x4-numFeatures-maxson2025 ,
+        entity:setting-NequIP-MgO-4x4-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-MgO-4x4-maxson2025 .
+
+entity:model-NequIP-MgO-4x4-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, MgO(100) surface, 4x4x4 slab" .
+
+entity:run-Allegro-MgO-4x4-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 MgO(100) surface, 4x4x4 slab" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-MgO-4x4-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-MgO-4x4-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-MgO-4x4-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-MgO-4x4-numFeatures-maxson2025 ,
+        entity:setting-Allegro-MgO-4x4-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-MgO-4x4-maxson2025 .
+
+entity:model-Allegro-MgO-4x4-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, MgO(100) surface, 4x4x4 slab" .
+
+entity:run-MACE-MgO-4x4-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 MgO(100) surface, 4x4x4 slab" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-MgO-4x4-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-MgO-4x4-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-MgO-4x4-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-MgO-4x4-numFeatures-maxson2025 ,
+        entity:setting-MACE-MgO-4x4-batchSize-maxson2025 ,
+        entity:setting-MACE-MgO-4x4-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-MgO-4x4-maxson2025 .
+
+entity:model-MACE-MgO-4x4-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, MgO(100) surface, 4x4x4 slab" .
+
+entity:run-ANI-MgO-4x4-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 MgO(100) surface, 4x4x4 slab" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-MgO-4x4-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-MgO-4x4-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-MgO-4x4-nn-architecture-maxson2025 ,
+        entity:setting-ANI-MgO-4x4-batchSize-maxson2025 ,
+        entity:setting-ANI-MgO-4x4-force-coefficient-maxson2025 ,
+        entity:setting-ANI-MgO-4x4-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-MgO-4x4-maxson2025 .
+
+entity:model-ANI-MgO-4x4-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, MgO(100) surface, 4x4x4 slab" .
+
+entity:run-MTP-MgO-4x4-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 MgO(100) surface, 4x4x4 slab" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-MgO-4x4-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-MgO-4x4-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-MgO-4x4-momentLevel-maxson2025 ,
+        entity:setting-MTP-MgO-4x4-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-MgO-4x4-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-MgO-4x4-maxson2025 .
+
+entity:model-MTP-MgO-4x4-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, MgO(100) surface, 4x4x4 slab" .
+
+entity:run-NequIP-Water-64-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 Bulk liquid water, 64 molecules" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Water-64-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Water-64-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-Water-64-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-Water-64-numFeatures-maxson2025 ,
+        entity:setting-NequIP-Water-64-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-Water-64-maxson2025 .
+
+entity:model-NequIP-Water-64-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, Bulk liquid water, 64 molecules" .
+
+entity:run-Allegro-Water-64-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 Bulk liquid water, 64 molecules" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Water-64-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Water-64-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-Water-64-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-Water-64-numFeatures-maxson2025 ,
+        entity:setting-Allegro-Water-64-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-Water-64-maxson2025 .
+
+entity:model-Allegro-Water-64-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, Bulk liquid water, 64 molecules" .
+
+entity:run-MACE-Water-64-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 Bulk liquid water, 64 molecules" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Water-64-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Water-64-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-Water-64-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-Water-64-numFeatures-maxson2025 ,
+        entity:setting-MACE-Water-64-batchSize-maxson2025 ,
+        entity:setting-MACE-Water-64-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-Water-64-maxson2025 .
+
+entity:model-MACE-Water-64-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, Bulk liquid water, 64 molecules" .
+
+entity:run-ANI-Water-64-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 Bulk liquid water, 64 molecules" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-Water-64-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-Water-64-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-Water-64-nn-architecture-maxson2025 ,
+        entity:setting-ANI-Water-64-batchSize-maxson2025 ,
+        entity:setting-ANI-Water-64-force-coefficient-maxson2025 ,
+        entity:setting-ANI-Water-64-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-Water-64-maxson2025 .
+
+entity:model-ANI-Water-64-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, Bulk liquid water, 64 molecules" .
+
+entity:run-MTP-Water-64-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 Bulk liquid water, 64 molecules" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Water-64-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-Water-64-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-Water-64-momentLevel-maxson2025 ,
+        entity:setting-MTP-Water-64-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-Water-64-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-Water-64-maxson2025 .
+
+entity:model-MTP-Water-64-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, Bulk liquid water, 64 molecules" .
+
+entity:run-NequIP-Water-192-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 Bulk liquid water, 192 molecules" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Water-192-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Water-192-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-Water-192-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-Water-192-numFeatures-maxson2025 ,
+        entity:setting-NequIP-Water-192-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-Water-192-maxson2025 .
+
+entity:model-NequIP-Water-192-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, Bulk liquid water, 192 molecules" .
+
+entity:run-Allegro-Water-192-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 Bulk liquid water, 192 molecules" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Water-192-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Water-192-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-Water-192-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-Water-192-numFeatures-maxson2025 ,
+        entity:setting-Allegro-Water-192-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-Water-192-maxson2025 .
+
+entity:model-Allegro-Water-192-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, Bulk liquid water, 192 molecules" .
+
+entity:run-MACE-Water-192-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 Bulk liquid water, 192 molecules" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Water-192-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Water-192-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-Water-192-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-Water-192-numFeatures-maxson2025 ,
+        entity:setting-MACE-Water-192-batchSize-maxson2025 ,
+        entity:setting-MACE-Water-192-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-Water-192-maxson2025 .
+
+entity:model-MACE-Water-192-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, Bulk liquid water, 192 molecules" .
+
+entity:run-ANI-Water-192-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 Bulk liquid water, 192 molecules" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-Water-192-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-Water-192-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-Water-192-nn-architecture-maxson2025 ,
+        entity:setting-ANI-Water-192-batchSize-maxson2025 ,
+        entity:setting-ANI-Water-192-force-coefficient-maxson2025 ,
+        entity:setting-ANI-Water-192-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-Water-192-maxson2025 .
+
+entity:model-ANI-Water-192-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, Bulk liquid water, 192 molecules" .
+
+entity:run-MTP-Water-192-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 Bulk liquid water, 192 molecules" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Water-192-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-Water-192-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-Water-192-momentLevel-maxson2025 ,
+        entity:setting-MTP-Water-192-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-Water-192-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-Water-192-maxson2025 .
+
+entity:model-MTP-Water-192-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, Bulk liquid water, 192 molecules" .
+
+entity:run-NequIP-CHA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 CHA zeolite framework" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-CHA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-CHA-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-CHA-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-CHA-numFeatures-maxson2025 ,
+        entity:setting-NequIP-CHA-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-CHA-maxson2025 .
+
+entity:model-NequIP-CHA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, CHA zeolite framework" .
+
+entity:run-Allegro-CHA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 CHA zeolite framework" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CHA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-CHA-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-CHA-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-CHA-numFeatures-maxson2025 ,
+        entity:setting-Allegro-CHA-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-CHA-maxson2025 .
+
+entity:model-Allegro-CHA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, CHA zeolite framework" .
+
+entity:run-MACE-CHA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 CHA zeolite framework" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-CHA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-CHA-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-CHA-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-CHA-numFeatures-maxson2025 ,
+        entity:setting-MACE-CHA-batchSize-maxson2025 ,
+        entity:setting-MACE-CHA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-CHA-maxson2025 .
+
+entity:model-MACE-CHA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, CHA zeolite framework" .
+
+entity:run-ANI-CHA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 CHA zeolite framework" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-CHA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-CHA-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-CHA-nn-architecture-maxson2025 ,
+        entity:setting-ANI-CHA-batchSize-maxson2025 ,
+        entity:setting-ANI-CHA-force-coefficient-maxson2025 ,
+        entity:setting-ANI-CHA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-CHA-maxson2025 .
+
+entity:model-ANI-CHA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, CHA zeolite framework" .
+
+entity:run-MTP-CHA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 CHA zeolite framework" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-CHA-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-CHA-momentLevel-maxson2025 ,
+        entity:setting-MTP-CHA-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-CHA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-CHA-maxson2025 .
+
+entity:model-MTP-CHA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, CHA zeolite framework" .
+
+entity:run-NequIP-Reaction-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 Methane C-H bond cleavage on Pt(111)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Reaction-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-Reaction-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-Reaction-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-Reaction-numFeatures-maxson2025 ,
+        entity:setting-NequIP-Reaction-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-Reaction-maxson2025 .
+
+entity:model-NequIP-Reaction-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, Methane C-H bond cleavage on Pt(111)" .
+
+entity:run-Allegro-Reaction-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 Methane C-H bond cleavage on Pt(111)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-Reaction-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-Reaction-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-Reaction-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-Reaction-numFeatures-maxson2025 ,
+        entity:setting-Allegro-Reaction-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-Reaction-maxson2025 .
+
+entity:model-Allegro-Reaction-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, Methane C-H bond cleavage on Pt(111)" .
+
+entity:run-MACE-Reaction-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 Methane C-H bond cleavage on Pt(111)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Reaction-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Reaction-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-Reaction-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-Reaction-numFeatures-maxson2025 ,
+        entity:setting-MACE-Reaction-batchSize-maxson2025 ,
+        entity:setting-MACE-Reaction-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-Reaction-maxson2025 .
+
+entity:model-MACE-Reaction-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, Methane C-H bond cleavage on Pt(111)" .
+
+entity:run-ANI-Reaction-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 Methane C-H bond cleavage on Pt(111)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-Reaction-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-Reaction-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-Reaction-nn-architecture-maxson2025 ,
+        entity:setting-ANI-Reaction-batchSize-maxson2025 ,
+        entity:setting-ANI-Reaction-force-coefficient-maxson2025 ,
+        entity:setting-ANI-Reaction-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-Reaction-maxson2025 .
+
+entity:model-ANI-Reaction-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, Methane C-H bond cleavage on Pt(111)" .
+
+entity:run-MTP-Reaction-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 Methane C-H bond cleavage on Pt(111)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-Reaction-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-Reaction-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-Reaction-momentLevel-maxson2025 ,
+        entity:setting-MTP-Reaction-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-Reaction-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-Reaction-maxson2025 .
+
+entity:model-MTP-Reaction-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, Methane C-H bond cleavage on Pt(111)" .
+
+entity:run-NequIP-HEA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-HEA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-HEA-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-HEA-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-HEA-numFeatures-maxson2025 ,
+        entity:setting-NequIP-HEA-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-HEA-maxson2025 .
+
+entity:model-NequIP-HEA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, FeNiCrCoCu high-entropy alloy (EAM reference)" .
+
+entity:run-Allegro-HEA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-HEA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-HEA-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-HEA-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-HEA-numFeatures-maxson2025 ,
+        entity:setting-Allegro-HEA-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-HEA-maxson2025 .
+
+entity:model-Allegro-HEA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, FeNiCrCoCu high-entropy alloy (EAM reference)" .
+
+entity:run-MACE-HEA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-HEA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-HEA-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-HEA-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-HEA-numFeatures-maxson2025 ,
+        entity:setting-MACE-HEA-batchSize-maxson2025 ,
+        entity:setting-MACE-HEA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-HEA-maxson2025 .
+
+entity:model-MACE-HEA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, FeNiCrCoCu high-entropy alloy (EAM reference)" .
+
+entity:run-ANI-HEA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-HEA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-HEA-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-HEA-nn-architecture-maxson2025 ,
+        entity:setting-ANI-HEA-batchSize-maxson2025 ,
+        entity:setting-ANI-HEA-force-coefficient-maxson2025 ,
+        entity:setting-ANI-HEA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-HEA-maxson2025 .
+
+entity:model-ANI-HEA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, FeNiCrCoCu high-entropy alloy (EAM reference)" .
+
+entity:run-MTP-HEA-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 FeNiCrCoCu high-entropy alloy (EAM reference)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-HEA-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-HEA-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-HEA-momentLevel-maxson2025 ,
+        entity:setting-MTP-HEA-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-HEA-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-HEA-maxson2025 .
+
+entity:model-MTP-HEA-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, FeNiCrCoCu high-entropy alloy (EAM reference)" .
+
+entity:run-NequIP-ZrO-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on MS25 Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-ZrO-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-ZrO-cutoffRadius-maxson2025 ,
+        entity:setting-NequIP-ZrO-numAngularBasis-maxson2025 ,
+        entity:setting-NequIP-ZrO-numFeatures-maxson2025 ,
+        entity:setting-NequIP-ZrO-batchSize-maxson2025 ;
+    mlips:produces entity:model-NequIP-ZrO-maxson2025 .
+
+entity:model-NequIP-ZrO-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP MS25 model, Zr-O chemical space (amorphous Zr-containing oxides)" .
+
+entity:run-Allegro-ZrO-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on MS25 Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-ZrO-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-ZrO-cutoffRadius-maxson2025 ,
+        entity:setting-Allegro-ZrO-numAngularBasis-maxson2025 ,
+        entity:setting-Allegro-ZrO-numFeatures-maxson2025 ,
+        entity:setting-Allegro-ZrO-batchSize-maxson2025 ;
+    mlips:produces entity:model-Allegro-ZrO-maxson2025 .
+
+entity:model-Allegro-ZrO-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro MS25 model, Zr-O chemical space (amorphous Zr-containing oxides)" .
+
+entity:run-MACE-ZrO-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on MS25 Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ZrO-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-ZrO-cutoffRadius-maxson2025 ,
+        entity:setting-MACE-ZrO-numAngularBasis-maxson2025 ,
+        entity:setting-MACE-ZrO-numFeatures-maxson2025 ,
+        entity:setting-MACE-ZrO-batchSize-maxson2025 ,
+        entity:setting-MACE-ZrO-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MACE-ZrO-maxson2025 .
+
+entity:model-MACE-ZrO-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MACE MS25 model, Zr-O chemical space (amorphous Zr-containing oxides)" .
+
+entity:run-ANI-ZrO-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "ANI trained on MS25 Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:runsOn entity:ds-ZrO-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ANI-ZrO-cutoffRadius-maxson2025 ,
+        entity:setting-ANI-ZrO-nn-architecture-maxson2025 ,
+        entity:setting-ANI-ZrO-batchSize-maxson2025 ,
+        entity:setting-ANI-ZrO-force-coefficient-maxson2025 ,
+        entity:setting-ANI-ZrO-numEpochs-maxson2025 ;
+    mlips:produces entity:model-ANI-ZrO-maxson2025 .
+
+entity:model-ANI-ZrO-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "ANI MS25 model, Zr-O chemical space (amorphous Zr-containing oxides)" .
+
+entity:run-MTP-ZrO-maxson2025 a mlips:MLIPRun ;
+    rdfs:label "MTP trained on MS25 Zr-O chemical space (amorphous Zr-containing oxides)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-ZrO-maxson2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-ZrO-cutoffRadius-maxson2025 ,
+        entity:setting-MTP-ZrO-momentLevel-maxson2025 ,
+        entity:setting-MTP-ZrO-numRadialBasis-maxson2025 ,
+        entity:setting-MTP-ZrO-numEpochs-maxson2025 ;
+    mlips:produces entity:model-MTP-ZrO-maxson2025 .
+
+entity:model-MTP-ZrO-maxson2025 a mlips:TrainedModel ;
+    rdfs:label "MTP MS25 model, Zr-O chemical space (amorphous Zr-containing oxides)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-maxson2025 mlips:hasResult
+    entity:result-MACE-ZrO-maxson2025 .
+
+entity:result-MACE-ZrO-maxson2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-ZrO-maxson2025 ;
+    mlips:targetMaterial entity:mat-ZrO-maxson2025 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-ZrO-1-maxson2025 ,
+        entity:metric-MACE-ZrO-2-maxson2025 .
+
+entity:metric-MACE-ZrO-1-maxson2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: MACE, Zr-O (value printed in the text)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-MACE-ZrO-2-maxson2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: MACE, Zr-O (value printed in the text)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "55"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Inference speeds of the error-optimised models are compared in LAMMPS on
+# a 40 GB A100 GPU and shown as figures; training wall times and hardware
+# are in the SI and the Zenodo repository.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Energy, force and stress errors of the 40 models are bar charts; only the MACE Zr-O values quoted in the text are encoded (the text also gives ranges for Zr-O over all architectures: energy MAE 4-13 meV/atom, force MAE 55-190 meV/A). The numbers are in the Zenodo repository of the paper.
+# - Table 8 (data training rates: log-log slopes of error against training-set size from 50 to 1000 points) has no MetricProperty.
+# - Only part of each hyperparameter table is encoded: L_max / l_max as numAngularBasis, 'Input Features' (NequIP, Allegro) and 'Number of channels' (MACE) as numFeatures, batch size, epochs, MTP lev_max and radial basis size, the ANI architecture and force coefficient. Network depths and widths, polynomial cutoffs, loss phase weights and stress coefficients are left out. NequIP and Allegro tables do not distinguish the two sizes of MgO and water, so both sizes carry the same settings.
+# - The radial cutoff of Table 1 is shared by all five architectures of a system. For ANI the mapping of that cutoff to its radial/angular cutoffs was not captured.
+# - The software used for ANI and MTP training is not named in the parts read. Property benchmarks (RDFs, diffusion, vibrational spectra, reaction energies, transferability to FAU/LTA/MFI) have no MetricProperty.
+# - Data-set sizes: the 1000-point split is the largest training size studied; the full sizes of the six data sets were not captured.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
