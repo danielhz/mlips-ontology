@@ -1,0 +1,354 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jaesun Kim et al. (2024). Data-Efficient Multifidelity Training for High-Fidelity Machine Learning Interatomic Potentials.
+#   Journal of the American Chemical Society. doi:10.1021/jacs.4c14455  arXiv:2409.07947v1
+#
+# Version read: arxiv-preprint arXiv:2409.07947v1 (sha256 bba1319151b4bba6...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 69 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the multi-fidelity training scheme implemented in
+# SevenNet (SevenNet-MF) and the two models whose errors the paper
+# prints: the multi-fidelity model for the solid electrolyte Li6PS5Cl
+# (PBE as low fidelity, SCAN as high fidelity) and the pretrained
+# universal multi-fidelity model SevenNet-MF-0 (Materials Project PBE
+# and r2SCAN data).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kim2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Kim et al. (2024): data-efficient multifidelity training for high-fidelity MLIPs (SevenNet-MF)" ;
+    mlips:reportedIn entity:article-kim2024 .
+
+entity:article-kim2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/jacs.4c14455> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Data-Efficient Multifidelity Training for High-Fidelity Machine Learning Interatomic Potentials" ;
+    schema:author <https://orcid.org/0009-0000-6646-1318> ,
+        <https://orcid.org/0009-0000-7380-6089> ,
+        <https://orcid.org/0009-0006-3182-9411> ,
+        <https://orcid.org/0009-0008-7266-091X> ,
+        <https://orcid.org/0009-0008-8690-935X> ,
+        <https://orcid.org/0000-0003-4532-0027> ,
+        <https://orcid.org/0000-0003-3958-0922> .
+
+<https://orcid.org/0009-0000-6646-1318> a schema:Person ;
+    schema:name "Jaesun Kim" ;
+    schema:givenName "Jaesun" ;
+    schema:familyName "Kim" ;
+    schema:identifier <https://orcid.org/0009-0000-6646-1318> .
+
+<https://orcid.org/0009-0000-7380-6089> a schema:Person ;
+    schema:name "Jisu Kim" ;
+    schema:givenName "Jisu" ;
+    schema:familyName "Kim" ;
+    schema:identifier <https://orcid.org/0009-0000-7380-6089> .
+
+<https://orcid.org/0009-0006-3182-9411> a schema:Person ;
+    schema:name "Jaehoon Kim" ;
+    schema:givenName "Jaehoon" ;
+    schema:familyName "Kim" ;
+    schema:identifier <https://orcid.org/0009-0006-3182-9411> .
+
+<https://orcid.org/0009-0008-7266-091X> a schema:Person ;
+    schema:name "Jiho Lee" ;
+    schema:givenName "Jiho" ;
+    schema:familyName "Lee" ;
+    schema:identifier <https://orcid.org/0009-0008-7266-091X> .
+
+<https://orcid.org/0009-0008-8690-935X> a schema:Person ;
+    schema:name "Yutack Park" ;
+    schema:givenName "Yutack" ;
+    schema:familyName "Park" ;
+    schema:identifier <https://orcid.org/0009-0008-8690-935X> .
+
+<https://orcid.org/0000-0003-4532-0027> a schema:Person ;
+    schema:name "Youngho Kang" ;
+    schema:givenName "Youngho" ;
+    schema:familyName "Kang" ;
+    schema:identifier <https://orcid.org/0000-0003-4532-0027> .
+
+<https://orcid.org/0000-0003-3958-0922> a schema:Person ;
+    schema:name "Seungwu Han" ;
+    schema:givenName "Seungwu" ;
+    schema:familyName "Han" ;
+    schema:identifier <https://orcid.org/0000-0003-3958-0922> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Li6PS5Cl-kim2024 a mlips:MaterialSystem ;
+    rdfs:label "Li6PS5Cl argyrodite solid electrolyte with S/Cl site disorder (2x2x2 supercells)" ;
+    mlips:chemicalFormula "Li6PS5Cl" ;
+    mlips:materialClass "Sulfide Li-ion conductor; strained crystals and high-temperature MD configurations" .
+
+entity:mat-mp-kim2024 a mlips:MaterialSystem ;
+    rdfs:label "Materials Project crystals (PBE and r2SCAN relaxation databases)" ;
+    mlips:materialClass "Universal inorganic crystals" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-lpsc-pbe-kim2024 a mlips:DFTCalculation .
+
+entity:calc-lpsc-scan-kim2024 a mlips:DFTCalculation .
+
+entity:calc-mp-dft-kim2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-lpsc-pbe-kim2024 mlips:hasDFTSettings entity:calc-settings-lpsc-pbe-kim2024 .
+
+entity:calc-settings-lpsc-pbe-kim2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "300"^^xsd:double ;
+    mlips:kPointMesh "2x2x2 per unit cell" ;
+    rdfs:comment "Low-fidelity level for Li6PS5Cl; spin-unpolarised." .
+
+entity:calc-lpsc-scan-kim2024 mlips:hasDFTSettings entity:calc-settings-lpsc-scan-kim2024 .
+
+entity:calc-settings-lpsc-scan-kim2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:SCAN ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "300"^^xsd:double ;
+    mlips:kPointMesh "2x2x2 per unit cell" ;
+    rdfs:comment "High-fidelity level for Li6PS5Cl: one-shot SCAN single points on structures sampled from the PBE data; PAW PBE pseudopotentials, spin-unpolarised." .
+
+entity:calc-mp-dft-kim2024 mlips:hasDFTSettings entity:calc-settings-mp-dft-kim2024 .
+
+entity:calc-settings-mp-dft-kim2024 a mlips:DFTSettings ;
+    rdfs:comment "Materials Project calculations: the PBE database (low fidelity) and the r2SCAN relaxation database retrieved in February 2024 (high fidelity); settings are those of the Materials Project and are not restated." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-lpsc-mf-kim2024 a mlips:TrainingDataset ;
+    rdfs:label "Li6PS5Cl multi-fidelity training set (PBE set plus subsampled SCAN single points)" ;
+    mlips:coversMaterial entity:mat-Li6PS5Cl-kim2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasDFTCalculation entity:calc-lpsc-pbe-kim2024 ,
+        entity:calc-lpsc-scan-kim2024 ;
+    rdfs:comment "The sizes per structure type are shown in Figure 2a and not printed in the text; the high-fidelity part costs 10-20% on top of the PBE set." .
+
+entity:ds-mp-mf-kim2024 a mlips:TrainingDataset ;
+    rdfs:label "Materials Project PBE + r2SCAN multi-fidelity training set" ;
+    mlips:coversMaterial entity:mat-mp-kim2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-mp-dft-kim2024 ;
+    rdfs:comment "Sizes were not captured from the parts read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-lpsc-mf-kim2024 mlips:samplingStrategy
+    entity:sampling-strained-crystals-kim2024 ,
+    entity:sampling-aimd-kim2024 ,
+    entity:sampling-high-fidelity-subsample-kim2024 .
+
+entity:ds-mp-mf-kim2024 mlips:samplingStrategy
+    entity:sampling-mp-relaxations-kim2024 .
+
+entity:sampling-strained-crystals-kim2024 a mlips:SamplingStrategy ;
+    rdfs:label "Strained bulk crystals" ;
+    rdfs:comment "0%, 50% and 100% Cl@4c crystals deformed by shear or hydrostatic strain within 5% of the lattice parameters." .
+
+entity:sampling-aimd-kim2024 a mlips:SamplingStrategy ;
+    rdfs:label "Ab initio MD at 600 K and 1200 K (NVT)" ;
+    rdfs:comment "Two 50% Cl@4c cells, 10 ps with a 2 fs time step; sampled every 20 fs after the first 300 fs for the low-fidelity set." .
+
+entity:sampling-high-fidelity-subsample-kim2024 a mlips:SamplingStrategy ;
+    rdfs:label "Subsampling for high-fidelity labels" ;
+    rdfs:comment "All strained crystals and 10% of the MD configurations (200 fs interval) are recomputed with the high-fidelity functional." .
+
+entity:sampling-mp-relaxations-kim2024 a mlips:SamplingStrategy ;
+    rdfs:label "Materials Project relaxation trajectories" ;
+    rdfs:comment "For the r2SCAN database: initial, middle and final configuration of the first relaxation trajectory of the smallest cell of each material." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-kim2024 ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-kim2024 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numAngularBasis ,
+        mlips:numFeatures ;
+    mlips:hasImplementation entity:impl-NequIP-kim2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:loss-NequIP-kim2024 a mlips:LossFunction ;
+    rdfs:label "Huber loss on energy, force and stress with fidelity-dependent weights (weight 7 for the MP-r2SCAN data, 1 otherwise)" .
+
+entity:alg-NequIP-kim2024 a mls:Algorithm ;
+    rdfs:label "Adam (epsilon = 1e-8, beta1 = 0.9, beta2 = 0.999)" .
+
+entity:impl-NequIP-kim2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SevenNet-MF-kim2024 .
+
+entity:lib-SevenNet-MF-kim2024 a mlips:Library ;
+    rdfs:label "SevenNet-MF" ;
+    rdfs:comment "Multi-fidelity extension of SevenNet (NequIP architecture) in which the fidelity of the data selects fidelity-dependent parameters, so one model is trained on several databases at once." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-lpsc-mf-numLayers-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-lpsc-mf-numAngularBasis-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-lpsc-mf-numFeatures-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-sevennet-mf-0-numLayers-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-sevennet-mf-0-numAngularBasis-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-sevennet-mf-0-numFeatures-kim2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-lpsc-mf-kim2024 a mlips:MLIPRun ;
+    rdfs:label "Multi-fidelity SevenNet-MF training for Li6PS5Cl (PBE + SCAN)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-lpsc-mf-kim2024 ;
+    mlips:hasHyperparameterSetting entity:setting-lpsc-mf-numLayers-kim2024 ,
+        entity:setting-lpsc-mf-numAngularBasis-kim2024 ,
+        entity:setting-lpsc-mf-numFeatures-kim2024 ;
+    mlips:produces entity:model-lpsc-mf-kim2024 .
+
+entity:model-lpsc-mf-kim2024 a mlips:TrainedModel ;
+    rdfs:label "Multi-fidelity MLIP for Li6PS5Cl (SevenNet-MF, 3 interaction layers, 32 channels)" .
+
+entity:run-sevennet-mf-0-kim2024 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-MF-0 training on the Materials Project PBE and r2SCAN databases" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-mp-mf-kim2024 ;
+    mlips:hasHyperparameterSetting entity:setting-sevennet-mf-0-numLayers-kim2024 ,
+        entity:setting-sevennet-mf-0-numAngularBasis-kim2024 ,
+        entity:setting-sevennet-mf-0-numFeatures-kim2024 ;
+    mlips:produces entity:model-sevennet-mf-0-kim2024 .
+
+entity:model-sevennet-mf-0-kim2024 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-MF-0 (128x0e + 64x1e + 32x2e, 5 interaction layers)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kim2024 mlips:hasResult
+    entity:result-lpsc-mf-val-kim2024 ,
+    entity:result-sevennet-mf-0-train-kim2024 .
+
+entity:result-lpsc-mf-val-kim2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-lpsc-mf-kim2024 ;
+    mlips:targetMaterial entity:mat-Li6PS5Cl-kim2024 ;
+    mlips:hasAccuracyMetric entity:metric-lpsc-mf-val-1-kim2024 ,
+        entity:metric-lpsc-mf-val-2-kim2024 ,
+        entity:metric-lpsc-mf-val-3-kim2024 .
+
+entity:metric-lpsc-mf-val-1-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy: multi-fidelity model, Li6PS5Cl" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-lpsc-mf-val-2-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on forces: multi-fidelity model, Li6PS5Cl" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "57.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-lpsc-mf-val-3-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on stress, in kbar: multi-fidelity model, Li6PS5Cl" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.64"^^xsd:double .
+
+entity:result-sevennet-mf-0-train-kim2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sevennet-mf-0-kim2024 ;
+    mlips:targetMaterial entity:mat-mp-kim2024 ;
+    mlips:hasAccuracyMetric entity:metric-sevennet-mf-0-train-1-kim2024 ,
+        entity:metric-sevennet-mf-0-train-2-kim2024 ,
+        entity:metric-sevennet-mf-0-train-3-kim2024 .
+
+entity:metric-sevennet-mf-0-train-1-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Training-set MAE on energy: SevenNet-MF-0" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "10.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-sevennet-mf-0-train-2-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Training-set MAE on forces: SevenNet-MF-0" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-sevennet-mf-0-train-3-kim2024 a mlips:AccuracyMetric ;
+    rdfs:label "Training-set MAE on stress, in kbar: SevenNet-MF-0" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.58"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - SevenNet-MF is encoded as an implementation of the registry method entity:NequIP; the multi-fidelity mechanism (fidelity-dependent parameters) is described in the implementation node. If multi-fidelity models must be queryable as a class, that needs a schema term.
+# - Each model has a low-fidelity and a high-fidelity channel; the printed errors do not say which channel or which fidelity subset they refer to. Stress errors are in kbar (no unit individual; mlips:hasUnit omitted).
+# - Not encoded: the single-fidelity comparison models for Li6PS5Cl (high-fidelity, low-fidelity, baseline), the InxGa1-xN study (PBE and r2SCAN), the molecular examples, and the property results (Li-ion conductivity and activation energies in Table 1, phase diagrams, formation-energy and volume MAEs of the universal models), which are figures or have no MetricProperty.
+# - SevenNet-MF-0 is paper-local here; lysogorskiy2026 compares against a later 'SevenNet-MF-ompa', which is a different model.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
