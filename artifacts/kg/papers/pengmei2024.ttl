@@ -1,0 +1,965 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Zihan Pengmei et al. (2024). Beyond MD17: the reactive xxMD dataset.
+#   Scientific Data. doi:10.1038/s41597-024-03019-3  arXiv:2308.11155v3
+#
+# Version read: arxiv-preprint arXiv:2308.11155v3 (sha256 8dd0f36dbca976de...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 49 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the xxMD data sets (geometries of azobenzene,
+# malonaldehyde, stilbene and dithiophene from nonadiabatic trajectory
+# surface hopping dynamics) and the benchmark of six neural force fields
+# (MACE, Allegro, NequIP, SchNet, DimeNet++, SphereNet) on the
+# single-state xxMD-DFT set with a temporal train/test split (Table 2).
+# The multi-state xxMD-CASSCF benchmark (Table 1) is not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-pengmei2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Pengmei et al. (2024): beyond MD17, the reactive xxMD data set, with a benchmark of six neural force fields" ;
+    mlips:reportedIn entity:article-pengmei2024 .
+
+entity:article-pengmei2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41597-024-03019-3> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Beyond MD17: the reactive xxMD dataset" ;
+    schema:author entity:person-Pengmei-pengmei2024 ,
+        <https://orcid.org/0000-0003-1669-8039> ,
+        <https://orcid.org/0000-0002-8371-0221> .
+
+entity:person-Pengmei-pengmei2024 a schema:Person ;
+    schema:name "Zihan Pengmei" ;
+    schema:givenName "Zihan" ;
+    schema:familyName "Pengmei" .
+
+<https://orcid.org/0000-0003-1669-8039> a schema:Person ;
+    schema:name "Junyu Liu" ;
+    schema:givenName "Junyu" ;
+    schema:familyName "Liu" ;
+    schema:identifier <https://orcid.org/0000-0003-1669-8039> .
+
+<https://orcid.org/0000-0002-8371-0221> a schema:Person ;
+    schema:name "Yinan Shu" ;
+    schema:givenName "Yinan" ;
+    schema:familyName "Shu" ;
+    schema:identifier <https://orcid.org/0000-0002-8371-0221> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-azobenzene-pengmei2024 a mlips:MaterialSystem ;
+    rdfs:label "Azobenzene molecule along photochemical reaction pathways (xxMD)" ;
+    mlips:materialClass "Organic molecule (gas phase); geometries from nonadiabatic dynamics, far from the ground-state minimum" .
+
+entity:mat-stilbene-pengmei2024 a mlips:MaterialSystem ;
+    rdfs:label "Stilbene molecule along photochemical reaction pathways (xxMD)" ;
+    mlips:materialClass "Organic molecule (gas phase); geometries from nonadiabatic dynamics, far from the ground-state minimum" .
+
+entity:mat-malonaldehyde-pengmei2024 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule along photochemical reaction pathways (xxMD)" ;
+    mlips:materialClass "Organic molecule (gas phase); geometries from nonadiabatic dynamics, far from the ground-state minimum" .
+
+entity:mat-dithiophene-pengmei2024 a mlips:MaterialSystem ;
+    rdfs:label "Dithiophene molecule along photochemical reaction pathways (xxMD)" ;
+    mlips:materialClass "Organic molecule (gas phase); geometries from nonadiabatic dynamics, far from the ground-state minimum" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-pengmei2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-pengmei2024 mlips:hasDFTSettings entity:calc-settings-dft-pengmei2024 .
+
+entity:calc-settings-dft-pengmei2024 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-M06-pengmei2024 ;
+    rdfs:comment "Single-point unrestricted KS-DFT with M06 on the geometries of the nonadiabatic trajectories (xxMD-DFT). Basis set and code are in the supplementary computational details and were not captured." .
+
+entity:xc-M06-pengmei2024 a mlips:XCFunctional ;
+    rdfs:label "M06" ;
+    rdfs:comment "Meta-GGA hybrid functional; spin-polarised (unrestricted) Kohn-Sham DFT." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-azobenzene-pengmei2024 a mlips:TrainingDataset ;
+    rdfs:label "xxMD-DFT azobenzene: training split (4200 of 8414 samples)" ;
+    mlips:coversMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 4200 ;
+    mlips:hasDFTCalculation entity:calc-dft-pengmei2024 .
+
+entity:ds-stilbene-pengmei2024 a mlips:TrainingDataset ;
+    rdfs:label "xxMD-DFT stilbene: training split (12800 of 27965 samples)" ;
+    mlips:coversMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 12800 ;
+    mlips:hasDFTCalculation entity:calc-dft-pengmei2024 .
+
+entity:ds-malonaldehyde-pengmei2024 a mlips:TrainingDataset ;
+    rdfs:label "xxMD-DFT malonaldehyde: training split (14000 of 25568 samples)" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 14000 ;
+    mlips:hasDFTCalculation entity:calc-dft-pengmei2024 .
+
+entity:ds-dithiophene-pengmei2024 a mlips:TrainingDataset ;
+    rdfs:label "xxMD-DFT dithiophene: training split (12400 of 24769 samples)" ;
+    mlips:coversMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 12400 ;
+    mlips:hasDFTCalculation entity:calc-dft-pengmei2024 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-azobenzene-pengmei2024 mlips:samplingStrategy
+    entity:sampling-tsh-pengmei2024 ,
+    entity:sampling-temporal-split-pengmei2024 .
+
+entity:ds-stilbene-pengmei2024 mlips:samplingStrategy
+    entity:sampling-tsh-pengmei2024 ,
+    entity:sampling-temporal-split-pengmei2024 .
+
+entity:ds-malonaldehyde-pengmei2024 mlips:samplingStrategy
+    entity:sampling-tsh-pengmei2024 ,
+    entity:sampling-temporal-split-pengmei2024 .
+
+entity:ds-dithiophene-pengmei2024 mlips:samplingStrategy
+    entity:sampling-tsh-pengmei2024 ,
+    entity:sampling-temporal-split-pengmei2024 .
+
+entity:sampling-tsh-pengmei2024 a mlips:SamplingStrategy ;
+    rdfs:label "Trajectory surface hopping nonadiabatic dynamics at the SA-CASSCF level" ;
+    rdfs:comment "Geometries sampled from energy-conserving trajectories with state-averaged CASSCF (active spaces from (2e,2o) to (10e,10o), 6-31g or 6-31g* basis)." .
+
+entity:sampling-temporal-split-pengmei2024 a mlips:SamplingStrategy ;
+    rdfs:label "Temporal split by trajectory time step" ;
+    rdfs:comment "Training, validation and test sets are partitioned by trajectory time steps rather than at random, so the test set probes extrapolation." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-pengmei2024 .
+
+entity:loss-MACE-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasLossFunction entity:loss-Allegro-pengmei2024 .
+
+entity:loss-Allegro-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasLossFunction entity:loss-NequIP-pengmei2024 .
+
+entity:loss-NequIP-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+entity:SchNet a mlips:MLIPMethod ;
+    rdfs:label "SchNet (continuous-filter convolutional deep neural network)" ;
+    mlips:hasLossFunction entity:loss-SchNet-pengmei2024 .
+
+entity:loss-SchNet-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+entity:DimeNet a mlips:MLIPMethod ;
+    rdfs:label "DimeNet / DimeNet++ (directional message passing neural network)" ;
+    mlips:hasLossFunction entity:loss-DimeNet-pengmei2024 .
+
+entity:loss-DimeNet-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+entity:SphereNet a mlips:MLIPMethod ;
+    rdfs:label "SphereNet (spherical message passing neural network)" ;
+    mlips:hasLossFunction entity:loss-SphereNet-pengmei2024 .
+
+entity:loss-SphereNet-pengmei2024 a mlips:LossFunction ;
+    rdfs:label "Weighted loss of 1 : 1000 on energy and forces" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-MACE-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-MACE-azobenzene-pengmei2024 .
+
+entity:model-MACE-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "MACE model for azobenzene (xxMD-DFT)" .
+
+entity:run-MACE-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-MACE-stilbene-pengmei2024 .
+
+entity:model-MACE-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "MACE model for stilbene (xxMD-DFT)" .
+
+entity:run-MACE-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-MACE-malonaldehyde-pengmei2024 .
+
+entity:model-MACE-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "MACE model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-MACE-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "MACE trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-MACE-dithiophene-pengmei2024 .
+
+entity:model-MACE-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "MACE model for dithiophene (xxMD-DFT)" .
+
+entity:run-Allegro-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-Allegro-azobenzene-pengmei2024 .
+
+entity:model-Allegro-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for azobenzene (xxMD-DFT)" .
+
+entity:run-Allegro-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-Allegro-stilbene-pengmei2024 .
+
+entity:model-Allegro-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for stilbene (xxMD-DFT)" .
+
+entity:run-Allegro-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-Allegro-malonaldehyde-pengmei2024 .
+
+entity:model-Allegro-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-Allegro-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "Allegro trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-Allegro-dithiophene-pengmei2024 .
+
+entity:model-Allegro-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "Allegro model for dithiophene (xxMD-DFT)" .
+
+entity:run-NequIP-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-NequIP-azobenzene-pengmei2024 .
+
+entity:model-NequIP-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for azobenzene (xxMD-DFT)" .
+
+entity:run-NequIP-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-NequIP-stilbene-pengmei2024 .
+
+entity:model-NequIP-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for stilbene (xxMD-DFT)" .
+
+entity:run-NequIP-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-NequIP-malonaldehyde-pengmei2024 .
+
+entity:model-NequIP-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-NequIP-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-NequIP-dithiophene-pengmei2024 .
+
+entity:model-NequIP-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP model for dithiophene (xxMD-DFT)" .
+
+entity:run-SchNet-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-SchNet-azobenzene-pengmei2024 .
+
+entity:model-SchNet-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SchNet model for azobenzene (xxMD-DFT)" .
+
+entity:run-SchNet-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-SchNet-stilbene-pengmei2024 .
+
+entity:model-SchNet-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SchNet model for stilbene (xxMD-DFT)" .
+
+entity:run-SchNet-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-SchNet-malonaldehyde-pengmei2024 .
+
+entity:model-SchNet-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SchNet model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-SchNet-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SchNet trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:SchNet ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-SchNet-dithiophene-pengmei2024 .
+
+entity:model-SchNet-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SchNet model for dithiophene (xxMD-DFT)" .
+
+entity:run-DimeNet-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "DimeNet++ trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:DimeNet ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-DimeNet-azobenzene-pengmei2024 .
+
+entity:model-DimeNet-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "DimeNet++ model for azobenzene (xxMD-DFT)" .
+
+entity:run-DimeNet-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "DimeNet++ trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:DimeNet ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-DimeNet-stilbene-pengmei2024 .
+
+entity:model-DimeNet-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "DimeNet++ model for stilbene (xxMD-DFT)" .
+
+entity:run-DimeNet-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "DimeNet++ trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:DimeNet ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-DimeNet-malonaldehyde-pengmei2024 .
+
+entity:model-DimeNet-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "DimeNet++ model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-DimeNet-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "DimeNet++ trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:DimeNet ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-DimeNet-dithiophene-pengmei2024 .
+
+entity:model-DimeNet-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "DimeNet++ model for dithiophene (xxMD-DFT)" .
+
+entity:run-SphereNet-azobenzene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SphereNet trained on xxMD-DFT azobenzene (default configuration)" ;
+    mlips:appliesMethod entity:SphereNet ;
+    mlips:runsOn entity:ds-azobenzene-pengmei2024 ;
+    mlips:produces entity:model-SphereNet-azobenzene-pengmei2024 .
+
+entity:model-SphereNet-azobenzene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SphereNet model for azobenzene (xxMD-DFT)" .
+
+entity:run-SphereNet-stilbene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SphereNet trained on xxMD-DFT stilbene (default configuration)" ;
+    mlips:appliesMethod entity:SphereNet ;
+    mlips:runsOn entity:ds-stilbene-pengmei2024 ;
+    mlips:produces entity:model-SphereNet-stilbene-pengmei2024 .
+
+entity:model-SphereNet-stilbene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SphereNet model for stilbene (xxMD-DFT)" .
+
+entity:run-SphereNet-malonaldehyde-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SphereNet trained on xxMD-DFT malonaldehyde (default configuration)" ;
+    mlips:appliesMethod entity:SphereNet ;
+    mlips:runsOn entity:ds-malonaldehyde-pengmei2024 ;
+    mlips:produces entity:model-SphereNet-malonaldehyde-pengmei2024 .
+
+entity:model-SphereNet-malonaldehyde-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SphereNet model for malonaldehyde (xxMD-DFT)" .
+
+entity:run-SphereNet-dithiophene-pengmei2024 a mlips:MLIPRun ;
+    rdfs:label "SphereNet trained on xxMD-DFT dithiophene (default configuration)" ;
+    mlips:appliesMethod entity:SphereNet ;
+    mlips:runsOn entity:ds-dithiophene-pengmei2024 ;
+    mlips:produces entity:model-SphereNet-dithiophene-pengmei2024 .
+
+entity:model-SphereNet-dithiophene-pengmei2024 a mlips:TrainedModel ;
+    rdfs:label "SphereNet model for dithiophene (xxMD-DFT)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-pengmei2024 mlips:hasResult
+    entity:result-MACE-azobenzene-pengmei2024 ,
+    entity:result-MACE-stilbene-pengmei2024 ,
+    entity:result-MACE-malonaldehyde-pengmei2024 ,
+    entity:result-MACE-dithiophene-pengmei2024 ,
+    entity:result-Allegro-azobenzene-pengmei2024 ,
+    entity:result-Allegro-stilbene-pengmei2024 ,
+    entity:result-Allegro-malonaldehyde-pengmei2024 ,
+    entity:result-Allegro-dithiophene-pengmei2024 ,
+    entity:result-NequIP-azobenzene-pengmei2024 ,
+    entity:result-NequIP-stilbene-pengmei2024 ,
+    entity:result-NequIP-malonaldehyde-pengmei2024 ,
+    entity:result-NequIP-dithiophene-pengmei2024 ,
+    entity:result-SchNet-azobenzene-pengmei2024 ,
+    entity:result-SchNet-stilbene-pengmei2024 ,
+    entity:result-SchNet-malonaldehyde-pengmei2024 ,
+    entity:result-SchNet-dithiophene-pengmei2024 ,
+    entity:result-DimeNet-azobenzene-pengmei2024 ,
+    entity:result-DimeNet-stilbene-pengmei2024 ,
+    entity:result-DimeNet-malonaldehyde-pengmei2024 ,
+    entity:result-DimeNet-dithiophene-pengmei2024 ,
+    entity:result-SphereNet-azobenzene-pengmei2024 ,
+    entity:result-SphereNet-stilbene-pengmei2024 ,
+    entity:result-SphereNet-malonaldehyde-pengmei2024 ,
+    entity:result-SphereNet-dithiophene-pengmei2024 .
+
+entity:result-MACE-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-azobenzene-1-pengmei2024 ,
+        entity:metric-MACE-azobenzene-2-pengmei2024 .
+
+entity:metric-MACE-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "292"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "85"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-stilbene-1-pengmei2024 ,
+        entity:metric-MACE-stilbene-2-pengmei2024 .
+
+entity:metric-MACE-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "315"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "149"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-malonaldehyde-1-pengmei2024 ,
+        entity:metric-MACE-malonaldehyde-2-pengmei2024 .
+
+entity:metric-MACE-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "190"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "166"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-MACE-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-dithiophene-1-pengmei2024 ,
+        entity:metric-MACE-dithiophene-2-pengmei2024 .
+
+entity:metric-MACE-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: MACE, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "100"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-MACE-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-azobenzene-1-pengmei2024 ,
+        entity:metric-Allegro-azobenzene-2-pengmei2024 .
+
+entity:metric-Allegro-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "174"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-Allegro-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "110"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-stilbene-1-pengmei2024 ,
+        entity:metric-Allegro-stilbene-2-pengmei2024 .
+
+entity:metric-Allegro-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "332"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-Allegro-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "189"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-malonaldehyde-1-pengmei2024 ,
+        entity:metric-Allegro-malonaldehyde-2-pengmei2024 .
+
+entity:metric-Allegro-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "151"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-Allegro-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "210"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-Allegro-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-Allegro-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-Allegro-dithiophene-1-pengmei2024 ,
+        entity:metric-Allegro-dithiophene-2-pengmei2024 .
+
+entity:metric-Allegro-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: Allegro, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "103"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-Allegro-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: Allegro, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-azobenzene-1-pengmei2024 ,
+        entity:metric-NequIP-azobenzene-2-pengmei2024 .
+
+entity:metric-NequIP-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1754"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "129"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-stilbene-1-pengmei2024 ,
+        entity:metric-NequIP-stilbene-2-pengmei2024 .
+
+entity:metric-NequIP-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "647"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "156"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-malonaldehyde-1-pengmei2024 ,
+        entity:metric-NequIP-malonaldehyde-2-pengmei2024 .
+
+entity:metric-NequIP-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "244"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "227"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-NequIP-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-NequIP-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-NequIP-dithiophene-1-pengmei2024 ,
+        entity:metric-NequIP-dithiophene-2-pengmei2024 .
+
+entity:metric-NequIP-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: NequIP, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "243"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-NequIP-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: NequIP, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "101"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-azobenzene-1-pengmei2024 ,
+        entity:metric-SchNet-azobenzene-2-pengmei2024 .
+
+entity:metric-SchNet-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SchNet, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "722"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SchNet, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "283"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-stilbene-1-pengmei2024 ,
+        entity:metric-SchNet-stilbene-2-pengmei2024 .
+
+entity:metric-SchNet-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SchNet, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "397"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SchNet, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "291"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-malonaldehyde-1-pengmei2024 ,
+        entity:metric-SchNet-malonaldehyde-2-pengmei2024 .
+
+entity:metric-SchNet-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SchNet, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "360"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SchNet, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "394"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SchNet-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SchNet-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SchNet-dithiophene-1-pengmei2024 ,
+        entity:metric-SchNet-dithiophene-2-pengmei2024 .
+
+entity:metric-SchNet-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SchNet, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "323"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SchNet-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SchNet, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "177"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-azobenzene-1-pengmei2024 ,
+        entity:metric-DimeNet-azobenzene-2-pengmei2024 .
+
+entity:metric-DimeNet-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DimeNet++, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "300"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DimeNet++, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "173"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-stilbene-1-pengmei2024 ,
+        entity:metric-DimeNet-stilbene-2-pengmei2024 .
+
+entity:metric-DimeNet-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DimeNet++, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "439"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DimeNet++, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "162"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-malonaldehyde-1-pengmei2024 ,
+        entity:metric-DimeNet-malonaldehyde-2-pengmei2024 .
+
+entity:metric-DimeNet-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DimeNet++, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "179"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DimeNet++, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "257"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-DimeNet-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-DimeNet-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-DimeNet-dithiophene-1-pengmei2024 ,
+        entity:metric-DimeNet-dithiophene-2-pengmei2024 .
+
+entity:metric-DimeNet-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: DimeNet++, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "61"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-DimeNet-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: DimeNet++, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "74"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SphereNet-azobenzene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SphereNet-azobenzene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-azobenzene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SphereNet-azobenzene-1-pengmei2024 ,
+        entity:metric-SphereNet-azobenzene-2-pengmei2024 .
+
+entity:metric-SphereNet-azobenzene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SphereNet, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "260"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SphereNet-azobenzene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SphereNet, xxMD-DFT azobenzene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "168"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SphereNet-stilbene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SphereNet-stilbene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-stilbene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SphereNet-stilbene-1-pengmei2024 ,
+        entity:metric-SphereNet-stilbene-2-pengmei2024 .
+
+entity:metric-SphereNet-stilbene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SphereNet, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "477"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SphereNet-stilbene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SphereNet, xxMD-DFT stilbene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "168"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SphereNet-malonaldehyde-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SphereNet-malonaldehyde-pengmei2024 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SphereNet-malonaldehyde-1-pengmei2024 ,
+        entity:metric-SphereNet-malonaldehyde-2-pengmei2024 .
+
+entity:metric-SphereNet-malonaldehyde-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SphereNet, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "185"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SphereNet-malonaldehyde-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SphereNet, xxMD-DFT malonaldehyde, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "255"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-SphereNet-dithiophene-pengmei2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SphereNet-dithiophene-pengmei2024 ;
+    mlips:targetMaterial entity:mat-dithiophene-pengmei2024 ;
+    mlips:hasAccuracyMetric entity:metric-SphereNet-dithiophene-1-pengmei2024 ,
+        entity:metric-SphereNet-dithiophene-2-pengmei2024 .
+
+entity:metric-SphereNet-dithiophene-1-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: SphereNet, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "76"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-SphereNet-dithiophene-2-pengmei2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: SphereNet, xxMD-DFT dithiophene, temporal split" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "90"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table 1 (xxMD-CASSCF: errors per electronic state S0, S1, S2 for each molecule and model) is not encoded; a model of an excited-state surface does not fit the single-reference-calculation pattern without more modelling. The CASSCF data are the sampling level of this file.
+# - Hyperparameters and training details of the six models are in the supplementary information ('default configurations'); none is encoded.
+# - DPP is DimeNet++ and SPN is SphereNet (Table S1); both are new registry methods here. DimeNet++ is encoded under entity:DimeNet.
+# - Table 3 compares with literature rMD17 values, and Tables S2-S4 give validation-set errors; neither is encoded.
+# - The NequIP energy MAE for azobenzene (1754 meV) is as printed.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
