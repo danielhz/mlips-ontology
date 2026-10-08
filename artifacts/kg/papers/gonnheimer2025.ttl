@@ -1,0 +1,129 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Nils Gönnheimer et al. (2025). Beyond Numerical Hessians: Higher-Order Derivatives for Machine Learning Interatomic Potentials via Automatic Differentiation.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.4c01790
+#
+# Version read: publisher (sha256 00579d4411635e62...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 85 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper computes analytic Hessians (and higher
+# derivatives) of the pretrained MACE-MP-0 'medium' model by automatic
+# differentiation and uses them for vibrational frequencies and heat
+# capacities of 233 porous materials (215 MOFs, 9 COFs, 9 zeolites),
+# compared with published PBE-D3(BJ) values. No model is trained and no
+# energy/force error is reported; only the demonstrated simulation types
+# are asserted.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-gonnheimer2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Goennheimer et al. (2025): beyond numerical Hessians, higher-order derivatives for MLIPs via automatic differentiation" ;
+    mlips:reportedIn entity:article-gonnheimer2025 .
+
+entity:article-gonnheimer2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.4c01790> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Beyond Numerical Hessians: Higher-Order Derivatives for Machine Learning Interatomic Potentials via Automatic Differentiation" ;
+    schema:author entity:person-Gonnheimer-gonnheimer2025 ,
+        <https://orcid.org/0000-0001-8473-8659> ,
+        <https://orcid.org/0000-0002-0862-5289> .
+
+entity:person-Gonnheimer-gonnheimer2025 a schema:Person ;
+    schema:name "Nils Gönnheimer" ;
+    schema:givenName "Nils" ;
+    schema:familyName "Gönnheimer" .
+
+<https://orcid.org/0000-0001-8473-8659> a schema:Person ;
+    schema:name "Karsten Reuter" ;
+    schema:givenName "Karsten" ;
+    schema:familyName "Reuter" ;
+    schema:identifier <https://orcid.org/0000-0001-8473-8659> .
+
+<https://orcid.org/0000-0002-0862-5289> a schema:Person ;
+    schema:name "Johannes T. Margraf" ;
+    schema:givenName "Johannes T." ;
+    schema:familyName "Margraf" ;
+    schema:identifier <https://orcid.org/0000-0002-0862-5289> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+# No material system is characterised by the paper (see Q12).
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+# No training dataset is characterised by the paper (see Q12).
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+# No sampling strategy is described by the paper (see Q12).
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# No training run or trained model is reported by the paper (see Q12).
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No training, data set or hyperparameter setting (Q2-Q6, Q8, Q9 empty). The model is 'the pretrained MACE-MP-0 foundation model with the medium model size', with D3(BJ) dispersion added; no release is named, so it is not linked to a registry model (cf. nam2025).
+# - The reported accuracy is on specific heat capacities against the DFT values of ref. 33 (PBE-D3(BJ) in CP2K, numerical frequencies with phonopy): MAE 0.10 J/(g K) and mean relative absolute error 12.18%, reduced to 0.02 J/(g K) and 2.86% with an empirical frequency scaling factor of 1.18. Heat capacity has no MetricProperty, so this is not encoded.
+# - The Hessian accuracy study (maximum and mean absolute error of numerical against automatic-differentiation Hessians as a function of step size and precision) and the timing comparison on supercells of one MOF are about the differentiation scheme, not about the potential.
+# - Cell optimisation with the Frechet cell filter and BFGS to 0.005 eV/A and harmonic vibrational analysis from the Hessian are the grounds for GeometryOptimization and PhononCalculation.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
