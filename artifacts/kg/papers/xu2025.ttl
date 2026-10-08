@@ -1,0 +1,639 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Zemin Xu et al. (2025). A Cartesian-3j Framework for Machine Learning Interatomic Potentials.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2512.16882  arXiv:2512.16882v2
+#
+# Version read: arxiv-preprint arXiv:2512.16882v2 (sha256 dcdef6e5ae07ec55...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 126 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the paper recasts equivariant MLIPs in irreducible
+# Cartesian tensors (Cartesian-3j symbols). Encoded: NequIP and Allegro
+# with their Cartesian counterparts (cNequIP, cAllegro) on 3BPA at one
+# model size each (Table 1), and the universal model TACE-v1-OAM-M with
+# the training settings of Table 8. Preprint only.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-xu2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Xu et al. (2025): a Cartesian-3j framework for machine learning interatomic potentials" ;
+    mlips:reportedIn entity:article-xu2025 .
+
+entity:article-xu2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2512.16882> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "A Cartesian-3j Framework for Machine Learning Interatomic Potentials" ;
+    schema:author entity:person-Xu-xu2025 ,
+        entity:person-Wu-xu2025 ,
+        entity:person-Xie-xu2025 ,
+        entity:person-Hu-xu2025 .
+
+entity:person-Xu-xu2025 a schema:Person ;
+    schema:name "Zemin Xu" ;
+    schema:givenName "Zemin" ;
+    schema:familyName "Xu" .
+
+entity:person-Wu-xu2025 a schema:Person ;
+    schema:name "Chenyu Wu" ;
+    schema:givenName "Chenyu" ;
+    schema:familyName "Wu" .
+
+entity:person-Xie-xu2025 a schema:Person ;
+    schema:name "Wenbo Xie" ;
+    schema:givenName "Wenbo" ;
+    schema:familyName "Xie" .
+
+entity:person-Hu-xu2025 a schema:Person ;
+    schema:name "P. Hu" ;
+    schema:givenName "P." ;
+    schema:familyName "Hu" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-3BPA-xu2025 a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA) molecule" ;
+    mlips:materialClass "Flexible drug-like organic molecule (gas phase)" .
+
+entity:mat-universal-xu2025 a mlips:MaterialSystem ;
+    rdfs:label "Inorganic materials of OMat24, sAlex and MPtrj" ;
+    mlips:materialClass "Universal inorganic crystals" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-3BPA-xu2025 a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set" ;
+    mlips:coversMaterial entity:mat-3BPA-xu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-oam-xu2025 a mlips:TrainingDataset ;
+    rdfs:label "OMat24 + sAlex + MPtrj" ;
+    mlips:coversMaterial entity:mat-universal-xu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Sizes and reference levels are those of the source data sets and are not restated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-3BPA-xu2025 mlips:samplingStrategy
+    entity:sampling-bpa-xu2025 .
+
+entity:ds-oam-xu2025 mlips:samplingStrategy
+    entity:sampling-omat-pretrain-xu2025 .
+
+entity:sampling-bpa-xu2025 a mlips:SamplingStrategy ;
+    rdfs:label "3BPA benchmark split (training at 300 K; tests at 300, 600, 1200 K and a dihedral scan)" .
+
+entity:sampling-omat-pretrain-xu2025 a mlips:SamplingStrategy ;
+    rdfs:label "Pretraining on OMat24, fine-tuning on sAlex + MPtrj" ;
+    rdfs:comment "OMat24 for four epochs, then the sAlex data set together with eight splits of MPtrj for two epochs." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter entity:hp-tensor-basis-xu2025 ,
+        entity:hp-model-size-xu2025 ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:numAngularBasis .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasHyperparameter entity:hp-tensor-basis-xu2025 ,
+        entity:hp-model-size-xu2025 ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:numAngularBasis .
+
+entity:TACE a mlips:MLIPMethod ;
+    rdfs:label "TACE (tensor atomic cluster expansion in Cartesian space)" ;
+    mlips:hasLossFunction entity:loss-TACE-xu2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-TACE-xu2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:bodyOrder ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs .
+
+entity:loss-TACE-xu2025 a mlips:LossFunction ;
+    rdfs:label "Huber loss (delta = 0.01) with per-atom energy : force : stress weights 1 : 8 : 8 in pretraining and 1 : 1 : 2 in fine-tuning" .
+
+entity:alg-TACE-xu2025 a mls:Algorithm ;
+    rdfs:label "AdamW; cosine annealing with warm-up from 4e-3 to 5e-4 for OMat24, constant 1e-4 with stochastic weight averaging for sAlex + MPtrj; weight decay 1e-8, gradient clipping 0.25, EMA decay 0.995" .
+
+entity:hp-tensor-basis-xu2025 a mlips:Hyperparameter ;
+    rdfs:label "Tensor basis of the equivariant features (spherical or irreducible Cartesian)" ;
+    mlips:hyperparameterName "tensor_basis" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-model-size-xu2025 a mlips:Hyperparameter ;
+    rdfs:label "Model size as scalar(tensor) channels - L_max - l_max - layers" ;
+    mlips:hyperparameterName "model_size" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-nequip-sph-tensor-basis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-basis-xu2025 ;
+    mlips:settingValue "spherical (original NequIP)" .
+
+entity:setting-nequip-sph-model-size-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-xu2025 ;
+    mlips:settingValue "64(64)-2-2-5" .
+
+entity:setting-nequip-sph-numLayers-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-nequip-sph-numFeatures-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-sph-numAngularBasis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-nequip-cart-tensor-basis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-basis-xu2025 ;
+    mlips:settingValue "Cartesian-3j (cNequIP)" .
+
+entity:setting-nequip-cart-model-size-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-xu2025 ;
+    mlips:settingValue "64(64)-2-2-5" .
+
+entity:setting-nequip-cart-numLayers-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-nequip-cart-numFeatures-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-nequip-cart-numAngularBasis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-allegro-sph-tensor-basis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-basis-xu2025 ;
+    mlips:settingValue "spherical (original Allegro)" .
+
+entity:setting-allegro-sph-model-size-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-xu2025 ;
+    mlips:settingValue "256(64)-2-2-3" .
+
+entity:setting-allegro-sph-numLayers-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-allegro-sph-numFeatures-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-allegro-sph-numAngularBasis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-allegro-cart-tensor-basis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-tensor-basis-xu2025 ;
+    mlips:settingValue "Cartesian-3j (cAllegro)" .
+
+entity:setting-allegro-cart-model-size-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-model-size-xu2025 ;
+    mlips:settingValue "256(64)-2-2-3" .
+
+entity:setting-allegro-cart-numLayers-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-allegro-cart-numFeatures-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-allegro-cart-numAngularBasis-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-tace-oam-cutoffRadius-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-tace-oam-numLayers-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-tace-oam-numFeatures-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "48"^^xsd:integer .
+
+entity:setting-tace-oam-bodyOrder-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-tace-oam-learningRate-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.004"^^xsd:double .
+
+entity:setting-tace-oam-batchSize-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "512"^^xsd:integer .
+
+entity:setting-tace-oam-numEpochs-xu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-nequip-sph-xu2025 a mlips:MLIPRun ;
+    rdfs:label "original NequIP (64(64)-2-2-5) trained on 3BPA" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-3BPA-xu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-sph-tensor-basis-xu2025 ,
+        entity:setting-nequip-sph-model-size-xu2025 ,
+        entity:setting-nequip-sph-numLayers-xu2025 ,
+        entity:setting-nequip-sph-numFeatures-xu2025 ,
+        entity:setting-nequip-sph-numAngularBasis-xu2025 ;
+    mlips:trainingHardware "Single NVIDIA RTX 4090 GPU, float32" ;
+    mlips:produces entity:model-nequip-sph-xu2025 .
+
+entity:model-nequip-sph-xu2025 a mlips:TrainedModel ;
+    rdfs:label "original NequIP 3BPA model, size 64(64)-2-2-5" .
+
+entity:run-nequip-cart-xu2025 a mlips:MLIPRun ;
+    rdfs:label "cNequIP (64(64)-2-2-5) trained on 3BPA" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-3BPA-xu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-cart-tensor-basis-xu2025 ,
+        entity:setting-nequip-cart-model-size-xu2025 ,
+        entity:setting-nequip-cart-numLayers-xu2025 ,
+        entity:setting-nequip-cart-numFeatures-xu2025 ,
+        entity:setting-nequip-cart-numAngularBasis-xu2025 ;
+    mlips:trainingHardware "Single NVIDIA RTX 4090 GPU, float32" ;
+    mlips:produces entity:model-nequip-cart-xu2025 .
+
+entity:model-nequip-cart-xu2025 a mlips:TrainedModel ;
+    rdfs:label "cNequIP 3BPA model, size 64(64)-2-2-5" .
+
+entity:run-allegro-sph-xu2025 a mlips:MLIPRun ;
+    rdfs:label "original Allegro (256(64)-2-2-3) trained on 3BPA" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-3BPA-xu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-allegro-sph-tensor-basis-xu2025 ,
+        entity:setting-allegro-sph-model-size-xu2025 ,
+        entity:setting-allegro-sph-numLayers-xu2025 ,
+        entity:setting-allegro-sph-numFeatures-xu2025 ,
+        entity:setting-allegro-sph-numAngularBasis-xu2025 ;
+    mlips:trainingHardware "Single NVIDIA RTX 4090 GPU, float32" ;
+    mlips:produces entity:model-allegro-sph-xu2025 .
+
+entity:model-allegro-sph-xu2025 a mlips:TrainedModel ;
+    rdfs:label "original Allegro 3BPA model, size 256(64)-2-2-3" .
+
+entity:run-allegro-cart-xu2025 a mlips:MLIPRun ;
+    rdfs:label "cAllegro (256(64)-2-2-3) trained on 3BPA" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-3BPA-xu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-allegro-cart-tensor-basis-xu2025 ,
+        entity:setting-allegro-cart-model-size-xu2025 ,
+        entity:setting-allegro-cart-numLayers-xu2025 ,
+        entity:setting-allegro-cart-numFeatures-xu2025 ,
+        entity:setting-allegro-cart-numAngularBasis-xu2025 ;
+    mlips:trainingHardware "Single NVIDIA RTX 4090 GPU, float32" ;
+    mlips:produces entity:model-allegro-cart-xu2025 .
+
+entity:model-allegro-cart-xu2025 a mlips:TrainedModel ;
+    rdfs:label "cAllegro 3BPA model, size 256(64)-2-2-3" .
+
+entity:run-tace-oam-xu2025 a mlips:MLIPRun ;
+    rdfs:label "TACE-v1-OAM-M: pretraining on OMat24 and fine-tuning on sAlex + MPtrj" ;
+    mlips:appliesMethod entity:TACE ;
+    mlips:runsOn entity:ds-oam-xu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-tace-oam-cutoffRadius-xu2025 ,
+        entity:setting-tace-oam-numLayers-xu2025 ,
+        entity:setting-tace-oam-numFeatures-xu2025 ,
+        entity:setting-tace-oam-bodyOrder-xu2025 ,
+        entity:setting-tace-oam-learningRate-xu2025 ,
+        entity:setting-tace-oam-batchSize-xu2025 ,
+        entity:setting-tace-oam-numEpochs-xu2025 ;
+    mlips:trainingHardware "Eight NVIDIA H100 GPUs, tf32 precision; total training time of the OAM and OMAT models about 960 hours" ;
+    mlips:produces entity:model-tace-oam-xu2025 .
+
+entity:model-tace-oam-xu2025 a mlips:TrainedModel ;
+    rdfs:label "TACE-v1-OAM-M universal potential" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-xu2025 mlips:hasResult
+    entity:result-nequip-sph-300K-xu2025 ,
+    entity:result-nequip-sph-600K-xu2025 ,
+    entity:result-nequip-sph-1200K-xu2025 ,
+    entity:result-nequip-cart-300K-xu2025 ,
+    entity:result-nequip-cart-600K-xu2025 ,
+    entity:result-nequip-cart-1200K-xu2025 ,
+    entity:result-allegro-sph-300K-xu2025 ,
+    entity:result-allegro-sph-600K-xu2025 ,
+    entity:result-allegro-sph-1200K-xu2025 ,
+    entity:result-allegro-cart-300K-xu2025 ,
+    entity:result-allegro-cart-600K-xu2025 ,
+    entity:result-allegro-cart-1200K-xu2025 .
+
+entity:result-nequip-sph-300K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-sph-300K-1-xu2025 ,
+        entity:metric-nequip-sph-300K-2-xu2025 .
+
+entity:metric-nequip-sph-300K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original NequIP (64(64)-2-2-5), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-sph-300K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original NequIP (64(64)-2-2-5), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-sph-600K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-sph-600K-1-xu2025 ,
+        entity:metric-nequip-sph-600K-2-xu2025 .
+
+entity:metric-nequip-sph-600K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original NequIP (64(64)-2-2-5), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-sph-600K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original NequIP (64(64)-2-2-5), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "37"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-sph-1200K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-sph-1200K-1-xu2025 ,
+        entity:metric-nequip-sph-1200K-2-xu2025 .
+
+entity:metric-nequip-sph-1200K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original NequIP (64(64)-2-2-5), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "43.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-sph-1200K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original NequIP (64(64)-2-2-5), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "89.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-cart-300K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-cart-300K-1-xu2025 ,
+        entity:metric-nequip-cart-300K-2-xu2025 .
+
+entity:metric-nequip-cart-300K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cNequIP (64(64)-2-2-5), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-cart-300K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cNequIP (64(64)-2-2-5), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-cart-600K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-cart-600K-1-xu2025 ,
+        entity:metric-nequip-cart-600K-2-xu2025 .
+
+entity:metric-nequip-cart-600K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cNequIP (64(64)-2-2-5), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-cart-600K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cNequIP (64(64)-2-2-5), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "36.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-cart-1200K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-cart-1200K-1-xu2025 ,
+        entity:metric-nequip-cart-1200K-2-xu2025 .
+
+entity:metric-nequip-cart-1200K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cNequIP (64(64)-2-2-5), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "42.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-nequip-cart-1200K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cNequIP (64(64)-2-2-5), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "89"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-sph-300K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-sph-300K-1-xu2025 ,
+        entity:metric-allegro-sph-300K-2-xu2025 .
+
+entity:metric-allegro-sph-300K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original Allegro (256(64)-2-2-3), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "9.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-sph-300K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original Allegro (256(64)-2-2-3), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-sph-600K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-sph-600K-1-xu2025 ,
+        entity:metric-allegro-sph-600K-2-xu2025 .
+
+entity:metric-allegro-sph-600K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original Allegro (256(64)-2-2-3), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-sph-600K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original Allegro (256(64)-2-2-3), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "42.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-sph-1200K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-sph-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-sph-1200K-1-xu2025 ,
+        entity:metric-allegro-sph-1200K-2-xu2025 .
+
+entity:metric-allegro-sph-1200K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: original Allegro (256(64)-2-2-3), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "67.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-sph-1200K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: original Allegro (256(64)-2-2-3), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "133.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-cart-300K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-cart-300K-1-xu2025 ,
+        entity:metric-allegro-cart-300K-2-xu2025 .
+
+entity:metric-allegro-cart-300K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cAllegro (256(64)-2-2-3), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-cart-300K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cAllegro (256(64)-2-2-3), 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-cart-600K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-cart-600K-1-xu2025 ,
+        entity:metric-allegro-cart-600K-2-xu2025 .
+
+entity:metric-allegro-cart-600K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cAllegro (256(64)-2-2-3), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "16.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-cart-600K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cAllegro (256(64)-2-2-3), 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "40.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-allegro-cart-1200K-xu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-allegro-cart-xu2025 ;
+    mlips:targetMaterial entity:mat-3BPA-xu2025 ;
+    mlips:hasAccuracyMetric entity:metric-allegro-cart-1200K-1-xu2025 ,
+        entity:metric-allegro-cart-1200K-2-xu2025 .
+
+entity:metric-allegro-cart-1200K-1-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: cAllegro (256(64)-2-2-3), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "70.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-allegro-cart-1200K-2-xu2025 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: cAllegro (256(64)-2-2-3), 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "132.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# 3BPA models: one NVIDIA RTX 4090. Universal models: eight NVIDIA H100
+# GPUs, about 960 hours in total for the OAM and OMAT models (whether
+# wall-clock or GPU hours is not stated, so it is kept as text). Table 4
+# gives MD speed in ps/day for several universal models and system sizes.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - cNequIP and cAllegro are the same architectures as NequIP and Allegro with the tensor algebra in irreducible Cartesian form (same parameter count, per the paper) and are encoded under the same registry methods with a 'tensor-basis' setting. The authors note that only one random seed was run.
+# - Table 1 has six model sizes and a dihedral-scan test; one size per architecture and the three temperature tests are encoded. Table 2 (MACE and cMACE) and the appendix tables were not read.
+# - The universal model's benchmark results (Matbench Discovery F1 and related scores) have no MetricProperty. Its settings are those of the OMat24 pretraining column of Table 8 (correlation order 2 as bodyOrder, 48 channels as numFeatures); the fine-tuning stage is in the algorithm label.
+# - TACE is a new registry method first used here; its method paper is cited as Xu et al. 2026. Preprint only (arXiv v2); authors from DataCite, without ORCIDs.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
