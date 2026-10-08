@@ -1,0 +1,428 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Junjie Wang et al. (2024). E(n)-Equivariant cartesian tensor message passing interatomic potential.
+#   Nature Communications. doi:10.1038/s41467-024-51886-6  arXiv:2402.15286v1
+#
+# Version read: arxiv-preprint arXiv:2402.15286v1 (sha256 bd13be4e8b9d717d...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 119 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the HotPP method (introduced here) and its two
+# potential-energy benchmarks: a model trained on 70% of ANI-1x and
+# tested on the six COMP6 subsets (Table I), and a model for carbon
+# across phases (Table II). The dipole and polarizability predictions
+# (Table III) are outside the protocol.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-wang2024hotpp a mlips:BenchmarkStudy ;
+    rdfs:label "Wang et al. (2024): E(n)-equivariant Cartesian tensor message passing interatomic potential (HotPP)" ;
+    mlips:reportedIn entity:article-wang2024hotpp .
+
+entity:article-wang2024hotpp a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-024-51886-6> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "E(n)-Equivariant cartesian tensor message passing interatomic potential" ;
+    schema:author <https://orcid.org/0000-0003-1411-3324> ,
+        entity:person-Wang-wang2024hotpp ,
+        entity:person-Zhang-wang2024hotpp ,
+        entity:person-Yang-wang2024hotpp ,
+        entity:person-Liang-wang2024hotpp ,
+        entity:person-Shi-wang2024hotpp ,
+        <https://orcid.org/0000-0002-2070-3446> ,
+        entity:person-Xing-wang2024hotpp ,
+        <https://orcid.org/0000-0001-6172-9100> .
+
+<https://orcid.org/0000-0003-1411-3324> a schema:Person ;
+    schema:name "Junjie Wang" ;
+    schema:givenName "Junjie" ;
+    schema:familyName "Wang" ;
+    schema:identifier <https://orcid.org/0000-0003-1411-3324> .
+
+entity:person-Wang-wang2024hotpp a schema:Person ;
+    schema:name "Yong Wang" ;
+    schema:givenName "Yong" ;
+    schema:familyName "Wang" .
+
+entity:person-Zhang-wang2024hotpp a schema:Person ;
+    schema:name "Haoting Zhang" ;
+    schema:givenName "Haoting" ;
+    schema:familyName "Zhang" .
+
+entity:person-Yang-wang2024hotpp a schema:Person ;
+    schema:name "Ziyang Yang" ;
+    schema:givenName "Ziyang" ;
+    schema:familyName "Yang" .
+
+entity:person-Liang-wang2024hotpp a schema:Person ;
+    schema:name "Zhixin Liang" ;
+    schema:givenName "Zhixin" ;
+    schema:familyName "Liang" .
+
+entity:person-Shi-wang2024hotpp a schema:Person ;
+    schema:name "Jiuyang Shi" ;
+    schema:givenName "Jiuyang" ;
+    schema:familyName "Shi" .
+
+<https://orcid.org/0000-0002-2070-3446> a schema:Person ;
+    schema:name "Hui-Tian Wang" ;
+    schema:givenName "Hui-Tian" ;
+    schema:familyName "Wang" ;
+    schema:identifier <https://orcid.org/0000-0002-2070-3446> .
+
+entity:person-Xing-wang2024hotpp a schema:Person ;
+    schema:name "Dingyu Xing" ;
+    schema:givenName "Dingyu" ;
+    schema:familyName "Xing" .
+
+<https://orcid.org/0000-0001-6172-9100> a schema:Person ;
+    schema:name "Jian Sun" ;
+    schema:givenName "Jian" ;
+    schema:familyName "Sun" ;
+    schema:identifier <https://orcid.org/0000-0001-6172-9100> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-organic-CHNO-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules with C, H, N, O (ANI-1x training domain)" ;
+    mlips:materialClass "Small organic molecules" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q174211> .
+
+entity:mat-carbon-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "Carbon across phases: ab initio MD snapshots, GAP-driven configurations and distorted diamond and graphite cells" ;
+    mlips:chemicalFormula "C" ;
+    mlips:materialClass "Elemental carbon; crystalline, amorphous and liquid configurations" .
+
+entity:mat-ANI-MD-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset ANI-MD" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+entity:mat-DrugBank-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset DrugBank" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+entity:mat-GDB7-9-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset GDB7-9" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+entity:mat-GDB10-13-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset GDB10-13" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+entity:mat-S66x8-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset S66x8" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+entity:mat-Tripeptides-wang2024hotpp a mlips:MaterialSystem ;
+    rdfs:label "COMP6 benchmark subset Tripeptides" ;
+    mlips:materialClass "Organic and biochemical molecules larger than those in the training set" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ANI-1x-wang2024hotpp a mlips:TrainingDataset ;
+    rdfs:label "ANI-1x, 70% training split" ;
+    mlips:coversMaterial entity:mat-organic-CHNO-wang2024hotpp ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "The full data set has about five million conformations; the reference level (omegaB97x/6-31G(d)) is described in smith2018." .
+
+entity:ds-carbon-wang2024hotpp a mlips:TrainingDataset ;
+    rdfs:label "Carbon data set (various phases)" ;
+    mlips:coversMaterial entity:mat-carbon-wang2024hotpp ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and reference level are not restated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ANI-1x-wang2024hotpp mlips:samplingStrategy
+    entity:sampling-ani1x-wang2024hotpp .
+
+entity:ds-carbon-wang2024hotpp mlips:samplingStrategy
+    entity:sampling-carbon-gap-wang2024hotpp .
+
+entity:sampling-ani1x-wang2024hotpp a mlips:SamplingStrategy ;
+    rdfs:label "ANI-1x conformations (active learning)" ;
+    rdfs:comment "About five million conformations from the ANI-1x active-learning data set; 70% used for training." .
+
+entity:sampling-carbon-gap-wang2024hotpp a mlips:SamplingStrategy ;
+    rdfs:label "Carbon data set of the GAP literature" ;
+    rdfs:comment "Structural snapshots from ab initio MD, iteratively extended from GAP-driven simulations, plus randomly distorted unit cells of diamond and graphite (ref. 36 of the paper)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HotPP a mlips:MLIPMethod ;
+    rdfs:label "HotPP (high-order tensor passing potential)" ;
+    mlips:hasFunctionalForm entity:ff-HotPP ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        entity:hp-max-tensor-order-wang2024hotpp ,
+        mlips:numRadialBasis ;
+    mlips:supportsSimulation mlips:PhononCalculation ,
+        mlips:MolecularDynamics .
+
+entity:ff-HotPP a mlips:FunctionalForm ;
+    rdfs:label "E(n)-equivariant message-passing network that passes Cartesian tensors of arbitrary order between atoms, built from tensor products of relative coordinates; outputs energies and, directly, vector and tensor properties" .
+
+entity:hp-max-tensor-order-wang2024hotpp a mlips:Hyperparameter ;
+    rdfs:label "HotPP maximum order of the Cartesian tensors (output layer and tensor product of relative coordinates)" ;
+    mlips:hyperparameterName "l_max" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-hotpp-ANI-1x-numLayers-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-hotpp-ANI-1x-max-tensor-order-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-tensor-order-wang2024hotpp ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-hotpp-ANI-1x-numRadialBasis-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-hotpp-carbon-numLayers-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-hotpp-carbon-max-tensor-order-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-tensor-order-wang2024hotpp ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-hotpp-carbon-numRadialBasis-wang2024hotpp a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-hotpp-ANI-1x-wang2024hotpp a mlips:MLIPRun ;
+    rdfs:label "HotPP trained on 70% of ANI-1x" ;
+    mlips:appliesMethod entity:HotPP ;
+    mlips:runsOn entity:ds-ANI-1x-wang2024hotpp ;
+    mlips:hasHyperparameterSetting entity:setting-hotpp-ANI-1x-numLayers-wang2024hotpp ,
+        entity:setting-hotpp-ANI-1x-max-tensor-order-wang2024hotpp ,
+        entity:setting-hotpp-ANI-1x-numRadialBasis-wang2024hotpp ;
+    mlips:produces entity:model-hotpp-ANI-1x-wang2024hotpp .
+
+entity:model-hotpp-ANI-1x-wang2024hotpp a mlips:TrainedModel ;
+    rdfs:label "HotPP ANI-1x model" .
+
+entity:run-hotpp-carbon-wang2024hotpp a mlips:MLIPRun ;
+    rdfs:label "HotPP trained on the carbon data set" ;
+    mlips:appliesMethod entity:HotPP ;
+    mlips:runsOn entity:ds-carbon-wang2024hotpp ;
+    mlips:hasHyperparameterSetting entity:setting-hotpp-carbon-numLayers-wang2024hotpp ,
+        entity:setting-hotpp-carbon-max-tensor-order-wang2024hotpp ,
+        entity:setting-hotpp-carbon-numRadialBasis-wang2024hotpp ;
+    mlips:produces entity:model-hotpp-carbon-wang2024hotpp .
+
+entity:model-hotpp-carbon-wang2024hotpp a mlips:TrainedModel ;
+    rdfs:label "HotPP carbon model (about 160k parameters)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-wang2024hotpp mlips:hasResult
+    entity:result-hotpp-ANI-MD-wang2024hotpp ,
+    entity:result-hotpp-DrugBank-wang2024hotpp ,
+    entity:result-hotpp-GDB7-9-wang2024hotpp ,
+    entity:result-hotpp-GDB10-13-wang2024hotpp ,
+    entity:result-hotpp-S66x8-wang2024hotpp ,
+    entity:result-hotpp-Tripeptides-wang2024hotpp ,
+    entity:result-hotpp-carbon-wang2024hotpp .
+
+entity:result-hotpp-ANI-MD-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-ANI-MD-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-ANI-MD-1-wang2024hotpp ,
+        entity:metric-hotpp-ANI-MD-2-wang2024hotpp .
+
+entity:metric-hotpp-ANI-MD-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 ANI-MD (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1155"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-ANI-MD-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 ANI-MD" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "61"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-DrugBank-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-DrugBank-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-DrugBank-1-wang2024hotpp ,
+        entity:metric-hotpp-DrugBank-2-wang2024hotpp .
+
+entity:metric-hotpp-DrugBank-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 DrugBank (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "534"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-DrugBank-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 DrugBank" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "62"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-GDB7-9-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-GDB7-9-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-GDB7-9-1-wang2024hotpp ,
+        entity:metric-hotpp-GDB7-9-2-wang2024hotpp .
+
+entity:metric-hotpp-GDB7-9-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 GDB7-9 (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "209"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-GDB7-9-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 GDB7-9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "61"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-GDB10-13-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-GDB10-13-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-GDB10-13-1-wang2024hotpp ,
+        entity:metric-hotpp-GDB10-13-2-wang2024hotpp .
+
+entity:metric-hotpp-GDB10-13-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 GDB10-13 (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "332"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-GDB10-13-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 GDB10-13" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-S66x8-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-S66x8-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-S66x8-1-wang2024hotpp ,
+        entity:metric-hotpp-S66x8-2-wang2024hotpp .
+
+entity:metric-hotpp-S66x8-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 S66x8 (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "231"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-S66x8-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 S66x8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "32"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-Tripeptides-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-ANI-1x-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-Tripeptides-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-Tripeptides-1-wang2024hotpp ,
+        entity:metric-hotpp-Tripeptides-2-wang2024hotpp .
+
+entity:metric-hotpp-Tripeptides-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: HotPP trained on ANI-1x, COMP6 Tripeptides (as printed, in meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "311"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-hotpp-Tripeptides-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: HotPP trained on ANI-1x, COMP6 Tripeptides" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-hotpp-carbon-wang2024hotpp a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hotpp-carbon-wang2024hotpp ;
+    mlips:targetMaterial entity:mat-carbon-wang2024hotpp ;
+    mlips:hasAccuracyMetric entity:metric-hotpp-carbon-1-wang2024hotpp ,
+        entity:metric-hotpp-carbon-2-wang2024hotpp .
+
+entity:metric-hotpp-carbon-1-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: HotPP, carbon" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "22"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-hotpp-carbon-2-wang2024hotpp a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on forces: HotPP, carbon" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "439"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table I prints COMP6 energy MAEs in meV with values between 209 and 1155 for HotPP (e.g. ANI-MD 1155) against the kcal/mol-scale values usually quoted; they are encoded as printed and the unit should be checked against the version of record.
+# - Other columns of Tables I and II (ANI-1x; GAP, DP, MTP, REANN, NEP, NequIP l = 1-3 on carbon) are literature values and are not encoded. The carbon virial RMSE (64 meV/atom) has no MetricProperty.
+# - The cutoff radius, loss and optimiser are in a figure or the methods that were not captured ('almost the same hyperparameters' for all data sets); 8 Bessel roots are encoded as numRadialBasis and the 3-layer radial MLP with 64 nodes is left out.
+# - A second carbon model retrained on a more accurate data set (for the diamond phonons), the separate liquid-water potential used for IR and Raman spectra, and the dipole and polarizability models (Table III) are not encoded. Phonons from automatic-differentiation force constants (phonopy) and classical MD of water are the grounds for the simulation types.
+# - Version read: arXiv v1, whose title differs from the version of record.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
