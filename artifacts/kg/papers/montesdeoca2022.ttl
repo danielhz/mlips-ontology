@@ -1,0 +1,268 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   David Montes de Oca Zapiain et al. (2022). Training data selection for accuracy and transferability of interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-022-00872-x  arXiv:2201.09829v2
+#
+# Version read: arxiv-preprint arXiv:2201.09829v2 (sha256 ddd13ea9066cd7b3...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 188 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the entropy-maximised (EM) tungsten data set generated
+# without human intervention, the expert-curated (DE) tungsten set it is
+# compared with, and the quadratic SNAP models trained on each (one of
+# the three models the paper selects for its transferability analysis).
+# The neural-network models on bispectrum descriptors are not encoded
+# (method identity, see gaps). Errors are shown as figures. Read from the
+# arXiv preprint (v2).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-montesdeoca2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Montes de Oca Zapiain et al. (2022): training data selection for accuracy and transferability of interatomic potentials" ;
+    mlips:reportedIn entity:article-montesdeoca2022 .
+
+entity:article-montesdeoca2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-022-00872-x> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "Training data selection for accuracy and transferability of interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0001-7890-0859> ,
+        entity:person-Wood-montesdeoca2022 ,
+        <https://orcid.org/0000-0002-9001-9973> ,
+        <https://orcid.org/0000-0001-8474-6341> ,
+        <https://orcid.org/0000-0002-0324-9114> ,
+        <https://orcid.org/0000-0003-3028-5249> .
+
+<https://orcid.org/0000-0001-7890-0859> a schema:Person ;
+    schema:name "David Montes de Oca Zapiain" ;
+    schema:givenName "David" ;
+    schema:familyName "Montes de Oca Zapiain" ;
+    schema:identifier <https://orcid.org/0000-0001-7890-0859> .
+
+entity:person-Wood-montesdeoca2022 a schema:Person ;
+    schema:name "Mitchell A. Wood" ;
+    schema:givenName "Mitchell A." ;
+    schema:familyName "Wood" .
+
+<https://orcid.org/0000-0002-9001-9973> a schema:Person ;
+    schema:name "Nicholas Lubbers" ;
+    schema:givenName "Nicholas" ;
+    schema:familyName "Lubbers" ;
+    schema:identifier <https://orcid.org/0000-0002-9001-9973> .
+
+<https://orcid.org/0000-0001-8474-6341> a schema:Person ;
+    schema:name "Carlos Z. Pereyra" ;
+    schema:givenName "Carlos Z." ;
+    schema:familyName "Pereyra" ;
+    schema:identifier <https://orcid.org/0000-0001-8474-6341> .
+
+<https://orcid.org/0000-0002-0324-9114> a schema:Person ;
+    schema:name "Aidan P. Thompson" ;
+    schema:givenName "Aidan P." ;
+    schema:familyName "Thompson" ;
+    schema:identifier <https://orcid.org/0000-0002-0324-9114> .
+
+<https://orcid.org/0000-0003-3028-5249> a schema:Person ;
+    schema:name "Danny Perez" ;
+    schema:givenName "Danny" ;
+    schema:familyName "Perez" ;
+    schema:identifier <https://orcid.org/0000-0003-3028-5249> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-W-EM-montesdeoca2022 a mlips:MaterialSystem ;
+    rdfs:label "Tungsten: entropy-maximised and entropy-minimised configurations (largely amorphous or defective crystalline)" ;
+    mlips:chemicalFormula "W" ;
+    mlips:materialClass "Elemental metal" .
+
+entity:mat-W-DE-montesdeoca2022 a mlips:MaterialSystem ;
+    rdfs:label "Tungsten: expert-curated configurations (domain-expertise set)" ;
+    mlips:chemicalFormula "W" ;
+    mlips:materialClass "Elemental metal" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-montesdeoca2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-montesdeoca2022 mlips:hasDFTSettings entity:calc-settings-dft-montesdeoca2022 .
+
+entity:calc-settings-dft-montesdeoca2022 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-GGA-functional-not-named-montesdeoca2022 ;
+    mlips:energyCutoff "600"^^xsd:double ;
+    mlips:kPointMesh "2x2x2 Monkhorst-Pack grid" ;
+    rdfs:comment "SCF threshold 1e-8 eV; the same cutoff and k-point grid for all configurations, which the authors call an approximation made to automate labelling." .
+
+entity:xc-GGA-functional-not-named-montesdeoca2022 a mlips:XCFunctional ;
+    rdfs:label "GGA (functional not named)" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-EM-montesdeoca2022 a mlips:TrainingDataset ;
+    rdfs:label "Entropy-optimised tungsten data set (223,660 configurations, more than 7e6 atomic environments; 70% / 10% / 20% train / validation / test)" ;
+    mlips:coversMaterial entity:mat-W-EM-montesdeoca2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 223660 ;
+    mlips:hasDFTCalculation entity:calc-dft-montesdeoca2022 ;
+    rdfs:comment "The count is the whole data set. Training considers total energies of configurations (stated for the neural networks)." .
+
+entity:ds-DE-montesdeoca2022 a mlips:TrainingDataset ;
+    rdfs:label "Domain-expertise tungsten data set (70% / 10% / 20% split)" ;
+    mlips:coversMaterial entity:mat-W-DE-montesdeoca2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and reference settings were not captured from the text read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-EM-montesdeoca2022 mlips:samplingStrategy
+    entity:sampling-entropy-montesdeoca2022 .
+
+entity:ds-DE-montesdeoca2022 mlips:samplingStrategy
+    entity:sampling-expert-montesdeoca2022 .
+
+entity:sampling-entropy-montesdeoca2022 a mlips:SamplingStrategy ;
+    rdfs:label "Diverse-by-construction sampling: annealing or minimisation on an effective potential V = V_repulsive - K S({D}), with S the entropy of bispectrum descriptors; half of the configurations entropy-maximised (K < 0 in the paper's figure) and half entropy-minimised; no curation and no reweighting" .
+
+entity:sampling-expert-montesdeoca2022 a mlips:SamplingStrategy ;
+    rdfs:label "Expert-curated tungsten data set built with domain expertise (from earlier SNAP work)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:qSNAP a mlips:MLIPMethod ;
+    rdfs:label "Quadratic Spectral Neighbor Analysis Potential (qSNAP)" ;
+    mlips:hasFunctionalForm entity:ff-qSNAP ;
+    mlips:hasTrainingAlgorithm entity:alg-qSNAP-montesdeoca2022 ;
+    mlips:hasHyperparameter entity:hp-jmax-montesdeoca2022 ,
+        entity:hp-num-descriptors-montesdeoca2022 ,
+        entity:hp-num-parameters-montesdeoca2022 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ff-qSNAP a mlips:FunctionalForm ;
+    rdfs:label "Atomic energy as a linear function of the bispectrum components plus all their distinct pairwise products" .
+
+entity:alg-qSNAP-montesdeoca2022 a mls:Algorithm ;
+    rdfs:label "Linear regression on bispectrum components and their pairwise products (convex loss)" .
+
+entity:hp-jmax-montesdeoca2022 a mlips:Hyperparameter ;
+    rdfs:label "Bispectrum angular momentum limit J_max" ;
+    mlips:hyperparameterName "jmax" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-descriptors-montesdeoca2022 a mlips:Hyperparameter ;
+    rdfs:label "Number of bispectrum components D" ;
+    mlips:hyperparameterName "num_descriptors" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-montesdeoca2022 a mlips:Hyperparameter ;
+    rdfs:label "Number of free parameters (degrees of freedom)" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-qsnap-EM-jmax-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-montesdeoca2022 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-qsnap-EM-num-descriptors-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-descriptors-montesdeoca2022 ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-qsnap-EM-num-parameters-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-montesdeoca2022 ;
+    mlips:settingValue "495"^^xsd:integer .
+
+entity:setting-qsnap-DE-jmax-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-jmax-montesdeoca2022 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-qsnap-DE-num-descriptors-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-descriptors-montesdeoca2022 ;
+    mlips:settingValue "30"^^xsd:integer .
+
+entity:setting-qsnap-DE-num-parameters-montesdeoca2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-montesdeoca2022 ;
+    mlips:settingValue "495"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-qsnap-EM-montesdeoca2022 a mlips:MLIPRun ;
+    rdfs:label "Quadratic SNAP trained on the entropy-optimised set" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-EM-montesdeoca2022 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-EM-jmax-montesdeoca2022 ,
+        entity:setting-qsnap-EM-num-descriptors-montesdeoca2022 ,
+        entity:setting-qsnap-EM-num-parameters-montesdeoca2022 ;
+    mlips:produces entity:model-qsnap-EM-montesdeoca2022 .
+
+entity:model-qsnap-EM-montesdeoca2022 a mlips:TrainedModel ;
+    rdfs:label "Quadratic SNAP for W (EM data)" .
+
+entity:run-qsnap-DE-montesdeoca2022 a mlips:MLIPRun ;
+    rdfs:label "Quadratic SNAP trained on the domain-expertise set" ;
+    mlips:appliesMethod entity:qSNAP ;
+    mlips:runsOn entity:ds-DE-montesdeoca2022 ;
+    mlips:hasHyperparameterSetting entity:setting-qsnap-DE-jmax-montesdeoca2022 ,
+        entity:setting-qsnap-DE-num-descriptors-montesdeoca2022 ,
+        entity:setting-qsnap-DE-num-parameters-montesdeoca2022 ;
+    mlips:produces entity:model-qsnap-DE-montesdeoca2022 .
+
+entity:model-qsnap-DE-montesdeoca2022 a mlips:TrainedModel ;
+    rdfs:label "Quadratic SNAP for W (DE data)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: validation RMSEs are shown against the number of parameters (Fig. 3), with only approximate saturation values in the text (about 1e-2 eV/atom on the EM set and about 4e-3 eV/atom on the DE set); the cross-set transferability errors are distributions (Fig. 4).
+# - Decision wanted: the paper's main models are feed-forward neural networks on bispectrum descriptors (ten architectures, types A and B; NN-A1 with 383 and NN-B1 with 3965 parameters at J_max = 3; 800 epochs, Adam). They are neither SNAP nor a symmetry-function HDNNP, so they match no registry method; as with the comparison network of purjapun2019, no method was minted for them and they are not encoded. Linear SNAP models are also part of the sweep and are not encoded as separate runs.
+# - Read from the arXiv v2 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
