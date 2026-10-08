@@ -1,0 +1,266 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yuzhi Zhang et al. (2020). DP-GEN: A concurrent learning platform for the generation of reliable deep learning based potential energy models.
+#   Computer Physics Communications. doi:10.1016/j.cpc.2020.107206  arXiv:1910.12690v1
+#
+# Version read: arxiv-preprint arXiv:1910.12690v1 (sha256 f04791ff076d491a...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 41 (Software/implementation). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the DP-GEN software paper. Its worked example, a Deep
+# Potential model for copper generated in 48 DP-GEN iterations, is
+# encoded: reference settings, exploration strategy, training settings
+# and the final productive model. Validation is by material properties
+# (Tables I and II, figures), with no energy/force error printed.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2020dpgen a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2020): DP-GEN, a concurrent learning platform for generating deep-learning potential energy models (copper example)" ;
+    mlips:reportedIn entity:article-zhang2020dpgen .
+
+entity:article-zhang2020dpgen a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.cpc.2020.107206> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "DP-GEN: A concurrent learning platform for the generation of reliable deep learning based potential energy models" ;
+    schema:author <https://orcid.org/0000-0002-5841-1107> ,
+        <https://orcid.org/0000-0003-4768-2136> ,
+        <https://orcid.org/0000-0003-3657-2943> ,
+        <https://orcid.org/0000-0002-1515-8172> ,
+        entity:person-Zhang-zhang2020dpgen ,
+        entity:person-Wang-zhang2020dpgen ,
+        entity:person-E-zhang2020dpgen .
+
+<https://orcid.org/0000-0002-5841-1107> a schema:Person ;
+    schema:name "Yuzhi Zhang" ;
+    schema:givenName "Yuzhi" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0002-5841-1107> .
+
+<https://orcid.org/0000-0003-4768-2136> a schema:Person ;
+    schema:name "Haidi Wang" ;
+    schema:givenName "Haidi" ;
+    schema:familyName "Wang" ;
+    schema:identifier <https://orcid.org/0000-0003-4768-2136> .
+
+<https://orcid.org/0000-0003-3657-2943> a schema:Person ;
+    schema:name "Weijie Chen" ;
+    schema:givenName "Weijie" ;
+    schema:familyName "Chen" ;
+    schema:identifier <https://orcid.org/0000-0003-3657-2943> .
+
+<https://orcid.org/0000-0002-1515-8172> a schema:Person ;
+    schema:name "Jinzhe Zeng" ;
+    schema:givenName "Jinzhe" ;
+    schema:familyName "Zeng" ;
+    schema:identifier <https://orcid.org/0000-0002-1515-8172> .
+
+entity:person-Zhang-zhang2020dpgen a schema:Person ;
+    schema:name "Linfeng Zhang" ;
+    schema:givenName "Linfeng" ;
+    schema:familyName "Zhang" .
+
+entity:person-Wang-zhang2020dpgen a schema:Person ;
+    schema:name "Han Wang" ;
+    schema:givenName "Han" ;
+    schema:familyName "Wang" .
+
+entity:person-E-zhang2020dpgen a schema:Person ;
+    schema:name "Weinan E" ;
+    schema:givenName "Weinan" ;
+    schema:familyName "E" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Cu-zhang2020dpgen a mlips:MaterialSystem ;
+    rdfs:label "Copper: fcc, hcp and bcc bulk and surface configurations up to high temperature and pressure" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "Elemental fcc metal" ;
+    mlips:microstructuralFeature "Surfaces along (100), (110), (111) for fcc and (100), (001), (110) for hcp" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhang2020dpgen a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhang2020dpgen mlips:hasDFTSettings entity:calc-settings-dft-zhang2020dpgen .
+
+entity:calc-settings-dft-zhang2020dpgen a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:energyCutoff "650"^^xsd:double ;
+    mlips:kPointMesh "Monkhorst-Pack mesh with spacing 0.1 A^-1" ;
+    rdfs:comment "VASP 5.4.4; SCF stops when total-energy and band-structure-energy differences are below 1e-6 eV. An additional calculation of a single Cu atom in a 19 A box is duplicated 200 times in the training data." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Cu-zhang2020dpgen a mlips:TrainingDataset ;
+    rdfs:label "DP-GEN copper data set (7646 labelled configurations)" ;
+    mlips:coversMaterial entity:mat-Cu-zhang2020dpgen ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Virials ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 7646 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020dpgen ;
+    rdfs:comment "numConfigurations is the number of configurations selected for labelling during the 48 iterations; the initial AIMD frames and the 200 copies of the isolated atom come on top." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Cu-zhang2020dpgen mlips:samplingStrategy
+    entity:sampling-initial-perturbation-zhang2020dpgen ,
+    entity:sampling-dpmd-exploration-zhang2020dpgen ,
+    entity:sampling-surfaces-zhang2020dpgen .
+
+entity:sampling-initial-perturbation-zhang2020dpgen a mlips:SamplingStrategy ;
+    rdfs:label "Random perturbation and short AIMD of compressed supercells" ;
+    rdfs:comment "Relaxed 2x2x2 fcc, hcp and bcc supercells scaled by 0.84 to 1.00, atomic positions perturbed by 0.01 A and cell vectors by 3%; 20-step canonical AIMD at 50 K on the perturbed structures." .
+
+entity:sampling-dpmd-exploration-zhang2020dpgen a mlips:SamplingStrategy ;
+    rdfs:label "Deep Potential MD exploration with model-deviation selection (DP-GEN)" ;
+    rdfs:comment "LAMMPS MD with four DP models differing in random seed; configurations with maximal force deviation between the trust levels 0.05 and 0.20 eV/A are candidates. 48 iterations; of 25 million explored configurations 7646 (0.03%) were labelled. At most 300 (bulk) or 100 (surface) candidates per structure and iteration." .
+
+entity:sampling-surfaces-zhang2020dpgen a mlips:SamplingStrategy ;
+    rdfs:label "Surface configurations from rigidly displaced crystalline halves" ;
+    rdfs:comment "Two crystalline halves displaced along the listed crystallographic directions with vacuum thickness from 0.5 A to 9 A, explored in the NVT ensemble." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-zhang2020dpgen ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-rcut-smooth-zhang2020dpgen ,
+        entity:hp-embedding-net-zhang2020dpgen ,
+        entity:hp-fitting-net-zhang2020dpgen ,
+        entity:hp-training-steps-zhang2020dpgen ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-DeePMD-zhang2020dpgen ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-DeePMD-zhang2020dpgen a mls:Algorithm ;
+    rdfs:label "Adam with exponentially decaying learning rate from 1.0e-3 to 3.5e-8; four models with different random seeds per DP-GEN iteration (400,000 steps each), final productive model with 8,000,000 steps" .
+
+entity:impl-DeePMD-zhang2020dpgen a mlips:Implementation ;
+    mlips:implementedIn mlips:DeePMDkit ;
+    mlips:version "driven by DP-GEN, with LAMMPS for exploration" .
+
+entity:hp-embedding-net-zhang2020dpgen a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential embedding network sizes" ;
+    mlips:hyperparameterName "embedding_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-fitting-net-zhang2020dpgen a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential fitting network sizes" ;
+    mlips:hyperparameterName "fitting_net" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-training-steps-zhang2020dpgen a mlips:Hyperparameter ;
+    rdfs:label "Number of training steps" ;
+    mlips:hyperparameterName "training_steps" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-rcut-smooth-zhang2020dpgen a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential smoothing start radius (Angstrom)" ;
+    mlips:hyperparameterName "rcut_smth" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-Cu-cutoffRadius-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-dp-Cu-rcut-smooth-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-rcut-smooth-zhang2020dpgen ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-dp-Cu-embedding-net-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-embedding-net-zhang2020dpgen ;
+    mlips:settingValue "25-50-100 (ResNet-like)" .
+
+entity:setting-dp-Cu-fitting-net-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-fitting-net-zhang2020dpgen ;
+    mlips:settingValue "240-240-240" .
+
+entity:setting-dp-Cu-training-steps-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-training-steps-zhang2020dpgen ;
+    mlips:settingValue "8000000"^^xsd:integer .
+
+entity:setting-dp-Cu-learningRate-zhang2020dpgen a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-Cu-zhang2020dpgen a mlips:MLIPRun ;
+    rdfs:label "Productive Deep Potential (smooth edition) training for copper on the DP-GEN data set" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-Cu-zhang2020dpgen ;
+    mlips:hasHyperparameterSetting entity:setting-dp-Cu-cutoffRadius-zhang2020dpgen ,
+        entity:setting-dp-Cu-rcut-smooth-zhang2020dpgen ,
+        entity:setting-dp-Cu-embedding-net-zhang2020dpgen ,
+        entity:setting-dp-Cu-fitting-net-zhang2020dpgen ,
+        entity:setting-dp-Cu-training-steps-zhang2020dpgen ,
+        entity:setting-dp-Cu-learningRate-zhang2020dpgen ;
+    mlips:trainingHardware "Single Tesla P100 GPU per training or exploration task (labelling on 28-core Intel Xeon Gold 5117 CPUs)" ;
+    mlips:produces entity:model-dp-Cu-zhang2020dpgen .
+
+entity:model-dp-Cu-zhang2020dpgen a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for copper (DP-GEN, 48 iterations)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Training and exploration used a single Tesla P100 card per task and
+# labelling ran on Intel Xeon Gold 5117 CPUs (28 cores); no time is given.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No energy or force RMSE/MAE is printed. The model is validated on properties (atomization energy, equilibrium volume, elastic constants, vacancy and interstitial formation energies, surface energies, stacking-fault energies, phonons, equation of state; Tables I and II) against DFT and a MEAM potential; these have no MetricProperty.
+# - The loss prefactors are those of the DeePMD-kit defaults referenced through the DP-GEN parameter file and are not printed.
+# - DP-GEN itself (scheduler, task dispatcher, machine settings) is workflow software and is not an mlips:Library of the method; it is named in the implementation version string only.
+# - Phonon and other property calculations are listed among the tests, but which code computed them was not captured, so only MolecularDynamics is asserted as demonstrated simulation type.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
