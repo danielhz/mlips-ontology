@@ -1,0 +1,210 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Justin S. Smith et al. (2020). The ANI-1ccx and ANI-1x data sets, coupled-cluster and density functional theory properties for molecules.
+#   Scientific Data. doi:10.1038/s41597-020-0473-z
+#
+# Version read: publisher (sha256 40d5f3f9a586b611...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 132 (Dataset/benchmark). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a data descriptor for two data sets of organic
+# molecules (C, H, N, O): ANI-1x (about 5 million DFT calculations from
+# active learning) and ANI-1ccx (about 500 thousand points at an
+# approximate CCSD(T)/CBS level). The data sets and their reference
+# levels are encoded; no potential is trained in this paper.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-smith2020 a mlips:BenchmarkStudy ;
+    rdfs:label "Smith et al. (2020): the ANI-1ccx and ANI-1x data sets, coupled-cluster and DFT properties for molecules" ;
+    mlips:reportedIn entity:article-smith2020 .
+
+entity:article-smith2020 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41597-020-0473-z> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "The ANI-1ccx and ANI-1x data sets, coupled-cluster and density functional theory properties for molecules" ;
+    schema:author <https://orcid.org/0000-0001-7314-7896> ,
+        entity:person-Zubatyuk-smith2020 ,
+        entity:person-Nebgen-smith2020 ,
+        entity:person-Lubbers-smith2020 ,
+        entity:person-Barros-smith2020 ,
+        entity:person-Roitberg-smith2020 ,
+        <https://orcid.org/0000-0001-7581-8497> ,
+        <https://orcid.org/0000-0001-5547-3647> .
+
+<https://orcid.org/0000-0001-7314-7896> a schema:Person ;
+    schema:name "Justin S. Smith" ;
+    schema:givenName "Justin S." ;
+    schema:familyName "Smith" ;
+    schema:identifier <https://orcid.org/0000-0001-7314-7896> .
+
+entity:person-Zubatyuk-smith2020 a schema:Person ;
+    schema:name "Roman Zubatyuk" ;
+    schema:givenName "Roman" ;
+    schema:familyName "Zubatyuk" .
+
+entity:person-Nebgen-smith2020 a schema:Person ;
+    schema:name "Benjamin Nebgen" ;
+    schema:givenName "Benjamin" ;
+    schema:familyName "Nebgen" .
+
+entity:person-Lubbers-smith2020 a schema:Person ;
+    schema:name "Nicholas Lubbers" ;
+    schema:givenName "Nicholas" ;
+    schema:familyName "Lubbers" .
+
+entity:person-Barros-smith2020 a schema:Person ;
+    schema:name "Kipton Barros" ;
+    schema:givenName "Kipton" ;
+    schema:familyName "Barros" .
+
+entity:person-Roitberg-smith2020 a schema:Person ;
+    schema:name "Adrian E. Roitberg" ;
+    schema:givenName "Adrian E." ;
+    schema:familyName "Roitberg" .
+
+<https://orcid.org/0000-0001-7581-8497> a schema:Person ;
+    schema:name "Olexandr Isayev" ;
+    schema:givenName "Olexandr" ;
+    schema:familyName "Isayev" ;
+    schema:identifier <https://orcid.org/0000-0001-7581-8497> .
+
+<https://orcid.org/0000-0001-5547-3647> a schema:Person ;
+    schema:name "Sergei Tretiak" ;
+    schema:givenName "Sergei" ;
+    schema:familyName "Tretiak" ;
+    schema:identifier <https://orcid.org/0000-0001-5547-3647> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-organic-CHNO-smith2020 a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules with C, H, N, O (ANI-1x / ANI-1ccx chemical space)" ;
+    mlips:materialClass "Small organic molecules, dimers and peptide fragments; equilibrium and non-equilibrium conformations" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q174211> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-smith2020 a mlips:DFTCalculation .
+
+entity:calc-cc-smith2020 a mlips:WaveFunctionCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-smith2020 mlips:hasDFTSettings entity:calc-settings-dft-smith2020 .
+
+entity:calc-settings-dft-smith2020 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:Gaussian ;
+    mlips:xcFunctional mlips:omegaB97X ;
+    mlips:dftBasisSet entity:basis-6-31G-d-smith2020 ;
+    rdfs:comment "omegaB97x/6-31G(d), the level of the ANI-1x active-learning data; a subset is also provided at omegaB97x/def2-TZVPP (from the text of the data descriptor; settings as in smith2018)." .
+
+entity:calc-cc-smith2020 mlips:hasWaveFunctionSettings entity:calc-settings-cc-smith2020 .
+
+entity:calc-settings-cc-smith2020 a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode mlips:ORCA ;
+    mlips:wfMethod mlips:DLPNO_CCSDT ;
+    mlips:basisSet "composite CBS extrapolation with cc-pVDZ, cc-pVTZ and cc-pVQZ" ;
+    rdfs:comment "CCSD(T)*/CBS composite scheme: DLPNO-CCSD(T)/cc-pVTZ with NormalPNO, a TightPNO-NormalPNO correction at cc-pVDZ, MP2 correlation extrapolated from cc-pVTZ and cc-pVQZ, and HF/CBS from cc-pVTZ and cc-pVQZ." .
+
+entity:basis-6-31G-d-smith2020 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(d)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ANI-1x-smith2020 a mlips:TrainingDataset ;
+    rdfs:label "ANI-1x data set (about 5 million DFT conformations)" ;
+    mlips:coversMaterial entity:mat-organic-CHNO-smith2020 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 5000000 ;
+    mlips:hasDFTCalculation entity:calc-dft-smith2020 ;
+    rdfs:comment "The abstract gives '5 M density functional theory calculations' (smith2018 gives 5,496,771 conformations for the same set); also provided: multipole moments, atomic charges and other properties, in an HDF5 file." .
+
+entity:ds-ANI-1ccx-smith2020 a mlips:TrainingDataset ;
+    rdfs:label "ANI-1ccx data set (about 500 thousand CCSD(T)*/CBS data points)" ;
+    mlips:coversMaterial entity:mat-organic-CHNO-smith2020 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 500000 ;
+    mlips:hasReferenceCalculation entity:calc-cc-smith2020 ;
+    rdfs:comment "The abstract gives '500 k data points'. Coupled-cluster energies only (no forces)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ANI-1x-smith2020 mlips:samplingStrategy
+    entity:sampling-active-learning-smith2020 .
+
+entity:ds-ANI-1ccx-smith2020 mlips:samplingStrategy
+    entity:sampling-active-learning-smith2020 ,
+    entity:sampling-ccx-subset-smith2020 .
+
+entity:sampling-active-learning-smith2020 a mlips:SamplingStrategy ;
+    rdfs:label "Query-by-committee active learning with several samplers" ;
+    rdfs:comment "The ANI-1x data come from the active-learning process of smith2018 (normal-mode, MD, dimer and torsion sampling with the ensemble disagreement rho as selection criterion); the torsion sampler runs relaxed scans in 10 degree steps and stores structures where the disagreement exceeds a threshold, with four perturbed copies each, over 20 iterations." .
+
+entity:sampling-ccx-subset-smith2020 a mlips:SamplingStrategy ;
+    rdfs:label "Subset of ANI-1x selected for coupled-cluster recalculation" ;
+    rdfs:comment "About 10% of the ANI-1x conformations, selected to cover the same chemical space, recomputed with the CCSD(T)*/CBS scheme." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+# No MLIP method is trained or evaluated by the paper (see Q12).
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# No training run or trained model is reported by the paper (see Q12).
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# About 14 million CPU core-hours were spent generating the data (a cost
+# of the reference calculations, not of a potential).
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Data-descriptor paper: no MLIP method, run, model or benchmark result (Q7-Q10 empty). The potentials built on these data are in smith2018 (ANI-1x) and smith2019ccx (ANI-1ccx), whose data-set nodes are separate, paper-local nodes.
+# - numConfigurations are the rounded figures of the abstract. mlips:DLPNO_CCSDT is used for the wave-function method of the composite scheme, as in smith2019ccx.
+# - The def2-TZVPP subset and the additional properties (dipoles, quadrupoles, charges, volumes) are not modelled.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
