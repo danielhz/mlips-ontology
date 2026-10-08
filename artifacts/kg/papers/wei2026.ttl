@@ -1,0 +1,243 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Zixiong Wei et al. (2026). PASS: Perturbation augmented space group structure sampling for transferable Fe-O machine learning interatomic potential.
+#   Research Square. doi:10.21203/rs.3.rs-10844125/v1  arXiv:2607.28000v1
+#
+# Version read: arxiv-preprint arXiv:2607.28000v1 (sha256 6deb387b7f097fe8...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 173 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the Fe-O ACE potential trained on the PASS data set:
+# VASP reference calculations, the composition of the training set
+# (Table 1), the sampling procedure, fitting settings and the training
+# errors stated in the text. Validation properties and MD applications
+# are not encoded. Preprint only (Research Square / arXiv v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-wei2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Wei et al. (2026): PASS, perturbation-augmented space-group structure sampling for a transferable Fe-O ACE potential" ;
+    mlips:reportedIn entity:article-wei2026 .
+
+entity:article-wei2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.21203/rs.3.rs-10844125/v1> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "PASS: Perturbation augmented space group structure sampling for transferable Fe-O machine learning interatomic potential" ;
+    schema:author entity:person-Wei-wei2026 ,
+        entity:person-Shuang-wei2026 ,
+        entity:person-Dey-wei2026 .
+
+entity:person-Wei-wei2026 a schema:Person ;
+    schema:name "Zixiong Wei" ;
+    schema:givenName "Zixiong" ;
+    schema:familyName "Wei" .
+
+entity:person-Shuang-wei2026 a schema:Person ;
+    schema:name "Fei Shuang" ;
+    schema:givenName "Fei" ;
+    schema:familyName "Shuang" .
+
+entity:person-Dey-wei2026 a schema:Person ;
+    schema:name "Poulumi Dey" ;
+    schema:givenName "Poulumi" ;
+    schema:familyName "Dey" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-FeO-wei2026 a mlips:MaterialSystem ;
+    rdfs:label "Iron-oxygen system (pure Fe, Fe-O compounds and pure O structures)" ;
+    mlips:chemicalFormula "Fe-O" ;
+    mlips:materialClass "Metal-oxide system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-wei2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-wei2026 mlips:hasDFTSettings entity:calc-settings-dft-wei2026 .
+
+entity:calc-settings-dft-wei2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred mesh with k-point spacing 0.2 per Angstrom" ;
+    rdfs:comment "Collinear spin-polarised; Gaussian smearing of 0.05 eV; SCF converged to 1e-6 eV." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-FeO-wei2026 a mlips:TrainingDataset ;
+    rdfs:label "PASS Fe-O training data set (28,091 structures)" ;
+    mlips:coversMaterial entity:mat-FeO-wei2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 28091 ;
+    mlips:hasDFTCalculation entity:calc-dft-wei2026 ;
+    rdfs:comment "Fe: 3,063 initial and 10,000 perturbed; Fe-O: 3,802 initial and 10,000 perturbed; O: 33 from OQMD and 1,193 from OMat24. Whether the O structures were recomputed at this level is not stated in the text read." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-FeO-wei2026 mlips:samplingStrategy
+    entity:sampling-pass-wei2026 ,
+    entity:sampling-external-wei2026 .
+
+entity:sampling-pass-wei2026 a mlips:SamplingStrategy ;
+    rdfs:label "PASS: space-group structures from PyXtal, stepwise relaxation (Volmin, Fullmin), rattle and stretch perturbations of the fully relaxed structures (ASSYST), SOAP descriptors reduced to 2D, farthest-point sampling of 10,000 perturbed structures each for Fe and Fe-O; no active learning" .
+
+entity:sampling-external-wei2026 a mlips:SamplingStrategy ;
+    rdfs:label "Oxygen structures taken from existing data sets (OQMD 33, OMat24 1,193)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasLossFunction entity:loss-ACE-wei2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-ACE-wei2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-num-basis-functions-wei2026 ,
+        entity:hp-num-parameters-wei2026 ,
+        entity:hp-force-energy-weight-wei2026 ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-ACE-wei2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:NudgedElasticBand .
+
+entity:loss-ACE-wei2026 a mlips:LossFunction ;
+    rdfs:label "Energy and force loss with force-to-energy weight ratio 1e-2; L1 and L2 regularisation coefficients 1e-8" .
+
+entity:alg-ACE-wei2026 a mls:Algorithm ;
+    rdfs:label "BFGS for 4,000 steps; Finnis-Sinclair-type non-linear embedding; simplified spherical Bessel radial functions" .
+
+entity:impl-ACE-wei2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:PACE ;
+    mlips:version "trained with PACEMAKER" .
+
+entity:hp-num-basis-functions-wei2026 a mlips:Hyperparameter ;
+    rdfs:label "Number of ACE B-basis functions per element" ;
+    mlips:hyperparameterName "num_basis_functions" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-wei2026 a mlips:Hyperparameter ;
+    rdfs:label "Number of fitted parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-force-energy-weight-wei2026 a mlips:Hyperparameter ;
+    rdfs:label "Force-to-energy weight ratio in the loss" ;
+    mlips:hyperparameterName "kappa" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-FeO-cutoffRadius-wei2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-FeO-num-basis-functions-wei2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-basis-functions-wei2026 ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-FeO-num-parameters-wei2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-wei2026 ;
+    mlips:settingValue "4448"^^xsd:integer .
+
+entity:setting-FeO-force-energy-weight-wei2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-energy-weight-wei2026 ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-FeO-numEpochs-wei2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "4000"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-FeO-wei2026 a mlips:MLIPRun ;
+    rdfs:label "ACE training for Fe-O on the PASS data set" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-FeO-wei2026 ;
+    mlips:hasHyperparameterSetting entity:setting-FeO-cutoffRadius-wei2026 ,
+        entity:setting-FeO-num-basis-functions-wei2026 ,
+        entity:setting-FeO-num-parameters-wei2026 ,
+        entity:setting-FeO-force-energy-weight-wei2026 ,
+        entity:setting-FeO-numEpochs-wei2026 ;
+    mlips:produces entity:model-FeO-wei2026 .
+
+entity:model-FeO-wei2026 a mlips:TrainedModel ;
+    rdfs:label "ACE potential for Fe-O (PASS)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-wei2026 mlips:hasResult
+    entity:result-train-wei2026 .
+
+entity:result-train-wei2026 a mlips:BenchmarkResult ;
+    rdfs:comment "Training errors over a data set that deliberately includes strongly perturbed structures; no test-set error is given in the text read." ;
+    mlips:evaluatesModel entity:model-FeO-wei2026 ;
+    mlips:targetMaterial entity:mat-FeO-wei2026 ;
+    mlips:hasAccuracyMetric entity:metric-train-1-wei2026 ,
+        entity:metric-train-2-wei2026 .
+
+entity:metric-train-1-wei2026 a mlips:AccuracyMetric ;
+    rdfs:label "Mean absolute training error, energy" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31.89"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-train-2-wei2026 a mlips:AccuracyMetric ;
+    rdfs:label "Mean absolute training error, force" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "120.52"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - numEpochs holds the 4,000 BFGS steps (the vocabulary has no optimiser-step hyperparameter). The implementation is recorded as the vocabulary library PACE; the text names PACEMAKER for the fit.
+# - Validation against DFT for point defects and surfaces (Table 2), bulk properties (Table 3), diffusion barriers (CI-NEB), oxygen diffusivity and the surface-oxidation MD are not encoded (no metric property). NudgedElasticBand is recorded because diffusion barriers are computed with the potential; to be removed if those barriers are DFT-only.
+# - Preprint only; the manifest DOI is the Research Square record and the text was read from the arXiv v1 PDF.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
