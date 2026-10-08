@@ -1,0 +1,785 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Bingqing Cheng et al. (2024). Cartesian atomic cluster expansion for machine learning interatomic potentials.
+#   npj Computational Materials. doi:10.1038/s41524-024-01332-4  arXiv:2402.07472v3
+#
+# Version read: arxiv-preprint arXiv:2402.07472v3 (sha256 b236f28b24322d53...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 4 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the CACE method and the five CACE fits of the paper
+# (liquid water with T=0 and T=1, MD17 ethanol, 3BPA, HEA25), plus the
+# comparison models the author trained on the water data set (NequIP,
+# DeepMD, MACE, a BPNN with N2P2). Errors quoted from other papers in
+# Tables I-IV are not results of this study and are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-cheng2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Cheng (2024): Cartesian atomic cluster expansion (CACE)" ;
+    mlips:reportedIn entity:article-cheng2024 .
+
+entity:article-cheng2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01332-4> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Cartesian atomic cluster expansion for machine learning interatomic potentials" ;
+    schema:author <https://orcid.org/0000-0002-3584-9632> .
+
+<https://orcid.org/0000-0002-3584-9632> a schema:Person ;
+    schema:name "Bingqing Cheng" ;
+    schema:givenName "Bingqing" ;
+    schema:familyName "Cheng" ;
+    schema:identifier <https://orcid.org/0000-0002-3584-9632> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-water-cheng2024 a mlips:MaterialSystem ;
+    rdfs:label "Bulk liquid water" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+entity:mat-ethanol-cheng2024 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule (MD17)" ;
+    mlips:chemicalFormula "C2H6O" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-3BPA-cheng2024 a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA) molecule" ;
+    mlips:materialClass "Flexible drug-like organic molecule (gas phase)" .
+
+entity:mat-HEA25-cheng2024 a mlips:MaterialSystem ;
+    rdfs:label "25-element d-block transition-metal high-entropy alloys (HEA25)" ;
+    mlips:materialClass "High-entropy alloy; distorted bcc and fcc crystalline structures of 36 or 48 atoms" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-water-dft-cheng2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-water-dft-cheng2024 mlips:hasDFTSettings entity:calc-settings-water-dft-cheng2024 .
+
+entity:calc-settings-water-dft-cheng2024 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-revPBE0-D3-cheng2024 ;
+    rdfs:comment "revPBE0-D3 level of DFT, as stated for the water data set of Ref. [37]; code and numerical settings are not given in this paper." .
+
+entity:xc-revPBE0-D3-cheng2024 a mlips:XCFunctional ;
+    rdfs:label "revPBE0-D3" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-water-cheng2024 a mlips:TrainingDataset ;
+    rdfs:label "Liquid water data set (1,593 configurations of 64 molecules)" ;
+    mlips:coversMaterial entity:mat-water-cheng2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1593 ;
+    mlips:hasDFTCalculation entity:calc-water-dft-cheng2024 ;
+    rdfs:comment "From Ref. [37] (github.com/BingqingCheng/ab-initio-thermodynamics-of-water); 90% of the data used for training." .
+
+entity:ds-ethanol-cheng2024 a mlips:TrainingDataset ;
+    rdfs:label "MD17 ethanol subset (1,000 structures)" ;
+    mlips:coversMaterial entity:mat-ethanol-cheng2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    rdfs:comment "90% train / 10% validation split; tested on another 10,000 random structures." .
+
+entity:ds-3BPA-cheng2024 a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set (500 structures at 300 K)" ;
+    mlips:coversMaterial entity:mat-3BPA-cheng2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 500 .
+
+entity:ds-HEA25-cheng2024 a mlips:TrainingDataset ;
+    rdfs:label "HEA25 training and validation pool (up to 24,630 structures)" ;
+    mlips:coversMaterial entity:mat-HEA25-cheng2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 24630 ;
+    rdfs:comment "The HEA25 data set has 25,630 structures; 1,000 are held out as the test set and up to the remaining 24,630 are used for training and validation." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ethanol-cheng2024 mlips:samplingStrategy
+    entity:sampling-md17-aimd-cheng2024 .
+
+entity:ds-3BPA-cheng2024 mlips:samplingStrategy
+    entity:sampling-bpa-300K-cheng2024 .
+
+entity:ds-HEA25-cheng2024 mlips:samplingStrategy
+    entity:sampling-hea-distorted-cheng2024 .
+
+entity:sampling-md17-aimd-cheng2024 a mlips:SamplingStrategy ;
+    rdfs:label "DFT molecular dynamics at 500 K (MD17)" ;
+    rdfs:comment "MD17 ethanol configurations sampled from DFT molecular dynamics at 500 K; 1,000 structures drawn at random." .
+
+entity:sampling-bpa-300K-cheng2024 a mlips:SamplingStrategy ;
+    rdfs:label "3BPA training configurations at 300 K" ;
+    rdfs:comment "500 training structures at 300 K; test data from simulations at 300 K, 600 K and 1200 K." .
+
+entity:sampling-hea-distorted-cheng2024 a mlips:SamplingStrategy ;
+    rdfs:label "Distorted crystalline HEA structures" ;
+    rdfs:comment "Distorted bcc or fcc structures of 36 or 48 atoms from the HEA25 data set of Ref. [54]." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CACE a mlips:MLIPMethod ;
+    rdfs:label "Cartesian Atomic Cluster Expansion (CACE)" ;
+    mlips:hasFunctionalForm entity:ff-CACE ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numAngularBasis ,
+        mlips:bodyOrder ,
+        mlips:numLayers ,
+        entity:hp-radial-channels-cheng2024 ,
+        entity:hp-n-embedding-cheng2024 ;
+    mlips:hasImplementation entity:impl-CACE-cheng2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ff-CACE a mlips:FunctionalForm ;
+    rdfs:label "Body-ordered atomic cluster expansion whose rotationally invariant features are built by symmetrising Cartesian angular basis functions, with optional message passing between atoms; atomic energies are summed to the total energy" .
+
+entity:impl-CACE-cheng2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-cace-cheng2024 .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numLayers .
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" .
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasImplementation entity:impl-HDNNP-cheng2024 .
+
+entity:impl-HDNNP-cheng2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-n2p2-cheng2024 .
+
+entity:lib-cace-cheng2024 a mlips:Library ;
+    rdfs:label "cace" ;
+    rdfs:comment "PyTorch implementation, https://github.com/BingqingCheng/cace; MD through ASE, no LAMMPS interface at the time of the paper." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-n2p2-cheng2024 a mlips:Library ;
+    rdfs:label "n2p2" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-radial-channels-cheng2024 a mlips:Hyperparameter ;
+    rdfs:label "CACE number of radial channels c" ;
+    mlips:hyperparameterName "c" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-n-embedding-cheng2024 a mlips:Hyperparameter ;
+    rdfs:label "CACE dimension of the element embedding N_embedding" ;
+    mlips:hyperparameterName "N_embedding" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-cace-water-T0-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-cace-water-T0-numRadialBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-cace-water-T0-radial-channels-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-cheng2024 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-cace-water-T0-numAngularBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T0-bodyOrder-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T0-n-embedding-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-cheng2024 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T0-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-cace-water-T1-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-cace-water-T1-numRadialBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-cace-water-T1-radial-channels-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-cheng2024 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-cace-water-T1-numAngularBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T1-bodyOrder-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T1-n-embedding-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-cheng2024 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-water-T1-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-cace-ethanol-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-cace-ethanol-numRadialBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-cace-ethanol-radial-channels-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-cheng2024 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-cace-ethanol-numAngularBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-cace-ethanol-bodyOrder-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-ethanol-n-embedding-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-cheng2024 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-cace-ethanol-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-cace-3BPA-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-cace-3BPA-numRadialBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-cace-3BPA-radial-channels-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-cheng2024 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-cace-3BPA-numAngularBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-cace-3BPA-bodyOrder-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-3BPA-n-embedding-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-cheng2024 ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-cace-3BPA-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-cace-HEA25-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-cace-HEA25-numAngularBasis-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numAngularBasis ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-HEA25-bodyOrder-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-HEA25-n-embedding-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-cheng2024 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-cace-HEA25-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-nequip-water-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-nequip-water-numLayers-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-deepmd-water-cutoffRadius-cheng2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-cace-water-T0-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "CACE fit to liquid water, no message passing (T=0)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-cace-water-T0-cutoffRadius-cheng2024 ,
+        entity:setting-cace-water-T0-numRadialBasis-cheng2024 ,
+        entity:setting-cace-water-T0-radial-channels-cheng2024 ,
+        entity:setting-cace-water-T0-numAngularBasis-cheng2024 ,
+        entity:setting-cace-water-T0-bodyOrder-cheng2024 ,
+        entity:setting-cace-water-T0-n-embedding-cheng2024 ,
+        entity:setting-cace-water-T0-numLayers-cheng2024 ;
+    mlips:trainingHardware "GeForce GTX 1080 Ti GPU; about two days" ;
+    mlips:produces entity:model-cace-water-T0-cheng2024 .
+
+entity:model-cace-water-T0-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "CACE water model, T=0 (24,572 trainable parameters)" .
+
+entity:run-cace-water-T1-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "CACE fit to liquid water, one message-passing layer (T=1)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-cace-water-T1-cutoffRadius-cheng2024 ,
+        entity:setting-cace-water-T1-numRadialBasis-cheng2024 ,
+        entity:setting-cace-water-T1-radial-channels-cheng2024 ,
+        entity:setting-cace-water-T1-numAngularBasis-cheng2024 ,
+        entity:setting-cace-water-T1-bodyOrder-cheng2024 ,
+        entity:setting-cace-water-T1-n-embedding-cheng2024 ,
+        entity:setting-cace-water-T1-numLayers-cheng2024 ;
+    mlips:trainingHardware "GeForce GTX 1080 Ti GPU; about two days" ;
+    mlips:produces entity:model-cace-water-T1-cheng2024 .
+
+entity:model-cace-water-T1-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "CACE water model, T=1 (69,320 trainable parameters)" ;
+    mlips:inferenceHardware "Single Nvidia A100 GPU: 24 / 8 / 3.5 / 1.7 ps of MD per hour for 1,536 / 5,184 / 12,288 / 24,000 atoms of liquid water (Table V)" .
+
+entity:run-cace-ethanol-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "CACE fit to MD17 ethanol" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-ethanol-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-cace-ethanol-cutoffRadius-cheng2024 ,
+        entity:setting-cace-ethanol-numRadialBasis-cheng2024 ,
+        entity:setting-cace-ethanol-radial-channels-cheng2024 ,
+        entity:setting-cace-ethanol-numAngularBasis-cheng2024 ,
+        entity:setting-cace-ethanol-bodyOrder-cheng2024 ,
+        entity:setting-cace-ethanol-n-embedding-cheng2024 ,
+        entity:setting-cace-ethanol-numLayers-cheng2024 ;
+    mlips:produces entity:model-cace-ethanol-cheng2024 .
+
+entity:model-cace-ethanol-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "CACE ethanol model" .
+
+entity:run-cace-3BPA-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "CACE fit to 3BPA (300 K training data)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-3BPA-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-cace-3BPA-cutoffRadius-cheng2024 ,
+        entity:setting-cace-3BPA-numRadialBasis-cheng2024 ,
+        entity:setting-cace-3BPA-radial-channels-cheng2024 ,
+        entity:setting-cace-3BPA-numAngularBasis-cheng2024 ,
+        entity:setting-cace-3BPA-bodyOrder-cheng2024 ,
+        entity:setting-cace-3BPA-n-embedding-cheng2024 ,
+        entity:setting-cace-3BPA-numLayers-cheng2024 ;
+    mlips:produces entity:model-cace-3BPA-cheng2024 .
+
+entity:model-cace-3BPA-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "CACE 3BPA model" .
+
+entity:run-cace-HEA25-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "CACE fit to HEA25" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-HEA25-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-cace-HEA25-cutoffRadius-cheng2024 ,
+        entity:setting-cace-HEA25-numAngularBasis-cheng2024 ,
+        entity:setting-cace-HEA25-bodyOrder-cheng2024 ,
+        entity:setting-cace-HEA25-n-embedding-cheng2024 ,
+        entity:setting-cace-HEA25-numLayers-cheng2024 ;
+    mlips:trainingHardware "GeForce GTX 1080 Ti GPU; about two days" ;
+    mlips:produces entity:model-cace-HEA25-cheng2024 .
+
+entity:model-cace-HEA25-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "CACE HEA25 model (91,232 trainable parameters)" .
+
+entity:run-nequip-water-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "NequIP comparison fit to liquid water (trained by the author)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-nequip-water-cutoffRadius-cheng2024 ,
+        entity:setting-nequip-water-numLayers-cheng2024 ;
+    mlips:produces entity:model-nequip-water-cheng2024 .
+
+entity:model-nequip-water-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "NequIP water model (4.5 A, T=3)" ;
+    mlips:inferenceHardware "Single Nvidia A100 GPU: 20 / 7 / 3 / 1.65 ps of MD per hour for 1,536 / 5,184 / 12,288 / 24,000 atoms (Table V)" .
+
+entity:run-deepmd-water-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "DeepMD comparison fit to liquid water (trained by the author)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:hasHyperparameterSetting entity:setting-deepmd-water-cutoffRadius-cheng2024 ;
+    mlips:produces entity:model-deepmd-water-cheng2024 .
+
+entity:model-deepmd-water-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "DeepMD water model (6 A)" .
+
+entity:run-mace-water-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "MACE comparison fit to liquid water (trained by the author)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:produces entity:model-mace-water-cheng2024 .
+
+entity:model-mace-water-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "MACE water model trained in this work" .
+
+entity:run-bpnn-water-cheng2024 a mlips:MLIPRun ;
+    rdfs:label "BPNN comparison fit to liquid water with N2P2 (trained by the author)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-water-cheng2024 ;
+    mlips:produces entity:model-bpnn-water-cheng2024 .
+
+entity:model-bpnn-water-cheng2024 a mlips:TrainedModel ;
+    rdfs:label "BPNN (N2P2) water model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-cheng2024 mlips:hasResult
+    entity:result-cace-water-T0-cheng2024 ,
+    entity:result-cace-water-T1-cheng2024 ,
+    entity:result-nequip-water-cheng2024 ,
+    entity:result-deepmd-water-cheng2024 ,
+    entity:result-mace-water-cheng2024 ,
+    entity:result-bpnn-water-cheng2024 ,
+    entity:result-cace-ethanol-cheng2024 ,
+    entity:result-cace-3BPA-300K-cheng2024 ,
+    entity:result-cace-3BPA-600K-cheng2024 ,
+    entity:result-cace-3BPA-1200K-cheng2024 ,
+    entity:result-cace-HEA25-test-cheng2024 ,
+    entity:result-cace-HEA25-substitute-cheng2024 ,
+    entity:result-cace-HEA25-5000K-cheng2024 .
+
+entity:result-cace-water-T0-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-water-T0-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-water-T0-1-cheng2024 ,
+        entity:metric-cace-water-T0-2-cheng2024 .
+
+entity:metric-cace-water-T0-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy per water molecule, in meV/H2O: CACE 5.5 A, T=0" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.49"^^xsd:double .
+
+entity:metric-cace-water-T0-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on forces: CACE 5.5 A, T=0" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "79"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-water-T1-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-water-T1-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-water-T1-1-cheng2024 ,
+        entity:metric-cace-water-T1-2-cheng2024 .
+
+entity:metric-cace-water-T1-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy per water molecule, in meV/H2O: CACE 5.5 A, T=1" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.77"^^xsd:double .
+
+entity:metric-cace-water-T1-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on forces: CACE 5.5 A, T=1" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-nequip-water-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-nequip-water-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-nequip-water-1-cheng2024 ,
+        entity:metric-nequip-water-2-cheng2024 .
+
+entity:metric-nequip-water-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy per water molecule, in meV/H2O: NequIP 4.5 A, T=3" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.8"^^xsd:double .
+
+entity:metric-nequip-water-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on forces: NequIP 4.5 A, T=3" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-deepmd-water-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-deepmd-water-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-deepmd-water-1-cheng2024 ,
+        entity:metric-deepmd-water-2-cheng2024 .
+
+entity:metric-deepmd-water-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on energy per water molecule, in meV/H2O: DeepMD 6 A" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.3"^^xsd:double .
+
+entity:metric-deepmd-water-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Validation RMSE on forces: DeepMD 6 A" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "92"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mace-water-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-water-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-mace-water-1-cheng2024 ,
+        entity:metric-mace-water-2-cheng2024 .
+
+entity:metric-mace-water-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy per water molecule, in meV/H2O: MACE trained in this work" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.9"^^xsd:double .
+
+entity:metric-mace-water-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: MACE trained in this work" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "46.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-bpnn-water-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-bpnn-water-cheng2024 ;
+    mlips:targetMaterial entity:mat-water-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-bpnn-water-1-cheng2024 ,
+        entity:metric-bpnn-water-2-cheng2024 .
+
+entity:metric-bpnn-water-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy per water molecule, in meV/H2O: BPNN trained with N2P2 in this work" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.8"^^xsd:double .
+
+entity:metric-bpnn-water-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: BPNN trained with N2P2 in this work" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "108"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-ethanol-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-ethanol-cheng2024 ;
+    mlips:targetMaterial entity:mat-ethanol-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-ethanol-1-cheng2024 ,
+        entity:metric-cace-ethanol-2-cheng2024 .
+
+entity:metric-cace-ethanol-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CACE, MD17 ethanol, 1,000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.37"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-ethanol-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CACE, MD17 ethanol, 1,000 training configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-3BPA-300K-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-3BPA-cheng2024 ;
+    mlips:targetMaterial entity:mat-3BPA-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-3BPA-300K-1-cheng2024 ,
+        entity:metric-cace-3BPA-300K-2-cheng2024 .
+
+entity:metric-cace-3BPA-300K-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "6.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-3BPA-300K-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "21.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-3BPA-600K-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-3BPA-cheng2024 ;
+    mlips:targetMaterial entity:mat-3BPA-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-3BPA-600K-1-cheng2024 ,
+        entity:metric-cace-3BPA-600K-2-cheng2024 .
+
+entity:metric-cace-3BPA-600K-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "18"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-3BPA-600K-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "45.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-3BPA-1200K-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-3BPA-cheng2024 ;
+    mlips:targetMaterial entity:mat-3BPA-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-3BPA-1200K-1-cheng2024 ,
+        entity:metric-cace-3BPA-1200K-2-cheng2024 .
+
+entity:metric-cace-3BPA-1200K-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-3BPA-1200K-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "113.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-HEA25-test-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-HEA25-cheng2024 ;
+    mlips:targetMaterial entity:mat-HEA25-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-HEA25-test-1-cheng2024 ,
+        entity:metric-cace-HEA25-test-2-cheng2024 .
+
+entity:metric-cace-HEA25-test-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: CACE, HEA25 (unit as printed: meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.28"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-HEA25-test-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: CACE, HEA25" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "111"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-HEA25-substitute-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-HEA25-cheng2024 ;
+    mlips:targetMaterial entity:mat-HEA25-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-HEA25-substitute-1-cheng2024 ,
+        entity:metric-cace-HEA25-substitute-2-cheng2024 .
+
+entity:metric-cace-HEA25-substitute-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on substitution energy: CACE, HEA25 structures with unseen Re and Os (unit as printed: meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "8.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-HEA25-substitute-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: CACE, HEA25 structures with unseen Re and Os" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "124"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-cace-HEA25-5000K-cheng2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cace-HEA25-cheng2024 ;
+    mlips:targetMaterial entity:mat-HEA25-cheng2024 ;
+    mlips:hasAccuracyMetric entity:metric-cace-HEA25-5000K-1-cheng2024 ,
+        entity:metric-cace-HEA25-5000K-2-cheng2024 .
+
+entity:metric-cace-HEA25-5000K-1-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: CACE, HEA25 configurations from a 5000 K trajectory (unit as printed: meV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "15.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-cace-HEA25-5000K-2-cheng2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: CACE, HEA25 configurations from a 5000 K trajectory" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "233"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Training of the water and HEA25 models took about two days on a GeForce
+# GTX 1080 Ti (trainingHardware); the small-molecule fits ran on a laptop
+# within one or two days. MD speed on one Nvidia A100 (Table V) is recorded
+# as inferenceHardware on the CACE T=1 and NequIP water models.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Loss function, optimizer, learning rate and number of epochs are not stated.
+# - Energy errors for water are per water molecule (meV/H2O), which has no unit individual: mlips:hasUnit is omitted and the unit is in the label.
+# - Table II (ethanol) prints seven energy values for nine columns; the last value of each row is read as CACE (E 2.37 meV, F 7.0 meV/A), consistent with the text. Worth a check against the version of record.
+# - Table IV prints energy errors for HEA25 in meV; whether they are per atom is not stated.
+# - The reference method is stated only for water (revPBE0-D3); the DFT levels of MD17, 3BPA and HEA25 are not given in this paper, so those data sets carry no reference calculation.
+# - For the HEA25 fit the number of radial functions and channels is not stated. The settings of the MACE and N2P2 comparison fits are not stated; the MACE value in Table I (1.9 / 36.2) is quoted from Ref. [18], the model trained here has 1.9 / 46.8.
+# - MD stability (ps) and water diffusivity cannot be encoded as metrics.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
