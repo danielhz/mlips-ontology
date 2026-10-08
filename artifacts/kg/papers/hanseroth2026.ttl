@@ -1,0 +1,2339 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jonas Hänseroth et al. (2026). Fine-Tuning Unifies Foundational Machine-Learned Interatomic Potential Architectures at ab initio Accuracy.
+#   The Journal of Physical Chemistry Letters. doi:10.1021/acs.jpclett.5c03801  arXiv:2511.05337v1
+#
+# Version read: arxiv-preprint arXiv:2511.05337v1 (sha256 0bbac1bda60bbffe...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 164 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the 35 fine-tuning runs (five frameworks, MACE, GRACE,
+# SevenNet, MatterSim and ORB, on seven systems), each with its
+# hyperparameters (SI Table S4), fine-tuning cost (Table S2) and force and
+# energy errors after fine-tuning (Table S1). The zero-shot errors of the
+# foundation models are kept in comments. Read from the arXiv preprint
+# (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-hanseroth2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Haenseroth et al. (2026): fine-tuning unifies foundational MLIP architectures at ab initio accuracy" ;
+    mlips:reportedIn entity:article-hanseroth2026 .
+
+entity:article-hanseroth2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jpclett.5c03801> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Fine-Tuning Unifies Foundational Machine-Learned Interatomic Potential Architectures at ab initio Accuracy" ;
+    schema:author <https://orcid.org/0009-0003-8324-6160> ,
+        entity:person-Flototto-hanseroth2026 ,
+        <https://orcid.org/0000-0003-4167-3116> ,
+        <https://orcid.org/0000-0002-0145-1263> .
+
+<https://orcid.org/0009-0003-8324-6160> a schema:Person ;
+    schema:name "Jonas Hänseroth" ;
+    schema:givenName "Jonas" ;
+    schema:familyName "Hänseroth" ;
+    schema:identifier <https://orcid.org/0009-0003-8324-6160> .
+
+entity:person-Flototto-hanseroth2026 a schema:Person ;
+    schema:name "Aaron Flötotto" ;
+    schema:givenName "Aaron" ;
+    schema:familyName "Flötotto" .
+
+<https://orcid.org/0000-0003-4167-3116> a schema:Person ;
+    schema:name "Muhammad Nawaz Qaisrani" ;
+    schema:givenName "Muhammad Nawaz" ;
+    schema:familyName "Qaisrani" ;
+    schema:identifier <https://orcid.org/0000-0003-4167-3116> .
+
+<https://orcid.org/0000-0002-0145-1263> a schema:Person ;
+    schema:name "Christian Dreßler" ;
+    schema:givenName "Christian" ;
+    schema:familyName "Dreßler" ;
+    schema:identifier <https://orcid.org/0000-0002-0145-1263> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CDP-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "CsH2PO4 (solid acid proton conductor)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-CPP-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "Cs7(H4PO4)(H2PO4)8 (solid acid)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-PyroNH4-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "L-pyroglutamate ammonium (organic molecular crystal with short hydrogen bonds)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-PhOH-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "Phenol in water (388 atoms)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-KOH-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "Aqueous KOH solution (288 atoms)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-Li13Si4-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "Li13Si4 (lithium silicide, 204 atoms)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+entity:mat-MoS2-hanseroth2026 a mlips:MaterialSystem ;
+    rdfs:label "1H-MoS2 with sulfur vacancies (106 atoms)" ;
+    mlips:materialClass "Fine-tuning benchmark system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-hanseroth2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-hanseroth2026 mlips:hasDFTSettings entity:calc-settings-dft-hanseroth2026 .
+
+entity:calc-settings-dft-hanseroth2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-CP2K-hanseroth2026 ;
+    mlips:xcFunctional entity:xc-BLYP-or-PBE-chosen-per-system-hanseroth2026 ;
+    mlips:pseudopotentialType mlips:NormConserving ;
+    mlips:dftBasisSet entity:basis-DZVP-MOLOPT-hanseroth2026 ;
+    rdfs:comment "Goedecker-Teter-Hutter pseudopotentials." .
+
+entity:lib-CP2K-hanseroth2026 a mlips:Library ;
+    rdfs:label "CP2K" ;
+    rdfs:comment "CP2K 2025.1, Born-Oppenheimer AIMD." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-BLYP-or-PBE-chosen-per-system-hanseroth2026 a mlips:XCFunctional ;
+    rdfs:label "BLYP or PBE (chosen per system)" ;
+    rdfs:comment "The text names both functionals without assigning them to systems." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-DZVP-MOLOPT-hanseroth2026 a mlips:DftBasisSet ;
+    rdfs:label "DZVP-MOLOPT" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-CDP-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "CsH2PO4: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-CPP-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "Cs7(H4PO4)(H2PO4)8: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-PyroNH4-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "L-pyroglutamate-NH4: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-PhOH-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "PhOH in H2O: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-KOH-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "KOH in H2O: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-Li13Si4-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "Li13Si4: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+entity:ds-MoS2-hanseroth2026 a mlips:TrainingDataset ;
+    rdfs:label "MoS2: 2000 AIMD configurations (70-90% used for training, the rest for validation and testing)" ;
+    mlips:coversMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 2000 ;
+    mlips:hasDFTCalculation entity:calc-dft-hanseroth2026 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-CDP-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-CPP-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-PyroNH4-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-PhOH-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-KOH-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-Li13Si4-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:ds-MoS2-hanseroth2026 mlips:samplingStrategy
+    entity:sampling-aimd-hanseroth2026 .
+
+entity:sampling-aimd-hanseroth2026 a mlips:SamplingStrategy ;
+    rdfs:label "Every 100th frame of Born-Oppenheimer AIMD trajectories at the target temperature (300-600 K depending on the system); no active learning" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-hanseroth2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-hanseroth2026 ,
+        mlips:learningRate ,
+        entity:hp-force-weight-hanseroth2026 ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-MACE-hanseroth2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-MACE-hanseroth2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning of a pretrained foundation model on system-specific AIMD data (aMACEing Toolkit workflow)" .
+
+entity:impl-MACE-hanseroth2026 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "mace-torch 0.3.10" .
+
+entity:GRACE a mlips:MLIPMethod ;
+    rdfs:label "Graph Atomic Cluster Expansion (GRACE)" ;
+    mlips:hasFunctionalForm entity:ff-GRACE ;
+    mlips:hasTrainingAlgorithm entity:alg-GRACE-hanseroth2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-hanseroth2026 ,
+        mlips:learningRate ,
+        entity:hp-force-weight-hanseroth2026 ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-GRACE-hanseroth2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ff-GRACE a mlips:FunctionalForm ;
+    rdfs:label "Graph extension of the atomic cluster expansion with star- and tree-like many-body basis functions; one-layer models use star-graph ACE basis functions, two-layer models add semi-local interactions through equivariant message passing; atomic energies are summed to the total energy" .
+
+entity:alg-GRACE-hanseroth2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning of a pretrained foundation model on system-specific AIMD data (aMACEing Toolkit workflow)" .
+
+entity:impl-GRACE-hanseroth2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-GRACE-tensorpotential-hanseroth2026 .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasTrainingAlgorithm entity:alg-NequIP-hanseroth2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-hanseroth2026 ,
+        mlips:learningRate ,
+        entity:hp-force-weight-hanseroth2026 ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-NequIP-hanseroth2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-NequIP-hanseroth2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning of a pretrained foundation model on system-specific AIMD data (aMACEing Toolkit workflow)" .
+
+entity:impl-NequIP-hanseroth2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SevenNet-hanseroth2026 .
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:hasTrainingAlgorithm entity:alg-M3GNet-hanseroth2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-hanseroth2026 ,
+        mlips:learningRate ,
+        entity:hp-force-weight-hanseroth2026 ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-M3GNet-hanseroth2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-M3GNet-hanseroth2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning of a pretrained foundation model on system-specific AIMD data (aMACEing Toolkit workflow)" .
+
+entity:impl-M3GNet-hanseroth2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-MatterSim-hanseroth2026 .
+
+entity:ORB a mlips:MLIPMethod ;
+    rdfs:label "Orb (graph network simulator universal interatomic potential)" ;
+    mlips:hasTrainingAlgorithm entity:alg-ORB-hanseroth2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-hanseroth2026 ,
+        mlips:learningRate ,
+        entity:hp-force-weight-hanseroth2026 ,
+        mlips:batchSize ,
+        mlips:numEpochs ;
+    mlips:hasImplementation entity:impl-ORB-hanseroth2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-ORB-hanseroth2026 a mls:Algorithm ;
+    rdfs:label "Fine-tuning of a pretrained foundation model on system-specific AIMD data (aMACEing Toolkit workflow)" .
+
+entity:impl-ORB-hanseroth2026 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-orb-models-hanseroth2026 .
+
+entity:lib-GRACE-tensorpotential-hanseroth2026 a mlips:Library ;
+    rdfs:label "GRACE tensorpotential" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-SevenNet-hanseroth2026 a mlips:Library ;
+    rdfs:label "SevenNet" ;
+    rdfs:comment "SevenNet 0.11.2; SevenNet models are encoded under the registry method NequIP." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-MatterSim-hanseroth2026 a mlips:Library ;
+    rdfs:label "MatterSim" ;
+    rdfs:comment "MatterSim 1.1.2; MatterSim models are encoded under the registry method M3GNet." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-orb-models-hanseroth2026 a mlips:Library ;
+    rdfs:label "orb-models" ;
+    rdfs:comment "ORB 0.3.2." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-initialisation-hanseroth2026 a mlips:Hyperparameter ;
+    rdfs:label "Foundation model the fine-tuning starts from" ;
+    mlips:hyperparameterName "initialisation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-force-weight-hanseroth2026 a mlips:Hyperparameter ;
+    rdfs:label "Force weight (force-to-energy loss ratio)" ;
+    mlips:hyperparameterName "force_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-MACE-CDP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-CDP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-CDP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-MACE-CDP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-CDP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-CDP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-CDP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-GRACE-CDP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "150"^^xsd:integer .
+
+entity:setting-GRACE-CDP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-CDP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2000"^^xsd:integer .
+
+entity:setting-SevenNet-CDP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-CDP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-SevenNet-CDP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-SevenNet-CDP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SevenNet-CDP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "250"^^xsd:integer .
+
+entity:setting-MatterSim-CDP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-CDP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-CDP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-MatterSim-CDP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-CDP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-CDP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-CDP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-CDP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-ORB-CDP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-CDP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1650"^^xsd:integer .
+
+entity:setting-MACE-CPP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-CPP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-CPP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-MACE-CPP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-CPP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-CPP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-CPP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-GRACE-CPP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-GRACE-CPP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-CPP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "2500"^^xsd:integer .
+
+entity:setting-SevenNet-CPP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-CPP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.004"^^xsd:double .
+
+entity:setting-SevenNet-CPP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-SevenNet-CPP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SevenNet-CPP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "300"^^xsd:integer .
+
+entity:setting-MatterSim-CPP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-CPP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-CPP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-MatterSim-CPP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-CPP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-CPP-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-CPP-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-CPP-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-ORB-CPP-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-CPP-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "400"^^xsd:integer .
+
+entity:setting-MACE-PyroNH4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-PyroNH4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-PyroNH4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-MACE-PyroNH4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-PyroNH4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-PyroNH4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-PyroNH4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-GRACE-PyroNH4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-GRACE-PyroNH4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-PyroNH4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-SevenNet-PyroNH4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-PyroNH4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-SevenNet-PyroNH4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-SevenNet-PyroNH4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SevenNet-PyroNH4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-MatterSim-PyroNH4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-PyroNH4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-PyroNH4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-MatterSim-PyroNH4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-PyroNH4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-PyroNH4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-PyroNH4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-PyroNH4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-ORB-PyroNH4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-PyroNH4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "400"^^xsd:integer .
+
+entity:setting-MACE-PhOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-PhOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-PhOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-MACE-PhOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-PhOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-PhOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-PhOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-GRACE-PhOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-GRACE-PhOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-PhOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-SevenNet-PhOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-PhOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.004"^^xsd:double .
+
+entity:setting-SevenNet-PhOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-SevenNet-PhOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SevenNet-PhOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "400"^^xsd:integer .
+
+entity:setting-MatterSim-PhOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-PhOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-PhOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.25"^^xsd:double .
+
+entity:setting-MatterSim-PhOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-PhOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-PhOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-PhOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0002"^^xsd:double .
+
+entity:setting-ORB-PhOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.25"^^xsd:double .
+
+entity:setting-ORB-PhOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-ORB-PhOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "800"^^xsd:integer .
+
+entity:setting-MACE-KOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-KOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-KOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-MACE-KOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-KOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-KOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-KOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-GRACE-KOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-GRACE-KOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-KOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-SevenNet-KOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-KOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-SevenNet-KOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-SevenNet-KOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SevenNet-KOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-MatterSim-KOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-KOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-KOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-MatterSim-KOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-KOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-KOH-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-KOH-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-KOH-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-ORB-KOH-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-KOH-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-MACE-Li13Si4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-Li13Si4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-Li13Si4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-MACE-Li13Si4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-Li13Si4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-Li13Si4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-Li13Si4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-GRACE-Li13Si4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-GRACE-Li13Si4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-Li13Si4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-SevenNet-Li13Si4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-Li13Si4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.004"^^xsd:double .
+
+entity:setting-SevenNet-Li13Si4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-SevenNet-Li13Si4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-SevenNet-Li13Si4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-MatterSim-Li13Si4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-Li13Si4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0005"^^xsd:double .
+
+entity:setting-MatterSim-Li13Si4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-MatterSim-Li13Si4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-Li13Si4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "350"^^xsd:integer .
+
+entity:setting-ORB-Li13Si4-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-Li13Si4-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-Li13Si4-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.75"^^xsd:double .
+
+entity:setting-ORB-Li13Si4-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-Li13Si4-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1250"^^xsd:integer .
+
+entity:setting-MACE-MoS2-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MACE-MP-0" .
+
+entity:setting-MACE-MoS2-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-MACE-MoS2-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-MACE-MoS2-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-MoS2-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "200"^^xsd:integer .
+
+entity:setting-GRACE-MoS2-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "GRACE-1L-OAM" .
+
+entity:setting-GRACE-MoS2-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-GRACE-MoS2-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-GRACE-MoS2-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-GRACE-MoS2-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1000"^^xsd:integer .
+
+entity:setting-SevenNet-MoS2-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "SevenNet-0" .
+
+entity:setting-SevenNet-MoS2-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-SevenNet-MoS2-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-SevenNet-MoS2-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-SevenNet-MoS2-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "400"^^xsd:integer .
+
+entity:setting-MatterSim-MoS2-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "MatterSim Large" .
+
+entity:setting-MatterSim-MoS2-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-MatterSim-MoS2-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-MatterSim-MoS2-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MatterSim-MoS2-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "500"^^xsd:integer .
+
+entity:setting-ORB-MoS2-initialisation-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-hanseroth2026 ;
+    mlips:settingValue "ORB-v2" .
+
+entity:setting-ORB-MoS2-learningRate-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.0003"^^xsd:double .
+
+entity:setting-ORB-MoS2-force-weight-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-force-weight-hanseroth2026 ;
+    mlips:settingValue "0.5"^^xsd:double .
+
+entity:setting-ORB-MoS2-batchSize-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-ORB-MoS2-numEpochs-hanseroth2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "750"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-MACE-CDP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on CsH2PO4" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-CDP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-CDP-initialisation-hanseroth2026 ,
+        entity:setting-MACE-CDP-learningRate-hanseroth2026 ,
+        entity:setting-MACE-CDP-force-weight-hanseroth2026 ,
+        entity:setting-MACE-CDP-batchSize-hanseroth2026 ,
+        entity:setting-MACE-CDP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 134.0 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-CDP-hanseroth2026 .
+
+entity:model-MACE-CDP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on CsH2PO4" .
+
+entity:run-GRACE-CDP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on CsH2PO4" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-CDP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-CDP-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-CDP-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-CDP-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-CDP-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-CDP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 40.9 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-CDP-hanseroth2026 .
+
+entity:model-GRACE-CDP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on CsH2PO4" .
+
+entity:run-SevenNet-CDP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on CsH2PO4" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-CDP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-CDP-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-CDP-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-CDP-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-CDP-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-CDP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 373.0 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-CDP-hanseroth2026 .
+
+entity:model-SevenNet-CDP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on CsH2PO4" .
+
+entity:run-MatterSim-CDP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on CsH2PO4" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-CDP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-CDP-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-CDP-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-CDP-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-CDP-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-CDP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 342.1 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-CDP-hanseroth2026 .
+
+entity:model-MatterSim-CDP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on CsH2PO4" .
+
+entity:run-ORB-CDP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on CsH2PO4" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-CDP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-CDP-initialisation-hanseroth2026 ,
+        entity:setting-ORB-CDP-learningRate-hanseroth2026 ,
+        entity:setting-ORB-CDP-force-weight-hanseroth2026 ,
+        entity:setting-ORB-CDP-batchSize-hanseroth2026 ,
+        entity:setting-ORB-CDP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 77.7 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-CDP-hanseroth2026 .
+
+entity:model-ORB-CDP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on CsH2PO4" .
+
+entity:run-MACE-CPP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on Cs7(H4PO4)(H2PO4)8" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-CPP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-CPP-initialisation-hanseroth2026 ,
+        entity:setting-MACE-CPP-learningRate-hanseroth2026 ,
+        entity:setting-MACE-CPP-force-weight-hanseroth2026 ,
+        entity:setting-MACE-CPP-batchSize-hanseroth2026 ,
+        entity:setting-MACE-CPP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 167.0 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-CPP-hanseroth2026 .
+
+entity:model-MACE-CPP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on Cs7(H4PO4)(H2PO4)8" .
+
+entity:run-GRACE-CPP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on Cs7(H4PO4)(H2PO4)8" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-CPP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-CPP-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-CPP-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-CPP-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-CPP-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-CPP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 36.7 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-CPP-hanseroth2026 .
+
+entity:model-GRACE-CPP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on Cs7(H4PO4)(H2PO4)8" .
+
+entity:run-SevenNet-CPP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on Cs7(H4PO4)(H2PO4)8" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-CPP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-CPP-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-CPP-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-CPP-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-CPP-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-CPP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 364.7 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-CPP-hanseroth2026 .
+
+entity:model-SevenNet-CPP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on Cs7(H4PO4)(H2PO4)8" .
+
+entity:run-MatterSim-CPP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on Cs7(H4PO4)(H2PO4)8" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-CPP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-CPP-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-CPP-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-CPP-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-CPP-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-CPP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 456.0 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-CPP-hanseroth2026 .
+
+entity:model-MatterSim-CPP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on Cs7(H4PO4)(H2PO4)8" .
+
+entity:run-ORB-CPP-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on Cs7(H4PO4)(H2PO4)8" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-CPP-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-CPP-initialisation-hanseroth2026 ,
+        entity:setting-ORB-CPP-learningRate-hanseroth2026 ,
+        entity:setting-ORB-CPP-force-weight-hanseroth2026 ,
+        entity:setting-ORB-CPP-batchSize-hanseroth2026 ,
+        entity:setting-ORB-CPP-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 108.0 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-CPP-hanseroth2026 .
+
+entity:model-ORB-CPP-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on Cs7(H4PO4)(H2PO4)8" .
+
+entity:run-MACE-PyroNH4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on L-pyroglutamate-NH4" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-PyroNH4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-PyroNH4-initialisation-hanseroth2026 ,
+        entity:setting-MACE-PyroNH4-learningRate-hanseroth2026 ,
+        entity:setting-MACE-PyroNH4-force-weight-hanseroth2026 ,
+        entity:setting-MACE-PyroNH4-batchSize-hanseroth2026 ,
+        entity:setting-MACE-PyroNH4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 37.5 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-PyroNH4-hanseroth2026 .
+
+entity:model-MACE-PyroNH4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on L-pyroglutamate-NH4" .
+
+entity:run-GRACE-PyroNH4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on L-pyroglutamate-NH4" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-PyroNH4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-PyroNH4-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-PyroNH4-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-PyroNH4-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-PyroNH4-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-PyroNH4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 12.2 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-PyroNH4-hanseroth2026 .
+
+entity:model-GRACE-PyroNH4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on L-pyroglutamate-NH4" .
+
+entity:run-SevenNet-PyroNH4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on L-pyroglutamate-NH4" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-PyroNH4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-PyroNH4-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-PyroNH4-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-PyroNH4-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-PyroNH4-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-PyroNH4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 188.5 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-PyroNH4-hanseroth2026 .
+
+entity:model-SevenNet-PyroNH4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on L-pyroglutamate-NH4" .
+
+entity:run-MatterSim-PyroNH4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on L-pyroglutamate-NH4" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-PyroNH4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-PyroNH4-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-PyroNH4-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-PyroNH4-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-PyroNH4-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-PyroNH4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 128.0 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-PyroNH4-hanseroth2026 .
+
+entity:model-MatterSim-PyroNH4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on L-pyroglutamate-NH4" .
+
+entity:run-ORB-PyroNH4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on L-pyroglutamate-NH4" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-PyroNH4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-PyroNH4-initialisation-hanseroth2026 ,
+        entity:setting-ORB-PyroNH4-learningRate-hanseroth2026 ,
+        entity:setting-ORB-PyroNH4-force-weight-hanseroth2026 ,
+        entity:setting-ORB-PyroNH4-batchSize-hanseroth2026 ,
+        entity:setting-ORB-PyroNH4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 44.0 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-PyroNH4-hanseroth2026 .
+
+entity:model-ORB-PyroNH4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on L-pyroglutamate-NH4" .
+
+entity:run-MACE-PhOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on PhOH in H2O" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-PhOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-PhOH-initialisation-hanseroth2026 ,
+        entity:setting-MACE-PhOH-learningRate-hanseroth2026 ,
+        entity:setting-MACE-PhOH-force-weight-hanseroth2026 ,
+        entity:setting-MACE-PhOH-batchSize-hanseroth2026 ,
+        entity:setting-MACE-PhOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 42.3 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-PhOH-hanseroth2026 .
+
+entity:model-MACE-PhOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on PhOH in H2O" .
+
+entity:run-GRACE-PhOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on PhOH in H2O" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-PhOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-PhOH-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-PhOH-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-PhOH-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-PhOH-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-PhOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 16.8 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-PhOH-hanseroth2026 .
+
+entity:model-GRACE-PhOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on PhOH in H2O" .
+
+entity:run-SevenNet-PhOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on PhOH in H2O" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-PhOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-PhOH-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-PhOH-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-PhOH-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-PhOH-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-PhOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 45.5 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-PhOH-hanseroth2026 .
+
+entity:model-SevenNet-PhOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on PhOH in H2O" .
+
+entity:run-MatterSim-PhOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on PhOH in H2O" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-PhOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-PhOH-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-PhOH-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-PhOH-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-PhOH-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-PhOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 45.4 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-PhOH-hanseroth2026 .
+
+entity:model-MatterSim-PhOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on PhOH in H2O" .
+
+entity:run-ORB-PhOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on PhOH in H2O" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-PhOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-PhOH-initialisation-hanseroth2026 ,
+        entity:setting-ORB-PhOH-learningRate-hanseroth2026 ,
+        entity:setting-ORB-PhOH-force-weight-hanseroth2026 ,
+        entity:setting-ORB-PhOH-batchSize-hanseroth2026 ,
+        entity:setting-ORB-PhOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 8.8 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-PhOH-hanseroth2026 .
+
+entity:model-ORB-PhOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on PhOH in H2O" .
+
+entity:run-MACE-KOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on KOH in H2O" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-KOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-KOH-initialisation-hanseroth2026 ,
+        entity:setting-MACE-KOH-learningRate-hanseroth2026 ,
+        entity:setting-MACE-KOH-force-weight-hanseroth2026 ,
+        entity:setting-MACE-KOH-batchSize-hanseroth2026 ,
+        entity:setting-MACE-KOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 85.0 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-KOH-hanseroth2026 .
+
+entity:model-MACE-KOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on KOH in H2O" .
+
+entity:run-GRACE-KOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on KOH in H2O" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-KOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-KOH-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-KOH-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-KOH-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-KOH-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-KOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 26.1 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-KOH-hanseroth2026 .
+
+entity:model-GRACE-KOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on KOH in H2O" .
+
+entity:run-SevenNet-KOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on KOH in H2O" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-KOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-KOH-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-KOH-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-KOH-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-KOH-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-KOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 359.2 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-KOH-hanseroth2026 .
+
+entity:model-SevenNet-KOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on KOH in H2O" .
+
+entity:run-MatterSim-KOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on KOH in H2O" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-KOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-KOH-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-KOH-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-KOH-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-KOH-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-KOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 338.0 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-KOH-hanseroth2026 .
+
+entity:model-MatterSim-KOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on KOH in H2O" .
+
+entity:run-ORB-KOH-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on KOH in H2O" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-KOH-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-KOH-initialisation-hanseroth2026 ,
+        entity:setting-ORB-KOH-learningRate-hanseroth2026 ,
+        entity:setting-ORB-KOH-force-weight-hanseroth2026 ,
+        entity:setting-ORB-KOH-batchSize-hanseroth2026 ,
+        entity:setting-ORB-KOH-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 150.5 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-KOH-hanseroth2026 .
+
+entity:model-ORB-KOH-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on KOH in H2O" .
+
+entity:run-MACE-Li13Si4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on Li13Si4" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-Li13Si4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-Li13Si4-initialisation-hanseroth2026 ,
+        entity:setting-MACE-Li13Si4-learningRate-hanseroth2026 ,
+        entity:setting-MACE-Li13Si4-force-weight-hanseroth2026 ,
+        entity:setting-MACE-Li13Si4-batchSize-hanseroth2026 ,
+        entity:setting-MACE-Li13Si4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 67.0 min per 100 epochs" ;
+    mlips:produces entity:model-MACE-Li13Si4-hanseroth2026 .
+
+entity:model-MACE-Li13Si4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on Li13Si4" .
+
+entity:run-GRACE-Li13Si4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on Li13Si4" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-Li13Si4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-Li13Si4-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-Li13Si4-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-Li13Si4-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-Li13Si4-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-Li13Si4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 21.0 min per 100 epochs" ;
+    mlips:produces entity:model-GRACE-Li13Si4-hanseroth2026 .
+
+entity:model-GRACE-Li13Si4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on Li13Si4" .
+
+entity:run-SevenNet-Li13Si4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on Li13Si4" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-Li13Si4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-Li13Si4-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-Li13Si4-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-Li13Si4-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-Li13Si4-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-Li13Si4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 164.0 min per 100 epochs" ;
+    mlips:produces entity:model-SevenNet-Li13Si4-hanseroth2026 .
+
+entity:model-SevenNet-Li13Si4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on Li13Si4" .
+
+entity:run-MatterSim-Li13Si4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on Li13Si4" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-Li13Si4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-Li13Si4-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-Li13Si4-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-Li13Si4-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-Li13Si4-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-Li13Si4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 178.6 min per 100 epochs" ;
+    mlips:produces entity:model-MatterSim-Li13Si4-hanseroth2026 .
+
+entity:model-MatterSim-Li13Si4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on Li13Si4" .
+
+entity:run-ORB-Li13Si4-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on Li13Si4" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-Li13Si4-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-Li13Si4-initialisation-hanseroth2026 ,
+        entity:setting-ORB-Li13Si4-learningRate-hanseroth2026 ,
+        entity:setting-ORB-Li13Si4-force-weight-hanseroth2026 ,
+        entity:setting-ORB-Li13Si4-batchSize-hanseroth2026 ,
+        entity:setting-ORB-Li13Si4-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "One NVIDIA A100 GPU; 58.7 min per 100 epochs" ;
+    mlips:produces entity:model-ORB-Li13Si4-hanseroth2026 .
+
+entity:model-ORB-Li13Si4-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on Li13Si4" .
+
+entity:run-MACE-MoS2-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MACE-MP-0 fine-tuned on MoS2" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-MoS2-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-MoS2-initialisation-hanseroth2026 ,
+        entity:setting-MACE-MoS2-learningRate-hanseroth2026 ,
+        entity:setting-MACE-MoS2-force-weight-hanseroth2026 ,
+        entity:setting-MACE-MoS2-batchSize-hanseroth2026 ,
+        entity:setting-MACE-MoS2-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPU" ;
+    mlips:produces entity:model-MACE-MoS2-hanseroth2026 .
+
+entity:model-MACE-MoS2-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 fine-tuned on MoS2" .
+
+entity:run-GRACE-MoS2-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on MoS2" ;
+    mlips:appliesMethod entity:GRACE ;
+    mlips:runsOn entity:ds-MoS2-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-GRACE-MoS2-initialisation-hanseroth2026 ,
+        entity:setting-GRACE-MoS2-learningRate-hanseroth2026 ,
+        entity:setting-GRACE-MoS2-force-weight-hanseroth2026 ,
+        entity:setting-GRACE-MoS2-batchSize-hanseroth2026 ,
+        entity:setting-GRACE-MoS2-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPU" ;
+    mlips:produces entity:model-GRACE-MoS2-hanseroth2026 .
+
+entity:model-GRACE-MoS2-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "GRACE-1L-OAM fine-tuned on MoS2" .
+
+entity:run-SevenNet-MoS2-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "SevenNet-0 fine-tuned on MoS2" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-MoS2-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-SevenNet-MoS2-initialisation-hanseroth2026 ,
+        entity:setting-SevenNet-MoS2-learningRate-hanseroth2026 ,
+        entity:setting-SevenNet-MoS2-force-weight-hanseroth2026 ,
+        entity:setting-SevenNet-MoS2-batchSize-hanseroth2026 ,
+        entity:setting-SevenNet-MoS2-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPU" ;
+    mlips:produces entity:model-SevenNet-MoS2-hanseroth2026 .
+
+entity:model-SevenNet-MoS2-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 fine-tuned on MoS2" .
+
+entity:run-MatterSim-MoS2-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "MatterSim Large fine-tuned on MoS2" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:runsOn entity:ds-MoS2-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-MatterSim-MoS2-initialisation-hanseroth2026 ,
+        entity:setting-MatterSim-MoS2-learningRate-hanseroth2026 ,
+        entity:setting-MatterSim-MoS2-force-weight-hanseroth2026 ,
+        entity:setting-MatterSim-MoS2-batchSize-hanseroth2026 ,
+        entity:setting-MatterSim-MoS2-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPU" ;
+    mlips:produces entity:model-MatterSim-MoS2-hanseroth2026 .
+
+entity:model-MatterSim-MoS2-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "MatterSim Large fine-tuned on MoS2" .
+
+entity:run-ORB-MoS2-hanseroth2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2 fine-tuned on MoS2" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-MoS2-hanseroth2026 ;
+    mlips:hasHyperparameterSetting entity:setting-ORB-MoS2-initialisation-hanseroth2026 ,
+        entity:setting-ORB-MoS2-learningRate-hanseroth2026 ,
+        entity:setting-ORB-MoS2-force-weight-hanseroth2026 ,
+        entity:setting-ORB-MoS2-batchSize-hanseroth2026 ,
+        entity:setting-ORB-MoS2-numEpochs-hanseroth2026 ;
+    mlips:trainingHardware "NVIDIA A100 GPU" ;
+    mlips:produces entity:model-ORB-MoS2-hanseroth2026 .
+
+entity:model-ORB-MoS2-hanseroth2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2 fine-tuned on MoS2" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-hanseroth2026 mlips:hasResult
+    entity:result-MACE-CDP-hanseroth2026 ,
+    entity:result-GRACE-CDP-hanseroth2026 ,
+    entity:result-SevenNet-CDP-hanseroth2026 ,
+    entity:result-MatterSim-CDP-hanseroth2026 ,
+    entity:result-ORB-CDP-hanseroth2026 ,
+    entity:result-MACE-CPP-hanseroth2026 ,
+    entity:result-GRACE-CPP-hanseroth2026 ,
+    entity:result-SevenNet-CPP-hanseroth2026 ,
+    entity:result-MatterSim-CPP-hanseroth2026 ,
+    entity:result-ORB-CPP-hanseroth2026 ,
+    entity:result-MACE-PyroNH4-hanseroth2026 ,
+    entity:result-GRACE-PyroNH4-hanseroth2026 ,
+    entity:result-SevenNet-PyroNH4-hanseroth2026 ,
+    entity:result-MatterSim-PyroNH4-hanseroth2026 ,
+    entity:result-ORB-PyroNH4-hanseroth2026 ,
+    entity:result-MACE-PhOH-hanseroth2026 ,
+    entity:result-GRACE-PhOH-hanseroth2026 ,
+    entity:result-SevenNet-PhOH-hanseroth2026 ,
+    entity:result-MatterSim-PhOH-hanseroth2026 ,
+    entity:result-ORB-PhOH-hanseroth2026 ,
+    entity:result-MACE-KOH-hanseroth2026 ,
+    entity:result-GRACE-KOH-hanseroth2026 ,
+    entity:result-SevenNet-KOH-hanseroth2026 ,
+    entity:result-MatterSim-KOH-hanseroth2026 ,
+    entity:result-ORB-KOH-hanseroth2026 ,
+    entity:result-MACE-Li13Si4-hanseroth2026 ,
+    entity:result-GRACE-Li13Si4-hanseroth2026 ,
+    entity:result-SevenNet-Li13Si4-hanseroth2026 ,
+    entity:result-MatterSim-Li13Si4-hanseroth2026 ,
+    entity:result-ORB-Li13Si4-hanseroth2026 ,
+    entity:result-MACE-MoS2-hanseroth2026 ,
+    entity:result-GRACE-MoS2-hanseroth2026 ,
+    entity:result-SevenNet-MoS2-hanseroth2026 ,
+    entity:result-MatterSim-MoS2-hanseroth2026 ,
+    entity:result-ORB-MoS2-hanseroth2026 .
+
+entity:result-MACE-CDP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.2411 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-CDP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-CDP-1-hanseroth2026 ,
+        entity:metric-MACE-CDP-2-hanseroth2026 .
+
+entity:metric-MACE-CDP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, CsH2PO4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0543"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-CDP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, CsH2PO4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00041"^^xsd:double .
+
+entity:result-GRACE-CDP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.2782 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-CDP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-CDP-1-hanseroth2026 ,
+        entity:metric-GRACE-CDP-2-hanseroth2026 .
+
+entity:metric-GRACE-CDP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, CsH2PO4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0631"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-CDP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, CsH2PO4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00017"^^xsd:double .
+
+entity:result-SevenNet-CDP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.2031 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-CDP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-CDP-1-hanseroth2026 ,
+        entity:metric-SevenNet-CDP-2-hanseroth2026 .
+
+entity:metric-SevenNet-CDP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, CsH2PO4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0316"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-CDP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, CsH2PO4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00096"^^xsd:double .
+
+entity:result-MatterSim-CDP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.196 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-CDP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-CDP-1-hanseroth2026 ,
+        entity:metric-MatterSim-CDP-2-hanseroth2026 .
+
+entity:metric-MatterSim-CDP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, CsH2PO4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.032"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-CDP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, CsH2PO4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0005"^^xsd:double .
+
+entity:result-ORB-CDP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.1916 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-CDP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CDP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-CDP-1-hanseroth2026 ,
+        entity:metric-ORB-CDP-2-hanseroth2026 .
+
+entity:metric-ORB-CDP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, CsH2PO4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0378"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-CDP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, CsH2PO4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00192"^^xsd:double .
+
+entity:result-MACE-CPP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.231 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-CPP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-CPP-1-hanseroth2026 ,
+        entity:metric-MACE-CPP-2-hanseroth2026 .
+
+entity:metric-MACE-CPP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Cs7(H4PO4)(H2PO4)8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0364"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-CPP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Cs7(H4PO4)(H2PO4)8 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00015"^^xsd:double .
+
+entity:result-GRACE-CPP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.2787 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-CPP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-CPP-1-hanseroth2026 ,
+        entity:metric-GRACE-CPP-2-hanseroth2026 .
+
+entity:metric-GRACE-CPP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Cs7(H4PO4)(H2PO4)8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0699"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-CPP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Cs7(H4PO4)(H2PO4)8 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00017"^^xsd:double .
+
+entity:result-SevenNet-CPP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.2039 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-CPP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-CPP-1-hanseroth2026 ,
+        entity:metric-SevenNet-CPP-2-hanseroth2026 .
+
+entity:metric-SevenNet-CPP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Cs7(H4PO4)(H2PO4)8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0414"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-CPP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Cs7(H4PO4)(H2PO4)8 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00077"^^xsd:double .
+
+entity:result-MatterSim-CPP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.2169 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-CPP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-CPP-1-hanseroth2026 ,
+        entity:metric-MatterSim-CPP-2-hanseroth2026 .
+
+entity:metric-MatterSim-CPP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Cs7(H4PO4)(H2PO4)8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0363"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-CPP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Cs7(H4PO4)(H2PO4)8 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00237"^^xsd:double .
+
+entity:result-ORB-CPP-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.1966 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-CPP-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-CPP-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-CPP-1-hanseroth2026 ,
+        entity:metric-ORB-CPP-2-hanseroth2026 .
+
+entity:metric-ORB-CPP-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Cs7(H4PO4)(H2PO4)8" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.048"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-CPP-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Cs7(H4PO4)(H2PO4)8 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00249"^^xsd:double .
+
+entity:result-MACE-PyroNH4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.4484 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-PyroNH4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-PyroNH4-1-hanseroth2026 ,
+        entity:metric-MACE-PyroNH4-2-hanseroth2026 .
+
+entity:metric-MACE-PyroNH4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, L-pyroglutamate-NH4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0333"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-PyroNH4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, L-pyroglutamate-NH4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00153"^^xsd:double .
+
+entity:result-GRACE-PyroNH4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.437 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-PyroNH4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-PyroNH4-1-hanseroth2026 ,
+        entity:metric-GRACE-PyroNH4-2-hanseroth2026 .
+
+entity:metric-GRACE-PyroNH4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, L-pyroglutamate-NH4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0403"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-PyroNH4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, L-pyroglutamate-NH4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00013"^^xsd:double .
+
+entity:result-SevenNet-PyroNH4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.3584 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-PyroNH4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-PyroNH4-1-hanseroth2026 ,
+        entity:metric-SevenNet-PyroNH4-2-hanseroth2026 .
+
+entity:metric-SevenNet-PyroNH4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, L-pyroglutamate-NH4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0211"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-PyroNH4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, L-pyroglutamate-NH4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00183"^^xsd:double .
+
+entity:result-MatterSim-PyroNH4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.3476 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-PyroNH4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-PyroNH4-1-hanseroth2026 ,
+        entity:metric-MatterSim-PyroNH4-2-hanseroth2026 .
+
+entity:metric-MatterSim-PyroNH4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, L-pyroglutamate-NH4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0232"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-PyroNH4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, L-pyroglutamate-NH4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0032"^^xsd:double .
+
+entity:result-ORB-PyroNH4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.3295 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-PyroNH4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PyroNH4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-PyroNH4-1-hanseroth2026 ,
+        entity:metric-ORB-PyroNH4-2-hanseroth2026 .
+
+entity:metric-ORB-PyroNH4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, L-pyroglutamate-NH4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0404"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-PyroNH4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, L-pyroglutamate-NH4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00075"^^xsd:double .
+
+entity:result-MACE-PhOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.1562 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-PhOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-PhOH-1-hanseroth2026 ,
+        entity:metric-MACE-PhOH-2-hanseroth2026 .
+
+entity:metric-MACE-PhOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, PhOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0261"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-PhOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, PhOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00052"^^xsd:double .
+
+entity:result-GRACE-PhOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.175 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-PhOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-PhOH-1-hanseroth2026 ,
+        entity:metric-GRACE-PhOH-2-hanseroth2026 .
+
+entity:metric-GRACE-PhOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, PhOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0485"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-PhOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, PhOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00022"^^xsd:double .
+
+entity:result-SevenNet-PhOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.1551 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-PhOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-PhOH-1-hanseroth2026 ,
+        entity:metric-SevenNet-PhOH-2-hanseroth2026 .
+
+entity:metric-SevenNet-PhOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, PhOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0388"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-PhOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, PhOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00312"^^xsd:double .
+
+entity:result-MatterSim-PhOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.1607 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-PhOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-PhOH-1-hanseroth2026 ,
+        entity:metric-MatterSim-PhOH-2-hanseroth2026 .
+
+entity:metric-MatterSim-PhOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, PhOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.049"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-PhOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, PhOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0094"^^xsd:double .
+
+entity:result-ORB-PhOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.1528 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-PhOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-PhOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-PhOH-1-hanseroth2026 ,
+        entity:metric-ORB-PhOH-2-hanseroth2026 .
+
+entity:metric-ORB-PhOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, PhOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0383"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-PhOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, PhOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0015"^^xsd:double .
+
+entity:result-MACE-KOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.0999 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-KOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-KOH-1-hanseroth2026 ,
+        entity:metric-MACE-KOH-2-hanseroth2026 .
+
+entity:metric-MACE-KOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, KOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0351"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-KOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, KOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00341"^^xsd:double .
+
+entity:result-GRACE-KOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.1294 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-KOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-KOH-1-hanseroth2026 ,
+        entity:metric-GRACE-KOH-2-hanseroth2026 .
+
+entity:metric-GRACE-KOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, KOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0485"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-KOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, KOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00213"^^xsd:double .
+
+entity:result-SevenNet-KOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.0851 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-KOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-KOH-1-hanseroth2026 ,
+        entity:metric-SevenNet-KOH-2-hanseroth2026 .
+
+entity:metric-SevenNet-KOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, KOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0193"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-KOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, KOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00216"^^xsd:double .
+
+entity:result-MatterSim-KOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.0954 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-KOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-KOH-1-hanseroth2026 ,
+        entity:metric-MatterSim-KOH-2-hanseroth2026 .
+
+entity:metric-MatterSim-KOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, KOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0354"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-KOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, KOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00594"^^xsd:double .
+
+entity:result-ORB-KOH-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.091 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-KOH-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-KOH-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-KOH-1-hanseroth2026 ,
+        entity:metric-ORB-KOH-2-hanseroth2026 .
+
+entity:metric-ORB-KOH-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, KOH in H2O" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0426"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-KOH-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, KOH in H2O (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00272"^^xsd:double .
+
+entity:result-MACE-Li13Si4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.1333 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-Li13Si4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-Li13Si4-1-hanseroth2026 ,
+        entity:metric-MACE-Li13Si4-2-hanseroth2026 .
+
+entity:metric-MACE-Li13Si4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Li13Si4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.022"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-Li13Si4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Li13Si4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0031"^^xsd:double .
+
+entity:result-GRACE-Li13Si4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.0923 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-Li13Si4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-Li13Si4-1-hanseroth2026 ,
+        entity:metric-GRACE-Li13Si4-2-hanseroth2026 .
+
+entity:metric-GRACE-Li13Si4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Li13Si4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.019"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-Li13Si4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Li13Si4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00143"^^xsd:double .
+
+entity:result-SevenNet-Li13Si4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.166 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-Li13Si4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-Li13Si4-1-hanseroth2026 ,
+        entity:metric-SevenNet-Li13Si4-2-hanseroth2026 .
+
+entity:metric-SevenNet-Li13Si4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Li13Si4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0151"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-Li13Si4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Li13Si4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00186"^^xsd:double .
+
+entity:result-MatterSim-Li13Si4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.1063 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-Li13Si4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-Li13Si4-1-hanseroth2026 ,
+        entity:metric-MatterSim-Li13Si4-2-hanseroth2026 .
+
+entity:metric-MatterSim-Li13Si4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Li13Si4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0313"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-Li13Si4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Li13Si4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00234"^^xsd:double .
+
+entity:result-ORB-Li13Si4-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.0861 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-Li13Si4-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-Li13Si4-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-Li13Si4-1-hanseroth2026 ,
+        entity:metric-ORB-Li13Si4-2-hanseroth2026 .
+
+entity:metric-ORB-Li13Si4-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, Li13Si4" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0327"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-Li13Si4-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, Li13Si4 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00405"^^xsd:double .
+
+entity:result-MACE-MoS2-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MACE-MP-0 without fine-tuning has a force error of 0.5103 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MACE-MoS2-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MACE-MoS2-1-hanseroth2026 ,
+        entity:metric-MACE-MoS2-2-hanseroth2026 .
+
+entity:metric-MACE-MoS2-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, MoS2" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0299"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MACE-MoS2-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, MoS2 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00109"^^xsd:double .
+
+entity:result-GRACE-MoS2-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model GRACE-1L-OAM without fine-tuning has a force error of 0.2587 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-GRACE-MoS2-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-GRACE-MoS2-1-hanseroth2026 ,
+        entity:metric-GRACE-MoS2-2-hanseroth2026 .
+
+entity:metric-GRACE-MoS2-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, MoS2" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.02299"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-GRACE-MoS2-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, MoS2 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0035"^^xsd:double .
+
+entity:result-SevenNet-MoS2-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model SevenNet-0 without fine-tuning has a force error of 0.5448 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-SevenNet-MoS2-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-SevenNet-MoS2-1-hanseroth2026 ,
+        entity:metric-SevenNet-MoS2-2-hanseroth2026 .
+
+entity:metric-SevenNet-MoS2-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, MoS2" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0284"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-SevenNet-MoS2-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, MoS2 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00013"^^xsd:double .
+
+entity:result-MatterSim-MoS2-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model MatterSim Large without fine-tuning has a force error of 0.2317 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-MatterSim-MoS2-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-MatterSim-MoS2-1-hanseroth2026 ,
+        entity:metric-MatterSim-MoS2-2-hanseroth2026 .
+
+entity:metric-MatterSim-MoS2-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, MoS2" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0175"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-MatterSim-MoS2-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, MoS2 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00023"^^xsd:double .
+
+entity:result-ORB-MoS2-hanseroth2026 a mlips:BenchmarkResult ;
+    rdfs:comment "The foundation model ORB-v2 without fine-tuning has a force error of 0.451 eV/A on the same structures." ;
+    mlips:evaluatesModel entity:model-ORB-MoS2-hanseroth2026 ;
+    mlips:targetMaterial entity:mat-MoS2-hanseroth2026 ;
+    mlips:hasAccuracyMetric entity:metric-ORB-MoS2-1-hanseroth2026 ,
+        entity:metric-ORB-MoS2-2-hanseroth2026 .
+
+entity:metric-ORB-MoS2-1-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute force error after fine-tuning, MoS2" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0431"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-ORB-MoS2-2-hanseroth2026 a mlips:AccuracyMetric ;
+    rdfs:label "Absolute energy error per atom after fine-tuning, MoS2 (eV/atom)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00136"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table S1 is headed 'absolute force and energy errors'; the methods section calls them mean absolute errors, so they are encoded as MAE. Energy errors are in eV per atom (no vocabulary unit; in the label). The foundation-model energy 'errors' (hundreds of eV per atom) are reference-energy offsets and are not encoded; the foundation-model force errors are in the result comments because the foundation models are not pinned to a release (MACE-MP-0, SevenNet-0 and MatterSim each have several registry or candidate checkpoints).
+# - Fine-tuning from a foundation model is a string-valued setting; schema 0.1.2 has no base-model relation. SevenNet runs are placed under the registry method NequIP and MatterSim runs under M3GNet, following the registry rows of SevenNet-0 and MatterSim-v1; GRACE-1L is the one-layer GRACE.
+# - The exchange-correlation functional per system (BLYP or PBE) and the exact train/validation/test split per run (70-90% training) are not given in the text read. Table S2 has no MoS2 row. Derived properties (RDFs, diffusion coefficients, autocorrelation functions) and MD timings (Table S3) are not encoded.
+# - Read from the arXiv v1 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
