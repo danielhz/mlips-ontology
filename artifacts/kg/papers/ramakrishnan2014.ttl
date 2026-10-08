@@ -1,0 +1,160 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Raghunathan Ramakrishnan et al. (2014). Quantum chemistry structures and properties of 134 kilo molecules.
+#   Scientific Data. doi:10.1038/sdata.2014.22
+#
+# Version read: publisher (sha256 b56f75a37eeb271f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 61 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the QM9 data set itself, as a data descriptor: 133,885
+# small organic molecules with equilibrium geometries and properties at
+# the B3LYP/6-31G(2df,p) level. The paper trains no interatomic
+# potential; it is in the corpus because QM9 is the benchmark that many
+# MLIP papers train on.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ramakrishnan2014 a mlips:BenchmarkStudy ;
+    rdfs:label "Ramakrishnan et al. (2014): quantum chemistry structures and properties of 134 kilo molecules (QM9)" ;
+    mlips:reportedIn entity:article-ramakrishnan2014 .
+
+entity:article-ramakrishnan2014 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/sdata.2014.22> ;
+    schema:datePublished "2014"^^xsd:gYear ;
+    schema:name "Quantum chemistry structures and properties of 134 kilo molecules" ;
+    schema:author entity:person-Ramakrishnan-ramakrishnan2014 ,
+        entity:person-Dral-ramakrishnan2014 ,
+        <https://orcid.org/0000-0002-2934-2958> ,
+        entity:person-vonLilienfeld-ramakrishnan2014 .
+
+entity:person-Ramakrishnan-ramakrishnan2014 a schema:Person ;
+    schema:name "Raghunathan Ramakrishnan" ;
+    schema:givenName "Raghunathan" ;
+    schema:familyName "Ramakrishnan" .
+
+entity:person-Dral-ramakrishnan2014 a schema:Person ;
+    schema:name "Pavlo O. Dral" ;
+    schema:givenName "Pavlo O." ;
+    schema:familyName "Dral" .
+
+<https://orcid.org/0000-0002-2934-2958> a schema:Person ;
+    schema:name "Matthias Rupp" ;
+    schema:givenName "Matthias" ;
+    schema:familyName "Rupp" ;
+    schema:identifier <https://orcid.org/0000-0002-2934-2958> .
+
+entity:person-vonLilienfeld-ramakrishnan2014 a schema:Person ;
+    schema:name "O. Anatole von Lilienfeld" ;
+    schema:givenName "O. Anatole" ;
+    schema:familyName "von Lilienfeld" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-gdb9-ramakrishnan2014 a mlips:MaterialSystem ;
+    rdfs:label "Small organic molecules of GDB-9: up to nine heavy atoms (C, N, O, F) plus hydrogen" ;
+    mlips:materialClass "Small organic molecules, equilibrium geometries; neutral, including 1,705 zwitterions" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q174211> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-ramakrishnan2014 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-ramakrishnan2014 mlips:hasDFTSettings entity:calc-settings-dft-ramakrishnan2014 .
+
+entity:calc-settings-dft-ramakrishnan2014 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:Gaussian ;
+    mlips:xcFunctional entity:xc-B3LYP-ramakrishnan2014 ;
+    mlips:dftBasisSet entity:basis-6-31G-2df-p-ramakrishnan2014 ;
+    rdfs:comment "B3LYP/6-31G(2df,p) geometry relaxations with Gaussian 09, with iteratively tightened SCF and geometry thresholds; spin-unrestricted calculations for the atoms (H, C, N, O, F) to compute atomization energies. Enthalpies of atomization are validated against higher-level methods for 100 molecules (Table 1)." .
+
+entity:xc-B3LYP-ramakrishnan2014 a mlips:XCFunctional ;
+    rdfs:label "B3LYP" ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-6-31G-2df-p-ramakrishnan2014 a mlips:DftBasisSet ;
+    rdfs:label "6-31G(2df,p)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-QM9-ramakrishnan2014 a mlips:TrainingDataset ;
+    rdfs:label "QM9 (133,885 molecules)" ;
+    mlips:coversMaterial entity:mat-gdb9-ramakrishnan2014 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 133885 ;
+    mlips:hasDFTCalculation entity:calc-dft-ramakrishnan2014 ;
+    rdfs:comment "Internal energies, enthalpies, free energies, rotational constants, dipole moments, polarisabilities, orbital energies, zero-point energies and heat capacities per molecule, in an XYZ-like format on Figshare; no forces (equilibrium geometries). A second file holds the 6,095 constitutional isomers of C7H10O2. Eleven molecules failed to converge to a minimum and are flagged." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-QM9-ramakrishnan2014 mlips:samplingStrategy
+    entity:sampling-smiles-relaxation-ramakrishnan2014 .
+
+entity:sampling-smiles-relaxation-ramakrishnan2014 a mlips:SamplingStrategy ;
+    rdfs:label "Enumeration from SMILES with semi-empirical pre-relaxation" ;
+    rdfs:comment "All SMILES strings of GDB molecules with up to nine heavy atoms, excluding ions and molecules with S, Br, Cl or I; initial coordinates with Corina, relaxation at the PM7 level with MOPAC, then B3LYP relaxation. Only equilibrium geometries." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+# No MLIP method is trained or evaluated by the paper (see Q12).
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# No training run or trained model is reported by the paper (see Q12).
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Data-descriptor paper: no MLIP method, run, model or benchmark result (Q7-Q10 empty). The data set is declared as mlips:TrainingDataset because other papers in the KG train on it; those files still declare their own paper-local QM9 nodes.
+# - The manifest classes this paper as 'Application/model instance'; it is a data-set paper.
+# - The validation of atomization enthalpies against G4MP2, G4 and CBS-QB3 for 100 molecules (Table 1) concerns the reference method, not a potential, and is not encoded.
+# - mlips:datasetProvenance InHouse is used in the sense 'generated by this paper'.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
