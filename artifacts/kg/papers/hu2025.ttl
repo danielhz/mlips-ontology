@@ -1,0 +1,623 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yanxiao Hu et al. (2025). Global Universal Scaling and Ultra-Small Parameterization in Machine Learning Interatomic Potentials with Super-Linearity.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2502.07293  arXiv:2502.07293v1
+#
+# Version read: arxiv-preprint arXiv:2502.07293v1 (sha256 15a8568ca2298dfa...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 194 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the SUS2-MLIP method (introduced here) and eight models
+# trained on published or in-house data sets, each with its basis label,
+# cutoff and parameter count; energy, force and stress MAEs are encoded
+# where the text or SI Table S2 prints them (MPF.2021.2.8, HH130, Cu2-xSe,
+# sulfide electrolytes). The benchmark against other architectures is a
+# figure. Preprint only (arXiv v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-hu2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Hu et al. (2025): global universal scaling and ultra-small parameterisation in MLIPs with super-linearity (SUS2-MLIP)" ;
+    mlips:reportedIn entity:article-hu2025 .
+
+entity:article-hu2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2502.07293> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Global Universal Scaling and Ultra-Small Parameterization in Machine Learning Interatomic Potentials with Super-Linearity" ;
+    schema:author entity:person-Hu-hu2025 ,
+        entity:person-Sheng-hu2025 ,
+        entity:person-Huang-hu2025 ,
+        entity:person-Xu-hu2025 ,
+        entity:person-Yang-hu2025 ,
+        entity:person-Zhang-hu2025 ,
+        entity:person-Wu-hu2025 ,
+        entity:person-Ye-hu2025 ,
+        entity:person-YangJiong-hu2025 ,
+        entity:person-ZhangWenqing-hu2025 .
+
+entity:person-Hu-hu2025 a schema:Person ;
+    schema:name "Yanxiao Hu" ;
+    schema:givenName "Yanxiao" ;
+    schema:familyName "Hu" .
+
+entity:person-Sheng-hu2025 a schema:Person ;
+    schema:name "Ye Sheng" ;
+    schema:givenName "Ye" ;
+    schema:familyName "Sheng" .
+
+entity:person-Huang-hu2025 a schema:Person ;
+    schema:name "Jing Huang" ;
+    schema:givenName "Jing" ;
+    schema:familyName "Huang" .
+
+entity:person-Xu-hu2025 a schema:Person ;
+    schema:name "Xiaoxin Xu" ;
+    schema:givenName "Xiaoxin" ;
+    schema:familyName "Xu" .
+
+entity:person-Yang-hu2025 a schema:Person ;
+    schema:name "Yuyan Yang" ;
+    schema:givenName "Yuyan" ;
+    schema:familyName "Yang" .
+
+entity:person-Zhang-hu2025 a schema:Person ;
+    schema:name "Mingqiang Zhang" ;
+    schema:givenName "Mingqiang" ;
+    schema:familyName "Zhang" .
+
+entity:person-Wu-hu2025 a schema:Person ;
+    schema:name "Yabei Wu" ;
+    schema:givenName "Yabei" ;
+    schema:familyName "Wu" .
+
+entity:person-Ye-hu2025 a schema:Person ;
+    schema:name "Caichao Ye" ;
+    schema:givenName "Caichao" ;
+    schema:familyName "Ye" .
+
+entity:person-YangJiong-hu2025 a schema:Person ;
+    schema:name "Jiong Yang" ;
+    schema:givenName "Jiong" ;
+    schema:familyName "Yang" .
+
+entity:person-ZhangWenqing-hu2025 a schema:Person ;
+    schema:name "Wenqing Zhang" ;
+    schema:givenName "Wenqing" ;
+    schema:familyName "Zhang" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-alloy-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Metallic alloys of 53 elements (solid solutions, elements, intermetallics)" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-cathode-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Layered transition-metal oxide cathodes (Li/Na)x-TMO2" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-perovskite-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "ABO3 perovskite oxides with three to six elements" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-semiconductor-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Twenty common semiconductors under various thermodynamic conditions" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-mpf-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Inorganic materials across the periodic table (MPF.2021.2.8)" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-hh130-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "130 half-Heusler compounds" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-cu2se-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Cu2-xSe (alpha and beta phases and vacancy-doped structures)" ;
+    mlips:materialClass "Benchmark material family" .
+
+entity:mat-sse-hu2025 a mlips:MaterialSystem ;
+    rdfs:label "Sulfide solid-state electrolytes" ;
+    mlips:materialClass "Benchmark material family" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-alloy-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Alloy data set (about 150,000 structures, 53 metallic elements)" ;
+    mlips:coversMaterial entity:mat-alloy-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-cathode-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Cathode data set, one third of 88,692 structures" ;
+    mlips:coversMaterial entity:mat-cathode-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 29564 .
+
+entity:ds-perovskite-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Perovskite data set (26 ABO3 oxides)" ;
+    mlips:coversMaterial entity:mat-perovskite-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 6966 .
+
+entity:ds-semiconductor-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Semiconductor data set, subset with maximum force below 5 eV/A" ;
+    mlips:coversMaterial entity:mat-semiconductor-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 20394 .
+
+entity:ds-mpf-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "MPF.2021.2.8 (the M3GNet data set; 187,687 structures, 89 elements, noble gases excluded)" ;
+    mlips:coversMaterial entity:mat-mpf-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 187687 .
+
+entity:ds-hh130-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "HH130 (130 half-Heusler compounds, 54 elements)" ;
+    mlips:coversMaterial entity:mat-hh130-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 31891 .
+
+entity:ds-cu2se-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Cu2-xSe in-house data set" ;
+    mlips:coversMaterial entity:mat-cu2se-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 836 .
+
+entity:ds-sse-hu2025 a mlips:TrainingDataset ;
+    rdfs:label "Sulfide solid-state electrolyte data set (15 elements)" ;
+    mlips:coversMaterial entity:mat-sse-hu2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 54771 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-alloy-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-cathode-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-perovskite-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-semiconductor-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-mpf-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-hh130-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:ds-cu2se-hu2025 mlips:samplingStrategy
+    entity:sampling-inhouse-hu2025 .
+
+entity:ds-sse-hu2025 mlips:samplingStrategy
+    entity:sampling-published-hu2025 .
+
+entity:sampling-published-hu2025 a mlips:SamplingStrategy ;
+    rdfs:label "Published data set used as provided (or a stated subset of it)" .
+
+entity:sampling-inhouse-hu2025 a mlips:SamplingStrategy ;
+    rdfs:label "In-house data set (construction not described in the text read)" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:SUS2-MLIP a mlips:MLIPMethod ;
+    rdfs:label "SUS2-MLIP (super-linear MLIP with universal scaling and ultra-small parameterisation)" ;
+    mlips:hasHyperparameter entity:hp-basis-label-hu2025 ,
+        mlips:cutoffRadius ,
+        entity:hp-num-parameters-hu2025 ;
+    mlips:hasImplementation entity:impl-SUS2-MLIP-hu2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:PhononCalculation .
+
+entity:impl-SUS2-MLIP-hu2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-SUS2-MLIP-hu2025 .
+
+entity:lib-SUS2-MLIP-hu2025 a mlips:Library ;
+    rdfs:label "SUS2-MLIP" ;
+    rdfs:comment "Open-source implementation announced in the paper's code-availability statement." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-basis-label-hu2025 a mlips:Hyperparameter ;
+    rdfs:label "SUS2-MLIP basis label" ;
+    mlips:hyperparameterName "basis" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-parameters-hu2025 a mlips:Hyperparameter ;
+    rdfs:label "Number of model parameters" ;
+    mlips:hyperparameterName "num_parameters" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-alloy-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l2k3_k" .
+
+entity:setting-alloy-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-alloy-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "17689"^^xsd:integer .
+
+entity:setting-cathode-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l3k3_lk" .
+
+entity:setting-cathode-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-cathode-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "2066"^^xsd:integer .
+
+entity:setting-perovskite-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l3k3_lk" .
+
+entity:setting-perovskite-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-perovskite-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "6028"^^xsd:integer .
+
+entity:setting-semiconductor-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l3k3_lk" .
+
+entity:setting-semiconductor-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-semiconductor-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "6786"^^xsd:integer .
+
+entity:setting-mpf-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l2k2_k" .
+
+entity:setting-mpf-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-mpf-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "29006"^^xsd:integer .
+
+entity:setting-hh130-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l2k3_k" .
+
+entity:setting-hh130-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-hh130-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "18310"^^xsd:integer .
+
+entity:setting-cu2se-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l3k2_k" .
+
+entity:setting-cu2se-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.5"^^xsd:double .
+
+entity:setting-cu2se-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "209"^^xsd:integer .
+
+entity:setting-sse-basis-label-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-basis-label-hu2025 ;
+    mlips:settingValue "l2k3_lk" .
+
+entity:setting-sse-cutoffRadius-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-sse-num-parameters-hu2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-parameters-hu2025 ;
+    mlips:settingValue "4494"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-alloy-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l2k3_k basis) trained on the alloy data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-alloy-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-alloy-basis-label-hu2025 ,
+        entity:setting-alloy-cutoffRadius-hu2025 ,
+        entity:setting-alloy-num-parameters-hu2025 ;
+    mlips:produces entity:model-alloy-hu2025 .
+
+entity:model-alloy-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, alloy data set" .
+
+entity:run-cathode-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l3k3_lk basis) trained on the cathode data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-cathode-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-cathode-basis-label-hu2025 ,
+        entity:setting-cathode-cutoffRadius-hu2025 ,
+        entity:setting-cathode-num-parameters-hu2025 ;
+    mlips:produces entity:model-cathode-hu2025 .
+
+entity:model-cathode-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, cathode data set" .
+
+entity:run-perovskite-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l3k3_lk basis) trained on the perovskite data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-perovskite-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-perovskite-basis-label-hu2025 ,
+        entity:setting-perovskite-cutoffRadius-hu2025 ,
+        entity:setting-perovskite-num-parameters-hu2025 ;
+    mlips:produces entity:model-perovskite-hu2025 .
+
+entity:model-perovskite-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, perovskite data set" .
+
+entity:run-semiconductor-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l3k3_lk basis) trained on the semiconductor data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-semiconductor-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-semiconductor-basis-label-hu2025 ,
+        entity:setting-semiconductor-cutoffRadius-hu2025 ,
+        entity:setting-semiconductor-num-parameters-hu2025 ;
+    mlips:produces entity:model-semiconductor-hu2025 .
+
+entity:model-semiconductor-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, semiconductor data set" .
+
+entity:run-mpf-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l2k2_k basis) trained on the mpf data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-mpf-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-mpf-basis-label-hu2025 ,
+        entity:setting-mpf-cutoffRadius-hu2025 ,
+        entity:setting-mpf-num-parameters-hu2025 ;
+    mlips:produces entity:model-mpf-hu2025 .
+
+entity:model-mpf-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, mpf data set" .
+
+entity:run-hh130-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l2k3_k basis) trained on the hh130 data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-hh130-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-hh130-basis-label-hu2025 ,
+        entity:setting-hh130-cutoffRadius-hu2025 ,
+        entity:setting-hh130-num-parameters-hu2025 ;
+    mlips:produces entity:model-hh130-hu2025 .
+
+entity:model-hh130-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, hh130 data set" .
+
+entity:run-cu2se-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l3k2_k basis) trained on the cu2se data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-cu2se-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-cu2se-basis-label-hu2025 ,
+        entity:setting-cu2se-cutoffRadius-hu2025 ,
+        entity:setting-cu2se-num-parameters-hu2025 ;
+    mlips:produces entity:model-cu2se-hu2025 .
+
+entity:model-cu2se-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, cu2se data set" .
+
+entity:run-sse-hu2025 a mlips:MLIPRun ;
+    rdfs:label "SUS2-MLIP (l2k3_lk basis) trained on the sse data set" ;
+    mlips:appliesMethod entity:SUS2-MLIP ;
+    mlips:runsOn entity:ds-sse-hu2025 ;
+    mlips:hasHyperparameterSetting entity:setting-sse-basis-label-hu2025 ,
+        entity:setting-sse-cutoffRadius-hu2025 ,
+        entity:setting-sse-num-parameters-hu2025 ;
+    mlips:produces entity:model-sse-hu2025 .
+
+entity:model-sse-hu2025 a mlips:TrainedModel ;
+    rdfs:label "SUS2-MLIP model, sse data set" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-hu2025 mlips:hasResult
+    entity:result-mpf-hu2025 ,
+    entity:result-hh130-hu2025 ,
+    entity:result-cu2se-hu2025 ,
+    entity:result-sse-hu2025 .
+
+entity:result-mpf-hu2025 a mlips:BenchmarkResult ;
+    rdfs:comment "The paper quotes M3GNet on the same data at 35 meV/atom, 72 meV/A and 0.41 GPa with 227,549 parameters (values of the M3GNet paper, chen2022)." ;
+    mlips:evaluatesModel entity:model-mpf-hu2025 ;
+    mlips:targetMaterial entity:mat-mpf-hu2025 ;
+    mlips:hasAccuracyMetric entity:metric-mpf-1-hu2025 ,
+        entity:metric-mpf-2-hu2025 ,
+        entity:metric-mpf-3-hu2025 .
+
+entity:metric-mpf-1-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "63"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mpf-2-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "155"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-mpf-3-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "1"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-hh130-hu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-hh130-hu2025 ;
+    mlips:targetMaterial entity:mat-hh130-hu2025 ;
+    mlips:hasAccuracyMetric entity:metric-hh130-1-hu2025 ,
+        entity:metric-hh130-2-hu2025 ,
+        entity:metric-hh130-3-hu2025 .
+
+entity:metric-hh130-1-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.35"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-hh130-2-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "21.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-hh130-3-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.022"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-cu2se-hu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-cu2se-hu2025 ;
+    mlips:targetMaterial entity:mat-cu2se-hu2025 ;
+    mlips:hasAccuracyMetric entity:metric-cu2se-1-hu2025 ,
+        entity:metric-cu2se-2-hu2025 ,
+        entity:metric-cu2se-3-hu2025 .
+
+entity:metric-cu2se-1-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.88"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-cu2se-2-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-cu2se-3-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.047"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+entity:result-sse-hu2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-sse-hu2025 ;
+    mlips:targetMaterial entity:mat-sse-hu2025 ;
+    mlips:hasAccuracyMetric entity:metric-sse-1-hu2025 ,
+        entity:metric-sse-2-hu2025 ,
+        entity:metric-sse-3-hu2025 .
+
+entity:metric-sse-1-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Energy MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.11"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-sse-2-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Force MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "57.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-sse-3-hu2025 a mlips:AccuracyMetric ;
+    rdfs:label "Stress MAE" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:StressProperty ;
+    mlips:metricValue "0.091"^^xsd:double ;
+    mlips:hasUnit unit:GigaPA .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The data sets are taken from other works (the paper marks them with URLs); their reference calculations are not restated, so the data-set nodes carry no mlips:ReferenceCalculation. That each set includes stresses is assumed from the stress MAEs reported for four of them. Whether the MAEs are on validation or test splits is not said in the text read.
+# - Errors for the alloy, cathode, perovskite and semiconductor models are shown only in Fig. 3 (RMSE against GemNet-OC, EquiformerV2, NequIP, Allegro and DPA-2 values from the DPA-2 paper). Parameter counts differ slightly between the main text and the Methods (cathode 2,130 vs 2,066; perovskite 6,092 vs 6,028); the Methods values are encoded.
+# - Fine-tuned per-compound half-Heusler models (Table S3), phonon and thermal-transport results and other applications are not encoded. Preprint only.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
