@@ -1,0 +1,1537 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Dávid Péter Kovács et al. (2025). MACE-OFF: Short-Range Transferable Machine Learning Force Fields for Organic Molecules.
+#   Journal of the American Chemical Society. doi:10.1021/jacs.4c07099  arXiv:2312.15211v5
+#
+# Version read: arxiv-preprint arXiv:2312.15211v5 (sha256 e3dd92a6cb2466f5...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 5 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the four MACE-OFF models (23(S), 23(M), 23(L), 24(M)),
+# their SPICE-based training sets, the Table 2 hyperparameters and the
+# held-out test errors per test-set category (Tables S1 and S2). Each
+# test-set category is a material system so that errors stay comparable
+# within a category.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-kovacs2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Kovacs et al. (2025): MACE-OFF transferable short-range force fields for organic molecules" ;
+    mlips:reportedIn entity:article-kovacs2025 .
+
+entity:article-kovacs2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/jacs.4c07099> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "MACE-OFF: Short-Range Transferable Machine Learning Force Fields for Organic Molecules" ;
+    schema:author <https://orcid.org/0000-0002-0854-2635> ,
+        <https://orcid.org/0000-0001-5116-3027> ,
+        entity:person-Browning-kovacs2025 ,
+        entity:person-Batatia-kovacs2025 ,
+        <https://orcid.org/0000-0001-8694-7200> ,
+        entity:person-Pu-kovacs2025 ,
+        entity:person-Kapil-kovacs2025 ,
+        entity:person-Witt-kovacs2025 ,
+        <https://orcid.org/0000-0002-3963-5076> ,
+        entity:person-Cole-kovacs2025 ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0002-0854-2635> a schema:Person ;
+    schema:name "Dávid Péter Kovács" ;
+    schema:givenName "Dávid Péter" ;
+    schema:familyName "Kovács" ;
+    schema:identifier <https://orcid.org/0000-0002-0854-2635> .
+
+<https://orcid.org/0000-0001-5116-3027> a schema:Person ;
+    schema:name "J. Harry Moore" ;
+    schema:givenName "J. Harry" ;
+    schema:familyName "Moore" ;
+    schema:identifier <https://orcid.org/0000-0001-5116-3027> .
+
+entity:person-Browning-kovacs2025 a schema:Person ;
+    schema:name "Nicholas J. Browning" ;
+    schema:givenName "Nicholas J." ;
+    schema:familyName "Browning" .
+
+entity:person-Batatia-kovacs2025 a schema:Person ;
+    schema:name "Ilyes Batatia" ;
+    schema:givenName "Ilyes" ;
+    schema:familyName "Batatia" .
+
+<https://orcid.org/0000-0001-8694-7200> a schema:Person ;
+    schema:name "Joshua T. Horton" ;
+    schema:givenName "Joshua T." ;
+    schema:familyName "Horton" ;
+    schema:identifier <https://orcid.org/0000-0001-8694-7200> .
+
+entity:person-Pu-kovacs2025 a schema:Person ;
+    schema:name "Yixuan Pu" ;
+    schema:givenName "Yixuan" ;
+    schema:familyName "Pu" .
+
+entity:person-Kapil-kovacs2025 a schema:Person ;
+    schema:name "Venkat Kapil" ;
+    schema:givenName "Venkat" ;
+    schema:familyName "Kapil" .
+
+entity:person-Witt-kovacs2025 a schema:Person ;
+    schema:name "William C. Witt" ;
+    schema:givenName "William C." ;
+    schema:familyName "Witt" .
+
+<https://orcid.org/0000-0002-3963-5076> a schema:Person ;
+    schema:name "Ioan-Bogdan Magdău" ;
+    schema:givenName "Ioan-Bogdan" ;
+    schema:familyName "Magdău" ;
+    schema:identifier <https://orcid.org/0000-0002-3963-5076> .
+
+entity:person-Cole-kovacs2025 a schema:Person ;
+    schema:name "Daniel J. Cole" ;
+    schema:givenName "Daniel J." ;
+    schema:familyName "Cole" .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-pubchem-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "PubChem molecules (SPICE subset)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, F, P, S, Cl, Br, I; 3-50 atoms" .
+
+entity:mat-des370k-monomers-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "DES370K monomers (SPICE subset)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, F, P, S, Cl, Br, I; 3-22 atoms" .
+
+entity:mat-des370k-dimers-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "DES370K dimers (SPICE subset)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, F, P, S, Cl, Br, I; 4-34 atoms" .
+
+entity:mat-dipeptides-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Dipeptides (SPICE subset)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, S; 26-60 atoms" .
+
+entity:mat-solvated-amino-acids-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Solvated amino acids (SPICE subset)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, S; 79-96 atoms" .
+
+entity:mat-water-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Water clusters" ;
+    mlips:materialClass "Organic molecular systems; elements H, O; 3-150 atoms" .
+
+entity:mat-qmugs-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "QMugs molecules (51-90 atoms)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O, F, P, S, Cl, Br, I; 51-90 atoms" .
+
+entity:mat-tripeptides-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Tripeptides (COMP6, recomputed at the SPICE level of theory)" ;
+    mlips:materialClass "Organic molecular systems; elements H, C, N, O; 30-69 atoms" .
+
+entity:mat-amino-acid-ligand-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Amino acid-ligand pairs (SPICE version 2 subset)" ;
+    mlips:materialClass "Organic molecular systems" .
+
+entity:mat-solvated-pubchem-kovacs2025 a mlips:MaterialSystem ;
+    rdfs:label "Solvated PubChem molecules (SPICE version 2 subset)" ;
+    mlips:materialClass "Organic molecular systems" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-kovacs2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-kovacs2025 mlips:hasDFTSettings entity:calc-settings-dft-kovacs2025 .
+
+entity:calc-settings-dft-kovacs2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode entity:lib-PSI4-kovacs2025 ;
+    mlips:xcFunctional entity:xc-omegaB97M-D3-BJ-kovacs2025 ;
+    mlips:dftBasisSet entity:basis-def2-TZVPPD-kovacs2025 ;
+    rdfs:comment "omegaB97M-D3(BJ)/def2-TZVPPD as implemented in PSI4 (the SPICE level of theory); QMugs and water-cluster geometries and the COMP6 tripeptides were re-evaluated at this level." .
+
+entity:lib-PSI4-kovacs2025 a mlips:Library ;
+    rdfs:label "PSI4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-omegaB97M-D3-BJ-kovacs2025 a mlips:XCFunctional ;
+    rdfs:label "omegaB97M-D3(BJ)" ;
+    rdfs:comment "Range-separated hybrid meta-GGA with D3(BJ) dispersion correction; the SPICE level of theory." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-TZVPPD-kovacs2025 a mlips:DftBasisSet ;
+    rdfs:label "def2-TZVPPD" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-off23-kovacs2025 a mlips:TrainingDataset ;
+    rdfs:label "MACE-OFF23 training set (SPICE version 1 subset + QMugs + water clusters)" ;
+    mlips:coversMaterial entity:mat-pubchem-kovacs2025 ,
+        entity:mat-des370k-monomers-kovacs2025 ,
+        entity:mat-des370k-dimers-kovacs2025 ,
+        entity:mat-dipeptides-kovacs2025 ,
+        entity:mat-solvated-amino-acids-kovacs2025 ,
+        entity:mat-water-kovacs2025 ,
+        entity:mat-qmugs-kovacs2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:numConfigurations 951813 ;
+    mlips:hasDFTCalculation entity:calc-dft-kovacs2025 ;
+    rdfs:comment "Neutral-formal-charge SPICE v1 subset with the ten elements H, C, N, O, F, P, S, Cl, Br, I and without the ion pairs (about 85% of SPICE), augmented with QMugs molecules and water clusters. numConfigurations is the sum of the '# Train' row of Table 1 (646821 + 16861 + 263065 + 19773 + 948 + 1597 + 2748); 95% train/validation and 5% test, split at the molecule level. 808 configurations with a maximum force error above 2 eV/A were removed from the training set after a first fit." .
+
+entity:ds-off24-kovacs2025 a mlips:TrainingDataset ;
+    rdfs:label "MACE-OFF24 training set (MACE-OFF23 set + SPICE version 2 additions)" ;
+    mlips:coversMaterial entity:mat-pubchem-kovacs2025 ,
+        entity:mat-des370k-monomers-kovacs2025 ,
+        entity:mat-des370k-dimers-kovacs2025 ,
+        entity:mat-dipeptides-kovacs2025 ,
+        entity:mat-solvated-amino-acids-kovacs2025 ,
+        entity:mat-water-kovacs2025 ,
+        entity:mat-qmugs-kovacs2025 ,
+        entity:mat-amino-acid-ligand-kovacs2025 ,
+        entity:mat-solvated-pubchem-kovacs2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-kovacs2025 ;
+    rdfs:comment "Adds about 208,000 SPICE version 2 configurations and 1000 water clusters; a maximum force filter of 15 eV/A and a total force filter of 0.1 eV/A removed 10,372 configurations from the SPICE version 2 subsets. The total size is not stated." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-off23-kovacs2025 mlips:samplingStrategy
+    entity:sampling-spice-md-kovacs2025 ,
+    entity:sampling-qmugs-xtb-md-kovacs2025 ,
+    entity:sampling-water-clusters-kovacs2025 .
+
+entity:ds-off24-kovacs2025 mlips:samplingStrategy
+    entity:sampling-spice-md-kovacs2025 ,
+    entity:sampling-qmugs-xtb-md-kovacs2025 ,
+    entity:sampling-water-clusters-kovacs2025 ,
+    entity:sampling-spice2-kovacs2025 .
+
+entity:sampling-spice-md-kovacs2025 a mlips:SamplingStrategy ;
+    rdfs:label "Classical force-field MD conformer sampling (SPICE)" ;
+    rdfs:comment "SPICE geometries from molecular dynamics with classical force fields at 300 K and 500 K, sampling maximally different conformations from the trajectories." .
+
+entity:sampling-qmugs-xtb-md-kovacs2025 a mlips:SamplingStrategy ;
+    rdfs:label "GFN2-xTB MD of larger molecules (QMugs)" ;
+    rdfs:comment "50-90 atom molecules randomly selected from QMugs; geometries from GFN2-xTB molecular dynamics." .
+
+entity:sampling-water-clusters-kovacs2025 a mlips:SamplingStrategy ;
+    rdfs:label "Water clusters carved from liquid-water MD" ;
+    rdfs:comment "Clusters of up to 50 water molecules carved out of molecular dynamics simulations of liquid water." .
+
+entity:sampling-spice2-kovacs2025 a mlips:SamplingStrategy ;
+    rdfs:label "SPICE version 2 additions" ;
+    rdfs:comment "About 208,000 additional configurations of solvated PubChem molecules (MD, same protocol as SPICE 1) and amino acid-ligand pairs extracted from PDB structures, plus 1000 water clusters of up to 90 atoms." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-kovacs2025 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-kovacs2025 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numFeatures ,
+        entity:hp-max-L-kovacs2025 ,
+        mlips:bodyOrder ,
+        mlips:numLayers ,
+        mlips:learningRate ;
+    mlips:hasImplementation entity:impl-MACE-kovacs2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:loss-MACE-kovacs2025 a mlips:LossFunction ;
+    rdfs:label "Weighted energy and force loss in two phases: force weight 1000 and energy weight 40, then force weight 10 and energy weight 1000 once the force error has converged" .
+
+entity:alg-MACE-kovacs2025 a mls:Algorithm ;
+    rdfs:label "Adam with AMSGrad and an exponential moving average of the weights; learning rate 0.01, reduced to 0.00025 in the second phase; stopped when the energy error no longer decreases" .
+
+entity:impl-MACE-kovacs2025 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE ;
+    mlips:version "PyTorch implementation, https://github.com/ACEsuit/mace" .
+
+entity:hp-max-L-kovacs2025 a mlips:Hyperparameter ;
+    rdfs:label "MACE maximum equivariance order L of the messages" ;
+    mlips:hyperparameterName "max_L" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-off23-S-cutoffRadius-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "4.5"^^xsd:double .
+
+entity:setting-off23-S-numFeatures-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "96"^^xsd:integer .
+
+entity:setting-off23-S-max-L-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-L-kovacs2025 ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-off23-S-bodyOrder-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-off23-S-numLayers-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-off23-S-learningRate-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-off23-M-cutoffRadius-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-off23-M-numFeatures-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-off23-M-max-L-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-L-kovacs2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-off23-M-bodyOrder-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-off23-M-numLayers-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-off23-M-learningRate-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-off23-L-cutoffRadius-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-off23-L-numFeatures-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "192"^^xsd:integer .
+
+entity:setting-off23-L-max-L-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-L-kovacs2025 ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-off23-L-bodyOrder-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-off23-L-numLayers-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-off23-L-learningRate-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-off24-M-cutoffRadius-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-off24-M-numFeatures-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-off24-M-max-L-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-max-L-kovacs2025 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-off24-M-bodyOrder-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-off24-M-numLayers-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-off24-M-learningRate-kovacs2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-off23-S-kovacs2025 a mlips:MLIPRun ;
+    rdfs:label "MACE-OFF23(S) training run" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-off23-kovacs2025 ;
+    mlips:hasHyperparameterSetting entity:setting-off23-S-cutoffRadius-kovacs2025 ,
+        entity:setting-off23-S-numFeatures-kovacs2025 ,
+        entity:setting-off23-S-max-L-kovacs2025 ,
+        entity:setting-off23-S-bodyOrder-kovacs2025 ,
+        entity:setting-off23-S-numLayers-kovacs2025 ,
+        entity:setting-off23-S-learningRate-kovacs2025 ;
+    mlips:trainingHardware "Single Nvidia A100 GPU; training took about 6 days" ;
+    mlips:produces entity:model-off23-S-kovacs2025 .
+
+entity:model-off23-S-kovacs2025 a mlips:TrainedModel ;
+    rdfs:label "MACE-OFF23(S)" .
+
+entity:run-off23-M-kovacs2025 a mlips:MLIPRun ;
+    rdfs:label "MACE-OFF23(M) training run" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-off23-kovacs2025 ;
+    mlips:hasHyperparameterSetting entity:setting-off23-M-cutoffRadius-kovacs2025 ,
+        entity:setting-off23-M-numFeatures-kovacs2025 ,
+        entity:setting-off23-M-max-L-kovacs2025 ,
+        entity:setting-off23-M-bodyOrder-kovacs2025 ,
+        entity:setting-off23-M-numLayers-kovacs2025 ,
+        entity:setting-off23-M-learningRate-kovacs2025 ;
+    mlips:trainingHardware "Single Nvidia A100 GPU; training took about 10 days" ;
+    mlips:produces entity:model-off23-M-kovacs2025 .
+
+entity:model-off23-M-kovacs2025 a mlips:TrainedModel ;
+    rdfs:label "MACE-OFF23(M)" .
+
+entity:run-off23-L-kovacs2025 a mlips:MLIPRun ;
+    rdfs:label "MACE-OFF23(L) training run" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-off23-kovacs2025 ;
+    mlips:hasHyperparameterSetting entity:setting-off23-L-cutoffRadius-kovacs2025 ,
+        entity:setting-off23-L-numFeatures-kovacs2025 ,
+        entity:setting-off23-L-max-L-kovacs2025 ,
+        entity:setting-off23-L-bodyOrder-kovacs2025 ,
+        entity:setting-off23-L-numLayers-kovacs2025 ,
+        entity:setting-off23-L-learningRate-kovacs2025 ;
+    mlips:trainingHardware "Single Nvidia A100 GPU; training took about 14 days" ;
+    mlips:produces entity:model-off23-L-kovacs2025 .
+
+entity:model-off23-L-kovacs2025 a mlips:TrainedModel ;
+    rdfs:label "MACE-OFF23(L)" .
+
+entity:run-off24-M-kovacs2025 a mlips:MLIPRun ;
+    rdfs:label "MACE-OFF24(M) training run" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-off24-kovacs2025 ;
+    mlips:hasHyperparameterSetting entity:setting-off24-M-cutoffRadius-kovacs2025 ,
+        entity:setting-off24-M-numFeatures-kovacs2025 ,
+        entity:setting-off24-M-max-L-kovacs2025 ,
+        entity:setting-off24-M-bodyOrder-kovacs2025 ,
+        entity:setting-off24-M-numLayers-kovacs2025 ,
+        entity:setting-off24-M-learningRate-kovacs2025 ;
+    mlips:trainingHardware "Single Nvidia A100 GPU" ;
+    mlips:produces entity:model-off24-M-kovacs2025 .
+
+entity:model-off24-M-kovacs2025 a mlips:TrainedModel ;
+    rdfs:label "MACE-OFF24(M)" ;
+    mlips:inferenceHardware "Single NVIDIA A100 80GB GPU: 3x10^5 MD steps per day in the solvated crambin simulation" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-kovacs2025 mlips:hasResult
+    entity:result-off23-S-pubchem-kovacs2025 ,
+    entity:result-off23-S-des370k-monomers-kovacs2025 ,
+    entity:result-off23-S-des370k-dimers-kovacs2025 ,
+    entity:result-off23-S-dipeptides-kovacs2025 ,
+    entity:result-off23-S-solvated-amino-acids-kovacs2025 ,
+    entity:result-off23-S-water-kovacs2025 ,
+    entity:result-off23-S-qmugs-kovacs2025 ,
+    entity:result-off23-S-tripeptides-kovacs2025 ,
+    entity:result-off23-M-pubchem-kovacs2025 ,
+    entity:result-off23-M-des370k-monomers-kovacs2025 ,
+    entity:result-off23-M-des370k-dimers-kovacs2025 ,
+    entity:result-off23-M-dipeptides-kovacs2025 ,
+    entity:result-off23-M-solvated-amino-acids-kovacs2025 ,
+    entity:result-off23-M-water-kovacs2025 ,
+    entity:result-off23-M-qmugs-kovacs2025 ,
+    entity:result-off23-M-tripeptides-kovacs2025 ,
+    entity:result-off23-L-pubchem-kovacs2025 ,
+    entity:result-off23-L-des370k-monomers-kovacs2025 ,
+    entity:result-off23-L-des370k-dimers-kovacs2025 ,
+    entity:result-off23-L-dipeptides-kovacs2025 ,
+    entity:result-off23-L-solvated-amino-acids-kovacs2025 ,
+    entity:result-off23-L-water-kovacs2025 ,
+    entity:result-off23-L-qmugs-kovacs2025 ,
+    entity:result-off23-L-tripeptides-kovacs2025 ,
+    entity:result-off24-M-pubchem-kovacs2025 ,
+    entity:result-off24-M-des370k-monomers-kovacs2025 ,
+    entity:result-off24-M-des370k-dimers-kovacs2025 ,
+    entity:result-off24-M-dipeptides-kovacs2025 ,
+    entity:result-off24-M-qmugs-kovacs2025 ,
+    entity:result-off24-M-solvated-amino-acids-kovacs2025 ,
+    entity:result-off24-M-amino-acid-ligand-kovacs2025 ,
+    entity:result-off24-M-solvated-pubchem-kovacs2025 .
+
+entity:result-off23-S-pubchem-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-pubchem-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-pubchem-1-kovacs2025 ,
+        entity:metric-off23-S-pubchem-2-kovacs2025 ,
+        entity:metric-off23-S-pubchem-3-kovacs2025 ,
+        entity:metric-off23-S-pubchem-4-kovacs2025 .
+
+entity:metric-off23-S-pubchem-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.41"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-pubchem-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "35.68"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-pubchem-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.74"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-pubchem-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "61.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-des370k-monomers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-monomers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-des370k-monomers-1-kovacs2025 ,
+        entity:metric-off23-S-des370k-monomers-2-kovacs2025 ,
+        entity:metric-off23-S-des370k-monomers-3-kovacs2025 ,
+        entity:metric-off23-S-des370k-monomers-4-kovacs2025 .
+
+entity:metric-off23-S-des370k-monomers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.04"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-des370k-monomers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "17.63"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-des370k-monomers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.47"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-des370k-monomers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.15"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-des370k-dimers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-dimers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-des370k-dimers-1-kovacs2025 ,
+        entity:metric-off23-S-des370k-dimers-2-kovacs2025 ,
+        entity:metric-off23-S-des370k-dimers-3-kovacs2025 ,
+        entity:metric-off23-S-des370k-dimers-4-kovacs2025 .
+
+entity:metric-off23-S-des370k-dimers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.98"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-des370k-dimers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-des370k-dimers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-des370k-dimers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "28.48"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-dipeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-dipeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-dipeptides-1-kovacs2025 ,
+        entity:metric-off23-S-dipeptides-2-kovacs2025 ,
+        entity:metric-off23-S-dipeptides-3-kovacs2025 ,
+        entity:metric-off23-S-dipeptides-4-kovacs2025 .
+
+entity:metric-off23-S-dipeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.84"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-dipeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "25.07"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-dipeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-dipeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "36.97"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-solvated-amino-acids-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-solvated-amino-acids-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-solvated-amino-acids-1-kovacs2025 ,
+        entity:metric-off23-S-solvated-amino-acids-2-kovacs2025 ,
+        entity:metric-off23-S-solvated-amino-acids-3-kovacs2025 ,
+        entity:metric-off23-S-solvated-amino-acids-4-kovacs2025 .
+
+entity:metric-off23-S-solvated-amino-acids-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-solvated-amino-acids-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "38.56"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-solvated-amino-acids-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.98"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-solvated-amino-acids-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "53.55"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-water-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-water-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-water-1-kovacs2025 ,
+        entity:metric-off23-S-water-2-kovacs2025 ,
+        entity:metric-off23-S-water-3-kovacs2025 ,
+        entity:metric-off23-S-water-4-kovacs2025 .
+
+entity:metric-off23-S-water-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.67"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-water-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "28.53"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-water-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.07"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-water-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "39.33"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-qmugs-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-qmugs-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-qmugs-1-kovacs2025 ,
+        entity:metric-off23-S-qmugs-2-kovacs2025 ,
+        entity:metric-off23-S-qmugs-3-kovacs2025 ,
+        entity:metric-off23-S-qmugs-4-kovacs2025 .
+
+entity:metric-off23-S-qmugs-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.03"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-qmugs-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "41.45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-qmugs-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.28"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-qmugs-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "62.46"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-S-tripeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-S-kovacs2025 ;
+    mlips:targetMaterial entity:mat-tripeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-S-tripeptides-1-kovacs2025 ,
+        entity:metric-off23-S-tripeptides-2-kovacs2025 ,
+        entity:metric-off23-S-tripeptides-3-kovacs2025 ,
+        entity:metric-off23-S-tripeptides-4-kovacs2025 .
+
+entity:metric-off23-S-tripeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(S), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.05"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-tripeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(S), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "32.88"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-S-tripeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(S), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-S-tripeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(S), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "71.41"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-pubchem-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-pubchem-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-pubchem-1-kovacs2025 ,
+        entity:metric-off23-M-pubchem-2-kovacs2025 ,
+        entity:metric-off23-M-pubchem-3-kovacs2025 ,
+        entity:metric-off23-M-pubchem-4-kovacs2025 .
+
+entity:metric-off23-M-pubchem-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.91"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-pubchem-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "20.57"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-pubchem-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.02"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-pubchem-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "40.51"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-des370k-monomers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-monomers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-des370k-monomers-1-kovacs2025 ,
+        entity:metric-off23-M-des370k-monomers-2-kovacs2025 ,
+        entity:metric-off23-M-des370k-monomers-3-kovacs2025 ,
+        entity:metric-off23-M-des370k-monomers-4-kovacs2025 .
+
+entity:metric-off23-M-des370k-monomers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.63"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-des370k-monomers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.36"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-des370k-monomers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-des370k-monomers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "14.31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-des370k-dimers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-dimers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-des370k-dimers-1-kovacs2025 ,
+        entity:metric-off23-M-des370k-dimers-2-kovacs2025 ,
+        entity:metric-off23-M-des370k-dimers-3-kovacs2025 ,
+        entity:metric-off23-M-des370k-dimers-4-kovacs2025 .
+
+entity:metric-off23-M-des370k-dimers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-des370k-dimers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.02"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-des370k-dimers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.91"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-des370k-dimers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-dipeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-dipeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-dipeptides-1-kovacs2025 ,
+        entity:metric-off23-M-dipeptides-2-kovacs2025 ,
+        entity:metric-off23-M-dipeptides-3-kovacs2025 ,
+        entity:metric-off23-M-dipeptides-4-kovacs2025 .
+
+entity:metric-off23-M-dipeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.52"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-dipeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "14.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-dipeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.85"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-dipeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "22.25"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-solvated-amino-acids-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-solvated-amino-acids-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-solvated-amino-acids-1-kovacs2025 ,
+        entity:metric-off23-M-solvated-amino-acids-2-kovacs2025 ,
+        entity:metric-off23-M-solvated-amino-acids-3-kovacs2025 ,
+        entity:metric-off23-M-solvated-amino-acids-4-kovacs2025 .
+
+entity:metric-off23-M-solvated-amino-acids-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-solvated-amino-acids-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.26"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-solvated-amino-acids-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.55"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-solvated-amino-acids-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "32.19"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-water-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-water-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-water-1-kovacs2025 ,
+        entity:metric-off23-M-water-2-kovacs2025 ,
+        entity:metric-off23-M-water-3-kovacs2025 ,
+        entity:metric-off23-M-water-4-kovacs2025 .
+
+entity:metric-off23-M-water-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.76"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-water-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "15.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-water-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.99"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-water-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "21.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-qmugs-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-qmugs-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-qmugs-1-kovacs2025 ,
+        entity:metric-off23-M-qmugs-2-kovacs2025 ,
+        entity:metric-off23-M-qmugs-3-kovacs2025 ,
+        entity:metric-off23-M-qmugs-4-kovacs2025 .
+
+entity:metric-off23-M-qmugs-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.69"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-qmugs-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-qmugs-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.89"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-qmugs-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "36.73"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-M-tripeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-tripeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-M-tripeptides-1-kovacs2025 ,
+        entity:metric-off23-M-tripeptides-2-kovacs2025 ,
+        entity:metric-off23-M-tripeptides-3-kovacs2025 ,
+        entity:metric-off23-M-tripeptides-4-kovacs2025 .
+
+entity:metric-off23-M-tripeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(M), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.57"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-tripeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(M), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.74"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-M-tripeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(M), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-M-tripeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(M), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "33.94"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-pubchem-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-pubchem-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-pubchem-1-kovacs2025 ,
+        entity:metric-off23-L-pubchem-2-kovacs2025 ,
+        entity:metric-off23-L-pubchem-3-kovacs2025 ,
+        entity:metric-off23-L-pubchem-4-kovacs2025 .
+
+entity:metric-off23-L-pubchem-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.88"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-pubchem-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "14.75"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-pubchem-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.48"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-pubchem-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "33.34"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-des370k-monomers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-monomers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-des370k-monomers-1-kovacs2025 ,
+        entity:metric-off23-L-des370k-monomers-2-kovacs2025 ,
+        entity:metric-off23-L-des370k-monomers-3-kovacs2025 ,
+        entity:metric-off23-L-des370k-monomers-4-kovacs2025 .
+
+entity:metric-off23-L-des370k-monomers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.59"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-des370k-monomers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-des370k-monomers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.84"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-des370k-monomers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.27"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-des370k-dimers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-dimers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-des370k-dimers-1-kovacs2025 ,
+        entity:metric-off23-L-des370k-dimers-2-kovacs2025 ,
+        entity:metric-off23-L-des370k-dimers-3-kovacs2025 ,
+        entity:metric-off23-L-des370k-dimers-4-kovacs2025 .
+
+entity:metric-off23-L-des370k-dimers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.54"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-des370k-dimers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.62"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-des370k-dimers-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.87"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-des370k-dimers-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.81"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-dipeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-dipeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-dipeptides-1-kovacs2025 ,
+        entity:metric-off23-L-dipeptides-2-kovacs2025 ,
+        entity:metric-off23-L-dipeptides-3-kovacs2025 ,
+        entity:metric-off23-L-dipeptides-4-kovacs2025 .
+
+entity:metric-off23-L-dipeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.42"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-dipeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.19"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-dipeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-dipeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.19"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-solvated-amino-acids-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-solvated-amino-acids-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-solvated-amino-acids-1-kovacs2025 ,
+        entity:metric-off23-L-solvated-amino-acids-2-kovacs2025 ,
+        entity:metric-off23-L-solvated-amino-acids-3-kovacs2025 ,
+        entity:metric-off23-L-solvated-amino-acids-4-kovacs2025 .
+
+entity:metric-off23-L-solvated-amino-acids-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.98"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-solvated-amino-acids-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "19.43"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-solvated-amino-acids-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.32"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-solvated-amino-acids-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.91"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-water-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-water-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-water-1-kovacs2025 ,
+        entity:metric-off23-L-water-2-kovacs2025 ,
+        entity:metric-off23-L-water-3-kovacs2025 ,
+        entity:metric-off23-L-water-4-kovacs2025 .
+
+entity:metric-off23-L-water-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.83"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-water-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), Water clusters test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.57"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-water-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.99"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-water-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), Water clusters test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "18.78"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-qmugs-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-qmugs-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-qmugs-1-kovacs2025 ,
+        entity:metric-off23-L-qmugs-2-kovacs2025 ,
+        entity:metric-off23-L-qmugs-3-kovacs2025 ,
+        entity:metric-off23-L-qmugs-4-kovacs2025 .
+
+entity:metric-off23-L-qmugs-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.45"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-qmugs-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "16.93"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-qmugs-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-qmugs-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "27.17"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off23-L-tripeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off23-L-kovacs2025 ;
+    mlips:targetMaterial entity:mat-tripeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off23-L-tripeptides-1-kovacs2025 ,
+        entity:metric-off23-L-tripeptides-2-kovacs2025 ,
+        entity:metric-off23-L-tripeptides-3-kovacs2025 ,
+        entity:metric-off23-L-tripeptides-4-kovacs2025 .
+
+entity:metric-off23-L-tripeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF23(L), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.38"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-tripeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on total forces: MACE-OFF23(L), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "13.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-off23-L-tripeptides-3-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy per atom: MACE-OFF23(L), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.49"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off23-L-tripeptides-4-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on total forces: MACE-OFF23(L), Tripeptides (COMP6, recomputed at the SPICE level of theory) test set" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "22.46"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-pubchem-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-pubchem-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-pubchem-1-kovacs2025 ,
+        entity:metric-off24-M-pubchem-2-kovacs2025 .
+
+entity:metric-off24-M-pubchem-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-pubchem-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), PubChem molecules (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "22.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-des370k-monomers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-monomers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-des370k-monomers-1-kovacs2025 ,
+        entity:metric-off24-M-des370k-monomers-2-kovacs2025 .
+
+entity:metric-off24-M-des370k-monomers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-des370k-monomers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), DES370K monomers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-des370k-dimers-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-des370k-dimers-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-des370k-dimers-1-kovacs2025 ,
+        entity:metric-off24-M-des370k-dimers-2-kovacs2025 .
+
+entity:metric-off24-M-des370k-dimers-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-des370k-dimers-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), DES370K dimers (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-dipeptides-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-dipeptides-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-dipeptides-1-kovacs2025 ,
+        entity:metric-off24-M-dipeptides-2-kovacs2025 .
+
+entity:metric-off24-M-dipeptides-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-dipeptides-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), Dipeptides (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "14.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-qmugs-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-qmugs-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-qmugs-1-kovacs2025 ,
+        entity:metric-off24-M-qmugs-2-kovacs2025 .
+
+entity:metric-off24-M-qmugs-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-qmugs-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), QMugs molecules (51-90 atoms) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-solvated-amino-acids-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-solvated-amino-acids-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-solvated-amino-acids-1-kovacs2025 ,
+        entity:metric-off24-M-solvated-amino-acids-2-kovacs2025 .
+
+entity:metric-off24-M-solvated-amino-acids-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-solvated-amino-acids-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), Solvated amino acids (SPICE subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "23.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-amino-acid-ligand-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-amino-acid-ligand-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-amino-acid-ligand-1-kovacs2025 ,
+        entity:metric-off24-M-amino-acid-ligand-2-kovacs2025 .
+
+entity:metric-off24-M-amino-acid-ligand-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), Amino acid-ligand pairs (SPICE version 2 subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-amino-acid-ligand-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), Amino acid-ligand pairs (SPICE version 2 subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-off24-M-solvated-pubchem-kovacs2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-off24-M-kovacs2025 ;
+    mlips:targetMaterial entity:mat-solvated-pubchem-kovacs2025 ;
+    mlips:hasAccuracyMetric entity:metric-off24-M-solvated-pubchem-1-kovacs2025 ,
+        entity:metric-off24-M-solvated-pubchem-2-kovacs2025 .
+
+entity:metric-off24-M-solvated-pubchem-1-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy per atom: MACE-OFF24(M), Solvated PubChem molecules (SPICE version 2 subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-off24-M-solvated-pubchem-2-kovacs2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: MACE-OFF24(M), Solvated PubChem molecules (SPICE version 2 subset) test set" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "22.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# All models were trained on a single Nvidia A100 GPU; the small model took
+# about 6 days, the medium about 10 and the large 14 (kept as text in
+# trainingHardware: the unit of mlips:trainingDuration is not fixed by the
+# schema). Inference throughput is reported as figures (OpenMM, LAMMPS).
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Intermolecular force errors and relative errors of Table S1 are not encoded (no MetricProperty for them); only total energy and force MAE/RMSE are.
+# - Property benchmarks (torsion scans, X23 sublimation enthalpies, liquid densities and heats of vaporisation, water structure, peptide free-energy surfaces, IR/Raman spectra) cannot be expressed as AccuracyMetric in schema 0.1.2.
+# - The 'max L' of Table 2 is the equivariance order of the messages; it is kept as a paper-local hyperparameter and not mapped to mlips:numAngularBasis. The correlation order nu = 3 (4-body) is encoded as mlips:bodyOrder 3, following batatia2024mp0.
+# - The two-phase loss weights and the learning-rate schedule are in the loss/algorithm labels; only the initial learning rate is a setting.
+# - Radial basis size and readout widths are not stated. The MACE-OFF24(M) training-set size and its training time are not stated.
+# - The MACE-OFF models are widely reused pretrained models; they are paper-local here (model-off23-S/M/L-kovacs2025, model-off24-M-kovacs2025) and become registry models when a second paper evaluates them.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
