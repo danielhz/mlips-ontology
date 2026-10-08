@@ -1,0 +1,194 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Moritz R. Schäfer et al. (2025). Apax: A Flexible and Performant Framework for the Development of Machine-Learned Interatomic Potentials.
+#   Journal of Chemical Information and Modeling. doi:10.1021/acs.jcim.5c01221  arXiv:2505.22168v2
+#
+# Version read: arxiv-preprint arXiv:2505.22168v2 (sha256 ea9e67241dac5941...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 110 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the Apax software paper (JAX-based training, ensembles
+# for uncertainty, batch active learning, an internal MD engine). The one
+# fit with printed errors is encoded: a Gaussian Moment Neural Network
+# (GMNN) trained on a 10K subset of the Li3PO4 data set, with test MAEs
+# and MD step times (Table 1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-schafer2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Schaefer et al. (2025): Apax, a flexible and performant framework for the development of MLIPs" ;
+    mlips:reportedIn entity:article-schafer2025 .
+
+entity:article-schafer2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jcim.5c01221> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Apax: A Flexible and Performant Framework for the Development of Machine-Learned Interatomic Potentials" ;
+    schema:author <https://orcid.org/0000-0001-8474-5808> ,
+        <https://orcid.org/0000-0003-3546-4879> ,
+        entity:person-Zills-schafer2025 ,
+        <https://orcid.org/0000-0003-2739-310X> ,
+        <https://orcid.org/0000-0001-6178-7669> .
+
+<https://orcid.org/0000-0001-8474-5808> a schema:Person ;
+    schema:name "Moritz R. Schäfer" ;
+    schema:givenName "Moritz R." ;
+    schema:familyName "Schäfer" ;
+    schema:identifier <https://orcid.org/0000-0001-8474-5808> .
+
+<https://orcid.org/0000-0003-3546-4879> a schema:Person ;
+    schema:name "Nico Segreto" ;
+    schema:givenName "Nico" ;
+    schema:familyName "Segreto" ;
+    schema:identifier <https://orcid.org/0000-0003-3546-4879> .
+
+entity:person-Zills-schafer2025 a schema:Person ;
+    schema:name "Fabian Zills" ;
+    schema:givenName "Fabian" ;
+    schema:familyName "Zills" .
+
+<https://orcid.org/0000-0003-2739-310X> a schema:Person ;
+    schema:name "Christian Holm" ;
+    schema:givenName "Christian" ;
+    schema:familyName "Holm" ;
+    schema:identifier <https://orcid.org/0000-0003-2739-310X> .
+
+<https://orcid.org/0000-0001-6178-7669> a schema:Person ;
+    schema:name "Johannes Kästner" ;
+    schema:givenName "Johannes" ;
+    schema:familyName "Kästner" ;
+    schema:identifier <https://orcid.org/0000-0001-6178-7669> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-Li3PO4-schafer2025 a mlips:MaterialSystem ;
+    rdfs:label "Li3PO4 solid-state electrolyte" ;
+    mlips:chemicalFormula "Li3PO4" ;
+    mlips:materialClass "Phosphate Li-ion conductor (data set of Musaelian et al.)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-Li3PO4-schafer2025 a mlips:TrainingDataset ;
+    rdfs:label "Li3PO4 data set, 10K subset" ;
+    mlips:coversMaterial entity:mat-Li3PO4-schafer2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 10000 ;
+    rdfs:comment "The same data set as in musaelian2023allegro; its reference settings are not restated here." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-Li3PO4-schafer2025 mlips:samplingStrategy
+    entity:sampling-li3po4-subset-schafer2025 .
+
+entity:sampling-li3po4-subset-schafer2025 a mlips:SamplingStrategy ;
+    rdfs:label "10K subset of the Li3PO4 data set" ;
+    rdfs:comment "Training setup following Musaelian et al. (the Allegro paper)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GMNN a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Moment Neural Network (GMNN)" ;
+    mlips:hasImplementation entity:impl-GMNN-schafer2025 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:impl-GMNN-schafer2025 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-apax-schafer2025 .
+
+entity:lib-apax-schafer2025 a mlips:Library ;
+    rdfs:label "apax" ;
+    rdfs:comment "JAX-based framework with an internal JIT-compiled MD engine and an ASE calculator; full and shallow ensembles for uncertainty estimates." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gmnn-Li3PO4-schafer2025 a mlips:MLIPRun ;
+    rdfs:label "GMNN trained with apax on the 10K Li3PO4 subset" ;
+    mlips:appliesMethod entity:GMNN ;
+    mlips:runsOn entity:ds-Li3PO4-schafer2025 ;
+    mlips:produces entity:model-gmnn-Li3PO4-schafer2025 .
+
+entity:model-gmnn-Li3PO4-schafer2025 a mlips:TrainedModel ;
+    rdfs:label "GMNN model for Li3PO4 (apax)" ;
+    mlips:inferenceHardware "Nvidia V100, apax internal MD engine: 10.1 microseconds per atom per step for 192 atoms and 2.3 for 5184 atoms (whole MD step, 600 K)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-schafer2025 mlips:hasResult
+    entity:result-gmnn-Li3PO4-schafer2025 .
+
+entity:result-gmnn-Li3PO4-schafer2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gmnn-Li3PO4-schafer2025 ;
+    mlips:targetMaterial entity:mat-Li3PO4-schafer2025 ;
+    mlips:hasAccuracyMetric entity:metric-gmnn-Li3PO4-1-schafer2025 ,
+        entity:metric-gmnn-Li3PO4-2-schafer2025 .
+
+entity:metric-gmnn-Li3PO4-1-schafer2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: GMNN (apax), Li3PO4 10K subset" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-gmnn-Li3PO4-2-schafer2025 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: GMNN (apax), Li3PO4 10K subset" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "68.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# MD step time on an Nvidia V100 (Table 1) is recorded as text in
+# inferenceHardware; ensemble inference times on an RTX 4090 and the
+# training-parallelisation study are figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The Allegro (1.7 meV/atom, 73.4 meV/A, 27.8 microseconds/atom/step) and SO3krates (0.2, 28.2, 23.6) rows of Table 1 are values reported elsewhere on the same GPU and are not encoded; the Allegro values are those of musaelian2023allegro.
+# - GMNN hyperparameters and the training settings were not captured. The other experiments (batch data selection, continuous learning on ionic-liquid data, uncertainty-driven dynamics, equivariant models trained through apax) report learning curves and are not encoded.
+# - GMNN is a new registry method first used here; its originating papers are not in this file. The manifest classes the paper as 'Application/model instance'; it is a software paper.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
