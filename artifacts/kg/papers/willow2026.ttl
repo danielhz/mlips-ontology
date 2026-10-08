@@ -1,0 +1,641 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Soohaeng Yoo Willow et al. (2026). Bayesian equivariant interatomic potential with iterative restratification of many-body message passing.
+#   npj Computational Materials. doi:10.1038/s41524-026-02258-9  arXiv:2510.03046v2
+#
+# Version read: arxiv-preprint arXiv:2510.03046v2 (sha256 0fd388d3ed2b3b5f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 123 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the RACE architecture (introduced here) as a
+# deterministic potential on the two standard force-field benchmarks:
+# seven rMD17 molecules (Table 3) and 3BPA trained at 300 K and tested at
+# 300, 600 and 1200 K (Table 4, hyperparameters of Table S5). The
+# Bayesian variants and the uncertainty-quantification study are
+# described in the gaps.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-willow2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Willow et al. (2026): Bayesian equivariant interatomic potential with iterative restratification of many-body message passing (RACE)" ;
+    mlips:reportedIn entity:article-willow2026 .
+
+entity:article-willow2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-026-02258-9> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Bayesian equivariant interatomic potential with iterative restratification of many-body message passing" ;
+    schema:author entity:person-Willow-willow2026 ,
+        entity:person-Park-willow2026 ,
+        entity:person-Sim-willow2026 ,
+        entity:person-Moon-willow2026 ,
+        entity:person-Min-willow2026 ,
+        entity:person-Seo-willow2026 ,
+        entity:person-Kim-willow2026 ,
+        entity:person-Yang-willow2026 ,
+        entity:person-KimHyunWoo-willow2026 ,
+        entity:person-Lee-willow2026 ,
+        entity:person-Myung-willow2026 .
+
+entity:person-Willow-willow2026 a schema:Person ;
+    schema:name "Soohaeng Yoo Willow" ;
+    schema:givenName "Soohaeng Yoo" ;
+    schema:familyName "Willow" .
+
+entity:person-Park-willow2026 a schema:Person ;
+    schema:name "Tae Hyeon Park" ;
+    schema:givenName "Tae Hyeon" ;
+    schema:familyName "Park" .
+
+entity:person-Sim-willow2026 a schema:Person ;
+    schema:name "Gi Beom Sim" ;
+    schema:givenName "Gi Beom" ;
+    schema:familyName "Sim" .
+
+entity:person-Moon-willow2026 a schema:Person ;
+    schema:name "Sung Wook Moon" ;
+    schema:givenName "Sung Wook" ;
+    schema:familyName "Moon" .
+
+entity:person-Min-willow2026 a schema:Person ;
+    schema:name "Seung Kyu Min" ;
+    schema:givenName "Seung Kyu" ;
+    schema:familyName "Min" .
+
+entity:person-Seo-willow2026 a schema:Person ;
+    schema:name "Sangjae Seo" ;
+    schema:givenName "Sangjae" ;
+    schema:familyName "Seo" .
+
+entity:person-Kim-willow2026 a schema:Person ;
+    schema:name "Jaewook Kim" ;
+    schema:givenName "Jaewook" ;
+    schema:familyName "Kim" .
+
+entity:person-Yang-willow2026 a schema:Person ;
+    schema:name "D. ChangMo Yang" ;
+    schema:givenName "D. ChangMo" ;
+    schema:familyName "Yang" .
+
+entity:person-KimHyunWoo-willow2026 a schema:Person ;
+    schema:name "Hyun Woo Kim" ;
+    schema:givenName "Hyun Woo" ;
+    schema:familyName "Kim" .
+
+entity:person-Lee-willow2026 a schema:Person ;
+    schema:name "Juho Lee" ;
+    schema:givenName "Juho" ;
+    schema:familyName "Lee" .
+
+entity:person-Myung-willow2026 a schema:Person ;
+    schema:name "Chang Woo Myung" ;
+    schema:givenName "Chang Woo" ;
+    schema:familyName "Myung" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-3BPA-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "3-(benzyloxy)pyridin-2-amine (3BPA) molecule" ;
+    mlips:materialClass "Flexible drug-like organic molecule (gas phase)" .
+
+entity:mat-aspirin-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-ethanol-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-naphthalene-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-salicylic-acid-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-uracil-willow2026 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-3BPA-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "3BPA training set (450 configurations at 300 K)" ;
+    mlips:coversMaterial entity:mat-3BPA-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 450 .
+
+entity:ds-rmd17-aspirin-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 aspirin: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-aspirin-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-ethanol-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 ethanol: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-ethanol-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-malonaldehyde-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 malonaldehyde: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-naphthalene-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 naphthalene: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-naphthalene-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-salicylic-acid-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 salicylic acid: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-toluene-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 toluene: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-toluene-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+entity:ds-rmd17-uracil-willow2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 uracil: 950 training configurations" ;
+    mlips:coversMaterial entity:mat-uracil-willow2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 950 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-3BPA-willow2026 mlips:samplingStrategy
+    entity:sampling-bpa-300K-willow2026 .
+
+entity:ds-rmd17-aspirin-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-ethanol-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-malonaldehyde-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-naphthalene-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-salicylic-acid-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-toluene-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:ds-rmd17-uracil-willow2026 mlips:samplingStrategy
+    entity:sampling-rmd17-willow2026 .
+
+entity:sampling-rmd17-willow2026 a mlips:SamplingStrategy ;
+    rdfs:label "rMD17 split of 950 training and 50 validation configurations" .
+
+entity:sampling-bpa-300K-willow2026 a mlips:SamplingStrategy ;
+    rdfs:label "3BPA training configurations at 300 K" ;
+    rdfs:comment "450 configurations for training and 50 for validation from the 300 K trajectory; test sets of 1,669 (300 K), 2,138 (600 K) and 2,139 (1200 K) configurations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:RACE a mlips:MLIPMethod ;
+    rdfs:label "RACE (E(3)-equivariant many-body message passing with iterative restratification)" ;
+    mlips:hasTrainingAlgorithm entity:alg-RACE-willow2026 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numEpochs ,
+        entity:hp-loss-weight-energy-willow2026 ,
+        entity:hp-loss-weight-force-willow2026 .
+
+entity:alg-RACE-willow2026 a mls:Algorithm ;
+    rdfs:label "AMSGrad with ReduceLROnPlateau (decay factor 0.9, patience 50), exponential moving average of the weights (decay 0.99) (3BPA settings, Table S5)" .
+
+entity:hp-loss-weight-energy-willow2026 a mlips:Hyperparameter ;
+    rdfs:label "Energy coefficient of the loss (lambda_E)" ;
+    mlips:hyperparameterName "lambda_E" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-loss-weight-force-willow2026 a mlips:Hyperparameter ;
+    rdfs:label "Force coefficient of the loss (lambda_F)" ;
+    mlips:hyperparameterName "lambda_F" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-race-3BPA-cutoffRadius-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-race-3BPA-numRadialBasis-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-race-3BPA-numLayers-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-race-3BPA-numFeatures-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "64"^^xsd:integer .
+
+entity:setting-race-3BPA-learningRate-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-race-3BPA-batchSize-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-race-3BPA-numEpochs-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "5000"^^xsd:integer .
+
+entity:setting-race-3BPA-loss-weight-energy-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-energy-willow2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-race-3BPA-loss-weight-force-willow2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-force-willow2026 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-race-3BPA-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on 3BPA (300 K)" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-3BPA-willow2026 ;
+    mlips:hasHyperparameterSetting entity:setting-race-3BPA-cutoffRadius-willow2026 ,
+        entity:setting-race-3BPA-numRadialBasis-willow2026 ,
+        entity:setting-race-3BPA-numLayers-willow2026 ,
+        entity:setting-race-3BPA-numFeatures-willow2026 ,
+        entity:setting-race-3BPA-learningRate-willow2026 ,
+        entity:setting-race-3BPA-batchSize-willow2026 ,
+        entity:setting-race-3BPA-numEpochs-willow2026 ,
+        entity:setting-race-3BPA-loss-weight-energy-willow2026 ,
+        entity:setting-race-3BPA-loss-weight-force-willow2026 ;
+    mlips:produces entity:model-race-3BPA-willow2026 .
+
+entity:model-race-3BPA-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE 3BPA model" .
+
+entity:run-race-aspirin-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 aspirin" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-aspirin-willow2026 ;
+    mlips:produces entity:model-race-aspirin-willow2026 .
+
+entity:model-race-aspirin-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 aspirin model" .
+
+entity:run-race-ethanol-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 ethanol" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-ethanol-willow2026 ;
+    mlips:produces entity:model-race-ethanol-willow2026 .
+
+entity:model-race-ethanol-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 ethanol model" .
+
+entity:run-race-malonaldehyde-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 malonaldehyde" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-malonaldehyde-willow2026 ;
+    mlips:produces entity:model-race-malonaldehyde-willow2026 .
+
+entity:model-race-malonaldehyde-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 malonaldehyde model" .
+
+entity:run-race-naphthalene-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 naphthalene" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-naphthalene-willow2026 ;
+    mlips:produces entity:model-race-naphthalene-willow2026 .
+
+entity:model-race-naphthalene-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 naphthalene model" .
+
+entity:run-race-salicylic-acid-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 salicylic acid" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-salicylic-acid-willow2026 ;
+    mlips:produces entity:model-race-salicylic-acid-willow2026 .
+
+entity:model-race-salicylic-acid-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 salicylic acid model" .
+
+entity:run-race-toluene-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 toluene" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-toluene-willow2026 ;
+    mlips:produces entity:model-race-toluene-willow2026 .
+
+entity:model-race-toluene-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 toluene model" .
+
+entity:run-race-uracil-willow2026 a mlips:MLIPRun ;
+    rdfs:label "RACE trained on rMD17 uracil" ;
+    mlips:appliesMethod entity:RACE ;
+    mlips:runsOn entity:ds-rmd17-uracil-willow2026 ;
+    mlips:produces entity:model-race-uracil-willow2026 .
+
+entity:model-race-uracil-willow2026 a mlips:TrainedModel ;
+    rdfs:label "RACE rMD17 uracil model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-willow2026 mlips:hasResult
+    entity:result-race-aspirin-willow2026 ,
+    entity:result-race-ethanol-willow2026 ,
+    entity:result-race-malonaldehyde-willow2026 ,
+    entity:result-race-naphthalene-willow2026 ,
+    entity:result-race-salicylic-acid-willow2026 ,
+    entity:result-race-toluene-willow2026 ,
+    entity:result-race-uracil-willow2026 ,
+    entity:result-race-3BPA-300K-willow2026 ,
+    entity:result-race-3BPA-600K-willow2026 ,
+    entity:result-race-3BPA-1200K-willow2026 .
+
+entity:result-race-aspirin-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-aspirin-willow2026 ;
+    mlips:targetMaterial entity:mat-aspirin-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-aspirin-1-willow2026 ,
+        entity:metric-race-aspirin-2-willow2026 .
+
+entity:metric-race-aspirin-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-aspirin-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-ethanol-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-ethanol-willow2026 ;
+    mlips:targetMaterial entity:mat-ethanol-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-ethanol-1-willow2026 ,
+        entity:metric-race-ethanol-2-willow2026 .
+
+entity:metric-race-ethanol-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-ethanol-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-malonaldehyde-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-malonaldehyde-willow2026 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-malonaldehyde-1-willow2026 ,
+        entity:metric-race-malonaldehyde-2-willow2026 .
+
+entity:metric-race-malonaldehyde-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-malonaldehyde-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "7.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-naphthalene-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-naphthalene-willow2026 ;
+    mlips:targetMaterial entity:mat-naphthalene-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-naphthalene-1-willow2026 ,
+        entity:metric-race-naphthalene-2-willow2026 .
+
+entity:metric-race-naphthalene-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-naphthalene-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 naphthalene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-salicylic-acid-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-salicylic-acid-willow2026 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-salicylic-acid-1-willow2026 ,
+        entity:metric-race-salicylic-acid-2-willow2026 .
+
+entity:metric-race-salicylic-acid-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-salicylic-acid-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 salicylic acid" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-toluene-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-toluene-willow2026 ;
+    mlips:targetMaterial entity:mat-toluene-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-toluene-1-willow2026 ,
+        entity:metric-race-toluene-2-willow2026 .
+
+entity:metric-race-toluene-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-toluene-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-uracil-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-uracil-willow2026 ;
+    mlips:targetMaterial entity:mat-uracil-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-uracil-1-willow2026 ,
+        entity:metric-race-uracil-2-willow2026 .
+
+entity:metric-race-uracil-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on energy: RACE, rMD17 uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-uracil-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces: RACE, rMD17 uracil" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "4.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-3BPA-300K-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-3BPA-willow2026 ;
+    mlips:targetMaterial entity:mat-3BPA-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-3BPA-300K-1-willow2026 ,
+        entity:metric-race-3BPA-300K-2-willow2026 .
+
+entity:metric-race-3BPA-300K-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: RACE, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-3BPA-300K-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: RACE, 3BPA test set at 300 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "12.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-3BPA-600K-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-3BPA-willow2026 ;
+    mlips:targetMaterial entity:mat-3BPA-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-3BPA-600K-1-willow2026 ,
+        entity:metric-race-3BPA-600K-2-willow2026 .
+
+entity:metric-race-3BPA-600K-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: RACE, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "11.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-3BPA-600K-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: RACE, 3BPA test set at 600 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-race-3BPA-1200K-willow2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-race-3BPA-willow2026 ;
+    mlips:targetMaterial entity:mat-3BPA-willow2026 ;
+    mlips:hasAccuracyMetric entity:metric-race-3BPA-1200K-1-willow2026 ,
+        entity:metric-race-3BPA-1200K-2-willow2026 .
+
+entity:metric-race-3BPA-1200K-1-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: RACE, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "37.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-race-3BPA-1200K-2-willow2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: RACE, 3BPA test set at 1200 K" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "115.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Only the deterministic 'RACE' rows are encoded. The ensemble (RACE-Ensemble) and the Bayesian variants trained with negative log-likelihood losses or approximate posteriors (RACE-DE-E, RACE-DE-JEF, RACE-LA, and MVE, SWAG, IVON in the UQ study) are further models of the same architecture and are not encoded; schema 0.1.2 has no terms for predictive uncertainty or calibration.
+# - All other rows of Tables 3 and 4 (GotenNet, MGNN, ViSNet, MACE, Allegro, BOTNet, NequIP, ACE, FCHL, GAP, ANI, PaiNN) are literature values.
+# - Settings are encoded for 3BPA only (Table S5; the hidden irreps 64x0o+64x0e+...+64x3e are encoded as numFeatures 64 and 'number of layers' 5 as numLayers); the rMD17 settings of Table S3 were not read. The reference levels of rMD17 and 3BPA are not restated.
+# - Not encoded: the QM9 property benchmark (Table 1), the PSB3 benchmark (Table 2), the oBN25 boron-nitride data set used for uncertainty quantification and active learning (PBE; Tables 5-8), and the recalibration results.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
