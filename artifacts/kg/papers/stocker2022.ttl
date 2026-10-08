@@ -1,0 +1,280 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Sina Stocker et al. (2022). How robust are modern graph neural network potentials in long and hot molecular dynamics simulations?.
+#   Machine Learning Science and Technology. doi:10.1088/2632-2153/ac9955
+#
+# Version read: publisher (sha256 9b00964c483686a7...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 93 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the GemNet-Q potentials trained on QM7-x subsets of
+# 3.2 k, 32 k, 320 k and 3.2 million configurations and tested for
+# robustness in 280 ns of MD at 300 K and above, with re-labelled MD
+# samples. The test-set force MAE of the largest model is the one value
+# printed in the text.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-stocker2022 a mlips:BenchmarkStudy ;
+    rdfs:label "Stocker et al. (2022): how robust are modern graph neural network potentials in long and hot molecular dynamics simulations?" ;
+    mlips:reportedIn entity:article-stocker2022 .
+
+entity:article-stocker2022 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/2632-2153/ac9955> ;
+    schema:datePublished "2022"^^xsd:gYear ;
+    schema:name "How robust are modern graph neural network potentials in long and hot molecular dynamics simulations?" ;
+    schema:author entity:person-Stocker-stocker2022 ,
+        <https://orcid.org/0000-0001-9388-6389> ,
+        entity:person-Becker-stocker2022 ,
+        entity:person-Gunnemann-stocker2022 ,
+        <https://orcid.org/0000-0002-0862-5289> .
+
+entity:person-Stocker-stocker2022 a schema:Person ;
+    schema:name "Sina Stocker" ;
+    schema:givenName "Sina" ;
+    schema:familyName "Stocker" .
+
+<https://orcid.org/0000-0001-9388-6389> a schema:Person ;
+    schema:name "Johannes Gasteiger" ;
+    schema:givenName "Johannes" ;
+    schema:familyName "Gasteiger" ;
+    schema:identifier <https://orcid.org/0000-0001-9388-6389> .
+
+entity:person-Becker-stocker2022 a schema:Person ;
+    schema:name "Florian Becker" ;
+    schema:givenName "Florian" ;
+    schema:familyName "Becker" .
+
+entity:person-Gunnemann-stocker2022 a schema:Person ;
+    schema:name "Stephan Günnemann" ;
+    schema:givenName "Stephan" ;
+    schema:familyName "Günnemann" .
+
+<https://orcid.org/0000-0002-0862-5289> a schema:Person ;
+    schema:name "Johannes T Margraf" ;
+    schema:givenName "Johannes T" ;
+    schema:familyName "Margraf" ;
+    schema:identifier <https://orcid.org/0000-0002-0862-5289> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-qm7x-stocker2022 a mlips:MaterialSystem ;
+    rdfs:label "QM7-x small organic molecules (up to seven non-hydrogen atoms: C, N, O, S, Cl; 4 to 23 atoms)" ;
+    mlips:materialClass "Small organic molecules, equilibrium and normal-mode-displaced non-equilibrium structures" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-stocker2022 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-stocker2022 mlips:hasDFTSettings entity:calc-settings-dft-stocker2022 .
+
+entity:calc-settings-dft-stocker2022 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-PBE0-MBD-stocker2022 ;
+    rdfs:comment "QM7-x level: tightly converged numerical atom-centred basis sets and integration grids (details in the QM7-x paper); MD samples are re-labelled with identical settings." .
+
+entity:xc-PBE0-MBD-stocker2022 a mlips:XCFunctional ;
+    rdfs:label "PBE0+MBD" ;
+    rdfs:comment "PBE0 hybrid functional with a many-body dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-qm7x-3k-stocker2022 a mlips:TrainingDataset ;
+    rdfs:label "QM7-x training subset of 3.2 k configurations" ;
+    mlips:coversMaterial entity:mat-qm7x-stocker2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3200 ;
+    mlips:hasDFTCalculation entity:calc-dft-stocker2022 .
+
+entity:ds-qm7x-32k-stocker2022 a mlips:TrainingDataset ;
+    rdfs:label "QM7-x training subset of 32 k configurations" ;
+    mlips:coversMaterial entity:mat-qm7x-stocker2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 32000 ;
+    mlips:hasDFTCalculation entity:calc-dft-stocker2022 .
+
+entity:ds-qm7x-320k-stocker2022 a mlips:TrainingDataset ;
+    rdfs:label "QM7-x training subset of 320 k configurations" ;
+    mlips:coversMaterial entity:mat-qm7x-stocker2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 320000 ;
+    mlips:hasDFTCalculation entity:calc-dft-stocker2022 .
+
+entity:ds-qm7x-3M-stocker2022 a mlips:TrainingDataset ;
+    rdfs:label "QM7-x training subset of 3.2 million configurations" ;
+    mlips:coversMaterial entity:mat-qm7x-stocker2022 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 3200000 ;
+    mlips:hasDFTCalculation entity:calc-dft-stocker2022 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-qm7x-3k-stocker2022 mlips:samplingStrategy
+    entity:sampling-normal-mode-stocker2022 .
+
+entity:ds-qm7x-32k-stocker2022 mlips:samplingStrategy
+    entity:sampling-normal-mode-stocker2022 .
+
+entity:ds-qm7x-320k-stocker2022 mlips:samplingStrategy
+    entity:sampling-normal-mode-stocker2022 .
+
+entity:ds-qm7x-3M-stocker2022 mlips:samplingStrategy
+    entity:sampling-normal-mode-stocker2022 .
+
+entity:sampling-normal-mode-stocker2022 a mlips:SamplingStrategy ;
+    rdfs:label "Equilibrium structures and normal-mode displacements (QM7-x)" ;
+    rdfs:comment "About 41,500 equilibrium structures from 6950 structural formulas and 100 non-equilibrium structures each, from linear combinations of normal-mode displacements; about 4.2 million configurations in total. Random split into training sets, validation sets (800 to 800 k) and a test set of 10,100 configurations." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GemNet a mlips:MLIPMethod ;
+    rdfs:label "GemNet (geometric message passing neural network)" ;
+    mlips:hasFunctionalForm entity:ff-GemNet ;
+    mlips:hasLossFunction entity:loss-GemNet-stocker2022 ;
+    mlips:hasHyperparameter entity:hp-variant-stocker2022 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ;
+    mlips:inferenceComplexity "Linear in the number of atoms (finite cutoff, per-atom energy contributions)" .
+
+entity:ff-GemNet a mlips:FunctionalForm ;
+    rdfs:label "Directional graph neural network with geometric message passing over atom triplets and, in the two-hop form, quadruplets, built on spherical representations; energies are sums of atomic contributions and forces are obtained by backpropagation or, in the direct variants, predicted directly" .
+
+entity:loss-GemNet-stocker2022 a mlips:LossFunction ;
+    rdfs:label "Combined loss on atomization energies and forces in which the atomization energy contributes 0.1%" .
+
+entity:hp-variant-stocker2022 a mlips:Hyperparameter ;
+    rdfs:label "GemNet variant (two-hop Q or one-hop T message passing; d = direct force prediction)" ;
+    mlips:hyperparameterName "variant" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-gemnet-3k-variant-stocker2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-stocker2022 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-gemnet-32k-variant-stocker2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-stocker2022 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-gemnet-320k-variant-stocker2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-stocker2022 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-gemnet-3M-variant-stocker2022 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-stocker2022 ;
+    mlips:settingValue "GemNet-Q" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-gemnet-3k-stocker2022 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on 3.2 k QM7-x configurations ('sparse')" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-qm7x-3k-stocker2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gemnet-3k-variant-stocker2022 ;
+    mlips:produces entity:model-gemnet-3k-stocker2022 .
+
+entity:model-gemnet-3k-stocker2022 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q QM7-x model, 3.2 k training configurations" .
+
+entity:run-gemnet-32k-stocker2022 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on 32 k QM7-x configurations ('sparse')" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-qm7x-32k-stocker2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gemnet-32k-variant-stocker2022 ;
+    mlips:produces entity:model-gemnet-32k-stocker2022 .
+
+entity:model-gemnet-32k-stocker2022 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q QM7-x model, 32 k training configurations" .
+
+entity:run-gemnet-320k-stocker2022 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on 320 k QM7-x configurations ('exhaustive')" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-qm7x-320k-stocker2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gemnet-320k-variant-stocker2022 ;
+    mlips:produces entity:model-gemnet-320k-stocker2022 .
+
+entity:model-gemnet-320k-stocker2022 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q QM7-x model, 320 k training configurations" .
+
+entity:run-gemnet-3M-stocker2022 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on 3.2 million QM7-x configurations ('exhaustive')" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-qm7x-3M-stocker2022 ;
+    mlips:hasHyperparameterSetting entity:setting-gemnet-3M-variant-stocker2022 ;
+    mlips:produces entity:model-gemnet-3M-stocker2022 .
+
+entity:model-gemnet-3M-stocker2022 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q QM7-x model, 3.2 million training configurations" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-stocker2022 mlips:hasResult
+    entity:result-gemnet-3M-test-stocker2022 .
+
+entity:result-gemnet-3M-test-stocker2022 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-gemnet-3M-stocker2022 ;
+    mlips:targetMaterial entity:mat-qm7x-stocker2022 ;
+    mlips:hasAccuracyMetric entity:metric-gemnet-3M-test-1-stocker2022 .
+
+entity:metric-gemnet-3M-test-1-stocker2022 a mlips:AccuracyMetric ;
+    rdfs:label "Test MAE on forces (10,100 QM7-x configurations): most exhaustive GemNet-Q model" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0043"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Learning curves (Fig. 1) and the errors on MD samples as a function of temperature and training-set size (Fig. 2) are figures; only the force MAE of the 3.2-million model is printed (the text adds an energy error of about 0.01 eV without saying for which model, so it is not encoded).
+# - GemNet-T, SchNet and DimeNet++ models are also trained on QM7-x for the learning curves; they are not encoded because no number is printed for them.
+# - Hyperparameters are in the SI. The MD robustness results (stability, fraction of converged DFT calculations, dissociation events) and the uncertainty study have no MetricProperty.
+# - The manifest classes this paper as 'Method/model'; it is a robustness study of an existing method.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
