@@ -1,0 +1,1077 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yajie Ji et al. (2026). Accurate learning of long-range interatomic potentials by coupling Cartesian atomic cluster expansion and sum-of-Gaussians neural networks.
+#   The Journal of Chemical Physics. doi:10.1063/5.0303312
+#
+# Version read: publisher (sha256 d8574f159461222e...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 60 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the CACE-SOG method (introduced here) and the fits
+# whose errors the paper tabulates: molecular dimers of three interaction
+# types (Table I) and ionic NaCl clusters (Table III), each with the
+# short-range CACE and the CACE-LES comparison models trained by the
+# authors, and CACE-SOG on Au2-MgO(001), Cu-BTA and Ag3 clusters
+# (Table IV).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-ji2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Ji et al. (2026): long-range interatomic potentials by coupling Cartesian atomic cluster expansion with sum-of-Gaussians neural networks (CACE-SOG)" ;
+    mlips:reportedIn entity:article-ji2026 .
+
+entity:article-ji2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1063/5.0303312> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Accurate learning of long-range interatomic potentials by coupling Cartesian atomic cluster expansion and sum-of-Gaussians neural networks" ;
+    schema:author <https://orcid.org/0009-0000-6789-4385> ,
+        <https://orcid.org/0000-0003-0247-4149> ,
+        <https://orcid.org/0000-0001-7645-4998> .
+
+<https://orcid.org/0009-0000-6789-4385> a schema:Person ;
+    schema:name "Yajie Ji" ;
+    schema:givenName "Yajie" ;
+    schema:familyName "Ji" ;
+    schema:identifier <https://orcid.org/0009-0000-6789-4385> .
+
+<https://orcid.org/0000-0003-0247-4149> a schema:Person ;
+    schema:name "Jiuyang Liang" ;
+    schema:givenName "Jiuyang" ;
+    schema:familyName "Liang" ;
+    schema:identifier <https://orcid.org/0000-0003-0247-4149> .
+
+<https://orcid.org/0000-0001-7645-4998> a schema:Person ;
+    schema:name "Zhenli Xu" ;
+    schema:givenName "Zhenli" ;
+    schema:familyName "Xu" ;
+    schema:identifier <https://orcid.org/0000-0001-7645-4998> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-NaCl-clusters-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Ionic Na9Cl8+ and Na8Cl8+ clusters" ;
+    mlips:materialClass "Charged ionic clusters with global charge transfer" .
+
+entity:mat-dimer-CC-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers: charge-charge dimers (1/r decay)" ;
+    mlips:materialClass "Molecular dimers at separations of about 5 to 15 A" .
+
+entity:mat-dimer-PP-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers: polar-polar dimers (1/r^3 decay)" ;
+    mlips:materialClass "Molecular dimers at separations of about 5 to 15 A" .
+
+entity:mat-dimer-AA-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Molecular dimers: apolar-apolar dimers (1/r^6 decay)" ;
+    mlips:materialClass "Molecular dimers at separations of about 5 to 15 A" .
+
+entity:mat-Au2-MgO-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Au2 cluster on MgO(001)" ;
+    mlips:materialClass "Benchmark system for long-range and charge-state effects" .
+
+entity:mat-Cu-BTA-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Benzotriazole (BTA) on copper" ;
+    mlips:materialClass "Benchmark system for long-range and charge-state effects" .
+
+entity:mat-Ag3-ji2026 a mlips:MaterialSystem ;
+    rdfs:label "Ag3 clusters in two charge states (+/-)" ;
+    mlips:materialClass "Benchmark system for long-range and charge-state effects" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dimer-dft-ji2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dimer-dft-ji2026 mlips:hasDFTSettings entity:calc-settings-dimer-dft-ji2026 .
+
+entity:calc-settings-dimer-dft-ji2026 a mlips:DFTSettings ;
+    mlips:xcFunctional entity:xc-HSE06-many-body-dispersion-ji2026 ;
+    rdfs:comment "Level of the molecular dimer data set (ref. 51 of the paper); code and basis not restated." .
+
+entity:xc-HSE06-many-body-dispersion-ji2026 a mlips:XCFunctional ;
+    rdfs:label "HSE06 + many-body dispersion" ;
+    rdfs:comment "HSE06 hybrid functional with a many-body dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-NaCl-clusters-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Na9Cl8+ / Na8Cl8+ cluster data set" ;
+    mlips:coversMaterial entity:mat-NaCl-clusters-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and reference level were not captured from the parts read." .
+
+entity:ds-dimer-CC-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Dimer data set, charge-charge dimers (1/r decay)" ;
+    mlips:coversMaterial entity:mat-dimer-CC-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dimer-dft-ji2026 .
+
+entity:ds-dimer-PP-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Dimer data set, polar-polar dimers (1/r^3 decay)" ;
+    mlips:coversMaterial entity:mat-dimer-PP-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dimer-dft-ji2026 .
+
+entity:ds-dimer-AA-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Dimer data set, apolar-apolar dimers (1/r^6 decay)" ;
+    mlips:coversMaterial entity:mat-dimer-AA-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:hasDFTCalculation entity:calc-dimer-dft-ji2026 .
+
+entity:ds-Au2-MgO-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Au2 cluster on MgO(001) data set" ;
+    mlips:coversMaterial entity:mat-Au2-MgO-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and reference level were not captured from the parts read." .
+
+entity:ds-Cu-BTA-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Benzotriazole (BTA) on copper data set" ;
+    mlips:coversMaterial entity:mat-Cu-BTA-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and reference level were not captured from the parts read." .
+
+entity:ds-Ag3-ji2026 a mlips:TrainingDataset ;
+    rdfs:label "Ag3 clusters in two charge states (+/-) data set" ;
+    mlips:coversMaterial entity:mat-Ag3-ji2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "11,013 configurations of Ag trimers in two charge states (Ko et al.)." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-dimer-CC-ji2026 mlips:samplingStrategy
+    entity:sampling-dimer-separation-ji2026 .
+
+entity:ds-dimer-PP-ji2026 mlips:samplingStrategy
+    entity:sampling-dimer-separation-ji2026 .
+
+entity:ds-dimer-AA-ji2026 mlips:samplingStrategy
+    entity:sampling-dimer-separation-ji2026 .
+
+entity:sampling-dimer-separation-ji2026 a mlips:SamplingStrategy ;
+    rdfs:label "Dimer separation scan with long-range extrapolation split" ;
+    rdfs:comment "Training set of ten configurations with intermolecular separations from about 5 to 12 A; test set of three configurations between 12 and 15 A." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:CACE a mlips:MLIPMethod ;
+    rdfs:label "Cartesian Atomic Cluster Expansion (CACE)" ;
+    mlips:hasFunctionalForm entity:ff-CACE ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-radial-channels-ji2026 ,
+        mlips:bodyOrder ,
+        entity:hp-n-embedding-ji2026 ,
+        mlips:numLayers .
+
+entity:ff-CACE a mlips:FunctionalForm ;
+    rdfs:label "Body-ordered atomic cluster expansion whose rotationally invariant features are built by symmetrising Cartesian angular basis functions, with optional message passing between atoms; atomic energies are summed to the total energy" .
+
+entity:CACE-LES a mlips:MLIPMethod ;
+    rdfs:label "CACE with latent Ewald summation (CACE-LES)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-radial-channels-ji2026 ,
+        mlips:bodyOrder ,
+        entity:hp-n-embedding-ji2026 ,
+        mlips:numLayers ,
+        entity:hp-latent-dim-ji2026 .
+
+entity:CACE-SOG a mlips:MLIPMethod ;
+    rdfs:label "CACE with sum-of-Gaussians long-range network (CACE-SOG)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        entity:hp-radial-channels-ji2026 ,
+        mlips:bodyOrder ,
+        entity:hp-n-embedding-ji2026 ,
+        mlips:numLayers ,
+        entity:hp-latent-dim-ji2026 ,
+        entity:hp-num-gaussians-ji2026 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:hp-radial-channels-ji2026 a mlips:Hyperparameter ;
+    rdfs:label "CACE number of radial channels c" ;
+    mlips:hyperparameterName "c" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-n-embedding-ji2026 a mlips:Hyperparameter ;
+    rdfs:label "CACE dimension of the element embedding N_embedding" ;
+    mlips:hyperparameterName "N_embedding" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-num-gaussians-ji2026 a mlips:Hyperparameter ;
+    rdfs:label "SOG-Net number of Gaussians M" ;
+    mlips:hyperparameterName "M" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-latent-dim-ji2026 a mlips:Hyperparameter ;
+    rdfs:label "Dimension P of the latent charge variable" ;
+    mlips:hyperparameterName "P" ;
+    mlips:hyperparameterDatatype xsd:integer ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-CACE-dimer-CC-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-dimer-CC-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-dimer-CC-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-dimer-CC-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-dimer-CC-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-dimer-CC-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-dimer-PP-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-dimer-AA-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-CC-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-PP-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-LES-dimer-AA-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-CC-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-PP-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-numRadialBasis-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "6"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-radial-channels-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-radial-channels-ji2026 ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-bodyOrder-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:bodyOrder ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-n-embedding-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-n-embedding-ji2026 ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-numLayers-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-latent-dim-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-latent-dim-ji2026 ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-CACE-SOG-dimer-AA-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-CACE-SOG-Au2-MgO-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.5"^^xsd:double .
+
+entity:setting-CACE-SOG-Au2-MgO-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-CACE-SOG-Cu-BTA-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-CACE-SOG-Cu-BTA-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+entity:setting-CACE-SOG-Ag3-cutoffRadius-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.29"^^xsd:double .
+
+entity:setting-CACE-SOG-Ag3-num-gaussians-ji2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-num-gaussians-ji2026 ;
+    mlips:settingValue "12"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-CACE-dimer-CC-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE trained on charge-charge dimers (1/r decay)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-dimer-CC-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-dimer-CC-cutoffRadius-ji2026 ,
+        entity:setting-CACE-dimer-CC-numRadialBasis-ji2026 ,
+        entity:setting-CACE-dimer-CC-radial-channels-ji2026 ,
+        entity:setting-CACE-dimer-CC-bodyOrder-ji2026 ,
+        entity:setting-CACE-dimer-CC-n-embedding-ji2026 ,
+        entity:setting-CACE-dimer-CC-numLayers-ji2026 ;
+    mlips:produces entity:model-CACE-dimer-CC-ji2026 .
+
+entity:model-CACE-dimer-CC-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE model for CC dimers" .
+
+entity:run-CACE-dimer-PP-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE trained on polar-polar dimers (1/r^3 decay)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-dimer-PP-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-dimer-PP-cutoffRadius-ji2026 ,
+        entity:setting-CACE-dimer-PP-numRadialBasis-ji2026 ,
+        entity:setting-CACE-dimer-PP-radial-channels-ji2026 ,
+        entity:setting-CACE-dimer-PP-bodyOrder-ji2026 ,
+        entity:setting-CACE-dimer-PP-n-embedding-ji2026 ,
+        entity:setting-CACE-dimer-PP-numLayers-ji2026 ;
+    mlips:produces entity:model-CACE-dimer-PP-ji2026 .
+
+entity:model-CACE-dimer-PP-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE model for PP dimers" .
+
+entity:run-CACE-dimer-AA-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE trained on apolar-apolar dimers (1/r^6 decay)" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-dimer-AA-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-dimer-AA-cutoffRadius-ji2026 ,
+        entity:setting-CACE-dimer-AA-numRadialBasis-ji2026 ,
+        entity:setting-CACE-dimer-AA-radial-channels-ji2026 ,
+        entity:setting-CACE-dimer-AA-bodyOrder-ji2026 ,
+        entity:setting-CACE-dimer-AA-n-embedding-ji2026 ,
+        entity:setting-CACE-dimer-AA-numLayers-ji2026 ;
+    mlips:produces entity:model-CACE-dimer-AA-ji2026 .
+
+entity:model-CACE-dimer-AA-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE model for AA dimers" .
+
+entity:run-CACE-NaCl-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE trained on Na9Cl8+ / Na8Cl8+ clusters" ;
+    mlips:appliesMethod entity:CACE ;
+    mlips:runsOn entity:ds-NaCl-clusters-ji2026 ;
+    mlips:produces entity:model-CACE-NaCl-ji2026 .
+
+entity:model-CACE-NaCl-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE model for NaCl clusters" .
+
+entity:run-CACE-LES-dimer-CC-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-LES trained on charge-charge dimers (1/r decay)" ;
+    mlips:appliesMethod entity:CACE-LES ;
+    mlips:runsOn entity:ds-dimer-CC-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-LES-dimer-CC-cutoffRadius-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-numRadialBasis-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-radial-channels-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-bodyOrder-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-n-embedding-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-numLayers-ji2026 ,
+        entity:setting-CACE-LES-dimer-CC-latent-dim-ji2026 ;
+    mlips:produces entity:model-CACE-LES-dimer-CC-ji2026 .
+
+entity:model-CACE-LES-dimer-CC-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-LES model for CC dimers" .
+
+entity:run-CACE-LES-dimer-PP-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-LES trained on polar-polar dimers (1/r^3 decay)" ;
+    mlips:appliesMethod entity:CACE-LES ;
+    mlips:runsOn entity:ds-dimer-PP-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-LES-dimer-PP-cutoffRadius-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-numRadialBasis-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-radial-channels-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-bodyOrder-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-n-embedding-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-numLayers-ji2026 ,
+        entity:setting-CACE-LES-dimer-PP-latent-dim-ji2026 ;
+    mlips:produces entity:model-CACE-LES-dimer-PP-ji2026 .
+
+entity:model-CACE-LES-dimer-PP-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-LES model for PP dimers" .
+
+entity:run-CACE-LES-dimer-AA-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-LES trained on apolar-apolar dimers (1/r^6 decay)" ;
+    mlips:appliesMethod entity:CACE-LES ;
+    mlips:runsOn entity:ds-dimer-AA-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-LES-dimer-AA-cutoffRadius-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-numRadialBasis-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-radial-channels-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-bodyOrder-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-n-embedding-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-numLayers-ji2026 ,
+        entity:setting-CACE-LES-dimer-AA-latent-dim-ji2026 ;
+    mlips:produces entity:model-CACE-LES-dimer-AA-ji2026 .
+
+entity:model-CACE-LES-dimer-AA-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-LES model for AA dimers" .
+
+entity:run-CACE-LES-NaCl-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-LES trained on Na9Cl8+ / Na8Cl8+ clusters" ;
+    mlips:appliesMethod entity:CACE-LES ;
+    mlips:runsOn entity:ds-NaCl-clusters-ji2026 ;
+    mlips:produces entity:model-CACE-LES-NaCl-ji2026 .
+
+entity:model-CACE-LES-NaCl-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-LES model for NaCl clusters" .
+
+entity:run-CACE-SOG-dimer-CC-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on charge-charge dimers (1/r decay)" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-dimer-CC-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-dimer-CC-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-numRadialBasis-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-radial-channels-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-bodyOrder-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-n-embedding-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-numLayers-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-latent-dim-ji2026 ,
+        entity:setting-CACE-SOG-dimer-CC-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-dimer-CC-ji2026 .
+
+entity:model-CACE-SOG-dimer-CC-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for CC dimers" .
+
+entity:run-CACE-SOG-dimer-PP-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on polar-polar dimers (1/r^3 decay)" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-dimer-PP-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-dimer-PP-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-numRadialBasis-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-radial-channels-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-bodyOrder-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-n-embedding-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-numLayers-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-latent-dim-ji2026 ,
+        entity:setting-CACE-SOG-dimer-PP-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-dimer-PP-ji2026 .
+
+entity:model-CACE-SOG-dimer-PP-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for PP dimers" .
+
+entity:run-CACE-SOG-dimer-AA-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on apolar-apolar dimers (1/r^6 decay)" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-dimer-AA-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-dimer-AA-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-numRadialBasis-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-radial-channels-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-bodyOrder-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-n-embedding-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-numLayers-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-latent-dim-ji2026 ,
+        entity:setting-CACE-SOG-dimer-AA-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-dimer-AA-ji2026 .
+
+entity:model-CACE-SOG-dimer-AA-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for AA dimers" .
+
+entity:run-CACE-SOG-NaCl-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on Na9Cl8+ / Na8Cl8+ clusters" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-NaCl-clusters-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-NaCl-ji2026 .
+
+entity:model-CACE-SOG-NaCl-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for NaCl clusters" .
+
+entity:run-CACE-SOG-Au2-MgO-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on Au2 cluster on MgO(001)" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-Au2-MgO-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-Au2-MgO-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-Au2-MgO-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-Au2-MgO-ji2026 .
+
+entity:model-CACE-SOG-Au2-MgO-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for Au2 cluster on MgO(001)" .
+
+entity:run-CACE-SOG-Cu-BTA-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on Benzotriazole (BTA) on copper" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-Cu-BTA-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-Cu-BTA-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-Cu-BTA-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-Cu-BTA-ji2026 .
+
+entity:model-CACE-SOG-Cu-BTA-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for Benzotriazole (BTA) on copper" .
+
+entity:run-CACE-SOG-Ag3-ji2026 a mlips:MLIPRun ;
+    rdfs:label "CACE-SOG trained on Ag3 clusters in two charge states (+/-)" ;
+    mlips:appliesMethod entity:CACE-SOG ;
+    mlips:runsOn entity:ds-Ag3-ji2026 ;
+    mlips:hasHyperparameterSetting entity:setting-CACE-SOG-Ag3-cutoffRadius-ji2026 ,
+        entity:setting-CACE-SOG-Ag3-num-gaussians-ji2026 ;
+    mlips:produces entity:model-CACE-SOG-Ag3-ji2026 .
+
+entity:model-CACE-SOG-Ag3-ji2026 a mlips:TrainedModel ;
+    rdfs:label "CACE-SOG model for Ag3 clusters in two charge states (+/-)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-ji2026 mlips:hasResult
+    entity:result-CACE-dimer-CC-ji2026 ,
+    entity:result-CACE-dimer-PP-ji2026 ,
+    entity:result-CACE-dimer-AA-ji2026 ,
+    entity:result-CACE-NaCl-ji2026 ,
+    entity:result-CACE-LES-dimer-CC-ji2026 ,
+    entity:result-CACE-LES-dimer-PP-ji2026 ,
+    entity:result-CACE-LES-dimer-AA-ji2026 ,
+    entity:result-CACE-LES-NaCl-ji2026 ,
+    entity:result-CACE-SOG-dimer-CC-ji2026 ,
+    entity:result-CACE-SOG-dimer-PP-ji2026 ,
+    entity:result-CACE-SOG-dimer-AA-ji2026 ,
+    entity:result-CACE-SOG-NaCl-ji2026 ,
+    entity:result-CACE-SOG-Au2-MgO-ji2026 ,
+    entity:result-CACE-SOG-Cu-BTA-ji2026 ,
+    entity:result-CACE-SOG-Ag3-ji2026 .
+
+entity:result-CACE-dimer-CC-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-dimer-CC-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-CC-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-dimer-CC-1-ji2026 ,
+        entity:metric-CACE-dimer-CC-2-ji2026 .
+
+entity:metric-CACE-dimer-CC-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.403"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-dimer-CC-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0831"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-dimer-PP-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-dimer-PP-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-PP-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-dimer-PP-1-ji2026 ,
+        entity:metric-CACE-dimer-PP-2-ji2026 .
+
+entity:metric-CACE-dimer-PP-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0316"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-dimer-PP-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0207"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-dimer-AA-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-dimer-AA-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-AA-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-dimer-AA-1-ji2026 ,
+        entity:metric-CACE-dimer-AA-2-ji2026 .
+
+entity:metric-CACE-dimer-AA-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.0138"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-dimer-AA-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.00195"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-NaCl-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-NaCl-ji2026 ;
+    mlips:targetMaterial entity:mat-NaCl-clusters-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-NaCl-1-ji2026 ,
+        entity:metric-CACE-NaCl-2-ji2026 .
+
+entity:metric-CACE-NaCl-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.58"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-NaCl-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "48.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CACE-LES-dimer-CC-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-LES-dimer-CC-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-CC-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-LES-dimer-CC-1-ji2026 ,
+        entity:metric-CACE-LES-dimer-CC-2-ji2026 .
+
+entity:metric-CACE-LES-dimer-CC-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-LES, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00272"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-LES-dimer-CC-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-LES, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0107"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-LES-dimer-PP-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-LES-dimer-PP-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-PP-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-LES-dimer-PP-1-ji2026 ,
+        entity:metric-CACE-LES-dimer-PP-2-ji2026 .
+
+entity:metric-CACE-LES-dimer-PP-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-LES, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00291"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-LES-dimer-PP-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-LES, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.00615"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-LES-dimer-AA-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-LES-dimer-AA-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-AA-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-LES-dimer-AA-1-ji2026 ,
+        entity:metric-CACE-LES-dimer-AA-2-ji2026 .
+
+entity:metric-CACE-LES-dimer-AA-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-LES, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00168"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-LES-dimer-AA-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-LES, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000952"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-LES-NaCl-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-LES-NaCl-ji2026 ;
+    mlips:targetMaterial entity:mat-NaCl-clusters-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-LES-NaCl-1-ji2026 ,
+        entity:metric-CACE-LES-NaCl-2-ji2026 .
+
+entity:metric-CACE-LES-NaCl-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-LES, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-LES-NaCl-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-LES, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.78"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-dimer-CC-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-dimer-CC-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-CC-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-dimer-CC-1-ji2026 ,
+        entity:metric-CACE-SOG-dimer-CC-2-ji2026 .
+
+entity:metric-CACE-SOG-dimer-CC-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00245"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-SOG-dimer-CC-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, CC dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.0116"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-dimer-PP-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-dimer-PP-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-PP-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-dimer-PP-1-ji2026 ,
+        entity:metric-CACE-SOG-dimer-PP-2-ji2026 .
+
+entity:metric-CACE-SOG-dimer-PP-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00146"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-SOG-dimer-PP-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, PP dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.00426"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-dimer-AA-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-dimer-AA-ji2026 ;
+    mlips:targetMaterial entity:mat-dimer-AA-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-dimer-AA-1-ji2026 ,
+        entity:metric-CACE-SOG-dimer-AA-2-ji2026 .
+
+entity:metric-CACE-SOG-dimer-AA-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00104"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:metric-CACE-SOG-dimer-AA-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, AA dimers (Table I)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000607"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-NaCl-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-NaCl-ji2026 ;
+    mlips:targetMaterial entity:mat-NaCl-clusters-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-NaCl-1-ji2026 ,
+        entity:metric-CACE-SOG-NaCl-2-ji2026 .
+
+entity:metric-CACE-SOG-NaCl-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.12"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-SOG-NaCl-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, Na9Cl8+ / Na8Cl8+ clusters (Table III)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "4.04"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-Au2-MgO-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-Au2-MgO-ji2026 ;
+    mlips:targetMaterial entity:mat-Au2-MgO-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-Au2-MgO-1-ji2026 ,
+        entity:metric-CACE-SOG-Au2-MgO-2-ji2026 .
+
+entity:metric-CACE-SOG-Au2-MgO-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, Au2 cluster on MgO(001) (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.083"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-SOG-Au2-MgO-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, Au2 cluster on MgO(001) (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.73"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-Cu-BTA-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-Cu-BTA-ji2026 ;
+    mlips:targetMaterial entity:mat-Cu-BTA-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-Cu-BTA-1-ji2026 ,
+        entity:metric-CACE-SOG-Cu-BTA-2-ji2026 .
+
+entity:metric-CACE-SOG-Cu-BTA-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, Benzotriazole (BTA) on copper (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.069"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-SOG-Cu-BTA-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, Benzotriazole (BTA) on copper (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.24"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-CACE-SOG-Ag3-ji2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CACE-SOG-Ag3-ji2026 ;
+    mlips:targetMaterial entity:mat-Ag3-ji2026 ;
+    mlips:hasAccuracyMetric entity:metric-CACE-SOG-Ag3-1-ji2026 ,
+        entity:metric-CACE-SOG-Ag3-2-ji2026 .
+
+entity:metric-CACE-SOG-Ag3-1-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy: CACE-SOG, Ag3 clusters in two charge states (+/-) (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.171"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-CACE-SOG-Ag3-2-ji2026 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on forces: CACE-SOG, Ag3 clusters in two charge states (+/-) (Table IV)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table I is captioned 'RMSEs' while the running text calls the same numbers 'mean absolute errors'; they are encoded as RMSE, following the caption.
+# - CACE-SOG and CACE-LES are new registry methods (a CACE short-range model with a different long-range term each). The DP-SR / DP-SOG models of Table II (parameter counts only) are not encoded.
+# - Table III also lists CACE-SOG without the BSA initialisation (0.25 meV/atom, 10.46 meV/A); only the default model is encoded. In Table IV the columns CC-ACE, 4G-HDNNP, NequIP-LR, Polar-LR and CACE-LES are literature values and are not encoded.
+# - Further applications (aqueous KF, the water liquid-vapour interface with revPBE0-D3 data, water/Pt(111) with PBE-D3 data of 48,041 structures) are reported with MD-derived properties or errors that were not captured; they are not encoded.
+# - mu_max (angular truncation, 2 for the dimers) is not mapped to mlips:numAngularBasis; nu_max = 2 is encoded as mlips:bodyOrder following cheng2024. Settings of the NaCl-cluster fits were not captured. Loss, optimizer and software are not stated in the parts read.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
