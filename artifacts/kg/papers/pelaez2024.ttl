@@ -1,0 +1,484 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Raúl P. Peláez et al. (2024). TorchMD-Net 2.0: Fast Neural Network Potentials for Molecular Simulations.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.4c00253  arXiv:2402.17660v3
+#
+# Version read: arxiv-preprint arXiv:2402.17660v3 (sha256 94ff0d18741ff87f...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 98 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the TorchMD-Net 2.0 software paper. Encoded are the
+# validation fits it reports: TensorNet with 0 to 3 interaction layers
+# and the re-implemented Equivariant Transformer on the QM9 U0 target
+# (Table 1), and the TensorNet models trained on ANI-2x for stable MD
+# (hyperparameters of Table 6).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-pelaez2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Pelaez et al. (2024): TorchMD-Net 2.0, fast neural network potentials for molecular simulations" ;
+    mlips:reportedIn entity:article-pelaez2024 .
+
+entity:article-pelaez2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.4c00253> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "TorchMD-Net 2.0: Fast Neural Network Potentials for Molecular Simulations" ;
+    schema:author <https://orcid.org/0000-0003-3393-7329> ,
+        <https://orcid.org/0000-0003-3225-1632> ,
+        <https://orcid.org/0000-0001-8431-1612> ,
+        <https://orcid.org/0000-0001-7798-0519> ,
+        <https://orcid.org/0000-0002-9566-9684> ,
+        <https://orcid.org/0000-0002-8678-8657> ,
+        <https://orcid.org/0000-0002-3208-2501> ,
+        <https://orcid.org/0000-0002-2747-0518> ,
+        <https://orcid.org/0000-0003-3913-4877> .
+
+<https://orcid.org/0000-0003-3393-7329> a schema:Person ;
+    schema:name "Raul P. Pelaez" ;
+    schema:givenName "Raul P." ;
+    schema:familyName "Pelaez" ;
+    schema:identifier <https://orcid.org/0000-0003-3393-7329> .
+
+<https://orcid.org/0000-0003-3225-1632> a schema:Person ;
+    schema:name "Guillem Simeon" ;
+    schema:givenName "Guillem" ;
+    schema:familyName "Simeon" ;
+    schema:identifier <https://orcid.org/0000-0003-3225-1632> .
+
+<https://orcid.org/0000-0001-8431-1612> a schema:Person ;
+    schema:name "Raimondas Galvelis" ;
+    schema:givenName "Raimondas" ;
+    schema:familyName "Galvelis" ;
+    schema:identifier <https://orcid.org/0000-0001-8431-1612> .
+
+<https://orcid.org/0000-0001-7798-0519> a schema:Person ;
+    schema:name "Antonio Mirarchi" ;
+    schema:givenName "Antonio" ;
+    schema:familyName "Mirarchi" ;
+    schema:identifier <https://orcid.org/0000-0001-7798-0519> .
+
+<https://orcid.org/0000-0002-9566-9684> a schema:Person ;
+    schema:name "Peter Eastman" ;
+    schema:givenName "Peter" ;
+    schema:familyName "Eastman" ;
+    schema:identifier <https://orcid.org/0000-0002-9566-9684> .
+
+<https://orcid.org/0000-0002-8678-8657> a schema:Person ;
+    schema:name "Stefan Doerr" ;
+    schema:givenName "Stefan" ;
+    schema:familyName "Doerr" ;
+    schema:identifier <https://orcid.org/0000-0002-8678-8657> .
+
+<https://orcid.org/0000-0002-3208-2501> a schema:Person ;
+    schema:name "Philipp Thölke" ;
+    schema:givenName "Philipp" ;
+    schema:familyName "Thölke" ;
+    schema:identifier <https://orcid.org/0000-0002-3208-2501> .
+
+<https://orcid.org/0000-0002-2747-0518> a schema:Person ;
+    schema:name "Thomas E. Markland" ;
+    schema:givenName "Thomas E." ;
+    schema:familyName "Markland" ;
+    schema:identifier <https://orcid.org/0000-0002-2747-0518> .
+
+<https://orcid.org/0000-0003-3913-4877> a schema:Person ;
+    schema:name "Gianni De Fabritiis" ;
+    schema:givenName "Gianni" ;
+    schema:familyName "De Fabritiis" ;
+    schema:identifier <https://orcid.org/0000-0003-3913-4877> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-QM9-pelaez2024 a mlips:MaterialSystem ;
+    rdfs:label "QM9 small organic molecules (internal energy U0)" ;
+    mlips:materialClass "Small organic molecules, equilibrium geometries" .
+
+entity:mat-ani2x-pelaez2024 a mlips:MaterialSystem ;
+    rdfs:label "Organic molecules with H, C, N, O, S, F, Cl (ANI-2x data set)" ;
+    mlips:materialClass "Small organic molecules, non-equilibrium conformations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-QM9-pelaez2024 a mlips:TrainingDataset ;
+    rdfs:label "QM9 (U0 target)" ;
+    mlips:coversMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Split sizes are in the hyperparameter tables S3/S5, which were not read." .
+
+entity:ds-ani2x-pelaez2024 a mlips:TrainingDataset ;
+    rdfs:label "ANI-2x data set (90% training split)" ;
+    mlips:coversMaterial entity:mat-ani2x-pelaez2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-QM9-pelaez2024 mlips:samplingStrategy
+    entity:sampling-qm9-pelaez2024 .
+
+entity:ds-ani2x-pelaez2024 mlips:samplingStrategy
+    entity:sampling-ani2x-pelaez2024 .
+
+entity:sampling-qm9-pelaez2024 a mlips:SamplingStrategy ;
+    rdfs:label "QM9 equilibrium geometries" .
+
+entity:sampling-ani2x-pelaez2024 a mlips:SamplingStrategy ;
+    rdfs:label "ANI-2x conformations" ;
+    rdfs:comment "Training fraction 0.9, validation fraction 0.1 (Table 6)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:TensorNet a mlips:MLIPMethod ;
+    rdfs:label "TensorNet (Cartesian tensor message-passing neural network)" ;
+    mlips:hasTrainingAlgorithm entity:alg-TensorNet-pelaez2024 ;
+    mlips:hasHyperparameter mlips:numLayers ,
+        mlips:numFeatures ,
+        mlips:cutoffRadius ,
+        mlips:numRadialBasis ,
+        mlips:batchSize ,
+        mlips:learningRate ,
+        entity:hp-loss-weight-energy-pelaez2024 ,
+        entity:hp-loss-weight-force-pelaez2024 ;
+    mlips:hasImplementation entity:impl-TensorNet-pelaez2024 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:alg-TensorNet-pelaez2024 a mls:Algorithm ;
+    rdfs:label "Learning rate 1e-3 with 1000 warm-up steps, reduced by a factor 0.5 after 4 epochs without improvement down to 1e-7; early stopping with patience 50; gradient clipping at 100 (ANI-2x models)" .
+
+entity:impl-TensorNet-pelaez2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-TorchMD-Net-2_0-pelaez2024 .
+
+entity:TorchMD-ET a mlips:MLIPMethod ;
+    rdfs:label "Equivariant Transformer (TorchMD-NET)" ;
+    mlips:hasImplementation entity:impl-TorchMD-ET-pelaez2024 .
+
+entity:impl-TorchMD-ET-pelaez2024 a mlips:Implementation ;
+    mlips:implementedIn entity:lib-TorchMD-Net-2_0-pelaez2024 .
+
+entity:lib-TorchMD-Net-2_0-pelaez2024 a mlips:Library ;
+    rdfs:label "TorchMD-Net 2.0" ;
+    rdfs:comment "PyTorch-based package with OpenMM integration (openmm-torch); provides TensorNet, the Equivariant Transformer and a graph network." ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:hp-loss-weight-energy-pelaez2024 a mlips:Hyperparameter ;
+    rdfs:label "Loss weight of the energy term (y_weight)" ;
+    mlips:hyperparameterName "y_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-loss-weight-force-pelaez2024 a mlips:Hyperparameter ;
+    rdfs:label "Loss weight of the force term (neg_dy_weight)" ;
+    mlips:hyperparameterName "neg_dy_weight" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-tensornet-qm9-0L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-tensornet-qm9-0L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-tensornet-qm9-1L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-tensornet-qm9-1L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-tensornet-qm9-2L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-tensornet-qm9-2L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-tensornet-qm9-3L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-tensornet-qm9-3L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-2L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-2L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-2L-cutoffRadius-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-tensornet-ani2x-2L-numRadialBasis-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-2L-batchSize-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-2L-learningRate-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-tensornet-ani2x-2L-loss-weight-energy-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-energy-pelaez2024 ;
+    mlips:settingValue "1"^^xsd:double .
+
+entity:setting-tensornet-ani2x-2L-loss-weight-force-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-force-pelaez2024 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-0L-numLayers-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "0"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-0L-numFeatures-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numFeatures ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-0L-cutoffRadius-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-tensornet-ani2x-0L-numRadialBasis-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numRadialBasis ;
+    mlips:settingValue "32"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-0L-batchSize-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "256"^^xsd:integer .
+
+entity:setting-tensornet-ani2x-0L-learningRate-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-tensornet-ani2x-0L-loss-weight-energy-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-energy-pelaez2024 ;
+    mlips:settingValue "1"^^xsd:double .
+
+entity:setting-tensornet-ani2x-0L-loss-weight-force-pelaez2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-loss-weight-force-pelaez2024 ;
+    mlips:settingValue "100"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-tensornet-qm9-0L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 0 interaction layers on QM9 U0" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-QM9-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-qm9-0L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-qm9-0L-numFeatures-pelaez2024 ;
+    mlips:produces entity:model-tensornet-qm9-0L-pelaez2024 .
+
+entity:model-tensornet-qm9-0L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 0L, QM9 U0" .
+
+entity:run-tensornet-qm9-1L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 1 interaction layer on QM9 U0" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-QM9-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-qm9-1L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-qm9-1L-numFeatures-pelaez2024 ;
+    mlips:produces entity:model-tensornet-qm9-1L-pelaez2024 .
+
+entity:model-tensornet-qm9-1L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 1L, QM9 U0" .
+
+entity:run-tensornet-qm9-2L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 2 interaction layers on QM9 U0" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-QM9-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-qm9-2L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-qm9-2L-numFeatures-pelaez2024 ;
+    mlips:produces entity:model-tensornet-qm9-2L-pelaez2024 .
+
+entity:model-tensornet-qm9-2L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 2L, QM9 U0" .
+
+entity:run-tensornet-qm9-3L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 3 interaction layers and embedding dimension 256 on QM9 U0" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-QM9-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-qm9-3L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-qm9-3L-numFeatures-pelaez2024 ;
+    mlips:produces entity:model-tensornet-qm9-3L-pelaez2024 .
+
+entity:model-tensornet-qm9-3L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 3L*, QM9 U0" .
+
+entity:run-et-qm9-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "Equivariant Transformer, new implementation (vector_cutoff = True), on QM9 U0" ;
+    mlips:appliesMethod entity:TorchMD-ET ;
+    mlips:runsOn entity:ds-QM9-pelaez2024 ;
+    mlips:produces entity:model-et-qm9-pelaez2024 .
+
+entity:model-et-qm9-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "Equivariant Transformer (new implementation), QM9 U0" .
+
+entity:run-tensornet-ani2x-2L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 2 interaction layers trained on ANI-2x" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-ani2x-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-ani2x-2L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-numFeatures-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-cutoffRadius-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-numRadialBasis-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-batchSize-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-learningRate-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-loss-weight-energy-pelaez2024 ,
+        entity:setting-tensornet-ani2x-2L-loss-weight-force-pelaez2024 ;
+    mlips:produces entity:model-tensornet-ani2x-2L-pelaez2024 .
+
+entity:model-tensornet-ani2x-2L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 2L, ANI-2x (used for 200 ns MD of four PubChem molecules)" .
+
+entity:run-tensornet-ani2x-0L-pelaez2024 a mlips:MLIPRun ;
+    rdfs:label "TensorNet with 0 interaction layers trained on ANI-2x" ;
+    mlips:appliesMethod entity:TensorNet ;
+    mlips:runsOn entity:ds-ani2x-pelaez2024 ;
+    mlips:hasHyperparameterSetting entity:setting-tensornet-ani2x-0L-numLayers-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-numFeatures-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-cutoffRadius-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-numRadialBasis-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-batchSize-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-learningRate-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-loss-weight-energy-pelaez2024 ,
+        entity:setting-tensornet-ani2x-0L-loss-weight-force-pelaez2024 ;
+    mlips:produces entity:model-tensornet-ani2x-0L-pelaez2024 .
+
+entity:model-tensornet-ani2x-0L-pelaez2024 a mlips:TrainedModel ;
+    rdfs:label "TensorNet 0L, ANI-2x" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-pelaez2024 mlips:hasResult
+    entity:result-tensornet-qm9-0L-pelaez2024 ,
+    entity:result-tensornet-qm9-1L-pelaez2024 ,
+    entity:result-tensornet-qm9-2L-pelaez2024 ,
+    entity:result-tensornet-qm9-3L-pelaez2024 ,
+    entity:result-et-qm9-pelaez2024 .
+
+entity:result-tensornet-qm9-0L-pelaez2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-tensornet-qm9-0L-pelaez2024 ;
+    mlips:targetMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:hasAccuracyMetric entity:metric-tensornet-qm9-0L-1-pelaez2024 .
+
+entity:metric-tensornet-qm9-0L-1-pelaez2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on QM9 U0: TensorNet 0L" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "7.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-tensornet-qm9-1L-pelaez2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-tensornet-qm9-1L-pelaez2024 ;
+    mlips:targetMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:hasAccuracyMetric entity:metric-tensornet-qm9-1L-1-pelaez2024 .
+
+entity:metric-tensornet-qm9-1L-1-pelaez2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on QM9 U0: TensorNet 1L" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-tensornet-qm9-2L-pelaez2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-tensornet-qm9-2L-pelaez2024 ;
+    mlips:targetMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:hasAccuracyMetric entity:metric-tensornet-qm9-2L-1-pelaez2024 .
+
+entity:metric-tensornet-qm9-2L-1-pelaez2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on QM9 U0: TensorNet 2L" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "4.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-tensornet-qm9-3L-pelaez2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-tensornet-qm9-3L-pelaez2024 ;
+    mlips:targetMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:hasAccuracyMetric entity:metric-tensornet-qm9-3L-1-pelaez2024 .
+
+entity:metric-tensornet-qm9-3L-1-pelaez2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on QM9 U0: TensorNet 3L* (embedding dimension 256)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-et-qm9-pelaez2024 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-et-qm9-pelaez2024 ;
+    mlips:targetMaterial entity:mat-QM9-pelaez2024 ;
+    mlips:hasAccuracyMetric entity:metric-et-qm9-1-pelaez2024 .
+
+entity:metric-et-qm9-1-pelaez2024 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on QM9 U0: Equivariant Transformer, new implementation" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "5.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Table 2 reports TensorNet inference speed in million MD steps per day
+# for plain, compiled and other execution modes on several GPUs; the
+# values were not read and are not encoded.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table 1 mixes values taken from the literature (Cormorant, SEGNN, SchNet, EGNN, Equiformer, DimeNet++, SphereNet, the original ET, PaiNN, Allegro, MACE) with the paper's own; only the TensorNet and new-ET rows are encoded. The text adds that the optimised TensorNet gives 3.8(2) meV against the originally published 3.9(1) meV, so the 3L* value may itself be the earlier published one.
+# - The MD17 aspirin check of the Equivariant Transformer (test MAE 0.139 kcal/mol for the energy; the force value was cut off in the text read) and the hyperparameter tables for MD17 and QM9 (Tables 3-5) are not encoded.
+# - TensorNet is a new registry method first used here; its originating paper (Simeon and De Fabritiis) is not this one. The reference levels of QM9 and ANI-2x are not restated.
+# - MD stability of four PubChem molecules over 200 ns (OpenMM, LangevinMiddleIntegrator, 298.5 K) has no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
