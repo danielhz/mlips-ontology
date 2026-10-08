@@ -1,0 +1,426 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Yixuan Zhang et al. (2020). Thermal conductivity of h-BN monolayers using machine learning interatomic potential.
+#   Journal of Physics Condensed Matter. doi:10.1088/1361-648x/abcf61  arXiv:2012.07578v1
+#
+# Version read: arxiv-preprint arXiv:2012.07578v1 (sha256 1fa9e1a4c5e4b124...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 192 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the GAP models (pair and triplet descriptors) for
+# monolayer h-BN trained on subsets of frozen-phonon configurations
+# chosen by a manual scheme and by an incremental scheme (iterations 2,
+# 4 and 6), with VASP reference settings, descriptor cutoffs and the
+# energy and force RMSEs of the text and Table II. Phonons and thermal
+# conductivities are not encoded. Read from the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zhang2020hbn a mlips:BenchmarkStudy ;
+    rdfs:label "Zhang et al. (2020): thermal conductivity of h-BN monolayers using a machine learning interatomic potential" ;
+    mlips:reportedIn entity:article-zhang2020hbn .
+
+entity:article-zhang2020hbn a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/1361-648x/abcf61> ;
+    schema:datePublished "2020"^^xsd:gYear ;
+    schema:name "Thermal conductivity of h-BN monolayers using machine learning interatomic potential" ;
+    schema:author <https://orcid.org/0000-0001-6165-0646> ,
+        entity:person-Shen-zhang2020hbn ,
+        entity:person-Long-zhang2020hbn ,
+        <https://orcid.org/0000-0002-1035-8861> .
+
+<https://orcid.org/0000-0001-6165-0646> a schema:Person ;
+    schema:name "Yixuan Zhang" ;
+    schema:givenName "Yixuan" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0001-6165-0646> .
+
+entity:person-Shen-zhang2020hbn a schema:Person ;
+    schema:name "Chen Shen" ;
+    schema:givenName "Chen" ;
+    schema:familyName "Shen" .
+
+entity:person-Long-zhang2020hbn a schema:Person ;
+    schema:name "Teng Long" ;
+    schema:givenName "Teng" ;
+    schema:familyName "Long" .
+
+<https://orcid.org/0000-0002-1035-8861> a schema:Person ;
+    schema:name "Hongbin Zhang" ;
+    schema:givenName "Hongbin" ;
+    schema:familyName "Zhang" ;
+    schema:identifier <https://orcid.org/0000-0002-1035-8861> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-hBN-zhang2020hbn a mlips:MaterialSystem ;
+    rdfs:label "Monolayer hexagonal boron nitride (6x6x1 supercell, frozen-phonon displaced configurations)" ;
+    mlips:chemicalFormula "BN" ;
+    mlips:materialClass "Two-dimensional material" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zhang2020hbn a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zhang2020hbn mlips:hasDFTSettings entity:calc-settings-dft-zhang2020hbn .
+
+entity:calc-settings-dft-zhang2020hbn a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "550"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack 4x4x1" ;
+    rdfs:comment "Energy convergence 1e-8 eV; interlayer distance 20 A." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-manual-zhang2020hbn a mlips:TrainingDataset ;
+    rdfs:label "Manual training set (325 of the 867 configurations)" ;
+    mlips:coversMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 325 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020hbn .
+
+entity:ds-inc2-zhang2020hbn a mlips:TrainingDataset ;
+    rdfs:label "Incremental-2 training set (82 of the 867 configurations)" ;
+    mlips:coversMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 82 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020hbn .
+
+entity:ds-inc4-zhang2020hbn a mlips:TrainingDataset ;
+    rdfs:label "Incremental-4 training set (162 of the 867 configurations)" ;
+    mlips:coversMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 162 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020hbn .
+
+entity:ds-inc6-zhang2020hbn a mlips:TrainingDataset ;
+    rdfs:label "Incremental-6 training set (242 of the 867 configurations)" ;
+    mlips:coversMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 242 ;
+    mlips:hasDFTCalculation entity:calc-dft-zhang2020hbn .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-manual-zhang2020hbn mlips:samplingStrategy
+    entity:sampling-frozen-zhang2020hbn ,
+    entity:sampling-manual-zhang2020hbn .
+
+entity:ds-inc2-zhang2020hbn mlips:samplingStrategy
+    entity:sampling-frozen-zhang2020hbn ,
+    entity:sampling-incremental-zhang2020hbn .
+
+entity:ds-inc4-zhang2020hbn mlips:samplingStrategy
+    entity:sampling-frozen-zhang2020hbn ,
+    entity:sampling-incremental-zhang2020hbn .
+
+entity:ds-inc6-zhang2020hbn mlips:samplingStrategy
+    entity:sampling-frozen-zhang2020hbn ,
+    entity:sampling-incremental-zhang2020hbn .
+
+entity:sampling-frozen-zhang2020hbn a mlips:SamplingStrategy ;
+    rdfs:label "867 third-order frozen-phonon configurations (displacement amplitude 0.04 A), split into in-plane (554) and out-of-plane (313) groups" .
+
+entity:sampling-manual-zhang2020hbn a mlips:SamplingStrategy ;
+    rdfs:label "Manual selection: one configuration from each subset of configurations displaced on the same atom in opposite directions (160 in-plane and 165 out-of-plane)" .
+
+entity:sampling-incremental-zhang2020hbn a mlips:SamplingStrategy ;
+    rdfs:label "Incremental selection with the help of the MLIP: 25 in-plane and 15 out-of-plane configurations added per iteration, starting from one random configuration per group" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasHyperparameter entity:hp-descriptors-zhang2020hbn ,
+        mlips:cutoffRadius ,
+        entity:hp-three-body-cutoff-zhang2020hbn ;
+    mlips:hasImplementation entity:impl-GAP-zhang2020hbn ;
+    mlips:supportsSimulation mlips:PhononCalculation .
+
+entity:impl-GAP-zhang2020hbn a mlips:Implementation ;
+    mlips:implementedIn mlips:QUIP .
+
+entity:hp-descriptors-zhang2020hbn a mlips:Hyperparameter ;
+    rdfs:label "Combination of GAP descriptors" ;
+    mlips:hyperparameterName "descriptors" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-three-body-cutoff-zhang2020hbn a mlips:Hyperparameter ;
+    rdfs:label "Cutoff of the three-body (angle_3b) descriptor (Angstrom)" ;
+    mlips:hyperparameterName "cutoff_3b" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-manual-descriptors-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhang2020hbn ;
+    mlips:settingValue "distance_2b + angle_3b" .
+
+entity:setting-manual-cutoffRadius-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:double .
+
+entity:setting-manual-three-body-cutoff-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhang2020hbn ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-inc2-descriptors-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhang2020hbn ;
+    mlips:settingValue "distance_2b + angle_3b" .
+
+entity:setting-inc2-cutoffRadius-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:double .
+
+entity:setting-inc2-three-body-cutoff-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhang2020hbn ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-inc4-descriptors-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhang2020hbn ;
+    mlips:settingValue "distance_2b + angle_3b" .
+
+entity:setting-inc4-cutoffRadius-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:double .
+
+entity:setting-inc4-three-body-cutoff-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhang2020hbn ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-inc6-descriptors-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-descriptors-zhang2020hbn ;
+    mlips:settingValue "distance_2b + angle_3b" .
+
+entity:setting-inc6-cutoffRadius-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "8"^^xsd:double .
+
+entity:setting-inc6-three-body-cutoff-zhang2020hbn a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-three-body-cutoff-zhang2020hbn ;
+    mlips:settingValue "6"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-manual-zhang2020hbn a mlips:MLIPRun ;
+    rdfs:label "GAP trained on the Manual set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-manual-zhang2020hbn ;
+    mlips:hasHyperparameterSetting entity:setting-manual-descriptors-zhang2020hbn ,
+        entity:setting-manual-cutoffRadius-zhang2020hbn ,
+        entity:setting-manual-three-body-cutoff-zhang2020hbn ;
+    mlips:produces entity:model-manual-zhang2020hbn .
+
+entity:model-manual-zhang2020hbn a mlips:TrainedModel ;
+    rdfs:label "GAP for monolayer h-BN (Manual)" .
+
+entity:run-inc2-zhang2020hbn a mlips:MLIPRun ;
+    rdfs:label "GAP trained on the Incremental-2 set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-inc2-zhang2020hbn ;
+    mlips:hasHyperparameterSetting entity:setting-inc2-descriptors-zhang2020hbn ,
+        entity:setting-inc2-cutoffRadius-zhang2020hbn ,
+        entity:setting-inc2-three-body-cutoff-zhang2020hbn ;
+    mlips:produces entity:model-inc2-zhang2020hbn .
+
+entity:model-inc2-zhang2020hbn a mlips:TrainedModel ;
+    rdfs:label "GAP for monolayer h-BN (Incremental-2)" .
+
+entity:run-inc4-zhang2020hbn a mlips:MLIPRun ;
+    rdfs:label "GAP trained on the Incremental-4 set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-inc4-zhang2020hbn ;
+    mlips:hasHyperparameterSetting entity:setting-inc4-descriptors-zhang2020hbn ,
+        entity:setting-inc4-cutoffRadius-zhang2020hbn ,
+        entity:setting-inc4-three-body-cutoff-zhang2020hbn ;
+    mlips:produces entity:model-inc4-zhang2020hbn .
+
+entity:model-inc4-zhang2020hbn a mlips:TrainedModel ;
+    rdfs:label "GAP for monolayer h-BN (Incremental-4)" .
+
+entity:run-inc6-zhang2020hbn a mlips:MLIPRun ;
+    rdfs:label "GAP trained on the Incremental-6 set" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-inc6-zhang2020hbn ;
+    mlips:hasHyperparameterSetting entity:setting-inc6-descriptors-zhang2020hbn ,
+        entity:setting-inc6-cutoffRadius-zhang2020hbn ,
+        entity:setting-inc6-three-body-cutoff-zhang2020hbn ;
+    mlips:produces entity:model-inc6-zhang2020hbn .
+
+entity:model-inc6-zhang2020hbn a mlips:TrainedModel ;
+    rdfs:label "GAP for monolayer h-BN (Incremental-6)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-zhang2020hbn mlips:hasResult
+    entity:result-manual-zhang2020hbn ,
+    entity:result-inc2-zhang2020hbn ,
+    entity:result-inc4-zhang2020hbn ,
+    entity:result-inc6-zhang2020hbn .
+
+entity:result-manual-zhang2020hbn a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-manual-zhang2020hbn ;
+    mlips:targetMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:hasAccuracyMetric entity:metric-manual-1-zhang2020hbn ,
+        entity:metric-manual-2-zhang2020hbn ,
+        entity:metric-manual-3-zhang2020hbn .
+
+entity:metric-manual-1-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE against DFT (eV/atom; printed as 1.1e-5)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.000011"^^xsd:double .
+
+entity:metric-manual-2-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on B atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.00027"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-manual-3-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on N atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000212"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-inc2-zhang2020hbn a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-inc2-zhang2020hbn ;
+    mlips:targetMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:hasAccuracyMetric entity:metric-inc2-1-zhang2020hbn ,
+        entity:metric-inc2-2-zhang2020hbn ,
+        entity:metric-inc2-3-zhang2020hbn .
+
+entity:metric-inc2-1-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE against DFT (eV/atom; printed as 5e-6)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.000005"^^xsd:double .
+
+entity:metric-inc2-2-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on B atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000282"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-inc2-3-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on N atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000232"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-inc4-zhang2020hbn a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-inc4-zhang2020hbn ;
+    mlips:targetMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:hasAccuracyMetric entity:metric-inc4-1-zhang2020hbn ,
+        entity:metric-inc4-2-zhang2020hbn ,
+        entity:metric-inc4-3-zhang2020hbn .
+
+entity:metric-inc4-1-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE against DFT (eV/atom; printed as 6e-6)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.000006"^^xsd:double .
+
+entity:metric-inc4-2-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on B atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000237"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-inc4-3-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on N atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000201"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:result-inc6-zhang2020hbn a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-inc6-zhang2020hbn ;
+    mlips:targetMaterial entity:mat-hBN-zhang2020hbn ;
+    mlips:hasAccuracyMetric entity:metric-inc6-1-zhang2020hbn ,
+        entity:metric-inc6-2-zhang2020hbn ,
+        entity:metric-inc6-3-zhang2020hbn .
+
+entity:metric-inc6-1-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Energy RMSE against DFT (eV/atom; printed as 1e-5)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.00001"^^xsd:double .
+
+entity:metric-inc6-2-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on B atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000232"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+entity:metric-inc6-3-zhang2020hbn a mlips:AccuracyMetric ;
+    rdfs:label "Force RMSE on N atoms" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.000196"^^xsd:double ;
+    mlips:hasUnit unit:EV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Training-set sizes are from Table I (Manual 325, Incremental-2 82, -4 162, -6 242 of 867 configurations). For the Manual model the text says the comparison is 'for the test sets'; for the Incremental models Table II does not name the evaluation set.
+# - Energy RMSEs are in eV per atom (no vocabulary unit; in the label). The registry label of entity:GAP says 'with SOAP kernel' although these models use pair and triplet descriptors only (legacy label, listed in METHODS.md). cutoffRadius is the two-body cutoff (8.0 A); other descriptor parameters (theta, delta) are not encoded.
+# - Phonon dispersions, lifetimes and lattice thermal conductivities are not encoded. Read from the arXiv v1 preprint; arXiv id matched by title and author.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
