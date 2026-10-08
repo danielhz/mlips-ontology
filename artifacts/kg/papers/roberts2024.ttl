@@ -1,0 +1,538 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Josiah Roberts et al. (2024). Machine learned interatomic potentials for ternary carbides trained on the AFLOW database.
+#   npj Computational Materials. doi:10.1038/s41524-024-01321-7  arXiv:2401.01852v2
+#
+# Version read: arxiv-preprint arXiv:2401.01852v2 (sha256 d2634ae2276eefd7...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 128 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: moment tensor potentials at levels 10, 16 and 22 for
+# four ternary carbide systems (C-Hf-Ta, C-Hf-Zr, C-Mo-W, C-Ta-Ti),
+# trained on relaxation data from the AFLOW database and refined by
+# active learning into a robust and an accurate potential with the PRAPs
+# workflow. One actively learned robust-potential run per system and
+# level is encoded with its settings. The per-system errors of Table II
+# did not survive text extraction.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-roberts2024 a mlips:BenchmarkStudy ;
+    rdfs:label "Roberts et al. (2024): machine learned interatomic potentials (MTPs) for ternary carbides trained on the AFLOW database" ;
+    mlips:reportedIn entity:article-roberts2024 .
+
+entity:article-roberts2024 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-024-01321-7> ;
+    schema:datePublished "2024"^^xsd:gYear ;
+    schema:name "Machine learned interatomic potentials for ternary carbides trained on the AFLOW database" ;
+    schema:author <https://orcid.org/0000-0002-1359-5184> ,
+        <https://orcid.org/0000-0003-3679-4191> ,
+        <https://orcid.org/0000-0002-4185-6150> ,
+        <https://orcid.org/0000-0003-3604-4761> ,
+        <https://orcid.org/0000-0002-8497-0092> ,
+        <https://orcid.org/0000-0002-3997-406X> ,
+        <https://orcid.org/0009-0009-1618-4469> ,
+        <https://orcid.org/0000-0003-0570-8238> ,
+        <https://orcid.org/0000-0003-0738-867X> .
+
+<https://orcid.org/0000-0002-1359-5184> a schema:Person ;
+    schema:name "Josiah Roberts" ;
+    schema:givenName "Josiah" ;
+    schema:familyName "Roberts" ;
+    schema:identifier <https://orcid.org/0000-0002-1359-5184> .
+
+<https://orcid.org/0000-0003-3679-4191> a schema:Person ;
+    schema:name "Biswas Rijal" ;
+    schema:givenName "Biswas" ;
+    schema:familyName "Rijal" ;
+    schema:identifier <https://orcid.org/0000-0003-3679-4191> .
+
+<https://orcid.org/0000-0002-4185-6150> a schema:Person ;
+    schema:name "Simon Divilov" ;
+    schema:givenName "Simon" ;
+    schema:familyName "Divilov" ;
+    schema:identifier <https://orcid.org/0000-0002-4185-6150> .
+
+<https://orcid.org/0000-0003-3604-4761> a schema:Person ;
+    schema:name "Jon-Paul Maria" ;
+    schema:givenName "Jon-Paul" ;
+    schema:familyName "Maria" ;
+    schema:identifier <https://orcid.org/0000-0003-3604-4761> .
+
+<https://orcid.org/0000-0002-8497-0092> a schema:Person ;
+    schema:name "William G. Fahrenholtz" ;
+    schema:givenName "William G." ;
+    schema:familyName "Fahrenholtz" ;
+    schema:identifier <https://orcid.org/0000-0002-8497-0092> .
+
+<https://orcid.org/0000-0002-3997-406X> a schema:Person ;
+    schema:name "Douglas E. Wolfe" ;
+    schema:givenName "Douglas E." ;
+    schema:familyName "Wolfe" ;
+    schema:identifier <https://orcid.org/0000-0002-3997-406X> .
+
+<https://orcid.org/0009-0009-1618-4469> a schema:Person ;
+    schema:name "Donald W. Brenner" ;
+    schema:givenName "Donald W." ;
+    schema:familyName "Brenner" ;
+    schema:identifier <https://orcid.org/0009-0009-1618-4469> .
+
+<https://orcid.org/0000-0003-0570-8238> a schema:Person ;
+    schema:name "Stefano Curtarolo" ;
+    schema:givenName "Stefano" ;
+    schema:familyName "Curtarolo" ;
+    schema:identifier <https://orcid.org/0000-0003-0570-8238> .
+
+<https://orcid.org/0000-0003-0738-867X> a schema:Person ;
+    schema:name "Eva Zurek" ;
+    schema:givenName "Eva" ;
+    schema:familyName "Zurek" ;
+    schema:identifier <https://orcid.org/0000-0003-0738-867X> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-CHfTa-roberts2024 a mlips:MaterialSystem ;
+    rdfs:label "C-Hf-Ta ternary carbides (AFLOW structures and RANDSPG-generated structures)" ;
+    mlips:chemicalFormula "C-Hf-Ta" ;
+    mlips:materialClass "Refractory ternary carbide system" .
+
+entity:mat-CHfZr-roberts2024 a mlips:MaterialSystem ;
+    rdfs:label "C-Hf-Zr ternary carbides (AFLOW structures and RANDSPG-generated structures)" ;
+    mlips:chemicalFormula "C-Hf-Zr" ;
+    mlips:materialClass "Refractory ternary carbide system" .
+
+entity:mat-CMoW-roberts2024 a mlips:MaterialSystem ;
+    rdfs:label "C-Mo-W ternary carbides (AFLOW structures and RANDSPG-generated structures)" ;
+    mlips:chemicalFormula "C-Mo-W" ;
+    mlips:materialClass "Refractory ternary carbide system" .
+
+entity:mat-CTaTi-roberts2024 a mlips:MaterialSystem ;
+    rdfs:label "C-Ta-Ti ternary carbides (AFLOW structures and RANDSPG-generated structures)" ;
+    mlips:chemicalFormula "C-Ta-Ti" ;
+    mlips:materialClass "Refractory ternary carbide system" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-roberts2024 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-roberts2024 mlips:hasDFTSettings entity:calc-settings-dft-roberts2024 .
+
+entity:calc-settings-dft-roberts2024 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "400"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack meshes with (number of divisions) x (lattice constant) = 30 A" ;
+    rdfs:comment "VASP 5.4.12, used for the single-point calculations of the active-learning procedure; AFLOW standard settings for the relaxations of the convex-hull analysis." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-CHfTa-roberts2024 a mlips:TrainingDataset ;
+    rdfs:label "C-Hf-Ta MTP training data (AFLOW relaxation steps plus actively selected configurations)" ;
+    mlips:coversMaterial entity:mat-CHfTa-roberts2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-roberts2024 ;
+    rdfs:comment "The numbers of AFLOW structures, ionic steps and RANDSPG structures per system are in Table I, which was not captured from the extracted text." .
+
+entity:ds-CHfZr-roberts2024 a mlips:TrainingDataset ;
+    rdfs:label "C-Hf-Zr MTP training data (AFLOW relaxation steps plus actively selected configurations)" ;
+    mlips:coversMaterial entity:mat-CHfZr-roberts2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-roberts2024 ;
+    rdfs:comment "The numbers of AFLOW structures, ionic steps and RANDSPG structures per system are in Table I, which was not captured from the extracted text." .
+
+entity:ds-CMoW-roberts2024 a mlips:TrainingDataset ;
+    rdfs:label "C-Mo-W MTP training data (AFLOW relaxation steps plus actively selected configurations)" ;
+    mlips:coversMaterial entity:mat-CMoW-roberts2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-roberts2024 ;
+    rdfs:comment "The numbers of AFLOW structures, ionic steps and RANDSPG structures per system are in Table I, which was not captured from the extracted text." .
+
+entity:ds-CTaTi-roberts2024 a mlips:TrainingDataset ;
+    rdfs:label "C-Ta-Ti MTP training data (AFLOW relaxation steps plus actively selected configurations)" ;
+    mlips:coversMaterial entity:mat-CTaTi-roberts2024 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ,
+        mlips:Stresses ;
+    mlips:datasetProvenance mlips:Augmented ;
+    mlips:hasDFTCalculation entity:calc-dft-roberts2024 ;
+    rdfs:comment "The numbers of AFLOW structures, ionic steps and RANDSPG structures per system are in Table I, which was not captured from the extracted text." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-CHfTa-roberts2024 mlips:samplingStrategy
+    entity:sampling-aflow-relaxations-roberts2024 ,
+    entity:sampling-randspg-active-learning-roberts2024 .
+
+entity:ds-CHfZr-roberts2024 mlips:samplingStrategy
+    entity:sampling-aflow-relaxations-roberts2024 ,
+    entity:sampling-randspg-active-learning-roberts2024 .
+
+entity:ds-CMoW-roberts2024 mlips:samplingStrategy
+    entity:sampling-aflow-relaxations-roberts2024 ,
+    entity:sampling-randspg-active-learning-roberts2024 .
+
+entity:ds-CTaTi-roberts2024 mlips:samplingStrategy
+    entity:sampling-aflow-relaxations-roberts2024 ,
+    entity:sampling-randspg-active-learning-roberts2024 .
+
+entity:sampling-aflow-relaxations-roberts2024 a mlips:SamplingStrategy ;
+    rdfs:label "Ionic steps of AFLOW structural relaxations" ;
+    rdfs:comment "All individual ionic steps of the relaxations of the system's structures in the AFLOW database; about 800 configurations with minimum interatomic distance above 1.1 A are chosen at random for the initial training (pre-robust potential)." .
+
+entity:sampling-randspg-active-learning-roberts2024 a mlips:SamplingStrategy ;
+    rdfs:label "Active learning during relaxation of RANDSPG-generated structures" ;
+    rdfs:comment "Structures from AFLOW and from the random symmetric structure generator RANDSPG are relaxed with the MTP; configurations with extrapolation grade 2 < gamma <= 10 are computed with DFT and added until no structure is selected (for level 22, until fewer than 1% would be added)." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-MTP-roberts2024 ;
+    mlips:hasHyperparameter mlips:momentLevel ,
+        mlips:cutoffRadius ,
+        entity:hp-min-distance-roberts2024 ;
+    mlips:hasImplementation entity:impl-MTP-roberts2024 ;
+    mlips:supportsSimulation mlips:GeometryOptimization .
+
+entity:alg-MTP-roberts2024 a mls:Algorithm ;
+    rdfs:label "Pre-training on AFLOW data (best of five trainings), then active learning into a robust potential and an accurate potential restricted to low-energy structures, automated by the PRAPs workflow" .
+
+entity:impl-MTP-roberts2024 a mlips:Implementation ;
+    mlips:implementedIn mlips:MLIP .
+
+entity:hp-min-distance-roberts2024 a mlips:Hyperparameter ;
+    rdfs:label "Minimum interatomic distance of the MTP (Angstrom)" ;
+    mlips:hyperparameterName "min_dist" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mtp-CHfTa-10-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-10-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-10-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CHfTa-16-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-16-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-16-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CHfTa-22-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "22"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-22-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfTa-22-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CHfZr-10-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-10-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-10-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CHfZr-16-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-16-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-16-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CHfZr-22-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "22"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-22-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CHfZr-22-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CMoW-10-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-mtp-CMoW-10-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CMoW-10-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CMoW-16-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-CMoW-16-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CMoW-16-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CTaTi-10-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "10"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-10-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-10-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CTaTi-16-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "16"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-16-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-16-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+entity:setting-mtp-CTaTi-22-momentLevel-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:momentLevel ;
+    mlips:settingValue "22"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-22-cutoffRadius-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-mtp-CTaTi-22-min-distance-roberts2024 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-min-distance-roberts2024 ;
+    mlips:settingValue "1.1"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mtp-CHfTa-10-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 10 for C-Hf-Ta (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfTa-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfTa-10-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfTa-10-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfTa-10-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfTa-10-roberts2024 .
+
+entity:model-mtp-CHfTa-10-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 10, C-Hf-Ta" .
+
+entity:run-mtp-CHfTa-16-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 16 for C-Hf-Ta (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfTa-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfTa-16-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfTa-16-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfTa-16-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfTa-16-roberts2024 .
+
+entity:model-mtp-CHfTa-16-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 16, C-Hf-Ta" .
+
+entity:run-mtp-CHfTa-22-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 22 for C-Hf-Ta (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfTa-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfTa-22-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfTa-22-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfTa-22-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfTa-22-roberts2024 .
+
+entity:model-mtp-CHfTa-22-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 22, C-Hf-Ta" .
+
+entity:run-mtp-CHfZr-10-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 10 for C-Hf-Zr (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfZr-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfZr-10-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfZr-10-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfZr-10-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfZr-10-roberts2024 .
+
+entity:model-mtp-CHfZr-10-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 10, C-Hf-Zr" .
+
+entity:run-mtp-CHfZr-16-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 16 for C-Hf-Zr (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfZr-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfZr-16-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfZr-16-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfZr-16-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfZr-16-roberts2024 .
+
+entity:model-mtp-CHfZr-16-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 16, C-Hf-Zr" .
+
+entity:run-mtp-CHfZr-22-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 22 for C-Hf-Zr (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CHfZr-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CHfZr-22-momentLevel-roberts2024 ,
+        entity:setting-mtp-CHfZr-22-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CHfZr-22-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CHfZr-22-roberts2024 .
+
+entity:model-mtp-CHfZr-22-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 22, C-Hf-Zr" .
+
+entity:run-mtp-CMoW-10-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 10 for C-Mo-W (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CMoW-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CMoW-10-momentLevel-roberts2024 ,
+        entity:setting-mtp-CMoW-10-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CMoW-10-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CMoW-10-roberts2024 .
+
+entity:model-mtp-CMoW-10-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 10, C-Mo-W" .
+
+entity:run-mtp-CMoW-16-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 16 for C-Mo-W (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CMoW-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CMoW-16-momentLevel-roberts2024 ,
+        entity:setting-mtp-CMoW-16-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CMoW-16-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CMoW-16-roberts2024 .
+
+entity:model-mtp-CMoW-16-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 16, C-Mo-W" .
+
+entity:run-mtp-CTaTi-10-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 10 for C-Ta-Ti (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CTaTi-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CTaTi-10-momentLevel-roberts2024 ,
+        entity:setting-mtp-CTaTi-10-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CTaTi-10-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CTaTi-10-roberts2024 .
+
+entity:model-mtp-CTaTi-10-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 10, C-Ta-Ti" .
+
+entity:run-mtp-CTaTi-16-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 16 for C-Ta-Ti (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CTaTi-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CTaTi-16-momentLevel-roberts2024 ,
+        entity:setting-mtp-CTaTi-16-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CTaTi-16-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CTaTi-16-roberts2024 .
+
+entity:model-mtp-CTaTi-16-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 16, C-Ta-Ti" .
+
+entity:run-mtp-CTaTi-22-roberts2024 a mlips:MLIPRun ;
+    rdfs:label "Robust MTP of level 22 for C-Ta-Ti (active learning with PRAPs)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-CTaTi-roberts2024 ;
+    mlips:hasHyperparameterSetting entity:setting-mtp-CTaTi-22-momentLevel-roberts2024 ,
+        entity:setting-mtp-CTaTi-22-cutoffRadius-roberts2024 ,
+        entity:setting-mtp-CTaTi-22-min-distance-roberts2024 ;
+    mlips:produces entity:model-mtp-CTaTi-22-roberts2024 .
+
+entity:model-mtp-CTaTi-22-roberts2024 a mlips:TrainedModel ;
+    rdfs:label "Robust MTP, level 22, C-Ta-Ti" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Timings of the workflow with and without the pre-training step are in
+# Table S4; not read.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Table II (MAE and RMSE of energies and forces by system, level and potential) is not in the extracted text as numbers. The text gives averages over the four systems for the pre-robust potentials only: energy MAE (RMSE) of 27 (44), 16 (25) and 8 (13) meV/atom and force MAE (RMSE) of 75 (217), 51 (147) and 26 (78) meV/A for levels 10, 16 and 22. Since these are averages over systems and belong to the pre-robust stage, no AccuracyMetric is attached to the per-system runs.
+# - Each system and level has three potentials (pre-robust, robust, accurate); one run per system and level stands for the robust potential. No level-22 potential is reported for C-Mo-W.
+# - The data sets are declared with provenance Augmented (published AFLOW data plus new DFT single points). The AFLOW relaxation data come with AFLOW's own settings; the reference node describes the calculations of this work.
+# - Convex-hull reproduction and discovery of new stable structures are the paper's main results and have no MetricProperty. Relaxation with the MTPs is the ground for GeometryOptimization.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
