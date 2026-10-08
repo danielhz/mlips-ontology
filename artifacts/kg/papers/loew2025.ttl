@@ -1,0 +1,323 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Antoine Loew et al. (2025). Universal machine learning interatomic potentials are ready for phonons.
+#   npj Computational Materials. doi:10.1038/s41524-025-01650-1  arXiv:2412.16551v2
+#
+# Version read: arxiv-preprint arXiv:2412.16551v2 (sha256 5521f56fc8807daa...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 62 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: a benchmark of seven pretrained universal MLIPs
+# (M3GNet, CHGNet, MACE-MP-0, SevenNet-0, MatterSim-v1, ORB, eqV2-M; none
+# trained here) on geometry relaxation and phonons of the MDR data set
+# recomputed with PBE. Only the energy MAE after relaxation (Table I) is
+# expressible as a metric.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-loew2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Loew et al. (2025): universal MLIPs benchmarked on phonons of about 10,000 semiconductors" ;
+    mlips:reportedIn entity:article-loew2025 .
+
+entity:article-loew2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41524-025-01650-1> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Universal machine learning interatomic potentials are ready for phonons" ;
+    schema:author <https://orcid.org/0009-0008-5018-4895> ,
+        <https://orcid.org/0009-0003-3487-5593> ,
+        <https://orcid.org/0000-0002-2892-5879> ,
+        <https://orcid.org/0000-0002-4920-2370> ,
+        <https://orcid.org/0000-0003-0170-8222> .
+
+<https://orcid.org/0009-0008-5018-4895> a schema:Person ;
+    schema:name "Antoine Loew" ;
+    schema:givenName "Antoine" ;
+    schema:familyName "Loew" ;
+    schema:identifier <https://orcid.org/0009-0008-5018-4895> .
+
+<https://orcid.org/0009-0003-3487-5593> a schema:Person ;
+    schema:name "Dewen Sun" ;
+    schema:givenName "Dewen" ;
+    schema:familyName "Sun" ;
+    schema:identifier <https://orcid.org/0009-0003-3487-5593> .
+
+<https://orcid.org/0000-0002-2892-5879> a schema:Person ;
+    schema:name "Hai-Chen Wang" ;
+    schema:givenName "Hai-Chen" ;
+    schema:familyName "Wang" ;
+    schema:identifier <https://orcid.org/0000-0002-2892-5879> .
+
+<https://orcid.org/0000-0002-4920-2370> a schema:Person ;
+    schema:name "Silvana Botti" ;
+    schema:givenName "Silvana" ;
+    schema:familyName "Botti" ;
+    schema:identifier <https://orcid.org/0000-0002-4920-2370> .
+
+<https://orcid.org/0000-0003-0170-8222> a schema:Person ;
+    schema:name "Miguel A. L. Marques" ;
+    schema:givenName "Miguel A. L." ;
+    schema:familyName "Marques" ;
+    schema:identifier <https://orcid.org/0000-0003-0170-8222> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-mdr-semiconductors-loew2025 a mlips:MaterialSystem ;
+    rdfs:label "About 10,000 non-magnetic semiconductors of the MDR phonon database" ;
+    mlips:materialClass "Inorganic crystalline semiconductors, mostly ternary and quaternary compounds (many oxides); no triclinic systems" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-loew2025 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-loew2025 mlips:hasDFTSettings entity:calc-settings-dft-loew2025 .
+
+entity:calc-settings-dft-loew2025 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional mlips:PBE ;
+    rdfs:comment "The MDR data set recomputed with PBE instead of PBEsol, all other parameters as in MDR; pre-relaxation to 1e-7 eV/cell and 1e-5 eV/A, stringent relaxation to 1e-8 eV/cell and 1e-8 eV/A; force constants by finite displacements with phonopy. This is the benchmark reference, not training data." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+# No training dataset is characterised by the paper (see Q12).
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+# No sampling strategy is described by the paper (see Q12).
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:M3GNet a mlips:MLIPMethod ;
+    rdfs:label "M3GNet: materials graph network with three-body interactions" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:CHGNet a mlips:MLIPMethod ;
+    rdfs:label "CHGNet: Crystal Hamiltonian Graph neural Network with charge-informed (magmom) outputs" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:ORB a mlips:MLIPMethod ;
+    rdfs:label "Orb (graph network simulator universal interatomic potential)" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:EquiformerV2 a mlips:MLIPMethod ;
+    rdfs:label "EquiformerV2 (equivariant transformer)" ;
+    mlips:supportsSimulation mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+# entity:model-m3gnet-chen2022 (M3GNet-MPF-2021.2.8) is evaluated here; its run and model are declared in papers/chen2022.ttl.
+
+# Registry stub for the externally trained model CHGNet-0.3.0 (not trained in this paper).
+entity:run-CHGNet-0_3_0 a mlips:MLIPRun ;
+    rdfs:label "Training run of CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:CHGNet ;
+    mlips:produces entity:model-CHGNet-0_3_0 .
+
+entity:model-CHGNet-0_3_0 a mlips:TrainedModel ;
+    rdfs:label "CHGNet v0.3.0 pretrained universal MLIP (412.5K parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model MACE-MP-0-2023.12.03 (not trained in this paper).
+entity:run-MACE-MP-0-2023_12_03 a mlips:MLIPRun ;
+    rdfs:label "Training run of MACE-MP-0 release 2023.12.03 (4.69M parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:produces entity:model-MACE-MP-0-2023_12_03 .
+
+entity:model-MACE-MP-0-2023_12_03 a mlips:TrainedModel ;
+    rdfs:label "MACE-MP-0 release 2023.12.03 (4.69M parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model SevenNet-0 (not trained in this paper).
+entity:run-SevenNet-0 a mlips:MLIPRun ;
+    rdfs:label "Training run of SevenNet-0 (842k parameters, trained on MPtrj) (external; registry stub)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:produces entity:model-SevenNet-0 .
+
+entity:model-SevenNet-0 a mlips:TrainedModel ;
+    rdfs:label "SevenNet-0 (842k parameters, trained on MPtrj)" .
+
+# Registry stub for the externally trained model MatterSim-v1 (not trained in this paper).
+entity:run-MatterSim-v1 a mlips:MLIPRun ;
+    rdfs:label "Training run of MatterSim-v1 (4.5M parameters, M3GNet architecture, about 6M training structures) (external; registry stub)" ;
+    mlips:appliesMethod entity:M3GNet ;
+    mlips:produces entity:model-MatterSim-v1 .
+
+entity:model-MatterSim-v1 a mlips:TrainedModel ;
+    rdfs:label "MatterSim-v1 (4.5M parameters, M3GNet architecture, about 6M training structures)" .
+
+# Registry stub for the externally trained model ORB-MPtrj (not trained in this paper).
+entity:run-ORB-MPtrj a mlips:MLIPRun ;
+    rdfs:label "Training run of ORB trained on MPtrj (25.2M parameters) (external; registry stub)" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:produces entity:model-ORB-MPtrj .
+
+entity:model-ORB-MPtrj a mlips:TrainedModel ;
+    rdfs:label "ORB trained on MPtrj (25.2M parameters)" .
+
+# Registry stub for the externally trained model eqV2-M (not trained in this paper).
+entity:run-eqV2-M a mlips:MLIPRun ;
+    rdfs:label "Training run of eqV2-M (86M parameters, trained on MPtrj, Alexandria and OMat) (external; registry stub)" ;
+    mlips:appliesMethod entity:EquiformerV2 ;
+    mlips:produces entity:model-eqV2-M .
+
+entity:model-eqV2-M a mlips:TrainedModel ;
+    rdfs:label "eqV2-M (86M parameters, trained on MPtrj, Alexandria and OMat)" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-loew2025 mlips:hasResult
+    entity:result-m3gnet-loew2025 ,
+    entity:result-chgnet-loew2025 ,
+    entity:result-mace-mp-0-loew2025 ,
+    entity:result-sevennet-0-loew2025 ,
+    entity:result-mattersim-v1-loew2025 ,
+    entity:result-orb-loew2025 ,
+    entity:result-eqv2-m-loew2025 .
+
+entity:result-m3gnet-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-m3gnet-chen2022 ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-m3gnet-1-loew2025 .
+
+entity:metric-m3gnet-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: M3GNet (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "33"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-chgnet-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-CHGNet-0_3_0 ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-chgnet-1-loew2025 .
+
+entity:metric-chgnet-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: CHGNet (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "334"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-mace-mp-0-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MACE-MP-0-2023_12_03 ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-mace-mp-0-1-loew2025 .
+
+entity:metric-mace-mp-0-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: MACE-MP-0 (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-sevennet-0-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-SevenNet-0 ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-sevennet-0-1-loew2025 .
+
+entity:metric-sevennet-0-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: SevenNet-0 (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-mattersim-v1-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-MatterSim-v1 ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-mattersim-v1-1-loew2025 .
+
+entity:metric-mattersim-v1-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: MatterSim-v1 (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "29"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-orb-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ORB-MPtrj ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-orb-1-loew2025 .
+
+entity:metric-orb-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: ORB (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "31"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-eqv2-m-loew2025 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-eqV2-M ;
+    mlips:targetMaterial entity:mat-mdr-semiconductors-loew2025 ;
+    mlips:hasAccuracyMetric entity:metric-eqv2-m-1-loew2025 .
+
+entity:metric-eqv2-m-1-loew2025 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on the energy of the converged relaxation with respect to PBE: eqV2-M (Table I)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "33"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The paper identifies the models by name, training set and parameter count (Table IV), not by release. They are matched to registry models by parameter count: M3GNet (188k MPF, 228k) to the model of chen2022, MACE-MP-0 (4.69M) to the 2023.12.03 release, CHGNet (413k) to v0.3.0. Worth confirming against the code repository of the paper.
+# - SevenNet-0 is 'built upon NequIP' and MatterSim-v1 'builds upon M3GNet' (the paper's words), so their registry stubs apply entity:NequIP and entity:M3GNet; ORB and eqV2-M get their own registry methods.
+# - The CHGNet energy MAE of 334 meV/atom is high because the energy correction used in CHGNet training was not applied (stated by the authors).
+# - Not encoded for lack of a MetricProperty: volume MAE, failure rates, MAE of the maximum phonon frequency, vibrational entropy, Helmholtz free energy, heat capacity, phonon DOS and sound velocities (Table II), and the dynamical-stability confusion matrix (Table III).
+# - No model is trained in this paper, so there is no training data set, sampling strategy or hyperparameter setting; the PBE reference calculation is declared but not attached to a data set.
+# - GPU/CPU timings mentioned in the discussion were not captured.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
