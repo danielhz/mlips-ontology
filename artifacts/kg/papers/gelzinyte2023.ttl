@@ -1,0 +1,394 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Elena Gelžinytė et al. (2023). Transferable Machine Learning Interatomic Potential for Bond Dissociation Energy Prediction of Drug-like Molecules.
+#   Journal of Chemical Theory and Computation. doi:10.1021/acs.jctc.3c00710
+#
+# Version read: publisher (sha256 5c69ea75a68849bb...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 80 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: one MACE model trained on about 17,000 drug-like
+# open- and closed-shell structures (ZINC-train) at the
+# B3LYP-D3BJ/def2-SV(P) level, its energy and force RMSEs on six test
+# sets (Table 2), and the pretrained ANI-2x evaluated on the three
+# COMP6 subsets for comparison.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-gelzinyte2023 a mlips:BenchmarkStudy ;
+    rdfs:label "Gelzinyte et al. (2024): transferable MACE potential for bond dissociation energy prediction of drug-like molecules" ;
+    mlips:reportedIn entity:article-gelzinyte2023 .
+
+entity:article-gelzinyte2023 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1021/acs.jctc.3c00710> ;
+    schema:datePublished "2023"^^xsd:gYear ;
+    schema:name "Transferable Machine Learning Interatomic Potential for Bond Dissociation Energy Prediction of Drug-like Molecules" ;
+    schema:author <https://orcid.org/0000-0002-8625-1497> ,
+        <https://orcid.org/0000-0003-4292-5557> ,
+        <https://orcid.org/0000-0002-2105-6535> ,
+        <https://orcid.org/0000-0002-8180-2034> .
+
+<https://orcid.org/0000-0002-8625-1497> a schema:Person ;
+    schema:name "Elena Gelžinytė" ;
+    schema:givenName "Elena" ;
+    schema:familyName "Gelžinytė" ;
+    schema:identifier <https://orcid.org/0000-0002-8625-1497> .
+
+<https://orcid.org/0000-0003-4292-5557> a schema:Person ;
+    schema:name "Mario Öeren" ;
+    schema:givenName "Mario" ;
+    schema:familyName "Öeren" ;
+    schema:identifier <https://orcid.org/0000-0003-4292-5557> .
+
+<https://orcid.org/0000-0002-2105-6535> a schema:Person ;
+    schema:name "Matthew D. Segall" ;
+    schema:givenName "Matthew D." ;
+    schema:familyName "Segall" ;
+    schema:identifier <https://orcid.org/0000-0002-2105-6535> .
+
+<https://orcid.org/0000-0002-8180-2034> a schema:Person ;
+    schema:name "Gábor Csányi" ;
+    schema:givenName "Gábor" ;
+    schema:familyName "Csányi" ;
+    schema:identifier <https://orcid.org/0000-0002-8180-2034> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-zinc-train-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "Drug-like molecules and their sp3-carbon radicals from the ZINC database (training domain)" ;
+    mlips:materialClass "Organic drug-like molecules, closed-shell and open-shell (radical) structures; mean 18.9, max 27 heavy atoms" .
+
+entity:mat-ZINC-test-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "Drug-like ZINC compounds not in the training set, 300 K GFN2-xTB MD (4642 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+entity:mat-CYP3A4-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "CYP 3A4 substrates with observed sites of metabolism (1177 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+entity:mat-Tyzack2016-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "CYP substrates of Tyzack et al. 2016 (630 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+entity:mat-DrugBank-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "DrugBank subset of COMP6 (2819 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+entity:mat-GDB7-9-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "GDB7-9 subset of COMP6 (7896 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+entity:mat-GDB10-13-gelzinyte2023 a mlips:MaterialSystem ;
+    rdfs:label "GDB10-13 subset of COMP6 (7356 configurations)" ;
+    mlips:materialClass "Organic drug-like molecules (test set)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-gelzinyte2023 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-gelzinyte2023 mlips:hasDFTSettings entity:calc-settings-dft-gelzinyte2023 .
+
+entity:calc-settings-dft-gelzinyte2023 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:ORCA ;
+    mlips:xcFunctional entity:xc-B3LYP-D3BJ-gelzinyte2023 ;
+    mlips:dftBasisSet entity:basis-def2-SV-P-gelzinyte2023 ;
+    rdfs:comment "ORCA v5.0.0; unrestricted DFT with singlet states for closed-shell and doublet states for open-shell structures, electronic smearing at 5000 K." .
+
+entity:xc-B3LYP-D3BJ-gelzinyte2023 a mlips:XCFunctional ;
+    rdfs:label "B3LYP-D3BJ" ;
+    rdfs:comment "B3LYP with D3(BJ) dispersion correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+entity:basis-def2-SV-P-gelzinyte2023 a mlips:DftBasisSet ;
+    rdfs:label "def2-SV(P)" ;
+    mlips:candidateForVocabulary mlips:DftBasisSet .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-zinc-train-gelzinyte2023 a mlips:TrainingDataset ;
+    rdfs:label "ZINC-train (16,824 configurations of 12,985 compounds)" ;
+    mlips:coversMaterial entity:mat-zinc-train-gelzinyte2023 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 16824 ;
+    mlips:hasDFTCalculation entity:calc-dft-gelzinyte2023 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-zinc-train-gelzinyte2023 mlips:samplingStrategy
+    entity:sampling-md-500K-gelzinyte2023 .
+
+entity:sampling-md-500K-gelzinyte2023 a mlips:SamplingStrategy ;
+    rdfs:label "MD at 500 K with GFN2-xTB or MACE, one structure per trajectory" ;
+    rdfs:comment "Initial conformers from SMILES with RDKit; nearly 17,000 starting geometries; a single structure is selected from each 500 K trajectory. No bond-dissociation data and no structures along hydrogen-abstraction paths are included." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasImplementation entity:impl-MACE-gelzinyte2023 ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization .
+
+entity:impl-MACE-gelzinyte2023 a mlips:Implementation ;
+    mlips:implementedIn mlips:MACE .
+
+entity:ANI a mlips:MLIPMethod ;
+    rdfs:label "ANI (ANAKIN-ME) neural network potential" ;
+    mlips:hasDescriptor mlips:ANIDescriptor .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-bde-gelzinyte2023 a mlips:MLIPRun ;
+    rdfs:label "MACE training on ZINC-train for bond dissociation energies" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-zinc-train-gelzinyte2023 ;
+    mlips:produces entity:model-mace-bde-gelzinyte2023 .
+
+entity:model-mace-bde-gelzinyte2023 a mlips:TrainedModel ;
+    rdfs:label "MACE potential for bond dissociation energies of drug-like molecules" .
+
+# Registry stub for the externally trained model ANI-2x (not trained in this paper).
+entity:run-ANI-2x a mlips:MLIPRun ;
+    rdfs:label "Training run of ANI-2x general-purpose neural network potential" ;
+    mlips:appliesMethod entity:ANI ;
+    mlips:produces entity:model-ANI-2x .
+
+entity:model-ANI-2x a mlips:TrainedModel ;
+    rdfs:label "ANI-2x general-purpose neural network potential" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-gelzinyte2023 mlips:hasResult
+    entity:result-mace-ZINC-test-gelzinyte2023 ,
+    entity:result-mace-CYP3A4-gelzinyte2023 ,
+    entity:result-mace-Tyzack2016-gelzinyte2023 ,
+    entity:result-mace-DrugBank-gelzinyte2023 ,
+    entity:result-ani2x-DrugBank-gelzinyte2023 ,
+    entity:result-mace-GDB7-9-gelzinyte2023 ,
+    entity:result-ani2x-GDB7-9-gelzinyte2023 ,
+    entity:result-mace-GDB10-13-gelzinyte2023 ,
+    entity:result-ani2x-GDB10-13-gelzinyte2023 .
+
+entity:result-mace-ZINC-test-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-ZINC-test-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-ZINC-test-1-gelzinyte2023 ,
+        entity:metric-mace-ZINC-test-2-gelzinyte2023 .
+
+entity:metric-mace-ZINC-test-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, ZINC-test" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.05"^^xsd:double .
+
+entity:metric-mace-ZINC-test-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, ZINC-test" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.91"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-mace-CYP3A4-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-CYP3A4-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-CYP3A4-1-gelzinyte2023 ,
+        entity:metric-mace-CYP3A4-2-gelzinyte2023 .
+
+entity:metric-mace-CYP3A4-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, CYP3A4" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.04"^^xsd:double .
+
+entity:metric-mace-CYP3A4-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, CYP3A4" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.2"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-mace-Tyzack2016-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-Tyzack2016-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-Tyzack2016-1-gelzinyte2023 ,
+        entity:metric-mace-Tyzack2016-2-gelzinyte2023 .
+
+entity:metric-mace-Tyzack2016-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, Tyzack2016" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.06"^^xsd:double .
+
+entity:metric-mace-Tyzack2016-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, Tyzack2016" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.24"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-mace-DrugBank-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-DrugBank-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-DrugBank-1-gelzinyte2023 ,
+        entity:metric-mace-DrugBank-2-gelzinyte2023 .
+
+entity:metric-mace-DrugBank-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, DrugBank" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.05"^^xsd:double .
+
+entity:metric-mace-DrugBank-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, DrugBank" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.37"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ani2x-DrugBank-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-DrugBank-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-ani2x-DrugBank-1-gelzinyte2023 ,
+        entity:metric-ani2x-DrugBank-2-gelzinyte2023 .
+
+entity:metric-ani2x-DrugBank-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: pretrained ANI-2x, DrugBank (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.07"^^xsd:double .
+
+entity:metric-ani2x-DrugBank-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: pretrained ANI-2x, DrugBank (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.09"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-mace-GDB7-9-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-GDB7-9-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-GDB7-9-1-gelzinyte2023 ,
+        entity:metric-mace-GDB7-9-2-gelzinyte2023 .
+
+entity:metric-mace-GDB7-9-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, GDB7-9" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.12"^^xsd:double .
+
+entity:metric-mace-GDB7-9-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, GDB7-9" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.72"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ani2x-GDB7-9-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-GDB7-9-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-ani2x-GDB7-9-1-gelzinyte2023 ,
+        entity:metric-ani2x-GDB7-9-2-gelzinyte2023 .
+
+entity:metric-ani2x-GDB7-9-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: pretrained ANI-2x, GDB7-9 (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.07"^^xsd:double .
+
+entity:metric-ani2x-GDB7-9-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: pretrained ANI-2x, GDB7-9 (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.2"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-mace-GDB10-13-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mace-bde-gelzinyte2023 ;
+    mlips:targetMaterial entity:mat-GDB10-13-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-mace-GDB10-13-1-gelzinyte2023 ,
+        entity:metric-mace-GDB10-13-2-gelzinyte2023 .
+
+entity:metric-mace-GDB10-13-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: MACE, GDB10-13" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.14"^^xsd:double .
+
+entity:metric-mace-GDB10-13-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: MACE, GDB10-13" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.4"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+entity:result-ani2x-GDB10-13-gelzinyte2023 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ANI-2x ;
+    mlips:targetMaterial entity:mat-GDB10-13-gelzinyte2023 ;
+    mlips:hasAccuracyMetric entity:metric-ani2x-GDB10-13-1-gelzinyte2023 ,
+        entity:metric-ani2x-GDB10-13-2-gelzinyte2023 .
+
+entity:metric-ani2x-GDB10-13-1-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on energy, in kcal/mol/atom: pretrained ANI-2x, GDB10-13 (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.12"^^xsd:double .
+
+entity:metric-ani2x-GDB10-13-2-gelzinyte2023 a mlips:AccuracyMetric ;
+    rdfs:label "RMSE on force components: pretrained ANI-2x, GDB10-13 (against the omegaB97x/6-31G(d) COMP6 values)" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.97"^^xsd:double ;
+    mlips:hasUnit mlips:KiloCAL-PER-MOL-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - MACE and ANI-2x errors on the COMP6 subsets are measured against different references (B3LYP-D3BJ/def2-SV(P) recomputed here for MACE; the omegaB97x/6-31G(d) COMP6 values for ANI-2x), as the authors state; the two are not errors against the same ground truth. The reference calculation of this file is the B3LYP one.
+# - Energy RMSEs are in kcal/mol per atom (no unit individual; mlips:hasUnit omitted).
+# - MACE hyperparameters are in Table S1 of the Supporting Information, not in the PDF read; no setting is encoded.
+# - The paper's headline results, bond dissociation energies (RMSE 1.37 kcal/mol on CYP 3A4 substrates) and their rank correlation against DFT, AM1, GFN2-xTB and ALFABET, and geometry RMSDs (Table 3), have no MetricProperty.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
