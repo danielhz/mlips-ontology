@@ -1,0 +1,821 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   G. Laskaris et al. (2026). Multi-objective optimization and quantum hybridization of equivariant deep learning interatomic potentials.
+#   Jyväskylä University Digital Archive (University of Jyväskylä). doi:10.1016/j.commatsci.2026.114742  arXiv:2602.16908v2
+#
+# Version read: arxiv-preprint arXiv:2602.16908v2 (sha256 4e3490eaf57eed64...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 118 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: Allegro and two modified variants (an added MLP, and a
+# quantum-classical hybrid with a QDI layer), each tuned by
+# multi-objective hyperparameter optimisation on rMD17 aspirin, rMD17
+# benzene, QM9 and an in-house Cu-Li interface data set, with the best
+# validation MAEs (Tables IV and V) and the tuned hyperparameters of
+# Tables I and II.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-laskaris2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Laskaris et al. (2026): multi-objective optimization and quantum hybridization of equivariant deep learning interatomic potentials (Allegro variants)" ;
+    mlips:reportedIn entity:article-laskaris2026 .
+
+entity:article-laskaris2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1016/j.commatsci.2026.114742> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Multi-objective optimization and quantum hybridization of equivariant deep learning interatomic potentials" ;
+    schema:author <https://orcid.org/0009-0009-8598-7708> ,
+        <https://orcid.org/0000-0001-9524-948X> ,
+        entity:person-Tarpanov-laskaris2026 ,
+        entity:person-Seth-laskaris2026 ,
+        entity:person-Procelewska-laskaris2026 ,
+        entity:person-Gautam-laskaris2026 ,
+        <https://orcid.org/0009-0009-3931-3702> ,
+        entity:person-Brasher-laskaris2026 ,
+        <https://orcid.org/0000-0002-5033-4063> .
+
+<https://orcid.org/0009-0009-8598-7708> a schema:Person ;
+    schema:name "G. Laskaris" ;
+    schema:givenName "G." ;
+    schema:familyName "Laskaris" ;
+    schema:identifier <https://orcid.org/0009-0009-8598-7708> .
+
+<https://orcid.org/0000-0001-9524-948X> a schema:Person ;
+    schema:name "D. Morozov" ;
+    schema:givenName "D." ;
+    schema:familyName "Morozov" ;
+    schema:identifier <https://orcid.org/0000-0001-9524-948X> .
+
+entity:person-Tarpanov-laskaris2026 a schema:Person ;
+    schema:name "D. Tarpanov" ;
+    schema:givenName "D." ;
+    schema:familyName "Tarpanov" .
+
+entity:person-Seth-laskaris2026 a schema:Person ;
+    schema:name "A. Seth" ;
+    schema:givenName "A." ;
+    schema:familyName "Seth" .
+
+entity:person-Procelewska-laskaris2026 a schema:Person ;
+    schema:name "J. Procelewska" ;
+    schema:givenName "J." ;
+    schema:familyName "Procelewska" .
+
+entity:person-Gautam-laskaris2026 a schema:Person ;
+    schema:name "G. Sai Gautam" ;
+    schema:givenName "G. Sai" ;
+    schema:familyName "Gautam" .
+
+<https://orcid.org/0009-0009-3931-3702> a schema:Person ;
+    schema:name "A. Sagingalieva" ;
+    schema:givenName "A." ;
+    schema:familyName "Sagingalieva" ;
+    schema:identifier <https://orcid.org/0009-0009-3931-3702> .
+
+entity:person-Brasher-laskaris2026 a schema:Person ;
+    schema:name "R. Brasher" ;
+    schema:givenName "R." ;
+    schema:familyName "Brasher" .
+
+<https://orcid.org/0000-0002-5033-4063> a schema:Person ;
+    schema:name "A. Melnikov" ;
+    schema:givenName "A." ;
+    schema:familyName "Melnikov" ;
+    schema:identifier <https://orcid.org/0000-0002-5033-4063> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-aspirin-laskaris2026 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-benzene-laskaris2026 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (rMD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-QM9-laskaris2026 a mlips:MaterialSystem ;
+    rdfs:label "QM9 small organic molecules" ;
+    mlips:materialClass "Small organic molecules, equilibrium geometries" .
+
+entity:mat-CuLi-laskaris2026 a mlips:MaterialSystem ;
+    rdfs:label "Cu-Li interface structures" ;
+    mlips:chemicalFormula "Cu-Li" ;
+    mlips:materialClass "Metal-metal interface (AIMD melt-quench configurations)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-culi-dft-laskaris2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-culi-dft-laskaris2026 mlips:hasDFTSettings entity:calc-settings-culi-dft-laskaris2026 .
+
+entity:calc-settings-culi-dft-laskaris2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    mlips:xcFunctional entity:xc-r2SCAN-laskaris2026 ;
+    mlips:pseudopotentialType mlips:PAW ;
+    mlips:energyCutoff "520"^^xsd:double ;
+    mlips:kPointMesh "Gamma-centred Monkhorst-Pack meshes with a minimum density of 32 per A^-1" ;
+    rdfs:comment "Convergence to 1e-5 eV in energy and 0.03 eV/A in forces; AIMD in the NVT ensemble with a 2 fs time step." .
+
+entity:xc-r2SCAN-laskaris2026 a mlips:XCFunctional ;
+    rdfs:label "r2SCAN" ;
+    rdfs:comment "Regularised-restored SCAN meta-GGA." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-aspirin-laskaris2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 aspirin" ;
+    mlips:coversMaterial entity:mat-aspirin-laskaris2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-benzene-laskaris2026 a mlips:TrainingDataset ;
+    rdfs:label "rMD17 benzene" ;
+    mlips:coversMaterial entity:mat-benzene-laskaris2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-QM9-laskaris2026 a mlips:TrainingDataset ;
+    rdfs:label "QM9" ;
+    mlips:coversMaterial entity:mat-QM9-laskaris2026 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-CuLi-laskaris2026 a mlips:TrainingDataset ;
+    rdfs:label "Cu-Li interface data set (11,000 structures)" ;
+    mlips:coversMaterial entity:mat-CuLi-laskaris2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 11000 ;
+    mlips:hasDFTCalculation entity:calc-culi-dft-laskaris2026 ;
+    rdfs:comment "Generated with an industrial partner; available on request only." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-aspirin-laskaris2026 mlips:samplingStrategy
+    entity:sampling-public-benchmark-laskaris2026 .
+
+entity:ds-benzene-laskaris2026 mlips:samplingStrategy
+    entity:sampling-public-benchmark-laskaris2026 .
+
+entity:ds-QM9-laskaris2026 mlips:samplingStrategy
+    entity:sampling-public-benchmark-laskaris2026 .
+
+entity:ds-CuLi-laskaris2026 mlips:samplingStrategy
+    entity:sampling-culi-aimd-laskaris2026 .
+
+entity:sampling-public-benchmark-laskaris2026 a mlips:SamplingStrategy ;
+    rdfs:label "Public benchmark data (rMD17, QM9)" .
+
+entity:sampling-culi-aimd-laskaris2026 a mlips:SamplingStrategy ;
+    rdfs:label "AIMD of Cu-Li interfaces" ;
+    rdfs:comment "NVT AIMD (Nose-Hoover), including quenching at 250 K/ps; the interfacial data form the bulk of the 11,000 distinct structures." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasTrainingAlgorithm entity:alg-Allegro-laskaris2026 ;
+    mlips:hasHyperparameter entity:hp-variant-laskaris2026 ,
+        mlips:cutoffRadius ,
+        mlips:learningRate ,
+        mlips:batchSize ,
+        mlips:numLayers .
+
+entity:alg-Allegro-laskaris2026 a mls:Algorithm ;
+    rdfs:label "Hyperparameters by multi-objective surrogate-assisted optimisation (SAMO-COBRA; 100 generations with 12 offspring, 1200 evaluations per variant and data set)" .
+
+entity:hp-variant-laskaris2026 a mlips:Hyperparameter ;
+    rdfs:label "Allegro variant (baseline, +MLP, +QDI quantum layer)" ;
+    mlips:hyperparameterName "variant" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-base-aspirin-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "baseline Allegro" .
+
+entity:setting-base-aspirin-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.3"^^xsd:double .
+
+entity:setting-base-aspirin-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.00536"^^xsd:double .
+
+entity:setting-base-aspirin-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-base-aspirin-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "4"^^xsd:integer .
+
+entity:setting-base-benzene-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "baseline Allegro" .
+
+entity:setting-base-benzene-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "12"^^xsd:double .
+
+entity:setting-base-benzene-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-base-benzene-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-base-benzene-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-base-QM9-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "baseline Allegro" .
+
+entity:setting-base-QM9-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "12"^^xsd:double .
+
+entity:setting-base-QM9-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-base-QM9-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-base-QM9-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-base-CuLi-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "baseline Allegro" .
+
+entity:setting-base-CuLi-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "12"^^xsd:double .
+
+entity:setting-base-CuLi-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.002"^^xsd:double .
+
+entity:setting-base-CuLi-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-base-CuLi-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mlp-aspirin-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with an additional two-hidden-layer MLP" .
+
+entity:setting-mlp-aspirin-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.4"^^xsd:double .
+
+entity:setting-mlp-aspirin-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.00293"^^xsd:double .
+
+entity:setting-mlp-aspirin-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mlp-aspirin-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-mlp-benzene-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with an additional two-hidden-layer MLP" .
+
+entity:setting-mlp-benzene-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "12"^^xsd:double .
+
+entity:setting-mlp-benzene-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-mlp-benzene-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mlp-benzene-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-mlp-QM9-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with an additional two-hidden-layer MLP" .
+
+entity:setting-mlp-QM9-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6.2"^^xsd:double .
+
+entity:setting-mlp-QM9-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.001"^^xsd:double .
+
+entity:setting-mlp-QM9-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mlp-QM9-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "2"^^xsd:integer .
+
+entity:setting-mlp-CuLi-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with an additional two-hidden-layer MLP" .
+
+entity:setting-mlp-CuLi-cutoffRadius-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:double .
+
+entity:setting-mlp-CuLi-learningRate-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.000935"^^xsd:double .
+
+entity:setting-mlp-CuLi-batchSize-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "1"^^xsd:integer .
+
+entity:setting-mlp-CuLi-numLayers-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numLayers ;
+    mlips:settingValue "3"^^xsd:integer .
+
+entity:setting-qdi-aspirin-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with a quantum (QDI) layer in place of the additional MLP" .
+
+entity:setting-qdi-benzene-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with a quantum (QDI) layer in place of the additional MLP" .
+
+entity:setting-qdi-QM9-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with a quantum (QDI) layer in place of the additional MLP" .
+
+entity:setting-qdi-CuLi-variant-laskaris2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-laskaris2026 ;
+    mlips:settingValue "Allegro with a quantum (QDI) layer in place of the additional MLP" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-base-aspirin-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on rMD17 aspirin (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-aspirin-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-base-aspirin-variant-laskaris2026 ,
+        entity:setting-base-aspirin-cutoffRadius-laskaris2026 ,
+        entity:setting-base-aspirin-learningRate-laskaris2026 ,
+        entity:setting-base-aspirin-batchSize-laskaris2026 ,
+        entity:setting-base-aspirin-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 9.6 minutes" ;
+    mlips:produces entity:model-base-aspirin-laskaris2026 .
+
+entity:model-base-aspirin-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model, rMD17 aspirin" .
+
+entity:run-base-benzene-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on rMD17 benzene (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-benzene-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-base-benzene-variant-laskaris2026 ,
+        entity:setting-base-benzene-cutoffRadius-laskaris2026 ,
+        entity:setting-base-benzene-learningRate-laskaris2026 ,
+        entity:setting-base-benzene-batchSize-laskaris2026 ,
+        entity:setting-base-benzene-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 6.0 minutes" ;
+    mlips:produces entity:model-base-benzene-laskaris2026 .
+
+entity:model-base-benzene-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model, rMD17 benzene" .
+
+entity:run-base-QM9-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on QM9 (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-QM9-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-base-QM9-variant-laskaris2026 ,
+        entity:setting-base-QM9-cutoffRadius-laskaris2026 ,
+        entity:setting-base-QM9-learningRate-laskaris2026 ,
+        entity:setting-base-QM9-batchSize-laskaris2026 ,
+        entity:setting-base-QM9-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 32.4 minutes" ;
+    mlips:produces entity:model-base-QM9-laskaris2026 .
+
+entity:model-base-QM9-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model, QM9" .
+
+entity:run-base-CuLi-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro on Cu-Li interface (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CuLi-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-base-CuLi-variant-laskaris2026 ,
+        entity:setting-base-CuLi-cutoffRadius-laskaris2026 ,
+        entity:setting-base-CuLi-learningRate-laskaris2026 ,
+        entity:setting-base-CuLi-batchSize-laskaris2026 ,
+        entity:setting-base-CuLi-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 4.8 minutes" ;
+    mlips:produces entity:model-base-CuLi-laskaris2026 .
+
+entity:model-base-CuLi-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro model, Cu-Li interface" .
+
+entity:run-mlp-aspirin-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+MLP on rMD17 aspirin (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-aspirin-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mlp-aspirin-variant-laskaris2026 ,
+        entity:setting-mlp-aspirin-cutoffRadius-laskaris2026 ,
+        entity:setting-mlp-aspirin-learningRate-laskaris2026 ,
+        entity:setting-mlp-aspirin-batchSize-laskaris2026 ,
+        entity:setting-mlp-aspirin-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 9.6 minutes" ;
+    mlips:produces entity:model-mlp-aspirin-laskaris2026 .
+
+entity:model-mlp-aspirin-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+MLP model, rMD17 aspirin" .
+
+entity:run-mlp-benzene-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+MLP on rMD17 benzene (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-benzene-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mlp-benzene-variant-laskaris2026 ,
+        entity:setting-mlp-benzene-cutoffRadius-laskaris2026 ,
+        entity:setting-mlp-benzene-learningRate-laskaris2026 ,
+        entity:setting-mlp-benzene-batchSize-laskaris2026 ,
+        entity:setting-mlp-benzene-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 6.0 minutes" ;
+    mlips:produces entity:model-mlp-benzene-laskaris2026 .
+
+entity:model-mlp-benzene-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+MLP model, rMD17 benzene" .
+
+entity:run-mlp-QM9-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+MLP on QM9 (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-QM9-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mlp-QM9-variant-laskaris2026 ,
+        entity:setting-mlp-QM9-cutoffRadius-laskaris2026 ,
+        entity:setting-mlp-QM9-learningRate-laskaris2026 ,
+        entity:setting-mlp-QM9-batchSize-laskaris2026 ,
+        entity:setting-mlp-QM9-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 32.4 minutes" ;
+    mlips:produces entity:model-mlp-QM9-laskaris2026 .
+
+entity:model-mlp-QM9-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+MLP model, QM9" .
+
+entity:run-mlp-CuLi-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+MLP on Cu-Li interface (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CuLi-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mlp-CuLi-variant-laskaris2026 ,
+        entity:setting-mlp-CuLi-cutoffRadius-laskaris2026 ,
+        entity:setting-mlp-CuLi-learningRate-laskaris2026 ,
+        entity:setting-mlp-CuLi-batchSize-laskaris2026 ,
+        entity:setting-mlp-CuLi-numLayers-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 4.8 minutes" ;
+    mlips:produces entity:model-mlp-CuLi-laskaris2026 .
+
+entity:model-mlp-CuLi-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+MLP model, Cu-Li interface" .
+
+entity:run-qdi-aspirin-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+QDI on rMD17 aspirin (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-aspirin-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-qdi-aspirin-variant-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 9.6 minutes" ;
+    mlips:produces entity:model-qdi-aspirin-laskaris2026 .
+
+entity:model-qdi-aspirin-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+QDI model, rMD17 aspirin" .
+
+entity:run-qdi-benzene-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+QDI on rMD17 benzene (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-benzene-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-qdi-benzene-variant-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 6.0 minutes" ;
+    mlips:produces entity:model-qdi-benzene-laskaris2026 .
+
+entity:model-qdi-benzene-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+QDI model, rMD17 benzene" .
+
+entity:run-qdi-QM9-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+QDI on QM9 (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-QM9-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-qdi-QM9-variant-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 32.4 minutes" ;
+    mlips:produces entity:model-qdi-QM9-laskaris2026 .
+
+entity:model-qdi-QM9-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+QDI model, QM9" .
+
+entity:run-qdi-CuLi-laskaris2026 a mlips:MLIPRun ;
+    rdfs:label "Allegro+QDI on Cu-Li interface (best run of the hyperparameter optimisation)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-CuLi-laskaris2026 ;
+    mlips:hasHyperparameterSetting entity:setting-qdi-CuLi-variant-laskaris2026 ;
+    mlips:trainingHardware "Single T4 GPU; mean wall-clock time per optimisation evaluation about 4.8 minutes" ;
+    mlips:produces entity:model-qdi-CuLi-laskaris2026 .
+
+entity:model-qdi-CuLi-laskaris2026 a mlips:TrainedModel ;
+    rdfs:label "Allegro+QDI model, Cu-Li interface" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-laskaris2026 mlips:hasResult
+    entity:result-base-aspirin-laskaris2026 ,
+    entity:result-base-benzene-laskaris2026 ,
+    entity:result-base-QM9-laskaris2026 ,
+    entity:result-base-CuLi-laskaris2026 ,
+    entity:result-mlp-aspirin-laskaris2026 ,
+    entity:result-mlp-benzene-laskaris2026 ,
+    entity:result-mlp-QM9-laskaris2026 ,
+    entity:result-mlp-CuLi-laskaris2026 ,
+    entity:result-qdi-aspirin-laskaris2026 ,
+    entity:result-qdi-benzene-laskaris2026 ,
+    entity:result-qdi-QM9-laskaris2026 ,
+    entity:result-qdi-CuLi-laskaris2026 .
+
+entity:result-base-aspirin-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-base-aspirin-laskaris2026 ;
+    mlips:targetMaterial entity:mat-aspirin-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-base-aspirin-1-laskaris2026 ,
+        entity:metric-base-aspirin-2-laskaris2026 .
+
+entity:metric-base-aspirin-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-base-aspirin-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-base-benzene-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-base-benzene-laskaris2026 ;
+    mlips:targetMaterial entity:mat-benzene-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-base-benzene-1-laskaris2026 ,
+        entity:metric-base-benzene-2-laskaris2026 .
+
+entity:metric-base-benzene-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-base-benzene-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.43"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-base-QM9-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-base-QM9-laskaris2026 ;
+    mlips:targetMaterial entity:mat-QM9-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-base-QM9-1-laskaris2026 .
+
+entity:metric-base-QM9-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro, QM9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "10.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-base-CuLi-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-base-CuLi-laskaris2026 ;
+    mlips:targetMaterial entity:mat-CuLi-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-base-CuLi-1-laskaris2026 ,
+        entity:metric-base-CuLi-2-laskaris2026 .
+
+entity:metric-base-CuLi-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "809"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-base-CuLi-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "45.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mlp-aspirin-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mlp-aspirin-laskaris2026 ;
+    mlips:targetMaterial entity:mat-aspirin-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-mlp-aspirin-1-laskaris2026 ,
+        entity:metric-mlp-aspirin-2-laskaris2026 .
+
+entity:metric-mlp-aspirin-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+MLP, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mlp-aspirin-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+MLP, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mlp-benzene-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mlp-benzene-laskaris2026 ;
+    mlips:targetMaterial entity:mat-benzene-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-mlp-benzene-1-laskaris2026 ,
+        entity:metric-mlp-benzene-2-laskaris2026 .
+
+entity:metric-mlp-benzene-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+MLP, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.21"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mlp-benzene-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+MLP, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.28"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-mlp-QM9-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mlp-QM9-laskaris2026 ;
+    mlips:targetMaterial entity:mat-QM9-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-mlp-QM9-1-laskaris2026 .
+
+entity:metric-mlp-QM9-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+MLP, QM9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "21.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-mlp-CuLi-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-mlp-CuLi-laskaris2026 ;
+    mlips:targetMaterial entity:mat-CuLi-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-mlp-CuLi-1-laskaris2026 ,
+        entity:metric-mlp-CuLi-2-laskaris2026 .
+
+entity:metric-mlp-CuLi-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+MLP, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "698.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-mlp-CuLi-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+MLP, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-qdi-aspirin-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-qdi-aspirin-laskaris2026 ;
+    mlips:targetMaterial entity:mat-aspirin-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-qdi-aspirin-1-laskaris2026 ,
+        entity:metric-qdi-aspirin-2-laskaris2026 .
+
+entity:metric-qdi-aspirin-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+QDI, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "3.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-qdi-aspirin-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+QDI, rMD17 aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-qdi-benzene-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-qdi-benzene-laskaris2026 ;
+    mlips:targetMaterial entity:mat-benzene-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-qdi-benzene-1-laskaris2026 ,
+        entity:metric-qdi-benzene-2-laskaris2026 .
+
+entity:metric-qdi-benzene-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+QDI, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.19"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-qdi-benzene-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+QDI, rMD17 benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-qdi-QM9-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-qdi-QM9-laskaris2026 ;
+    mlips:targetMaterial entity:mat-QM9-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-qdi-QM9-1-laskaris2026 .
+
+entity:metric-qdi-QM9-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+QDI, QM9" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "23.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-qdi-CuLi-laskaris2026 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-qdi-CuLi-laskaris2026 ;
+    mlips:targetMaterial entity:mat-CuLi-laskaris2026 ;
+    mlips:hasAccuracyMetric entity:metric-qdi-CuLi-1-laskaris2026 ,
+        entity:metric-qdi-CuLi-2-laskaris2026 .
+
+entity:metric-qdi-CuLi-1-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on energy: Allegro+QDI, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "495.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:metric-qdi-CuLi-2-laskaris2026 a mlips:AccuracyMetric ;
+    rdfs:label "Best validation MAE on forces: Allegro+QDI, Cu-Li interface" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "37.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# Mean wall-clock time per optimisation evaluation on a single T4 GPU:
+# about 32.4 minutes (QM9), 9.6 (rMD17 aspirin), 6.0 (rMD17 benzene) and
+# 4.8 (Cu-Li); recorded as text in trainingHardware.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - The +MLP and +QDI models are modifications of Allegro's output pathway and are encoded under entity:Allegro with a 'variant' setting (METHODS.md rule 3). The QDI layer is a quantum-circuit layer; whether it ran on a simulator or on hardware was not captured.
+# - Errors are validation MAEs of the best runs (up to 300 epochs for QM9, 100 for Cu-Li, 3000 for aspirin and benzene), not test errors. The Cu-Li energy MAEs (809.0 / 698.9 / 495.7 meV/atom) are as printed and are strikingly large.
+# - Tuned hyperparameters are encoded for baseline Allegro and Allegro+MLP (Tables I and II: r_max as cutoffRadius, learning rate, batch size, layers); the polynomial cutoff P and the MLP widths are left out, and Table III (Allegro+QDI) was not read.
+# - The column 'Allegro [12]' of Tables IV and V and the comparison Table VI are literature values. The reference levels of rMD17 and QM9 are not restated.
+# - The venue string in the manifest ('Jyvaskyla University Digital Archive') is the repository; the DOI is that of Computational Materials Science. The manifest notes that the DOI had to be cleaned.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
