@@ -1,0 +1,324 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Stefan Chmiela et al. (2018). Towards exact molecular dynamics simulations with machine-learned force fields.
+#   Nature Communications. doi:10.1038/s41467-018-06169-2  arXiv:1802.09238v3
+#
+# Version read: arxiv-preprint arXiv:1802.09238v3 (sha256 ffde67eba00609eb...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 82 (Application/model instance). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the sGDML method (introduced here: GDML with
+# permutational symmetries recovered from the data) and the
+# coupled-cluster force fields the paper builds with it for benzene,
+# toluene, ethanol, malonaldehyde (CCSD(T)) and aspirin (CCSD). The
+# DFT-trained sGDML and GDML models for ten molecules are compared in a
+# figure; errors are in the supplementary tables.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-chmiela2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Chmiela et al. (2018): towards exact molecular dynamics simulations with machine-learned force fields (sGDML at CCSD(T) accuracy)" ;
+    mlips:reportedIn entity:article-chmiela2018 .
+
+entity:article-chmiela2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1038/s41467-018-06169-2> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Towards exact molecular dynamics simulations with machine-learned force fields" ;
+    schema:author entity:person-Chmiela-chmiela2018 ,
+        <https://orcid.org/0000-0001-6091-3408> ,
+        entity:person-Muller-chmiela2018 ,
+        entity:person-Tkatchenko-chmiela2018 .
+
+entity:person-Chmiela-chmiela2018 a schema:Person ;
+    schema:name "Stefan Chmiela" ;
+    schema:givenName "Stefan" ;
+    schema:familyName "Chmiela" .
+
+<https://orcid.org/0000-0001-6091-3408> a schema:Person ;
+    schema:name "Huziel E. Sauceda" ;
+    schema:givenName "Huziel E." ;
+    schema:familyName "Sauceda" ;
+    schema:identifier <https://orcid.org/0000-0001-6091-3408> .
+
+entity:person-Muller-chmiela2018 a schema:Person ;
+    schema:name "Klaus-Robert Müller" ;
+    schema:givenName "Klaus-Robert" ;
+    schema:familyName "Müller" .
+
+entity:person-Tkatchenko-chmiela2018 a schema:Person ;
+    schema:name "Alexandre Tkatchenko" ;
+    schema:givenName "Alexandre" ;
+    schema:familyName "Tkatchenko" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-benzene-chmiela2018 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-toluene-chmiela2018 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-ethanol-chmiela2018 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule" ;
+    mlips:materialClass "Small fluxional organic molecule (gas phase)" .
+
+entity:mat-malonaldehyde-chmiela2018 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule" ;
+    mlips:materialClass "Small organic molecule (gas phase)" .
+
+entity:mat-aspirin-chmiela2018 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule" ;
+    mlips:materialClass "Organic molecule of 21 atoms (gas phase)" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-ccsdt-pvtz-chmiela2018 a mlips:WaveFunctionCalculation .
+
+entity:calc-ccsdt-pvdz-chmiela2018 a mlips:WaveFunctionCalculation .
+
+entity:calc-ccsdt-benzene-chmiela2018 a mlips:WaveFunctionCalculation .
+
+entity:calc-ccsd-pvdz-chmiela2018 a mlips:WaveFunctionCalculation .
+
+entity:calc-dft-chmiela2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-ccsdt-pvtz-chmiela2018 mlips:hasWaveFunctionSettings entity:calc-settings-ccsdt-pvtz-chmiela2018 .
+
+entity:calc-settings-ccsdt-pvtz-chmiela2018 a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode entity:lib-Psi4-chmiela2018 ;
+    mlips:wfMethod mlips:CCSDT ;
+    mlips:basisSet "cc-pVTZ" ;
+    rdfs:comment "All-electron CCSD(T)/cc-pVTZ, used for ethanol." .
+
+entity:calc-ccsdt-pvdz-chmiela2018 mlips:hasWaveFunctionSettings entity:calc-settings-ccsdt-pvdz-chmiela2018 .
+
+entity:calc-settings-ccsdt-pvdz-chmiela2018 a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode entity:lib-Psi4-chmiela2018 ;
+    mlips:wfMethod mlips:CCSDT ;
+    mlips:basisSet "cc-pVDZ" ;
+    rdfs:comment "All-electron CCSD(T)/cc-pVDZ, used for toluene and malonaldehyde." .
+
+entity:calc-ccsdt-benzene-chmiela2018 mlips:hasWaveFunctionSettings entity:calc-settings-ccsdt-benzene-chmiela2018 .
+
+entity:calc-settings-ccsdt-benzene-chmiela2018 a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode entity:lib-Psi4-chmiela2018 ;
+    mlips:wfMethod mlips:CCSDT ;
+    rdfs:comment "All-electron CCSD(T) for benzene; the basis set is not named in the sentence that lists the others." .
+
+entity:calc-ccsd-pvdz-chmiela2018 mlips:hasWaveFunctionSettings entity:calc-settings-ccsd-pvdz-chmiela2018 .
+
+entity:calc-settings-ccsd-pvdz-chmiela2018 a mlips:WaveFunctionSettings ;
+    mlips:usedReferenceCode entity:lib-Psi4-chmiela2018 ;
+    mlips:wfMethod mlips:CCSD ;
+    mlips:basisSet "cc-pVDZ" ;
+    rdfs:comment "CCSD/cc-pVDZ, used for the larger aspirin molecule." .
+
+entity:calc-dft-chmiela2018 mlips:hasDFTSettings entity:calc-settings-dft-chmiela2018 .
+
+entity:calc-settings-dft-chmiela2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:FHIaims ;
+    mlips:xcFunctional entity:xc-PBE-TS-chmiela2018 ;
+    rdfs:comment "All-electron calculations with FHI-aims; level of the sampling MD and of the DFT-trained models." .
+
+entity:lib-Psi4-chmiela2018 a mlips:Library ;
+    rdfs:label "Psi4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-Psi4-chmiela2018 a mlips:Library ;
+    rdfs:label "Psi4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-Psi4-chmiela2018 a mlips:Library ;
+    rdfs:label "Psi4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:lib-Psi4-chmiela2018 a mlips:Library ;
+    rdfs:label "Psi4" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-PBE-TS-chmiela2018 a mlips:XCFunctional ;
+    rdfs:label "PBE+TS" ;
+    rdfs:comment "PBE with Tkatchenko-Scheffler van der Waals correction." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-benzene-chmiela2018 a mlips:TrainingDataset ;
+    rdfs:label "Benzene CCSD(T) force data set" ;
+    mlips:coversMaterial entity:mat-benzene-chmiela2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-ccsdt-benzene-chmiela2018 .
+
+entity:ds-toluene-chmiela2018 a mlips:TrainingDataset ;
+    rdfs:label "Toluene CCSD(T)/cc-pVDZ force data set" ;
+    mlips:coversMaterial entity:mat-toluene-chmiela2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-ccsdt-pvdz-chmiela2018 .
+
+entity:ds-ethanol-chmiela2018 a mlips:TrainingDataset ;
+    rdfs:label "Ethanol CCSD(T)/cc-pVTZ force data set" ;
+    mlips:coversMaterial entity:mat-ethanol-chmiela2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-ccsdt-pvtz-chmiela2018 .
+
+entity:ds-malonaldehyde-chmiela2018 a mlips:TrainingDataset ;
+    rdfs:label "Malonaldehyde CCSD(T)/cc-pVDZ force data set" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-chmiela2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-ccsdt-pvdz-chmiela2018 .
+
+entity:ds-aspirin-chmiela2018 a mlips:TrainingDataset ;
+    rdfs:label "Aspirin CCSD/cc-pVDZ force data set" ;
+    mlips:coversMaterial entity:mat-aspirin-chmiela2018 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-pvdz-chmiela2018 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-benzene-chmiela2018 mlips:samplingStrategy
+    entity:sampling-dft-md-boltzmann-chmiela2018 .
+
+entity:ds-toluene-chmiela2018 mlips:samplingStrategy
+    entity:sampling-dft-md-boltzmann-chmiela2018 .
+
+entity:ds-ethanol-chmiela2018 mlips:samplingStrategy
+    entity:sampling-dft-md-boltzmann-chmiela2018 .
+
+entity:ds-malonaldehyde-chmiela2018 mlips:samplingStrategy
+    entity:sampling-dft-md-boltzmann-chmiela2018 .
+
+entity:ds-aspirin-chmiela2018 mlips:samplingStrategy
+    entity:sampling-dft-md-boltzmann-chmiela2018 .
+
+entity:sampling-dft-md-boltzmann-chmiela2018 a mlips:SamplingStrategy ;
+    rdfs:label "Subsampling of a DFT MD trajectory under preservation of the Maxwell-Boltzmann energy distribution" ;
+    rdfs:comment "NVT ab initio MD (Nose-Hoover) at 500 K for 200 ps with 0.5 fs resolution; a few hundred geometries are subsampled and, for the coupled-cluster data sets, recomputed at the CCSD(T) or CCSD level." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:sGDML a mlips:MLIPMethod ;
+    rdfs:label "Symmetric Gradient-Domain Machine Learning (sGDML)" ;
+    mlips:hasLossFunction entity:loss-sGDML-chmiela2018 ;
+    mlips:hasTrainingAlgorithm entity:alg-sGDML-chmiela2018 ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:loss-sGDML-chmiela2018 a mlips:LossFunction ;
+    rdfs:label "Kernel ridge regression on forces only; an energy penalty is intentionally omitted from the cost function" .
+
+entity:alg-sGDML-chmiela2018 a mls:Algorithm ;
+    rdfs:label "Symmetric kernel built as a sum over the permutations found by bipartite matching of molecular graphs (Hungarian algorithm) across the training set" .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+# No hyperparameter value is stated by the paper (see Q12).
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-sgdml-benzene-chmiela2018 a mlips:MLIPRun ;
+    rdfs:label "sGDML@CCSD(T) force field for benzene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-benzene-chmiela2018 ;
+    mlips:produces entity:model-sgdml-benzene-chmiela2018 .
+
+entity:model-sgdml-benzene-chmiela2018 a mlips:TrainedModel ;
+    rdfs:label "sGDML@CCSD(T) model for benzene" .
+
+entity:run-sgdml-toluene-chmiela2018 a mlips:MLIPRun ;
+    rdfs:label "sGDML@CCSD(T) force field for toluene" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-toluene-chmiela2018 ;
+    mlips:produces entity:model-sgdml-toluene-chmiela2018 .
+
+entity:model-sgdml-toluene-chmiela2018 a mlips:TrainedModel ;
+    rdfs:label "sGDML@CCSD(T) model for toluene" .
+
+entity:run-sgdml-ethanol-chmiela2018 a mlips:MLIPRun ;
+    rdfs:label "sGDML@CCSD(T) force field for ethanol" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-ethanol-chmiela2018 ;
+    mlips:produces entity:model-sgdml-ethanol-chmiela2018 .
+
+entity:model-sgdml-ethanol-chmiela2018 a mlips:TrainedModel ;
+    rdfs:label "sGDML@CCSD(T) model for ethanol" .
+
+entity:run-sgdml-malonaldehyde-chmiela2018 a mlips:MLIPRun ;
+    rdfs:label "sGDML@CCSD(T) force field for malonaldehyde" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-malonaldehyde-chmiela2018 ;
+    mlips:produces entity:model-sgdml-malonaldehyde-chmiela2018 .
+
+entity:model-sgdml-malonaldehyde-chmiela2018 a mlips:TrainedModel ;
+    rdfs:label "sGDML@CCSD(T) model for malonaldehyde" .
+
+entity:run-sgdml-aspirin-chmiela2018 a mlips:MLIPRun ;
+    rdfs:label "sGDML@CCSD force field for aspirin" ;
+    mlips:appliesMethod entity:sGDML ;
+    mlips:runsOn entity:ds-aspirin-chmiela2018 ;
+    mlips:produces entity:model-sgdml-aspirin-chmiela2018 .
+
+entity:model-sgdml-aspirin-chmiela2018 a mlips:TrainedModel ;
+    rdfs:label "sGDML@CCSD model for aspirin" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Training-set sizes and the energy and force errors of the coupled-cluster models are in Supplementary Table 2, not in the PDF read ('a few hundred molecular conformations'); no numConfigurations and no AccuracyMetric are encoded. The main text gives only that sGDML reaches a force MAE of 1 kcal/mol/A with about 200 training examples on DFT data (GDML: about 800).
+# - The DFT-trained sGDML and GDML models for ten molecules (benzene to azobenzene, Fig. 2 and Table I) are not encoded as runs; the PBE+TS reference calculation is declared for the sampling level and is not attached to a data set.
+# - mlips:CCSDT is used for CCSD(T), as in smith2019ccx (DLPNO_CCSDT); the vocabulary has no separate individual for full CCSDT, so this reading should be confirmed.
+# - Classical and path-integral MD (i-PI, 16 beads, 0.2 fs) with the sGDML models are demonstrated; the spectroscopic and conformational results have no MetricProperty.
+# - The manifest classes this paper as 'Application/model instance'; it is the originating sGDML method paper (registry origin of entity:sGDML).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
