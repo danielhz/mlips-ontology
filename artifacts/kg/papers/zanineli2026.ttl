@@ -1,0 +1,420 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Pedro H. M. Zanineli et al. (2026). Cross-Geometry Transferability Assessment of Universal Machine Learning Interatomic Potentials: From Bulk Materials to Atomic Nanowires.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2608.06662  arXiv:2608.06662v1
+#
+# Version read: arxiv-preprint arXiv:2608.06662v1 (sha256 8842ea6bd3debc89...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 157 (Training/reliability). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the eight training runs of the fine-tuning versus
+# from-scratch comparison (MACE MP-0, MACE MPA-0, ORB-v2-MPtrj and ORB-v3
+# architectures on the geometry-diverse ZrO2 data set) with their shared
+# settings and wall times. Their errors are shown as figures. The
+# zero-shot table for 26 pretrained models is not encoded; see gaps.
+# Preprint only (arXiv v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-zanineli2026 a mlips:BenchmarkStudy ;
+    rdfs:label "Zanineli et al. (2026): cross-geometry transferability of universal MLIPs, from bulk ZrO2 to atomic nanowires" ;
+    mlips:reportedIn entity:article-zanineli2026 .
+
+entity:article-zanineli2026 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2608.06662> ;
+    schema:datePublished "2026"^^xsd:gYear ;
+    schema:name "Cross-Geometry Transferability Assessment of Universal Machine Learning Interatomic Potentials: From Bulk Materials to Atomic Nanowires" ;
+    schema:author entity:person-Zanineli-zanineli2026 ,
+        entity:person-Focassio-zanineli2026 ,
+        entity:person-Schleder-zanineli2026 .
+
+entity:person-Zanineli-zanineli2026 a schema:Person ;
+    schema:name "Pedro H. M. Zanineli" ;
+    schema:givenName "Pedro H. M." ;
+    schema:familyName "Zanineli" .
+
+entity:person-Focassio-zanineli2026 a schema:Person ;
+    schema:name "Bruno Focassio" ;
+    schema:givenName "Bruno" ;
+    schema:familyName "Focassio" .
+
+entity:person-Schleder-zanineli2026 a schema:Person ;
+    schema:name "Gabriel R. Schleder" ;
+    schema:givenName "Gabriel R." ;
+    schema:familyName "Schleder" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-ZrO2-zanineli2026 a mlips:MaterialSystem ;
+    rdfs:label "Zirconia in five geometry classes: bulk, slab, particle, neck and wire" ;
+    mlips:chemicalFormula "ZrO2" ;
+    mlips:materialClass "Oxide across bulk and nanostructure geometries" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-dft-zanineli2026 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-dft-zanineli2026 mlips:hasDFTSettings entity:calc-settings-dft-zanineli2026 .
+
+entity:calc-settings-dft-zanineli2026 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    rdfs:comment "DFT as implemented in VASP; functional and settings were not captured from the text read." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-ZrO2-zanineli2026 a mlips:TrainingDataset ;
+    rdfs:label "ZrO2 training partition after force filtering (9331 structures, 454,851 atomic environments)" ;
+    mlips:coversMaterial entity:mat-ZrO2-zanineli2026 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 9331 ;
+    mlips:hasDFTCalculation entity:calc-dft-zanineli2026 ;
+    rdfs:comment "By geometry: bulk 67, slab/surface defect/grain boundary 2140, particle 548, neck 2269, wire 4307 structures. About 72% / 18% / 10% train / validation / test after filtering." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-ZrO2-zanineli2026 mlips:samplingStrategy
+    entity:sampling-process-zanineli2026 .
+
+entity:sampling-process-zanineli2026 a mlips:SamplingStrategy ;
+    rdfs:label "First-principles simulations following the structural evolution from bulk and slabs through particles and necks to atomic wires; geometry-stratified split, then removal of structures with any force above 3 eV/A" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasLossFunction entity:loss-MACE-zanineli2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-MACE-zanineli2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-zanineli2026 ,
+        mlips:numEpochs ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:loss-MACE-zanineli2026 a mlips:LossFunction ;
+    rdfs:label "Per-atom energy loss plus force RMSE with unit weights" .
+
+entity:alg-MACE-zanineli2026 a mls:Algorithm ;
+    rdfs:label "AdamW with ReduceLROnPlateau; full-parameter single-head fine-tuning or training from scratch, 50 epochs, float32 (Graph-PES)" .
+
+entity:ORB a mlips:MLIPMethod ;
+    rdfs:label "Orb (graph network simulator universal interatomic potential)" ;
+    mlips:hasLossFunction entity:loss-ORB-zanineli2026 ;
+    mlips:hasTrainingAlgorithm entity:alg-ORB-zanineli2026 ;
+    mlips:hasHyperparameter entity:hp-initialisation-zanineli2026 ,
+        mlips:numEpochs ,
+        mlips:learningRate ,
+        mlips:batchSize ;
+    mlips:supportsSimulation mlips:MolecularDynamics ,
+        mlips:GeometryOptimization ,
+        mlips:PhononCalculation .
+
+entity:loss-ORB-zanineli2026 a mlips:LossFunction ;
+    rdfs:label "Per-atom energy loss plus force RMSE with unit weights" .
+
+entity:alg-ORB-zanineli2026 a mls:Algorithm ;
+    rdfs:label "AdamW with ReduceLROnPlateau; full-parameter single-head fine-tuning or training from scratch, 50 epochs, float32 (Graph-PES)" .
+
+entity:hp-initialisation-zanineli2026 a mlips:Hyperparameter ;
+    rdfs:label "Weight initialisation (pretrained checkpoint or random)" ;
+    mlips:hyperparameterName "initialisation" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-mace-mp0-ft-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "pretrained checkpoint large" .
+
+entity:setting-mace-mp0-ft-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-mace-mp0-ft-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-mace-mp0-ft-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-mace-mp0-fs-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "random (from scratch)" .
+
+entity:setting-mace-mp0-fs-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-mace-mp0-fs-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-mace-mp0-fs-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-orb-v2-mptrj-ft-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "pretrained checkpoint orb-mptraj-only-v2" .
+
+entity:setting-orb-v2-mptrj-ft-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-orb-v2-mptrj-ft-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-orb-v2-mptrj-ft-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-orb-v2-mptrj-fs-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "random (from scratch)" .
+
+entity:setting-orb-v2-mptrj-fs-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-orb-v2-mptrj-fs-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-orb-v2-mptrj-fs-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-mace-mpa0-ft-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "pretrained checkpoint medium-mpa-0" .
+
+entity:setting-mace-mpa0-ft-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-mace-mpa0-ft-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-mace-mpa0-ft-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-mace-mpa0-fs-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "random (from scratch)" .
+
+entity:setting-mace-mpa0-fs-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-mace-mpa0-fs-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-mace-mpa0-fs-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-orb-v3-ft-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "pretrained checkpoint orb-v3-direct-20-omat" .
+
+entity:setting-orb-v3-ft-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-orb-v3-ft-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-orb-v3-ft-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+entity:setting-orb-v3-fs-initialisation-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-initialisation-zanineli2026 ;
+    mlips:settingValue "random (from scratch)" .
+
+entity:setting-orb-v3-fs-numEpochs-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "50"^^xsd:integer .
+
+entity:setting-orb-v3-fs-learningRate-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-orb-v3-fs-batchSize-zanineli2026 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "8"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-mace-mp0-ft-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "MACE MP-0 fine-tuned on the ZrO2 data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mp0-ft-initialisation-zanineli2026 ,
+        entity:setting-mace-mp0-ft-numEpochs-zanineli2026 ,
+        entity:setting-mace-mp0-ft-learningRate-zanineli2026 ,
+        entity:setting-mace-mp0-ft-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 169.0 min" ;
+    mlips:produces entity:model-mace-mp0-ft-zanineli2026 .
+
+entity:model-mace-mp0-ft-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "MACE MP-0 fine-tuned on ZrO2" .
+
+entity:run-mace-mp0-fs-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "MACE MP-0 architecture trained from scratch on the ZrO2 data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mp0-fs-initialisation-zanineli2026 ,
+        entity:setting-mace-mp0-fs-numEpochs-zanineli2026 ,
+        entity:setting-mace-mp0-fs-learningRate-zanineli2026 ,
+        entity:setting-mace-mp0-fs-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 168.5 min" ;
+    mlips:produces entity:model-mace-mp0-fs-zanineli2026 .
+
+entity:model-mace-mp0-fs-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "MACE MP-0 architecture trained from scratch on ZrO2" .
+
+entity:run-orb-v2-mptrj-ft-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2-MPtrj fine-tuned on the ZrO2 data set" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-orb-v2-mptrj-ft-initialisation-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-ft-numEpochs-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-ft-learningRate-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-ft-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 298.6 min" ;
+    mlips:produces entity:model-orb-v2-mptrj-ft-zanineli2026 .
+
+entity:model-orb-v2-mptrj-ft-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2-MPtrj fine-tuned on ZrO2" .
+
+entity:run-orb-v2-mptrj-fs-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v2-MPtrj architecture trained from scratch on the ZrO2 data set" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-orb-v2-mptrj-fs-initialisation-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-fs-numEpochs-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-fs-learningRate-zanineli2026 ,
+        entity:setting-orb-v2-mptrj-fs-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 302.2 min" ;
+    mlips:produces entity:model-orb-v2-mptrj-fs-zanineli2026 .
+
+entity:model-orb-v2-mptrj-fs-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v2-MPtrj architecture trained from scratch on ZrO2" .
+
+entity:run-mace-mpa0-ft-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "MACE MPA-0 fine-tuned on the ZrO2 data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mpa0-ft-initialisation-zanineli2026 ,
+        entity:setting-mace-mpa0-ft-numEpochs-zanineli2026 ,
+        entity:setting-mace-mpa0-ft-learningRate-zanineli2026 ,
+        entity:setting-mace-mpa0-ft-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 152.0 min" ;
+    mlips:produces entity:model-mace-mpa0-ft-zanineli2026 .
+
+entity:model-mace-mpa0-ft-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "MACE MPA-0 fine-tuned on ZrO2" .
+
+entity:run-mace-mpa0-fs-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "MACE MPA-0 architecture trained from scratch on the ZrO2 data set" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-mace-mpa0-fs-initialisation-zanineli2026 ,
+        entity:setting-mace-mpa0-fs-numEpochs-zanineli2026 ,
+        entity:setting-mace-mpa0-fs-learningRate-zanineli2026 ,
+        entity:setting-mace-mpa0-fs-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 150.3 min" ;
+    mlips:produces entity:model-mace-mpa0-fs-zanineli2026 .
+
+entity:model-mace-mpa0-fs-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "MACE MPA-0 architecture trained from scratch on ZrO2" .
+
+entity:run-orb-v3-ft-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v3 fine-tuned on the ZrO2 data set" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-orb-v3-ft-initialisation-zanineli2026 ,
+        entity:setting-orb-v3-ft-numEpochs-zanineli2026 ,
+        entity:setting-orb-v3-ft-learningRate-zanineli2026 ,
+        entity:setting-orb-v3-ft-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 280.8 min" ;
+    mlips:produces entity:model-orb-v3-ft-zanineli2026 .
+
+entity:model-orb-v3-ft-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v3 fine-tuned on ZrO2" .
+
+entity:run-orb-v3-fs-zanineli2026 a mlips:MLIPRun ;
+    rdfs:label "ORB-v3 architecture trained from scratch on the ZrO2 data set" ;
+    mlips:appliesMethod entity:ORB ;
+    mlips:runsOn entity:ds-ZrO2-zanineli2026 ;
+    mlips:hasHyperparameterSetting entity:setting-orb-v3-fs-initialisation-zanineli2026 ,
+        entity:setting-orb-v3-fs-numEpochs-zanineli2026 ,
+        entity:setting-orb-v3-fs-learningRate-zanineli2026 ,
+        entity:setting-orb-v3-fs-batchSize-zanineli2026 ;
+    mlips:trainingHardware "One NVIDIA L40 GPU; wall time 289.2 min" ;
+    mlips:produces entity:model-orb-v3-fs-zanineli2026 .
+
+entity:model-orb-v3-fs-zanineli2026 a mlips:TrainedModel ;
+    rdfs:label "ORB-v3 architecture trained from scratch on ZrO2" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Review first: SI Table S3 gives zero-shot raw and reference-aligned energy RMSE/MAE and force RMSE on this data set for 26 pretrained models (for example orb-v3 30.36 raw / 31.27 aligned meV/atom and 197.29 meV/A; mace-mp-0 90.96 / 44.83 and 509.17; chgnet 368.92 / 55.48 and 486.37; m3gnet 109.65 / 52.47 and 601.14). The models are named by Matbench Discovery keys without release or checkpoint, so they were not matched to registry models (the registry separates several MACE-MP-0, CHGNet, M3GNet and SevenNet checkpoints). With the checkpoints pinned this table is directly encodable.
+# - The errors of the eight trained models (Fig. 3), the geometry-specific learning curves, the cross-geometry transfer matrices and mixed-geometry fine-tuning (Fig. 4) are figures only; the text gives approximate values only (mixed-geometry MACE force RMSE from about 100 to 70 meV/A).
+# - Fine-tuning from a pretrained model is recorded as a string-valued setting; schema 0.1.2 has no relation between a fine-tuned model and its base model. Wall times are in minutes and kept in the hardware string because mlips:trainingDuration is in hours.
+# - Elastic, phonon and surface-energy validations and the neck tensile MD are not encoded. The DFT functional was not captured.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
