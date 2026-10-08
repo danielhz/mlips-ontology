@@ -1,0 +1,487 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Jiequn Han et al. (2018). Deep Potential: A General Representation of a Many-Body Potential Energy Surface.
+#   Communications in Computational Physics. doi:10.4208/cicp.oa-2017-0213  arXiv:1707.01478v2
+#
+# Version read: arxiv-preprint arXiv:1707.01478v2 (sha256 4011e6a02afe2482...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 25 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the first Deep Potential paper (energies only, local
+# frames): four fits with their architectures and energy errors (Tables 1
+# and 2): C7O2H10 isomers, EAM copper, AIMD zirconium and path-integral
+# AIMD liquid water.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-han2018 a mlips:BenchmarkStudy ;
+    rdfs:label "Han et al. (2018): Deep Potential, a general representation of a many-body potential energy surface" ;
+    mlips:reportedIn entity:article-han2018 .
+
+entity:article-han2018 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.4208/cicp.oa-2017-0213> ;
+    schema:datePublished "2018"^^xsd:gYear ;
+    schema:name "Deep Potential: A General Representation of a Many-Body Potential Energy Surface" ;
+    schema:author entity:person-Han-han2018 ,
+        entity:person-Zhang-han2018 ,
+        entity:person-Car-han2018 ,
+        entity:person-E-han2018 .
+
+entity:person-Han-han2018 a schema:Person ;
+    schema:name "Jiequn Han" ;
+    schema:givenName "Jiequn" ;
+    schema:familyName "Han" .
+
+entity:person-Zhang-han2018 a schema:Person ;
+    schema:name "Linfeng Zhang" ;
+    schema:givenName "Linfeng" ;
+    schema:familyName "Zhang" .
+
+entity:person-Car-han2018 a schema:Person ;
+    schema:name "Roberto Car" ;
+    schema:givenName "Roberto" ;
+    schema:familyName "Car" .
+
+entity:person-E-han2018 a schema:Person ;
+    schema:name "Weinan E" ;
+    schema:givenName "Weinan" ;
+    schema:familyName "E" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-C7O2H10-han2018 a mlips:MaterialSystem ;
+    rdfs:label "C7O2H10 isomers" ;
+    mlips:chemicalFormula "C7O2H10" ;
+    mlips:materialClass "Small organic molecules (gas phase), AIMD conformations" .
+
+entity:mat-Cu-han2018 a mlips:MaterialSystem ;
+    rdfs:label "Bulk copper, heated from 500 K to 2400 K and cooled back (256 atoms)" ;
+    mlips:chemicalFormula "Cu" ;
+    mlips:materialClass "Elemental fcc metal, solid and liquid" .
+
+entity:mat-Zr-han2018 a mlips:MaterialSystem ;
+    rdfs:label "Solid zirconium with randomly displaced atoms (radiation-damage model, 8000-atom supercells)" ;
+    mlips:chemicalFormula "Zr" ;
+    mlips:materialClass "Elemental metal; threshold-displacement-energy trajectories" .
+
+entity:mat-water-han2018 a mlips:MaterialSystem ;
+    rdfs:label "Liquid water at 300 K and 1 atm (64 molecules, path-integral AIMD)" ;
+    mlips:chemicalFormula "H2O" ;
+    mlips:materialClass "Molecular liquid" ;
+    mlips:sameAsWikidata <http://www.wikidata.org/entity/Q283> .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-eam-Cu-han2018 a mlips:ReferenceCalculation .
+
+entity:calc-dft-Zr-han2018 a mlips:DFTCalculation .
+
+entity:calc-dft-water-han2018 a mlips:DFTCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-eam-Cu-han2018 mlips:hasReferenceSettings entity:calc-settings-eam-Cu-han2018 .
+
+entity:calc-settings-eam-Cu-han2018 a mlips:ReferenceSettings ;
+    mlips:usedReferenceCode entity:lib-LAMMPS-han2018 ;
+    rdfs:comment "Embedded-atom-method (EAM) potential for Cu run with LAMMPS 2016; a classical potential serves as the reference, time step 1 fs, Nose-Hoover thermostat and barostat." .
+
+entity:calc-dft-Zr-han2018 mlips:hasDFTSettings entity:calc-settings-dft-Zr-han2018 .
+
+entity:calc-settings-dft-Zr-han2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:VASP ;
+    rdfs:comment "AIMD with VASP; functional and settings are not given in this paper." .
+
+entity:calc-dft-water-han2018 mlips:hasDFTSettings entity:calc-settings-dft-water-han2018 .
+
+entity:calc-settings-dft-water-han2018 a mlips:DFTSettings ;
+    mlips:usedDFTCode mlips:QuantumESPRESSO ;
+    mlips:xcFunctional entity:xc-PBE0-TS-han2018 ;
+    rdfs:comment "Path-integral AIMD with Quantum ESPRESSO interfaced with i-PI, 8 beads (generalized Langevin equation), time step 0.48 fs, trajectory of about 10 ps." .
+
+entity:lib-LAMMPS-han2018 a mlips:Library ;
+    rdfs:label "LAMMPS" ;
+    mlips:candidateForVocabulary mlips:Library .
+
+entity:xc-PBE0-TS-han2018 a mlips:XCFunctional ;
+    rdfs:label "PBE0+TS" ;
+    rdfs:comment "PBE0 with self-consistent Tkatchenko-Scheffler dispersion." ;
+    mlips:candidateForVocabulary mlips:XCFunctional .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-C7O2H10-han2018 a mlips:TrainingDataset ;
+    rdfs:label "C7O2H10 isomer AIMD data (DTNN benchmark protocol)" ;
+    mlips:coversMaterial entity:mat-C7O2H10-han2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "From http://quantum-machine.org/datasets/; the level of theory and the split sizes are not restated in this paper." .
+
+entity:ds-Cu-han2018 a mlips:TrainingDataset ;
+    rdfs:label "EAM copper MD snapshots (72000 training of 80000)" ;
+    mlips:coversMaterial entity:mat-Cu-han2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 72000 ;
+    mlips:hasReferenceCalculation entity:calc-eam-Cu-han2018 ;
+    rdfs:comment "8000 snapshots held out for testing." .
+
+entity:ds-Zr-han2018 a mlips:TrainingDataset ;
+    rdfs:label "Zirconium AIMD snapshots (90% of 14000)" ;
+    mlips:coversMaterial entity:mat-Zr-han2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 12600 ;
+    mlips:hasDFTCalculation entity:calc-dft-Zr-han2018 ;
+    rdfs:comment "numConfigurations is 90% of the 14000 snapshots, as stated ('90% of the corresponding snapshots are used for training'); trajectory data provided by Han Wang." .
+
+entity:ds-water-han2018 a mlips:TrainingDataset ;
+    rdfs:label "Liquid water PI-AIMD snapshots (90000 training of 100000)" ;
+    mlips:coversMaterial entity:mat-water-han2018 ;
+    mlips:coversProperty mlips:Energy ;
+    mlips:datasetProvenance mlips:InHouse ;
+    mlips:numConfigurations 90000 ;
+    mlips:hasDFTCalculation entity:calc-dft-water-han2018 ;
+    rdfs:comment "10000 snapshots held out for testing." .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-C7O2H10-han2018 mlips:samplingStrategy
+    entity:sampling-isomer-aimd-han2018 .
+
+entity:ds-Cu-han2018 mlips:samplingStrategy
+    entity:sampling-eam-md-ramp-han2018 .
+
+entity:ds-Zr-han2018 mlips:samplingStrategy
+    entity:sampling-zr-aimd-han2018 .
+
+entity:ds-water-han2018 mlips:samplingStrategy
+    entity:sampling-pi-aimd-han2018 .
+
+entity:sampling-isomer-aimd-han2018 a mlips:SamplingStrategy ;
+    rdfs:label "AIMD of C7O2H10 isomers (quantum-machine.org)" ;
+    rdfs:comment "Data set and training/testing protocol of the DTNN benchmark." .
+
+entity:sampling-eam-md-ramp-han2018 a mlips:SamplingStrategy ;
+    rdfs:label "EAM MD temperature ramp" ;
+    rdfs:comment "Snapshots every 0.1 ps; temperature raised by 100 K every 200 ps at zero pressure up to 2400 K and lowered again to 500 K." .
+
+entity:sampling-zr-aimd-han2018 a mlips:SamplingStrategy ;
+    rdfs:label "Short AIMD trajectories of displaced atoms (Zr)" ;
+    rdfs:comment "14000 snapshots from 30 trajectories of 1 ps with a variable time step, used to determine threshold displacement energies along symmetric directions." .
+
+entity:sampling-pi-aimd-han2018 a mlips:SamplingStrategy ;
+    rdfs:label "Path-integral AIMD of liquid water" ;
+    rdfs:comment "100000 snapshots selected at random along the trajectory; almost all time steps are used, so the data are strongly correlated." .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:DeePMD a mlips:MLIPMethod ;
+    rdfs:label "Deep Potential Molecular Dynamics (DeePMD)" ;
+    mlips:hasDescriptor mlips:DeepPotentialDescriptor ;
+    mlips:hasTrainingAlgorithm entity:alg-DeePMD-han2018 ;
+    mlips:hasHyperparameter mlips:cutoffRadius ,
+        entity:hp-hidden-layers-han2018 ,
+        mlips:numEpochs ,
+        mlips:learningRate ,
+        entity:hp-lr-decay-rate-han2018 ,
+        entity:hp-lr-decay-epochs-han2018 ,
+        mlips:batchSize ;
+    mlips:inferenceComplexity "Linear in the number of atoms N (at most N_c neighbours inside the cutoff, N_c size independent)" .
+
+entity:alg-DeePMD-han2018 a mls:Algorithm ;
+    rdfs:label "Adam with batch size 128 and exponentially decaying learning rate a * b^(x/c); fully connected sub-networks with ReLU activation; Batch Normalization for C7O2H10 and H2O only" .
+
+entity:hp-hidden-layers-han2018 a mlips:Hyperparameter ;
+    rdfs:label "Deep Potential hidden-layer widths of the sub-networks" ;
+    mlips:hyperparameterName "hidden_layers" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-rate-han2018 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay rate" ;
+    mlips:hyperparameterName "decay_rate" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+entity:hp-lr-decay-epochs-han2018 a mlips:Hyperparameter ;
+    rdfs:label "Learning-rate decay epoch" ;
+    mlips:hyperparameterName "decay_epoch" ;
+    mlips:hyperparameterDatatype xsd:double ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-dp-C7O2H10-hidden-layers-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-han2018 ;
+    mlips:settingValue "600-400-200-100-80-40-20" .
+
+entity:setting-dp-C7O2H10-numEpochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "300"^^xsd:integer .
+
+entity:setting-dp-C7O2H10-learningRate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-dp-C7O2H10-lr-decay-rate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-han2018 ;
+    mlips:settingValue "0.96"^^xsd:double .
+
+entity:setting-dp-C7O2H10-lr-decay-epochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-epochs-han2018 ;
+    mlips:settingValue "1.5"^^xsd:double .
+
+entity:setting-dp-C7O2H10-batchSize-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-dp-Cu-cutoffRadius-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "6"^^xsd:double .
+
+entity:setting-dp-Cu-hidden-layers-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-han2018 ;
+    mlips:settingValue "80-40-20-10" .
+
+entity:setting-dp-Cu-numEpochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "600"^^xsd:integer .
+
+entity:setting-dp-Cu-learningRate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-dp-Cu-lr-decay-rate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-han2018 ;
+    mlips:settingValue "0.96"^^xsd:double .
+
+entity:setting-dp-Cu-lr-decay-epochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-epochs-han2018 ;
+    mlips:settingValue "3.6"^^xsd:double .
+
+entity:setting-dp-Cu-batchSize-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-dp-Zr-cutoffRadius-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7"^^xsd:double .
+
+entity:setting-dp-Zr-hidden-layers-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-han2018 ;
+    mlips:settingValue "80-20-5-5" .
+
+entity:setting-dp-Zr-numEpochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "1200"^^xsd:integer .
+
+entity:setting-dp-Zr-learningRate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.005"^^xsd:double .
+
+entity:setting-dp-Zr-lr-decay-rate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-han2018 ;
+    mlips:settingValue "0.96"^^xsd:double .
+
+entity:setting-dp-Zr-lr-decay-epochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-epochs-han2018 ;
+    mlips:settingValue "7.2"^^xsd:double .
+
+entity:setting-dp-Zr-batchSize-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+entity:setting-dp-water-cutoffRadius-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5.8"^^xsd:double .
+
+entity:setting-dp-water-hidden-layers-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-hidden-layers-han2018 ;
+    mlips:settingValue "160-40-10-10" .
+
+entity:setting-dp-water-numEpochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:numEpochs ;
+    mlips:settingValue "300"^^xsd:integer .
+
+entity:setting-dp-water-learningRate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:learningRate ;
+    mlips:settingValue "0.01"^^xsd:double .
+
+entity:setting-dp-water-lr-decay-rate-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-rate-han2018 ;
+    mlips:settingValue "0.96"^^xsd:double .
+
+entity:setting-dp-water-lr-decay-epochs-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-lr-decay-epochs-han2018 ;
+    mlips:settingValue "1.6"^^xsd:double .
+
+entity:setting-dp-water-batchSize-han2018 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:batchSize ;
+    mlips:settingValue "128"^^xsd:integer .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-dp-C7O2H10-han2018 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training on C7O2H10 isomers" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-C7O2H10-han2018 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-C7O2H10-hidden-layers-han2018 ,
+        entity:setting-dp-C7O2H10-numEpochs-han2018 ,
+        entity:setting-dp-C7O2H10-learningRate-han2018 ,
+        entity:setting-dp-C7O2H10-lr-decay-rate-han2018 ,
+        entity:setting-dp-C7O2H10-lr-decay-epochs-han2018 ,
+        entity:setting-dp-C7O2H10-batchSize-han2018 ;
+    mlips:produces entity:model-dp-C7O2H10-han2018 .
+
+entity:model-dp-C7O2H10-han2018 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for C7O2H10 isomers" .
+
+entity:run-dp-Cu-han2018 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training on EAM copper (radial information only)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-Cu-han2018 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-Cu-cutoffRadius-han2018 ,
+        entity:setting-dp-Cu-hidden-layers-han2018 ,
+        entity:setting-dp-Cu-numEpochs-han2018 ,
+        entity:setting-dp-Cu-learningRate-han2018 ,
+        entity:setting-dp-Cu-lr-decay-rate-han2018 ,
+        entity:setting-dp-Cu-lr-decay-epochs-han2018 ,
+        entity:setting-dp-Cu-batchSize-han2018 ;
+    mlips:produces entity:model-dp-Cu-han2018 .
+
+entity:model-dp-Cu-han2018 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for EAM Cu" .
+
+entity:run-dp-Zr-han2018 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training on AIMD zirconium (radial information only)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-Zr-han2018 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-Zr-cutoffRadius-han2018 ,
+        entity:setting-dp-Zr-hidden-layers-han2018 ,
+        entity:setting-dp-Zr-numEpochs-han2018 ,
+        entity:setting-dp-Zr-learningRate-han2018 ,
+        entity:setting-dp-Zr-lr-decay-rate-han2018 ,
+        entity:setting-dp-Zr-lr-decay-epochs-han2018 ,
+        entity:setting-dp-Zr-batchSize-han2018 ;
+    mlips:produces entity:model-dp-Zr-han2018 .
+
+entity:model-dp-Zr-han2018 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for Zr" .
+
+entity:run-dp-water-han2018 a mlips:MLIPRun ;
+    rdfs:label "Deep Potential training on PI-AIMD liquid water (radial and first-shell angular information)" ;
+    mlips:appliesMethod entity:DeePMD ;
+    mlips:runsOn entity:ds-water-han2018 ;
+    mlips:hasHyperparameterSetting entity:setting-dp-water-cutoffRadius-han2018 ,
+        entity:setting-dp-water-hidden-layers-han2018 ,
+        entity:setting-dp-water-numEpochs-han2018 ,
+        entity:setting-dp-water-learningRate-han2018 ,
+        entity:setting-dp-water-lr-decay-rate-han2018 ,
+        entity:setting-dp-water-lr-decay-epochs-han2018 ,
+        entity:setting-dp-water-batchSize-han2018 ;
+    mlips:produces entity:model-dp-water-han2018 .
+
+entity:model-dp-water-han2018 a mlips:TrainedModel ;
+    rdfs:label "Deep Potential model for liquid water" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-han2018 mlips:hasResult
+    entity:result-dp-C7O2H10-han2018 ,
+    entity:result-dp-Cu-han2018 ,
+    entity:result-dp-Zr-han2018 ,
+    entity:result-dp-water-han2018 .
+
+entity:result-dp-C7O2H10-han2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-dp-C7O2H10-han2018 ;
+    mlips:targetMaterial entity:mat-C7O2H10-han2018 ;
+    mlips:hasAccuracyMetric entity:metric-dp-C7O2H10-1-han2018 .
+
+entity:metric-dp-C7O2H10-1-han2018 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: Deep Potential, C7O2H10 isomers (DTNN: 0.07 eV)" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.04"^^xsd:double ;
+    mlips:hasUnit unit:EV .
+
+entity:result-dp-Cu-han2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-dp-Cu-han2018 ;
+    mlips:targetMaterial entity:mat-Cu-han2018 ;
+    mlips:hasAccuracyMetric entity:metric-dp-Cu-1-han2018 .
+
+entity:metric-dp-Cu-1-han2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: Deep Potential, EAM Cu" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-dp-Zr-han2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-dp-Zr-han2018 ;
+    mlips:targetMaterial entity:mat-Zr-han2018 ;
+    mlips:hasAccuracyMetric entity:metric-dp-Zr-1-han2018 .
+
+entity:metric-dp-Zr-1-han2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy: Deep Potential, Zr" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "0.09"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ATOM .
+
+entity:result-dp-water-han2018 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-dp-water-han2018 ;
+    mlips:targetMaterial entity:mat-water-han2018 ;
+    mlips:hasAccuracyMetric entity:metric-dp-water-1-han2018 .
+
+entity:metric-dp-water-1-han2018 a mlips:AccuracyMetric ;
+    rdfs:label "Test RMSE on energy, in meV per molecule: Deep Potential, liquid water" ;
+    mlips:metricType mlips:RMSE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "1.8"^^xsd:double .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Only energies are fitted and tested; no force error is given. The model of this paper is the energy-only precursor of DeePMD and is encoded under the registry method entity:DeePMD (alias 'Deep Potential').
+# - For copper the reference is a classical EAM potential, encoded as a generic mlips:ReferenceCalculation with LAMMPS as code.
+# - The BPNN comparison values (Cu 0.20, Zr 0.21 meV/atom) come from the authors' own BPNN implementation with the Cu symmetry functions of ref. 29; no settings are given, so they are not encoded as runs.
+# - No cutoff is stated for C7O2H10. Ablations (no rotational fixing: 0.05 eV; no permutational fixing for Cu: 15.6 meV/atom) are not encoded.
+# - The water energy RMSE is per molecule (no unit individual). The software implementation is not named.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
