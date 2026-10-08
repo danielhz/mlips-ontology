@@ -1,0 +1,1310 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Johannes Gasteiger et al. (2021). GemNet: Universal Directional Graph Neural Networks for Molecules.
+#   arXiv (Cornell University). doi:10.48550/arxiv.2106.08903  arXiv:2106.08903v10
+#
+# Version read: arxiv-preprint arXiv:2106.08903v10 (sha256 0a3eeb97afcdaa05...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 58 (Method/model). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the GemNet method (introduced here) in its variants
+# GemNet-Q, -T, -dQ and -dT, and its benchmark fits: COLL (Table 1),
+# MD17 with 1000 training and validation configurations (Table 3),
+# MD17@CCSD (Table 2) and OC20 S2EF for GemNet-dT (Table 4). Values of
+# other models in the tables are literature values and are not encoded.
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-gasteiger2021 a mlips:BenchmarkStudy ;
+    rdfs:label "Gasteiger, Becker and Guennemann (2021): GemNet, universal directional graph neural networks for molecules" ;
+    mlips:reportedIn entity:article-gasteiger2021 .
+
+entity:article-gasteiger2021 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.48550/arxiv.2106.08903> ;
+    schema:datePublished "2021"^^xsd:gYear ;
+    schema:name "GemNet: Universal Directional Graph Neural Networks for Molecules" ;
+    schema:author entity:person-Gasteiger-gasteiger2021 ,
+        entity:person-Becker-gasteiger2021 ,
+        entity:person-Gunnemann-gasteiger2021 .
+
+entity:person-Gasteiger-gasteiger2021 a schema:Person ;
+    schema:name "Johannes Gasteiger" ;
+    schema:givenName "Johannes" ;
+    schema:familyName "Gasteiger" .
+
+entity:person-Becker-gasteiger2021 a schema:Person ;
+    schema:name "Florian Becker" ;
+    schema:givenName "Florian" ;
+    schema:familyName "Becker" .
+
+entity:person-Gunnemann-gasteiger2021 a schema:Person ;
+    schema:name "Stephan Günnemann" ;
+    schema:givenName "Stephan" ;
+    schema:familyName "Günnemann" .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-COLL-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "COLL: configurations from collisions of small organic molecules" ;
+    mlips:materialClass "Small organic molecules in collision geometries (gas phase)" .
+
+entity:mat-oc20-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "OC20 adsorbate-catalyst systems (average over the four test sets)" ;
+    mlips:materialClass "Heterogeneous-catalysis slab + adsorbate systems" .
+
+entity:mat-aspirin-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Aspirin molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-benzene-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-benzene-chmiela2017-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (MD17, benzene data of Chmiela et al. 2017)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-benzene-chmiela2018-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Benzene molecule (MD17, benzene data of Chmiela et al. 2018)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-ethanol-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Ethanol molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-malonaldehyde-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Malonaldehyde molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-naphthalene-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Naphthalene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-salicylic-acid-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Salicylic acid molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-toluene-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Toluene molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+entity:mat-uracil-gasteiger2021 a mlips:MaterialSystem ;
+    rdfs:label "Uracil molecule (MD17)" ;
+    mlips:materialClass "Small organic molecule (gas phase), thermalised MD conformations" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+entity:calc-ccsd-gasteiger2021 a mlips:WaveFunctionCalculation .
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+entity:calc-ccsd-gasteiger2021 mlips:hasWaveFunctionSettings entity:calc-settings-ccsd-gasteiger2021 .
+
+entity:calc-settings-ccsd-gasteiger2021 a mlips:WaveFunctionSettings ;
+    rdfs:comment "MD17@CCSD: forces computed with CCSD or CCSD(T) (the paper does not say which applies to which molecule)." .
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-COLL-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "COLL training set" ;
+    mlips:coversMaterial entity:mat-COLL-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "Size and level of theory are not restated in this paper." .
+
+entity:ds-oc20-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "OC20 S2EF training data" ;
+    mlips:coversMaterial entity:mat-oc20-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    rdfs:comment "All presented OC20 models are trained on the S2EF data; the subset size is in the appendix and was not captured." .
+
+entity:ds-md17-aspirin-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 aspirin: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-benzene-chmiela2017-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 benzene: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-benzene-chmiela2017-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-benzene-chmiela2018-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 benzene: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-benzene-chmiela2018-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-ethanol-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 ethanol: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-malonaldehyde-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 malonaldehyde: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-naphthalene-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 naphthalene: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-naphthalene-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-salicylic-acid-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 salicylic acid: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-salicylic-acid-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-toluene-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 toluene: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-md17-uracil-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17 uracil: 1000 training and validation configurations" ;
+    mlips:coversMaterial entity:mat-uracil-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 .
+
+entity:ds-ccsd-aspirin-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17@CCSD aspirin: 950 training and 50 validation configurations" ;
+    mlips:coversMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-benzene-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17@CCSD benzene: 950 training and 50 validation configurations" ;
+    mlips:coversMaterial entity:mat-benzene-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-ethanol-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17@CCSD ethanol: 950 training and 50 validation configurations" ;
+    mlips:coversMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-malonaldehyde-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17@CCSD malonaldehyde: 950 training and 50 validation configurations" ;
+    mlips:coversMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-toluene-gasteiger2021 a mlips:TrainingDataset ;
+    rdfs:label "MD17@CCSD toluene: 950 training and 50 validation configurations" ;
+    mlips:coversMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published ;
+    mlips:numConfigurations 1000 ;
+    mlips:hasReferenceCalculation entity:calc-ccsd-gasteiger2021 .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-COLL-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-coll-gasteiger2021 .
+
+entity:ds-oc20-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-oc20-s2ef-gasteiger2021 .
+
+entity:ds-md17-aspirin-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-benzene-chmiela2017-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-benzene-chmiela2018-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-ethanol-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-malonaldehyde-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-naphthalene-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-salicylic-acid-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-toluene-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-md17-uracil-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-gasteiger2021 .
+
+entity:ds-ccsd-aspirin-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-benzene-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-ethanol-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-malonaldehyde-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-ccsd-gasteiger2021 .
+
+entity:ds-ccsd-toluene-gasteiger2021 mlips:samplingStrategy
+    entity:sampling-md17-ccsd-gasteiger2021 .
+
+entity:sampling-coll-gasteiger2021 a mlips:SamplingStrategy ;
+    rdfs:label "Molecular-collision configurations (COLL)" .
+
+entity:sampling-md17-gasteiger2021 a mlips:SamplingStrategy ;
+    rdfs:label "Thermalised MD configurations of single molecules (MD17)" ;
+    rdfs:comment "1000 training and validation configurations per molecule, following Batzner et al." .
+
+entity:sampling-md17-ccsd-gasteiger2021 a mlips:SamplingStrategy ;
+    rdfs:label "MD17@CCSD configurations" ;
+    rdfs:comment "950 training and 50 validation configurations per molecule." .
+
+entity:sampling-oc20-s2ef-gasteiger2021 a mlips:SamplingStrategy ;
+    rdfs:label "OC20 S2EF relaxation-trajectory structures" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:GemNet a mlips:MLIPMethod ;
+    rdfs:label "GemNet (geometric message passing neural network)" ;
+    mlips:hasFunctionalForm entity:ff-GemNet ;
+    mlips:hasLossFunction entity:loss-GemNet-gasteiger2021 ;
+    mlips:hasHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:inferenceComplexity "O(n k_int^2 k_emb) for GemNet-Q and O(n k_emb^2) for GemNet-T, with k_int interacting neighbours and k_emb embedded directions" .
+
+entity:ff-GemNet a mlips:FunctionalForm ;
+    rdfs:label "Directional graph neural network with geometric message passing over atom triplets and, in the two-hop form, quadruplets, built on spherical representations; energies are sums of atomic contributions and forces are obtained by backpropagation or, in the direct variants, predicted directly" .
+
+entity:loss-GemNet-gasteiger2021 a mlips:LossFunction ;
+    rdfs:label "Combined energy and force loss with a high force weight (stated without the value)" .
+
+entity:hp-variant-gasteiger2021 a mlips:Hyperparameter ;
+    rdfs:label "GemNet variant (two-hop Q or one-hop T message passing; d = direct force prediction)" ;
+    mlips:hyperparameterName "variant" ;
+    mlips:hyperparameterDatatype xsd:string ;
+    mlips:candidateForVocabulary mlips:Hyperparameter .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-coll-Q-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-coll-T-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-coll-dQ-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-dQ" .
+
+entity:setting-coll-dT-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-dT" .
+
+entity:setting-md17-Q-aspirin-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-benzene-chmiela2017-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-benzene-chmiela2018-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-ethanol-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-malonaldehyde-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-naphthalene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-salicylic-acid-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-toluene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-Q-uracil-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-ccsd-Q-aspirin-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-ccsd-Q-benzene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-ccsd-Q-ethanol-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-ccsd-Q-malonaldehyde-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-ccsd-Q-toluene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-Q" .
+
+entity:setting-md17-T-aspirin-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-benzene-chmiela2017-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-benzene-chmiela2018-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-ethanol-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-malonaldehyde-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-naphthalene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-salicylic-acid-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-toluene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-md17-T-uracil-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-ccsd-T-aspirin-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-ccsd-T-benzene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-ccsd-T-ethanol-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-ccsd-T-malonaldehyde-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-ccsd-T-toluene-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-T" .
+
+entity:setting-oc20-dT-variant-gasteiger2021 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter entity:hp-variant-gasteiger2021 ;
+    mlips:settingValue "GemNet-dT" .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-coll-Q-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on COLL (two-hop geometric message passing, forces by backpropagation)" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-COLL-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-coll-Q-variant-gasteiger2021 ;
+    mlips:produces entity:model-coll-Q-gasteiger2021 .
+
+entity:model-coll-Q-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q COLL model" .
+
+entity:run-coll-T-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on COLL (one-hop (triplet) message passing only, forces by backpropagation)" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-COLL-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-coll-T-variant-gasteiger2021 ;
+    mlips:produces entity:model-coll-T-gasteiger2021 .
+
+entity:model-coll-T-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T COLL model" .
+
+entity:run-coll-dQ-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-dQ trained on COLL (two-hop message passing, direct force prediction)" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-COLL-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-coll-dQ-variant-gasteiger2021 ;
+    mlips:produces entity:model-coll-dQ-gasteiger2021 .
+
+entity:model-coll-dQ-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-dQ COLL model" .
+
+entity:run-coll-dT-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-dT trained on COLL (one-hop message passing, direct force prediction)" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-COLL-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-coll-dT-variant-gasteiger2021 ;
+    mlips:produces entity:model-coll-dT-gasteiger2021 .
+
+entity:model-coll-dT-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-dT COLL model" .
+
+entity:run-md17-Q-aspirin-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 aspirin" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-aspirin-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-aspirin-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-aspirin-gasteiger2021 .
+
+entity:model-md17-Q-aspirin-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 aspirin model" .
+
+entity:run-md17-Q-benzene-chmiela2017-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-benzene-chmiela2017-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-benzene-chmiela2017-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-benzene-chmiela2017-gasteiger2021 .
+
+entity:model-md17-Q-benzene-chmiela2017-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 benzene model" .
+
+entity:run-md17-Q-benzene-chmiela2018-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-benzene-chmiela2018-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-benzene-chmiela2018-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-benzene-chmiela2018-gasteiger2021 .
+
+entity:model-md17-Q-benzene-chmiela2018-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 benzene model" .
+
+entity:run-md17-Q-ethanol-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 ethanol" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-ethanol-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-ethanol-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-ethanol-gasteiger2021 .
+
+entity:model-md17-Q-ethanol-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 ethanol model" .
+
+entity:run-md17-Q-malonaldehyde-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 malonaldehyde" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-malonaldehyde-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-malonaldehyde-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-malonaldehyde-gasteiger2021 .
+
+entity:model-md17-Q-malonaldehyde-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 malonaldehyde model" .
+
+entity:run-md17-Q-naphthalene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 naphthalene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-naphthalene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-naphthalene-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-naphthalene-gasteiger2021 .
+
+entity:model-md17-Q-naphthalene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 naphthalene model" .
+
+entity:run-md17-Q-salicylic-acid-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 salicylic acid" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-salicylic-acid-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-salicylic-acid-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-salicylic-acid-gasteiger2021 .
+
+entity:model-md17-Q-salicylic-acid-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 salicylic acid model" .
+
+entity:run-md17-Q-toluene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 toluene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-toluene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-toluene-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-toluene-gasteiger2021 .
+
+entity:model-md17-Q-toluene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 toluene model" .
+
+entity:run-md17-Q-uracil-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17 uracil" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-uracil-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-Q-uracil-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-Q-uracil-gasteiger2021 .
+
+entity:model-md17-Q-uracil-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17 uracil model" .
+
+entity:run-ccsd-Q-aspirin-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17@CCSD aspirin" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-aspirin-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-Q-aspirin-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-Q-aspirin-gasteiger2021 .
+
+entity:model-ccsd-Q-aspirin-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17@CCSD aspirin model" .
+
+entity:run-ccsd-Q-benzene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17@CCSD benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-benzene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-Q-benzene-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-Q-benzene-gasteiger2021 .
+
+entity:model-ccsd-Q-benzene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17@CCSD benzene model" .
+
+entity:run-ccsd-Q-ethanol-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17@CCSD ethanol" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-ethanol-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-Q-ethanol-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-Q-ethanol-gasteiger2021 .
+
+entity:model-ccsd-Q-ethanol-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17@CCSD ethanol model" .
+
+entity:run-ccsd-Q-malonaldehyde-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17@CCSD malonaldehyde" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-malonaldehyde-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-Q-malonaldehyde-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-Q-malonaldehyde-gasteiger2021 .
+
+entity:model-ccsd-Q-malonaldehyde-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17@CCSD malonaldehyde model" .
+
+entity:run-ccsd-Q-toluene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-Q trained on MD17@CCSD toluene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-toluene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-Q-toluene-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-Q-toluene-gasteiger2021 .
+
+entity:model-ccsd-Q-toluene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-Q MD17@CCSD toluene model" .
+
+entity:run-md17-T-aspirin-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 aspirin" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-aspirin-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-aspirin-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-aspirin-gasteiger2021 .
+
+entity:model-md17-T-aspirin-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 aspirin model" .
+
+entity:run-md17-T-benzene-chmiela2017-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-benzene-chmiela2017-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-benzene-chmiela2017-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-benzene-chmiela2017-gasteiger2021 .
+
+entity:model-md17-T-benzene-chmiela2017-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 benzene model" .
+
+entity:run-md17-T-benzene-chmiela2018-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-benzene-chmiela2018-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-benzene-chmiela2018-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-benzene-chmiela2018-gasteiger2021 .
+
+entity:model-md17-T-benzene-chmiela2018-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 benzene model" .
+
+entity:run-md17-T-ethanol-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 ethanol" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-ethanol-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-ethanol-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-ethanol-gasteiger2021 .
+
+entity:model-md17-T-ethanol-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 ethanol model" .
+
+entity:run-md17-T-malonaldehyde-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 malonaldehyde" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-malonaldehyde-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-malonaldehyde-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-malonaldehyde-gasteiger2021 .
+
+entity:model-md17-T-malonaldehyde-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 malonaldehyde model" .
+
+entity:run-md17-T-naphthalene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 naphthalene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-naphthalene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-naphthalene-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-naphthalene-gasteiger2021 .
+
+entity:model-md17-T-naphthalene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 naphthalene model" .
+
+entity:run-md17-T-salicylic-acid-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 salicylic acid" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-salicylic-acid-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-salicylic-acid-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-salicylic-acid-gasteiger2021 .
+
+entity:model-md17-T-salicylic-acid-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 salicylic acid model" .
+
+entity:run-md17-T-toluene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 toluene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-toluene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-toluene-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-toluene-gasteiger2021 .
+
+entity:model-md17-T-toluene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 toluene model" .
+
+entity:run-md17-T-uracil-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17 uracil" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-md17-uracil-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-md17-T-uracil-variant-gasteiger2021 ;
+    mlips:produces entity:model-md17-T-uracil-gasteiger2021 .
+
+entity:model-md17-T-uracil-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17 uracil model" .
+
+entity:run-ccsd-T-aspirin-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17@CCSD aspirin" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-aspirin-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-T-aspirin-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-T-aspirin-gasteiger2021 .
+
+entity:model-ccsd-T-aspirin-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17@CCSD aspirin model" .
+
+entity:run-ccsd-T-benzene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17@CCSD benzene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-benzene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-T-benzene-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-T-benzene-gasteiger2021 .
+
+entity:model-ccsd-T-benzene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17@CCSD benzene model" .
+
+entity:run-ccsd-T-ethanol-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17@CCSD ethanol" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-ethanol-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-T-ethanol-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-T-ethanol-gasteiger2021 .
+
+entity:model-ccsd-T-ethanol-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17@CCSD ethanol model" .
+
+entity:run-ccsd-T-malonaldehyde-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17@CCSD malonaldehyde" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-malonaldehyde-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-T-malonaldehyde-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-T-malonaldehyde-gasteiger2021 .
+
+entity:model-ccsd-T-malonaldehyde-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17@CCSD malonaldehyde model" .
+
+entity:run-ccsd-T-toluene-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-T trained on MD17@CCSD toluene" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-ccsd-toluene-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-ccsd-T-toluene-variant-gasteiger2021 ;
+    mlips:produces entity:model-ccsd-T-toluene-gasteiger2021 .
+
+entity:model-ccsd-T-toluene-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-T MD17@CCSD toluene model" .
+
+entity:run-oc20-dT-gasteiger2021 a mlips:MLIPRun ;
+    rdfs:label "GemNet-dT trained on OC20 S2EF" ;
+    mlips:appliesMethod entity:GemNet ;
+    mlips:runsOn entity:ds-oc20-gasteiger2021 ;
+    mlips:hasHyperparameterSetting entity:setting-oc20-dT-variant-gasteiger2021 ;
+    mlips:produces entity:model-oc20-dT-gasteiger2021 .
+
+entity:model-oc20-dT-gasteiger2021 a mlips:TrainedModel ;
+    rdfs:label "GemNet-dT OC20 model" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+entity:study-gasteiger2021 mlips:hasResult
+    entity:result-coll-Q-gasteiger2021 ,
+    entity:result-coll-T-gasteiger2021 ,
+    entity:result-coll-dQ-gasteiger2021 ,
+    entity:result-coll-dT-gasteiger2021 ,
+    entity:result-md17-Q-aspirin-gasteiger2021 ,
+    entity:result-md17-Q-benzene-chmiela2017-gasteiger2021 ,
+    entity:result-md17-Q-benzene-chmiela2018-gasteiger2021 ,
+    entity:result-md17-Q-ethanol-gasteiger2021 ,
+    entity:result-md17-Q-malonaldehyde-gasteiger2021 ,
+    entity:result-md17-Q-naphthalene-gasteiger2021 ,
+    entity:result-md17-Q-salicylic-acid-gasteiger2021 ,
+    entity:result-md17-Q-toluene-gasteiger2021 ,
+    entity:result-md17-Q-uracil-gasteiger2021 ,
+    entity:result-ccsd-Q-aspirin-gasteiger2021 ,
+    entity:result-ccsd-Q-benzene-gasteiger2021 ,
+    entity:result-ccsd-Q-ethanol-gasteiger2021 ,
+    entity:result-ccsd-Q-malonaldehyde-gasteiger2021 ,
+    entity:result-ccsd-Q-toluene-gasteiger2021 ,
+    entity:result-md17-T-aspirin-gasteiger2021 ,
+    entity:result-md17-T-benzene-chmiela2017-gasteiger2021 ,
+    entity:result-md17-T-benzene-chmiela2018-gasteiger2021 ,
+    entity:result-md17-T-ethanol-gasteiger2021 ,
+    entity:result-md17-T-malonaldehyde-gasteiger2021 ,
+    entity:result-md17-T-naphthalene-gasteiger2021 ,
+    entity:result-md17-T-salicylic-acid-gasteiger2021 ,
+    entity:result-md17-T-toluene-gasteiger2021 ,
+    entity:result-md17-T-uracil-gasteiger2021 ,
+    entity:result-ccsd-T-aspirin-gasteiger2021 ,
+    entity:result-ccsd-T-benzene-gasteiger2021 ,
+    entity:result-ccsd-T-ethanol-gasteiger2021 ,
+    entity:result-ccsd-T-malonaldehyde-gasteiger2021 ,
+    entity:result-ccsd-T-toluene-gasteiger2021 ,
+    entity:result-oc20-dT-gasteiger2021 .
+
+entity:result-coll-Q-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-coll-Q-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-COLL-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-coll-Q-1-gasteiger2021 ,
+        entity:metric-coll-Q-2-gasteiger2021 .
+
+entity:metric-coll-Q-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "26.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-coll-Q-2-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: GemNet-Q, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "53"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-coll-T-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-coll-T-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-COLL-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-coll-T-1-gasteiger2021 ,
+        entity:metric-coll-T-2-gasteiger2021 .
+
+entity:metric-coll-T-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "31.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-coll-T-2-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: GemNet-T, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "60"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-coll-dQ-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-coll-dQ-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-COLL-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-coll-dQ-1-gasteiger2021 ,
+        entity:metric-coll-dQ-2-gasteiger2021 .
+
+entity:metric-coll-dQ-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-dQ, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "38.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-coll-dQ-2-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: GemNet-dQ, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "60"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-coll-dT-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-coll-dT-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-COLL-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-coll-dT-1-gasteiger2021 ,
+        entity:metric-coll-dT-2-gasteiger2021 .
+
+entity:metric-coll-dT-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-dT, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "43.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:metric-coll-dT-2-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on energy: GemNet-dT, COLL" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "55"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:result-md17-Q-aspirin-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-aspirin-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-aspirin-1-gasteiger2021 .
+
+entity:metric-md17-Q-aspirin-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 aspirin, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-benzene-chmiela2017-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-benzene-chmiela2017-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-chmiela2017-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-benzene-chmiela2017-1-gasteiger2021 .
+
+entity:metric-md17-Q-benzene-chmiela2017-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 benzene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-benzene-chmiela2018-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-benzene-chmiela2018-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-chmiela2018-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-benzene-chmiela2018-1-gasteiger2021 .
+
+entity:metric-md17-Q-benzene-chmiela2018-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 benzene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-ethanol-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-ethanol-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-ethanol-1-gasteiger2021 .
+
+entity:metric-md17-Q-ethanol-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 ethanol, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.8"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-malonaldehyde-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-malonaldehyde-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-malonaldehyde-1-gasteiger2021 .
+
+entity:metric-md17-Q-malonaldehyde-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 malonaldehyde, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-naphthalene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-naphthalene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-naphthalene-1-gasteiger2021 .
+
+entity:metric-md17-Q-naphthalene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 naphthalene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-salicylic-acid-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-salicylic-acid-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-salicylic-acid-1-gasteiger2021 .
+
+entity:metric-md17-Q-salicylic-acid-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 salicylic acid, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-toluene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-toluene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-toluene-1-gasteiger2021 .
+
+entity:metric-md17-Q-toluene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 toluene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-Q-uracil-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-Q-uracil-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-uracil-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-Q-uracil-1-gasteiger2021 .
+
+entity:metric-md17-Q-uracil-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17 uracil, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "4.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-Q-aspirin-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-Q-aspirin-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-Q-aspirin-1-gasteiger2021 .
+
+entity:metric-ccsd-Q-aspirin-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17@CCSD aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-Q-benzene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-Q-benzene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-Q-benzene-1-gasteiger2021 .
+
+entity:metric-ccsd-Q-benzene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17@CCSD benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-Q-ethanol-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-Q-ethanol-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-Q-ethanol-1-gasteiger2021 .
+
+entity:metric-ccsd-Q-ethanol-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17@CCSD ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-Q-malonaldehyde-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-Q-malonaldehyde-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-Q-malonaldehyde-1-gasteiger2021 .
+
+entity:metric-ccsd-Q-malonaldehyde-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17@CCSD malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-Q-toluene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-Q-toluene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-Q-toluene-1-gasteiger2021 .
+
+entity:metric-ccsd-Q-toluene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-Q, MD17@CCSD toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-aspirin-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-aspirin-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-aspirin-1-gasteiger2021 .
+
+entity:metric-md17-T-aspirin-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 aspirin, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "9.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-benzene-chmiela2017-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-benzene-chmiela2017-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-chmiela2017-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-benzene-chmiela2017-1-gasteiger2021 .
+
+entity:metric-md17-T-benzene-chmiela2017-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 benzene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-benzene-chmiela2018-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-benzene-chmiela2018-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-chmiela2018-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-benzene-chmiela2018-1-gasteiger2021 .
+
+entity:metric-md17-T-benzene-chmiela2018-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 benzene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "1.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-ethanol-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-ethanol-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-ethanol-1-gasteiger2021 .
+
+entity:metric-md17-T-ethanol-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 ethanol, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-malonaldehyde-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-malonaldehyde-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-malonaldehyde-1-gasteiger2021 .
+
+entity:metric-md17-T-malonaldehyde-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 malonaldehyde, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "6.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-naphthalene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-naphthalene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-naphthalene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-naphthalene-1-gasteiger2021 .
+
+entity:metric-md17-T-naphthalene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 naphthalene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-salicylic-acid-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-salicylic-acid-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-salicylic-acid-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-salicylic-acid-1-gasteiger2021 .
+
+entity:metric-md17-T-salicylic-acid-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 salicylic acid, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.5"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-toluene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-toluene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-toluene-1-gasteiger2021 .
+
+entity:metric-md17-T-toluene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 toluene, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.6"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-md17-T-uracil-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-md17-T-uracil-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-uracil-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-md17-T-uracil-1-gasteiger2021 .
+
+entity:metric-md17-T-uracil-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17 uracil, 1000 training and validation configurations" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "4.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-T-aspirin-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-T-aspirin-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-aspirin-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-T-aspirin-1-gasteiger2021 .
+
+entity:metric-ccsd-T-aspirin-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17@CCSD aspirin" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "10.3"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-T-benzene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-T-benzene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-benzene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-T-benzene-1-gasteiger2021 .
+
+entity:metric-ccsd-T-benzene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17@CCSD benzene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "0.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-T-ethanol-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-T-ethanol-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-ethanol-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-T-ethanol-1-gasteiger2021 .
+
+entity:metric-ccsd-T-ethanol-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17@CCSD ethanol" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "3.1"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-T-malonaldehyde-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-T-malonaldehyde-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-malonaldehyde-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-T-malonaldehyde-1-gasteiger2021 .
+
+entity:metric-ccsd-T-malonaldehyde-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17@CCSD malonaldehyde" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "5.9"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-ccsd-T-toluene-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-ccsd-T-toluene-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-toluene-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-ccsd-T-toluene-1-gasteiger2021 .
+
+entity:metric-ccsd-T-toluene-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "MAE on forces: GemNet-T, MD17@CCSD toluene" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "2.7"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+entity:result-oc20-dT-gasteiger2021 a mlips:BenchmarkResult ;
+    mlips:evaluatesModel entity:model-oc20-dT-gasteiger2021 ;
+    mlips:targetMaterial entity:mat-oc20-gasteiger2021 ;
+    mlips:hasAccuracyMetric entity:metric-oc20-dT-1-gasteiger2021 ,
+        entity:metric-oc20-dT-2-gasteiger2021 .
+
+entity:metric-oc20-dT-1-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF energy MAE averaged over the four OC20 test sets: GemNet-dT" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:EnergyProperty ;
+    mlips:metricValue "292.4"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV .
+
+entity:metric-oc20-dT-2-gasteiger2021 a mlips:AccuracyMetric ;
+    rdfs:label "S2EF force MAE averaged over the four OC20 test sets: GemNet-dT" ;
+    mlips:metricType mlips:MAE ;
+    mlips:metricProperty mlips:ForceProperty ;
+    mlips:metricValue "24.2"^^xsd:double ;
+    mlips:hasUnit mlips:MilliEV-PER-ANGSTROM .
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - Hyperparameters and training details are in Appendix G, which was not read; only the variant is encoded as a setting. Cutoffs, embedding sizes, optimizer and learning rate are missing.
+# - The four GemNet variants are settings of one registry method (METHODS.md rule 3). The direct-force variants (-dQ, -dT) do not give a conservative force field; a query that needs that distinction must filter on the variant setting.
+# - MD17 has two benzene rows in Table 3, from the 2017 and the 2018 data of Chmiela et al.; they are two material/data-set nodes.
+# - The reference levels of COLL, MD17 and OC20 are not restated; only MD17@CCSD carries a (generic wave-function) reference calculation, because the paper says 'CCSD or CCSD(T)' without assigning them.
+# - OC20 IS2RS and IS2RE results, force cosine, AFbT and ADwT of Table 4 are not encoded.
+# - This is a preprint (arXiv v10); the manifest notes 'preprint only', and the DOI is the arXiv DOI (authors from DataCite, without ORCIDs).
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: datacite).
