@@ -38,6 +38,17 @@ How a per-paper file names the MLIP method and the trained models it talks about
 
 `make methods-check` fails if a non-legacy file declares or applies a method that is not in the registry, changes a registry label, descriptor or form, evaluates a model that is neither local nor registered, or has a paper-local subject without its suffix.
 
+## The convention as applied in the population run (2026-10-08/09)
+
+178 files were encoded under these rules; `make methods-check` passes on all of them (56 registry methods, 19 registry models). What the run added to the picture:
+
+- **Registry growth.** The registry went from 12 seeded families to 56 methods. A row was added whenever a paper's method matched no alias; papers that introduce a method are its `origin` (for example MatRIS, franken, MACE-QEq, CliffordIP, AIMNet2, SUS2-MLIP, BOTNet, DimeNet). PET was added on first use although its originating paper is not in the KG, so its `origin` is empty.
+- **Variants are settings, consistently.** Model sizes, body orders, descriptor choices inside one package (the five DeePMD-kit descriptors, GAP with 2b+3b instead of SOAP, tabGAP), optimisers, cutoff schemes (dynamic cutoffs), frozen layers and fine-tuning from a checkpoint are all paper-local string or numeric settings on the run. Each file that does this says so in its gaps, with what a separate method would cost (one registry row and re-pointing the runs).
+- **Architectures hosted by another family.** SevenNet models apply `entity:NequIP`, MatterSim models apply `entity:M3GNet`, PFP applies `entity:TeaNet`, following the registry rows of the corresponding pretrained models.
+- **Pretrained models are linked only when the checkpoint is pinned.** A result on "MACE-MP-0" or "CHGNet" without a release is not linked to a registry model; the values stay in a result comment and the file's gaps say what is missing. Several files flag disagreements between a paper's description of a checkpoint and the registry label (parameter counts, training-set sizes) instead of linking.
+- **Models with no matching method are left out, not forced.** Feed-forward networks on descriptors other than symmetry functions (bispectrum, GMP, PINN-style structural parameters) match neither `entity:SNAP` nor `entity:HDNNP`; they are named in the gaps of purjapun2019, montesdeoca2022 and hu2022 with "decision wanted".
+- **Fine-tuning has no relation.** Schema 0.1.2 cannot say that a model starts from another model; the base model is a string-valued setting (`initialisation`). This is the most frequent schema limit met in 2025-2026 papers and is the second v0.2.0 proposal below.
+
 ## The 20 files encoded before this convention
 
 They are exempt from the gate (listed as `LEGACY` in the checker) and were not rewritten. New files reuse the legacy shared IRIs as they are, so the new papers join the live graph today. Bringing the 20 in line would take:
