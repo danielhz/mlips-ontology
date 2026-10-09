@@ -39,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check duplicates-report cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check duplicates-report result-labels result-labels-check datasets-registry datasets-check cq cq-check clean
 
 all: release
 
@@ -205,6 +205,25 @@ methods-check: | $(VENV_STAMP)
 # entities); see artifacts/kg/IDENTITY.md. Informational, not a gate.
 duplicates-report: | $(VENV_STAMP)
 	$(PY) artifacts/scripts/report_duplicates.py
+
+# Generated rdfs:label on every BenchmarkResult (model on material, plus
+# the evaluation variant where two results would otherwise look alike).
+# `result-labels` (re)writes the generated block at the end of each paper
+# file; `result-labels-check` fails if a block is missing or stale.
+result-labels: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/add_result_labels.py
+
+result-labels-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/add_result_labels.py --check
+
+# Data-set registry (artifacts/kg/DATASETS.md): shared entities for original
+# data sets, origin-paper stubs, and the generated table mapping each
+# paper-local data set to the registry. A report, not a gate on paper files.
+datasets-registry: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/datasets_registry.py
+
+datasets-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/datasets_registry.py --check
 
 # === DaRUS deposit packaging ===
 #
