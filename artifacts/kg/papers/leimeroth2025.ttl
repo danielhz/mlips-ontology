@@ -1,0 +1,419 @@
+# Canonical Turtle for the protocol-derived encoding of:
+#   Niklas Leimeroth et al. (2025). Machine-learning interatomic potentials from a users perspective: a comparison of accuracy, speed and data efficiency.
+#   Modelling and Simulation in Materials Science and Engineering. doi:10.1088/1361-651x/adf56d  arXiv:2505.02503v1
+#
+# Version read: arxiv-preprint arXiv:2505.02503v1 (sha256 3b5f4813f88b0746...);
+#   the DOI above is cited, numbers are those of the version read.
+# Corpus rank 54 (Overview/taxonomy). Method identity follows
+#   artifacts/kg/METHODS.md (registry: artifacts/kg/methods-registry.csv).
+#
+# Encoding scope: the comparison set-up: HDNNP, GAP, MTP, linear and
+# nonlinear ACE, NequIP, Allegro and MACE potentials fitted to the same
+# Si-O and Al-Cu-Zr DFT data sets, with the shared cutoffs. One run per
+# potential type and system stands for the family of fits the paper
+# makes. Accuracy, speed, data efficiency and extrapolation are reported
+# as figures, so no AccuracyMetric is encoded. The manifest files the
+# paper under 'Overview/taxonomy'; it is an original benchmark. Read from
+# the arXiv preprint (v1).
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <https://schema.org/> .
+@prefix mls: <http://www.w3.org/ns/mls#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix mlips: <https://w3id.org/mlips#> .
+@prefix entity: <https://w3id.org/mlips/entity/> .
+
+###############################################################################
+# Q1 -- Bibliographic identification
+###############################################################################
+
+entity:study-leimeroth2025 a mlips:BenchmarkStudy ;
+    rdfs:label "Leimeroth et al. (2025): MLIPs from a user's perspective, a comparison of accuracy, speed and data efficiency" ;
+    mlips:reportedIn entity:article-leimeroth2025 .
+
+entity:article-leimeroth2025 a schema:ScholarlyArticle ;
+    schema:sameAs <https://doi.org/10.1088/1361-651x/adf56d> ;
+    schema:datePublished "2025"^^xsd:gYear ;
+    schema:name "Machine-learning interatomic potentials from a users perspective: a comparison of accuracy, speed and data efficiency" ;
+    schema:author <https://orcid.org/0009-0005-3906-4751> ,
+        <https://orcid.org/0000-0003-0219-5801> ,
+        <https://orcid.org/0000-0003-4669-8056> ,
+        <https://orcid.org/0000-0002-4492-3371> .
+
+<https://orcid.org/0009-0005-3906-4751> a schema:Person ;
+    schema:name "Niklas Leimeroth" ;
+    schema:givenName "Niklas" ;
+    schema:familyName "Leimeroth" ;
+    schema:identifier <https://orcid.org/0009-0005-3906-4751> .
+
+<https://orcid.org/0000-0003-0219-5801> a schema:Person ;
+    schema:name "Linus C Erhard" ;
+    schema:givenName "Linus C" ;
+    schema:familyName "Erhard" ;
+    schema:identifier <https://orcid.org/0000-0003-0219-5801> .
+
+<https://orcid.org/0000-0003-4669-8056> a schema:Person ;
+    schema:name "Karsten Albe" ;
+    schema:givenName "Karsten" ;
+    schema:familyName "Albe" ;
+    schema:identifier <https://orcid.org/0000-0003-4669-8056> .
+
+<https://orcid.org/0000-0002-4492-3371> a schema:Person ;
+    schema:name "Jochen Rohrer" ;
+    schema:givenName "Jochen" ;
+    schema:familyName "Rohrer" ;
+    schema:identifier <https://orcid.org/0000-0002-4492-3371> .
+
+###############################################################################
+# Q2 -- Material system
+###############################################################################
+
+entity:mat-SiO-leimeroth2025 a mlips:MaterialSystem ;
+    rdfs:label "Si-O system (crystalline, liquid and amorphous silica and related structures)" ;
+    mlips:chemicalFormula "Si-O" ;
+    mlips:materialClass "Ionic-covalent oxide" .
+
+entity:mat-AlCuZr-leimeroth2025 a mlips:MaterialSystem ;
+    rdfs:label "Al-Cu-Zr system (crystalline phases and metallic glasses)" ;
+    mlips:chemicalFormula "Al-Cu-Zr" ;
+    mlips:materialClass "Metallic alloy / metallic glass" .
+
+###############################################################################
+# Q3 -- Reference calculation method (type only; settings live in Q4)
+###############################################################################
+
+# No reference calculation is described by the paper (see Q12).
+
+###############################################################################
+# Q4 -- Reference settings + software code
+###############################################################################
+
+###############################################################################
+# Q5 -- Training dataset characterisation
+###############################################################################
+
+entity:ds-SiO-leimeroth2025 a mlips:TrainingDataset ;
+    rdfs:label "Si-O training data (from the earlier silica potential study)" ;
+    mlips:coversMaterial entity:mat-SiO-leimeroth2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Published .
+
+entity:ds-AlCuZr-leimeroth2025 a mlips:TrainingDataset ;
+    rdfs:label "Al-Cu-Zr training data (Cu-Zr data extended with Al)" ;
+    mlips:coversMaterial entity:mat-AlCuZr-leimeroth2025 ;
+    mlips:coversProperty mlips:Energy ,
+        mlips:Forces ;
+    mlips:datasetProvenance mlips:Augmented .
+
+###############################################################################
+# Q6 -- Sampling strategies
+###############################################################################
+
+entity:ds-SiO-leimeroth2025 mlips:samplingStrategy
+    entity:sampling-published-leimeroth2025 .
+
+entity:ds-AlCuZr-leimeroth2025 mlips:samplingStrategy
+    entity:sampling-published-leimeroth2025 .
+
+entity:sampling-published-leimeroth2025 a mlips:SamplingStrategy ;
+    rdfs:label "Published DFT training data from the authors' earlier potential-development studies (Si-O unchanged; Cu-Zr data extended with Al in the same way), available on Zenodo" .
+
+###############################################################################
+# Q7 -- MLIP method, components, implementation
+###############################################################################
+
+entity:HDNNP a mlips:MLIPMethod ;
+    rdfs:label "High-Dimensional Neural Network Potential (Behler-Parrinello)" ;
+    mlips:hasDescriptor mlips:SymmetryFunctionDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:GAP a mlips:MLIPMethod ;
+    rdfs:label "Gaussian Approximation Potential with SOAP kernel" ;
+    mlips:hasDescriptor mlips:SOAPDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:MTP a mlips:MLIPMethod ;
+    rdfs:label "Moment Tensor Potential" ;
+    mlips:hasDescriptor mlips:MomentTensorDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:ACE a mlips:MLIPMethod ;
+    rdfs:label "Atomic Cluster Expansion (ACE)" ;
+    mlips:hasDescriptor mlips:AtomicClusterExpansionDescriptor ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:NequIP a mlips:MLIPMethod ;
+    rdfs:label "NequIP (Neural Equivariant Interatomic Potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:Allegro a mlips:MLIPMethod ;
+    rdfs:label "Allegro (strictly local equivariant interatomic potential)" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+entity:MACE a mlips:MLIPMethod ;
+    rdfs:label "MACE: higher-order equivariant message-passing neural network" ;
+    mlips:hasHyperparameter mlips:cutoffRadius ;
+    mlips:supportsSimulation mlips:MolecularDynamics .
+
+###############################################################################
+# Q8 -- Hyperparameter settings
+###############################################################################
+
+entity:setting-HDNNP-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-HDNNP-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-GAP-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-GAP-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-MTP-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MTP-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-ACE-lin-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ACE-lin-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-ACE-nonlin-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-ACE-nonlin-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-NequIP-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-NequIP-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-Allegro-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-Allegro-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+entity:setting-MACE-SiO-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "5"^^xsd:integer .
+
+entity:setting-MACE-AlCuZr-cutoffRadius-leimeroth2025 a mlips:HyperparameterSetting ;
+    mlips:forHyperparameter mlips:cutoffRadius ;
+    mlips:settingValue "7.6"^^xsd:double .
+
+###############################################################################
+# Q9 -- MLIP run + trained model (Q11 compute-cost properties inline)
+###############################################################################
+
+entity:run-HDNNP-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "HDNNP fitted to the SiO data (n2p2)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-HDNNP-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-HDNNP-SiO-leimeroth2025 .
+
+entity:model-HDNNP-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "HDNNP potential for SiO" .
+
+entity:run-HDNNP-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "HDNNP fitted to the AlCuZr data (n2p2)" ;
+    mlips:appliesMethod entity:HDNNP ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-HDNNP-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-HDNNP-AlCuZr-leimeroth2025 .
+
+entity:model-HDNNP-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "HDNNP potential for AlCuZr" .
+
+entity:run-GAP-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "GAP (2-body + SOAP) fitted to the SiO data (QUIP)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-GAP-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-GAP-SiO-leimeroth2025 .
+
+entity:model-GAP-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "GAP (2-body + SOAP) potential for SiO" .
+
+entity:run-GAP-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "GAP (2-body + SOAP) fitted to the AlCuZr data (QUIP)" ;
+    mlips:appliesMethod entity:GAP ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-GAP-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-GAP-AlCuZr-leimeroth2025 .
+
+entity:model-GAP-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "GAP (2-body + SOAP) potential for AlCuZr" .
+
+entity:run-MTP-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "MTP fitted to the SiO data (MLIP)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-MTP-SiO-leimeroth2025 .
+
+entity:model-MTP-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "MTP potential for SiO" .
+
+entity:run-MTP-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "MTP fitted to the AlCuZr data (MLIP)" ;
+    mlips:appliesMethod entity:MTP ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MTP-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-MTP-AlCuZr-leimeroth2025 .
+
+entity:model-MTP-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "MTP potential for AlCuZr" .
+
+entity:run-ACE-lin-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fitted to the SiO data (pacemaker)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-lin-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-ACE-lin-SiO-leimeroth2025 .
+
+entity:model-ACE-lin-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "linear ACE potential for SiO" .
+
+entity:run-ACE-lin-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "linear ACE fitted to the AlCuZr data (pacemaker)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-lin-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-ACE-lin-AlCuZr-leimeroth2025 .
+
+entity:model-ACE-lin-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "linear ACE potential for AlCuZr" .
+
+entity:run-ACE-nonlin-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "nonlinear ACE fitted to the SiO data (pacemaker)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-nonlin-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-ACE-nonlin-SiO-leimeroth2025 .
+
+entity:model-ACE-nonlin-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "nonlinear ACE potential for SiO" .
+
+entity:run-ACE-nonlin-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "nonlinear ACE fitted to the AlCuZr data (pacemaker)" ;
+    mlips:appliesMethod entity:ACE ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-ACE-nonlin-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-ACE-nonlin-AlCuZr-leimeroth2025 .
+
+entity:model-ACE-nonlin-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "nonlinear ACE potential for AlCuZr" .
+
+entity:run-NequIP-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP fitted to the SiO data (NequIP)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-NequIP-SiO-leimeroth2025 .
+
+entity:model-NequIP-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP potential for SiO" .
+
+entity:run-NequIP-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "NequIP fitted to the AlCuZr data (NequIP)" ;
+    mlips:appliesMethod entity:NequIP ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-NequIP-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-NequIP-AlCuZr-leimeroth2025 .
+
+entity:model-NequIP-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "NequIP potential for AlCuZr" .
+
+entity:run-Allegro-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro fitted to the SiO data (Allegro)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-Allegro-SiO-leimeroth2025 .
+
+entity:model-Allegro-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro potential for SiO" .
+
+entity:run-Allegro-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "Allegro fitted to the AlCuZr data (Allegro)" ;
+    mlips:appliesMethod entity:Allegro ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-Allegro-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-Allegro-AlCuZr-leimeroth2025 .
+
+entity:model-Allegro-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "Allegro potential for AlCuZr" .
+
+entity:run-MACE-SiO-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "MACE fitted to the SiO data (MACE)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-SiO-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-SiO-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-MACE-SiO-leimeroth2025 .
+
+entity:model-MACE-SiO-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "MACE potential for SiO" .
+
+entity:run-MACE-AlCuZr-leimeroth2025 a mlips:MLIPRun ;
+    rdfs:label "MACE fitted to the AlCuZr data (MACE)" ;
+    mlips:appliesMethod entity:MACE ;
+    mlips:runsOn entity:ds-AlCuZr-leimeroth2025 ;
+    mlips:hasHyperparameterSetting entity:setting-MACE-AlCuZr-cutoffRadius-leimeroth2025 ;
+    mlips:produces entity:model-MACE-AlCuZr-leimeroth2025 .
+
+entity:model-MACE-AlCuZr-leimeroth2025 a mlips:TrainedModel ;
+    rdfs:label "MACE potential for AlCuZr" .
+
+###############################################################################
+# Q10 -- Benchmark results
+###############################################################################
+
+# No energy/force/stress accuracy metric is reported in a form the schema captures (see Q12).
+
+###############################################################################
+# Q11 -- Computational resources
+###############################################################################
+
+# The paper reports no training-cost or inference-cost figures.
+
+###############################################################################
+# Q12 -- Gaps and ambiguities (prose; not triples)
+###############################################################################
+
+# - No AccuracyMetric: energy and force MAEs on the test sets against compute time per atom and MD step (Fig. 2), GPU speeds, learning curves, energy-volume curves and the extrapolation tests (Laves phases, silica under compression) are figures. The tabulated material (Tables 1 to 9) is a grading scheme and user-friendliness comments.
+# - The paper fits several models per potential type with different sizes (basis functions, layers, features) and marks one per type for the later tests; one run per type and system is encoded with the shared cutoff only (5 A for Si-O, 7.6 A for Al-Cu-Zr; for message-passing models this is the cutoff of a single shell). For Al-Cu-Zr the GAPs use only 10% of the training data because of memory. Fitting codes are named in the run labels and not asserted as mlips:hasImplementation, since several are not vocabulary libraries.
+# - Reference DFT settings and data-set sizes are in the cited earlier studies and the Zenodo record; the data-set nodes carry no reference calculation. Whether stresses were fitted varies by code (stress-enabled NequIP and Allegro variants are mentioned).
+# - Read from the arXiv v1 preprint.
+# - Author affiliations are not encoded (ORCIDs are those deposited with the DOI metadata, source: crossref).
