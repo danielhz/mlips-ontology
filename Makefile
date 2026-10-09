@@ -39,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check duplicates-report cq cq-check clean
 
 all: release
 
@@ -200,6 +200,11 @@ wikidata-check: | $(VENV_STAMP)
 
 methods-check: | $(VENV_STAMP)
 	$(PY) artifacts/scripts/check_methods.py
+
+# Same-label instance report per class (a lower bound on duplicated
+# entities); see artifacts/kg/IDENTITY.md. Informational, not a gate.
+duplicates-report: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/report_duplicates.py
 
 # === DaRUS deposit packaging ===
 #
