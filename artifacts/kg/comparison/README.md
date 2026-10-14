@@ -132,8 +132,8 @@ opt, phonon, thermo. integration); link from *Algorithm* to
 ### CQ9: Method efficiency (asymptotic complexity + compute cost)
 
 Required: an asymptotic *inferenceComplexity* on the method, plus
-measured *gpuHours* (on the run) and *inferenceTimePerAtom* (on the
-trained model).
+measured *gpuHours* (on the run) and *inferenceTimePerAtom* (on a
+benchmark result that evaluates the trained model).
 
 | Comparator | Verdict | Note |
 |---|---|---|

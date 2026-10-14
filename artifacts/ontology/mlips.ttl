@@ -362,6 +362,13 @@ mlips:isEvaluatedIn a owl:ObjectProperty ;
     rdfs:range mlips:BenchmarkResult ;
     owl:inverseOf mlips:evaluatesModel .
 
+mlips:isKind a owl:AnnotationProperty ;
+    rdfs:label "is kind"@en ;
+    rdfs:comment "True on a class that is a kind in the UFO/OntoUML sense: a rigid sortal that supplies the identity criterion of its instances (OntoClean +O), as opposed to a subkind, which carries an identity criterion inherited from its kind. Orthogonal to mlips:metaSort: a kind's meta-sort is Sortal or Subordinate Sortal. Kinds are pairwise disjoint, and disjoint from the top-level reified relations."@en ;
+    rdfs:domain owl:Class ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> ;
+    rdfs:range xsd:boolean .
+
 mlips:kPointMesh a owl:DatatypeProperty ;
     rdfs:label "k-point mesh"@en ;
     rdfs:comment "K-point mesh specification (e.g., '4x4x4')."@en ;
@@ -468,7 +475,7 @@ instead."""@en ;
 mlips:reportedIn a owl:ObjectProperty ;
     rdfs:label "reported in"@en ;
     rdfs:comment "Links a benchmark study to the scholarly article that reports it (a schema:ScholarlyArticle)."@en ;
-    rdfs:domain mlips:BenchmarkResult ;
+    rdfs:domain mlips:BenchmarkStudy ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:range schema:ScholarlyArticle .
 
@@ -684,39 +691,6 @@ the range of mlips:reportedIn so a benchmark study can point to the
 scholarly article that publishes it."""@en ;
     rdfs:subClassOf rdfs:Resource .
 
-mlips:DftBasisSet a owl:Class ;
-    rdfs:label "DFT Basis Set"@en ;
-    rdfs:comment """The basis set used in a DFT calculation,
-when the code is all-electron or otherwise uses a localised basis (e.g.,
-FHI-aims NAO families, LAPW, Gaussian-type orbitals such as cc-pVDZ
-or 6-31G). Range of mlips:dftBasisSet on DFTSettings. Plane-wave
-codes specify the basis through mlips:energyCutoff instead and leave
-this slot empty. Concrete basis sets are modelled as named individuals;
-an open extension point."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:PseudopotentialType a owl:Class ;
-    rdfs:label "Pseudopotential Type"@en ;
-    rdfs:comment """A family of pseudopotentials used in a
-plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
-Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
-leave this slot empty. Concrete pseudopotential families are modelled
-as named individuals; an open extension point."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:SamplingStrategy a owl:Class ;
-    rdfs:label "Sampling Strategy"@en ;
-    rdfs:comment """A strategy used to sample the atomic
-configurations in a training dataset (e.g., chemical sampling across
-compositions, vibrational sampling across thermal snapshots, or a
-combination). Concrete sampling strategies are modeled as instances and
-will be developed in future work; this class is left open as an
-extension point."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
-
 mlips:WaveFunctionCalculation a owl:Class ;
     rdfs:label "Wave Function Calculation"@en ;
     rdfs:comment """A wave-function-based reference calculation
@@ -729,26 +703,6 @@ more expensive."""@en ;
             owl:someValuesFrom mlips:WaveFunctionSettings ],
         mlips:ReferenceCalculation ;
     mlips:metaSort mlips:SubordinateSortal .
-
-mlips:WfMethod a owl:Class ;
-    rdfs:label "Wave Function Method"@en ;
-    rdfs:comment """A wave-function correlation method used to
-produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
-CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
-Concrete methods are modelled as named individuals; an open
-extension point."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:XCFunctional a owl:Class ;
-    rdfs:label "Exchange-Correlation Functional"@en ;
-    rdfs:comment """A density-functional approximation to the
-exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
-PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
-DFTSettings. Concrete functionals are modelled as named individuals;
-an open extension point."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
 
 mlips:coversMaterial a owl:ObjectProperty ;
     rdfs:label "covers material"@en ;
@@ -930,14 +884,6 @@ schema:Organization a owl:Class ;
 publisher and affiliation IRIs in the ontology metadata header."""@en ;
     rdfs:subClassOf rdfs:Resource .
 
-mlips:AtomicConfiguration a owl:Class ;
-    rdfs:label "Atomic Configuration"@en ;
-    rdfs:comment """A single atomic configuration (positions, cell,
-properties) in a training dataset."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/AtomicStructure> ;
-    mlips:metaSort mlips:Sortal .
-
 mlips:DFTCalculation a owl:Class ;
     rdfs:label "DFT Calculation"@en ;
     rdfs:comment """A density functional theory calculation that produced
@@ -950,24 +896,62 @@ reference data for training."""@en ;
         mlips:ReferenceCalculation ;
     mlips:metaSort mlips:SubordinateSortal .
 
-mlips:FunctionalForm a owl:Class ;
-    rdfs:label "Functional Form"@en ;
-    rdfs:comment "A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+mlips:DftBasisSet a owl:Class ;
+    rdfs:label "DFT Basis Set"@en ;
+    rdfs:comment """The basis set used in a DFT calculation,
+when the code is all-electron or otherwise uses a localised basis (e.g.,
+FHI-aims NAO families, LAPW, Gaussian-type orbitals such as cc-pVDZ
+or 6-31G). Range of mlips:dftBasisSet on DFTSettings. Plane-wave
+codes specify the basis through mlips:energyCutoff instead and leave
+this slot empty. Concrete basis sets are modelled as named individuals;
+an open extension point."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
-mlips:LossFunction a owl:Class ;
-    rdfs:label "Loss Function"@en ;
-    rdfs:comment "A scalar objective whose minimisation fits the parameters of the functional form."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+mlips:PseudopotentialType a owl:Class ;
+    rdfs:label "Pseudopotential Type"@en ;
+    rdfs:comment """A family of pseudopotentials used in a
+plane-wave DFT calculation (e.g., PAW, ultrasoft, norm-conserving).
+Range of mlips:pseudopotentialType on DFTSettings. All-electron codes
+leave this slot empty. Concrete pseudopotential families are modelled
+as named individuals; an open extension point."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
-mlips:SimulationType a owl:Class ;
-    rdfs:label "Simulation Type"@en ;
-    rdfs:comment """A type of atomistic simulation: molecular dynamics,
-Monte Carlo, geometry optimization, phonon calculations,
-thermodynamic integration, etc."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+mlips:SamplingStrategy a owl:Class ;
+    rdfs:label "Sampling Strategy"@en ;
+    rdfs:comment """A strategy used to sample the atomic
+configurations in a training dataset (e.g., chemical sampling across
+compositions, vibrational sampling across thermal snapshots, or a
+combination). Concrete sampling strategies are modeled as instances and
+will be developed in future work; this class is left open as an
+extension point."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:WfMethod a owl:Class ;
+    rdfs:label "Wave Function Method"@en ;
+    rdfs:comment """A wave-function correlation method used to
+produce reference data (e.g., HF, MP2, CCSD, CCSD(T), DLPNO-CCSD(T),
+CASPT2, NEVPT2). Range of mlips:wfMethod on WaveFunctionSettings.
+Concrete methods are modelled as named individuals; an open
+extension point."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:XCFunctional a owl:Class ;
+    rdfs:label "Exchange-Correlation Functional"@en ;
+    rdfs:comment """A density-functional approximation to the
+exchange-correlation energy used in a DFT calculation (e.g., LDA, PBE,
+PBE0, HSE06, SCAN, BLYP, omegaB97X). Range of mlips:xcFunctional on
+DFTSettings. Concrete functionals are modelled as named individuals;
+an open extension point."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
 mlips:appliesMethod a owl:ObjectProperty ;
@@ -1025,14 +1009,36 @@ Used as the range of mlips:hasTrainingAlgorithm so an MLIP method can
 delegate the training-algorithm side to ML-Schema."""@en ;
     rdfs:subClassOf rdfs:Resource .
 
-mlips:BenchmarkStudy a owl:Class ;
-    rdfs:label "Benchmark Study"@en ;
-    rdfs:comment "A published study reporting MLIP evaluation results."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
-    rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasResult ;
-            owl:someValuesFrom mlips:BenchmarkResult ],
-        prov:Activity ;
+mlips:AtomicConfiguration a owl:Class ;
+    rdfs:label "Atomic Configuration"@en ;
+    rdfs:comment """A single atomic configuration (positions, cell,
+properties) in a training dataset."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/AtomicStructure> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:FunctionalForm a owl:Class ;
+    rdfs:label "Functional Form"@en ;
+    rdfs:comment "A parametrised mapping from an atomic configuration to an energy, specified independently of parameter values."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:LossFunction a owl:Class ;
+    rdfs:label "Loss Function"@en ;
+    rdfs:comment "A scalar objective whose minimisation fits the parameters of the functional form."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:SimulationType a owl:Class ;
+    rdfs:label "Simulation Type"@en ;
+    rdfs:comment """A type of atomistic simulation: molecular dynamics,
+Monte Carlo, geometry optimization, phonon calculations,
+thermodynamic integration, etc."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
 mlips:hasReferenceSettings a owl:ObjectProperty ;
@@ -1052,19 +1058,31 @@ mlips:runsOn a owl:ObjectProperty ;
     rdfs:range mlips:TrainingDataset ;
     rdfs:subPropertyOf prov:used .
 
+mlips:BenchmarkStudy a owl:Class ;
+    rdfs:label "Benchmark Study"@en ;
+    rdfs:comment "A published study reporting MLIP evaluation results."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips:hasResult ;
+            owl:someValuesFrom mlips:BenchmarkResult ],
+        prov:Activity ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
 mlips:Implementation a owl:Class ;
     rdfs:label "Implementation"@en ;
     rdfs:comment """A software implementation of an MLIP method in a
 specific library and version."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:implementedIn ;
-            owl:someValuesFrom mlips:Library ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:isImplementationOf ;
             owl:someValuesFrom mlips:MLIPMethod ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:implementedIn ;
+            owl:someValuesFrom mlips:Library ],
         mls:Implementation,
         schema:SoftwareSourceCode ;
+    mlips:isKind true ;
     mlips:metaSort mlips:SubordinateSortal .
 
 mlips:Library a owl:Class ;
@@ -1073,6 +1091,17 @@ mlips:Library a owl:Class ;
 (e.g., ASE, LAMMPS, VASP, GPAW)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf schema:SoftwareApplication ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:MetaSort a owl:Class ;
+    rdfs:label "Meta-Sort"@en ;
+    rdfs:comment """An OntoClean-style meta-category used to
+classify classes of the ontology. The four named individuals
+mlips:Sortal, mlips:SubordinateSortal, mlips:Role, and
+mlips:ReifiedRelation exhaustively partition the schema."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> ;
+    rdfs:subClassOf rdfs:Resource ;
     mlips:metaSort mlips:Sortal .
 
 mlips:ReferenceCalculation a owl:Class ;
@@ -1087,44 +1116,8 @@ CASPT2) and other ab initio approaches."""@en ;
             owl:someValuesFrom mlips:ReferenceSettings ],
         prov:Activity,
         mdo-calc:Calculation ;
+    mlips:isKind true ;
     mlips:metaSort mlips:SubordinateSortal .
-
-mlips:DatasetProvenance a owl:Class ;
-    rdfs:label "Dataset Provenance"@en ;
-    rdfs:comment "The provenance type of a training dataset."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:MetaSort a owl:Class ;
-    rdfs:label "Meta-Sort"@en ;
-    rdfs:comment """An OntoClean-style meta-category used to
-classify classes of the ontology. The four named individuals
-mlips:Sortal, mlips:SubordinateSortal, mlips:Role, and
-mlips:ReifiedRelation exhaustively partition the schema."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> ;
-    rdfs:subClassOf rdfs:Resource ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:MetricProperty a owl:Class ;
-    rdfs:label "Metric Property"@en ;
-    rdfs:comment "The physical property being measured (energy, force, stress)."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:MetricType a owl:Class ;
-    rdfs:label "Metric Type"@en ;
-    rdfs:comment "Type of accuracy metric (RMSE, MAE, R², etc.)."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:ReferenceSettings a owl:Class ;
-    rdfs:label "Reference Settings"@en ;
-    rdfs:comment """Settings of a reference calculation, abstracted
-across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
-carry the method-specific parameters; the supertype carries cross-family slots
-such as the software code used."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    mlips:metaSort mlips:ReifiedRelation .
 
 mlips:SubordinateSortal a owl:NamedIndividual,
         mlips:MetaSort ;
@@ -1151,31 +1144,35 @@ mlips:produces a owl:ObjectProperty ;
     rdfs:range mlips:TrainedModel ;
     rdfs:subPropertyOf prov:generated .
 
-mlips:AccuracyMetric a owl:Class ;
-    rdfs:label "Accuracy Metric"@en ;
-    rdfs:comment """An accuracy measure reported in a benchmark
-(e.g., RMSE of energy, MAE of forces)."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
-    rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isMetricOf ;
-            owl:someValuesFrom mlips:BenchmarkResult ],
-        [ a owl:Restriction ;
-            owl:onClass mlips:MetricType ;
-            owl:onProperty mlips:metricType ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        qudt:QuantityValue ;
-    mlips:metaSort mlips:ReifiedRelation .
-
-mlips:CoveredProperty a owl:Class ;
-    rdfs:label "Covered Property"@en ;
-    rdfs:comment """A physical property covered by the training dataset
-(energy, forces, stresses, virials)."""@en ;
+mlips:DatasetProvenance a owl:Class ;
+    rdfs:label "Dataset Provenance"@en ;
+    rdfs:comment "The provenance type of a training dataset."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
+
+mlips:MetricProperty a owl:Class ;
+    rdfs:label "Metric Property"@en ;
+    rdfs:comment "The physical property being measured (energy, force, stress)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:MetricType a owl:Class ;
+    rdfs:label "Metric Type"@en ;
+    rdfs:comment "Type of accuracy metric (RMSE, MAE, R², etc.)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:ReferenceSettings a owl:Class ;
+    rdfs:label "Reference Settings"@en ;
+    rdfs:comment """Settings of a reference calculation, abstracted
+across method families. Concrete subclasses (DFTSettings, WaveFunctionSettings)
+carry the method-specific parameters; the supertype carries cross-family slots
+such as the software code used."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:metaSort mlips:ReifiedRelation .
 
 mlips:ReifiedRelation a owl:NamedIndividual,
         mlips:MetaSort ;
@@ -1185,24 +1182,36 @@ between sortals. Instances have no identity outside their relata.
 OntoClean profile: ~R, -I, -U, +D."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/metasort> .
 
+mlips:AccuracyMetric a owl:Class ;
+    rdfs:label "Accuracy Metric"@en ;
+    rdfs:comment """An accuracy measure reported in a benchmark
+(e.g., RMSE of energy, MAE of forces)."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:MetricType ;
+            owl:onProperty mlips:metricType ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isMetricOf ;
+            owl:someValuesFrom mlips:BenchmarkResult ],
+        qudt:QuantityValue ;
+    mlips:metaSort mlips:ReifiedRelation .
+
+mlips:CoveredProperty a owl:Class ;
+    rdfs:label "Covered Property"@en ;
+    rdfs:comment """A physical property covered by the training dataset
+(energy, forces, stresses, virials)."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
 <https://w3id.org/mlips/module/metasort> a owl:Ontology ;
     rdfs:label "Meta-categorisation Vocabulary"@en ;
-    dcterms:description "Annotation vocabulary attaching an OntoClean-style meta-category to every class in the ontology. The four meta-categories (Sortal, Subordinate Sortal, Role, Reified Relation) are named individuals of the class MetaSort; the property mlips:metaSort attaches one such individual to each class."@en .
-
-mlips:MaterialSystem a owl:Class ;
-    rdfs:label "Material System"@en ;
-    rdfs:comment """A material system studied in a dataset: element, alloy,
-compound, or complex microstructure."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial>,
-        mdo:Material ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:AtomicEnvironmentDescriptor a owl:Class ;
-    rdfs:label "Atomic Environment Descriptor"@en ;
-    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP method."@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
-    mlips:metaSort mlips:Sortal .
+    dcterms:description "Annotation vocabulary attaching an OntoClean-style meta-category to every class in the ontology. The four meta-categories (Sortal, Subordinate Sortal, Role, Reified Relation) are named individuals of the class MetaSort; the property mlips:metaSort attaches one such individual to each class. Orthogonally, mlips:isKind marks the kinds: the classes that supply the identity criterion of their instances. The kinds and the top-level reified relations are pairwise disjoint (disjointness axiom)."@en .
 
 mlips:DFTSettings a owl:Class ;
     rdfs:label "DFT Settings"@en ;
@@ -1211,6 +1220,23 @@ functional, k-point mesh, energy cutoff, pseudopotential type."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf mlips:ReferenceSettings ;
     mlips:metaSort mlips:ReifiedRelation .
+
+mlips:MaterialSystem a owl:Class ;
+    rdfs:label "Material System"@en ;
+    rdfs:comment """A material system studied in a dataset: element, alloy,
+compound, or complex microstructure."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    rdfs:subClassOf <https://purls.helmholtz-metadaten.de/cmso/CrystallineMaterial>,
+        mdo:Material ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
+mlips:AtomicEnvironmentDescriptor a owl:Class ;
+    rdfs:label "Atomic Environment Descriptor"@en ;
+    rdfs:comment "A mathematical representation of the local atomic environment used by an MLIP method."@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
 
 mlips:TrainedModel a owl:Class ;
     rdfs:label "Trained Model"@en ;
@@ -1223,6 +1249,7 @@ parameters (weights) that can be used for prediction."""@en ;
             owl:someValuesFrom mlips:MLIPRun ],
         mls:Model,
         prov:Entity ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
 mlips:HyperparameterSetting a owl:Class ;
@@ -1245,27 +1272,7 @@ data type, range, and default value."""@en ;
             owl:onProperty mlips:isHyperparameterOf ;
             owl:someValuesFrom mlips:MLIPMethod ],
         mls:HyperParameter ;
-    mlips:metaSort mlips:Sortal .
-
-mlips:TrainingDataset a owl:Class ;
-    rdfs:label "Training Dataset"@en ;
-    rdfs:comment """A dataset of atomic configurations used for MLIP
-training, with provenance, size, property coverage, and DFT settings."""@en ;
-    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
-    rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:coversMaterial ;
-            owl:someValuesFrom mlips:MaterialSystem ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:datasetProvenance ;
-            owl:someValuesFrom mlips:DatasetProvenance ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:coversProperty ;
-            owl:someValuesFrom mlips:CoveredProperty ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:hasConfiguration ;
-            owl:someValuesFrom mlips:AtomicConfiguration ],
-        mls:Dataset,
-        prov:Entity ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
 schema:Person a owl:Class ;
@@ -1296,15 +1303,33 @@ material system with specific hyperparameters, reporting accuracy metrics."""@en
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
+mlips:TrainingDataset a owl:Class ;
+    rdfs:label "Training Dataset"@en ;
+    rdfs:comment """A dataset of atomic configurations used for MLIP
+training, with provenance, size, property coverage, and DFT settings."""@en ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty mlips:coversProperty ;
+            owl:someValuesFrom mlips:CoveredProperty ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:datasetProvenance ;
+            owl:someValuesFrom mlips:DatasetProvenance ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:hasConfiguration ;
+            owl:someValuesFrom mlips:AtomicConfiguration ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:coversMaterial ;
+            owl:someValuesFrom mlips:MaterialSystem ],
+        mls:Dataset,
+        prov:Entity ;
+    mlips:isKind true ;
+    mlips:metaSort mlips:Sortal .
+
 mlips:MLIPRun a owl:Class ;
     rdfs:label "MLIP Run"@en ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:TrainedModel ;
-            owl:onProperty mlips:produces ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:TrainingDataset ;
             owl:onProperty mlips:runsOn ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
@@ -1312,7 +1337,12 @@ mlips:MLIPRun a owl:Class ;
             owl:onClass mlips:MLIPMethod ;
             owl:onProperty mlips:appliesMethod ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainedModel ;
+            owl:onProperty mlips:produces ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Activity ;
+    mlips:isKind true ;
     mlips:metaSort mlips:SubordinateSortal .
 
 mlips:MLIPMethod a owl:Class ;
@@ -1322,8 +1352,8 @@ mlips:MLIPMethod a owl:Class ;
 a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:hasFunctionalForm ;
-            owl:someValuesFrom mlips:FunctionalForm ],
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasHyperparameter ;
             owl:someValuesFrom mlips:Hyperparameter ],
@@ -1331,12 +1361,13 @@ a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
             owl:onProperty mlips:hasLossFunction ;
             owl:someValuesFrom mlips:LossFunction ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ],
+            owl:onProperty mlips:hasFunctionalForm ;
+            owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasTrainingAlgorithm ;
             owl:someValuesFrom mls:Algorithm ] ;
     owl:disjointWith mls:Algorithm ;
+    mlips:isKind true ;
     mlips:metaSort mlips:Sortal .
 
 mlips:Sortal a owl:NamedIndividual,
@@ -1358,4 +1389,8 @@ OntoClean profile: +R, +I, +U, -D."""@en ;
 <https://w3id.org/mlips/module/algorithm> a owl:Ontology ;
     rdfs:label "Algorithm Module"@en ;
     dcterms:description "The Algorithm module describes the machine-learning interatomic potential itself: its functional form and atomic-environment descriptor, the hyperparameters that size and bound that descriptor, the loss it is fitted with, and the software that implements it. In the running example it captures the Moment Tensor Potential (MTP) used for TiCr2-H, fitted with the MLIP-2 package, with hyperparameters such as the moment level and the cutoff radius."@en .
+
+[] a owl:AllDisjointClasses ;
+    rdfs:comment "Kinds (mlips:isKind true) and top-level reified relations are pairwise disjoint."@en ;
+    owl:members ( mlips:AtomicConfiguration mlips:AtomicEnvironmentDescriptor mlips:BenchmarkStudy mlips:CoveredProperty mlips:DatasetProvenance mlips:DftBasisSet mlips:FunctionalForm mlips:Hyperparameter mlips:Implementation mlips:Library mlips:LossFunction mlips:MLIPMethod mlips:MLIPRun mlips:MaterialSystem mlips:MetricProperty mlips:MetricType mlips:PseudopotentialType mlips:ReferenceCalculation mlips:SamplingStrategy mlips:SimulationType mlips:TrainedModel mlips:TrainingDataset mlips:WfMethod mlips:XCFunctional mlips:AccuracyMetric mlips:BenchmarkResult mlips:HyperparameterSetting mlips:ReferenceSettings ) .
 

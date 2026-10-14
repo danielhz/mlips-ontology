@@ -345,7 +345,7 @@ def generate_benchmark_instance_dot():
     lines.append(_edge("result", "metric_e", "hasAccuracyMetric"))
     lines.append(_edge("result", "metric_f", "hasAccuracyMetric"))
     lines.append(_edge("result", "setting_c", "hasHyperparameterSetting"))
-    lines.append(_edge("result", "article", "reportedIn"))
+    lines.append(_edge("study", "article", "reportedIn"))
     lines.append(_edge("metric_e", "mt_rmse", "metricType"))
     lines.append(_edge("metric_e", "mp_energy", "metricProperty"))
     lines.append(_edge("metric_e", "l_val_e", "metricValue"))

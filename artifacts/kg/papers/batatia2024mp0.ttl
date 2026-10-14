@@ -716,13 +716,17 @@ entity:run-mace-mp-0-batatia2024mp0 a mlips:MLIPRun ;
         entity:setting-mlp-hidden-3x64-batatia2024mp0 ,
         entity:setting-initial-lr-1e-3-batatia2024mp0 ,
         entity:setting-num-epochs-100-batatia2024mp0 ;
-    mlips:gpuHours 2600 ;
+    mlips:gpuHours "2600"^^xsd:double ;
     mlips:trainingHardware "40-80 NVIDIA H100 GPUs across 10-20 nodes" ;
     mlips:produces entity:model-mace-mp-0-batatia2024mp0 .
 
 entity:model-mace-mp-0-batatia2024mp0 a mlips:TrainedModel ;
-    rdfs:label "MACE-MP-0b3 medium foundation model" ;
-    mlips:inferenceHardware "Single NVIDIA A100 80GB GPU: ~ns/day for 1000-atom system; weak scaling to 32,000 atoms on 64 GPUs at 0.1 ns/day" .
+    rdfs:label "MACE-MP-0b3 medium foundation model" .
+
+# Not encoded (issue #1): mlips:inferenceHardware and mlips:inferenceTimePerAtom
+# belong on a BenchmarkResult, and the timing is for an unspecified 1000-atom system, not for the material of the two benchmark results. As previously encoded on
+# entity:model-mace-mp-0-batatia2024mp0:
+#   mlips:inferenceHardware "Single NVIDIA A100 80GB GPU: ~ns/day for 1000-atom system; weak scaling to 32,000 atoms on 64 GPUs at 0.1 ns/day"
 
 ###############################################################################
 # Q10 -- Benchmark results
@@ -763,7 +767,8 @@ entity:metric-mae-force-batatia2024mp0 a mlips:AccuracyMetric ;
 # Captured in Q9 (run) and Q10 (model) where the predicates allow it:
 #   - mlips:gpuHours = 2600
 #   - mlips:trainingHardware = "40-80 NVIDIA H100 GPUs across 10-20 nodes"
-#   - mlips:inferenceHardware = "Single NVIDIA A100 80GB GPU ..."
+#   - inference hardware: kept in a comment after the model statement
+#     (the timed system is not the material of the benchmark results)
 # Wall-clock training duration, peak memory, and explicit per-atom
 # inference time are not reported.
 

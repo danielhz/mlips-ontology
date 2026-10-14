@@ -39,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check duplicates-report result-labels result-labels-check datasets-registry datasets-check cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check duplicates-report result-labels result-labels-check datasets-registry datasets-check consistency-check reason-kg cq cq-check clean
 
 all: release
 
@@ -224,6 +224,30 @@ datasets-registry: | $(VENV_STAMP)
 
 datasets-check: | $(VENV_STAMP)
 	$(PY) artifacts/scripts/datasets_registry.py --check
+
+# Consistency of schema + vocabulary + KG (issue #1). `consistency-check`
+# is a gate without Java: RDFS type closure over all paper files plus the
+# vendored PROV-O and ML-Schema (artifacts/ontology/imports/), then fails
+# on any individual typed with two disjoint classes (including the
+# kind/reified-relation disjointness axiom) and on literals outside the
+# XSD range of their property. `reason-kg` runs HermiT on the same merged
+# graph through ROBOT, resolving the imports from the local catalog.
+KG_MERGED = dist/kg-merged.owl
+
+consistency-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/check_consistency.py
+
+reason-kg: | $(VENV_STAMP)
+	@mkdir -p dist
+	$(PY) artifacts/scripts/check_consistency.py --write-merged $(KG_MERGED)
+	@echo "==> HermiT consistency (schema + vocab + KG)"
+	@if $(ROBOT) --catalog artifacts/ontology/imports/catalog-v001.xml \
+	     reason --reasoner hermit --input $(KG_MERGED) 2>&1 \
+	     | grep -iE 'incon|unsat|error' ; then \
+	  echo "HermiT: FAIL" ; exit 1 ; \
+	else \
+	  echo "HermiT: consistent, no unsatisfiable classes" ; \
+	fi
 
 # === DaRUS deposit packaging ===
 #

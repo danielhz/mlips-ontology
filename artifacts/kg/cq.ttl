@@ -243,13 +243,18 @@ cq:CQ9 a cq:CompetencyQuestion ;
     dcterms:identifier "CQ9" ;
     rdfs:label "Method efficiency: inference complexity, GPU hours, inference time"@en ;
     cq:questionText "For a given target accuracy, which methods and trained models are most efficient (asymptotic complexity plus measured training and inference cost)?" ;
-    cq:motivates mlips:MLIPMethod, mlips:TrainedModel, mlips:MLIPRun ;
+    cq:motivates mlips:MLIPMethod, mlips:TrainedModel, mlips:MLIPRun, mlips:BenchmarkResult ;
     cq:sparqlQuery """PREFIX mlips: <https://w3id.org/mlips#>
 
 # CQ9: For a given target accuracy, which methods and trained
 # models are most efficient? Combines asymptotic complexity (prior
 # knowledge attached to the method) with measured training and
-# inference cost (empirical data on the run).
+# inference cost (empirical data on the run and on the results).
+#
+# Inference time is a property of a benchmark result (it depends on
+# hardware and settings, not only on the weights; issue #1), so it is
+# read from a result that evaluates the model (?timing), and the
+# accuracy from any result of the same model (?result).
 #
 # Same property-chain note as cq06/cq07: traverses ?run
 # appliesMethod ?algo + ?run produces ?model on the asserted edges
@@ -261,10 +266,12 @@ cq:CQ9 a cq:CompetencyQuestion ;
 # papers that report compute cost contribute rows.
 
 SELECT ?algo ?inf_complexity ?gpu_hours ?t_inf ?rmse WHERE {
+  ?timing a mlips:BenchmarkResult ;
+          mlips:evaluatesModel ?model ;
+          mlips:inferenceTimePerAtom ?t_inf .
   ?result a mlips:BenchmarkResult ;
           mlips:evaluatesModel ?model ;
           mlips:hasAccuracyMetric ?metric .
-  ?model mlips:inferenceTimePerAtom ?t_inf .
   ?metric mlips:metricType mlips:RMSE ;
           mlips:metricValue ?rmse .
   FILTER(?rmse < 2.0)
