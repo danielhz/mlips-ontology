@@ -1,0 +1,66 @@
+id: houston2024
+source:
+  rank: 569
+  year: "2024"
+  first_author: "Paul L. Houston"
+  title: "No Headache for PIPs: A PIP Potential for Aspirin Runs Much Faster and with Similar Precision Than Other Machine-Learned Potentials"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.4c00054"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2401.09316v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a67997216e9e1e5b18727168557f642d29ffbece72f43ea4cd81ecafc4e97f37"
+study_label: "Houston et al. (2024): a permutationally invariant polynomial potential for aspirin with precision similar to other MLPs and much faster evaluation"
+scope: |
+  Encoding scope: PIP fits to rMD17 aspirin (third-order basis with
+  49,978 coefficients; a 25,001-coefficient 2-4 order basis for PES1):
+  the train/test study with three training sizes (Table 2) and the four
+  final PESs fitted to the lowest-energy data (Table 3). Errors are in
+  cm-1 and cm-1/bohr (outside the schema units) and kept with unit null.
+  Literature ACE, PaiNN and Allegro values and stationary-point
+  properties are not encoded.
+hyperparameters:
+  ncoef: {label: "Number of PIP coefficients", name: "number of coefficients", datatype: integer}
+materials:
+  aspirin: {label: "Aspirin (rMD17)", class: "Small organic molecules (MD trajectories)"}
+reference:
+  md17: {type: DFT, comment: "rMD17 aspirin reference as published"}
+sampling:
+  rand: {label: "Random 60/40 train/test split of rMD17 aspirin"}
+  low: {label: "Lowest-energy configurations and their gradients from rMD17 aspirin"}
+datasets:
+  d-t1: {label: "rMD17 aspirin training subset: 30,000 energies and 2,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 30000, loc: "Table 2"}, calc: md17, sampling: [rand]}
+  d-t2: {label: "rMD17 aspirin training subset: 45,000 energies and 3,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 45000, loc: "Table 2"}, calc: md17, sampling: [rand]}
+  d-t3: {label: "rMD17 aspirin training subset: 60,000 energies and 4,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 60000, loc: "Table 2"}, calc: md17, sampling: [rand]}
+  d-pes1: {label: "rMD17 aspirin lowest-energy subset: 80,000 energies and 10,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 80000, loc: "Table 3"}, calc: md17, sampling: [low]}
+  d-pes2: {label: "rMD17 aspirin lowest-energy subset: 60,000 energies and 3,500 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 60000, loc: "Table 3"}, calc: md17, sampling: [low]}
+  d-pes3: {label: "rMD17 aspirin lowest-energy subset: 60,000 energies and 4,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 60000, loc: "Table 3"}, calc: md17, sampling: [low]}
+  d-pes4: {label: "rMD17 aspirin lowest-energy subset: 80,000 energies and 5,000 gradient sets", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 80000, loc: "Table 3"}, calc: md17, sampling: [low]}
+methods:
+  PIP:
+    hp: [ncoef]
+    loss: "Weighted linear least squares on energies and gradients"
+    algorithm: "Over-determined linear regression; MSA basis generation"
+    impl: {lib: {local: MSA}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  pip-t1: {label: "PIP (49,978 coefficients) trained on 30,000 energies and 2,000 gradients", method: PIP, dataset: d-t1, settings: {ncoef: {v: 49978, loc: "Table 2"}}, model: "PIP aspirin Train1"}
+  pip-t2: {label: "PIP (49,978 coefficients) trained on 45,000 energies and 3,000 gradients", method: PIP, dataset: d-t2, settings: {ncoef: {v: 49978, loc: "Table 2"}}, model: "PIP aspirin Train2"}
+  pip-t3: {label: "PIP (49,978 coefficients) trained on 60,000 energies and 4,000 gradients", method: PIP, dataset: d-t3, settings: {ncoef: {v: 49978, loc: "Table 2"}}, model: "PIP aspirin Train3"}
+  pip-pes1: {label: "PIP PES1 (order 2-4, 25,001 coefficients)", method: PIP, dataset: d-pes1, settings: {ncoef: {v: 25001, loc: "Table 3"}}, model: "PIP aspirin PES1"}
+  pip-pes2: {label: "PIP PES2 (order 3, 49,978 coefficients)", method: PIP, dataset: d-pes2, settings: {ncoef: {v: 49978, loc: "Table 3"}}, model: "PIP aspirin PES2"}
+  pip-pes3: {label: "PIP PES3 (order 3, 49,978 coefficients)", method: PIP, dataset: d-pes3, settings: {ncoef: {v: 49978, loc: "Table 3"}}, model: "PIP aspirin PES3"}
+  pip-pes4: {label: "PIP PES4 (order 3, 49,978 coefficients)", method: PIP, dataset: d-pes4, settings: {ncoef: {v: 49978, loc: "Table 3"}}, model: "PIP aspirin PES4"}
+results:
+  - {key: pip-t1-train, model: pip-t1, material: aspirin, role: training, eval_data: {label: "Training subset (30,000 energies, 2,000 gradients)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 28, null, "training energy RMSE (cm-1) on aspirin: PIP Train1", "Table 2"], [RMSE, Force, 83, null, "training gradient RMSE (cm-1/bohr) on aspirin: PIP Train1", "Table 2"], [MAE, Energy, 21, null, "training energy MAE (cm-1) on aspirin: PIP Train1", "Table 2"], [MAE, Force, 62, null, "training gradient MAE (cm-1/bohr) on aspirin: PIP Train1", "Table 2"], [R2, Energy, 0.999833, null, "training energy R2 on aspirin: PIP Train1", "Table 2"], [R2, Force, 0.999765, null, "training gradient R2 on aspirin: PIP Train1", "Table 2"]]}
+  - {key: pip-t1-test, model: pip-t1, material: aspirin, role: test, eval_data: {label: "Test set (40,000 energies and gradient sets)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 51, null, "test energy RMSE (cm-1) on aspirin: PIP Train1", "Table 2"], [RMSE, Force, 189, null, "test gradient RMSE (cm-1/bohr) on aspirin: PIP Train1", "Table 2"], [MAE, Energy, 36, null, "test energy MAE (cm-1) on aspirin: PIP Train1", "Table 2"], [MAE, Force, 132, null, "test gradient MAE (cm-1/bohr) on aspirin: PIP Train1", "Table 2"], [R2, Energy, 0.99944, null, "test energy R2 on aspirin: PIP Train1", "Table 2"], [R2, Force, 0.999789, null, "test gradient R2 on aspirin: PIP Train1", "Table 2"]]}
+  - {key: pip-t2-train, model: pip-t2, material: aspirin, role: training, eval_data: {label: "Training subset (45,000 energies, 3,000 gradients)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 32, null, "training energy RMSE (cm-1) on aspirin: PIP Train2", "Table 2"], [RMSE, Force, 96, null, "training gradient RMSE (cm-1/bohr) on aspirin: PIP Train2", "Table 2"], [MAE, Energy, 24, null, "training energy MAE (cm-1) on aspirin: PIP Train2", "Table 2"], [MAE, Force, 70, null, "training gradient MAE (cm-1/bohr) on aspirin: PIP Train2", "Table 2"], [R2, Energy, 0.999785, null, "training energy R2 on aspirin: PIP Train2", "Table 2"], [R2, Force, 0.999686, null, "training gradient R2 on aspirin: PIP Train2", "Table 2"]]}
+  - {key: pip-t2-test, model: pip-t2, material: aspirin, role: test, eval_data: {label: "Test set (40,000 energies and gradient sets)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 43, null, "test energy RMSE (cm-1) on aspirin: PIP Train2", "Table 2"], [RMSE, Force, 158, null, "test gradient RMSE (cm-1/bohr) on aspirin: PIP Train2", "Table 2"], [MAE, Energy, 32, null, "test energy MAE (cm-1) on aspirin: PIP Train2", "Table 2"], [MAE, Force, 110, null, "test gradient MAE (cm-1/bohr) on aspirin: PIP Train2", "Table 2"], [R2, Energy, 0.999597, null, "test energy R2 on aspirin: PIP Train2", "Table 2"], [R2, Force, 0.999152, null, "test gradient R2 on aspirin: PIP Train2", "Table 2"]]}
+  - {key: pip-t3-train, model: pip-t3, material: aspirin, role: training, eval_data: {label: "Training subset (60,000 energies, 4,000 gradients)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 33, null, "training energy RMSE (cm-1) on aspirin: PIP Train3", "Table 2"], [RMSE, Force, 102, null, "training gradient RMSE (cm-1/bohr) on aspirin: PIP Train3", "Table 2"], [MAE, Energy, 25, null, "training energy MAE (cm-1) on aspirin: PIP Train3", "Table 2"], [MAE, Force, 74, null, "training gradient MAE (cm-1/bohr) on aspirin: PIP Train3", "Table 2"], [R2, Energy, 0.999767, null, "training energy R2 on aspirin: PIP Train3", "Table 2"], [R2, Force, 0.999643, null, "training gradient R2 on aspirin: PIP Train3", "Table 2"]]}
+  - {key: pip-t3-test, model: pip-t3, material: aspirin, role: test, eval_data: {label: "Test set (40,000 energies and gradient sets)", registry: rMD17, location: "Table 2"}, metrics: [[RMSE, Energy, 41, null, "test energy RMSE (cm-1) on aspirin: PIP Train3", "Table 2"], [RMSE, Force, 147, null, "test gradient RMSE (cm-1/bohr) on aspirin: PIP Train3", "Table 2"], [MAE, Energy, 30, null, "test energy MAE (cm-1) on aspirin: PIP Train3", "Table 2"], [MAE, Force, 102, null, "test gradient MAE (cm-1/bohr) on aspirin: PIP Train3", "Table 2"], [R2, Energy, 0.999644, null, "test energy R2 on aspirin: PIP Train3", "Table 2"], [R2, Force, 0.999628, null, "test gradient R2 on aspirin: PIP Train3", "Table 2"]]}
+  - {key: pip-pes1-fit, model: pip-pes1, material: aspirin, role: training, eval_data: {label: "Fitted lowest-energy data", registry: rMD17, location: "Table 3"}, metrics: [[RMSE, Energy, 123, null, "fit energy RMSE (cm-1) on aspirin: PIP PES1", "Table 3"], [RMSE, Force, 255, null, "fit gradient RMSE (cm-1/bohr) on aspirin: PIP PES1", "Table 3"], [MAE, Energy, 94, null, "fit energy MAE (cm-1) on aspirin: PIP PES1", "Table 3"], [MAE, Force, 177, null, "fit gradient MAE (cm-1/bohr) on aspirin: PIP PES1", "Table 3"], [R2, Energy, 0.993577, null, "fit energy R2 on aspirin: PIP PES1", "Table 3"], [R2, Force, 0.996879, null, "fit gradient R2 on aspirin: PIP PES1", "Table 3"]]}
+  - {key: pip-pes2-fit, model: pip-pes2, material: aspirin, role: training, eval_data: {label: "Fitted lowest-energy data", registry: rMD17, location: "Table 3"}, metrics: [[RMSE, Energy, 23, null, "fit energy RMSE (cm-1) on aspirin: PIP PES2", "Table 3"], [RMSE, Force, 47, null, "fit gradient RMSE (cm-1/bohr) on aspirin: PIP PES2", "Table 3"], [MAE, Energy, 17, null, "fit energy MAE (cm-1) on aspirin: PIP PES2", "Table 3"], [MAE, Force, 35, null, "fit gradient MAE (cm-1/bohr) on aspirin: PIP PES2", "Table 3"], [R2, Energy, 0.999672, null, "fit energy R2 on aspirin: PIP PES2", "Table 3"], [R2, Force, 0.999884, null, "fit gradient R2 on aspirin: PIP PES2", "Table 3"]]}
+  - {key: pip-pes3-fit, model: pip-pes3, material: aspirin, role: training, eval_data: {label: "Fitted lowest-energy data", registry: rMD17, location: "Table 3"}, metrics: [[RMSE, Energy, 23, null, "fit energy RMSE (cm-1) on aspirin: PIP PES3", "Table 3"], [RMSE, Force, 47, null, "fit gradient RMSE (cm-1/bohr) on aspirin: PIP PES3", "Table 3"], [MAE, Energy, 17, null, "fit energy MAE (cm-1) on aspirin: PIP PES3", "Table 3"], [MAE, Force, 35, null, "fit gradient MAE (cm-1/bohr) on aspirin: PIP PES3", "Table 3"], [R2, Energy, 0.999672, null, "fit energy R2 on aspirin: PIP PES3", "Table 3"], [R2, Force, 0.999884, null, "fit gradient R2 on aspirin: PIP PES3", "Table 3"]]}
+  - {key: pip-pes4-fit, model: pip-pes4, material: aspirin, role: training, eval_data: {label: "Fitted lowest-energy data", registry: rMD17, location: "Table 3"}, metrics: [[RMSE, Energy, 27, null, "fit energy RMSE (cm-1) on aspirin: PIP PES4", "Table 3"], [RMSE, Force, 53, null, "fit gradient RMSE (cm-1/bohr) on aspirin: PIP PES4", "Table 3"], [MAE, Energy, 21, null, "fit energy MAE (cm-1) on aspirin: PIP PES4", "Table 3"], [MAE, Force, 39, null, "fit gradient MAE (cm-1/bohr) on aspirin: PIP PES4", "Table 3"], [R2, Energy, 0.999682, null, "fit energy R2 on aspirin: PIP PES4", "Table 3"], [R2, Force, 0.999856, null, "fit gradient R2 on aspirin: PIP PES4", "Table 3"]]}
+gaps:
+  - "Weighted RMSEs (eWRMSE, fWRMSE) are not encoded. Table 4 lists PES1 and PES4 force MAEs (77 and 39 cm-1/bohr) as forces, differing from the Table 3 gradient MAE for PES1 (177); Table 4 is not encoded. Timing comparisons with other MLPs (Fig. 3) are figure-only and partly taken from Ref. 15. PIP is a new registry method without origin."
