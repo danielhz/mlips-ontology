@@ -1,0 +1,48 @@
+id: anon2025
+source:
+  rank: 666
+  year: "2025"
+  first_author: "А. А. Соловых"
+  title: "Path-integral molecular dynamics with actively-trained and universal machine learning force fields"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2505.14245"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2505.14245v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0ce26db431331c003440f7800b1d7090701809c62bfa498e64725994a41dea75"
+study_label: "Solovykh, Rybin, Novikov and Shapeev (2025): path-integral MD with actively trained MTPs and a universal force field"
+scope: |
+  Encoding scope: the actively learned MTPs for LiH and Si (MLIP-2 with
+  i-PI, active learning in classical MD and PIMD) with their training
+  RMSEs (Table 1), and MatterSim-v1.0.0-1M used as distributed for
+  comparison. Lattice parameters, thermal expansion and RDFs from PIMD are
+  property results.
+materials:
+  lih: {label: "LiH crystal", formula: LiH, class: "ionic hydride"}
+  si: {label: "Diamond silicon (64-atom supercell)", formula: Si, class: "covalent semiconductor"}
+reference:
+  pbe-lih: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 650, kpoints: "2x2x2", comment: "Single-point labels; AIMD at 300 eV, Gamma only."}
+  pbe-si: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "4x4x4", comment: "Single-point labels; AIMD settings as for LiH."}
+sampling:
+  al-pimd: {label: "Maxvol selection from AIMD, then active learning (gamma_th = 2.1, gamma_cr = 10) in classical NVT MD at 500 K and PIMD at 100 K"}
+datasets:
+  lih: {label: "LiH MTP training set (313 configurations)", materials: [lih], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 313, loc: "Sec. 2.5.1"}, calc: pbe-lih, sampling: [al-pimd]}
+  si: {label: "Si MTP training set (363 configurations)", materials: [si], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 363, loc: "Sec. 2.5.2"}, calc: pbe-si, sampling: [al-pimd]}
+methods:
+  MTP:
+    hp: [momentLevel, cutoffRadius, minInteratomicDistance]
+    loss: "Energy, force and stress weights 1.0, 0.01, 0.001"
+    impl: {lib: MLIP, comment: "MLIP-2 with an i-PI interface"}
+    sims: [MolecularDynamics]
+  M3GNet:
+    sims: [MolecularDynamics]
+runs:
+  mtp-lih: {label: "Actively learned MTP for LiH (level 16, 222 parameters)", method: MTP, dataset: lih, settings: {momentLevel: {v: 16, loc: "Sec. 2.5.1"}, cutoffRadius: {v: 5, loc: "Sec. 2.5.1"}, minInteratomicDistance: {v: 1.42, loc: "Sec. 2.5.1"}}, model: "MTP-16 LiH (PIMD)"}
+  mtp-si: {label: "Actively learned MTP for Si (level 24, 913 parameters)", method: MTP, dataset: si, settings: {momentLevel: {v: 24, loc: "Sec. 2.5.2"}, cutoffRadius: {v: 5, loc: "Sec. 2.5.2"}, minInteratomicDistance: {v: 2, loc: "Sec. 2.5.2"}}, model: "MTP-24 Si (PIMD)"}
+  mattersim-1m: {label: "MatterSim-v1.0.0-1M as distributed", method: M3GNet, model: "MatterSim-v1.0.0-1M"}
+results:
+  - {key: mtp-lih-train, model: mtp-lih, material: lih, role: training, eval_data: {label: "LiH training set", location: "Table 1"}, metrics: [[RMSE, Energy, 0.26, meV/atom, "train energy RMSE on LiH: MTP-16", "Table 1"], [RMSE, Force, 14.12, meV/A, "train force RMSE on LiH: MTP-16", "Table 1"], [RMSE, Stress, 0.06175, GPa, "train stress RMSE on LiH: MTP-16", "Table 1 (61.75 MPa)"]]}
+  - {key: mtp-si-train, model: mtp-si, material: si, role: training, eval_data: {label: "Si training set", location: "Table 1"}, metrics: [[RMSE, Energy, 0.54, meV/atom, "train energy RMSE on Si: MTP-24", "Table 1"], [RMSE, Force, 33.4, meV/A, "train force RMSE on Si: MTP-24", "Table 1"], [RMSE, Stress, 0.07161, GPa, "train stress RMSE on Si: MTP-24", "Table 1 (71.61 MPa)"]]}
+gaps:
+  - "The manifest gives the first author as 'А. А. Соловых' (Cyrillic for A. A. Solovykh); the KG uses the DataCite authors."
+  - "MatterSim is compared only through PIMD properties (figures); MatterSim-v1.0.0-1M is not the registry model MatterSim-v1 (5M) and is a paper-local run, mapped to M3GNet as before. The total cost ('about 1e4 CPU-hours') is approximate."

@@ -1,0 +1,36 @@
+id: xu2023
+source:
+  rank: 667
+  year: "2023"
+  first_author: "Hui Xu"
+  title: "High-Accuracy Neural Network Interatomic Potential for Silicon Nitride"
+  venue: "Nanomaterials"
+  doi: "10.3390/nano13081352"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "0d15d621b48a84e241fa669c539d20678be639452a9142a26acfed20a9ce05f5"
+study_label: "Xu et al. (2023): a Deep Potential for silicon nitride"
+scope: |
+  Encoding scope: the DeePMD (DeepPot-SE) model for Si3N4 trained on AIMD
+  data at 2000 K and 3000 K and used for SiNx melt-quench simulations.
+  Energy and force RMSE and R2 values appear only in the parity plots, so
+  there are no results.
+materials:
+  sin: {label: "Amorphous and liquid Si3N4 (112-atom cells) and SiNx compositions", class: "nitride ceramic"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma-centred, k-spacing 0.4 1/A"}
+sampling:
+  aimd: {label: "NVT AIMD of randomly packed 112-atom Si3N4 at 2000 K and 3000 K (10,000 steps of 1 fs each)"}
+datasets:
+  sin: {label: "Si3N4 AIMD frames at 2000 K and 3000 K (10,000 per temperature; four of five sets for training)", materials: [sin], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [aimd]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, learningRate]
+    algorithm: "DeepPot-SE (se_a) with smoothing from 5.8 A; embedding layers 25, 50, 100; learning rate 1e-3 decaying by 0.95 every 5000 steps; 2000 K and 3000 K data combined"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  dp: {label: "DP model for silicon nitride (2000 K + 3000 K data)", method: DeePMD, dataset: sin, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 2.2"}, learningRate: {v: 0.001, loc: "Sec. 2.2 (initial)"}}, model: "DP Si3N4"}
+gaps:
+  - "Energy and force RMSEs and R2 values are given only inside the parity plots (Figs. 1-2), which are not read off. RDFs, coordination numbers, bond-angle distributions and SiNx structure are property comparisons."
