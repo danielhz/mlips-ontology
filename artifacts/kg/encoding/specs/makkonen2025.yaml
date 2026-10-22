@@ -1,0 +1,59 @@
+id: makkonen2025
+source:
+  rank: 683
+  year: "2025"
+  first_author: "Eetu Makkonen"
+  title: "Fast machine learned interatomic potential for hydrogen-induced embrittlement in α-Fe"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2511.21464"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2511.21464v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "83bbcc1b2dbaa515e73e482a8d0874e3df610837a77b1179adff3eb9ef410d72"
+study_label: "Makkonen, Lopez-Cazalilla and Djurabekova (2025): a fast tabGAP for hydrogen embrittlement in alpha-Fe"
+scope: |
+  Encoding scope: the Fe-H GAP (2b + 3b + EAM descriptors) and its
+  tabulated version (tabGAP), trained on the alpha-Fe data of Byggmästar
+  et al. extended with Fe-H structures, with training and test RMSEs
+  (Table II) and single-core MD cost (Table III); the literature Meng NNIP
+  is timed as distributed. EAM potentials are classical. H solution,
+  trapping, migration and dislocation properties are property results.
+materials:
+  feh: {label: "alpha-Fe with interstitial H, vacancies, self-interstitials, dislocations, surfaces and short-range H-H configurations", class: "bcc metal with hydrogen"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "k-point spacing 0.15 1/A", comment: "Fe_sv (16 electrons) and standard H PAW; aspherical PAW contributions; collinear ferromagnetic; Methfessel-Paxton 0.1 eV; settings as in Byggmästar et al."}
+sampling:
+  feh: {label: "Byggmästar et al. alpha-Fe data plus 1609 new Fe-H structures (random displacements, MD snapshots, vacancy-H, short-range H-H and H-H-H, SIA-H, O-site H, dislocation-H)"}
+datasets:
+  feh: {label: "Fe-H data set (2686 structures; 90% training, 10% per-category test)", materials: [feh], properties: [Energy, Forces, Virials], provenance: Augmented, n: {v: 2686, loc: "Sec. II B"}, calc: pbe, sampling: [feh]}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "2b (Fe-Fe, Fe-H, H-H), 3b (cutoff 3.7 A, 800 sparse points) and species-resolved EAM descriptors with species-dependent energy scales"
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, NudgedElasticBand, GeometryOptimization]
+  tabGAP:
+    hp: [cutoffRadius]
+    algorithm: "Fe-H GAP tabulated on 5000-point 2b and 120^3 3b grids"
+    sims: [MolecularDynamics, NudgedElasticBand, GeometryOptimization]
+  HDNNP:
+    sims: [MolecularDynamics]
+runs:
+  gap: {label: "Fe-H GAP (2b + 3b + EAM)", method: GAP, dataset: feh, settings: {cutoffRadius: {v: 4.5, loc: "Table I (EAM and Fe-H 2b)"}, numSparseConfigs: {v: 800, loc: "Table I (3b)"}}, model: "Fe-H GAP (Makkonen 2025)"}
+  tabgap: {label: "Fe-H tabGAP (tabulated GAP)", method: tabGAP, dataset: feh, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}}, model: "Fe-H tabGAP (Makkonen 2025)"}
+  meng-nnip: {label: "Meng et al. Fe-H NNIP (Ref. 48) as distributed", method: HDNNP, model: "alpha-Fe-H NNIP (Meng et al. 2021)"}
+results:
+  - {key: gap-train, model: gap, material: feh, role: training, eval_data: {label: "Fe-H training set (excluding free dimers/trimers and liquid Fe)", location: "Table II"}, metrics: [[RMSE, Energy, 2.20, meV/atom, "train energy RMSE (all structures) on Fe-H: GAP", "Table II"], [RMSE, Energy, 1.18, meV/atom, "train energy RMSE (Fe-H structures only) on Fe-H: GAP", "Table II"], [RMSE, Force, 73, meV/A, "train force RMSE (all atoms) on Fe-H: GAP", "Table II (0.073 eV/A)"], [RMSE, Force, 135, meV/A, "train force RMSE (H atoms) on Fe-H: GAP", "Table II (0.135 eV/A)"]]}
+  - {key: gap-test, model: gap, material: feh, role: test, eval_data: {label: "Fe-H test set (10% per category)", location: "Table II"}, metrics: [[RMSE, Energy, 1.87, meV/atom, "test energy RMSE (all structures) on Fe-H: GAP", "Table II"], [RMSE, Energy, 1.76, meV/atom, "test energy RMSE (Fe-H structures only) on Fe-H: GAP", "Table II"], [RMSE, Force, 69, meV/A, "test force RMSE (all atoms) on Fe-H: GAP", "Table II (0.069 eV/A)"], [RMSE, Force, 150, meV/A, "test force RMSE (H atoms) on Fe-H: GAP", "Table II (0.150 eV/A)"]]}
+  - {key: tabgap-train, model: tabgap, material: feh, role: training, eval_data: {label: "Fe-H training set (excluding free dimers/trimers and liquid Fe)", location: "Table II"}, metrics: [[RMSE, Energy, 2.23, meV/atom, "train energy RMSE (all structures) on Fe-H: tabGAP", "Table II"], [RMSE, Energy, 1.29, meV/atom, "train energy RMSE (Fe-H structures only) on Fe-H: tabGAP", "Table II"], [RMSE, Force, 77, meV/A, "train force RMSE (all atoms) on Fe-H: tabGAP", "Table II (0.077 eV/A)"], [RMSE, Force, 154, meV/A, "train force RMSE (H atoms) on Fe-H: tabGAP", "Table II (0.154 eV/A)"]]}
+  - {key: tabgap-test, model: tabgap, material: feh, role: test, eval_data: {label: "Fe-H test set (10% per category)", location: "Table II"}, metrics: [[RMSE, Energy, 1.88, meV/atom, "test energy RMSE (all structures) on Fe-H: tabGAP", "Table II"], [RMSE, Energy, 1.75, meV/atom, "test energy RMSE (Fe-H structures only) on Fe-H: tabGAP", "Table II"], [RMSE, Force, 69, meV/A, "test force RMSE (all atoms) on Fe-H: tabGAP", "Table II (0.069 eV/A)"], [RMSE, Force, 157, meV/A, "test force RMSE (H atoms) on Fe-H: tabGAP", "Table II (0.157 eV/A)"]]}
+timings:
+  - {model: tabgap, system: "6x6x6 alpha-Fe supercell with 0.25 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 0.0096, unit: "ms per (atom x step)", per_atom_us: 9.6, hardware: "single core of a Xeon Gold 6230 CPU", result: tabgap-test, location: "Table III"}
+  - {model: meng-nnip, system: "6x6x6 alpha-Fe supercell with 0.25 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 2.13, unit: "ms per (atom x step)", per_atom_us: 2130, hardware: "single core of a Xeon Gold 6230 CPU", result: null, location: "Table III"}
+  - {model: tabgap, system: "6x6x6 alpha-Fe supercell with 1 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 0.0105, unit: "ms per (atom x step)", per_atom_us: 10.5, hardware: "single core of a Xeon Gold 6230 CPU", result: null, location: "Table III"}
+  - {model: meng-nnip, system: "6x6x6 alpha-Fe supercell with 1 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 2.09, unit: "ms per (atom x step)", per_atom_us: 2090, hardware: "single core of a Xeon Gold 6230 CPU", result: null, location: "Table III"}
+  - {model: tabgap, system: "6x6x6 alpha-Fe supercell with 10 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 0.0172, unit: "ms per (atom x step)", per_atom_us: 17.2, hardware: "single core of a Xeon Gold 6230 CPU", result: null, location: "Table III"}
+  - {model: meng-nnip, system: "6x6x6 alpha-Fe supercell with 10 at.% interstitial H, 10,000-step NVT MD", atoms: null, value: 2.41, unit: "ms per (atom x step)", per_atom_us: 2410, hardware: "single core of a Xeon Gold 6230 CPU", result: null, location: "Table III"}
+gaps:
+  - "Table III also times three classical EAM potentials (0.0017-0.0032 ms per atom-step), which are not encoded. The exact atom count of the timed cells is not stated."
+  - "H solution energies, vacancy trapping, migration barriers (Tables IV-V), elastic constants and screw-dislocation kink-pair barriers are property results."
