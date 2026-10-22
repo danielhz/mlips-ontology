@@ -1,12 +1,12 @@
 # Method identity in the per-paper KG
 
-How a per-paper file names the MLIP method and the trained models it talks about, so that the merged graph has one node per method however many papers use it. Fixed on 2026-10-08, before the population run over the 200-paper corpus; stays within schema 0.1.2. The registry is `methods-registry.csv`; the gate is `make methods-check` (`artifacts/scripts/check_methods.py`).
+How a per-paper file names the MLIP method and the trained models it talks about, so that the merged graph has one node per method however many papers use it. Fixed on 2026-10-08, before the population run over the 200-paper corpus; stays within schema 0.1.2. The registry is `methods-registry.csv`; the gate is `make methods-check` (`artifacts/scripts/check_methods.py`). Since issue #4 the registry also records which method a method derives from (`mlips:derivedFromMethod`); see [Method derivation](#method-derivation).
 
 ## The rules
 
 1. **One IRI per method family, reused across papers.** A method is a functional form plus its descriptor, as the literature names it: MTP, GAP, ACE, SNAP, HDNNP, DeePMD, SchNet, NequIP, Allegro, MACE, M3GNet, CHGNet. Its IRI is `entity:<Name>` with no paper suffix, and it is listed in the registry.
 
-2. **Look it up before minting.** Before writing a `mlips:MLIPMethod`, search the `aliases` column of `methods-registry.csv` for the name the paper uses. A hit means reuse. A miss means a new registry row first, then the file. Nothing is a method unless it is a registry row.
+2. **Look it up before minting.** Before writing a `mlips:MLIPMethod`, search the `aliases` column of `methods-registry.csv` for the name the paper uses. A hit means reuse. A miss means a new registry row first, then the file. Nothing is a method unless it is a registry row. **When the new row is a method that this paper introduces, fill `derived_from` and `derived_from_source` from the same paper:** if the paper states that its method is built on an earlier one ("we build on", "extends", "is based on", "we augment X with"), put the parent's registry key in `derived_from` (several keys `|`-separated; a parent that is not in the registry gets its own row first) and `<paper-id>, <section>` in `derived_from_source`, and quote the sentence in the file's gaps or the run comment. Leave both empty when the paper only compares with, cites or resembles another method, and when the paper is not the one that introduced the method (`origin` empty or another paper): say in the gaps which parent the paper mentions, so it can be confirmed when the introducing paper is encoded. Never write `mlips:derivedFromMethod` in the paper file; `make methods-registry` generates it.
 
 3. **When a new method IRI is justified.** Only for a different functional form or descriptor that the literature treats as a method of its own (CACE next to ACE, quadratic SNAP next to SNAP, Allegro next to NequIP). **Not** for: a hyperparameter choice (cutoff, level, body order, a small/medium/large size), a different training set, a retrained or fine-tuned instance, a software package or version, or a pretrained checkpoint. Those are runs, settings, implementations and trained models (rules 5–7).
 
@@ -34,9 +34,11 @@ How a per-paper file names the MLIP method and the trained models it talks about
 | `method`, `run_iri` | for a model: the method its run applies, and the run IRI |
 | `aliases` | names used in papers, `|`-separated; this is the column to search |
 | `origin` | paper-id of the file that introduces the method, or that holds the model's full run; empty for a model known only through stubs |
+| `derived_from` | methods only: registry keys of the methods this method is built on, `|`-separated; empty unless the introducing paper states it (rule 2) |
+| `derived_from_source` | the paper and location that state the derivation, e.g. `ji2026, Abstract and Introduction`; set exactly when `derived_from` is |
 | `note` | status and alignment remarks |
 
-`make methods-check` fails if a non-legacy file declares or applies a method that is not in the registry, changes a registry label, descriptor or form, evaluates a model that is neither local nor registered, or has a paper-local subject without its suffix.
+`make methods-check` fails if a non-legacy file declares or applies a method that is not in the registry, changes a registry label, descriptor or form, evaluates a model that is neither local nor registered, or has a paper-local subject without its suffix. It also fails if any paper file (legacy ones included) asserts `mlips:derivedFromMethod`, if a `derived_from` key is not a registry method, if `derived_from` and `derived_from_source` are not set together, if the derivation has a cycle, or if `shared/methods.ttl` is stale.
 
 ## The convention as applied in the population run (2026-10-08/09)
 
@@ -61,7 +63,7 @@ They are exempt from the gate (listed as `LEGACY` in the checker) and were not r
 | `bartok2010` | `entity:GAP-bartok2010` (bispectrum, typed `SOAPDescriptor`) | rename to `entity:GAP`; generalise the registry label (now "… with SOAP kernel"); the bispectrum descriptor needs a vocabulary individual |
 | `bartok2018si` | `entity:GAP` | suffix the local nodes; form label without paper values |
 | `behler2007` | `entity:HDNNP-behler2007` | rename to `entity:HDNNP` |
-| `lysogorskiy2021ace` | `entity:ACE-lysogorskiy2021ace` | rename to `entity:ACE` |
+| `lysogorskiy2021ace` | `entity:ACE` (renamed from `entity:ACE-lysogorskiy2021ace` in issue #4) | done; the file still attaches its own functional form node to `entity:ACE`, which the registry does not fix |
 | `smith2017`, `smith2019ccx` | `entity:ANI-smith2017`, `entity:ANI-smith2019ccx` | rename both to `entity:ANI` |
 | `batatia2024mp0` | `entity:MACE-MP-0` typed as a method, with its own label and form | its run applies `entity:MACE`; MACE-MP-0b3 stays the trained model `entity:model-mace-mp-0-batatia2024mp0`; drop the second method |
 | `batatia2022`, `batzner2022`, `musaelian2023allegro`, `chen2022`, `deng2023`, `wang2018dpkit`, `schutt2018`, `eckhoff2021spin` | canonical IRI already | form labels carry paper values (layer counts, widths) that belong on the run; un-suffixed local nodes |
@@ -71,7 +73,43 @@ Until then the merged graph has `entity:MACE-MP-0` beside `entity:MACE`, and fou
 ## Proposals for v0.2.0 (need a schema change, not done here)
 
 - `mlips:hasLossFunction` and `mlips:hasTrainingAlgorithm` on `mlips:MLIPRun` (or a run-level settings node), so that a loss and an optimizer belong to the run that used them.
-- A relation between a method and the method it derives from (MACE → ACE, Allegro → NequIP, quadratic SNAP → SNAP), and between a fine-tuned model and its base model.
+- A relation between a fine-tuned model and its base model. (The relation between a method and the method it derives from is in place since issue #4: `mlips:derivedFromMethod`.)
 - Shared material systems (one `entity:mat-Si`), with their own registry; today each paper declares its own.
 - More `mlips:MetricProperty` individuals (phonon frequencies, elastic constants, formation and defect energies, lattice parameters). Only energy, force and stress errors can be encoded as metrics now; everything else is listed as a gap in the file.
 - A unit for errors stated in eV/atom, kbar or meV/Å³ (files give the unit in the metric label and omit `mlips:hasUnit` when the vocabulary has none; values are never converted).
+
+## Method derivation
+
+`mlips:derivedFromMethod` (domain and range `mlips:MLIPMethod`, a subproperty of `prov:wasDerivedFrom`; `mlips:MLIPMethod` is a `prov:Plan`) links a method to an earlier method it is built on. An edge is recorded only when the paper that introduced the derived method states it; similarity of names or architectures is not enough. The edges live in the registry (`derived_from`, `derived_from_source`) and nowhere else: `make methods-registry` (`artifacts/scripts/methods_registry.py`) generates `shared/methods.ttl`, one statement per method with its source as a comment, and `make methods-check` fails if that file is stale. Paper files never assert the property, so per-paper round-trips and listings are unchanged. Like the other files under `shared/`, `shared/methods.ttl` is not read by `cq-queries/run-all.sh`; it is read by `make consistency-check` and `make reason-kg`.
+
+Edges confirmed against the introducing paper (issue #4, 2026-10-22):
+
+| method | derived from | stated in |
+|---|---|---|
+| CACE | ACE | cheng2024, Introduction: CACE "has the same mathematical foundation as the ACE framework, so it also adopts the nice properties of ACE" |
+| CACE-SOG | CACE, SOG-Net | ji2026, Abstract and Introduction: "we extend the SOG-Net framework by integrating it with the Cartesian atomic cluster expansion (CACE) descriptor" |
+| sGDML | GDML | chmiela2018, Results: "The sGDML model is built on the previously introduced GDML model" |
+| 4G-HDNNP | HDNNP | ko2021, Introduction and Method: "a fourth generation (4G) HDNNP", with "short-range atomic energies similar to those used in 2G-HDNNPs" |
+| mHDNNP | HDNNP | eckhoff2021spin, Introduction: "employing second-generation HDNNPs [9], extending these potentials by an explicit dependence on the full spin configuration" |
+| MACE-QEq | MACE | vondrak2026, Abstract and Methods: "we extend the short-range MACE model by introducing additional readout heads" |
+| GemNet | DimeNet | gasteiger2021, Sec. 6: "GemNet is a significantly refined architecture based on DimeNet++" |
+
+Candidates not recorded:
+
+- Introducing paper not in the corpus yet (to be confirmed when it is encoded): qSNAP → SNAP (Wood and Thompson 2018), GRACE → ACE (Bochkarev et al. 2024), TACE → ACE (Xu et al. 2025), CACE-LES → CACE (Cheng 2025), 3G-HDNNP → HDNNP (Artrith et al. 2011).
+- Introducing paper in the corpus but the derivation is not stated in it: MACE → ACE (batatia2022 places MACE in the multi-ACE framework of its related work and builds its many-body features with the ACE construction, but does not say that MACE derives from ACE); Allegro → NequIP (musaelian2023allegro compares with NequIP and shares its irreps representation, and says it retains the accuracy of equivariant message-passing networks in general). Both wait for a decision.
+
+Example: every method derived, directly or not, from ACE (the merged graph, or `shared/methods.ttl` alone):
+
+```sparql
+PREFIX mlips: <https://w3id.org/mlips#>
+PREFIX entity: <https://w3id.org/mlips/entity/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?method ?label WHERE {
+  ?method mlips:derivedFromMethod+ entity:ACE .
+  OPTIONAL { ?method rdfs:label ?label }
+}
+ORDER BY ?method
+```
+
+On the merged graph this returns `entity:CACE` and `entity:CACE-SOG`. Because the property is a subproperty of `prov:wasDerivedFrom`, a reasoner (or a query over the RDFS closure) also finds these edges through `prov:wasDerivedFrom`.

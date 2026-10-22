@@ -32,7 +32,12 @@ artifacts/kg/
 ## Workflow per paper
 
 1. Encode the paper's facts into `papers/<paper-id>.ttl`, organised by
-   the 12 questions of the protocol.
+   the 12 questions of the protocol. Name methods and pretrained models
+   from `methods-registry.csv` (`METHODS.md`). If the paper introduces a
+   method, add its registry row with `origin`, and with `derived_from` /
+   `derived_from_source` whenever the paper states the method it builds
+   on (METHODS.md, rule 2); then run `make methods-registry` and
+   `make methods-check`.
 2. Run `./check-roundtrip.sh <paper-id>` to verify the 11 queries
    reproduce every triple in the canonical file. If it fails, fix the
    .ttl or revise a query.

@@ -14,7 +14,14 @@ legacy files against artifacts/kg/methods-registry.csv:
   4. a registry model whose run is re-declared in the file (a "stub")
      uses the registry run IRI, label and method;
   5. every other subject in the entity: namespace ends in -<paper-id>,
-     so paper-local nodes of different files can never merge.
+     so paper-local nodes of different files can never merge;
+  6. no paper file asserts mlips:derivedFromMethod (method derivation is
+     registry-fixed and generated into shared/methods.ttl).
+
+It also checks the registry itself: every key in the derived_from column
+is a registry method, each such row names its derived_from_source, and
+no method derives from itself, directly or not. Checked for all files,
+legacy ones included: rule 6.
 
 Exit status 1 on any violation.
 """
@@ -52,6 +59,40 @@ def load_registry():
 
 def local(iri):
     return str(iri)[len(ENTITY):]
+
+
+def parents(row):
+    return [k for k in row["derived_from"].split("|") if k]
+
+
+def derivation_errors(methods):
+    """Registry-level checks of the derived_from / derived_from_source columns."""
+    errs = []
+    by_key = {m["key"]: m for m in methods.values()}
+    for key, m in sorted(by_key.items()):
+        for p in parents(m):
+            if p not in by_key:
+                errs.append(f"registry: {key} derived_from {p} is not a registry method key")
+            elif p == key:
+                errs.append(f"registry: {key} is derived from itself")
+        if parents(m) and not m["derived_from_source"].strip():
+            errs.append(f"registry: {key} has derived_from but no derived_from_source")
+        if m["derived_from_source"].strip() and not parents(m):
+            errs.append(f"registry: {key} has derived_from_source but no derived_from")
+
+    def reaches(start, goal, seen):
+        for p in parents(by_key[start]):
+            if p == goal:
+                return True
+            if p in by_key and p not in seen:
+                seen.add(p)
+                if reaches(p, goal, seen):
+                    return True
+        return False
+    for key in sorted(by_key):
+        if any(p != key for p in parents(by_key[key])) and reaches(key, key, set()):
+            errs.append(f"registry: {key} is in a derivation cycle")
+    return errs
 
 
 def check(path, methods, models):
@@ -114,9 +155,17 @@ def main():
     paths = sorted(glob.glob(os.path.join(KG, "papers", "*.ttl")))
     only = set(sys.argv[1:])
     bad = checked = 0
+    for e in derivation_errors(methods):
+        bad += 1
+        print(e)
     for path in paths:
         pid = os.path.basename(path)[:-4]
-        if pid in LEGACY or (only and pid not in only):
+        if only and pid not in only:
+            continue
+        if (None, MLIPS.derivedFromMethod, None) in rdflib.Graph().parse(path):
+            bad += 1
+            print(f"{pid}: asserts mlips:derivedFromMethod (registry-fixed; set derived_from in the registry)")
+        if pid in LEGACY:
             continue
         checked += 1
         for e in check(path, methods, models):

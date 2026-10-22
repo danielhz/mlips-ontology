@@ -246,6 +246,19 @@ mlips:defaultValue a owl:DatatypeProperty ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:range rdfs:Literal .
 
+mlips:derivedFromMethod a owl:ObjectProperty ;
+    rdfs:label "derived from method"@en ;
+    rdfs:comment """Links an MLIP method to an earlier MLIP method it was built on
+(e.g., sGDML to GDML, GemNet to DimeNet). A method may derive from several
+methods. Evidence rule: the link is asserted only when the paper that
+introduced the derived method states it (for example "we build on",
+"extends"), not on similarity of names or architectures; the stating paper
+and location are recorded in the method registry (derived_from_source)."""@en ;
+    rdfs:domain mlips:MLIPMethod ;
+    rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
+    rdfs:range mlips:MLIPMethod ;
+    rdfs:subPropertyOf prov:wasDerivedFrom .
+
 mlips:dftBasisSet a owl:ObjectProperty ;
     rdfs:label "DFT basis set"@en ;
     rdfs:comment """The basis set used by an all-electron or
@@ -1075,11 +1088,11 @@ mlips:Implementation a owl:Class ;
 specific library and version."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isImplementationOf ;
-            owl:someValuesFrom mlips:MLIPMethod ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:implementedIn ;
             owl:someValuesFrom mlips:Library ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:isImplementationOf ;
+            owl:someValuesFrom mlips:MLIPMethod ],
         mls:Implementation,
         schema:SoftwareSourceCode ;
     mlips:isKind true ;
@@ -1188,16 +1201,16 @@ mlips:AccuracyMetric a owl:Class ;
 (e.g., RMSE of energy, MAE of forces)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:MetricProperty ;
-            owl:onProperty mlips:metricProperty ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+            owl:onProperty mlips:isMetricOf ;
+            owl:someValuesFrom mlips:BenchmarkResult ],
         [ a owl:Restriction ;
             owl:onClass mlips:MetricType ;
             owl:onProperty mlips:metricType ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:isMetricOf ;
-            owl:someValuesFrom mlips:BenchmarkResult ],
+            owl:onClass mlips:MetricProperty ;
+            owl:onProperty mlips:metricProperty ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         qudt:QuantityValue ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1288,18 +1301,18 @@ mlips:BenchmarkResult a owl:Class ;
 material system with specific hyperparameters, reporting accuracy metrics."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/benchmark> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:isResultOf ;
-            owl:someValuesFrom mlips:BenchmarkStudy ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:targetMaterial ;
             owl:someValuesFrom mlips:MaterialSystem ],
         [ a owl:Restriction ;
-            owl:onProperty mlips:hasAccuracyMetric ;
-            owl:someValuesFrom mlips:AccuracyMetric ],
+            owl:onProperty mlips:isResultOf ;
+            owl:someValuesFrom mlips:BenchmarkStudy ],
         [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:evaluatesModel ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:hasAccuracyMetric ;
+            owl:someValuesFrom mlips:AccuracyMetric ],
         prov:Entity ;
     mlips:metaSort mlips:ReifiedRelation .
 
@@ -1309,17 +1322,17 @@ mlips:TrainingDataset a owl:Class ;
 training, with provenance, size, property coverage, and DFT settings."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/training> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:coversProperty ;
-            owl:someValuesFrom mlips:CoveredProperty ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:datasetProvenance ;
-            owl:someValuesFrom mlips:DatasetProvenance ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:hasConfiguration ;
             owl:someValuesFrom mlips:AtomicConfiguration ],
         [ a owl:Restriction ;
+            owl:onProperty mlips:coversProperty ;
+            owl:someValuesFrom mlips:CoveredProperty ],
+        [ a owl:Restriction ;
             owl:onProperty mlips:coversMaterial ;
             owl:someValuesFrom mlips:MaterialSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:datasetProvenance ;
+            owl:someValuesFrom mlips:DatasetProvenance ],
         mls:Dataset,
         prov:Entity ;
     mlips:isKind true ;
@@ -1330,16 +1343,16 @@ mlips:MLIPRun a owl:Class ;
     rdfs:comment "A concrete fitting activity for an MLIP method: it applies an MLIP method to a training dataset and produces a trained model."@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onClass mlips:TrainingDataset ;
-            owl:onProperty mlips:runsOn ;
-            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
-        [ a owl:Restriction ;
             owl:onClass mlips:MLIPMethod ;
             owl:onProperty mlips:appliesMethod ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         [ a owl:Restriction ;
             owl:onClass mlips:TrainedModel ;
             owl:onProperty mlips:produces ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass mlips:TrainingDataset ;
+            owl:onProperty mlips:runsOn ;
             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
         prov:Activity ;
     mlips:isKind true ;
@@ -1349,23 +1362,26 @@ mlips:MLIPMethod a owl:Class ;
     rdfs:label "MLIP Method"@en ;
     rdfs:comment """A machine learning interatomic potential method family
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
-a loss function, and a training algorithm. Disjoint from mls:Algorithm."""@en ;
+a loss function, and a training algorithm. Disjoint from mls:Algorithm.
+A prov:Plan, so that a method can be derived from another one
+(mlips:derivedFromMethod)."""@en ;
     rdfs:isDefinedBy <https://w3id.org/mlips/module/algorithm> ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:onProperty mlips:supportsSimulation ;
-            owl:someValuesFrom mlips:SimulationType ],
-        [ a owl:Restriction ;
             owl:onProperty mlips:hasHyperparameter ;
             owl:someValuesFrom mlips:Hyperparameter ],
-        [ a owl:Restriction ;
-            owl:onProperty mlips:hasLossFunction ;
-            owl:someValuesFrom mlips:LossFunction ],
         [ a owl:Restriction ;
             owl:onProperty mlips:hasFunctionalForm ;
             owl:someValuesFrom mlips:FunctionalForm ],
         [ a owl:Restriction ;
+            owl:onProperty mlips:supportsSimulation ;
+            owl:someValuesFrom mlips:SimulationType ],
+        [ a owl:Restriction ;
             owl:onProperty mlips:hasTrainingAlgorithm ;
-            owl:someValuesFrom mls:Algorithm ] ;
+            owl:someValuesFrom mls:Algorithm ],
+        [ a owl:Restriction ;
+            owl:onProperty mlips:hasLossFunction ;
+            owl:someValuesFrom mlips:LossFunction ],
+        prov:Plan ;
     owl:disjointWith mls:Algorithm ;
     mlips:isKind true ;
     mlips:metaSort mlips:Sortal .

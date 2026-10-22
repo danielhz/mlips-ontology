@@ -399,14 +399,21 @@ functional form mapping an atomic configuration to an energy, a loss function
 defined over that form, and a training algorithm used to fit its parameters.
 MLIPMethod is disjoint from mls:Algorithm: an MLIP method is a named
 specification of all three components, whereas mls:Algorithm refers to a
-training/learning procedure (e.g., Adam, L-BFGS).</p>
+training/learning procedure (e.g., Adam, L-BFGS).
+An MLIP method is a prov:Plan (a set of steps intended to achieve a goal),
+and hence a prov:Entity, so that a method can be derived from another one
+(mlips:derivedFromMethod, a subproperty of prov:wasDerivedFrom).</p>
+      <p><strong>Subclass of:</strong> <code>prov:Plan</code></p>
       <p><strong>Disjoint with:</strong> <code>mlschema:Algorithm</code></p>
 
       <pre class="owl-xml"><code><![CDATA[<owl:Class rdf:about="https://w3id.org/mlips#MLIPMethod">
   <rdfs:label xml:lang="en">MLIP Method</rdfs:label>
   <rdfs:comment xml:lang="en">A machine learning interatomic potential method family
 (e.g., MACE, ACE, HDNNP, NequIP, M3GNet, MTP). Specifies a functional form,
-a loss function, and a training algorithm. Disjoint from mls:Algorithm.</rdfs:comment>
+a loss function, and a training algorithm. Disjoint from mls:Algorithm.
+A prov:Plan, so that a method can be derived from another one
+(mlips:derivedFromMethod).</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Plan"/>
   <owl:disjointWith rdf:resource="http://www.w3.org/ns/mls#Algorithm"/>
   <rdfs:subClassOf>
     <owl:Restriction>
@@ -614,6 +621,35 @@ message passing (MACE, NequIP), or atomic cluster expansion (ACE).</p>
   <rdfs:comment xml:lang="en">Links an MLIP run to the MLIP method it fits.</rdfs:comment>
   <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPRun"/>
   <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+</owl:ObjectProperty>]]></code></pre>
+    </section>
+
+    <section id="derivedFromMethod" class="term object-property"
+             typeof="owl:ObjectProperty" about="mlips:derivedFromMethod">
+      <h4><span property="rdfs:label">derived from method</span></h4>
+      <p property="rdfs:comment">Links an MLIP method to an earlier MLIP method it was built on
+(e.g., sGDML to GDML, GemNet to DimeNet). A method may derive from several
+methods. Evidence rule: the link is asserted only when the paper that
+introduced the derived method states it (for example "we build on",
+"extends"), not on similarity of names or architectures; the stating paper
+and location are recorded in the method registry (derived_from_source).</p>
+      <dl>
+        <dt>Domain</dt><dd><a href="#MLIPMethod" property="rdfs:domain" resource="mlips:MLIPMethod">MLIPMethod</a></dd>
+        <dt>Range</dt><dd><a href="#MLIPMethod" property="rdfs:range" resource="mlips:MLIPMethod">MLIPMethod</a></dd>
+      </dl>
+      <p><strong>Subproperty of:</strong> <code>prov:wasDerivedFrom</code></p>
+
+      <pre class="owl-xml"><code><![CDATA[<owl:ObjectProperty rdf:about="https://w3id.org/mlips#derivedFromMethod">
+  <rdfs:label xml:lang="en">derived from method</rdfs:label>
+  <rdfs:comment xml:lang="en">Links an MLIP method to an earlier MLIP method it was built on
+(e.g., sGDML to GDML, GemNet to DimeNet). A method may derive from several
+methods. Evidence rule: the link is asserted only when the paper that
+introduced the derived method states it (for example "we build on",
+"extends"), not on similarity of names or architectures; the stating paper
+and location are recorded in the method registry (derived_from_source).</rdfs:comment>
+  <rdfs:domain rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  <rdfs:range rdf:resource="https://w3id.org/mlips#MLIPMethod"/>
+  <rdfs:subPropertyOf rdf:resource="http://www.w3.org/ns/prov#wasDerivedFrom"/>
 </owl:ObjectProperty>]]></code></pre>
     </section>
 
