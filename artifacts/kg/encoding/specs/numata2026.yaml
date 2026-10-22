@@ -1,0 +1,44 @@
+id: numata2026
+source:
+  rank: 682
+  year: "2026"
+  first_author: "Kohei Numata"
+  title: "Quantum machine learning interatomic potential: Application of variational quantum algorithm"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.27841"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2607.27841v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e4aacd948fb18e10d1f0627df89c975cc4c8b180b96bfe2376f177f55d994010"
+study_label: "Numata et al. (2026): quantum machine-learning interatomic potential with a variational quantum circuit inserted into ANI"
+scope: |
+  Encoding scope: TorchANI models pre-trained classically and then
+  transferred with a variational quantum circuit (or, for comparison, a
+  classical layer) inserted between the input and output networks, on the
+  D1 subset (one non-hydrogen atom) of the ANI data; encoded results are
+  the stated mean test RMSEs for nq = 4 and 12 with the RzRy circuit and
+  the classical layer. Cholesterol isomer tests and other circuit settings
+  are figure-only.
+materials:
+  d1: {label: "Small H/C/N/O molecules with one non-hydrogen atom (ANI data subset D1)", class: "small organic molecules"}
+reference:
+  ani: {type: DFT, comment: "Energies from the data distributed with the ANI model library (TorchANI); level of theory not restated."}
+datasets:
+  d1: {label: "ANI data subset D1 (60/20/20 train/validation/test)", materials: [d1], properties: [Energy], provenance: Published, calc: ani}
+methods:
+  ANI:
+    hp: [numFeatures, learningRate, numEpochs]
+    algorithm: "ANI atomic networks split into L_in and L_out with an inserted quantum circuit layer (Ry/Rz rotations, nq qubits) or a classical layer; pre-training with AdamW/SGD then transfer learning of the inserted layer (simulated quantum circuits)"
+    impl: {lib: TorchANI}
+runs:
+  q-nq4: {label: "ANI (l = 1, d = 1) with inserted RzRy quantum circuit, nq = 4, on D1", method: ANI, dataset: d1, settings: {numFeatures: {v: 384, loc: "Sec. 3.2 (AEV length)"}, learningRate: {v: 0.001, loc: "Sec. 3.2"}, numEpochs: {v: 100, loc: "Sec. 3.2 (pre-training)"}}, model: "ANI-QCL nq=4 (D1)"}
+  c-nq4: {label: "ANI (l = 1, d = 1) with inserted classical NN layer, nq = 4, on D1", method: ANI, dataset: d1, settings: {numFeatures: {v: 384, loc: "Sec. 3.2 (AEV length)"}, learningRate: {v: 0.001, loc: "Sec. 3.2"}, numEpochs: {v: 100, loc: "Sec. 3.2 (pre-training)"}}, model: "ANI-CCL nq=4 (D1)"}
+  q-nq12: {label: "ANI (l = 1, d = 1) with inserted RzRy quantum circuit, nq = 12, on D1", method: ANI, dataset: d1, settings: {numFeatures: {v: 384, loc: "Sec. 3.2 (AEV length)"}, learningRate: {v: 0.001, loc: "Sec. 3.2"}, numEpochs: {v: 100, loc: "Sec. 3.2 (pre-training)"}}, model: "ANI-QCL nq=12 (D1)"}
+  c-nq12: {label: "ANI (l = 1, d = 1) with inserted classical NN layer, nq = 12, on D1", method: ANI, dataset: d1, settings: {numFeatures: {v: 384, loc: "Sec. 3.2 (AEV length)"}, learningRate: {v: 0.001, loc: "Sec. 3.2"}, numEpochs: {v: 100, loc: "Sec. 3.2 (pre-training)"}}, model: "ANI-CCL nq=12 (D1)"}
+results:
+  - {key: q-nq4-test, model: q-nq4, material: d1, role: test, eval_data: {label: "D1 test split (mean of five trials)", location: "Sec. 3.4.1"}, metrics: [[RMSE, Energy, 1.48, kcal/mol, "test energy RMSE on ANI D1: ANI with RzRy quantum circuit, nq = 4", "Sec. 3.4.1"]]}
+  - {key: c-nq4-test, model: c-nq4, material: d1, role: test, eval_data: {label: "D1 test split (mean of five trials)", location: "Sec. 3.4.1"}, metrics: [[RMSE, Energy, 1.8, kcal/mol, "test energy RMSE on ANI D1: ANI with classical NN layer, nq = 4", "Sec. 3.4.1"]]}
+  - {key: q-nq12-test, model: q-nq12, material: d1, role: test, eval_data: {label: "D1 test split (mean of five trials)", location: "Sec. 3.4.1"}, metrics: [[RMSE, Energy, 1.27, kcal/mol, "test energy RMSE on ANI D1: ANI with RzRy quantum circuit, nq = 12", "Sec. 3.4.1"]]}
+  - {key: c-nq12-test, model: c-nq12, material: d1, role: test, eval_data: {label: "D1 test split (mean of five trials)", location: "Sec. 3.4.1"}, metrics: [[RMSE, Energy, 1.4, kcal/mol, "test energy RMSE on ANI D1: ANI with classical NN layer, nq = 12", "Sec. 3.4.1"]]}
+gaps:
+  - "Only the RMSEs stated in the text (nq = 4 and 12; l = 1, d = 1) are encoded; other circuit types, depths, layer counts and D2-D4 results are in Fig. 3. Cholesterol isomer energies are property results."

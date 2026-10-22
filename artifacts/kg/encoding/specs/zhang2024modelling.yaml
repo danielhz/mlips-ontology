@@ -1,0 +1,52 @@
+id: zhang2024modelling
+source:
+  rank: 681
+  year: "2024"
+  first_author: "Hanwen Zhang"
+  title: "Modelling chemical processes in explicit solvents with machine learning potentials"
+  venue: "Nature Communications"
+  doi: "10.1038/s41467-024-50418-6"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "570470730e47dec942e5db8598f42cc2f7d26f97b3dd3903227a07c5270eeb5e"
+study_label: "Zhang, Juraskova and Duarte (2024): modelling chemical processes in explicit solvents with ACE potentials and active learning"
+scope: |
+  Encoding scope: the linear ACE potentials (ACE.jl via mlp-train) trained
+  with active learning: water models comparing energy-, similarity- and
+  distance-based selectors (PBE0-D3BJ), and the models for the endo and exo
+  Diels-Alder reaction of cyclopentadiene with methyl vinyl ketone in
+  explicit water, explicit methanol and implicit solvent (wB97M-D3BJ).
+  Errors are stated only as bounds or as unnamed single values, so there
+  are no results.
+materials:
+  water: {label: "Liquid water (27-molecule clusters and 216-molecule periodic boxes)", formula: H2O, class: "molecular liquid"}
+  da-water: {label: "Cyclopentadiene + methyl vinyl ketone Diels-Alder reaction in explicit water", class: "organic reaction in solution"}
+  da-meoh: {label: "Cyclopentadiene + methyl vinyl ketone Diels-Alder reaction in explicit methanol", class: "organic reaction in solution"}
+  da-implicit: {label: "Cyclopentadiene + methyl vinyl ketone Diels-Alder reaction in implicit solvent", class: "organic reaction (implicit solvent)"}
+reference:
+  pbe0: {type: DFT, code: ORCA, xc: {local: PBE0-D3BJ}, basis: "def2-SVP", comment: "ORCA 4.2.1 via autodE; water systems."}
+  wb97m: {type: DFT, code: ORCA, xc: {local: wB97M-D3BJ}, basis: "def2-TZVP", comment: "Diels-Alder systems."}
+sampling:
+  al: {label: "mlp-train active learning (MD up to 5 ps) with energy-, SOAP-similarity- or distance-based selectors"}
+  al-subsets: {label: "Active learning over four subsets: substrate complex, substrate with 2 and with 33 solvent molecules, and pure solvent"}
+datasets:
+  water: {label: "Actively selected water configurations (e.g. 40 or 52 for descriptor-based selectors)", materials: [water], properties: [Energy, Forces], provenance: InHouse, calc: pbe0, sampling: [al]}
+  da-water: {label: "Endo/exo Diels-Alder training data in explicit water (about 600 points for the endo model)", materials: [da-water], properties: [Energy, Forces], provenance: InHouse, calc: wb97m, sampling: [al-subsets]}
+  da-meoh: {label: "Endo/exo Diels-Alder training data in explicit methanol", materials: [da-meoh], properties: [Energy, Forces], provenance: InHouse, calc: wb97m, sampling: [al-subsets]}
+  da-implicit: {label: "Endo/exo Diels-Alder training data in implicit solvent", materials: [da-implicit], properties: [Energy, Forces], provenance: InHouse, calc: wb97m, sampling: [al]}
+methods:
+  ACE:
+    algorithm: "Linear ACE; hyperparameters in SI Sec. S2"
+    impl: {lib: {local: ACE.jl}, comment: "pyjulip in mlp-train"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  ace-water: {label: "ACE water models from the different active-learning selectors", method: ACE, dataset: water, model: "ACE water (mlp-train selectors)"}
+  ace-endo-water: {label: "ACE for the endo Diels-Alder reaction in explicit water", method: ACE, dataset: da-water, model: "ACE DA endo (water)"}
+  ace-exo-water: {label: "ACE for the exo Diels-Alder reaction in explicit water", method: ACE, dataset: da-water, model: "ACE DA exo (water)"}
+  ace-endo-meoh: {label: "ACE for the endo Diels-Alder reaction in explicit methanol", method: ACE, dataset: da-meoh, model: "ACE DA endo (methanol)"}
+  ace-exo-meoh: {label: "ACE for the exo Diels-Alder reaction in explicit methanol", method: ACE, dataset: da-meoh, model: "ACE DA exo (methanol)"}
+  ace-implicit: {label: "ACE models for the endo/exo Diels-Alder reaction in implicit solvent", method: ACE, dataset: da-implicit, model: "ACE DA (implicit solvent)"}
+gaps:
+  - "Water-model errors are stated only as bounds ('MAD errors in energy below 1 kcal/mol and errors in force of less than 2 kcal/mol/A'); the endo-in-water validation reports 'the energy error of 2 meV/atom' without naming the metric. Neither is encoded."
+  - "Free-energy barriers (e.g. 18.8 and 20.3 kcal/mol in water), hydrogen-bond analyses and RDFs are property results."
