@@ -1,0 +1,73 @@
+id: wang2026multifidelit
+source:
+  rank: 627
+  year: "2026"
+  first_author: "Xinwei Wang"
+  title: "Multifidelity Machine Learning Interatomic Potentials for Charged Point Defects"
+  venue: "PRX Energy"
+  doi: "10.1103/tzwd-cl3y"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.05238v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0bdd4482024197a540916754ba72f526d980f55fd649dcb1478d8127ab272b39"
+study_label: "Wang, Mosquera-Lois and Walsh (2026): charge-embedded and multi-fidelity MACE potentials for charged point defects in Sb2Se3"
+scope: |
+  Encoding scope: four foundation MLIPs evaluated as distributed on
+  antimony vacancies (structure RMSDs only); the bespoke MACE model with a
+  global charge embedding trained on HSE06 data for VSe(1) in five charge
+  states (Table S1); the multi-fidelity two-head (PBE/HSE06) MACE model for
+  neutral VSe(1) (Table S5); and the MACE-LES and MACE-POLAR comparison
+  models trained on the same split (only MACE-LES without embedding has
+  errors in the text). QET models have no registry method and are not
+  encoded.
+materials:
+  sb2se3: {label: "Sb2Se3 3x1x1 supercell (59-60 atoms) with Sb and Se vacancies in charge states -3 to +2", formula: Sb2Se3, class: "chalcogenide semiconductor (point defects)"}
+reference:
+  hse06: {type: DFT, code: VASP, xc: HSE06, pp: PAW, cutoff: 350, kpoints: "Gamma point (joint model); 2x2x2 for the multi-fidelity HF data", comment: "D3 dispersion corrections."}
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 350, kpoints: "2x2x2", comment: "D3 dispersion corrections; on the HSE06-relaxed lattice."}
+sampling:
+  snb: {label: "ShakeNBreak/doped bond-distorted (0-60%) initial structures with 0.20 A random displacements; full DFT relaxation trajectories, filtered by shortest bond length"}
+  hf-sub: {label: "About 10% of PBE relaxation frames (always including initial and final) recomputed with HSE06"}
+datasets:
+  vse-hse: {label: "HSE06 relaxation trajectories of VSe(1) in charge states -2 to +2 plus 97 pristine bulk structures (80/20 split; short-bond structures training-only)", materials: [sb2se3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: hse06, sampling: [snb]}
+  vse0-pbe: {label: "Low-fidelity PBE data for neutral VSe(1)", materials: [sb2se3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [snb]}
+  vse0-hse: {label: "High-fidelity HSE06 single points for neutral VSe(1)", materials: [sb2se3], properties: [Energy, Forces], provenance: InHouse, calc: hse06, sampling: [hf-sub]}
+external_models: [MatterSim-v1]
+methods:
+  MACE:
+    hp: [numLayers, numFeatures, cutoffRadius, bodyOrder, learningRate, batchSize, numEpochs]
+    loss: "Huber loss; energy:force:stress weights 1:100:10, then 1000:10:10 after SWA"
+    algorithm: "ScaleShiftMACE with ZBL repulsion, L=3; global charge state as a learnable 64-dimensional embedding added to species embeddings and read out directly; multi-fidelity model uses two output heads (PBE, HSE06)"
+    impl: {lib: MACE, comment: "MACE v0.3.15, float64, AMSGrad"}
+    sims: [GeometryOptimization]
+  GRACE:
+    sims: [GeometryOptimization]
+  M3GNet:
+    sims: [GeometryOptimization]
+  MACE-LES:
+    sims: [GeometryOptimization]
+  MACE-POLAR:
+    sims: [GeometryOptimization]
+runs:
+  mace-mh-1: {label: "MACE-MH-1 as distributed", method: MACE, model: "MACE-MH-1"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed", method: MACE, model: "MACE-MPA-0"}
+  grace-2l-omat: {label: "GRACE-2L-OMAT as distributed", method: GRACE, model: "GRACE-2L-OMAT"}
+  joint: {label: "Bespoke MACE with global charge embedding (VSe(1), five charge states, HSE06)", method: MACE, dataset: vse-hse, settings: {numLayers: {v: 2, loc: "S2.3.2"}, numFeatures: {v: 128, loc: "S2.3.2"}, cutoffRadius: {v: 5.5, loc: "S2.3.2"}, bodyOrder: {v: 3, loc: "S2.3.2 (correlation order)"}, learningRate: {v: 0.005, loc: "S2.3.2"}, batchSize: {v: 4, loc: "S2.3.2"}, numEpochs: {v: 150, loc: "S2.3.2"}}, model: "Charge-embedded MACE VSe(1)"}
+  mf: {label: "Multi-fidelity two-head MACE (PBE and HSE06 heads) for neutral VSe(1)", method: MACE, dataset: vse0-hse, settings: {numLayers: {v: 2, loc: "S2.3.2"}, numFeatures: {v: 128, loc: "S2.3.2"}, cutoffRadius: {v: 5.5, loc: "S2.3.2"}, bodyOrder: {v: 3, loc: "S2.3.2 (correlation order)"}, learningRate: {v: 0.005, loc: "S2.3.2"}, batchSize: {v: 2, loc: "S2.3.2"}, numEpochs: {v: 120, loc: "S2.3.2"}}, model: "Multi-fidelity MACE VSe(1) q=0"}
+  les-noemb: {label: "MACE-LES without global charge embedding, same data and settings as the joint model", method: MACE-LES, dataset: vse-hse, model: "MACE-LES (no charge embedding) VSe(1)"}
+  les-emb: {label: "MACE-LES with global charge embedding", method: MACE-LES, dataset: vse-hse, model: "MACE-LES (charge embedding) VSe(1)"}
+  polar-noemb: {label: "MACE-POLAR without global charge embedding", method: MACE-POLAR, dataset: vse-hse, model: "MACE-POLAR (no charge embedding) VSe(1)"}
+  polar-emb: {label: "MACE-POLAR with global charge embedding", method: MACE-POLAR, dataset: vse-hse, model: "MACE-POLAR (charge embedding) VSe(1)"}
+results:
+  - {key: joint-train, model: joint, material: sb2se3, role: training, eval_data: {label: "Training split, average over five charge states (2287 structures)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.59, meV/atom, "train energy RMSE on sb2se3 (VSe(1), average over charge states): charge-embedded MACE", "Table S1"], [RMSE, Force, 55.46, meV/A, "train force RMSE on sb2se3 (VSe(1), average over charge states): charge-embedded MACE", "Table S1"]]}
+  - {key: joint-test, model: joint, material: sb2se3, role: test, eval_data: {label: "Test split, average over five charge states (569 structures)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.48, meV/atom, "test energy RMSE on sb2se3 (VSe(1), average over charge states): charge-embedded MACE", "Table S1"], [RMSE, Force, 20.15, meV/A, "test force RMSE on sb2se3 (VSe(1), average over charge states): charge-embedded MACE", "Table S1"]]}
+  - {key: mf-train-pbe, model: mf, material: sb2se3, role: training, eval_data: {label: "Training split, PBE head (452 structures)", location: "Table S5"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "train energy RMSE on sb2se3 (PBE head): multi-fidelity MACE", "Table S5"], [RMSE, Force, 15.2, meV/A, "train force RMSE on sb2se3 (PBE head): multi-fidelity MACE", "Table S5"]]}
+  - {key: mf-train-hse, model: mf, material: sb2se3, role: training, eval_data: {label: "Training split, HSE06 head (34 structures)", location: "Table S5"}, metrics: [[RMSE, Energy, 1.4, meV/atom, "train energy RMSE on sb2se3 (HSE06 head): multi-fidelity MACE", "Table S5"], [RMSE, Force, 42.7, meV/A, "train force RMSE on sb2se3 (HSE06 head): multi-fidelity MACE", "Table S5"]]}
+  - {key: mf-test-pbe, model: mf, material: sb2se3, role: test, eval_data: {label: "Test split, PBE head (113 structures)", location: "Table S5"}, metrics: [[RMSE, Energy, 0.6, meV/atom, "test energy RMSE on sb2se3 (PBE head): multi-fidelity MACE", "Table S5"], [RMSE, Force, 18.0, meV/A, "test force RMSE on sb2se3 (PBE head): multi-fidelity MACE", "Table S5"]]}
+  - {key: mf-test-hse, model: mf, material: sb2se3, role: test, eval_data: {label: "Test split, HSE06 head (9 structures)", location: "Table S5"}, metrics: [[RMSE, Energy, 1.0, meV/atom, "test energy RMSE on sb2se3 (HSE06 head): multi-fidelity MACE", "Table S5"], [RMSE, Force, 30.3, meV/A, "test force RMSE on sb2se3 (HSE06 head): multi-fidelity MACE", "Table S5"]]}
+  - {key: les-noemb-test, model: les-noemb, material: sb2se3, role: test, eval_data: {label: "Test split of the VSe(1) data (post-SWA checkpoint)", location: "S5.2.1"}, metrics: [[RMSE, Energy, 20.1, meV/atom, "test energy RMSE on sb2se3: MACE-LES without charge embedding (post-SWA)", "S5.2.1"], [RMSE, Force, 1153, meV/A, "test force RMSE on sb2se3: MACE-LES without charge embedding (post-SWA)", "S5.2.1"]]}
+gaps:
+  - "Per-charge-state RMSEs of the charge-embedded model (Table S1) are summarised by the stated averages; the training/test structure counts are summed from Table S1."
+  - "The pre-SWA MACE-LES (no embedding) checkpoint (energy RMSE 94.6 meV/atom, force 25.6 meV/A) is a different checkpoint of the same run and is not encoded separately; the other MACE-LES/MACE-POLAR errors are only in Fig. S10. QET models (from scratch and fine-tuned from QET-PES-MatQ) have no registry method."
+  - "Foundation models are compared only by structure RMSDs and PES shapes; MatterSim v1 5M is linked to the registry model MatterSim-v1. The multi-fidelity run lists only its HSE06 data set; it also trains on the PBE set (vse0-pbe)."
+  - "Defect formation energies and transition levels (Tables S2-S4) are property comparisons; DFT cost estimates are approximate."

@@ -1,0 +1,51 @@
+id: wu2026large
+source:
+  rank: 625
+  year: "2026"
+  first_author: "Yong-Chao Wu"
+  title: "Machine-learned interatomic potential for large-scale simulations of the CrCoNi medium-entropy alloys"
+  venue: "Communications Materials"
+  doi: "10.1038/s43246-026-01245-3"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.25616v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "737ac0cf7e2bd7c862b1a46081183ba772bf79f24803ceae49584fdd63f57b4d"
+study_label: "Wu, Mäkinen, Alava and Esfandiarpour (2026): NEP for large-scale simulations of CrCoNi medium-entropy alloys"
+scope: |
+  Encoding scope: the NEP model for the Cr-Co-Ni system trained with
+  active learning, and the published CrCoNi MTP of Cao et al. (Ref. 24)
+  re-evaluated as distributed, with the energy, force and stress RMSEs of
+  Table I on the NEP training set, the MTP data set and an independent
+  84-structure validation set. EAM and MEAM potentials are classical and
+  not encoded.
+materials:
+  crconi: {label: "Cr-Co-Ni system: FCC Ni, BCC Cr, HCP Co, binary and ternary (equiatomic and non-equiatomic) CrCoNi alloys", class: "medium-entropy alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 450, kpoints: "Monkhorst-Pack, minimum spacing 0.25 1/A", comment: "VASP 6.4.2, potpaw.PBE.64; collinear spin-polarised (initial 3 muB); 0.1 eV Methfessel-Paxton smearing."}
+sampling:
+  init: {label: "Existing MTP data (Cao et al. TS-0, TS-3, TS-f; CrCoNi subset of a CrCoFeNi set) plus FCC/BCC composition grid with random displacements, reduced by SOAP-PCA farthest-point sampling to 2000 structures"}
+  al: {label: "Active learning with NEP MD: elemental systems at 1-3000 K, point defects, stacking faults, compression and tension"}
+  val-md: {label: "2 ns NPT MD at 5-3000 K from seven initial structures, 12 frames each"}
+datasets:
+  nep: {label: "Final NEP training set (3030 structures)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: Augmented, n: {v: 3030, loc: "Sec. II A; Methods 2"}, calc: pbe, sampling: [init, al]}
+  val: {label: "Independent validation set (84 structures)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 84, loc: "Methods 2"}, calc: pbe, sampling: [val-md]}
+methods:
+  NEP:
+    algorithm: "Trained for about 400,000 generations"
+    sims: [MolecularDynamics, MonteCarlo, GeometryOptimization]
+  MTP:
+    sims: [MolecularDynamics]
+runs:
+  nep: {label: "NEP model for CrCoNi alloys", method: NEP, dataset: nep, model: "NEP CrCoNi (Wu et al. 2026)", trainingHardware: "8 Tesla V100 GPUs, 57 h"}
+  mtp-cao: {label: "CrCoNi MTP of Cao et al. (Ref. 24) as distributed", method: MTP, model: "MTP CrCoNi (Cao et al.)"}
+results:
+  - {key: nep-nepset, model: nep, material: crconi, role: training, eval_data: {label: "NEP training set (3030 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 2.45, meV/atom, "energy RMSE on NEP training set (3030 structures): NEP", "Table I"], [RMSE, Force, 106.1, meV/A, "force RMSE on NEP training set (3030 structures): NEP", "Table I"], [RMSE, Stress, 0.39, GPa, "stress RMSE on NEP training set (3030 structures): NEP", "Table I"]]}
+  - {key: nep-mtpset, model: nep, material: crconi, role: null, eval_data: {label: "MTP data set of Ref. 24 (5798 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 10.65, meV/atom, "energy RMSE on MTP data set of Ref. 24 (5798 structures): NEP", "Table I"], [RMSE, Force, 144.04, meV/A, "force RMSE on MTP data set of Ref. 24 (5798 structures): NEP", "Table I"], [RMSE, Stress, 0.64, GPa, "stress RMSE on MTP data set of Ref. 24 (5798 structures): NEP", "Table I"]]}
+  - {key: nep-valset, model: nep, material: crconi, role: validation, eval_data: {label: "Independent validation set (84 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.1, meV/atom, "energy RMSE on Independent validation set (84 structures): NEP", "Table I"], [RMSE, Force, 121.41, meV/A, "force RMSE on Independent validation set (84 structures): NEP", "Table I"], [RMSE, Stress, 0.42, GPa, "stress RMSE on Independent validation set (84 structures): NEP", "Table I"]]}
+  - {key: mtp-cao-nepset, model: mtp-cao, material: crconi, role: external, eval_data: {label: "NEP training set (3030 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 775.41, meV/atom, "energy RMSE on NEP training set (3030 structures): MTP (Cao et al.)", "Table I"], [RMSE, Force, 153.76, meV/A, "force RMSE on NEP training set (3030 structures): MTP (Cao et al.)", "Table I"], [RMSE, Stress, 5.74, GPa, "stress RMSE on NEP training set (3030 structures): MTP (Cao et al.)", "Table I"]]}
+  - {key: mtp-cao-mtpset, model: mtp-cao, material: crconi, role: null, eval_data: {label: "MTP data set of Ref. 24 (5798 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 547.57, meV/atom, "energy RMSE on MTP data set of Ref. 24 (5798 structures): MTP (Cao et al.)", "Table I"], [RMSE, Force, 144.77, meV/A, "force RMSE on MTP data set of Ref. 24 (5798 structures): MTP (Cao et al.)", "Table I"], [RMSE, Stress, 2.39, GPa, "stress RMSE on MTP data set of Ref. 24 (5798 structures): MTP (Cao et al.)", "Table I"]]}
+  - {key: mtp-cao-valset, model: mtp-cao, material: crconi, role: external, eval_data: {label: "Independent validation set (84 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 866.23, meV/atom, "energy RMSE on Independent validation set (84 structures): MTP (Cao et al.)", "Table I"], [RMSE, Force, 192.41, meV/A, "force RMSE on Independent validation set (84 structures): MTP (Cao et al.)", "Table I"], [RMSE, Stress, 0.72, GPa, "stress RMSE on Independent validation set (84 structures): MTP (Cao et al.)", "Table I"]]}
+gaps:
+  - "The NEP's errors on the MTP data set have role null because the NEP training set includes part of it (TS-0, TS-3, TS-f); the MTP's errors on its own data set also have role null, since the paper does not state which of TS-0..TS-5 and TS-f were used to train it."
+  - "EAM1, EAM2 and MEAM errors (Table I) are classical potentials and not encoded. Simulation speed is shown only in Fig. 9 (relative throughput), so no timing is encoded. NEP hyperparameters are not stated in the text read."
+  - "Crystal, short-range-order, stacking-fault, melting and tensile properties (Table II, Figs. 2-8) are property comparisons."
