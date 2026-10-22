@@ -1,0 +1,48 @@
+id: allen2022
+source:
+  rank: 696
+  year: "2022"
+  first_author: "Connor Allen"
+  title: "Optimal data generation for machine learned interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ac9ae7"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2207.11828v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8ddb54e2d7310097e01bf5a9f789db6a608b022d59869e4bf5440bd45e550213"
+study_label: "Allen and Bartók (2022): optimal data generation for MLIPs with nondiagonal supercells"
+scope: |
+  Encoding scope: GAP models for hcp Mg, fcc Al, diamond Si and bcc W
+  trained on configurations built from nondiagonal supercells (NDSCs)
+  commensurate with a 4x4x4 phonon grid, with random displacements and
+  strains, plus an Al model extended along the Bain path. Model quality is
+  reported as phonon-frequency RMSEs (THz) and elastic constants, which are
+  property errors, so there are no results.
+materials:
+  mg: {label: "hcp Mg", formula: Mg, class: "hcp metal"}
+  al: {label: "fcc Al (plus bcc and Bain-path structures for the extended model)", formula: Al, class: "fcc metal"}
+  si: {label: "Diamond Si", formula: Si, class: "covalent semiconductor"}
+  w: {label: "bcc W", formula: W, class: "bcc metal"}
+reference:
+  castep: {type: DFT, code: {local: CASTEP}, pp: Ultrasoft, comment: "GGA functional; on-the-fly ultrasoft pseudopotentials; cutoffs 520/800/400/600 eV and k-spacings 0.012/0.010/0.030/0.015 1/A for Mg/Al/Si/W (Table I)."}
+sampling:
+  ndsc: {label: "Nondiagonal supercells commensurate with a 4x4x4 vibrational Brillouin-zone grid, with random displacements and small random strains"}
+datasets:
+  mg: {label: "Mg NDSC training configurations", materials: [mg], properties: [Energy, Forces, Virials], provenance: InHouse, calc: castep, sampling: [ndsc]}
+  al: {label: "Al NDSC training configurations", materials: [al], properties: [Energy, Forces, Virials], provenance: InHouse, calc: castep, sampling: [ndsc]}
+  si: {label: "Si NDSC training configurations", materials: [si], properties: [Energy, Forces, Virials], provenance: InHouse, calc: castep, sampling: [ndsc]}
+  w: {label: "W NDSC training configurations", materials: [w], properties: [Energy, Forces, Virials], provenance: InHouse, calc: castep, sampling: [ndsc]}
+  al-bain: {label: "Al NDSC data plus bcc and Bain-path configurations (3751 atomic environments, 1455 energies)", materials: [al], properties: [Energy, Forces, Virials], provenance: InHouse, calc: castep, sampling: [ndsc]}
+methods:
+  GAP:
+    hp: [numSparseConfigs]
+    algorithm: "SOAP kernel (zeta = 4, delta = 2 eV), 1400 CUR-selected sparse points, adaptive regularisation; further hyperparameters in Table II"
+    sims: [PhononCalculation]
+runs:
+  gap-mg: {label: "GAP for Mg trained on NDSC data", method: GAP, dataset: mg, settings: {numSparseConfigs: {v: 1400, loc: "Sec. III C"}}, model: "GAP Mg (NDSC)"}
+  gap-al: {label: "GAP for Al trained on NDSC data", method: GAP, dataset: al, settings: {numSparseConfigs: {v: 1400, loc: "Sec. III C"}}, model: "GAP Al (NDSC)"}
+  gap-si: {label: "GAP for Si trained on NDSC data", method: GAP, dataset: si, settings: {numSparseConfigs: {v: 1400, loc: "Sec. III C"}}, model: "GAP Si (NDSC)"}
+  gap-w: {label: "GAP for W trained on NDSC data", method: GAP, dataset: w, settings: {numSparseConfigs: {v: 1400, loc: "Sec. III C"}}, model: "GAP W (NDSC)"}
+  gap-al-bain: {label: "GAP for Al extended along the Bain path", method: GAP, dataset: al-bain, settings: {numSparseConfigs: {v: 1400, loc: "Sec. III C"}}, model: "GAP Al (NDSC + Bain path)"}
+gaps:
+  - "Model quality is given as RMSEs of phonon frequencies (THz) and elastic constants (Table III), which are property errors. Minimal-data Al models (74 and 65 environments) are not encoded as runs. The fitting code is not named beyond 'the GAP framework'."

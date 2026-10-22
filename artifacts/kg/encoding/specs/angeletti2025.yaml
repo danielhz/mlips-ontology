@@ -1,0 +1,50 @@
+id: angeletti2025
+source:
+  rank: 697
+  year: "2025"
+  first_author: "Andrea Angeletti"
+  title: "Hydrogen diffusion in magnesium using machine learning potentials: a comparative study"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01555-z"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2407.21088v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "894e6f8732cc3c8c7eeb0649825e1b73298b61cf2a827219eb49b3ba1762b8e5"
+study_label: "Angeletti et al. (2025): hydrogen diffusion in magnesium with machine-learning potentials, a comparative study"
+scope: |
+  Encoding scope: the VASP on-the-fly MLFF for H in hcp Mg, the
+  pre-trained MACE and CHGNet universal potentials (MPtrj) as distributed,
+  their fine-tunes on the VASP on-the-fly data, and a MACE trained from
+  scratch on the same data. Energy and force RMSEs on the 1200-structure
+  test set are shown only in Fig. 3 (the text gives bounds), so there are
+  no results. Diffusion coefficients and NEB barriers are property
+  results.
+materials:
+  mgh: {label: "hcp Mg with interstitial H (MgH0.0625; 128 Mg + 8 H, also 4-10 H)", class: "metal hydride (dilute H in Mg)"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "4x4x4", comment: "VASP 6.4.2/6.4.3; non-spin-polarised; Gaussian smearing 0.05 eV; Materials Project-compatible settings."}
+sampling:
+  otf: {label: "VASP on-the-fly MLFF-MD heating 0-700 K over 0.2 ns plus 100 ps NpT at 300, 480 and 673 K (Bayesian threshold 5 meV/A)"}
+datasets:
+  mgh: {label: "On-the-fly ab initio configurations (over 3,700)", materials: [mgh], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [otf]}
+methods:
+  VASP-MLFF:
+    algorithm: "VASP on-the-fly MLFF with default parameters"
+    impl: {lib: VASP}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  MACE:
+    impl: {lib: MACE, comment: "developer-suggested training and fine-tuning settings; LAMMPS for MD"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  CHGNet:
+    impl: {lib: CHGNet, comment: "ASE for MD"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  vasp-mlff: {label: "VASP on-the-fly MLFF for H in Mg", method: VASP-MLFF, dataset: mgh, model: "VASP-MLFF MgH0.0625"}
+  mace-mp: {label: "MACE pre-trained on MPtrj as distributed (release not stated)", method: MACE, model: "MACE-MP-0"}
+  chgnet-mp: {label: "CHGNet pre-trained on MPtrj as distributed (version not stated)", method: CHGNet, model: "CHGNet pretrained"}
+  mace-ft: {label: "MACE_FT: MACE fine-tuned on the VASP on-the-fly data", method: MACE, dataset: mgh, model: "MACE_FT (Mg-H)", base_model: {run: mace-mp, relation: fine-tuned, location: "Sec. 2.2"}}
+  chgnet-ft: {label: "CHGNet_FT: CHGNet fine-tuned on the VASP on-the-fly data", method: CHGNet, dataset: mgh, model: "CHGNet_FT (Mg-H)", base_model: {run: chgnet-mp, relation: fine-tuned, location: "Sec. 2.2"}}
+  mace-scratch: {label: "MACE trained from scratch on the VASP on-the-fly data", method: MACE, dataset: mgh, model: "MACE scratch (Mg-H)"}
+gaps:
+  - "Test RMSEs on 1200 configurations sampled from MACE_FT NVE runs are shown only in Fig. 3; the text gives bounds for VASP-MLFF ('below 0.3 meV/atom' energy, 'below 10 meV/A' force). R2 values are in SI Fig. SF2."
+  - "Diffusion coefficients, activation energies and NEB barriers are property results."

@@ -1,0 +1,56 @@
+id: robredomagro2025
+source:
+  rank: 694
+  year: "2025"
+  first_author: "Iñigo Robredo-Magro"
+  title: "Minimalist machine-learned interatomic potentials can predict complex structural behaviors accurately"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2511.17449"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2511.17449v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a5f21c128ad7c48473a59ca11f2b0b4381f427809d6ae9d5803a95daac1c5993"
+study_label: "Robredo-Magro, Mukherjee, Aramberri and Íñiguez-González (2025): minimalist MLIPs predict complex structural behaviour of ferroelectrics"
+scope: |
+  Encoding scope: for BaTiO3, BiFeO3, PbZrO3 and HfO2, the kernel models
+  trained with VASP's Bayesian on-the-fly framework ('VASP MLIPs') on
+  small supercells, and Allegro models trained on the same data sets.
+  Training errors are stated only as bounds and extrapolation tests are
+  property comparisons, so there are no results.
+materials:
+  batio3: {label: "BaTiO3 (40-atom perovskite cells)", formula: BaTiO3, class: "ferroelectric perovskite"}
+  bifeo3: {label: "BiFeO3 (40-atom cells)", formula: BiFeO3, class: "multiferroic perovskite"}
+  pbzro3: {label: "PbZrO3 (40-atom cells)", formula: PbZrO3, class: "antiferroelectric perovskite"}
+  hfo2: {label: "HfO2 (24-atom supercells)", formula: HfO2, class: "ferroelectric fluorite oxide"}
+reference:
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, pp: PAW, cutoff: 500, kpoints: "Gamma-centred 3x3x3 (BaTiO3, PbZrO3, HfO2) or 2x2x2 (BiFeO3)", comment: "Hubbard U = 4 eV on Fe for BiFeO3."}
+sampling:
+  otf: {label: "VASP Bayesian on-the-fly MD of small periodic supercells starting from known phases"}
+datasets:
+  batio3: {label: "BaTiO3 on-the-fly training set", materials: [batio3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbesol, sampling: [otf]}
+  bifeo3: {label: "BiFeO3 on-the-fly training set", materials: [bifeo3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbesol, sampling: [otf]}
+  pbzro3: {label: "PbZrO3 on-the-fly training set", materials: [pbzro3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbesol, sampling: [otf]}
+  hfo2: {label: "HfO2 on-the-fly training set", materials: [hfo2], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbesol, sampling: [otf]}
+methods:
+  VASP-MLFF:
+    hp: [cutoffRadius]
+    algorithm: "Kernel ridge regression on SOAP-type descriptors with Bayesian error estimates (radial cutoff 8 A, angular cutoff 5 A); default hyperparameters"
+    impl: {lib: VASP}
+    sims: [MolecularDynamics, PhononCalculation, NudgedElasticBand]
+  Allegro:
+    hp: [cutoffRadius]
+    algorithm: "Modest hyperparameters following the Allegro example (2 tensor layers)"
+    impl: {lib: Allegro}
+    sims: [MolecularDynamics, PhononCalculation, NudgedElasticBand]
+runs:
+  vasp-batio3: {label: "VASP on-the-fly MLIP for BaTiO3", method: VASP-MLFF, dataset: batio3, settings: {cutoffRadius: {v: 8, loc: "Sec. II A (radial descriptor)"}}, model: "VASP MLIP BaTiO3"}
+  allegro-batio3: {label: "Allegro for BaTiO3 trained on the VASP on-the-fly data", method: Allegro, dataset: batio3, settings: {cutoffRadius: {v: 8, loc: "Sec. II B"}}, model: "Allegro BaTiO3"}
+  vasp-bifeo3: {label: "VASP on-the-fly MLIP for BiFeO3", method: VASP-MLFF, dataset: bifeo3, settings: {cutoffRadius: {v: 8, loc: "Sec. II A (radial descriptor)"}}, model: "VASP MLIP BiFeO3"}
+  allegro-bifeo3: {label: "Allegro for BiFeO3 trained on the VASP on-the-fly data", method: Allegro, dataset: bifeo3, settings: {cutoffRadius: {v: 8, loc: "Sec. II B"}}, model: "Allegro BiFeO3"}
+  vasp-pbzro3: {label: "VASP on-the-fly MLIP for PbZrO3", method: VASP-MLFF, dataset: pbzro3, settings: {cutoffRadius: {v: 8, loc: "Sec. II A (radial descriptor)"}}, model: "VASP MLIP PbZrO3"}
+  allegro-pbzro3: {label: "Allegro for PbZrO3 trained on the VASP on-the-fly data", method: Allegro, dataset: pbzro3, settings: {cutoffRadius: {v: 8, loc: "Sec. II B"}}, model: "Allegro PbZrO3"}
+  vasp-hfo2: {label: "VASP on-the-fly MLIP for HfO2", method: VASP-MLFF, dataset: hfo2, settings: {cutoffRadius: {v: 8, loc: "Sec. II A (radial descriptor)"}}, model: "VASP MLIP HfO2"}
+  allegro-hfo2: {label: "Allegro for HfO2 trained on the VASP on-the-fly data", method: Allegro, dataset: hfo2, settings: {cutoffRadius: {v: 8, loc: "Sec. II B"}}, model: "Allegro HfO2"}
+gaps:
+  - "Training errors are stated only as bounds ('most of the predictions fall within +/-5 meV per f.u. for energy, +/-50 meV/A for force components and +/-3 kBar for stress'); phonons of reference phases, vortex textures, polymorph energies (Tables I-II) and switching barriers are property comparisons."
+  - "The paper calls the VASP models 'kernel-based GAPs implemented in VASP' trained with the Bayesian on-the-fly framework; they are mapped to the registry method VASP-MLFF."
