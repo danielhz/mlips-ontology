@@ -1,0 +1,67 @@
+id: moon2025unveiling
+source:
+  rank: 472
+  year: "2025"
+  first_author: "Minseok Moon"
+  title: "Unveiling Defect Motifs in Amorphous GeSe Using Machine Learning Interatomic Potentials"
+  venue: "ACS Applied Materials & Interfaces"
+  doi: "10.1021/acsami.5c12334"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2506.15934v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "78be3efdc43a9cf743e9202a7e31fbb82b9e26f5bbae88e2046b8190ca1fafe2"
+study_label: "Moon et al. (2025): defect motifs in amorphous GeSe and the role of correlation order and receptive field in BPNN, MTP and SevenNet potentials"
+scope: |
+  Encoding scope: BPNN (SIMPLE-NN), MTP (MLIP package, levels 26 and
+  20) and SevenNet models (NequIP-type, and MACE-type with self-tensor
+  products at varying correlation order, depth and cutoff) trained on one
+  GeSe dataset (crystal, liquid, quench, amorphous, melt, unary and
+  interface MD; VASP PBE); the large-cell error check of the selected
+  SevenNet model. Cubicity, ring statistics, DOS/IPR, sensitivity and
+  defect analyses are properties.
+hyperparameters:
+  nu: {label: "Maximum correlation order nu (number of self-tensor products)", name: "nu", datatype: integer}
+materials:
+  gese: {label: "Amorphous, liquid and crystalline GeSe with unary Ge and Se and Ge/Se interfaces", formula: GeSe, class: "Amorphous chalcogenide"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 300, comment: "Labels recomputed at 300 eV with the Baldereschi point; AIMD at 200 eV, Gamma point"}
+sampling:
+  md: {label: "AIMD of strained crystals (3 phases, 700 K), liquid, melt-quench, amorphous, crystal melting, unary Ge/Se liquids and interfaces (Table 1)"}
+datasets:
+  gese: {label: "GeSe training set of Table 1 (crystal, liquid, quench, amorphous, melt, unary and interface MD)", materials: [gese], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [md]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers]
+    loss: "MSE of energy per atom, forces and stresses, L2 regularization 1e-8"
+    impl: {lib: {local: SIMPLE-NN}, comment: "92-30-30-1 network, 20 radial and 72 angular symmetry functions, PCA-whitened"}
+    sims: [MolecularDynamics]
+  MTP:
+    hp: [cutoffRadius, momentLevel, numRadialBasis]
+    loss: "MSE of energies, forces and stresses"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics]
+  NequIP:
+    hp: [cutoffRadius, numLayers, numFeatures, numRadialBasis]
+    impl: {lib: {local: SevenNet}, comment: "lmax up to 3, radial network 64-64"}
+    sims: [MolecularDynamics, GeometryOptimization]
+  MACE:
+    hp: [cutoffRadius, numLayers, nu]
+    impl: {lib: {local: SevenNet}, comment: "MACE-type self-tensor products in SevenNet; lmax 2 (node) and 3 (edge)"}
+    sims: [MolecularDynamics]
+runs:
+  bpnn: {label: "BPNN for GeSe", method: HDNNP, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 2.2"}, numLayers: {v: 2, loc: "Sec. 2.2"}}, model: "BPNN GeSe"}
+  mtp: {label: "MTP (level 26) for GeSe", method: MTP, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 2.2"}, momentLevel: {v: 26, loc: "Sec. 2.2"}, numRadialBasis: {v: 8, loc: "Sec. 2.2"}}, model: "MTP GeSe"}
+  mtp-low: {label: "MTP-low (level 20, three-body) for GeSe", method: MTP, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 3.1.1"}, momentLevel: {v: 20, loc: "Sec. 3.1.2"}}, model: "MTP-low GeSe"}
+  sevennet: {label: "SevenNet (four layers, 4 A cutoff; c4i4) for GeSe", method: NequIP, dataset: gese, settings: {cutoffRadius: {v: 4, loc: "Sec. 2.2"}, numLayers: {v: 4, loc: "Sec. 3.1.1"}, numFeatures: {v: 32, loc: "Sec. 2.2"}, numRadialBasis: {v: 8, loc: "Sec. 2.2"}}, model: "SevenNet GeSe c4i4"}
+  nu2: {label: "Single-layer MACE-type SevenNet, 8 A, nu = 2", method: MACE, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 3.1.2"}, numLayers: {v: 1, loc: "Sec. 3.1.2"}, nu: {v: 2, loc: "Sec. 3.1.2"}}, model: "SevenNet GeSe nu=2"}
+  nu3: {label: "Single-layer MACE-type SevenNet, 8 A, nu = 3", method: MACE, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 3.1.2"}, numLayers: {v: 1, loc: "Sec. 3.1.2"}, nu: {v: 3, loc: "Sec. 3.1.2"}}, model: "SevenNet GeSe nu=3"}
+  nu4: {label: "Single-layer MACE-type SevenNet, 8 A, nu = 4", method: MACE, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 3.1.2"}, numLayers: {v: 1, loc: "Sec. 3.1.2"}, nu: {v: 4, loc: "Sec. 3.1.2"}}, model: "SevenNet GeSe nu=4"}
+  c8i2: {label: "Two-layer MACE-type SevenNet, 8 A per layer, nu = 2 (c8i2)", method: MACE, dataset: gese, settings: {cutoffRadius: {v: 8, loc: "Sec. 3.1.3"}, numLayers: {v: 2, loc: "Sec. 3.1.3"}, nu: {v: 2, loc: "Sec. 3.1.3"}}, model: "SevenNet GeSe c8i2"}
+  c16i1: {label: "Single-layer MACE-type SevenNet, 16 A, nu = 3 (c16i1)", method: MACE, dataset: gese, settings: {cutoffRadius: {v: 16, loc: "Sec. 3.1.3"}, numLayers: {v: 1, loc: "Sec. 3.1.3"}, nu: {v: 3, loc: "Sec. 3.1.3"}}, model: "SevenNet GeSe c16i1"}
+results:
+  - {key: sevennet-960, model: sevennet, material: gese, role: test, eval_data: {label: "Snapshots from SevenNet melt-quench trajectories of 960-atom a-GeSe cells, recomputed with DFT", location: "Sec. 3.2"}, metrics: [[RMSE, Energy, 5.8, meV/atom, "energy RMSE on 960-atom a-GeSe snapshots: SevenNet c4i4", "Sec. 3.2"], [RMSE, Force, 0.1, eV/A, "force RMSE on 960-atom a-GeSe snapshots: SevenNet c4i4", "Sec. 3.2"]]}
+resources: |
+  MTP training with a 16 A cutoff is estimated at about 40 days on one Intel Xeon 6226R CPU (Sec. 3.1.3); no such model was trained.
+gaps:
+  - "Per-model training and test RMSEs are in SI Table S1, not in the text read; the main text gives only ranges over models (test energy 4.4-9.7 meV/atom, force 0.16-0.28 eV/A, SevenNet lowest) and a BPNN energy offset of about 20 meV/atom."
+  - "The sevennet run is taken as the c4i4 model of Sec. 3.1.3, since both are four-layer, 4 A SevenNet models with a 16 A receptive field; the paper does not say whether they are the same training. Six-layer variants (Fig. S7) are not encoded."

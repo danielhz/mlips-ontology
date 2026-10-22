@@ -1,0 +1,51 @@
+id: wang2024
+source:
+  rank: 467
+  year: "2024"
+  first_author: "Yangshuai Wang"
+  title: "A theoretical case study of the generalization of machine-learned potentials"
+  venue: "Computer Methods in Applied Mechanics and Engineering"
+  doi: "10.1016/j.cma.2024.116831"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2311.01664v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a7e2637ce33100be8024d3b7e334e3b2cc15e42aaee4334acecb99ec76b26175"
+study_label: "Wang, Patel and Ortner (2024): a theoretical case study of MLIP generalization from small training domains to dislocation simulations, with linear ACE tests on W, Si and NiAl"
+scope: |
+  Encoding scope: the numerical tests of the generalization analysis.
+  Linear ACE models (ACEpotentials.jl, ARD) are fitted to randomly
+  perturbed relaxed configurations of dislocation training domains,
+  labelled by empirical reference potentials (EAM for W and NiAl, an
+  optimized bond-order potential for Si), with energy, force and
+  virial-stress terms. Geometry and energy errors versus test RMSE and
+  training-domain size are figure-only; the theory itself is not encoded.
+materials:
+  w: {label: "Tungsten with quadrupole screw dislocations and a dislocation loop", formula: W, class: "Metals"}
+  si: {label: "Diamond silicon with quadrupole edge dislocations", formula: Si, class: "Elemental semiconductor"}
+  nial: {label: "B2 NiAl with quadrupole screw dislocations", formula: NiAl, class: "Metals"}
+reference:
+  eamw: {type: REF, comment: "Embedded-atom model for W (Ref. 10)"}
+  bopsi: {type: REF, comment: "Optimized bond-order interatomic potential for Si (Ref. 37)"}
+  eamnial: {type: REF, comment: "EAM for NiAl from OpenKIM (Ref. 38)"}
+sampling:
+  perturb: {label: "Random perturbations (alpha = 0.5 A or 0.1 A) of the relaxed training-domain configuration"}
+datasets:
+  w-screw: {label: "W screw-dislocation training domains (L = 8-20 r0), 100 perturbed configurations", materials: [w], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 100, loc: "Sec. 4.2.1"}, calc: eamw, sampling: [perturb]}
+  si-edge: {label: "Si edge-dislocation training domains (L = 8-14 r0), 100 perturbed configurations", materials: [si], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 100, loc: "Sec. 4.2.2"}, calc: bopsi, sampling: [perturb]}
+  nial-screw: {label: "NiAl screw-dislocation training domains (L = 8-14 r0), 100 perturbed configurations", materials: [nial], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 100, loc: "Sec. 4.2.3"}, calc: eamnial, sampling: [perturb]}
+  w-loop: {label: "W dipole screw and dipole edge training domains for the dislocation loop, 150 perturbed configurations", materials: [w], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 150, loc: "Sec. 4.3"}, calc: eamw, sampling: [perturb]}
+methods:
+  ACE:
+    loss: "Weighted least squares on energies, forces and two virial matching terms (W_E >> W_F ~ W_d1V)"
+    algorithm: "Bayesian linear regression with automatic relevance determination (ARD)"
+    impl: {lib: {local: ACEpotentials.jl}, comment: "Linear ACE; JuLIP.jl for simulations"}
+    sims: [GeometryOptimization]
+runs:
+  ace-w: {label: "Linear ACE for W screw dislocations", method: ACE, dataset: w-screw, model: "ACE W screw dislocation"}
+  ace-si: {label: "Linear ACE for Si edge dislocations", method: ACE, dataset: si-edge, model: "ACE Si edge dislocation"}
+  ace-nial: {label: "Linear ACE for NiAl screw dislocations", method: ACE, dataset: nial-screw, model: "ACE NiAl screw dislocation"}
+  ace-loop: {label: "Linear ACE for the W dislocation loop", method: ACE, dataset: w-loop, model: "ACE W dislocation loop"}
+results: []
+gaps:
+  - "All errors (geometry error, energy error, test RMSE versus training-domain size and observation set) are plotted only (Figs. 4-14); no values are stated in the text. The 50-configuration test sets therefore carry no result."
+  - "ACE basis parameters are taken from Ref. 1, Sec. 7.5, and not restated. One run per system stands for the family of models over training-domain sizes and loss variants (no elasticity, CLE, CLE+nonlinear)."

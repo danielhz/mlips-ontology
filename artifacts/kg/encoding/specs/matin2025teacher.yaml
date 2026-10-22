@@ -1,0 +1,52 @@
+id: matin2025teacher
+source:
+  rank: 469
+  year: "2025"
+  first_author: "Sakib Matin"
+  title: "Teacher-student training improves the accuracy and efficiency of machine learning interatomic potentials"
+  venue: "Digital Discovery"
+  doi: "10.1039/d5dd00085h"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2502.05379v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0a40a83f31869fd28ad84975c1e09b8029441b8e8141873a49e32c86c50ae2de"
+study_label: "Matin et al. (2025): teacher-student training with teacher atomic energies as auxiliary targets for HIP-NN potentials on the ANI-Al aluminium dataset"
+scope: |
+  Encoding scope: HIP-NN teacher models trained on ANI-Al, smaller
+  student models trained on the same data plus the teacher's per-atom
+  energies, same-size control models trained on ground truth only, and
+  "Born Again" students with the teacher's architecture and a loss
+  schedule. The Pareto, capacity, learning-curve and speed/memory
+  comparisons are figure-only; the Born Again errors are in the text.
+hyperparameters:
+  wA: {label: "Weight of the teacher atomic-energy loss term (w_A)", name: "w_A", datatype: decimal}
+materials:
+  al: {label: "Condensed-phase aluminium (ANI-Al active-learning configurations)", formula: Al, class: "Metals"}
+reference:
+  anial: {type: DFT, xc: PBE, comment: "ANI-Al dataset (Ref. 23), about 6,000 DFT calculations"}
+  teacher: {type: REF, code: MLIP, comment: "Teacher HIP-NN per-atom energies as auxiliary targets"}
+sampling:
+  al: {label: "Published ANI-Al active-learning configurations (MD of 50-250 atom boxes with ensemble disagreement)"}
+datasets:
+  anial: {label: "ANI-Al dataset (about 6,000 DFT configurations)", materials: [al], properties: [Energy, Forces], provenance: Published, calc: anial, sampling: [al]}
+  anial-aug: {label: "ANI-Al dataset augmented with teacher atomic energies", materials: [al], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [al]}
+methods:
+  HIP-NN:
+    hp: [numLayers, cutoffRadius, numRadialBasis, learningRate, wA]
+    loss: "Sum of RMSE and MAE terms for energy and forces (w_E 1, w_F 10), L2 10^-6, HIP-NN R term 0.01; students add the atomic-energy term (w_E 1, w_F 30, w_A 100)"
+    algorithm: "Adam, learning rate halved with patience 30, termination patience 50"
+    impl: {lib: {local: hippynn}, comment: "One interaction layer, tensor sensitivity order l_max = 1"}
+    sims: [MolecularDynamics]
+runs:
+  teacher: {label: "HIP-NN teacher (4 atom layers of width 128, 40 sensitivity functions)", method: HIP-NN, dataset: anial, settings: {numLayers: {v: 1, loc: "App. A.1 (interaction layers)"}, cutoffRadius: {v: 7.5, loc: "App. A.1 (hard maximum cutoff)"}, numRadialBasis: {v: 40, loc: "App. A.1"}, learningRate: {v: 0.001, loc: "App. A.1"}}, model: "HIP-NN ANI-Al teacher"}
+  student: {label: "HIP-NN students (1-4 atom layers of width 12-128, 8-40 sensitivity functions) trained with teacher atomic energies", method: HIP-NN, dataset: anial-aug, settings: {numLayers: {v: 1, loc: "App. A.1 (interaction layers)"}, cutoffRadius: {v: 7.5, loc: "App. A.1"}, learningRate: {v: 0.001, loc: "App. A.1"}, wA: {v: 100, loc: "App. A.1"}}, model: "HIP-NN ANI-Al students", base_model: {run: teacher, relation: distilled, location: "Sec. 2.2-2.3"}}
+  control: {label: "HIP-NN control models (student architectures, ground truth only)", method: HIP-NN, dataset: anial, settings: {numLayers: {v: 1, loc: "App. A.1 (interaction layers)"}, cutoffRadius: {v: 7.5, loc: "App. A.1"}, learningRate: {v: 0.001, loc: "App. A.1"}}, model: "HIP-NN ANI-Al controls"}
+  ba: {label: "Born Again HIP-NN student (teacher architecture, scheduled loss weights)", method: HIP-NN, dataset: anial-aug, settings: {numLayers: {v: 1, loc: "App. A.1 (interaction layers)"}, cutoffRadius: {v: 7.5, loc: "App. A.1"}, numRadialBasis: {v: 40, loc: "App. A.1"}, learningRate: {v: 0.001, loc: "App. A.1"}}, model: "HIP-NN ANI-Al Born Again student", base_model: {run: teacher, relation: distilled, location: "Sec. 3.5"}}
+results:
+  - {key: teacher-ba, model: teacher, material: al, role: null, eval_data: {label: "ANI-Al data (split not stated for the Born Again comparison)", location: "Sec. 3.5"}, metrics: [[RMSE, Energy, 0.38, eV, "energy RMSE on ANI-Al: HIP-NN teacher", "Sec. 3.5"], [RMSE, Force, 0.092, eV/A, "force RMSE on ANI-Al: HIP-NN teacher", "Sec. 3.5"]]}
+  - {key: ba, model: ba, material: al, role: null, eval_data: {label: "ANI-Al data (split not stated for the Born Again comparison)", location: "Sec. 3.5"}, metrics: [[RMSE, Energy, 0.37, eV, "energy RMSE on ANI-Al: Born Again HIP-NN student (mean, +/- 0.02 eV)", "Sec. 3.5"], [RMSE, Force, 0.083, eV/A, "force RMSE on ANI-Al: Born Again HIP-NN student (mean, +/- 0.003 eV/A)", "Sec. 3.5"]]}
+resources: |
+  Speed and memory are measured with ASE on one NVIDIA A6000 (48 GB): NVE MD of 48,000 atoms, 1 fs step, 1 ps (Sec. 3.1); values are figure-only (Figs. 2, 5).
+gaps:
+  - "Student, control and teacher force/energy RMSEs versus time per MD step, memory per atom and number of weights, learning curves and RDF errors are figure-only (Figs. 2-5). The text gives only relative statements (more than 2x speed-up at less than half the memory, under 20% force-accuracy loss)."
+  - "The Born Again student is trained on the teacher's atomic energies with the same architecture; the paper contrasts it with knowledge distillation, but the schema's only fitting relation for training on teacher outputs is 'distilled'. The student and control runs each stand for a family of architectures."

@@ -1,0 +1,53 @@
+id: fan2025
+source:
+  rank: 473
+  year: "2025"
+  first_author: "Zhao Fan"
+  title: "Efficient machine learning interatomic potentials robust for liquid and multiple solid polymorphs of NaF and KF"
+  venue: "Physical Review Materials"
+  doi: "10.1103/xbfm-clgd"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "6453a1ece8865b5a5093898e97a838c5e1b8b7071dba7ff97078ff1c2ff87c75"
+study_label: "Fan, Whittaker and Asta (2025): ACE potentials for liquid and five solid polymorphs of NaF and KF trained on SCAN data"
+scope: |
+  Encoding scope: one linear ACE potential each for NaF and KF (268
+  basis functions), trained by active learning (extrapolation grade,
+  short bonds, uniform MD snapshots) on SCAN data for the liquid and the
+  B1, B2, B3, B4 and H5 polymorphs up to 2000 K (NaF) or 1600 K (KF) and
+  100 GPa; final training and test RMSEs (Sec. II C) and the 1-million-
+  atom MD cost. Per-snapshot error bounds from long MD (Figs. 4-5),
+  melting points, thermodynamic and transport properties are not metrics.
+hyperparameters:
+  nbasis: {label: "Number of ACE basis functions", name: "number of basis functions", datatype: integer}
+materials:
+  naf: {label: "NaF liquid and B1, B2, B3, B4, H5 polymorphs", formula: NaF, class: "Molten salts and ionic crystals"}
+  kf: {label: "KF liquid and B1, B2, B3, B4, H5 polymorphs", formula: KF, class: "Molten salts and ionic crystals"}
+reference:
+  scan: {type: DFT, code: VASP, xc: SCAN, cutoff: 600, kpoints: "Gamma point (cells > 200 atoms)", comment: "No dispersion correction; SCF convergence 0.1 meV"}
+sampling:
+  al: {label: "Active learning from MD with intermediate ACE potentials: high extrapolation grade, short bond lengths or uniform time intervals, until the maximum energy error is below 5 meV/atom; 4:1 train/test split per MD run"}
+datasets:
+  naf-train: {label: "NaF training set (15,720 configurations, 4,124,984 atoms)", materials: [naf], properties: [Energy, Forces], provenance: InHouse, n: {v: 15720, loc: "Sec. II A"}, calc: scan, sampling: [al]}
+  kf-train: {label: "KF training set (14,964 configurations, 3,642,464 atoms)", materials: [kf], properties: [Energy, Forces], provenance: InHouse, n: {v: 14964, loc: "Sec. II A"}, calc: scan, sampling: [al]}
+methods:
+  ACE:
+    hp: [cutoffRadius, nbasis]
+    loss: "Energies and forces"
+    algorithm: "Linear embedding function; fitting package not named in the text read"
+    sims: [MolecularDynamics]
+runs:
+  ace-naf: {label: "ACE potential for NaF", method: ACE, dataset: naf-train, settings: {cutoffRadius: {v: 6.3, loc: "Sec. II C"}, nbasis: {v: 268, loc: "Sec. II C"}}, model: "ACE NaF (SCAN)"}
+  ace-kf: {label: "ACE potential for KF", method: ACE, dataset: kf-train, settings: {cutoffRadius: {v: 6.5, loc: "Sec. II C"}, nbasis: {v: 268, loc: "Sec. II C"}}, model: "ACE KF (SCAN)"}
+results:
+  - {key: naf-train, model: ace-naf, material: naf, role: training, eval_data: {label: "NaF training set", location: "Sec. II C; Fig. 2"}, metrics: [[RMSE, Energy, 2.05, meV/atom, "training energy RMSE on NaF: ACE", "Sec. II C"], [RMSE, Force, 37.25, meV/A, "training force RMSE on NaF: ACE", "Sec. II C"]]}
+  - {key: naf-test, model: ace-naf, material: naf, role: test, eval_data: {label: "NaF test set (3,961 configurations)", location: "Sec. II A, II C"}, metrics: [[RMSE, Energy, 2.14, meV/atom, "test energy RMSE on NaF: ACE", "Sec. II C"], [RMSE, Force, 35.77, meV/A, "test force RMSE on NaF: ACE", "Sec. II C"]]}
+  - {key: kf-train, model: ace-kf, material: kf, role: training, eval_data: {label: "KF training set", location: "Sec. II C; Fig. 2"}, metrics: [[RMSE, Energy, 1.95, meV/atom, "training energy RMSE on KF: ACE", "Sec. II C"], [RMSE, Force, 28.79, meV/A, "training force RMSE on KF: ACE", "Sec. II C"]]}
+  - {key: kf-test, model: ace-kf, material: kf, role: test, eval_data: {label: "KF test set (3,765 configurations)", location: "Sec. II A, II C"}, metrics: [[RMSE, Energy, 1.94, meV/atom, "test energy RMSE on KF: ACE", "Sec. II C"], [RMSE, Force, 28.86, meV/A, "test force RMSE on KF: ACE", "Sec. II C"]]}
+timings:
+  - {model: ace-naf, system: "NaF melt at the melting point, 1 ns MD (1 fs step)", atoms: 1000000, value: 97, unit: "hours per ns (approximate)", per_atom_us: null, hardware: "One NERSC CPU node, 128 cores", result: null, location: "Sec. III D"}
+  - {model: ace-kf, system: "KF melt at the melting point, 1 ns MD (1 fs step)", atoms: 1000000, value: 70, unit: "hours per ns (approximate)", per_atom_us: null, hardware: "One NERSC CPU node, 128 cores", result: null, location: "Sec. III D"}
+gaps:
+  - "Errors on snapshots from long MD, compression and heating runs are stated only as upper bounds (energy below 3-5 meV/atom, force RMSE below 35-100 meV/A; Figs. 4-5); not encoded."
+  - "The ACE fitting package is not named in the text read; the extrapolation grade (Ref. 46) suggests pacemaker, but it is not stated."
