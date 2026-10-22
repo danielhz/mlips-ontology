@@ -1,0 +1,45 @@
+id: okuno2026
+source:
+  rank: 279
+  year: "2026"
+  first_author: "Ryuhei Okuno"
+  title: "MLIP Detective: Active Failure Mode Discovery Beyond Benchmark Scores for Machine-Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.08399"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2609.08399v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3ddd17db3ccd266da476f93348219b18b719e1ebda476963f78c8e641c329dbf"
+study_label: "Okuno et al. (2026): MLIP Detective, LLM-agent failure-mode discovery for universal MLIPs (case MACE-MPA-0)"
+scope: |
+  Encoding scope: the target model MACE-MPA-0 and the committee models
+  (Matlantis PFP v9.0.0 and v8.0.0, SevenNet-Omni, SevenNet, Orb-v3) used
+  by the agentic MLIP Detective framework; the stated adsorption-energy MAE
+  of MACE-MPA-0 against DFT-PBE on a 36-system subset of the Wellendorff
+  benchmark. The adsorption anomalies (relative energies, desorption
+  barriers, CI-NEB profiles with DFT single points) are single-system
+  properties, not error metrics, and are not encoded.
+materials:
+  adsorption: {label: "Small adsorbates (O, OH, CO, NO, F, H, N, S) on transition-metal surfaces", class: "Adsorbate-metal surface systems"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 680, kpoints: "7x7x1 (slab), 2x2x2 (molecule)", comment: "VASP 6.5.1, PBE_64 PAW, spin-polarised collinear, Gaussian smearing 0.05 eV, SCF 1e-6 eV; single points on the CO/Cu(111) NEB images."}
+methods:
+  MACE: {sims: [GeometryOptimization, NudgedElasticBand, MolecularDynamics]}
+  TeaNet: {sims: [GeometryOptimization, NudgedElasticBand]}
+  NequIP: {sims: [GeometryOptimization]}
+  ORB: {sims: [GeometryOptimization]}
+runs:
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed (MPtrj + sAlex)", method: MACE, model: "MACE-MPA-0"}
+  pfp-v9: {label: "Matlantis PFP v9.0.0 as distributed (PBE mode)", method: TeaNet, model: "Matlantis PFP v9.0.0"}
+  pfp-v8: {label: "Matlantis PFP v8.0.0 as distributed", method: TeaNet, model: "Matlantis PFP v8.0.0"}
+  sevennet-omni: {label: "SevenNet-Omni as distributed (MatPES-PBE and MPA channels)", method: NequIP, model: "SevenNet-Omni"}
+  sevennet: {label: "SevenNet as distributed (checkpoint not stated)", method: NequIP, model: "SevenNet"}
+  orb-v3: {label: "Orb-v3 as distributed (OMat)", method: ORB, model: "Orb-v3 (OMat)"}
+results:
+  - {key: mace-mpa-0, model: mace-mpa-0, material: adsorption, role: external, eval_data: {label: "36-system subset of the Wellendorff et al. metal-surface adsorption-energy benchmark, DFT-PBE references", location: "Table 1, step 1.1"}, metrics: [[MAE, Energy, 1.21, eV, "Adsorption-energy MAE vs DFT-PBE: MACE-MPA-0, 36 adsorbate-surface systems", "Table 1"]]}
+resources: |
+  No timings are given; the agents used Claude Opus 5 (Sec. 3.1) and Claude
+  Opus 4.8 (Sec. 3.2) as the underlying LLM.
+gaps:
+  - "The MAE of 1.21 eV is computed by the Detective Agent and quoted in the action log (Table 1); the errors are described as bimodal (5 of 36 systems with large errors). Committee-model errors on the benchmark are not stated."
+  - "PFP is the TeaNet architecture (registry method); SevenNet is a NequIP implementation. Checkpoints other than PFP v9.0.0/v8.0.0 are not identified, so all models are paper-local runs."

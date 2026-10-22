@@ -1,0 +1,63 @@
+id: gramatte2024
+source:
+  rank: 278
+  year: "2024"
+  first_author: "Simon Gramatte"
+  title: "Do we really need machine learning interatomic potentials for modeling amorphous metal oxides? Case study on amorphous alumina by recycling an existing ab initio database"
+  venue: "Modelling and Simulation in Materials Science and Engineering"
+  doi: "10.1088/1361-651x/ad39ff"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "7bbc5687658e947497a9bb4a03acd4fe001dd00cd02bdbde3d894a813b26ae49"
+study_label: "Gramatte, Turlo and Politano (2024): classical and NequIP potentials for amorphous alumina"
+scope: |
+  Encoding scope: NequIP potentials trained here on 835 amorphous-alumina
+  structures selected from the AIMD database of Li et al. (Ref. [41]), in
+  the four variants of Table 2 (default settings, one layer, eight layers,
+  eleven radial basis functions), with energy and force RMSEs on the
+  stoichiometric (889) and non-stoichiometric (835) test sets and their
+  time per MD iteration. Classical fixed-charge and variable-charge
+  potentials (Matsui, ReaxFF, COMB3, SMTB-Q and others) are not MLIPs and
+  are not encoded.
+materials:
+  am-alumina: {label: "Amorphous aluminium oxide over a range of stoichiometries and densities", formula: "AlxOy", class: "Amorphous metal oxide"}
+  am-al2o3: {label: "Stoichiometric amorphous Al2O3", formula: "Al2O3", class: "Amorphous metal oxide"}
+reference:
+  li-dft: {type: DFT, comment: "AIMD database of Li et al. (Ref. [41], Materials Cloud 2020.89); settings not restated here."}
+datasets:
+  train: {label: "Training set: 835 structures binned by energy/atom, stoichiometry and density from the cleaned database of Ref. [41] (about 160,000 AIMD structures)", materials: [am-alumina], properties: [Energy, Forces], provenance: Published, n: {v: 835, loc: "Sec. 2.1"}, calc: li-dft, comment: "382 further structures form the validation set."}
+methods:
+  NequIP:
+    hp: [numLayers, numRadialBasis]
+    impl: {lib: NequIP, comment: "NequIP v0.5.5; MD in LAMMPS"}
+    sims: [MolecularDynamics]
+runs:
+  nequip-default: {label: "NequIP with the developers' default settings", method: NequIP, dataset: train, model: "NequIP am-alumina potential (default settings)"}
+  nequip-l1: {label: "NequIP with num_layers = 1", method: NequIP, dataset: train, settings: {numLayers: {v: 1, loc: "Table 2"}}, model: "NequIP am-alumina potential (num_layers = 1)"}
+  nequip-l8: {label: "NequIP with num_layers = 8", method: NequIP, dataset: train, settings: {numLayers: {v: 8, loc: "Table 2"}}, model: "NequIP am-alumina potential (num_layers = 8)"}
+  nequip-b11: {label: "NequIP with num_base = 11", method: NequIP, dataset: train, settings: {numRadialBasis: {v: 11, loc: "Table 2"}}, model: "NequIP am-alumina potential (num_base = 11)"}
+results:
+  - {key: nequip-l1-st, model: nequip-l1, material: am-al2o3, role: test, eval_data: {label: "Stoichiometric am-Al2O3 test set (889 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 80, meV/atom, "Stoichiometric test energy RMSE (0.08 eV/atom, relative to alpha-Al2O3): NequIP num_layers = 1", "Table 2"], [RMSE, Force, 0.2, eV/A, "Stoichiometric test force RMSE: NequIP num_layers = 1", "Table 2"]]}
+  - {key: nequip-l1-ns, model: nequip-l1, material: am-alumina, role: test, eval_data: {label: "Non-stoichiometric amorphous alumina test set (835 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 80, meV/atom, "Non-stoichiometric test formation-energy RMSE (0.08 eV/atom): NequIP num_layers = 1", "Table 2"], [RMSE, Force, 0.14, eV/A, "Non-stoichiometric test force RMSE: NequIP num_layers = 1", "Table 2"]]}
+  - {key: nequip-default-st, model: nequip-default, material: am-al2o3, role: test, eval_data: {label: "Stoichiometric am-Al2O3 test set (889 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 60, meV/atom, "Stoichiometric test energy RMSE (0.06 eV/atom, relative to alpha-Al2O3): NequIP default settings", "Table 2"], [RMSE, Force, 0.18, eV/A, "Stoichiometric test force RMSE: NequIP default settings", "Table 2"]]}
+  - {key: nequip-default-ns, model: nequip-default, material: am-alumina, role: test, eval_data: {label: "Non-stoichiometric amorphous alumina test set (835 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 40, meV/atom, "Non-stoichiometric test formation-energy RMSE (0.04 eV/atom): NequIP default settings", "Table 2"], [RMSE, Force, 0.25, eV/A, "Non-stoichiometric test force RMSE: NequIP default settings", "Table 2"]]}
+  - {key: nequip-b11-st, model: nequip-b11, material: am-al2o3, role: test, eval_data: {label: "Stoichiometric am-Al2O3 test set (889 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 50, meV/atom, "Stoichiometric test energy RMSE (0.05 eV/atom, relative to alpha-Al2O3): NequIP num_base = 11", "Table 2"], [RMSE, Force, 0.1, eV/A, "Stoichiometric test force RMSE: NequIP num_base = 11", "Table 2"]]}
+  - {key: nequip-b11-ns, model: nequip-b11, material: am-alumina, role: test, eval_data: {label: "Non-stoichiometric amorphous alumina test set (835 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 40, meV/atom, "Non-stoichiometric test formation-energy RMSE (0.04 eV/atom): NequIP num_base = 11", "Table 2"], [RMSE, Force, 0.03, eV/A, "Non-stoichiometric test force RMSE: NequIP num_base = 11", "Table 2"]]}
+  - {key: nequip-l8-st, model: nequip-l8, material: am-al2o3, role: test, eval_data: {label: "Stoichiometric am-Al2O3 test set (889 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 40, meV/atom, "Stoichiometric test energy RMSE (0.04 eV/atom, relative to alpha-Al2O3): NequIP num_layers = 8", "Table 2"], [RMSE, Force, 0.08, eV/A, "Stoichiometric test force RMSE: NequIP num_layers = 8", "Table 2"]]}
+  - {key: nequip-l8-ns, model: nequip-l8, material: am-alumina, role: test, eval_data: {label: "Non-stoichiometric amorphous alumina test set (835 structures)", location: "Sec. 2.1; Table 2"}, metrics: [[RMSE, Energy, 30, meV/atom, "Non-stoichiometric test formation-energy RMSE (0.03 eV/atom): NequIP num_layers = 8", "Table 2"], [RMSE, Force, 0.02, eV/A, "Non-stoichiometric test force RMSE: NequIP num_layers = 8", "Table 2"]]}
+timings:
+  - {model: nequip-l1, system: "Relaxed alpha-Al2O3 cell, NVT MD, 1000 iterations (stoichiometric performance test)", atoms: 2160, value: 0.1, unit: "s per MD iteration", per_atom_us: 46.3, hardware: "Single GPU node, NVIDIA Tesla P100 16GB with Intel Xeon E5-2690 v3: 0.1 s per iteration (NequIP num_layers = 1)", result: nequip-l1-st, location: "Sec. 2.3; Table 2"}
+  - {model: nequip-default, system: "Relaxed alpha-Al2O3 cell, NVT MD, 1000 iterations (stoichiometric performance test)", atoms: 2160, value: 0.74, unit: "s per MD iteration", per_atom_us: 342.6, hardware: "Single GPU node, NVIDIA Tesla P100 16GB with Intel Xeon E5-2690 v3: 0.74 s per iteration (NequIP default settings)", result: nequip-default-st, location: "Sec. 2.3; Table 2"}
+  - {model: nequip-b11, system: "Relaxed alpha-Al2O3 cell, NVT MD, 1000 iterations (stoichiometric performance test)", atoms: 2160, value: 0.78, unit: "s per MD iteration", per_atom_us: 361.1, hardware: "Single GPU node, NVIDIA Tesla P100 16GB with Intel Xeon E5-2690 v3: 0.78 s per iteration (NequIP num_base = 11)", result: nequip-b11-st, location: "Sec. 2.3; Table 2"}
+  - {model: nequip-l8, system: "Relaxed alpha-Al2O3 cell, NVT MD, 1000 iterations (stoichiometric performance test)", atoms: 2160, value: 1.87, unit: "s per MD iteration", per_atom_us: 865.7, hardware: "Single GPU node, NVIDIA Tesla P100 16GB with Intel Xeon E5-2690 v3: 1.87 s per iteration (NequIP num_layers = 8)", result: nequip-l8-st, location: "Sec. 2.3; Table 2"}
+resources: |
+  Time per MD iteration (Table 2) for the 2,160-atom alpha-Al2O3 cell of
+  the stoichiometric performance test, NequIP on one Tesla P100 GPU; the
+  per-atom time is the iteration time divided by 2,160. Classical
+  potentials: Vashishta 0.02 s, Matsui 0.06 s, ReaxFF 0.62 s on the same
+  set-up. No training times are given.
+gaps:
+  - "Energy RMSEs are stated in eV/atom to two decimals and converted to meV/atom; stoichiometric energies are relative to alpha-Al2O3 (Eq. 1) and non-stoichiometric ones are formation energies relative to fcc Al and O2 (Eq. 2)."
+  - "The Table 2 timing column is not split by test; it is attached to the stoichiometric results, whose performance cell (2,160 atoms) is defined in Sec. 2.3 (the non-stoichiometric test used a 4,368-atom cell)."
+  - "The default NequIP hyperparameter values are given only by reference to the developers' training file (Materials Cloud); the other hyperparameter scans of Fig. 6 and Table S5 are figure-only. The DFT settings of the database are those of Ref. [41]."

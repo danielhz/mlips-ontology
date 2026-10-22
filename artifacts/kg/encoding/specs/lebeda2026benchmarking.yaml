@@ -1,0 +1,58 @@
+id: lebeda2026benchmarking
+source:
+  rank: 284
+  year: "2026"
+  first_author: "M. Lebeda"
+  title: "Benchmarking Universal Machine-Learning Interatomic Potentials for Temperature-Dependent Elasticity of Binary and High-Entropy Refractory Carbides"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.11878"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2610.11878v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0a5893681e435acb3c968b60ce8278cda347459284bbe71ccec504a2614dce7b"
+study_label: "Lebeda et al. (2026): nine universal MLIPs for temperature-dependent elasticity of binary and high-entropy refractory carbides"
+scope: |
+  Encoding scope: nine pretrained universal MLIPs (Table 1) used in
+  stress-strain NPT/NVT MD of 512-atom TiC, ZrC, HfC, VC, TaC and two
+  high-entropy carbides at 300-1200 K, and the stated MD speeds for a
+  512-atom TiC cell. Accuracy is reported as MAPE of elastic constants and
+  moduli against AIMD and softening errors in percentage points, which are
+  not energy/force/stress error metrics; no metric is encoded.
+materials:
+  carbides: {label: "Rocksalt TiC, ZrC, HfC, VC, TaC and the high-entropy carbides (Ti,Zr,Hf,Ta,W)C and (V,Nb,Ta,Mo,W)C (512-atom supercells)", class: "Refractory transition-metal carbides"}
+methods:
+  NequIP: {sims: [MolecularDynamics]}
+  MACE: {sims: [MolecularDynamics]}
+  PET: {sims: [MolecularDynamics]}
+  M3GNet: {sims: [MolecularDynamics]}
+  GRACE: {sims: [MolecularDynamics]}
+  ORB: {sims: [MolecularDynamics]}
+  DPA4: {sims: [MolecularDynamics]}
+  ALIGNN-FF: {sims: [MolecularDynamics]}
+runs:
+  7net-nano: {label: "SevenNet-Nano 5.5 A (7net-nano-5.5, trained on SevenNet-Omni data) as distributed", method: NequIP, model: "7net-nano-5.5"}
+  mace-mh-1: {label: "MACE-MH-1 (omat_pbe head) as distributed", method: MACE, model: "MACE-MH-1 (omat_pbe)"}
+  pet-mad: {label: "PET-MAD-1.5-S as distributed", method: PET, model: "PET-MAD-1.5-S"}
+  mattersim-1m: {label: "MatterSim-v1.0.0-1M as distributed", method: M3GNet, model: "MatterSim-v1.0.0-1M"}
+  grace: {label: "GRACE-2L-OMAT-medium-ft-AM as distributed", method: GRACE, model: "GRACE-2L-OMAT-medium-ft-AM"}
+  orb-v3: {label: "orb-v3-conservative-inf-omat as distributed", method: ORB, model: "orb-v3-conservative-inf-omat"}
+  nequip-oam: {label: "NequIP-OAM-M v0.1 as distributed", method: NequIP, model: "NequIP-OAM-M v0.1"}
+  dpa4-mini: {label: "DPA4-Mini as distributed", method: DPA4, model: "DPA4-Mini"}
+  alignn-ff: {label: "ALIGNN-FF MatPES-PBE as distributed", method: ALIGNN-FF, model: "ALIGNN-FF MatPES-PBE"}
+results: []
+timings:
+  - {model: 7net-nano, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 23.4, unit: "MD steps per second", per_atom_us: 83.5, hardware: "NVIDIA RTX 4090 24GB: 23.4 steps/s (SevenNet-Nano 5.5 A; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+  - {model: 7net-nano, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 30.5, unit: "MD steps per second", per_atom_us: 64.0, hardware: "NVIDIA H100 80GB: 30.5 steps/s (SevenNet-Nano 5.5 A; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+  - {model: mattersim-1m, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 5.9, unit: "MD steps per second", per_atom_us: 331.0, hardware: "NVIDIA RTX 4090 24GB: 5.9 steps/s (MatterSim-v1.0.0-1M; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+  - {model: mattersim-1m, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 7.7, unit: "MD steps per second", per_atom_us: 253.7, hardware: "NVIDIA H100 80GB: 7.7 steps/s (MatterSim-v1.0.0-1M; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+  - {model: alignn-ff, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 5.2, unit: "MD steps per second", per_atom_us: 375.6, hardware: "NVIDIA RTX 4090 24GB: 5.2 steps/s (ALIGNN-FF MatPES-PBE; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+  - {model: alignn-ff, system: "512-atom TiC supercell, NPT MD at 300 K, 1 fs step, 20,000 steps (ASE)", atoms: 512, value: 7.2, unit: "MD steps per second", per_atom_us: 271.3, hardware: "NVIDIA H100 80GB: 7.2 steps/s (ALIGNN-FF MatPES-PBE; FP32 and cuEquivariance where supported)", result: null, location: "Sec. 3.6; Fig. 9"}
+resources: |
+  MD speeds for a 512-atom TiC cell (Fig. 9): SevenNet-Nano 23.4 and 30.5
+  steps/s, MatterSim-v1.0.0-1M 5.9 and 7.7, ALIGNN-FF 5.2 and 7.2 on RTX
+  4090 and H100; the other six models are given only as a range (8-11.5
+  and 10-16 steps/s) and are not encoded individually. Per-atom times are
+  1/(steps per second x 512). GPU memory 1.1-5.5 GiB.
+gaps:
+  - "The accuracy measures (MAPE of C11, C12, C44 and Hill moduli; softening errors in percentage points) are property errors with no metric type in the schema; e.g. MACE-MH-1 has the lowest overall MAPE (5.7%)."
+  - "DPA4 and ALIGNN-FF are new registry methods (method papers not in the corpus). SevenNet and NequIP-OAM are NequIP-family models; MatterSim applies M3GNet."

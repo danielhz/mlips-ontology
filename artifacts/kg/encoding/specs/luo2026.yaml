@@ -1,0 +1,75 @@
+id: luo2026
+source:
+  rank: 283
+  year: "2026"
+  first_author: "Mingxiang Luo"
+  title: "Active rejection enables reliable generalization of universal machine-learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.09456"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2607.09456v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "74a9747cc8afc43901b9512184f6b309d0b9e522bb604317b7d8e0d4ed73551d"
+study_label: "Luo et al. (2026): Adaptive Multi-Teacher Routing (ATR) with active rejection for r2SCAN-level pseudo-labels and CHGNet students"
+scope: |
+  Encoding scope: the ATR pseudo-label data set (2.89 million accepted
+  r2SCAN-level labels from universal-MLIP teachers, calibrated on about
+  18,000 r2SCAN single points), the CHGNet student and control models and
+  the teacher references of Table 3 (held-out r2SCAN and MP-r2SCAN energy
+  and force MAEs), the SevenNet-Omni-i12-MP calibration-set errors (Fig.
+  2a, b) and the HgInSn AIMD energy MAEs (Table 4). Router screening
+  metrics (Tables 1, 2) and MD stability statistics are not encoded.
+materials:
+  open-materials: {label: "Inorganic materials from Materials Project, Alexandria, MPtrj and OQMD (86 elements, up to 240 atoms; mostly bulk alloys, halides, chalcogenides and oxides)", class: "Inorganic crystals"}
+  hginsn: {label: "Hg16In20Sn12 alloy supercell at 300 K", formula: "Hg16In20Sn12", class: "Soft-metal alloy"}
+reference:
+  r2scan: {type: DFT, code: VASP, xc: {local: "r2SCAN"}, pp: PAW, cutoff: 680, kpoints: "KSPACING = 0.22 1/A", comment: "MatPES-compatible static workflow, PBE_64 PAW, ENAUG 1360 eV, PREC Accurate, EDIFF 1e-5, spin-polarised; AIMD with 450 eV and Gamma point."}
+datasets:
+  atr: {label: "ATR pseudo-label pretraining set: about 2.6 million of 2,893,331 accepted r2SCAN-level pseudo-labels (from 7,674,241 PBE candidate structures)", materials: [open-materials], properties: [Energy, Forces], provenance: Augmented, calc: r2scan, comment: "Pseudo-labels from SevenNet, MACE, CHGNet and PET-MAD teachers selected by the ATR router; calibration set of about 18,000 real r2SCAN single points."}
+  pbe-orig: {label: "Same 2.6M structure pool with original (non-routed) labels, for the without-ATR controls", materials: [open-materials], properties: [Energy, Forces], provenance: Published}
+  mp-r2scan: {label: "MP-r2SCAN training data", materials: [open-materials], properties: [Energy, Forces], provenance: Published}
+methods:
+  CHGNet:
+    hp: [learningRate, batchSize, numEpochs]
+    loss: "Huber loss on energies and forces (wE:wF = 1:1 in pretraining, 3:1 in fine-tuning)"
+    algorithm: "4-GPU DDP, cosine annealing from 1e-3 to 1e-5"
+    impl: {lib: CHGNet}
+    sims: [MolecularDynamics]
+  NequIP: {sims: [MolecularDynamics]}
+runs:
+  baseline: {label: "CHGNet trained only on MP-r2SCAN (baseline)", method: CHGNet, dataset: mp-r2scan, model: "CHGNet baseline (MP-r2SCAN only)"}
+  noatr1: {label: "CHGNet without ATR, control 1 (non-routed pretraining on the same structure pool)", method: CHGNet, dataset: pbe-orig, model: "CHGNet without ATR 1"}
+  noatr2: {label: "CHGNet without ATR, control 2 (non-routed pretraining on the same structure pool, different protocol)", method: CHGNet, dataset: pbe-orig, model: "CHGNet without ATR 2"}
+  student-pre: {label: "CHGNet pretrained from scratch on ATR pseudo-labels", method: CHGNet, dataset: atr, settings: {learningRate: {v: 0.001, loc: "Sec. 4.5"}, batchSize: {v: 256, loc: "Sec. 4.5 (global)"}, numEpochs: {v: 40, loc: "Sec. 4.5"}}, model: "CHGNet ATR-pretrained checkpoint"}
+  student: {label: "ATR student: ATR-pretrained CHGNet fine-tuned on MP-r2SCAN", method: CHGNet, dataset: mp-r2scan, settings: {learningRate: {v: 0.001, loc: "Sec. 4.5"}, batchSize: {v: 256, loc: "Sec. 4.5 (global)"}, numEpochs: {v: 50, loc: "Sec. 4.5"}}, model: "CHGNet ATR student", base_model: {run: student-pre, relation: fine-tuned, location: "Sec. 4.5"}}
+  chgnet-r2scan: {label: "Official CHGNet-r2SCAN checkpoint as distributed", method: CHGNet, model: "CHGNet-r2SCAN"}
+  7net-mp: {label: "SevenNet-Omni-i12 (MP-r2SCAN channel) as distributed", method: NequIP, model: "SevenNet-Omni-i12-MP (r2SCAN)"}
+  7net-matpes: {label: "SevenNet-Omni-i12 (MatPES-r2SCAN channel) as distributed", method: NequIP, model: "SevenNet-Omni-i12-MatPES (r2SCAN)"}
+results:
+  - {key: ho-baseline, model: baseline, material: open-materials, role: test, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 1634.0, meV/atom, "Held-out r2SCAN energy MAE (1.634 eV/atom): CHGNet baseline", "Table 3"], [MAE, Force, 2.847, eV/A, "Held-out r2SCAN force MAE: CHGNet baseline", "Table 3"]]}
+  - {key: mp-baseline, model: baseline, material: open-materials, role: test, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 78.8, meV/atom, "MP-r2SCAN energy MAE (0.0788 eV/atom): CHGNet baseline", "Table 3"], [MAE, Force, 0.0661, eV/A, "MP-r2SCAN force MAE: CHGNet baseline", "Table 3"]]}
+  - {key: ho-noatr1, model: noatr1, material: open-materials, role: test, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 1027.0, meV/atom, "Held-out r2SCAN energy MAE (1.027 eV/atom): CHGNet without ATR 1", "Table 3"], [MAE, Force, 1.895, eV/A, "Held-out r2SCAN force MAE: CHGNet without ATR 1", "Table 3"]]}
+  - {key: mp-noatr1, model: noatr1, material: open-materials, role: test, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 29.4, meV/atom, "MP-r2SCAN energy MAE (0.0294 eV/atom): CHGNet without ATR 1", "Table 3"], [MAE, Force, 0.0242, eV/A, "MP-r2SCAN force MAE: CHGNet without ATR 1", "Table 3"]]}
+  - {key: ho-noatr2, model: noatr2, material: open-materials, role: test, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 1375.0, meV/atom, "Held-out r2SCAN energy MAE (1.375 eV/atom): CHGNet without ATR 2", "Table 3"], [MAE, Force, 1.628, eV/A, "Held-out r2SCAN force MAE: CHGNet without ATR 2", "Table 3"]]}
+  - {key: mp-noatr2, model: noatr2, material: open-materials, role: test, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 27.3, meV/atom, "MP-r2SCAN energy MAE (0.0273 eV/atom): CHGNet without ATR 2", "Table 3"], [MAE, Force, 0.024, eV/A, "MP-r2SCAN force MAE: CHGNet without ATR 2", "Table 3"]]}
+  - {key: ho-student, model: student, material: open-materials, role: test, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 74.0, meV/atom, "Held-out r2SCAN energy MAE (0.074 eV/atom): CHGNet ATR student", "Table 3"], [MAE, Force, 0.069, eV/A, "Held-out r2SCAN force MAE: CHGNet ATR student", "Table 3"]]}
+  - {key: mp-student, model: student, material: open-materials, role: test, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 14.8, meV/atom, "MP-r2SCAN energy MAE (0.0148 eV/atom): CHGNet ATR student", "Table 3"], [MAE, Force, 0.0216, eV/A, "MP-r2SCAN force MAE: CHGNet ATR student", "Table 3"]]}
+  - {key: ho-chgnet-r2scan, model: chgnet-r2scan, material: open-materials, role: external, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 455.0, meV/atom, "Held-out r2SCAN energy MAE (0.455 eV/atom): CHGNet-r2SCAN", "Table 3"], [MAE, Force, 2.053, eV/A, "Held-out r2SCAN force MAE: CHGNet-r2SCAN", "Table 3"]]}
+  - {key: mp-chgnet-r2scan, model: chgnet-r2scan, material: open-materials, role: external, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 17.0, meV/atom, "MP-r2SCAN energy MAE (0.017 eV/atom): CHGNet-r2SCAN", "Table 3"], [MAE, Force, 0.038, eV/A, "MP-r2SCAN force MAE: CHGNet-r2SCAN", "Table 3"]]}
+  - {key: ho-7net-mp, model: 7net-mp, material: open-materials, role: external, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 58.0, meV/atom, "Held-out r2SCAN energy MAE (0.058 eV/atom): SevenNet-Omni-i12-MP r2SCAN", "Table 3"], [MAE, Force, 0.307, eV/A, "Held-out r2SCAN force MAE: SevenNet-Omni-i12-MP r2SCAN", "Table 3"]]}
+  - {key: mp-7net-mp, model: 7net-mp, material: open-materials, role: external, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 6.8, meV/atom, "MP-r2SCAN energy MAE (0.0068 eV/atom): SevenNet-Omni-i12-MP r2SCAN", "Table 3"], [MAE, Force, 0.0136, eV/A, "MP-r2SCAN force MAE: SevenNet-Omni-i12-MP r2SCAN", "Table 3"]]}
+  - {key: ho-7net-matpes, model: 7net-matpes, material: open-materials, role: external, eval_data: {label: "2,000 held-out r2SCAN DFT structures (no overlap with pseudo-label and MP-r2SCAN sets)", location: "Table 3"}, metrics: [[MAE, Energy, 446.0, meV/atom, "Held-out r2SCAN energy MAE (0.446 eV/atom): SevenNet-Omni-i12-MatPES r2SCAN", "Table 3"], [MAE, Force, 0.311, eV/A, "Held-out r2SCAN force MAE: SevenNet-Omni-i12-MatPES r2SCAN", "Table 3"]]}
+  - {key: mp-7net-matpes, model: 7net-matpes, material: open-materials, role: external, eval_data: {label: "MP-r2SCAN benchmark", location: "Table 3"}, metrics: [[MAE, Energy, 432.6, meV/atom, "MP-r2SCAN energy MAE (0.4326 eV/atom): SevenNet-Omni-i12-MatPES r2SCAN", "Table 3"], [MAE, Force, 0.0168, eV/A, "MP-r2SCAN force MAE: SevenNet-Omni-i12-MatPES r2SCAN", "Table 3"]]}
+  - {key: cal-7net-mp, model: 7net-mp, material: open-materials, role: external, eval_data: {label: "ATR r2SCAN calibration set (17,994 structures, 678,162 force components)", location: "Fig. 2a, b"}, metrics: [[MAE, Energy, 58, meV/atom, "Calibration-set energy MAE (0.058 eV/atom): SevenNet-Omni-i12-MP", "Fig. 2a"], [R2, Energy, 0.9995, null, "Calibration-set energy R2: SevenNet-Omni-i12-MP", "Fig. 2a"], [MAE, Force, 0.284, eV/A, "Calibration-set force MAE: SevenNet-Omni-i12-MP", "Fig. 2b"], [R2, Force, 0.9618, null, "Calibration-set force R2: SevenNet-Omni-i12-MP", "Fig. 2b"]]}
+  - {key: hg-student, model: student, material: hginsn, role: external, eval_data: {label: "10 ps r2SCAN NVT AIMD reference trajectory of Hg16In20Sn12 at 300 K", location: "Table 4"}, metrics: [[MAE, Energy, 17.9, meV/atom, "Energy MAE along the HgInSn AIMD trajectory: CHGNet ATR student", "Table 4"]]}
+  - {key: hg-baseline, model: baseline, material: hginsn, role: external, eval_data: {label: "10 ps r2SCAN NVT AIMD reference trajectory of Hg16In20Sn12 at 300 K", location: "Table 4"}, metrics: [[MAE, Energy, 174.8, meV/atom, "Energy MAE along the HgInSn AIMD trajectory: CHGNet baseline", "Table 4"]]}
+  - {key: hg-7net-mp, model: 7net-mp, material: hginsn, role: external, eval_data: {label: "10 ps r2SCAN NVT AIMD reference trajectory of Hg16In20Sn12 at 300 K", location: "Table 4"}, metrics: [[MAE, Energy, 193.7, meV/atom, "Energy MAE along the HgInSn AIMD trajectory: SevenNet-Omni-i12-MP", "Table 4"]]}
+  - {key: hg-7net-matpes, model: 7net-matpes, material: hginsn, role: external, eval_data: {label: "10 ps r2SCAN NVT AIMD reference trajectory of Hg16In20Sn12 at 300 K", location: "Table 4"}, metrics: [[MAE, Energy, 202.0, meV/atom, "Energy MAE along the HgInSn AIMD trajectory: SevenNet-Omni-i12-MatPES", "Table 4"]]}
+  - {key: hg-chgnet-r2scan, model: chgnet-r2scan, material: hginsn, role: external, eval_data: {label: "10 ps r2SCAN NVT AIMD reference trajectory of Hg16In20Sn12 at 300 K", location: "Table 4"}, metrics: [[MAE, Energy, 43.2, meV/atom, "Energy MAE along the HgInSn AIMD trajectory: CHGNet-r2SCAN", "Table 4"]]}
+resources: |
+  Pretraining and fine-tuning used 4-GPU DDP (per-GPU batch 64); no times
+  or GPU types are given.
+gaps:
+  - "Table 3 gives CHGNet-r2SCAN MP-r2SCAN errors as 0.017 (0.0159) eV/atom and 0.038 (0.0211) eV/A; the parenthesised values are not explained and the first values are encoded. Energy MAEs in eV/atom are converted to meV/atom. The MP-r2SCAN test set may overlap with the teachers' training data (Sec. 2.4)."
+  - "The two without-ATR controls are described only as supervised and self-/supervised pretraining on the original labels followed by MP-r2SCAN fine-tuning; which is control 1 and which control 2 is not stated. The ATR-routed calibration predictions (Fig. 2c, d: 0.025 eV/atom, 0.079 eV/A) are a selection of teacher outputs, not a model, and are not encoded."
+  - "Router metrics (Tables 1, 2) and MD stability statistics (temperatures, maximum forces, minimum distances, Table 4) have no metric property in the schema. The ten candidate teacher models are not all named."
