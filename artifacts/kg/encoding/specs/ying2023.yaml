@@ -1,0 +1,54 @@
+id: ying2023
+source:
+  rank: 700
+  year: "2023"
+  first_author: "Penghua Ying"
+  title: "Combining the D3 dispersion correction with the neuroevolution machine-learned potential"
+  venue: "Journal of Physics Condensed Matter"
+  doi: "10.1088/1361-648x/ad1278"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2310.05279v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f7f3941d7878adb2409006e59dc527bf855c241c5350e3c8a88ce30fe2375892"
+study_label: "Ying and Fan (2023): combining the D3 dispersion correction with the neuroevolution potential (NEP-D3)"
+scope: |
+  Encoding scope: the bilayer-graphene NEP-D3 model (NEP trained on PBE
+  data with cutoffs 4.5/4.5 A, plus the GPUMD D3 correction) and three pure
+  NEP models trained on PBE-D3 data with radial cutoffs 6, 8 and 10 A,
+  with their RMSEs against the PBE-D3 reference and MD speeds (Table I).
+  The D3 implementation check on MOFs and thermal conductivities are not
+  MLIP metrics.
+materials:
+  blg: {label: "Bilayer graphene with interlayer distances 2-10 A and lateral shifts (AA, AB, saddle point), plus MD structures at 300-1500 K", formula: C, class: "layered 2D carbon"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 850, kpoints: "Gamma-centred, k-spacing 0.15 1/A", comment: "Gaussian smearing 0.1 eV; SCF 1e-7 eV."}
+  pbe-d3: {type: DFT, code: VASP, xc: {local: PBE-D3}, pp: PAW, cutoff: 850, kpoints: "Gamma-centred, k-spacing 0.15 1/A", comment: "IVDW = 12 (D3 with Becke-Johnson damping)."}
+sampling:
+  blg: {label: "Bilayer configurations over interlayer distance and stacking, plus REBO + registry-dependent ILP MD snapshots (300-1500 K)"}
+datasets:
+  blg-pbe: {label: "Bilayer graphene data with PBE labels", materials: [blg], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe, sampling: [blg]}
+  blg-pbed3: {label: "Bilayer graphene data with PBE-D3 labels", materials: [blg], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe-d3, sampling: [blg]}
+methods:
+  NEP:
+    hp: [cutoffRadius, batchSize]
+    algorithm: "Separable natural evolution strategy (population 50, 300,000 generations); NEP-D3 adds a GPUMD D3(BJ) term with R_pot = 12 A and R_cn = 6 A"
+    impl: {lib: {local: GPUMD}}
+    sims: [MolecularDynamics]
+runs:
+  nep-d3: {label: "NEP(4.5 A, 4.5 A)-D3: NEP trained on PBE data plus D3 correction", method: NEP, dataset: blg-pbe, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}, batchSize: {v: 10000, loc: "Appendix B"}}, model: "NEP(4.5,4.5)-D3 bilayer graphene"}
+  nep-6: {label: "NEP(6.0 A, 4.5 A) trained on PBE-D3 data", method: NEP, dataset: blg-pbed3, settings: {cutoffRadius: {v: 6.0, loc: "Table I (radial)"}, batchSize: {v: 10000, loc: "Appendix B"}}, model: "NEP(6.0,4.5) bilayer graphene (PBE-D3)"}
+  nep-8: {label: "NEP(8.0 A, 4.5 A) trained on PBE-D3 data", method: NEP, dataset: blg-pbed3, settings: {cutoffRadius: {v: 8.0, loc: "Table I (radial)"}, batchSize: {v: 10000, loc: "Appendix B"}}, model: "NEP(8.0,4.5) bilayer graphene (PBE-D3)"}
+  nep-10: {label: "NEP(10.0 A, 4.5 A) trained on PBE-D3 data", method: NEP, dataset: blg-pbed3, settings: {cutoffRadius: {v: 10.0, loc: "Table I (radial)"}, batchSize: {v: 10000, loc: "Appendix B"}}, model: "NEP(10.0,4.5) bilayer graphene (PBE-D3)"}
+results:
+  - {key: nep-d3-pbed3, model: nep-d3, material: blg, role: null, eval_data: {label: "Bilayer graphene data versus the PBE-D3 reference (split not stated)", location: "Table I"}, metrics: [[RMSE, Energy, 1.16, meV/atom, "energy RMSE vs PBE-D3 on bilayer graphene: NEP(4.5,4.5)-D3", "Table I"], [RMSE, Force, 46.72, meV/A, "force RMSE vs PBE-D3 on bilayer graphene: NEP(4.5,4.5)-D3", "Table I"], [RMSE, Stress, 15.38, null, "virial RMSE in meV/atom vs PBE-D3 on bilayer graphene: NEP(4.5,4.5)-D3", "Table I"]]}
+  - {key: nep-6-pbed3, model: nep-6, material: blg, role: null, eval_data: {label: "Bilayer graphene data versus the PBE-D3 reference (split not stated)", location: "Table I"}, metrics: [[RMSE, Energy, 1.28, meV/atom, "energy RMSE vs PBE-D3 on bilayer graphene: NEP(6.0,4.5)", "Table I"], [RMSE, Force, 47.45, meV/A, "force RMSE vs PBE-D3 on bilayer graphene: NEP(6.0,4.5)", "Table I"], [RMSE, Stress, 17.33, null, "virial RMSE in meV/atom vs PBE-D3 on bilayer graphene: NEP(6.0,4.5)", "Table I"]]}
+  - {key: nep-8-pbed3, model: nep-8, material: blg, role: null, eval_data: {label: "Bilayer graphene data versus the PBE-D3 reference (split not stated)", location: "Table I"}, metrics: [[RMSE, Energy, 1.25, meV/atom, "energy RMSE vs PBE-D3 on bilayer graphene: NEP(8.0,4.5)", "Table I"], [RMSE, Force, 48.08, meV/A, "force RMSE vs PBE-D3 on bilayer graphene: NEP(8.0,4.5)", "Table I"], [RMSE, Stress, 16.09, null, "virial RMSE in meV/atom vs PBE-D3 on bilayer graphene: NEP(8.0,4.5)", "Table I"]]}
+  - {key: nep-10-pbed3, model: nep-10, material: blg, role: null, eval_data: {label: "Bilayer graphene data versus the PBE-D3 reference (split not stated)", location: "Table I"}, metrics: [[RMSE, Energy, 1.29, meV/atom, "energy RMSE vs PBE-D3 on bilayer graphene: NEP(10.0,4.5)", "Table I"], [RMSE, Force, 49.6, meV/A, "force RMSE vs PBE-D3 on bilayer graphene: NEP(10.0,4.5)", "Table I"], [RMSE, Stress, 17.44, null, "virial RMSE in meV/atom vs PBE-D3 on bilayer graphene: NEP(10.0,4.5)", "Table I"]]}
+timings:
+  - {model: nep-d3, system: "Bilayer graphene, 40,000 atoms, MD", atoms: 40000, value: 6.29e+06, unit: "atom-steps per second", per_atom_us: 0.159, hardware: "one GeForce RTX 4090 GPU", result: nep-d3-pbed3, location: "Table I"}
+  - {model: nep-6, system: "Bilayer graphene, 40,000 atoms, MD", atoms: 40000, value: 2.05e+07, unit: "atom-steps per second", per_atom_us: 0.0488, hardware: "one GeForce RTX 4090 GPU", result: nep-6-pbed3, location: "Table I"}
+  - {model: nep-8, system: "Bilayer graphene, 40,000 atoms, MD", atoms: 40000, value: 1.53e+07, unit: "atom-steps per second", per_atom_us: 0.0654, hardware: "one GeForce RTX 4090 GPU", result: nep-8-pbed3, location: "Table I"}
+  - {model: nep-10, system: "Bilayer graphene, 40,000 atoms, MD", atoms: 40000, value: 8.5e+06, unit: "atom-steps per second", per_atom_us: 0.1176, hardware: "one GeForce RTX 4090 GPU", result: nep-10-pbed3, location: "Table I"}
+gaps:
+  - "Table I does not say whether errors are on training or test data, so the role is null. Virial RMSEs are in meV/atom (unit null). RMSEs of the PBE-trained NEPs versus cutoff are in Fig. 2 only."
+  - "The D3 force comparison against VASP for MOF-5, ZIF-8 and HKUST-1 (Fig. 1) checks the D3 implementation, not an MLIP; binding curves and thermal conductivities are property results."
