@@ -1,0 +1,93 @@
+id: lu2026
+source:
+  rank: 556
+  year: "2026"
+  first_author: "Muyu Lu"
+  title: "OMC-bench and AtomBit-OMC: task-aligned benchmarks and robust, interpretable machine-learned interatomic potentials for organic molecular crystals"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02315-3"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "28a4fb5b45440677f1cf59ebe475805675a3419c23c349cb967f3a69e5ff95d4"
+study_label: "Lu et al. (2026): OMC-bench task-aligned benchmarks for organic molecular crystals and the AtomBit-OMC Cartesian-tensor MLIP"
+scope: |
+  Encoding scope: the OMC training dataset (PBE-D3(BJ), CSD-derived
+  organic molecular crystals: optimization trajectories, AIMD and fixed
+  displacements), 14 off-the-shelf foundation MLIPs as distributed and
+  five OMC-specialized models trained from scratch (NEMP-OMC, MACE-OMC,
+  MatRIS-OMC, AtomBit-OMC-s, AtomBit-OMC-l); Task 1 force and stress
+  MAEs of Table 1. Phonon, thermodynamic, cocrystal-recovery and
+  polymorph-ranking metrics (Tasks 2-4) are properties.
+materials:
+  omc: {label: "Organic molecular crystals from the CSD (H, B, C, N, O, F, P, S, Cl, Br, I; under 400 atoms per cell)", class: "Organic molecular crystal"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Gamma-centred, KSPACING 0.4 1/A", comment: "D3(BJ) dispersion"}
+sampling:
+  omc: {label: "DFT geometry-optimization trajectories, AIMD at 600 K and 1 GPa, and fixed all-atom displacements (0.01-0.30 A) of CSD-derived crystals; benchmark sets by dual-objective farthest-point sampling in SOAP-UMAP space"}
+datasets:
+  omc: {label: "OMC training dataset (about 2.07 million configurations)", materials: [omc], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [omc]}
+methods:
+  AlphaNet: {sims: [GeometryOptimization, PhononCalculation]}
+  AtomBit:
+    hp: [cutoffRadius, numLayers, numFeatures, numEpochs]
+    loss: "Energies, forces and stresses"
+    algorithm: "OneCycle learning rate 1e-5 to 1e-3 to 1e-6, EMA 0.999, cost-aware dynamic batch sampler"
+    sims: [GeometryOptimization, PhononCalculation]
+  CHGNet: {sims: [GeometryOptimization, PhononCalculation]}
+  DPA3: {sims: [GeometryOptimization, PhononCalculation]}
+  Eqnorm: {sims: [GeometryOptimization, PhononCalculation]}
+  GRACE: {sims: [GeometryOptimization, PhononCalculation]}
+  MACE: {sims: [GeometryOptimization, PhononCalculation]}
+  MatRIS: {sims: [GeometryOptimization, PhononCalculation]}
+  NEMP: {sims: [GeometryOptimization, PhononCalculation]}
+  NequIP: {sims: [GeometryOptimization, PhononCalculation]}
+  Nequix: {sims: [GeometryOptimization, PhononCalculation]}
+  ORB: {sims: [GeometryOptimization, PhononCalculation]}
+  UMA: {sims: [GeometryOptimization, PhononCalculation]}
+  eSEN: {sims: [GeometryOptimization, PhononCalculation]}
+runs:
+  grace1l: {label: "GRACE-1L-OAM (off-the-shelf, as distributed)", method: GRACE, model: "GRACE-1L-OAM"}
+  macemp0: {label: "MACE-MP-0 (off-the-shelf, as distributed)", method: MACE, model: "MACE-MP-0"}
+  alphanet: {label: "AlphaNet-v1-OAM (off-the-shelf, as distributed)", method: AlphaNet, model: "AlphaNet-v1-OAM"}
+  macempa0: {label: "MACE-MPA-0 (off-the-shelf, as distributed)", method: MACE, model: "MACE-MPA-0"}
+  chgnet: {label: "CHGNet (off-the-shelf, as distributed)", method: CHGNet, model: "CHGNet"}
+  sevennet: {label: "SevenNet-l3i5 (off-the-shelf, as distributed)", method: NequIP, model: "SevenNet-l3i5"}
+  eqnorm: {label: "Eqnorm MPtrj (off-the-shelf, as distributed)", method: Eqnorm, model: "Eqnorm MPtrj"}
+  nequix: {label: "Nequix-MP (off-the-shelf, as distributed)", method: Nequix, model: "Nequix-MP"}
+  dpa31: {label: "DPA-3.1-MPtrj (off-the-shelf, as distributed)", method: DPA3, model: "DPA-3.1-MPtrj"}
+  orbv3: {label: "ORB v3 (conserve) (off-the-shelf, as distributed)", method: ORB, model: "ORB v3 (conserve)"}
+  matrisoam: {label: "MatRIS-OAM (off-the-shelf, as distributed)", method: MatRIS, model: "MatRIS-OAM"}
+  esen30m: {label: "eSEN-30M-OAM (off-the-shelf, as distributed)", method: eSEN, model: "eSEN-30M-OAM"}
+  maceomol: {label: "MACE-OMol (off-the-shelf, as distributed)", method: MACE, model: "MACE-OMol"}
+  umamd: {label: "UMA-md (off-the-shelf, as distributed)", method: UMA, model: "UMA-md"}
+  nempomc: {label: "NEMP-OMC (trained from scratch on the OMC dataset)", method: NEMP, dataset: omc, model: "NEMP-OMC"}
+  maceomc: {label: "MACE-OMC (trained from scratch on the OMC dataset)", method: MACE, dataset: omc, model: "MACE-OMC"}
+  matrisomc: {label: "MatRIS-OMC (trained from scratch on the OMC dataset)", method: MatRIS, dataset: omc, model: "MatRIS-OMC"}
+  atombits: {label: "AtomBit-OMC-s (trained from scratch on the OMC dataset)", method: AtomBit, dataset: omc, settings: {cutoffRadius: {v: 6, loc: "Methods (AtomBit)"}, numLayers: {v: 2, loc: "Methods (AtomBit)"}, numFeatures: {v: 64, loc: "Methods (AtomBit)"}, numEpochs: {v: 15, loc: "Methods (AtomBit)"}}, model: "AtomBit-OMC-s"}
+  atombitl: {label: "AtomBit-OMC-l (trained from scratch on the OMC dataset)", method: AtomBit, dataset: omc, settings: {cutoffRadius: {v: 6, loc: "Methods (AtomBit)"}, numLayers: {v: 2, loc: "Methods (AtomBit)"}, numFeatures: {v: 128, loc: "Methods (AtomBit)"}, numEpochs: {v: 15, loc: "Methods (AtomBit)"}}, model: "AtomBit-OMC-l"}
+results:
+  - {key: grace1l-task1, model: grace1l, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 134.7, meV/A, "OMC-bench Task 1 force MAE: GRACE-1L-OAM", "Table 1"], [MAE, Stress, 0.68, GPa, "OMC-bench Task 1 stress MAE: GRACE-1L-OAM", "Table 1"]]}
+  - {key: macemp0-task1, model: macemp0, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 121.4, meV/A, "OMC-bench Task 1 force MAE: MACE-MP-0", "Table 1"], [MAE, Stress, 0.55, GPa, "OMC-bench Task 1 stress MAE: MACE-MP-0", "Table 1"]]}
+  - {key: alphanet-task1, model: alphanet, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 120.1, meV/A, "OMC-bench Task 1 force MAE: AlphaNet-v1-OAM", "Table 1"], [MAE, Stress, 0.84, GPa, "OMC-bench Task 1 stress MAE: AlphaNet-v1-OAM", "Table 1"]]}
+  - {key: macempa0-task1, model: macempa0, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 103.4, meV/A, "OMC-bench Task 1 force MAE: MACE-MPA-0", "Table 1"], [MAE, Stress, 1.09, GPa, "OMC-bench Task 1 stress MAE: MACE-MPA-0", "Table 1"]]}
+  - {key: chgnet-task1, model: chgnet, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 113.6, meV/A, "OMC-bench Task 1 force MAE: CHGNet", "Table 1"], [MAE, Stress, 0.53, GPa, "OMC-bench Task 1 stress MAE: CHGNet", "Table 1"]]}
+  - {key: sevennet-task1, model: sevennet, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 97.9, meV/A, "OMC-bench Task 1 force MAE: SevenNet-l3i5", "Table 1"], [MAE, Stress, 0.67, GPa, "OMC-bench Task 1 stress MAE: SevenNet-l3i5", "Table 1"]]}
+  - {key: eqnorm-task1, model: eqnorm, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 91.8, meV/A, "OMC-bench Task 1 force MAE: Eqnorm MPtrj", "Table 1"], [MAE, Stress, 0.62, GPa, "OMC-bench Task 1 stress MAE: Eqnorm MPtrj", "Table 1"]]}
+  - {key: nequix-task1, model: nequix, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 86.9, meV/A, "OMC-bench Task 1 force MAE: Nequix-MP", "Table 1"], [MAE, Stress, 0.73, GPa, "OMC-bench Task 1 stress MAE: Nequix-MP", "Table 1"]]}
+  - {key: dpa31-task1, model: dpa31, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 85.5, meV/A, "OMC-bench Task 1 force MAE: DPA-3.1-MPtrj", "Table 1"], [MAE, Stress, 0.61, GPa, "OMC-bench Task 1 stress MAE: DPA-3.1-MPtrj", "Table 1"]]}
+  - {key: orbv3-task1, model: orbv3, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 76.0, meV/A, "OMC-bench Task 1 force MAE: ORB v3 (conserve)", "Table 1"], [MAE, Stress, 0.7, GPa, "OMC-bench Task 1 stress MAE: ORB v3 (conserve)", "Table 1"]]}
+  - {key: matrisoam-task1, model: matrisoam, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 51.7, meV/A, "OMC-bench Task 1 force MAE: MatRIS-OAM", "Table 1"], [MAE, Stress, 0.62, GPa, "OMC-bench Task 1 stress MAE: MatRIS-OAM", "Table 1"]]}
+  - {key: esen30m-task1, model: esen30m, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 24.5, meV/A, "OMC-bench Task 1 force MAE: eSEN-30M-OAM", "Table 1"], [MAE, Stress, 0.75, GPa, "OMC-bench Task 1 stress MAE: eSEN-30M-OAM", "Table 1"]]}
+  - {key: maceomol-task1, model: maceomol, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 175.1, meV/A, "OMC-bench Task 1 force MAE: MACE-OMol", "Table 1"], [MAE, Stress, 1.3, GPa, "OMC-bench Task 1 stress MAE: MACE-OMol", "Table 1"]]}
+  - {key: umamd-task1, model: umamd, material: omc, role: external, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 22.9, meV/A, "OMC-bench Task 1 force MAE: UMA-md", "Table 1"], [MAE, Stress, 0.36, GPa, "OMC-bench Task 1 stress MAE: UMA-md", "Table 1"]]}
+  - {key: nempomc-task1, model: nempomc, material: omc, role: test, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 29.1, meV/A, "OMC-bench Task 1 force MAE: NEMP-OMC", "Table 1"], [MAE, Stress, 0.15, GPa, "OMC-bench Task 1 stress MAE: NEMP-OMC", "Table 1"]]}
+  - {key: maceomc-task1, model: maceomc, material: omc, role: test, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 36.9, meV/A, "OMC-bench Task 1 force MAE: MACE-OMC", "Table 1"], [MAE, Stress, 0.29, GPa, "OMC-bench Task 1 stress MAE: MACE-OMC", "Table 1"]]}
+  - {key: matrisomc-task1, model: matrisomc, material: omc, role: test, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 13.9, meV/A, "OMC-bench Task 1 force MAE: MatRIS-OMC", "Table 1"], [MAE, Stress, 0.09, GPa, "OMC-bench Task 1 stress MAE: MatRIS-OMC", "Table 1"]]}
+  - {key: atombits-task1, model: atombits, material: omc, role: test, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 32.7, meV/A, "OMC-bench Task 1 force MAE: AtomBit-OMC-s", "Table 1"], [MAE, Stress, 0.13, GPa, "OMC-bench Task 1 stress MAE: AtomBit-OMC-s", "Table 1"]]}
+  - {key: atombitl-task1, model: atombitl, material: omc, role: test, eval_data: {label: "OMC-bench Task 1 (large-cell out-of-distribution force/stress set)", location: "Table 1; Methods"}, metrics: [[MAE, Force, 25.2, meV/A, "OMC-bench Task 1 force MAE: AtomBit-OMC-l", "Table 1"], [MAE, Stress, 0.12, GPa, "OMC-bench Task 1 stress MAE: AtomBit-OMC-l", "Table 1"]]}
+resources: |
+  Data generation consumed about 1.3e7 CPU core-hours and 2.0e5 GPU-hours (Methods). AtomBit models were trained in FP32 on 8 GPUs for 15 epochs.
+gaps:
+  - "Off-the-shelf checkpoints are paper-local runs (names as printed; none matches a registry model version). Their pretraining data may overlap OMC-bench (documented for UMA-md). Tasks 2-4 metrics are not energy/force/stress errors and are not encoded. The OMC dataset size is printed as 2.07 M; no n."
+  - "AtomBit is a new registry method (origin lu2026); Eqnorm is a new registry method without origin (its paper is not in the corpus)."
