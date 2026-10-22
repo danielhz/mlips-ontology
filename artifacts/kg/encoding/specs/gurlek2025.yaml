@@ -1,0 +1,69 @@
+id: gurlek2025
+source:
+  rank: 383
+  year: "2025"
+  first_author: "Burak Gurlek"
+  title: "Accurate machine learning interatomic potentials for polyacene molecular crystals: application to single molecule host-guest systems"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01825-w"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2504.11224v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3301a5b80046beb81467392fb2a37ca53f2a646a41930859116ec8d8c27e53a4"
+study_label: "Gurlek et al. (2025): VASP and MACE MLIPs for polyacene molecular crystals, committee uncertainty propagation to phonons, and pentacene in naphthalene"
+scope: |
+  Encoding scope: VASP on-the-fly MLFFs and MACE models for crystalline
+  naphthalene (single-temperature 295 K data, Table 1; multi-temperature
+  VASP data and committee-selected FHI-aims data, Table 2; VASP MLFF on
+  the MACE committee data, SI Table 1), and the generalized MACE
+  committees for naphthalene to pentacene (Table 4). Phonon-frequency
+  errors, VDOS and host-guest analyses are properties.
+materials:
+  naph: {label: "Crystalline naphthalene (80-295 K)", formula: "C10H8", class: "Organic molecular crystal"}
+  acenes: {label: "Crystalline naphthalene, anthracene, tetracene and pentacene", class: "Organic molecular crystal"}
+reference:
+  vasp: {type: DFT, code: VASP, cutoff: 1000, kpoints: "2x2x1 Monkhorst-Pack", comment: "VASP 6.4.2 on-the-fly MD data; the exchange-correlation functional is not named in the main text (Methods)."}
+  aims: {type: DFT, code: FHIaims, comment: "FHI-aims with the tight basis-set defaults (no vocabulary individual for tight); functional not named in the main text."}
+sampling:
+  otf: {label: "VASP on-the-fly Bayesian active learning during MD of a 1x2x2 naphthalene supercell"}
+  committee: {label: "Committee (8 MACE models) active learning on energy uncertainty from an AIMD/MACE-OFF structure pool, starting from 100 farthest-point-sampled structures, 25 added per iteration"}
+datasets:
+  v295: {label: "VASP on-the-fly naphthalene data at 295 K", materials: [naph], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1402, loc: "Sec. 2.1"}, calc: vasp, sampling: [otf]}
+  vmulti: {label: "VASP on-the-fly naphthalene data at 295, 220, 150, 120 and 80 K (940, 22, 145, 14, 47 structures)", materials: [naph], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1168, loc: "Sec. 2.1"}, calc: vasp, sampling: [otf]}
+  mcomm: {label: "Committee-selected naphthalene structures at 80-295 K (FHI-aims single points; 9:1 train/validation)", materials: [naph], properties: [Energy, Forces], provenance: InHouse, n: {v: 450, loc: "Sec. 2.1; Table 4"}, calc: aims, sampling: [committee]}
+  g1: {label: "Generalized set G-MLIP 1: 450 naphthalene + 125 anthracene structures", materials: [acenes], properties: [Energy, Forces], provenance: InHouse, n: {v: 575, loc: "Table 4"}, calc: aims, sampling: [committee]}
+  g2: {label: "Generalized set G-MLIP 2: 450 naphthalene + 125 anthracene + 125 tetracene structures", materials: [acenes], properties: [Energy, Forces], provenance: InHouse, n: {v: 700, loc: "Table 4"}, calc: aims, sampling: [committee]}
+  g3: {label: "Generalized set G-MLIP 3: 450 naphthalene + 125 each of anthracene, tetracene and pentacene", materials: [acenes], properties: [Energy, Forces], provenance: InHouse, n: {v: 825, loc: "Table 4"}, calc: aims, sampling: [committee]}
+methods:
+  VASP-MLFF:
+    hp: [cutoffRadius, angularCutoff]
+    impl: {lib: VASP}
+    sims: [MolecularDynamics, PhononCalculation]
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures]
+    loss: "Energy weight 10, force weight 1000"
+    impl: {lib: MACE, comment: "MACE 0.3.10"}
+    sims: [MolecularDynamics, PhononCalculation, GeometryOptimization]
+runs:
+  vasp-295: {label: "VASP MLFF trained on the 295 K on-the-fly naphthalene data", method: VASP-MLFF, dataset: v295, settings: {cutoffRadius: {v: 8, loc: "Sec. 2.1"}, angularCutoff: {v: 5, loc: "Sec. 2.1"}}, model: "naphthalene VASP MLIP (295 K)"}
+  mace-295: {label: "MACE trained on the 295 K VASP naphthalene data", method: MACE, dataset: v295, settings: {cutoffRadius: {v: 6.0, loc: "Table 3"}, numLayers: {v: 2, loc: "Table 3"}, numFeatures: {v: 256, loc: "Table 3"}}, model: "naphthalene MACE MLIP (295 K)"}
+  vasp-multi: {label: "VASP MLIP-multi trained on the multi-temperature VASP data", method: VASP-MLFF, dataset: vmulti, settings: {cutoffRadius: {v: 8, loc: "Sec. 2.1"}, angularCutoff: {v: 5, loc: "Sec. 2.1"}}, model: "naphthalene VASP MLIP-multi"}
+  mace-comm: {label: "MACE MLIP-committee (8 members; N-MLIP) trained on the committee-selected FHI-aims data", method: MACE, dataset: mcomm, settings: {cutoffRadius: {v: 6.0, loc: "Table 3"}, numLayers: {v: 2, loc: "Table 3"}, numFeatures: {v: 256, loc: "Table 3"}}, model: "naphthalene MACE MLIP-committee"}
+  vasp-on-mcomm: {label: "VASP MLFF trained on the MACE committee data set (SI Note 2)", method: VASP-MLFF, dataset: mcomm, settings: {cutoffRadius: {v: 8, loc: "Sec. 2.1"}, angularCutoff: {v: 5, loc: "Sec. 2.1"}}, model: "naphthalene VASP MLIP on committee data"}
+  g1: {label: "Generalized MACE committee G-MLIP 1", method: MACE, dataset: g1, settings: {cutoffRadius: {v: 6.0, loc: "Table 3"}, numLayers: {v: 2, loc: "Table 3"}, numFeatures: {v: 256, loc: "Table 3"}}, model: "acene MACE G-MLIP 1"}
+  g2: {label: "Generalized MACE committee G-MLIP 2", method: MACE, dataset: g2, settings: {cutoffRadius: {v: 6.0, loc: "Table 3"}, numLayers: {v: 2, loc: "Table 3"}, numFeatures: {v: 256, loc: "Table 3"}}, model: "acene MACE G-MLIP 2"}
+  g3: {label: "Generalized MACE committee G-MLIP 3", method: MACE, dataset: g3, settings: {cutoffRadius: {v: 6.0, loc: "Table 3"}, numLayers: {v: 2, loc: "Table 3"}, numFeatures: {v: 256, loc: "Table 3"}}, model: "acene MACE G-MLIP 3"}
+results:
+  - {key: vasp-295-train, model: vasp-295, material: naph, role: training, eval_data: {label: "295 K VASP training data", location: "Table 1"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on naph: VASP MLIP (295 K)", "Table 1"], [RMSE, Force, 23.7, meV/A, "training force RMSE on naph: VASP MLIP (295 K)", "Table 1"]]}
+  - {key: mace-295-train, model: mace-295, material: naph, role: training, eval_data: {label: "295 K VASP training data", location: "Table 1"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on naph: MACE MLIP (295 K)", "Table 1"], [RMSE, Force, 10.5, meV/A, "training force RMSE on naph: MACE MLIP (295 K)", "Table 1"]]}
+  - {key: vasp-multi-train, model: vasp-multi, material: naph, role: training, eval_data: {label: "Multi-temperature VASP training data", location: "Table 2"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on naph: VASP MLIP-multi", "Table 2"], [RMSE, Force, 20.9, meV/A, "training force RMSE on naph: VASP MLIP-multi", "Table 2"]]}
+  - {key: vasp-multi-val, model: vasp-multi, material: naph, role: validation, eval_data: {label: "Validation data (Methods test set)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "validation energy RMSE on naph: VASP MLIP-multi", "Table 2"], [RMSE, Force, 14.6, meV/A, "validation force RMSE on naph: VASP MLIP-multi", "Table 2"]]}
+  - {key: mace-comm-train, model: mace-comm, material: naph, role: training, eval_data: {label: "Committee training data", location: "Table 2"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on naph: MACE MLIP-committee", "Table 2"], [RMSE, Force, 4.3, meV/A, "training force RMSE on naph: MACE MLIP-committee", "Table 2"]]}
+  - {key: mace-comm-val, model: mace-comm, material: naph, role: validation, eval_data: {label: "Validation data (Methods test set)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "validation energy RMSE on naph: MACE MLIP-committee", "Table 2"], [RMSE, Force, 4.4, meV/A, "validation force RMSE on naph: MACE MLIP-committee", "Table 2"]]}
+  - {key: vasp-on-mcomm-train, model: vasp-on-mcomm, material: naph, role: training, eval_data: {label: "MACE committee training data", location: "SI Table 1"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on naph: VASP MLIP on committee data", "SI Table 1"], [RMSE, Force, 30.1, meV/A, "training force RMSE on naph: VASP MLIP on committee data", "SI Table 1"]]}
+  - {key: vasp-on-mcomm-test, model: vasp-on-mcomm, material: naph, role: test, eval_data: {label: "Test set of the committee data", location: "SI Table 1"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "test energy RMSE on naph: VASP MLIP on committee data", "SI Table 1"], [RMSE, Force, 26.4, meV/A, "test force RMSE on naph: VASP MLIP on committee data", "SI Table 1"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "Table 2 labels its error columns 'Validation' while SI Note 2 calls the same evaluation set the 'test set'; roles follow each table's label. SI Table 1 repeats the MACE committee errors with more digits (0.08 meV/atom); the Table 2 values are encoded."
+  - "The FHI-aims tight basis has no vocabulary individual, so it is given only in the comment. Functionals are not named in the main text. Errors of the generalized G-MLIPs and phonon/VDOS errors are figure-only or properties."

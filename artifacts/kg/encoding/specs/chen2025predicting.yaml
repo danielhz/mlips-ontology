@@ -1,0 +1,42 @@
+id: chen2025predicting
+source:
+  rank: 381
+  year: "2025"
+  first_author: "Beihan Chen"
+  title: "Machine learning interatomic potential for predicting the thermal properties of uranium nitride"
+  venue: "Journal of Applied Physics"
+  doi: "10.1063/5.0294389"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2507.18786v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6b81b4544cc7102f1cf688b0229a77f3824b8b1564a98fde721d05bcefdae748"
+study_label: "Chen et al. (2025): an actively learned moment tensor potential for the thermal properties of uranium nitride"
+scope: |
+  Encoding scope: the VASP PBE+SOC (ferromagnetic, no Hubbard U) data
+  set of 64-atom UN cells grown by MLIP-3 active learning with MD up to
+  3600 K (3,236 configurations, 90/10 train/validation), the MTP trained
+  on it (energy, force and stress weights 0.85, 0.15, 0.001), and its
+  validation RMSEs. Elastic constants, defect energies, thermal expansion,
+  specific heat, melting point and thermal conductivity are properties.
+materials:
+  un: {label: "Uranium nitride (rocksalt UN), crystalline, defective and high-temperature/amorphous configurations", formula: "UN", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "3x3x3", comment: "VASP 6.4.1, spin-orbit coupling, ferromagnetic ordering, no Hubbard U, Gaussian smearing 0.05 eV, 2x2x2 conventional supercell (64 atoms) (Sec. II B)."}
+sampling:
+  al: {label: "MLIP-3 active learning: MTP-driven MD up to 3600 K with extrapolation-grade selection of new configurations"}
+datasets:
+  un: {label: "UN active-learning data set (90 % training, 10 % validation)", materials: [un], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 3236, loc: "Sec. II B"}, calc: pbe, sampling: [al]}
+methods:
+  MTP:
+    loss: "Weighted energy, force and stress squared errors (0.85, 0.15, 0.001)"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  mtp-un: {label: "MTP for UN trained with MLIP-3 active learning", method: MTP, dataset: un, model: "UN MTP (Chen 2025)"}
+results:
+  - {key: mtp-un-val, model: mtp-un, material: un, role: validation, eval_data: {label: "UN validation set (450 configurations)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 2.82, meV/atom, "validation energy RMSE on un: UN MTP", "Sec. III A"], [RMSE, Force, 45.49, meV/A, "validation force RMSE on un: UN MTP", "Sec. III A"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The MTP level and cutoff radius are not stated in the main text. The validation set is stated as 450 configurations, which is not 10 % of 3,236; both numbers are kept as written."
+  - "The HIP-NN errors of Alzate-Vargas et al. (2.48 meV/atom, 111 meV/A) are quoted from another paper and not encoded. Lattice and elastic constants (Table I), defect energies (Table II) and thermal properties are properties."

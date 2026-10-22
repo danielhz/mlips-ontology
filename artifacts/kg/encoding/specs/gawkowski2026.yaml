@@ -1,0 +1,70 @@
+id: gawkowski2026
+source:
+  rank: 388
+  year: "2026"
+  first_author: "Mikołaj Jan Gawkowski"
+  title: "Dyna-Mat: End-to-end benchmarking of foundation machine learning interatomic potentials in finite-temperature ensembles"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.03433"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2607.03433v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "26604caa07fd48ed1199ca86b7be41ae2d60609bcdf16c800889078b0fe51912"
+study_label: "Gawkowski et al. (2026): Dyna-Mat, end-to-end benchmarking of 15 foundation MLIPs on finite-temperature first-principles MD ensembles"
+scope: |
+  Encoding scope: the Dyna-Mat-v1.0 data set (17 NVT first-principles
+  MD trajectories at 293-1500 K over metals, TMDs, alloys, perovskites,
+  interfaces and molecular crystals; VASP PBE, FHI-aims PBE+D3 for the
+  molecular crystals) and the 15 foundation MLIPs evaluated on it as
+  distributed, in four tiers of training data. Per-model energy and force
+  RMSEs, RDF, pressure and VDOS errors are shown only in figures; the text
+  gives only tier medians, which are aggregates over models and are not
+  encoded.
+materials:
+  dynamat: {label: "Dyna-Mat-v1.0 systems: pure metals, transition-metal dichalcogenides, metal alloys, perovskites (e.g. MAPbBr3), H2O on Pt(111), Cu3Au clusters and molecular crystals (naphthalene, anthracene, tetracene, pentacene, picene)", class: "Universal (materials and molecules)"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 700, kpoints: "4.54 1/A Gamma-centred k-point density", comment: "potpaw.64, Gaussian smearing 0.05 eV, dipole corrections for surfaces (Table I)."}
+  aims: {type: DFT, code: FHIaims, xc: PBE, comment: "PBE+D3 for molecular crystals, tight (2020) defaults, all-electron (Table I)."}
+datasets:
+  dynamat: {label: "Dyna-Mat-v1.0: 17 first-principles NVT MD trajectories (up to about 21 ps each)", materials: [dynamat], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp}
+external_models: [MatterSim-v1]
+methods:
+  CHGNet:
+    sims: [MolecularDynamics]
+  EquiformerV2:
+    sims: [MolecularDynamics]
+  GRACE:
+    sims: [MolecularDynamics]
+  MACE:
+    sims: [MolecularDynamics]
+  NequIP:
+    sims: [MolecularDynamics]
+  ORB:
+    sims: [MolecularDynamics]
+  PET:
+    sims: [MolecularDynamics]
+  UMA:
+    sims: [MolecularDynamics]
+  eSEN:
+    sims: [MolecularDynamics]
+runs:
+  chgnet: {label: "CHGNet (Tier 1, MPtrj) as distributed", method: CHGNet, model: "CHGNet"}
+  macemp0: {label: "MACE-MP-0 (Tier 1, MPtrj; release not stated) as distributed", method: MACE, model: "MACE-MP-0"}
+  grace-mptrj: {label: "GRACE-2L-MPtrj (Tier 1) as distributed", method: GRACE, model: "GRACE-2L-MPtrj"}
+  mpa0: {label: "MACE-MPA-0 (Tier 2, MPtrj + sAlex) as distributed", method: MACE, model: "MACE-MPA-0"}
+  orbv2: {label: "orb-v2 (Tier 2) as distributed", method: ORB, model: "orb-v2"}
+  grace-oam: {label: "GRACE-2L-OAM (Tier 3) as distributed", method: GRACE, model: "GRACE-2L-OAM"}
+  orbv3: {label: "orb-v3-conservative-inf-mpa (Tier 3) as distributed", method: ORB, model: "orb-v3-conservative-inf-mpa"}
+  esen: {label: "eSEN-30M-OAM (Tier 3) as distributed", method: eSEN, model: "eSEN-30M-OAM"}
+  nequip: {label: "NequIP-OAM-XL (Tier 3) as distributed", method: NequIP, model: "NequIP-OAM-XL"}
+  eqv2: {label: "EquiformerV2 pretrained on OMat24 and fine-tuned on MPtrj (Tier 3; checkpoint name not stated) as distributed", method: EquiformerV2, model: "EquiformerV2 (OMat24, fine-tuned on MPtrj)"}
+  pet: {label: "PET-OAM-XL (Tier 3) as distributed", method: PET, model: "PET-OAM-XL"}
+  mh1: {label: "MACE-MH-1, OMAT head (Tier 4) as distributed", method: MACE, model: "MACE-MH-1-OMAT"}
+  umas: {label: "UMA-S p1 checkpoint (Tier 4) as distributed", method: UMA, model: "UMA-S-P1"}
+  umam: {label: "UMA-M p1 checkpoint (Tier 4) as distributed", method: UMA, model: "UMA-M-P1"}
+results: []
+resources: |
+  No MLIP timings are given in the text.
+gaps:
+  - "Per-model mean energy and force RMSEs over the 17 systems (Fig. 2), per-class errors (Figs. S1-S2) and RDF, pressure and VDOS errors are figure-only. The text states only tier medians (energy 0.236, 0.180, 0.164, 0.116 eV/atom; force 0.166, 0.106, 0.063, 0.054 eV/A for Tiers 1-4), which aggregate several models and have no single model to attach to."
+  - "MatterSim-v1.0.0-5M is linked to the registry model MatterSim-v1. The MACE-MP-0 release and the EquiformerV2 checkpoint are not named precisely, so they are paper-local runs. The molecular-crystal trajectories use the FHI-aims reference, which the data set node does not separate."

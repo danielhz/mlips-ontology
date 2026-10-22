@@ -1,0 +1,65 @@
+id: hedin2026
+source:
+  rank: 386
+  year: "2026"
+  first_author: "Ludwig Hedin"
+  title: "Barocaloric phase transformation from data efficient fine-tuning of machine learned interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2606.25742"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2606.25742v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d7b8460acb6090dd1682918b67f628528f6ba872015ed0c30ce0876863631ccc"
+study_label: "Hedin and Klarbring (2026): data-efficient naive and multihead-replay fine-tuning of MACE-MPA-0 for the barocaloric transformation in ammonium sulfate"
+scope: |
+  Encoding scope: r2SCAN data sets of ammonium sulfate (360-atom VASP
+  MLFF on-the-fly MD snapshots, 1,385 structures with a 139-structure
+  hold-out test set; 60-atom MACE-MPA-0 MD snapshots, 2,403 structures,
+  with DIRECT-sampled subsets of 5-500), MACE models trained from scratch
+  and fine-tuned from MACE-MPA-0 (naive, NFT; multihead replay, MHFT),
+  and the hold-out test RMSEs of the models listed in Table I. PBE0 and
+  PBE0+D3 fine-tunes and the out-of-domain errors of Fig. 9 are
+  figure-only; lattice parameters and transition behaviour are
+  properties.
+materials:
+  as: {label: "Ammonium sulfate (NH4)2SO4, low-temperature Pna21 and high-temperature Pnam phases", formula: "(NH4)2SO4", class: "Inorganic crystals"}
+reference:
+  r2scan: {type: DFT, code: VASP, xc: {local: r2SCAN}, pp: PAW, cutoff: 900, kpoints: "Gamma point (360-atom cells); KSPACING 0.5 (60-atom cells)", comment: "50 meV Gaussian smearing, EDIFF 1e-6 eV (Sec. II C)."}
+  pbe0d3: {type: DFT, code: VASP, xc: PBE0, pp: PAW, cutoff: 900, comment: "PBE0 with and without D3 on selected subsets (PRECFOCK Normal)."}
+sampling:
+  otf: {label: "VASP MLFF on-the-fly MD of 360-atom cells over temperatures and pressures in both phases"}
+  mpa-md: {label: "MACE-MPA-0 MD of 60-atom cells over temperatures and pressures, temporally separated snapshots; DIRECT sampling (MACE-MPA-0 features, PCA, clustering) for subsets"}
+datasets:
+  d360: {label: "360-atom r2SCAN data (1,385 structures; 139 held out as test set)", materials: [as], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1385, loc: "Sec. II B"}, calc: r2scan, sampling: [otf]}
+  d60: {label: "60-atom r2SCAN data (80/20 train/validation)", materials: [as], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2403, loc: "Sec. II B"}, calc: r2scan, sampling: [mpa-md]}
+  s100: {label: "DIRECT subset of 100 60-atom r2SCAN structures", materials: [as], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 100, loc: "Table I"}, calc: r2scan, sampling: [mpa-md]}
+  s10: {label: "DIRECT subset of 10 60-atom r2SCAN structures", materials: [as], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 10, loc: "Table I"}, calc: r2scan, sampling: [mpa-md]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures, learningRate, batchSize, numEpochs]
+    impl: {lib: MACE, comment: "MACE 0.3.12"}
+    sims: [MolecularDynamics]
+runs:
+  mpa0: {label: "MACE-MPA-0 foundation model as distributed (MPtrj + sAlex)", method: MACE, model: "MACE-MPA-0"}
+  ref360: {label: "360 Ref. model: MACE trained from scratch on the 360-atom data", method: MACE, dataset: d360, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.01, loc: "Sec. II D (first stage)"}, batchSize: {v: 4, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE ref360"}
+  ref60: {label: "60 Ref. model: MACE trained from scratch on the full 60-atom data", method: MACE, dataset: d60, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.01, loc: "Sec. II D (first stage)"}, batchSize: {v: 4, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE ref60"}
+  scr100: {label: "Scratch(100): MACE trained from scratch on 100 structures", method: MACE, dataset: s100, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.01, loc: "Sec. II D (first stage)"}, batchSize: {v: 4, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE scr100"}
+  scr10: {label: "Scratch(10): MACE trained from scratch on 10 structures", method: MACE, dataset: s10, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.01, loc: "Sec. II D (first stage)"}, batchSize: {v: 4, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE scr10"}
+  nft100: {label: "NFT(100): MACE-MPA-0 naively fine-tuned on 100 structures", method: MACE, dataset: s100, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.0005, loc: "Sec. II D"}, batchSize: {v: 2, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE nft100", base_model: {run: mpa0, relation: fine-tuned, location: "Sec. II D"}}
+  nft10: {label: "NFT(10): MACE-MPA-0 naively fine-tuned on 10 structures", method: MACE, dataset: s10, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.0005, loc: "Sec. II D"}, batchSize: {v: 2, loc: "Sec. II D"}, numEpochs: {v: 500, loc: "Sec. II D (maximum)"}}, model: "ammonium sulfate MACE nft10", base_model: {run: mpa0, relation: fine-tuned, location: "Sec. II D"}}
+  mhft100: {label: "MHFT(100): MACE-MPA-0 multihead-replay fine-tuned on 100 structures (50,000 MPtrj replay structures)", method: MACE, dataset: s100, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.0001, loc: "Sec. II D"}, batchSize: {v: 8, loc: "Sec. II D"}, numEpochs: {v: 20, loc: "Sec. II D"}}, model: "ammonium sulfate MACE mhft100", base_model: {run: mpa0, relation: fine-tuned, location: "Sec. II D"}}
+  mhft10: {label: "MHFT(10): MACE-MPA-0 multihead-replay fine-tuned on 10 structures (50,000 MPtrj replay structures)", method: MACE, dataset: s10, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, learningRate: {v: 0.0001, loc: "Sec. II D"}, batchSize: {v: 8, loc: "Sec. II D"}, numEpochs: {v: 20, loc: "Sec. II D"}}, model: "ammonium sulfate MACE mhft10", base_model: {run: mpa0, relation: fine-tuned, location: "Sec. II D"}}
+results:
+  - {key: ref360-test, model: ref360, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 6.42, meV/A, "test force RMSE on as: ammonium sulfate MACE ref360", "Table I"], [RMSE, Energy, 0.04, meV/atom, "test energy RMSE on as: ammonium sulfate MACE ref360", "Table I"], [RMSE, Stress, 0.37, null, "test stress RMSE on as in kbar: ammonium sulfate MACE ref360", "Table I"]]}
+  - {key: ref60-test, model: ref60, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 10.46, meV/A, "test force RMSE on as: ammonium sulfate MACE ref60", "Table I"], [RMSE, Energy, 0.088, meV/atom, "test energy RMSE on as: ammonium sulfate MACE ref60", "Table I"], [RMSE, Stress, 0.31, null, "test stress RMSE on as in kbar: ammonium sulfate MACE ref60", "Table I"]]}
+  - {key: scr100-test, model: scr100, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 40.54, meV/A, "test force RMSE on as: ammonium sulfate MACE scr100", "Table I"], [RMSE, Energy, 0.56, meV/atom, "test energy RMSE on as: ammonium sulfate MACE scr100", "Table I"], [RMSE, Stress, 0.68, null, "test stress RMSE on as in kbar: ammonium sulfate MACE scr100", "Table I"]]}
+  - {key: scr10-test, model: scr10, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 128.42, meV/A, "test force RMSE on as: ammonium sulfate MACE scr10", "Table I"], [RMSE, Energy, 7.41, meV/atom, "test energy RMSE on as: ammonium sulfate MACE scr10", "Table I"], [RMSE, Stress, 3.28, null, "test stress RMSE on as in kbar: ammonium sulfate MACE scr10", "Table I"]]}
+  - {key: nft100-test, model: nft100, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 20.99, meV/A, "test force RMSE on as: ammonium sulfate MACE nft100", "Table I"], [RMSE, Energy, 0.11, meV/atom, "test energy RMSE on as: ammonium sulfate MACE nft100", "Table I"], [RMSE, Stress, 0.42, null, "test stress RMSE on as in kbar: ammonium sulfate MACE nft100", "Table I"]]}
+  - {key: nft10-test, model: nft10, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 37.12, meV/A, "test force RMSE on as: ammonium sulfate MACE nft10", "Table I"], [RMSE, Energy, 0.56, meV/atom, "test energy RMSE on as: ammonium sulfate MACE nft10", "Table I"], [RMSE, Stress, 3.02, null, "test stress RMSE on as in kbar: ammonium sulfate MACE nft10", "Table I"]]}
+  - {key: mhft100-test, model: mhft100, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 22.15, meV/A, "test force RMSE on as: ammonium sulfate MACE mhft100", "Table I"], [RMSE, Energy, 0.34, meV/atom, "test energy RMSE on as: ammonium sulfate MACE mhft100", "Table I"], [RMSE, Stress, 0.85, null, "test stress RMSE on as in kbar: ammonium sulfate MACE mhft100", "Table I"]]}
+  - {key: mhft10-test, model: mhft10, material: as, role: test, eval_data: {label: "Hold-out test set of 139 360-atom r2SCAN structures", location: "Sec. II D; Table I"}, metrics: [[RMSE, Force, 35.32, meV/A, "test force RMSE on as: ammonium sulfate MACE mhft10", "Table I"], [RMSE, Energy, 0.33, meV/atom, "test energy RMSE on as: ammonium sulfate MACE mhft10", "Table I"], [RMSE, Stress, 1.3, null, "test stress RMSE on as in kbar: ammonium sulfate MACE mhft10", "Table I"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Stress RMSEs are in kbar (no schema unit; recorded with unit null). Force RMSEs for all dataset sizes (Fig. 5), the PBE0 and PBE0+D3 fine-tunes and the out-of-domain errors including MACE-MPA-0 itself (Fig. 9) are figure-only."
+  - "The 60 Ref. model is trained on the full 60-atom set with an 80/20 train/validation split; Table I evaluates all models on the 360-atom hold-out set. Lattice parameters and phase-transformation behaviour are properties."

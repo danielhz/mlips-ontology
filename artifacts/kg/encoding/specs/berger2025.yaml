@@ -1,0 +1,47 @@
+id: berger2025
+source:
+  rank: 385
+  year: "2025"
+  first_author: "Ethan Berger"
+  title: "Screening of material defects using universal machine-learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2504.06993"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2504.06993v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "80ae6f11fb93b254cca5018ab8c7fb7ed5a25934d7ec2c32e8ffa7402c756523"
+study_label: "Berger et al. (2025): screening of vacancy defects in Materials Project materials with universal MLIPs, and 2D layers from simulated etching"
+scope: |
+  Encoding scope: four pretrained universal MLIPs (MACE-MP-0 small
+  without dispersion, the CHGNet package default, M3GNet-MP-2021.2.8-PES
+  and ALIGNN-FF mptraj) benchmarked on vacancy and defect formation
+  energies of three DFT (PBE) databases (Angsten et al., Huang et al.,
+  Bjork et al.), with the MACE RMSEs stated in the text; MACE is then
+  used for 130,321 vacancy formation energies and 8,017 etched layers.
+  The RMSEs of the other three models and all correlation plots are
+  figure-only.
+materials:
+  fcchcp: {label: "Elemental fcc and hcp metals with a vacancy (Angsten et al. database)", class: "Metals"}
+  twod: {label: "2D materials with vacancies and substitutions (h-BN, MoS2, GaSe, BP and others; Huang et al. database)", class: "2D material"}
+  layered: {label: "Layered TMDC, MAX and YRu2Si2-type phases with vacancies (Bjork et al. database)", class: "Inorganic crystals"}
+external_models: [M3GNet-MPF-2021.2.8]
+methods:
+  MACE:
+    sims: [GeometryOptimization]
+  CHGNet:
+    sims: [GeometryOptimization]
+  ALIGNN-FF:
+    sims: [GeometryOptimization]
+runs:
+  mace-s: {label: "MACE-MP-0 small (no dispersion, float32) as distributed", method: MACE, model: "MACE-MP-0 small"}
+  chgnet: {label: "CHGNet default model of the chgnet package (version not stated)", method: CHGNet, model: "CHGNet (package default)"}
+  alignn: {label: "ALIGNN-FF mptraj model as distributed (alignn package)", method: ALIGNN-FF, model: "ALIGNN-FF mptraj"}
+results:
+  - {key: mace-angsten, model: mace-s, material: fcchcp, role: external, eval_data: {label: "Angsten et al. elemental vacancy database (PBE)", location: "Sec. II A; Fig. 1"}, metrics: [[RMSE, Energy, 0.80, eV, "Vacancy formation energy RMSE against DFT: MACE-MP-0 small, Angsten et al.", "Sec. II A"]]}
+  - {key: mace-huang, model: mace-s, material: twod, role: external, eval_data: {label: "Huang et al. 2D defect database (PBE)", location: "Sec. II A; Fig. 1"}, metrics: [[RMSE, Energy, 0.46, eV, "Defect formation energy RMSE against DFT: MACE-MP-0 small, Huang et al.", "Sec. II A"]]}
+  - {key: mace-bjork, model: mace-s, material: layered, role: external, eval_data: {label: "Bjork et al. layered-phase vacancy database (PBE)", location: "Sec. II A; Fig. 1"}, metrics: [[RMSE, Energy, 0.67, eV, "Vacancy formation energy RMSE against DFT: MACE-MP-0 small, Bjork et al.", "Sec. II A"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "CHGNet, M3GNet and ALIGNN RMSEs are shown only in Fig. 1(a). The Huang et al. errors are per defect site in the SI plots ('eV/site'), while the text gives the RMSE in eV; it is encoded as stated. M3GNet-MP-2021.2.8-PES is linked to the registry model M3GNet-MPF-2021.2.8 through its registry alias."
+  - "The MACE-MP-0 small release date is not stated, so it is a paper-local run; the CHGNet version is not stated either. Vacancy formation energies, oxidation-state statistics and etched layers are screening results, not error metrics."

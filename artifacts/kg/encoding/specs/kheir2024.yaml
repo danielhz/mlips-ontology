@@ -1,0 +1,43 @@
+id: kheir2024
+source:
+  rank: 373
+  year: "2024"
+  first_author: "Omar Abou El Kheir"
+  title: "Unraveling the crystallization kinetics of the Ge2Sb2Te5 phase change compound with a machine-learned interatomic potential"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01217-6"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2304.03109v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "64022610aab0b4cdc559c5294a92a105272f55b1a22cfa3cbf1843a81d941e98"
+study_label: "Abou El Kheir et al. (2024): a DeePMD potential for Ge2Sb2Te5 and the crystallization kinetics of the phase-change compound"
+scope: |
+  Encoding scope: the CP2K PBE database of GST225 (liquid, supercooled
+  liquid, quenching, amorphous, cubic, hexagonal and metadynamics
+  configurations; Table I, about 180,000 configurations), the DeePMD
+  potential (two-body se_e2 cutoff 7 A plus three-body 3.8 A embeddings,
+  fitting net 120-60-30-15, 200 epochs) and its training and test RMSEs.
+  Structural, dynamical and crystallization properties are properties.
+materials:
+  gst: {label: "Ge2Sb2Te5 (GST225): liquid, supercooled liquid, amorphous, cubic and hexagonal phases", formula: "Ge2Sb2Te5", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: {local: CP2K}, xc: PBE, pp: NormConserving, kpoints: "3x3x3 (108-atom cells) or 4x4x4 (smaller cells)", comment: "GTH pseudopotentials (s and p valence), TZVP Gaussian basis, 400 Ry density cutoff for the training single points; Gamma-point DFT-MD for sampling (Methods)."}
+sampling:
+  md: {label: "Born-Oppenheimer DFT-MD of liquid, supercooled liquid, quenched, amorphous, cubic and hexagonal GST225 and metadynamics runs (Table I)"}
+datasets:
+  gst: {label: "GST225 PBE database (Table I: liquid 4,489; supercooled liquid 64,440; quenching 70,463; amorphous 3,620; cubic 8,764; hexagonal 7,935; metadynamics 18,524)", materials: [gst], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [md]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, angularCutoff, learningRate, numEpochs]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  dp-gst: {label: "DeePMD potential for GST225 (se_e2 two-body cutoff 7 A, three-body 3.8 A; fitting net 120-60-30-15 with residual connections)", method: DeePMD, dataset: gst, settings: {cutoffRadius: {v: 7, loc: "Methods (two-body descriptor)"}, angularCutoff: {v: 3.8, loc: "Methods (three-body descriptor)"}, learningRate: {v: 0.001, loc: "SI Table IV (initial)"}, numEpochs: {v: 200, loc: "SI Table IV"}}, model: "GST225 DeePMD potential (Abou El Kheir 2024)"}
+results:
+  - {key: dp-gst-train, model: dp-gst, material: gst, role: training, eval_data: {label: "GST225 training set", location: "Sec. II A"}, metrics: [[RMSE, Energy, 8.4, meV/atom, "train energy RMSE on gst: GST225 DeePMD", "Sec. II A"], [RMSE, Force, 159, meV/A, "train force RMSE on gst: GST225 DeePMD", "Sec. II A"]]}
+  - {key: dp-gst-test, model: dp-gst, material: gst, role: test, eval_data: {label: "GST225 test set", location: "Sec. II A"}, metrics: [[RMSE, Energy, 8.6, meV/atom, "test energy RMSE on gst: GST225 DeePMD", "Sec. II A"], [RMSE, Force, 159, meV/A, "test force RMSE on gst: GST225 DeePMD", "Sec. II A"]]}
+resources: |
+  NN-MD with LAMMPS on GPUs (2 fs steps); no timings are given.
+gaps:
+  - "The train/test split ratio is not stated in the main text. The total database size is given only as 'about 180000'; per-phase counts are in the dataset label."
+  - "Diffusion coefficients, melting temperature, latent heat, equations of state and crystal growth velocities are properties."
