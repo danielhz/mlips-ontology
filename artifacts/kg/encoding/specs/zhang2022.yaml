@@ -1,0 +1,64 @@
+id: zhang2022
+source:
+  rank: 418
+  year: "2022"
+  first_author: "Linfeng Zhang"
+  title: "A deep potential model with long-range electrostatic interactions"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0083669"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2112.13327v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "fe49d1c17f55a946d7a1712530b8b71916cee80d78704e1dafd28f773173eb0c"
+study_label: "Zhang et al. (2022): the Deep Potential Long-Range (DPLR) model with Wannier-centroid Gaussian charges, for water and NaCl"
+scope: |
+  Encoding scope: the PBE water data set built with DP-GEN (583
+  configurations: 135 initial plus 323 bulk, 94 surface and 31
+  low-density), the DP, Deep Wannier (DW) and DPLR models for water, the
+  NaCl DP and DPLR models, and the errors stated in the text (water
+  energies in meV/H2O at the chosen beta = 0.4 1/A and for DP with
+  6 and 8 A cutoffs; NaCl training errors). The DW centroid errors (A)
+  are not energy/force errors. Dimer energies, free-energy profiles and
+  phonons are properties.
+materials:
+  water: {label: "Liquid water (bulk, slabs with vacuum, low-density configurations; 128 molecules)", formula: "H2O", class: "Molecular liquid"}
+  nacl: {label: "Crystalline NaCl (2x2x2 supercell, 64 atoms, 100 K)", formula: "NaCl", class: "Molten salt"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 1500, comment: "VASP 5.4.4, EDIFF 1e-6 eV; maximally localised Wannier centres for the DW model (Sec. III A)."}
+  pbe-nacl: {type: DFT, xc: PBE, kpoints: "4x4x4 Monkhorst-Pack", comment: "NaCl labels with Wannier distributions (Sec. V)."}
+sampling:
+  dpgen: {label: "DP-GEN concurrent learning over 23 iterations (bulk NPT, slab NVT, low-density NVT at 200-400 K), selecting configurations with force deviation 0.15-0.30 eV/A"}
+datasets:
+  water: {label: "Water DP-GEN data set (583 configurations)", materials: [water], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 583, loc: "Sec. III A"}, calc: pbe, sampling: [dpgen]}
+  nacl: {label: "NaCl data from a 200 ps DPMD NPT trajectory at 100 K", materials: [nacl], properties: [Energy, Forces], provenance: InHouse, calc: pbe-nacl}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, learningRate, batchSize]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics, PhononCalculation]
+  DPLR:
+    hp: [cutoffRadius, angularCutoff]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  dp-water: {label: "Standard DP for water (hybrid descriptor, rc = 6 A)", method: DeePMD, dataset: water, settings: {cutoffRadius: {v: 6, loc: "Sec. III A"}, learningRate: {v: 0.001, loc: "Sec. III A (initial)"}, batchSize: {v: 1, loc: "Sec. III A"}}, model: "water DP (rc 6 A)"}
+  dp-water-8: {label: "Standard DP for water with rc = 8 A", method: DeePMD, dataset: water, settings: {cutoffRadius: {v: 8, loc: "Sec. III C"}}, model: "water DP (rc 8 A)"}
+  dplr-water: {label: "DPLR for water (beta = 0.4 1/A; Da cutoff 4 A, Dr cutoff 6 A)", method: DPLR, dataset: water, settings: {cutoffRadius: {v: 6, loc: "Sec. III C"}, angularCutoff: {v: 4, loc: "Sec. III C (cutoff of Da)"}}, model: "water DPLR (beta 0.4)"}
+  dp-nacl: {label: "DP for NaCl (water hyperparameters)", method: DeePMD, dataset: nacl, settings: {cutoffRadius: {v: 6, loc: "Sec. V"}}, model: "NaCl DP"}
+  dplr-nacl: {label: "DPLR for NaCl (beta = 0.2 1/A)", method: DPLR, dataset: nacl, settings: {cutoffRadius: {v: 6, loc: "Sec. V"}}, model: "NaCl DPLR (beta 0.2)"}
+results:
+  - {key: dp-water-surf-train, model: dp-water, material: water, role: training, eval_data: {label: "Water surface training configurations", location: "Fig. 4"}, metrics: [[RMSE, Energy, 1.2, null, "train energy RMSE on surface water in meV/H2O: water DP", "Sec. III C"]]}
+  - {key: dp-water-test, model: dp-water, material: water, role: test, eval_data: {label: "20 DFT-labelled 128-molecule slab configurations (7 and 12 A vacuum) from DPLR MD", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.0, null, "test energy RMSE on water slabs in meV/H2O: water DP", "Sec. III C"]]}
+  - {key: dplr-water-train, model: dplr-water, material: water, role: training, eval_data: {label: "Water training configurations", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.3, null, "train energy RMSE on water in meV/H2O: water DPLR (beta 0.4)", "Sec. III C"]]}
+  - {key: dplr-water-test, model: dplr-water, material: water, role: test, eval_data: {label: "20 DFT-labelled 128-molecule slab configurations (7 and 12 A vacuum) from DPLR MD", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.5, null, "test energy RMSE on water slabs in meV/H2O: water DPLR (beta 0.4)", "Sec. III C"]]}
+  - {key: dp6-water-bulk-train, model: dp-water, material: water, role: training, eval_data: {label: "Water bulk training configurations (cutoff comparison)", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.02, null, "train energy RMSE on bulk water in meV/H2O: water DP rc 6 A", "Sec. III C"]]}
+  - {key: dp6-water-surf-train2, model: dp-water, material: water, role: training, eval_data: {label: "Water surface training configurations (cutoff comparison)", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.26, null, "train energy RMSE on surface water in meV/H2O: water DP rc 6 A (cutoff comparison)", "Sec. III C"]]}
+  - {key: dp6-water-test2, model: dp-water, material: water, role: test, eval_data: {label: "Water slab test configurations (cutoff comparison)", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.14, null, "test energy RMSE on water slabs in meV/H2O: water DP rc 6 A (cutoff comparison)", "Sec. III C"]]}
+  - {key: dp8-water-bulk-train, model: dp-water-8, material: water, role: training, eval_data: {label: "Water bulk training configurations", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.01, null, "train energy RMSE on bulk water in meV/H2O: water DP rc 8 A", "Sec. III C"]]}
+  - {key: dp8-water-surf-train, model: dp-water-8, material: water, role: training, eval_data: {label: "Water surface training configurations", location: "Sec. III C"}, metrics: [[RMSE, Energy, 1.18, null, "train energy RMSE on surface water in meV/H2O: water DP rc 8 A", "Sec. III C"]]}
+  - {key: dp8-water-test, model: dp-water-8, material: water, role: test, eval_data: {label: "Water slab test configurations", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.08, null, "test energy RMSE on water slabs in meV/H2O: water DP rc 8 A", "Sec. III C"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Water energy errors are in meV per H2O molecule (no schema unit; recorded with unit null). The paper states two DP rc = 6 A surface-training values (1.2 and 1.26 meV/H2O) and two test values (2.0 and 2.14 meV/H2O) in different passages; both are kept as written. The NaCl training accuracy (DP 7.6e-4 eV/atom and 2.0e-3 eV/A; DPLR 7.7e-4 eV/atom and 2.6e-3 eV/A) does not name the metric, so it is not encoded."
+  - "DW model centroid errors (1.7e-3 A training, 1.9e-3 A test) are not energy/force errors. The beta scan (Fig. 4) is figure-only. Dimer energies, free-energy profiles and NaCl phonons are properties."

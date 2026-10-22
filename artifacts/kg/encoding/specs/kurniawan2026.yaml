@@ -1,0 +1,52 @@
+id: kurniawan2026
+source:
+  rank: 419
+  year: "2026"
+  first_author: "Yonatan Kurniawan"
+  title: "Comparative study of ensemble-based uncertainty quantification methods for neural network interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae9fb4"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2508.06456v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "12571c35c82bee91f4ad4a1bf5edd54c93d701c394a2e72a84b8dabd10fd960a"
+study_label: "Kurniawan et al. (2026): comparison of ensemble-based uncertainty quantification (bootstrap, dropout, random initialisation, snapshots) for neural-network interatomic potentials of carbon"
+scope: |
+  Encoding scope: the carbon DFT data set of an earlier study (diamond,
+  graphite, monolayer and bilayer graphene from AIMD at 300-900 K and
+  1,500 K plus strained graphene; PBE with MBD for layered systems;
+  4,788 configurations, 90/10 split; Table 1), the Behler-Parrinello-type
+  NNIP (three hidden layers of 128 tanh nodes, dropout 0.1, atom-centred
+  symmetry functions) trained as four ensemble types, and their training
+  and test RMSEs (Table 2). Uncertainty calibration and out-of-
+  distribution analyses are UQ diagnostics.
+materials:
+  carbon: {label: "Carbon allotropes: diamond, graphite, monolayer and bilayer graphene", formula: "C", class: "Elemental solid and liquid carbon"}
+reference:
+  pbe: {type: DFT, xc: PBE, cutoff: 500, comment: "Many-body dispersion for bilayer graphene and graphite; about 30 A vacuum for slabs; Gamma-centred Monkhorst-Pack meshes (Sec. 2.2; data of Refs. 6, 48)."}
+datasets:
+  carbon: {label: "Carbon data set (4,344 training and 444 test configurations; Table 1)", materials: [carbon], properties: [Energy, Forces], provenance: Published, n: {v: 4788, loc: "Sec. 2.2"}, calc: pbe}
+methods:
+  HDNNP:
+    hp: [numLayers, numFeatures, batchSize, learningRate, numEpochs]
+    loss: "Squared residuals of per-atom energy (sigma_E = 1 eV) and forces (sigma_F = 10 eV/A)"
+    algorithm: "Adam; learning rate 1e-3 for 5,000 epochs then 1e-4 for 35,000; dropout 0.1"
+runs:
+  bootstrap: {label: "Bootstrap ensemble of the carbon NNIP", method: HDNNP, dataset: carbon, settings: {numLayers: {v: 3, loc: "Sec. 2.1"}, numFeatures: {v: 128, loc: "Sec. 2.1 (nodes per hidden layer)"}, batchSize: {v: 100, loc: "Sec. 2.2"}, learningRate: {v: 0.001, loc: "Sec. 2.2 (initial)"}, numEpochs: {v: 40000, loc: "Sec. 2.2"}}, model: "carbon NNIP bootstrap ensemble"}
+  dropout: {label: "Dropout ensemble of the carbon NNIP", method: HDNNP, dataset: carbon, settings: {numLayers: {v: 3, loc: "Sec. 2.1"}, numFeatures: {v: 128, loc: "Sec. 2.1 (nodes per hidden layer)"}, batchSize: {v: 100, loc: "Sec. 2.2"}, learningRate: {v: 0.001, loc: "Sec. 2.2 (initial)"}, numEpochs: {v: 40000, loc: "Sec. 2.2"}}, model: "carbon NNIP dropout ensemble"}
+  randinit: {label: "Random initialization ensemble of the carbon NNIP", method: HDNNP, dataset: carbon, settings: {numLayers: {v: 3, loc: "Sec. 2.1"}, numFeatures: {v: 128, loc: "Sec. 2.1 (nodes per hidden layer)"}, batchSize: {v: 100, loc: "Sec. 2.2"}, learningRate: {v: 0.001, loc: "Sec. 2.2 (initial)"}, numEpochs: {v: 40000, loc: "Sec. 2.2"}}, model: "carbon NNIP random initialization ensemble"}
+  snapshots: {label: "Snapshots ensemble of the carbon NNIP", method: HDNNP, dataset: carbon, settings: {numLayers: {v: 3, loc: "Sec. 2.1"}, numFeatures: {v: 128, loc: "Sec. 2.1 (nodes per hidden layer)"}, batchSize: {v: 100, loc: "Sec. 2.2"}, learningRate: {v: 0.001, loc: "Sec. 2.2 (initial)"}, numEpochs: {v: 40000, loc: "Sec. 2.2"}}, model: "carbon NNIP snapshots ensemble"}
+results:
+  - {key: bootstrap-train, model: bootstrap, material: carbon, role: training, eval_data: {label: "Carbon training set (90 %)", location: "Table 2"}, metrics: [[RMSE, Energy, 8.905, meV/atom, "train energy RMSE on carbon: carbon NNIP bootstrap ensemble", "Table 2"], [RMSE, Force, 3.001, meV/A, "train force RMSE on carbon: carbon NNIP bootstrap ensemble", "Table 2"]]}
+  - {key: bootstrap-test, model: bootstrap, material: carbon, role: test, eval_data: {label: "Carbon test set (10 %; also used for epoch selection)", location: "Table 2"}, metrics: [[RMSE, Energy, 9.204, meV/atom, "test energy RMSE on carbon: carbon NNIP bootstrap ensemble", "Table 2"], [RMSE, Force, 3.35, meV/A, "test force RMSE on carbon: carbon NNIP bootstrap ensemble", "Table 2"]]}
+  - {key: dropout-train, model: dropout, material: carbon, role: training, eval_data: {label: "Carbon training set (90 %)", location: "Table 2"}, metrics: [[RMSE, Energy, 6.087, meV/atom, "train energy RMSE on carbon: carbon NNIP dropout ensemble", "Table 2"], [RMSE, Force, 5.249, meV/A, "train force RMSE on carbon: carbon NNIP dropout ensemble", "Table 2"]]}
+  - {key: dropout-test, model: dropout, material: carbon, role: test, eval_data: {label: "Carbon test set (10 %; also used for epoch selection)", location: "Table 2"}, metrics: [[RMSE, Energy, 6.252, meV/atom, "test energy RMSE on carbon: carbon NNIP dropout ensemble", "Table 2"], [RMSE, Force, 5.559, meV/A, "test force RMSE on carbon: carbon NNIP dropout ensemble", "Table 2"]]}
+  - {key: randinit-train, model: randinit, material: carbon, role: training, eval_data: {label: "Carbon training set (90 %)", location: "Table 2"}, metrics: [[RMSE, Energy, 5.91, meV/atom, "train energy RMSE on carbon: carbon NNIP random initialization ensemble", "Table 2"], [RMSE, Force, 4.631, meV/A, "train force RMSE on carbon: carbon NNIP random initialization ensemble", "Table 2"]]}
+  - {key: randinit-test, model: randinit, material: carbon, role: test, eval_data: {label: "Carbon test set (10 %; also used for epoch selection)", location: "Table 2"}, metrics: [[RMSE, Energy, 6.164, meV/atom, "test energy RMSE on carbon: carbon NNIP random initialization ensemble", "Table 2"], [RMSE, Force, 4.948, meV/A, "test force RMSE on carbon: carbon NNIP random initialization ensemble", "Table 2"]]}
+  - {key: snapshots-train, model: snapshots, material: carbon, role: training, eval_data: {label: "Carbon training set (90 %)", location: "Table 2"}, metrics: [[RMSE, Energy, 7.105, meV/atom, "train energy RMSE on carbon: carbon NNIP snapshots ensemble", "Table 2"], [RMSE, Force, 5.218, meV/A, "train force RMSE on carbon: carbon NNIP snapshots ensemble", "Table 2"]]}
+  - {key: snapshots-test, model: snapshots, material: carbon, role: test, eval_data: {label: "Carbon test set (10 %; also used for epoch selection)", location: "Table 2"}, metrics: [[RMSE, Energy, 7.235, meV/atom, "test energy RMSE on carbon: carbon NNIP snapshots ensemble", "Table 2"], [RMSE, Force, 5.501, meV/A, "test force RMSE on carbon: carbon NNIP snapshots ensemble", "Table 2"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "For most ensembles the final epoch is chosen by the lowest loss on the test set, so the 'test' errors are not fully independent; the role follows the paper's label. Table 2 values are for the ensemble models as stated."
+  - "Uncertainty-versus-residual analyses (Figs. 6-10), feature-space and dropout-ratio studies are UQ diagnostics, not error metrics."

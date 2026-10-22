@@ -1,0 +1,48 @@
+id: meng2025
+source:
+  rank: 417
+  year: "2025"
+  first_author: "Zijian Meng"
+  title: "Small-cell-based fast active learning of machine learning interatomic potentials"
+  venue: "Computational Materials Science"
+  doi: "10.1016/j.commatsci.2025.113919"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2504.07293v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "eb3e1fc228fd0bdb8aa09b59acf526061a6d682d58259f9c85ad085e99eaa3d3"
+study_label: "Meng et al. (2025): small-cell-based fast active learning of moment tensor potentials for potassium, sodium and Na-K"
+scope: |
+  Encoding scope: the small-cell active-learning protocol (24 parallel
+  MD instances per stage with cells growing from 1-2 to 54 atoms;
+  configuration- or neighbourhood-mode extrapolation grades; Quantum
+  ESPRESSO PBE labels), the potassium MTPs of levels 8-18 trained with it
+  or with large cells, and the Na-K MTP (level 18, configuration mode).
+  Training and test errors are figure-only (Figs. 5-8); training costs
+  are given in core-hours (Table 5, resources); solid and liquid
+  properties are properties.
+materials:
+  k: {label: "Potassium: solid bcc and liquid", formula: "K", class: "Metals"}
+  nak: {label: "Na-K alloys: liquid eutectic and the Na2K C14 Laves phase", class: "Metals"}
+reference:
+  pbe: {type: DFT, code: QuantumESPRESSO, xc: PBE, pp: PAW, comment: "QE 6.6; K 60/300 Ry, Na 90/450 Ry; 0.01 Ry Gaussian smearing; PSlibrary spn-kjpaw pseudopotentials; k-points per stage (Table 1)."}
+sampling:
+  smallcell: {label: "Small-cell active learning: staged parallel MD (random temperatures and strains; barostat and random concentrations for Na-K) with MLIP-3 extrapolation-grade selection (gamma_select 2.1, gamma_break 10) and redundancy filtering"}
+datasets:
+  k-nbh: {label: "Potassium training set from neighbourhood-mode small-cell active learning (2-54 atoms)", materials: [k], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [smallcell]}
+  nak: {label: "Na-K training set (K and Na sets combined, then extended by configuration-mode small-cell active learning)", materials: [nak], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [smallcell]}
+methods:
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    impl: {lib: MLIP, comment: "MLIP-3 (07 Jun 2023)"}
+    sims: [MolecularDynamics]
+runs:
+  k-nbh08: {label: "Potassium MTP NBH08(2-54): level 8, neighbourhood mode, cells of 2-54 atoms", method: MTP, dataset: k-nbh, settings: {cutoffRadius: {v: 7, loc: "Sec. 2.3"}, momentLevel: {v: 8, loc: "Sec. 2.3"}}, model: "K MTP NBH08(2-54)"}
+  k-nbh12: {label: "Potassium MTP NBH12(2-54): level 12, neighbourhood mode", method: MTP, dataset: k-nbh, settings: {cutoffRadius: {v: 7, loc: "Sec. 2.3"}, momentLevel: {v: 12, loc: "Sec. 3.2"}}, model: "K MTP NBH12(2-54)"}
+  k-nbh16: {label: "Potassium MTP NBH16(2-54): level 16, neighbourhood mode", method: MTP, dataset: k-nbh, settings: {cutoffRadius: {v: 7, loc: "Sec. 2.3"}, momentLevel: {v: 16, loc: "Sec. 3.2"}}, model: "K MTP NBH16(2-54)"}
+  nak18: {label: "Na-K MTP, level 18, configuration-mode small-cell active learning", method: MTP, dataset: nak, settings: {cutoffRadius: {v: 7, loc: "Sec. 2.3"}, momentLevel: {v: 18, loc: "Sec. 3.5"}}, model: "NaK MTP level 18"}
+results: []
+resources: |
+  Small-cell training costs (Table 5): potassium 348.5 core-h CPU (20.0 h wall), sodium 312.0 core-h (22.2 h), Na-K 1,012.8 core-h (73.1 h); DFT is about 95 % of the cost for potassium. NBH08(54-54) large-cell training costs 237 times more CPU time than CFG08(2-54) (Fig. 5). Intel Xeon E5-2650 v4 nodes.
+gaps:
+  - "Training RMSEs (Fig. 5), test force residuals on 20 liquid 128-atom AIMD configurations (Figs. 6-8) and sparsification effects are figure-only; the figure text is not machine-readable here. Other levels (10, 14, 18), configuration-mode and large-cell potassium MTPs are not encoded separately."
+  - "Elastic constants (Table 3), critical exponents (Table 4), densities (Table 6), RDFs, melting points and the C14 equation of state are properties."
