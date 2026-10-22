@@ -1,0 +1,54 @@
+id: vassilevgalindo2021
+source:
+  rank: 574
+  year: "2021"
+  first_author: "Valentín Vassilev-Galindo"
+  title: "Challenges for machine learning force fields in reproducing potential energy surfaces of flexible molecules"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0038516"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2103.01103v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "9a879031347781314783b31018c13d53ae6efaf4b11343096cca9ab5b73e81a0"
+study_label: "Vassilev-Galindo et al. (2021): challenges for machine learning force fields on the isomerization potential energy surfaces of flexible molecules (glycine and azobenzene)"
+scope: |
+  Encoding scope: BPNN, SchNet, GAP/SOAP and sGDML models (5 A cutoff
+  for the local models) trained with 5-fold cross-validation on
+  Boltzmann-selected subsets of PBE+TS datasets for glycine and for the
+  azobenzene inversion and rotation isomerization paths, and the one
+  exact error stated in the text (best SchNet with 1,000 rotation points
+  over the whole rotation dataset). Learning curves are figure-only; an
+  extended sGDML descriptor is a setting.
+materials:
+  glycine: {label: "Glycine conformers and isomerization paths (gas phase)", class: "Small organic molecule (gas phase)"}
+  azobenzene: {label: "Azobenzene cis-trans isomerization (inversion and rotation paths)", class: "Small organic molecule (gas phase)"}
+reference:
+  pbets: {type: DFT, code: FHIaims, xc: PBE, comment: "Tight settings with Tkatchenko-Scheffler vdW"}
+sampling:
+  md: {label: "AIMD and enhanced sampling (i-PI with FHI-aims) of equilibrium states and transition paths; training subsets chosen by the sGDML Boltzmann scheme"}
+datasets:
+  gly: {label: "Glycine dataset (PBE+TS)", materials: [glycine], properties: [Energy, Forces], provenance: InHouse, calc: pbets, sampling: [md]}
+  inv: {label: "Azobenzene inversion dataset (PBE+TS)", materials: [azobenzene], properties: [Energy, Forces], provenance: InHouse, calc: pbets, sampling: [md]}
+  rot: {label: "Azobenzene rotation dataset (PBE+TS)", materials: [azobenzene], properties: [Energy, Forces], provenance: InHouse, calc: pbets, sampling: [md]}
+methods:
+  HDNNP: {sims: [MolecularDynamics]}
+  SchNet: {sims: [MolecularDynamics]}
+  GAP: {impl: {lib: QUIP, comment: "SOAP descriptor"}, sims: [MolecularDynamics]}
+  sGDML: {sims: [MolecularDynamics]}
+runs:
+  bpnn-gly: {label: "BPNN for glycine (up to 1,000 training points)", method: HDNNP, dataset: gly, model: "BPNN Glycine"}
+  schnet-gly: {label: "SchNet for glycine (up to 1,000 training points)", method: SchNet, dataset: gly, model: "SchNet Glycine"}
+  gap-gly: {label: "GAP/SOAP for glycine (up to 1,000 training points)", method: GAP, dataset: gly, model: "GAP/SOAP Glycine"}
+  sgdml-gly: {label: "sGDML [1/r] for glycine (up to 1,000 training points)", method: sGDML, dataset: gly, model: "sGDML [1/r] Glycine"}
+  bpnn-inv: {label: "BPNN for azobenzene inversion (up to 1,000 training points)", method: HDNNP, dataset: inv, model: "BPNN Azobenzene inversion"}
+  schnet-inv: {label: "SchNet for azobenzene inversion (up to 1,000 training points)", method: SchNet, dataset: inv, model: "SchNet Azobenzene inversion"}
+  gap-inv: {label: "GAP/SOAP for azobenzene inversion (up to 1,000 training points)", method: GAP, dataset: inv, model: "GAP/SOAP Azobenzene inversion"}
+  sgdml-inv: {label: "sGDML [1/r] for azobenzene inversion (up to 1,000 training points)", method: sGDML, dataset: inv, model: "sGDML [1/r] Azobenzene inversion"}
+  bpnn-rot: {label: "BPNN for azobenzene rotation (up to 1,000 training points)", method: HDNNP, dataset: rot, model: "BPNN Azobenzene rotation"}
+  schnet-rot: {label: "SchNet for azobenzene rotation (up to 1,000 training points)", method: SchNet, dataset: rot, model: "SchNet Azobenzene rotation"}
+  gap-rot: {label: "GAP/SOAP for azobenzene rotation (up to 1,000 training points)", method: GAP, dataset: rot, model: "GAP/SOAP Azobenzene rotation"}
+  sgdml-rot: {label: "sGDML [1/r] for azobenzene rotation (up to 1,000 training points)", method: sGDML, dataset: rot, model: "sGDML [1/r] Azobenzene rotation"}
+results:
+  - {key: schnet-rot-full, model: schnet-rot, material: azobenzene, role: null, eval_data: {label: "Complete azobenzene rotation dataset (training points included)", location: "Sec. V, Fig. 7 caption"}, metrics: [[RMSE, Energy, 0.6, kcal/mol, "energy RMSE over the full rotation dataset: best SchNet (1,000 training points)", "Fig. 7 caption"], [RMSE, Force, 1.3, kcal/mol/A, "force RMSE over the full rotation dataset: best SchNet (1,000 training points)", "Fig. 7 caption"]]}
+gaps:
+  - "All other errors are given as learning curves (Figs. 4-6) or as approximate thresholds in the text (e.g. BPNN above 6.0 kcal/mol/A for glycine forces); not encoded. The SchNet value is over the complete rotation dataset including training points, so role is null. The 4,000-point SchNet model and the cutoff study for GAP/SOAP are not separate runs."

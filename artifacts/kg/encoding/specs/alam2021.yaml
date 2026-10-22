@@ -1,0 +1,40 @@
+id: alam2021
+source:
+  rank: 575
+  year: "2021"
+  first_author: "Masud Alam"
+  title: "Artificial neural network interatomic potential for dislocation and fracture properties of Molybdenum"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2112.04636"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2112.04636v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "054a83c23159d15a40081528c0195e71695c6e4317bee4008fd84a07a20c2f88"
+study_label: "Alam and Lymperakis (2021): artificial neural network potential for dislocation and fracture properties of molybdenum"
+scope: |
+  Encoding scope: the aenet Behler-Parrinello ANN for Mo (15 radial and
+  18 angular symmetry functions, 6.5 A cutoff, four layers) trained with
+  BFGS on a DFT database of strained bcc/fcc/hcp/sc phases, surfaces,
+  generalized stacking faults and traction-separation curves. Errors
+  are given only as an upper bound (below 5 meV/atom). Dislocation-core,
+  elastic, surface and fracture results are properties.
+materials:
+  mo: {label: "Molybdenum (bcc, fcc, hcp, sc under strain; surfaces, stacking faults, decohesion)", formula: Mo, class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, comment: "Spin-polarized GGA, 400 eV, 6x6x6 k-mesh equivalent"}
+sampling:
+  db: {label: "Material-property database: strained bulk phases, {100}/{110}/{111} surfaces, {112} and {100} generalized stacking faults along <111>, {110} traction-separation"}
+datasets:
+  mo: {label: "Mo structure-energy database", materials: [mo], properties: [Energy], provenance: InHouse, calc: vasp, sampling: [db]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius]
+    loss: "Energies"
+    algorithm: "BFGS, 200 iterations"
+    impl: {lib: {local: aenet}, comment: "33-input four-layer network"}
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  ann: {label: "ANN potential for Mo", method: HDNNP, dataset: mo, settings: {cutoffRadius: {v: 6.5, loc: "Sec. II B"}}, model: "ANN Mo (Alam 2021)"}
+results: []
+gaps:
+  - "Training and test energy RMSEs are stated only as below 5 meV/atom (Abstract, Sec. II B; Fig. 2); not encoded. Database size is not stated in the text read."
