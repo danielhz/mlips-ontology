@@ -97,7 +97,14 @@ Edges confirmed against the introducing paper (issue #4, 2026-10-22):
 Candidates not recorded:
 
 - Introducing paper not in the corpus yet (to be confirmed when it is encoded): qSNAP → SNAP (Wood and Thompson 2018), GRACE → ACE (Bochkarev et al. 2024), TACE → ACE (Xu et al. 2025), CACE-LES → CACE (Cheng 2025), 3G-HDNNP → HDNNP (Artrith et al. 2011).
-- Introducing paper in the corpus but the derivation is not stated in it: MACE → ACE (batatia2022 places MACE in the multi-ACE framework of its related work and builds its many-body features with the ACE construction, but does not say that MACE derives from ACE); Allegro → NequIP (musaelian2023allegro compares with NequIP and shares its irreps representation, and says it retains the accuracy of equivariant message-passing networks in general). Both wait for a decision.
+- Introducing paper in the corpus but the derivation is not stated in it: none left (MACE → ACE and Allegro → NequIP are recorded provisionally, below).
+
+Provisional edges (Daniel, 2026-10-22). The introducing paper does not state these derivations in so many words; Daniel decided to record them until Blazej Grabowski and Jong Hyun Jung, whom he asked, say otherwise. Their `derived_from_source` says "provisional"; if either expert disagrees, empty both registry cells and run `make methods-registry`.
+
+| method | derived from | basis |
+|---|---|---|
+| MACE | ACE | batatia2022 places MACE in the multi-ACE framework of its related work ("extending the ACE framework to include methods built on equivariant MPNNs") and builds its many-body features with the ACE construction, but describes MACE itself as following the general framework of MPNNs |
+| Allegro | NequIP | musaelian2023allegro shares NequIP's irreps representation ("In both the present work and in NequIP, …") and compares with it, but does not say Allegro derives from it |
 
 Example: every method derived, directly or not, from ACE (the merged graph, or `shared/methods.ttl` alone):
 
@@ -112,4 +119,4 @@ SELECT ?method ?label WHERE {
 ORDER BY ?method
 ```
 
-On the merged graph this returns `entity:CACE` and `entity:CACE-SOG`. Because the property is a subproperty of `prov:wasDerivedFrom`, a reasoner (or a query over the RDFS closure) also finds these edges through `prov:wasDerivedFrom`.
+On the merged graph this returns `entity:CACE`, `entity:CACE-SOG`, `entity:MACE` and `entity:MACE-QEq`. Because the property is a subproperty of `prov:wasDerivedFrom`, a reasoner (or a query over the RDFS closure) also finds these edges through `prov:wasDerivedFrom`.
