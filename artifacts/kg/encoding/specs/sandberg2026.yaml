@@ -1,0 +1,84 @@
+id: sandberg2026
+source:
+  rank: 405
+  year: "2026"
+  first_author: "Johannes Sandberg"
+  title: "Benchmarking machine-learning interatomic potentials using classical force fields"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.14239"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2610.14239v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7fe2a9c9be5668d881ccc5f1b92b479dee3d01dcb9ac829aa22d38d1ed3b4345"
+study_label: "Sandberg et al. (2026): benchmarking linear ACE, HDNNP and MACE against classical reference force fields (LJ, EAM, Stillinger-Weber)"
+scope: |
+  Encoding scope: synthetic data sets labelled by three classical
+  potentials (LJ argon, EAM copper, SW silicon), each sampled as Liquid 1,
+  Liquid 2 (ramped to evaporation) and Cluster (64-atom droplets) with
+  250 snapshots, and the linear ACE (python-ace), HDNNP (n2p2) and MACE
+  models trained on them (five 9:1 splits each). The models trained on
+  Liquid 2 are encoded as runs because their run times are tabulated
+  (Tables II-III); all accuracy results (force RMSEs, 2- and 4-body curve
+  errors, RDF errors, noise study) are figure-only.
+materials:
+  lj: {label: "Lennard-Jones argon (eps = 117.7 K, sigma = 3.504 A, cut at 2.5 sigma): liquid and cluster configurations of 64 atoms", formula: "Ar", class: "Material-specific benchmark system (solid acid, electrolyte, alloy, layered material or molecular liquid)"}
+  eam: {label: "EAM copper (Ref. 47): liquid and cluster configurations of 64 atoms", formula: "Cu", class: "Material-specific benchmark system (solid acid, electrolyte, alloy, layered material or molecular liquid)"}
+  sw: {label: "Stillinger-Weber silicon (Ref. 48): liquid and cluster configurations of 64 atoms", formula: "Si", class: "Material-specific benchmark system (solid acid, electrolyte, alloy, layered material or molecular liquid)"}
+reference:
+  ref-lj: {type: REF, comment: "Classical LJ potential (Lennard-Jones argon (eps = 117.7 K, sigma = 3.504 A, cut at 2.5 sigma)) evaluated in LAMMPS as the reference."}
+  ref-eam: {type: REF, comment: "Classical EAM potential (EAM copper (Ref. 47)) evaluated in LAMMPS as the reference."}
+  ref-sw: {type: REF, comment: "Classical SW potential (Stillinger-Weber silicon (Ref. 48)) evaluated in LAMMPS as the reference."}
+sampling:
+  md: {label: "LAMMPS NPT MD of 64 atoms: equilibration at T0, then a temperature ramp to T1 with 250 snapshots every 4,000 steps (Table I)"}
+datasets:
+  liq2-lj: {label: "Liquid 2 data set for LJ (250 snapshots, ramp to evaporation)", materials: [lj], properties: [Energy, Forces], provenance: InHouse, n: {v: 250, loc: "Sec. II A"}, calc: ref-lj, sampling: [md]}
+  liq2-eam: {label: "Liquid 2 data set for EAM (250 snapshots, ramp to evaporation)", materials: [eam], properties: [Energy, Forces], provenance: InHouse, n: {v: 250, loc: "Sec. II A"}, calc: ref-eam, sampling: [md]}
+  liq2-sw: {label: "Liquid 2 data set for SW (250 snapshots, ramp to evaporation)", materials: [sw], properties: [Energy, Forces], provenance: InHouse, n: {v: 250, loc: "Sec. II A"}, calc: ref-sw, sampling: [md]}
+methods:
+  ACE:
+    hp: [bodyOrder]
+    loss: "Linear ridge regression"
+    impl: {lib: PACE, comment: "python-ace, linear ACE"}
+    sims: [MolecularDynamics]
+  HDNNP:
+    impl: {lib: {local: n2p2}}
+    sims: [MolecularDynamics]
+  MACE:
+    hp: [numFeatures]
+    impl: {lib: MACE}
+    sims: [MolecularDynamics]
+runs:
+  ace-lj: {label: "Linear ACE (body order 6) trained on the LJ Liquid 2 data", method: ACE, dataset: liq2-lj, settings: {bodyOrder: {v: 6, loc: "Sec. II B"}}, model: "linear ACE LJ Liquid 2"}
+  hdnnp-lj: {label: "HDNNP (two hidden layers of 10 neurons; 10 radial and 12 angular SFs) trained on the LJ Liquid 2 data", method: HDNNP, dataset: liq2-lj, model: "HDNNP LJ Liquid 2"}
+  mace-lj: {label: "MACE (128 channels, lmax 3) trained on the LJ Liquid 2 data", method: MACE, dataset: liq2-lj, settings: {numFeatures: {v: 128, loc: "Sec. II B"}}, model: "MACE LJ Liquid 2"}
+  ace-eam: {label: "Linear ACE (body order 6) trained on the EAM Liquid 2 data", method: ACE, dataset: liq2-eam, settings: {bodyOrder: {v: 6, loc: "Sec. II B"}}, model: "linear ACE EAM Liquid 2"}
+  hdnnp-eam: {label: "HDNNP (two hidden layers of 10 neurons; 10 radial and 12 angular SFs) trained on the EAM Liquid 2 data", method: HDNNP, dataset: liq2-eam, model: "HDNNP EAM Liquid 2"}
+  mace-eam: {label: "MACE (128 channels, lmax 3) trained on the EAM Liquid 2 data", method: MACE, dataset: liq2-eam, settings: {numFeatures: {v: 128, loc: "Sec. II B"}}, model: "MACE EAM Liquid 2"}
+  ace-sw: {label: "Linear ACE (body order 6) trained on the SW Liquid 2 data", method: ACE, dataset: liq2-sw, settings: {bodyOrder: {v: 6, loc: "Sec. II B"}}, model: "linear ACE SW Liquid 2"}
+  hdnnp-sw: {label: "HDNNP (two hidden layers of 10 neurons; 10 radial and 12 angular SFs) trained on the SW Liquid 2 data", method: HDNNP, dataset: liq2-sw, model: "HDNNP SW Liquid 2"}
+  mace-sw: {label: "MACE (128 channels, lmax 3) trained on the SW Liquid 2 data", method: MACE, dataset: liq2-sw, settings: {numFeatures: {v: 128, loc: "Sec. II B"}}, model: "MACE SW Liquid 2"}
+results: []
+timings:
+  - {model: ace-lj, system: "4-body probe curve (LJ; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.2664, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: hdnnp-lj, system: "4-body probe curve (LJ; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.07355, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: mace-lj, system: "4-body probe curve (LJ; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 61.95, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: ace-lj, system: "RDF simulation of LJ, 200,000 MD steps (system size not stated)", atoms: null, value: 3, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: hdnnp-lj, system: "RDF simulation of LJ, 200,000 MD steps (system size not stated)", atoms: null, value: 10, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: mace-lj, system: "RDF simulation of LJ, 200,000 MD steps (system size not stated)", atoms: null, value: 60, unit: "min wall time", per_atom_us: null, hardware: "one GPU", result: null, location: "Table III"}
+  - {model: ace-eam, system: "4-body probe curve (EAM; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.2639, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: hdnnp-eam, system: "4-body probe curve (EAM; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.07534, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: mace-eam, system: "4-body probe curve (EAM; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 60.08, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: ace-eam, system: "RDF simulation of EAM, 200,000 MD steps (system size not stated)", atoms: null, value: 3, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: hdnnp-eam, system: "RDF simulation of EAM, 200,000 MD steps (system size not stated)", atoms: null, value: 14, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: mace-eam, system: "RDF simulation of EAM, 200,000 MD steps (system size not stated)", atoms: null, value: 65, unit: "min wall time", per_atom_us: null, hardware: "one GPU", result: null, location: "Table III"}
+  - {model: ace-sw, system: "4-body probe curve (SW; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.2707, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: hdnnp-sw, system: "4-body probe curve (SW; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 0.07478, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: mace-sw, system: "4-body probe curve (SW; probe atom over an equilateral triangle of three atoms), full curve", atoms: 4, value: 60.32, unit: "s per curve", per_atom_us: null, hardware: "single CPU core", result: null, location: "Table II"}
+  - {model: ace-sw, system: "RDF simulation of SW, 200,000 MD steps (system size not stated)", atoms: null, value: 3, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: hdnnp-sw, system: "RDF simulation of SW, 200,000 MD steps (system size not stated)", atoms: null, value: 10, unit: "min wall time", per_atom_us: null, hardware: "8 CPU cores", result: null, location: "Table III"}
+  - {model: mace-sw, system: "RDF simulation of SW, 200,000 MD steps (system size not stated)", atoms: null, value: 52, unit: "min wall time", per_atom_us: null, hardware: "one GPU", result: null, location: "Table III"}
+resources: |
+  Table III also gives estimated energy use and carbon footprint of the RDF runs (e.g. 7.11 Wh for ACE, 23.7-33.2 Wh for HDNNP and 538-672 Wh for MACE).
+gaps:
+  - "All errors (force RMSEs, Fig. 1; 2- and 4-body curve RMSEs, Fig. 4; RDF errors; data-size and noise studies, Figs. 6-8) are figure-only. Models trained on Liquid 1 and Cluster (five splits each) are not encoded as separate runs."
+  - "The number of points on the 4-body curve and the size of the RDF system are not stated, so no per-atom times are derived. The MACE RDF runs used a GPU while ACE and HDNNP used 8 CPU cores."

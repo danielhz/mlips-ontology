@@ -1,0 +1,218 @@
+id: zeng2025deepmd
+source:
+  rank: 403
+  year: "2025"
+  first_author: "Jinzhe Zeng"
+  title: "DeePMD-kit v3: A Multiple-Backend Framework for Machine Learning Potentials"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c00340"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2502.19161v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "fd3eb31855e11fe359119ef2785e0af781bead7c9cdd342a865b031e6c03fc1b"
+study_label: "Zeng et al. (2025): DeePMD-kit v3, a multiple-backend (TensorFlow, PyTorch, JAX, PaddlePaddle) framework for machine-learning potentials"
+scope: |
+  Encoding scope: the software paper's benchmark: water models DPA-1
+  without attention (L=0; also compressed), DPA-1 with two attention
+  layers (L=2) and DPA-2 (medium), all with 6 A cutoffs and 240-240-240
+  fitting nets, timed in LAMMPS MD on water systems of 192 to 98,304
+  atoms in FP64 and FP32 with each backend. The H100 timings (Table S1)
+  are encoded; the A800 and RTX 4090 tables (S2, S3) are summarised in
+  gaps. No accuracy metrics are reported; the training data of the water
+  models are not described.
+materials:
+  water: {label: "Liquid water boxes of 192 to 98,304 atoms (benchmark systems)", formula: "H2O", class: "Molecular liquid"}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, numLayers]
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit v3 with TensorFlow, PyTorch and JAX backends"}
+    sims: [MolecularDynamics]
+  DPA2:
+    hp: [cutoffRadius, numLayers]
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit v3 (PyTorch and JAX backends)"}
+    sims: [MolecularDynamics]
+runs:
+  dpa1-l0: {label: "DPA-1 water model without attention layers (L=0; se_atten descriptor)", method: DeePMD, settings: {cutoffRadius: {v: 6, loc: "Sec. 4"}}, model: "water DPA-1 (L=0)"}
+  dpa1-l0c: {label: "Compressed DPA-1 water model without attention layers (L=0)", method: DeePMD, settings: {cutoffRadius: {v: 6, loc: "Sec. 4"}}, model: "water DPA-1 (L=0), compressed"}
+  dpa1-l2: {label: "DPA-1 water model with two attention layers (L=2; hidden vectors 128)", method: DeePMD, settings: {cutoffRadius: {v: 6, loc: "Sec. 4"}, numLayers: {v: 2, loc: "Sec. 4 (attention layers)"}}, model: "water DPA-1 (L=2)"}
+  dpa2: {label: "DPA-2 (medium) water model (6 Reperformer layers; 6 A initializer, 4 A Reperformer and three-body cutoffs)", method: DPA2, settings: {cutoffRadius: {v: 6, loc: "Sec. 4"}, numLayers: {v: 6, loc: "Sec. 4 (Reperformer layers)"}}, model: "water DPA-2 (medium)"}
+results: []
+timings:
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 1.53, unit: "ms per MD step", per_atom_us: 7.969, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 3.71, unit: "ms per MD step", per_atom_us: 19.323, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 4.36, unit: "ms per MD step", per_atom_us: 22.708, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 1.46, unit: "ms per MD step", per_atom_us: 7.604, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 3.4, unit: "ms per MD step", per_atom_us: 17.708, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 6.18, unit: "ms per MD step", per_atom_us: 32.188, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 8.23, unit: "ms per MD step", per_atom_us: 42.865, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 7.47, unit: "ms per MD step", per_atom_us: 38.906, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 41.46, unit: "ms per MD step", per_atom_us: 215.938, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 14.62, unit: "ms per MD step", per_atom_us: 76.146, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 2.04, unit: "ms per MD step", per_atom_us: 5.312, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 3.88, unit: "ms per MD step", per_atom_us: 10.104, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 5.29, unit: "ms per MD step", per_atom_us: 13.776, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 1.7, unit: "ms per MD step", per_atom_us: 4.427, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 3.56, unit: "ms per MD step", per_atom_us: 9.271, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 10.49, unit: "ms per MD step", per_atom_us: 27.318, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 12.52, unit: "ms per MD step", per_atom_us: 32.604, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 11.15, unit: "ms per MD step", per_atom_us: 29.036, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 47.62, unit: "ms per MD step", per_atom_us: 124.01, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 21.42, unit: "ms per MD step", per_atom_us: 55.781, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 3.04, unit: "ms per MD step", per_atom_us: 3.958, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 4.55, unit: "ms per MD step", per_atom_us: 5.924, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 7.2, unit: "ms per MD step", per_atom_us: 9.375, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 1.98, unit: "ms per MD step", per_atom_us: 2.578, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 4.03, unit: "ms per MD step", per_atom_us: 5.247, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 18.56, unit: "ms per MD step", per_atom_us: 24.167, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 21.48, unit: "ms per MD step", per_atom_us: 27.969, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 17.47, unit: "ms per MD step", per_atom_us: 22.747, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 69.71, unit: "ms per MD step", per_atom_us: 90.768, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 34.18, unit: "ms per MD step", per_atom_us: 44.505, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 5.11, unit: "ms per MD step", per_atom_us: 3.327, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 6.75, unit: "ms per MD step", per_atom_us: 4.395, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 10.98, unit: "ms per MD step", per_atom_us: 7.148, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 2.74, unit: "ms per MD step", per_atom_us: 1.784, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 4.79, unit: "ms per MD step", per_atom_us: 3.118, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 34.37, unit: "ms per MD step", per_atom_us: 22.376, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 39.05, unit: "ms per MD step", per_atom_us: 25.423, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 30.8, unit: "ms per MD step", per_atom_us: 20.052, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 124.0, unit: "ms per MD step", per_atom_us: 80.729, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 61.77, unit: "ms per MD step", per_atom_us: 40.215, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 9.26, unit: "ms per MD step", per_atom_us: 3.014, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 11.6, unit: "ms per MD step", per_atom_us: 3.776, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 18.83, unit: "ms per MD step", per_atom_us: 6.13, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 4.09, unit: "ms per MD step", per_atom_us: 1.331, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 6.96, unit: "ms per MD step", per_atom_us: 2.266, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 66.0, unit: "ms per MD step", per_atom_us: 21.484, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 73.82, unit: "ms per MD step", per_atom_us: 24.03, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 57.35, unit: "ms per MD step", per_atom_us: 18.669, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 226.73, unit: "ms per MD step", per_atom_us: 73.805, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 123.22, unit: "ms per MD step", per_atom_us: 40.111, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 17.5, unit: "ms per MD step", per_atom_us: 2.848, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 21.47, unit: "ms per MD step", per_atom_us: 3.494, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 34.19, unit: "ms per MD step", per_atom_us: 5.565, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 7.41, unit: "ms per MD step", per_atom_us: 1.206, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 11.22, unit: "ms per MD step", per_atom_us: 1.826, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 129.22, unit: "ms per MD step", per_atom_us: 21.032, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 144.01, unit: "ms per MD step", per_atom_us: 23.439, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 110.95, unit: "ms per MD step", per_atom_us: 18.058, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 457.75, unit: "ms per MD step", per_atom_us: 74.504, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 294.68, unit: "ms per MD step", per_atom_us: 47.962, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 34.46, unit: "ms per MD step", per_atom_us: 2.804, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 41.09, unit: "ms per MD step", per_atom_us: 3.344, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 64.76, unit: "ms per MD step", per_atom_us: 5.27, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 14.09, unit: "ms per MD step", per_atom_us: 1.147, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 21.46, unit: "ms per MD step", per_atom_us: 1.746, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 257.11, unit: "ms per MD step", per_atom_us: 20.924, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 286.22, unit: "ms per MD step", per_atom_us: 23.293, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 217.21, unit: "ms per MD step", per_atom_us: 17.677, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 655.23, unit: "ms per MD step", per_atom_us: 53.323, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 69.32, unit: "ms per MD step", per_atom_us: 2.821, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 94.21, unit: "ms per MD step", per_atom_us: 3.833, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 143.25, unit: "ms per MD step", per_atom_us: 5.829, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 29.62, unit: "ms per MD step", per_atom_us: 1.205, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 53.78, unit: "ms per MD step", per_atom_us: 2.188, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 479.7, unit: "ms per MD step", per_atom_us: 19.519, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 139.24, unit: "ms per MD step", per_atom_us: 2.833, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 195.81, unit: "ms per MD step", per_atom_us: 3.984, hardware: "NVIDIA H100 80 GB, FP64, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 286.93, unit: "ms per MD step", per_atom_us: 5.838, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 56.72, unit: "ms per MD step", per_atom_us: 1.154, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 113.98, unit: "ms per MD step", per_atom_us: 2.319, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 575.62, unit: "ms per MD step", per_atom_us: 5.856, hardware: "NVIDIA H100 80 GB, FP64, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 117.23, unit: "ms per MD step", per_atom_us: 1.193, hardware: "NVIDIA H100 80 GB, FP64, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 238.53, unit: "ms per MD step", per_atom_us: 2.426, hardware: "NVIDIA H100 80 GB, FP64, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 1.45, unit: "ms per MD step", per_atom_us: 7.552, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 3.84, unit: "ms per MD step", per_atom_us: 20.0, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 3.78, unit: "ms per MD step", per_atom_us: 19.688, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 1.46, unit: "ms per MD step", per_atom_us: 7.604, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 3.5, unit: "ms per MD step", per_atom_us: 18.229, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 4.04, unit: "ms per MD step", per_atom_us: 21.042, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 8.39, unit: "ms per MD step", per_atom_us: 43.698, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 5.42, unit: "ms per MD step", per_atom_us: 28.229, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 35.83, unit: "ms per MD step", per_atom_us: 186.615, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (192 atoms)", atoms: 192, value: 9.69, unit: "ms per MD step", per_atom_us: 50.469, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 1.74, unit: "ms per MD step", per_atom_us: 4.531, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 3.96, unit: "ms per MD step", per_atom_us: 10.312, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 4.46, unit: "ms per MD step", per_atom_us: 11.615, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 1.61, unit: "ms per MD step", per_atom_us: 4.193, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 4.0, unit: "ms per MD step", per_atom_us: 10.417, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 6.47, unit: "ms per MD step", per_atom_us: 16.849, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 9.37, unit: "ms per MD step", per_atom_us: 24.401, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 7.56, unit: "ms per MD step", per_atom_us: 19.688, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 38.94, unit: "ms per MD step", per_atom_us: 101.406, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (384 atoms)", atoms: 384, value: 13.74, unit: "ms per MD step", per_atom_us: 35.781, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 2.31, unit: "ms per MD step", per_atom_us: 3.008, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 4.29, unit: "ms per MD step", per_atom_us: 5.586, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 5.99, unit: "ms per MD step", per_atom_us: 7.799, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 1.87, unit: "ms per MD step", per_atom_us: 2.435, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 3.9, unit: "ms per MD step", per_atom_us: 5.078, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 11.22, unit: "ms per MD step", per_atom_us: 14.609, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 15.62, unit: "ms per MD step", per_atom_us: 20.339, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 11.49, unit: "ms per MD step", per_atom_us: 14.961, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 46.35, unit: "ms per MD step", per_atom_us: 60.352, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (768 atoms)", atoms: 768, value: 22.28, unit: "ms per MD step", per_atom_us: 29.01, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 3.54, unit: "ms per MD step", per_atom_us: 2.305, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 5.49, unit: "ms per MD step", per_atom_us: 3.574, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 9.17, unit: "ms per MD step", per_atom_us: 5.97, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 2.41, unit: "ms per MD step", per_atom_us: 1.569, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 4.91, unit: "ms per MD step", per_atom_us: 3.197, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 20.4, unit: "ms per MD step", per_atom_us: 13.281, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 27.66, unit: "ms per MD step", per_atom_us: 18.008, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 19.53, unit: "ms per MD step", per_atom_us: 12.715, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 72.6, unit: "ms per MD step", per_atom_us: 47.266, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (1536 atoms)", atoms: 1536, value: 41.72, unit: "ms per MD step", per_atom_us: 27.161, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 6.07, unit: "ms per MD step", per_atom_us: 1.976, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 9.2, unit: "ms per MD step", per_atom_us: 2.995, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 15.27, unit: "ms per MD step", per_atom_us: 4.971, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 3.56, unit: "ms per MD step", per_atom_us: 1.159, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 6.24, unit: "ms per MD step", per_atom_us: 2.031, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 38.5, unit: "ms per MD step", per_atom_us: 12.533, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 50.98, unit: "ms per MD step", per_atom_us: 16.595, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 35.85, unit: "ms per MD step", per_atom_us: 11.67, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 133.2, unit: "ms per MD step", per_atom_us: 43.359, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (3072 atoms)", atoms: 3072, value: 86.0, unit: "ms per MD step", per_atom_us: 27.995, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 11.21, unit: "ms per MD step", per_atom_us: 1.825, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 16.14, unit: "ms per MD step", per_atom_us: 2.627, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 27.57, unit: "ms per MD step", per_atom_us: 4.487, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 6.23, unit: "ms per MD step", per_atom_us: 1.014, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 10.05, unit: "ms per MD step", per_atom_us: 1.636, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 74.11, unit: "ms per MD step", per_atom_us: 12.062, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 98.62, unit: "ms per MD step", per_atom_us: 16.051, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 68.26, unit: "ms per MD step", per_atom_us: 11.11, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 239.83, unit: "ms per MD step", per_atom_us: 39.035, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (6144 atoms)", atoms: 6144, value: 223.71, unit: "ms per MD step", per_atom_us: 36.411, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 21.82, unit: "ms per MD step", per_atom_us: 1.776, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 30.84, unit: "ms per MD step", per_atom_us: 2.51, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 51.97, unit: "ms per MD step", per_atom_us: 4.229, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 12.11, unit: "ms per MD step", per_atom_us: 0.986, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 18.43, unit: "ms per MD step", per_atom_us: 1.5, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 146.37, unit: "ms per MD step", per_atom_us: 11.912, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 192.7, unit: "ms per MD step", per_atom_us: 15.682, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 132.45, unit: "ms per MD step", per_atom_us: 10.779, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 479.85, unit: "ms per MD step", per_atom_us: 39.05, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (12288 atoms)", atoms: 12288, value: 509.55, unit: "ms per MD step", per_atom_us: 41.467, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 43.92, unit: "ms per MD step", per_atom_us: 1.787, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 75.62, unit: "ms per MD step", per_atom_us: 3.077, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 118.79, unit: "ms per MD step", per_atom_us: 4.834, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 23.34, unit: "ms per MD step", per_atom_us: 0.95, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 49.69, unit: "ms per MD step", per_atom_us: 2.022, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 292.36, unit: "ms per MD step", per_atom_us: 11.896, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 398.49, unit: "ms per MD step", per_atom_us: 16.215, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 277.51, unit: "ms per MD step", per_atom_us: 11.292, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa2, system: "Water, LAMMPS MD (24576 atoms)", atoms: 24576, value: 1101.69, unit: "ms per MD step", per_atom_us: 44.828, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 88.37, unit: "ms per MD step", per_atom_us: 1.798, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 154.09, unit: "ms per MD step", per_atom_us: 3.135, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 235.74, unit: "ms per MD step", per_atom_us: 4.796, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 47.29, unit: "ms per MD step", per_atom_us: 0.962, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 102.83, unit: "ms per MD step", per_atom_us: 2.092, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l2, system: "Water, LAMMPS MD (49152 atoms)", atoms: 49152, value: 573.12, unit: "ms per MD step", per_atom_us: 11.66, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 184.06, unit: "ms per MD step", per_atom_us: 1.872, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 315.71, unit: "ms per MD step", per_atom_us: 3.212, hardware: "NVIDIA H100 80 GB, FP32, PyTorch backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 479.91, unit: "ms per MD step", per_atom_us: 4.882, hardware: "NVIDIA H100 80 GB, FP32, JAX backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 102.68, unit: "ms per MD step", per_atom_us: 1.045, hardware: "NVIDIA H100 80 GB, FP32, TensorFlow (compressed) backend", result: null, location: "Table S1"}
+  - {model: dpa1-l0c, system: "Water, LAMMPS MD (98304 atoms)", atoms: 98304, value: 215.32, unit: "ms per MD step", per_atom_us: 2.19, hardware: "NVIDIA H100 80 GB, FP32, PyTorch (compressed) backend", result: null, location: "Table S1"}
+resources: |
+  Each timing is the average of 500 repeated calculations (Sec. 4). The same benchmarks on a 40 GB NVIDIA A800/A100 and a 24 GB RTX 4090 are in Tables S2 and S3.
+gaps:
+  - "No energy or force errors are reported, and the training data and level of theory of the water models are not described. The A800/A100 (Table S2) and RTX 4090 (Table S3) timings are not encoded (same models and systems); out-of-memory entries are omitted."
+  - "DPA-1 is a DeePMD-kit descriptor (se_atten) and is encoded under DeePMD, with compression and attention depth as settings; DPA-2 is a new registry method (method paper not in the corpus). per_atom_us is ms per step divided by the atom count."
