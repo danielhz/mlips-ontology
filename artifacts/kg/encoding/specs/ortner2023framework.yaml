@@ -1,0 +1,43 @@
+id: ortner2023framework
+source:
+  rank: 633
+  year: "2023"
+  first_author: "Christoph Ortner"
+  title: "A Framework for a Generalization Analysis of Machine-Learned Interatomic Potentials"
+  venue: "Multiscale Modeling and Simulation"
+  doi: "10.1137/22m152267x"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2209.05366v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "df5652c7f7bc6c8503a202a64b40b5506b03deb49a4c5c1b3fe4f1904fb5097a"
+study_label: "Ortner and Wang (2023): a framework for a generalisation analysis of machine-learned interatomic potentials"
+scope: |
+  Encoding scope: the linear ACE models (ACE1.jl, rank-revealing QR least
+  squares) fitted to perturbed defect configurations of two reference
+  models used to test the theory: an EAM potential on a 2D triangular
+  lattice (toy model) and the NRL tight-binding model for Si multi-
+  vacancies. Errors are geometry and energy errors versus training-domain
+  size shown in figures, and the toy-model RMSEs of Table 2 are in rescaled
+  units, so there are no results.
+materials:
+  toy2d: {label: "2D triangular lattice with vacancies and interstitials (EAM reference)", class: "model system"}
+  si: {label: "Diamond silicon with multiple vacancies", formula: Si, class: "covalent semiconductor"}
+reference:
+  eam: {type: REF, comment: "Embedded atom model used as the reference for the 2D toy problem."}
+  nrltb: {type: REF, comment: "NRL tight-binding model for Si (Appendix D)."}
+sampling:
+  perturb: {label: "Random perturbations (parameter 0.01) of equilibrated defect configurations in training domains of radius L"}
+datasets:
+  toy: {label: "Perturbed 2D defect configurations labelled with EAM", materials: [toy2d], properties: [Energy, Forces], provenance: InHouse, calc: eam, sampling: [perturb]}
+  si-tb: {label: "Perturbed Si multi-vacancy configurations labelled with NRL-TB", materials: [si], properties: [Energy, Forces], provenance: InHouse, calc: nrltb, sampling: [perturb]}
+methods:
+  ACE:
+    loss: "Weighted energy and force least squares (force-constant terms dropped)"
+    algorithm: "Linear ACE fitted by rank-revealing QR with regularisation 1e-6"
+    impl: {lib: {local: ACE1.jl}}
+    sims: [GeometryOptimization]
+runs:
+  ace-toy: {label: "Linear ACE models for the 2D EAM toy problem (series over training-domain size and basis size)", method: ACE, dataset: toy, model: "ACE 2D toy (generalisation study)"}
+  ace-si: {label: "Linear ACE models for NRL-TB Si multi-vacancies (series over training-domain size)", method: ACE, dataset: si-tb, model: "ACE Si NRL-TB (generalisation study)"}
+gaps:
+  - "Geometry and energy errors of relaxed defects versus fit RMSE and training-domain size are shown only in Figs. 4-9. The 2D toy-model RMSEs and force-constant errors of Table 2 are in rescaled, dimensionless units and are not encoded."

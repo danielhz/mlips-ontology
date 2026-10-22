@@ -1,0 +1,72 @@
+id: yu2024physics
+source:
+  rank: 634
+  year: "2024"
+  first_author: "Hongyu Yu"
+  title: "Physics-informed time-reversal equivariant neural network potential for magnetic materials"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.110.104427"
+  kg_relevance: "Method/model"
+  arxiv_id: "2211.11403v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b24d4d286c7aea60ba046f1a9579c967913b8dd8ecddd47a8d19afffbbf4c41e"
+study_label: "Yu et al. (2024): SpinGNN++, time-reversal equivariant neural network potentials for magnetic materials"
+scope: |
+  Encoding scope: the Spin-Allegro++ models introduced in the paper
+  (registry method Spin-Allegro++, origin) with different spin-interaction
+  terms, and spin-free Allegro baselines trained on the same data, for
+  monolayer CrI3 and CrTe2 (Tables 1 and 3), plus the Spin-Allegro++ fit to
+  the artificial MnGe-type spin-lattice benchmark (energy only). Magnetic
+  ground states, magnetic energy differences and Curie temperatures are
+  property results.
+materials:
+  cri3: {label: "Monolayer CrI3 with noncollinear spins", formula: CrI3, class: "2D magnetic semiconductor"}
+  crte2: {label: "Monolayer CrTe2 with noncollinear spins", formula: CrTe2, class: "2D magnetic material"}
+  mnge: {label: "MnGe-type structure with an artificial spin-lattice model (4149 interaction terms)", class: "model magnetic system"}
+reference:
+  cri3-dft: {type: DFT, code: VASP, xc: {local: PBE+U}, pp: PAW, cutoff: 400, kpoints: "Gamma point", comment: "Spin-polarised with SOC; U = 4 eV on Cr."}
+  crte2-dft: {type: DFT, code: VASP, xc: {local: PBE+U}, pp: PAW, cutoff: 400, kpoints: "2x3x1 Monkhorst-Pack", comment: "Spin-polarised with SOC; rotationally invariant DFT+U with U = 3 eV, J = 0.6 eV on Cr."}
+  pasp: {type: REF, comment: "Artificial spin-lattice model evaluated with PASP."}
+sampling:
+  npt-spins: {label: "NPT MD structures (72-atom CrI3 and 48-atom CrTe2 supercells) with randomly sampled spin configurations"}
+  random: {label: "Random displacements and spin vectors"}
+datasets:
+  cri3: {label: "Monolayer CrI3 data set (4900 train / 611 validation / 611 test)", materials: [cri3], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 6122, loc: "Results, CrI3"}, calc: cri3-dft, sampling: [npt-spins]}
+  crte2: {label: "Monolayer CrTe2 data set (5661 train / 708 validation / 708 test)", materials: [crte2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 7077, loc: "Results, CrTe2"}, calc: crte2-dft, sampling: [npt-spins]}
+  mnge: {label: "Artificial MnGe-type spin-lattice benchmark (5696 train / 712 validation / 712 test; energy only)", materials: [mnge], properties: [Energy], provenance: InHouse, n: {v: 7120, loc: "Results"}, calc: pasp, sampling: [random]}
+methods:
+  Spin-Allegro++:
+    hp: [cutoffRadius]
+    algorithm: "Allegro-based SpinGNN++ with MSENN (Heisenberg/DM/Kitaev J matrix, biquadratic and single-ion anisotropy terms) and TENN time-reversal equivariant convolutions"
+    impl: {lib: Allegro, comment: "Modified NequIP 0.5.6 / Allegro 0.2.0 with T-e3nn (e3nn 0.5.1 extension); pair_allegro in LAMMPS with SPIN package"}
+    sims: [MolecularDynamics, GeometryOptimization]
+  Allegro:
+    hp: [cutoffRadius]
+    impl: {lib: Allegro}
+runs:
+  cri3-full: {label: "Spin-Allegro++ (MSENN & TENN) for monolayer CrI3", method: Spin-Allegro++, dataset: cri3, settings: {cutoffRadius: {v: 8.0, loc: "Results, CrI3"}}, model: "Spin-Allegro++ (MSENN & TENN) CrI3"}
+  cri3-jbs: {label: "Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA) for monolayer CrI3", method: Spin-Allegro++, dataset: cri3, settings: {cutoffRadius: {v: 8.0, loc: "Results, CrI3"}}, model: "Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA) CrI3"}
+  cri3-js: {label: "Spin-Allegro++ (MSENN with J matrix and SIA) for monolayer CrI3", method: Spin-Allegro++, dataset: cri3, settings: {cutoffRadius: {v: 8.0, loc: "Results, CrI3"}}, model: "Spin-Allegro++ (MSENN with J matrix and SIA) CrI3"}
+  cri3-j: {label: "Spin-Allegro++ (MSENN with J matrix) for monolayer CrI3", method: Spin-Allegro++, dataset: cri3, settings: {cutoffRadius: {v: 8.0, loc: "Results, CrI3"}}, model: "Spin-Allegro++ (MSENN with J matrix) CrI3"}
+  cri3-nospin: {label: "Allegro without spin for monolayer CrI3", method: Allegro, dataset: cri3, settings: {cutoffRadius: {v: 8.0, loc: "Results, CrI3"}}, model: "Allegro without spin CrI3"}
+  crte2-full: {label: "Spin-Allegro++ (MSENN & TENN) for monolayer CrTe2", method: Spin-Allegro++, dataset: crte2, settings: {cutoffRadius: {v: 7.5, loc: "Results, CrTe2"}}, model: "Spin-Allegro++ (MSENN & TENN) CrTe2"}
+  crte2-jbs: {label: "Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA) for monolayer CrTe2", method: Spin-Allegro++, dataset: crte2, settings: {cutoffRadius: {v: 7.5, loc: "Results, CrTe2"}}, model: "Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA) CrTe2"}
+  crte2-js: {label: "Spin-Allegro++ (MSENN with J matrix and SIA) for monolayer CrTe2", method: Spin-Allegro++, dataset: crte2, settings: {cutoffRadius: {v: 7.5, loc: "Results, CrTe2"}}, model: "Spin-Allegro++ (MSENN with J matrix and SIA) CrTe2"}
+  crte2-j: {label: "Spin-Allegro++ (MSENN with J matrix) for monolayer CrTe2", method: Spin-Allegro++, dataset: crte2, settings: {cutoffRadius: {v: 7.5, loc: "Results, CrTe2"}}, model: "Spin-Allegro++ (MSENN with J matrix) CrTe2"}
+  crte2-nospin: {label: "Allegro without spin for monolayer CrTe2", method: Allegro, dataset: crte2, settings: {cutoffRadius: {v: 7.5, loc: "Results, CrTe2"}}, model: "Allegro without spin CrTe2"}
+  mnge: {label: "Spin-Allegro++ (two MSENN and TENN layers) on the artificial MnGe-type benchmark", method: Spin-Allegro++, dataset: mnge, model: "Spin-Allegro++ MnGe benchmark"}
+results:
+  - {key: cri3-full-test, model: cri3-full, material: cri3, role: test, eval_data: {label: "CrI3 test split", location: "Table 1"}, metrics: [[MAE, Energy, 0.101, meV/atom, "test energy MAE on CrI3: Spin-Allegro++ (MSENN & TENN)", "Table 1"], [MAE, Force, 6.0, meV/A, "test force MAE on CrI3: Spin-Allegro++ (MSENN & TENN)", "Table 1"], [MAE, Stress, 0.111, null, "test stress MAE in meV/A3 on CrI3: Spin-Allegro++ (MSENN & TENN)", "Table 1"]]}
+  - {key: cri3-jbs-test, model: cri3-jbs, material: cri3, role: test, eval_data: {label: "CrI3 test split", location: "Table 1"}, metrics: [[MAE, Energy, 0.173, meV/atom, "test energy MAE on CrI3: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 1"], [MAE, Force, 7.79, meV/A, "test force MAE on CrI3: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 1"], [MAE, Stress, 0.116, null, "test stress MAE in meV/A3 on CrI3: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 1"]]}
+  - {key: cri3-js-test, model: cri3-js, material: cri3, role: test, eval_data: {label: "CrI3 test split", location: "Table 1"}, metrics: [[MAE, Energy, 0.169, meV/atom, "test energy MAE on CrI3: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 1"], [MAE, Force, 7.88, meV/A, "test force MAE on CrI3: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 1"], [MAE, Stress, 0.116, null, "test stress MAE in meV/A3 on CrI3: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 1"]]}
+  - {key: cri3-j-test, model: cri3-j, material: cri3, role: test, eval_data: {label: "CrI3 test split", location: "Table 1"}, metrics: [[MAE, Energy, 0.153, meV/atom, "test energy MAE on CrI3: Spin-Allegro++ (MSENN with J matrix)", "Table 1"], [MAE, Force, 8.35, meV/A, "test force MAE on CrI3: Spin-Allegro++ (MSENN with J matrix)", "Table 1"], [MAE, Stress, 0.123, null, "test stress MAE in meV/A3 on CrI3: Spin-Allegro++ (MSENN with J matrix)", "Table 1"]]}
+  - {key: cri3-nospin-test, model: cri3-nospin, material: cri3, role: test, eval_data: {label: "CrI3 test split", location: "Table 1"}, metrics: [[MAE, Energy, 2.463, meV/atom, "test energy MAE on CrI3: Allegro without spin", "Table 1"], [MAE, Force, 25.76, meV/A, "test force MAE on CrI3: Allegro without spin", "Table 1"], [MAE, Stress, 0.169, null, "test stress MAE in meV/A3 on CrI3: Allegro without spin", "Table 1"]]}
+  - {key: crte2-full-test, model: crte2-full, material: crte2, role: test, eval_data: {label: "CrTe2 test split", location: "Table 3"}, metrics: [[MAE, Energy, 0.637, meV/atom, "test energy MAE on CrTe2: Spin-Allegro++ (MSENN & TENN)", "Table 3"], [MAE, Force, 18.8, meV/A, "test force MAE on CrTe2: Spin-Allegro++ (MSENN & TENN)", "Table 3"], [MAE, Stress, 0.223, null, "test stress MAE in meV/A3 on CrTe2: Spin-Allegro++ (MSENN & TENN)", "Table 3"]]}
+  - {key: crte2-jbs-test, model: crte2-jbs, material: crte2, role: test, eval_data: {label: "CrTe2 test split", location: "Table 3"}, metrics: [[MAE, Energy, 1.24, meV/atom, "test energy MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 3"], [MAE, Force, 20.7, meV/A, "test force MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 3"], [MAE, Stress, 0.239, null, "test stress MAE in meV/A3 on CrTe2: Spin-Allegro++ (MSENN with J matrix, biquadratic and SIA)", "Table 3"]]}
+  - {key: crte2-js-test, model: crte2-js, material: crte2, role: test, eval_data: {label: "CrTe2 test split", location: "Table 3"}, metrics: [[MAE, Energy, 1.35, meV/atom, "test energy MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 3"], [MAE, Force, 22.3, meV/A, "test force MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 3"], [MAE, Stress, 0.23, null, "test stress MAE in meV/A3 on CrTe2: Spin-Allegro++ (MSENN with J matrix and SIA)", "Table 3"]]}
+  - {key: crte2-j-test, model: crte2-j, material: crte2, role: test, eval_data: {label: "CrTe2 test split", location: "Table 3"}, metrics: [[MAE, Energy, 1.55, meV/atom, "test energy MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix)", "Table 3"], [MAE, Force, 21.4, meV/A, "test force MAE on CrTe2: Spin-Allegro++ (MSENN with J matrix)", "Table 3"], [MAE, Stress, 0.239, null, "test stress MAE in meV/A3 on CrTe2: Spin-Allegro++ (MSENN with J matrix)", "Table 3"]]}
+  - {key: crte2-nospin-test, model: crte2-nospin, material: crte2, role: test, eval_data: {label: "CrTe2 test split", location: "Table 3"}, metrics: [[MAE, Energy, 6.06, meV/atom, "test energy MAE on CrTe2: Allegro without spin", "Table 3"], [MAE, Force, 65.4, meV/A, "test force MAE on CrTe2: Allegro without spin", "Table 3"], [MAE, Stress, 0.359, null, "test stress MAE in meV/A3 on CrTe2: Allegro without spin", "Table 3"]]}
+  - {key: mnge-test, model: mnge, material: mnge, role: test, eval_data: {label: "Artificial MnGe-type benchmark test split (712 samples)", location: "Results; Fig. 3b"}, metrics: [[R2, Energy, 0.9979, null, "test energy R2 on mnge: Spin-Allegro++", "Results; Fig. 3b"]]}
+gaps:
+  - "Stress MAEs are in meV/A3, which has no unit individual (unit null, unit in label). The energy-only MSENN-with-J-matrix CrI3 model (0.110 meV/atom) is a separate training not encoded as a run; the MnGe benchmark MAE is shown only in Fig. 3b."
+  - "Magnetic-state energy differences (Table 2), DFT validation forces of relaxed structures, Curie temperatures and the CrTe2 ground state and strain phase diagram are property results."
