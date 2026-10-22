@@ -1,0 +1,45 @@
+id: kharwar2026
+source:
+  rank: 521
+  year: "2026"
+  first_author: "Saurabh Kharwar"
+  title: "Correlating atomic structure with carrier transport in defective MoS2 with grain boundary via machine-learned potentials"
+  venue: "Communications Materials"
+  doi: "10.1038/s43246-026-01356-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "9d47dc81f93ddede83327cd191360b7ff4f76bb5e28d7b7a0bd3bff2738d2749"
+study_label: "Kharwar et al. (2026): MTPs for defective MoS2 with grain boundaries, validated against DFT-NEGF carrier transport"
+scope: |
+  Encoding scope: the initial MTP (i-MTP; 555 configurations of 15
+  Materials Project Mo-S, Mo and S structures) and the augmented MTP
+  (A-MTP; 703 configurations adding five grain-boundary structures with
+  perturbations), QuantumATK PBE/LCAO references, and the geometry-
+  optimization timings. Test errors are stated only as ranges over fitted
+  realizations; structural, electronic and transport comparisons are
+  properties.
+materials:
+  mos2: {label: "Monolayer MoS2 with grain boundaries (5|7-22-S), pristine Mo-S phases and elemental Mo and S", formula: MoS2, class: "2D material"}
+reference:
+  atk: {type: DFT, code: {local: QuantumATK}, xc: PBE, pp: NormConserving, comment: "LCAO basis, PseudoDojo pseudopotentials, 105 Ha cutoff, about 10 k-points per 1/A"}
+sampling:
+  rand: {label: "Random atomic displacements around 15 Materials Project structures"}
+  gb: {label: "Five representative grain-boundary structures with random displacements and local bond distortions"}
+datasets:
+  i: {label: "i-MTP dataset (555 configurations; 444 training, 111 test)", materials: [mos2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 444, loc: "Results"}, calc: atk, sampling: [rand]}
+  a: {label: "A-MTP dataset (703 configurations; 569 training, 134 test)", materials: [mos2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 569, loc: "Results"}, calc: atk, sampling: [rand, gb]}
+methods:
+  MTP:
+    loss: "Energies, forces and stresses"
+    algorithm: "Nonlinear coefficient scanning and particle swarm optimization of hyperparameters; model chosen by combined training and test error"
+    sims: [GeometryOptimization]
+runs:
+  i-mtp: {label: "i-MTP (initial MTP for MoS2)", method: MTP, dataset: i, model: "i-MTP MoS2"}
+  a-mtp: {label: "A-MTP (MTP augmented with grain-boundary data)", method: MTP, dataset: a, model: "A-MTP MoS2"}
+results: []
+timings:
+  - {model: i-mtp, system: "Geometry optimization of the 5|7-22-S grain-boundary structure (DFT: 9,395 s)", atoms: null, value: 11.16, unit: "s per relaxation", per_atom_us: null, hardware: "not stated", result: null, location: "Introduction"}
+  - {model: a-mtp, system: "Geometry optimization of the 5|7-22-S grain-boundary structure (DFT: 9,395 s)", atoms: null, value: 10.46, unit: "s per relaxation", per_atom_us: null, hardware: "not stated", result: null, location: "Introduction"}
+gaps:
+  - "Test RMSEs are given only as ranges across fitted realizations (i-MTP: 1.6-3.3 meV/atom, 78-93 meV/A, 5.7-12 meV/A^3; A-MTP: about 1.0-2.4 meV/atom, 71-83 meV/A, 3.8-17.1 meV/A^3), not for the selected models; not encoded. The MTP fitting software is not named in the text read."

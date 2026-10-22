@@ -1,0 +1,57 @@
+id: liu2026ai2pot
+source:
+  rank: 520
+  year: "2026"
+  first_author: "Hanyu Liu"
+  title: "AI2Pot: A scalable and unified framework for machine-learning interatomic potential development and large-scale molecular dynamic simulations"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.06969"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2607.06969v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5654aeeba4188eda222c96378df965a3bbacdb9918a4fb937b4bc0d230d210d8"
+study_label: "Liu et al. (2026): AI2Pot, a PyTorch/CUDA framework for training and deploying MTP and NEP potentials, demonstrated on Ge-Sb-Te"
+scope: |
+  Encoding scope: the MTP (level 18) and NEP models trained with
+  AI2Pot-cli defaults on a Ge-Sb-Te dataset (2,633 training and 673 test
+  frames; crystalline, liquid and amorphous), their training and test
+  RMSEs, training times and LAMMPS MD throughput on one GPU. Batch-size
+  ratios are figure-only.
+materials:
+  gst: {label: "Ge-Sb-Te crystalline, liquid and amorphous configurations of various compositions", class: "Phase-change materials"}
+reference:
+  fp: {type: DFT, comment: "First-principles energies, forces and virials; level of theory not stated in the text read"}
+sampling:
+  gst: {label: "Ge-Sb-Te dataset of crystalline, liquid and amorphous configurations (source not described)"}
+datasets:
+  gst: {label: "Ge-Sb-Te training set (2,633 frames, 283,465 atoms)", materials: [gst], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 2633, loc: "Sec. 4.1"}, calc: fp, sampling: [gst]}
+methods:
+  MTP:
+    hp: [momentLevel, cutoffRadius, numRadialBasis, learningRate, numEpochs, batchSize]
+    loss: "Energy, force and virial terms with dynamic loss weighting"
+    impl: {lib: {local: AI2Pot}, comment: "AI2Pot v1.0.0, LAMMPS deployment"}
+    sims: [MolecularDynamics]
+  NEP:
+    hp: [cutoffRadius, angularCutoff, numRadialBasis, learningRate, numEpochs, batchSize]
+    loss: "Energy, force and virial terms with dynamic loss weighting"
+    impl: {lib: {local: AI2Pot}, comment: "AI2Pot v1.0.0, LAMMPS deployment"}
+    sims: [MolecularDynamics]
+runs:
+  mtp: {label: "MTP (level 18, 526 parameters) for Ge-Sb-Te", method: MTP, dataset: gst, settings: {momentLevel: {v: 18, loc: "Table 1"}, cutoffRadius: {v: 5.0, loc: "Table 1"}, numRadialBasis: {v: 8, loc: "Table 1"}, learningRate: {v: 0.01, loc: "Table 1 (start)"}, numEpochs: {v: 200, loc: "Table 1"}, batchSize: {v: 1, loc: "Table 1"}}, model: "AI2Pot MTP Ge-Sb-Te"}
+  nep: {label: "NEP (7.9k parameters) for Ge-Sb-Te", method: NEP, dataset: gst, settings: {cutoffRadius: {v: 7.0, loc: "Table 2"}, angularCutoff: {v: 5.0, loc: "Table 2"}, numRadialBasis: {v: 8, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2 (start)"}, numEpochs: {v: 200, loc: "Table 2"}, batchSize: {v: 1, loc: "Table 2"}}, model: "AI2Pot NEP Ge-Sb-Te"}
+results:
+  - {key: mtp-train, model: mtp, material: gst, role: training, eval_data: {label: "Ge-Sb-Te training set", location: "Sec. 4.1.1"}, metrics: [[RMSE, Energy, 21.79, meV/atom, "training energy RMSE on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"], [RMSE, Force, 243.86, meV/A, "training force RMSE on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"], [RMSE, Stress, 74.40, null, "training virial RMSE (meV/atom) on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"]]}
+  - {key: mtp-test, model: mtp, material: gst, role: test, eval_data: {label: "Ge-Sb-Te test set (673 frames)", location: "Sec. 4.1"}, metrics: [[RMSE, Energy, 25.03, meV/atom, "test energy RMSE on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"], [RMSE, Force, 207.69, meV/A, "test force RMSE on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"], [RMSE, Stress, 46.38, null, "test virial RMSE (meV/atom) on Ge-Sb-Te: AI2Pot MTP", "Sec. 4.1.1"]]}
+  - {key: nep-train, model: nep, material: gst, role: training, eval_data: {label: "Ge-Sb-Te training set", location: "Sec. 4.1.2"}, metrics: [[RMSE, Energy, 12.74, meV/atom, "training energy RMSE on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"], [RMSE, Force, 176.38, meV/A, "training force RMSE on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"], [RMSE, Stress, 47.58, null, "training virial RMSE (meV/atom) on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"]]}
+  - {key: nep-test, model: nep, material: gst, role: test, eval_data: {label: "Ge-Sb-Te test set (673 frames)", location: "Sec. 4.1"}, metrics: [[RMSE, Energy, 16.47, meV/atom, "test energy RMSE on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"], [RMSE, Force, 156.28, meV/A, "test force RMSE on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"], [RMSE, Stress, 31.22, null, "test virial RMSE (meV/atom) on Ge-Sb-Te: AI2Pot NEP", "Sec. 4.1.2"]]}
+timings:
+  - {model: mtp, system: "Ge-Sb-Te LAMMPS MD, 189 atoms", atoms: 189, value: 16.6, unit: "katom-step/s", per_atom_us: 60.24, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+  - {model: mtp, system: "Ge-Sb-Te LAMMPS MD, 6,804 atoms", atoms: 6804, value: 269.7, unit: "katom-step/s", per_atom_us: 3.708, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+  - {model: mtp, system: "Ge-Sb-Te LAMMPS MD, about 3.4 million atoms (peak)", atoms: null, value: 355.3, unit: "katom-step/s", per_atom_us: 2.815, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+  - {model: nep, system: "Ge-Sb-Te LAMMPS MD, 189 atoms", atoms: 189, value: 15.3, unit: "katom-step/s", per_atom_us: 65.36, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+  - {model: nep, system: "Ge-Sb-Te LAMMPS MD, 55,566 atoms", atoms: 55566, value: 807.9, unit: "katom-step/s", per_atom_us: 1.238, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+  - {model: nep, system: "Ge-Sb-Te LAMMPS MD, about 3.4 million atoms (peak)", atoms: null, value: 923.5, unit: "katom-step/s", per_atom_us: 1.083, hardware: "One NVIDIA GeForce RTX 4090 D", result: null, location: "Sec. 4.3"}
+resources: |
+  Training time with batch size 1: MTP 5.93 h, NEP 8.93 h (down to 0.75 h and 1.30 h at batch size 32) on an RTX 4090 D workstation (Table 3).
+gaps:
+  - "The Ge-Sb-Te dataset's source and level of theory are not described in the text read; provenance is set to in-house without a statement. Virial RMSEs are in meV/atom, outside the schema stress units, and are kept with unit null."
