@@ -1,0 +1,39 @@
+id: jana2026
+source:
+  rank: 370
+  year: "2026"
+  first_author: "Asmita Jana"
+  title: "Benchmarking machine-learned potentials for adsorption on Pt and $$\\textrm{IrO}_2$$ surfaces using OC20 and OMat24"
+  venue: "Discover Chemistry."
+  doi: "10.1007/s44371-026-00865-5"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "bc89392b27d45122ac756390217f87169ac4f4d6b807bf9ae02fdd09301bcc9f"
+study_label: "Jana et al. (2026): benchmarking UMA (OC20 and OMat24 tasks) for adsorption energies on Pt and IrO2 surfaces against DFT"
+scope: |
+  Encoding scope: the pretrained uma-s-1p1 checkpoint (FAIRChem, ASE
+  LBFGS to 0.001 eV/A) with the OC20 task for CO, NO, O and H on
+  Pt(111), Pt(110) and Pt(231), and with the OMat24 task for H, O and OH
+  on O-terminated IrO2(110), compared with VASP RPBE (Pt, spin-polarised
+  and non-spin-polarised) and PBE+D3 (IrO2) adsorption energies. The text
+  gives only approximate agreement ('within about 0.1, 0.2, 0.3 eV');
+  the per-adsorbate values are in SI tables, so no metrics are encoded.
+materials:
+  pt: {label: "CO, NO, O and H adsorbed on Pt(111), Pt(110) and Pt(231) slabs", formula: "Pt", class: "Heterogeneous catalysis: adsorbates on inorganic surfaces"}
+  iro2: {label: "H, O and OH adsorbed on O-terminated rutile IrO2(110) (1x2 supercell)", formula: "IrO2", class: "Heterogeneous catalysis: adsorbates on inorganic surfaces"}
+reference:
+  rpbe: {type: DFT, code: VASP, xc: {local: RPBE}, pp: PAW, cutoff: 550, comment: "Pt systems, spin-polarised and non-spin-polarised, dipole corrections (Sec. 2)."}
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 550, comment: "IrO2 systems, PBE+D3, spin-polarised, dipole corrections (Sec. 2)."}
+methods:
+  UMA:
+    impl: {lib: {local: "fairchem"}}
+    sims: [GeometryOptimization]
+runs:
+  uma-oc20: {label: "UMA small uma-s-1p1 as distributed, OC20 task", method: UMA, model: "uma-s-1p1 (oc20 task)"}
+  uma-omat: {label: "UMA small uma-s-1p1 as distributed, OMat24 task", method: UMA, model: "uma-s-1p1 (omat task)"}
+results: []
+resources: |
+  No timings are given; the MLIP-then-DFT procedure is said to shorten the DFT relaxation.
+gaps:
+  - "Adsorption-energy agreement is given only approximately in the text (about 0.1 eV vs non-spin-polarised RPBE and about 1.2 eV vs spin-polarised RPBE for UMA-OC20; about 0.3 eV relaxed and 0.2 eV single-point for UMA-OMat24); per-adsorbate values are in SI Tables S1-S7. Geometry norms are structural comparisons."

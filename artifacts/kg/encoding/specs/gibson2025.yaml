@@ -1,0 +1,48 @@
+id: gibson2025
+source:
+  rank: 366
+  year: "2025"
+  first_author: "Jason Gibson"
+  title: "When more data hurts: Optimizing data coverage while mitigating diversity-induced underfitting in an ultrafast machine-learned potential"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.9.043802"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.07610v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a9fa143e7806f2bd72e49384e398aaa7b24db752efa2fa76eaa3a114681c721c"
+study_label: "Gibson et al. (2025): when more data hurts, training-data diversity and underfitting in UF3 potentials for amorphous silicon nitride"
+scope: |
+  Encoding scope: the PBE data sets for Si-N (stoichiometric: AIMD of
+  alpha, beta and gamma Si3N4 at 300-3200 K, elastic and high-pressure
+  relaxations; non-stoichiometric: GASP genetic-algorithm relaxation
+  trajectories, filtered at 20 eV/A and 3 eV/atom above the hull) and the
+  four UF3 variants trained on them (stoic., nonstoic., total, final).
+  Force MAEs and R2 values are given in tables inside Fig. 3 (figure-
+  only); elastic constants, density and RDF/ADF are properties.
+materials:
+  sin: {label: "Silicon nitride: crystalline alpha, beta, gamma Si3N4, amorphous SiNx and non-stoichiometric Si-N phases", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400, kpoints: "45 per 1/A, Methfessel-Paxton smearing 100 meV", comment: "All data sets (p. 3)."}
+sampling:
+  aimd: {label: "AIMD of Si3N4 phases at 300, 1200, 1800 and 3200 K (5 ps), elastic-constant and high-pressure (up to 200 GPa) relaxation trajectories"}
+  ga: {label: "Genetic-algorithm structure search (GASP) relaxation trajectories over Si-N compositions"}
+datasets:
+  stoic: {label: "Stoichiometric Si3N4 training data (3200 K AIMD held out for testing)", materials: [sin], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [aimd]}
+  nonstoic: {label: "Non-stoichiometric GA training data (80 % of the GA set)", materials: [sin], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [ga]}
+  total: {label: "Stoichiometric + non-stoichiometric training data", materials: [sin], properties: [Energy, Forces], provenance: Augmented, calc: pbe, sampling: [aimd, ga]}
+  final: {label: "Stoichiometric training data + non-stoichiometric data without structures richer in N than Si3N5", materials: [sin], properties: [Energy, Forces], provenance: Augmented, calc: pbe, sampling: [aimd, ga]}
+methods:
+  UF3:
+    loss: "Linear least squares with ridge and curvature regularisation for 2- and 3-body terms"
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  uf3-stoic: {label: "UF3 (2+3-body) trained on the stoichiometric data", method: UF3, dataset: stoic, model: "SiN UF3 stoic."}
+  uf3-nonstoic: {label: "UF3 (2+3-body) trained on the non-stoichiometric GA data", method: UF3, dataset: nonstoic, model: "SiN UF3 nonstoic."}
+  uf3-total: {label: "UF3 (2+3-body) trained on stoichiometric + non-stoichiometric data", method: UF3, dataset: total, model: "SiN UF3 total"}
+  uf3-final: {label: "UF3 (2+3-body) trained on stoichiometric + N-filtered non-stoichiometric data (hyperparameters optimised for this variant)", method: UF3, dataset: final, model: "SiN UF3 final"}
+results: []
+resources: |
+  UF3 is stated to be 9,269 times faster than DFT and 8 times faster than GAP (Ref. 16) for 100 NVE steps of a 3,024-atom beta-Si3N4 cell on 4 Intel Xeon E5-2698 CPUs (Fig. 1); absolute times are figure-only.
+gaps:
+  - "Force MAEs and R2 values for the stoichiometric and non-stoichiometric test sets are in tables inside Fig. 3, which the text does not repeat (except R2 = 0.99 and -32.62 for UF3 stoic.); not encoded."
+  - "Data-set sizes and UF3 cutoffs and knot counts are not stated in the text. Elastic-constant MAPEs (12.0 % stoic., 8.5 % final), densities and RDF/ADF are properties."

@@ -1,0 +1,48 @@
+id: ibragimova2025
+source:
+  rank: 362
+  year: "2025"
+  first_author: "Rina Ibragimova"
+  title: "Unifying the Description of Hydrocarbons and Hydrogenated Carbon Materials with a Chemically Reactive Machine Learning Interatomic Potential"
+  venue: "Chemistry of Materials"
+  doi: "10.1021/acs.chemmater.4c02905"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.08194v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b301af79017f9dd9831b76a00da508a2459e2d260764a966be1f568ab2308ff2"
+study_label: "Ibragimova et al. (2025): a chemically reactive CH GAP for hydrocarbons and hydrogenated carbon materials"
+scope: |
+  Encoding scope: the PBE (VASP) database of QM9 CH molecules,
+  actively generated interacting-molecule pairs, high-temperature
+  'soup' structures, melt-quench structures and pure-carbon structures,
+  the CH GAP (2b, 3b and soap_turbo many-body descriptors with tabulated
+  core repulsion; gap_fit, TurboGAP) and its test RMSEs overall (6,941
+  structures) and per structure type stated in Sec. III A. The local
+  Hirshfeld-volume model for TS/MBD dispersion, defect energetics and the
+  applications are properties or auxiliary models.
+materials:
+  ch: {label: "Hydrocarbons and hydrogenated carbon: QM9 CH molecules, interacting molecule pairs, CH soups (300-15000 K), melt-quench structures and fragments, carbon chains, amorphous carbon, graphite and diamond", class: "Elemental solid and liquid carbon"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, cutoff: 650, kpoints: "automatic, minimum spacing 0.25 1/A", comment: "Identical convergence settings for all single points (Sec. II B)."}
+datasets:
+  ch: {label: "CH GAP database (QM9 CH molecules, interacting molecules, soups, melt-quench structures, pure carbon); split into training and test sets", materials: [ch], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe}
+methods:
+  GAP:
+    hp: [cutoffRadius, angularCutoff]
+    loss: "Per-configuration-type regularisation (sigma from about 0.025 down to 0.001 eV/atom), CUR sparsification"
+    impl: {lib: QUIP, comment: "gap_fit for training; TurboGAP for MD"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  chgap: {label: "CH GAP (2b + 3b + soap_turbo, tabulated core pair potentials)", method: GAP, dataset: ch, settings: {cutoffRadius: {v: 5, loc: "Sec. II A (2b descriptors)"}, angularCutoff: {v: 2, loc: "Sec. II A (3b descriptors)"}}, model: "CH GAP (Ibragimova 2025)"}
+results:
+  - {key: chgap-test, model: chgap, material: ch, role: test, eval_data: {label: "CH GAP test set (6,941 structures)", location: "Sec. III A; Fig. 5"}, metrics: [[RMSE, Energy, 14, meV/atom, "test energy RMSE on ch: CH GAP", "Sec. III A"], [RMSE, Force, 1, eV/A, "test force RMSE on C atoms of ch: CH GAP", "Sec. III A (per carbon atom)"], [RMSE, Force, 0.5, eV/A, "test force RMSE on H atoms of ch: CH GAP", "Sec. III A (per hydrogen atom)"]]}
+  - {key: chgap-test-qm9, model: chgap, material: ch, role: test, eval_data: {label: "QM9 CH molecules in the test set", location: "Sec. III A"}, metrics: [[RMSE, Energy, 2, meV/atom, "test energy RMSE on QM9 molecules: CH GAP", "Sec. III A"]]}
+  - {key: chgap-test-bulk, model: chgap, material: ch, role: test, eval_data: {label: "Bulk carbon (graphite and diamond) in the test set", location: "Sec. III A"}, metrics: [[RMSE, Energy, 2, meV/atom, "test energy RMSE on bulk carbon: CH GAP", "Sec. III A"]]}
+  - {key: chgap-test-inter, model: chgap, material: ch, role: test, eval_data: {label: "Interacting molecules in the test set", location: "Sec. III A"}, metrics: [[RMSE, Energy, 5, meV/atom, "test energy RMSE on interacting molecules: CH GAP", "Sec. III A"]]}
+  - {key: chgap-test-mq, model: chgap, material: ch, role: test, eval_data: {label: "Melt-quench molecules in the test set", location: "Sec. III A"}, metrics: [[RMSE, Energy, 56, meV/atom, "test energy RMSE on melt-quench molecules: CH GAP", "Sec. III A"]]}
+  - {key: chgap-qm9-all, model: chgap, material: ch, role: null, eval_data: {label: "Whole CH-QM9 set (training + test)", location: "Sec. III A; Fig. S1"}, metrics: [[RMSE, Force, 0.42, eV/A, "force RMSE on C atoms of the whole CH-QM9 set: CH GAP", "Sec. III A"], [RMSE, Force, 0.16, eV/A, "force RMSE on H atoms of the whole CH-QM9 set: CH GAP", "Sec. III A"]]}
+resources: |
+  No timings are given in the encoded sections.
+gaps:
+  - "Force RMSEs are given per element (C and H). The a-C energy RMSE is given as a range (34-36 meV/atom) and the whole CH-QM9 energy RMSE as 'about 3 meV per atom', so neither is encoded. The CH-QM9 role is null because the set mixes training and test data."
+  - "The SOAP cutoff and sparse-set sizes are in the released potential's metadata, not in the text. Hirshfeld-volume RMSE (0.009 per atom, Fig. 4) belongs to the auxiliary local-property model; dimer interaction energies, defect energetics and applications are properties."
