@@ -1,0 +1,44 @@
+id: ito2025fast
+source:
+  rank: 561
+  year: "2025"
+  first_author: "Kazuma Ito"
+  title: "Fast and accurate Fe-H machine-learning interatomic potential for elucidating hydrogen embrittlement mechanisms"
+  venue: "arXiv (Cornell University)"
+  doi: "10.1016/j.ijhydene.2026.155600"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2512.22934v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "598a809873edc099723bdc7be41f869a70135fa782530a3c58a5a659777e446a"
+study_label: "Ito (2025): fast and accurate PACE (ACE) Fe-H potential for hydrogen embrittlement, trained on a concurrent-learning dataset"
+scope: |
+  Encoding scope: the pacemaker ACE potential for Fe-H (544 basis
+  functions, 4,982 parameters, Fe-Fe cutoff 6.0 A, others 4.5 A) trained
+  on the 36,438-structure DP-GEN dataset of the author's earlier work;
+  its stated energy and force RMSEs and relative MD cost. Defect,
+  segregation, dislocation and fracture results are properties.
+hyperparameters:
+  nfunc: {label: "Number of ACE basis functions", name: "number of basis functions", datatype: integer}
+materials:
+  feh: {label: "alpha-Fe with H: stacking faults, surfaces, symmetric tilt grain boundaries, vacancy clusters and H-containing counterparts", class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, comment: "Settings of Ref. 65"}
+sampling:
+  dpgen: {label: "Initial dataset (six subsets) and DP-GEN concurrent-learning dataset (eight subsets) of Ref. 65 (Table 1)"}
+datasets:
+  feh: {label: "Fe-H training dataset (36,438 structures, 1,549,196 atomic environments)", materials: [feh], properties: [Energy, Forces], provenance: Published, n: {v: 36438, loc: "Sec. 2.1"}, calc: vasp, sampling: [dpgen]}
+methods:
+  ACE:
+    hp: [cutoffRadius, nfunc]
+    loss: "Energies and forces with automatic weighting (0.52)"
+    algorithm: "BFGS"
+    impl: {lib: PACE, comment: "pacemaker; nonlinear embedding with nine density terms; Bessel radial basis"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  pace: {label: "PACE Fe-H potential", method: ACE, dataset: feh, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 2.1 (Fe-Fe)"}, nfunc: {v: 544, loc: "Sec. 2.1"}}, model: "PACE Fe-H (Ito 2025)"}
+results:
+  - {key: pace-fit, model: pace, material: feh, role: null, eval_data: {label: "Fe-H dataset (split not stated)", location: "Sec. 2.1"}, metrics: [[RMSE, Energy, 5.85, meV/atom, "energy RMSE on Fe-H dataset: PACE", "Sec. 2.1"], [RMSE, Force, 87.26, meV/A, "force RMSE on Fe-H dataset: PACE", "Sec. 2.1"]]}
+resources: |
+  For a 250,000-atom alpha-Fe supercell the PACE potential costs 27 times EAM per atom per step, versus 272 (BNNP-Ito) and 837 (BNNP-Meng) times EAM (Fig. 5b; Sec. 3.1).
+gaps:
+  - "The RMSEs are not attributed to a training or test split in the text read, so the role is null. BNNP values (4.09 meV/atom, 109.16 meV/A) are from Ref. 65 and not encoded. Hydrogen segregation-energy RMSEs (0.046 and 0.039 eV) are property errors."

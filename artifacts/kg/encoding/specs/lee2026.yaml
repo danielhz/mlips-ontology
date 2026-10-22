@@ -1,0 +1,59 @@
+id: lee2026
+source:
+  rank: 562
+  year: "2026"
+  first_author: "Hyeon-Jong Lee"
+  title: "Budget-constrained augmentation of universal interatomic potentials for reliable multicomponent molecular dynamics"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02202-x"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "3e1928a71969dac3300fd02315c863d692fd3d65fa7a089f4b005dcfab71bcfc"
+study_label: "Lee et al. (2026): budget-constrained augmentation of universal interatomic potentials (Random, DIRECT, LCMD sampling; scratch vs Re-EWC fine-tuning) for sodium-oxide molecular dynamics"
+scope: |
+  Encoding scope: SevenNet-architecture models trained on MatPES-PBE-2025.1
+  (baseline), retrained from scratch with sodium-oxide augmentation
+  sets chosen by Random, DIRECT or LCMD sampling under a fixed DFT
+  budget, or fine-tuned from the baseline with replay and EWC; force MAEs
+  on the AIMD validation set (Sec. Results). Distance-binned RMSEs,
+  force-softening scales and MD properties are not encoded as results.
+materials:
+  naox: {label: "Sodium-oxide multicomponent chemistries (solid-electrolyte candidates)", class: "Inorganic ionic conductors"}
+  matpes: {label: "Inorganic materials of MatPES", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, comment: "MatPES-compatible PBE settings"}
+sampling:
+  pool: {label: "Candidate pool (about 67.6 million configurations) from 600-1400 K NVT MD with SevenNet-MatPES on sodium-oxide structures up to 25 meV/atom above hull, embedded with the M3GNet-Ef encoder and PCA"}
+  rand: {label: "Random selection from the candidate pool"}
+  direct: {label: "DIRECT clustering selection"}
+  lcmd: {label: "LCMD initial-aware selection starting from MatPES structures as centres"}
+datasets:
+  matpes: {label: "MatPES-PBE-2025.1 (434,712 PBE calculations; 90/5/5)", materials: [matpes], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 434712, loc: "Methods"}, calc: pbe, sampling: [pool]}
+  random: {label: "MatPES plus Random-sampled sodium-oxide data", materials: [matpes, naox], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: pbe, sampling: [rand]}
+  direct: {label: "MatPES plus DIRECT-sampled sodium-oxide data", materials: [matpes, naox], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: pbe, sampling: [direct]}
+  lcmd: {label: "MatPES plus LCMD-sampled sodium-oxide data", materials: [matpes, naox], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: pbe, sampling: [lcmd]}
+methods:
+  NequIP:
+    hp: [numEpochs, batchSize]
+    loss: "Energies, forces and stresses (SevenNet0-11July2024 settings); Re-EWC with 10% replay for fine-tuning"
+    impl: {lib: {local: SevenNet}, comment: "SevenNet0-11July2024 architecture"}
+    sims: [MolecularDynamics]
+runs:
+  matpes: {label: "MatPES baseline (SevenNet architecture, trained on MatPES-PBE-2025.1)", method: NequIP, dataset: matpes, settings: {numEpochs: {v: 600, loc: "Methods"}, batchSize: {v: 128, loc: "Methods"}}, model: "SevenNet MatPES baseline"}
+  random-sc: {label: "Random-SC (scratch retraining with Random-sampled sodium-oxide data)", method: NequIP, dataset: random, settings: {numEpochs: {v: 600, loc: "Methods"}, batchSize: {v: 128, loc: "Methods"}}, model: "SevenNet RANDOM-SC"}
+  direct-sc: {label: "DIRECT-SC (scratch retraining with DIRECT-sampled data)", method: NequIP, dataset: direct, settings: {numEpochs: {v: 600, loc: "Methods"}, batchSize: {v: 128, loc: "Methods"}}, model: "SevenNet DIRECT-SC"}
+  lcmd-sc: {label: "LCMD-SC (scratch retraining with LCMD-sampled data)", method: NequIP, dataset: lcmd, settings: {numEpochs: {v: 600, loc: "Methods"}, batchSize: {v: 128, loc: "Methods"}}, model: "SevenNet LCMD-SC"}
+  random-ft: {label: "Random-FT (Re-EWC fine-tuning of the MatPES baseline)", method: NequIP, dataset: random, model: "SevenNet RANDOM-FT", base_model: {run: matpes, relation: fine-tuned, location: "Methods (iii)"}}
+  direct-ft: {label: "DIRECT-FT (Re-EWC fine-tuning of the MatPES baseline)", method: NequIP, dataset: direct, model: "SevenNet DIRECT-FT", base_model: {run: matpes, relation: fine-tuned, location: "Methods (iii)"}}
+  lcmd-ft: {label: "LCMD-FT (Re-EWC fine-tuning of the MatPES baseline)", method: NequIP, dataset: lcmd, model: "SevenNet LCMD-FT", base_model: {run: matpes, relation: fine-tuned, location: "Methods (iii)"}}
+results:
+  - {key: matpes-aimd, model: matpes, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.214, eV/A, "force MAE on sodium-oxide AIMD validation set: matpes", "Results"]]}
+  - {key: random-sc-aimd, model: random-sc, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.143, eV/A, "force MAE on sodium-oxide AIMD validation set: random-sc", "Results"]]}
+  - {key: direct-sc-aimd, model: direct-sc, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.141, eV/A, "force MAE on sodium-oxide AIMD validation set: direct-sc", "Results"]]}
+  - {key: lcmd-sc-aimd, model: lcmd-sc, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.148, eV/A, "force MAE on sodium-oxide AIMD validation set: lcmd-sc", "Results"]]}
+  - {key: random-ft-aimd, model: random-ft, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.171, eV/A, "force MAE on sodium-oxide AIMD validation set: random-ft", "Results"]]}
+  - {key: direct-ft-aimd, model: direct-ft, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.171, eV/A, "force MAE on sodium-oxide AIMD validation set: direct-ft", "Results"]]}
+  - {key: lcmd-ft-aimd, model: lcmd-ft, material: naox, role: external, eval_data: {label: "AIMD validation trajectories of sodium-oxide structures", location: "Results; Methods"}, metrics: [[MAE, Force, 0.172, eV/A, "force MAE on sodium-oxide AIMD validation set: lcmd-ft", "Results"]]}
+gaps:
+  - "Sampled dataset sizes per strategy are set by the budget in the Methods and SI and are not encoded. Distance-binned force RMSEs (e.g. 0.307-0.331 eV/A at distance 6.5) and force-softening scales are not encoded."
