@@ -1,0 +1,43 @@
+id: bideault2024
+source:
+  rank: 536
+  year: "2024"
+  first_author: "Marthe Bideault"
+  title: "Polyvalent machine-learned potential for cobalt: From bulk to nanoparticles"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.8.123803"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2404.02626v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "2a30ec02ad1ba724ea857e99cab41436fc98ab16ebb2ac725b109a632d78d9b1"
+study_label: "Bideault et al. (2024): a quadratic SNAP potential for cobalt from bulk to nanoparticles"
+scope: |
+  Encoding scope: the q-SNAP for Co trained with the MedeA MLPG on
+  spin-polarized VASP PBE energies, forces and stresses of unit cells,
+  bulk MD, defects, surfaces and nanoparticles (2-308 atoms); training
+  and test MAE/RMSE/R2 of Table II. Bulk, surface, thermal and
+  nanoparticle results are properties.
+hyperparameters:
+  twoJmax: {label: "SNAP/qSNAP angular order 2Jmax of the bispectrum expansion", name: "2Jmax", datatype: integer}
+materials:
+  co: {label: "Cobalt (hcp and fcc bulk, defects, surfaces, nanoclusters and nanoparticles)", formula: Co, class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 300, kpoints: "k-spacing 0.2 1/A in periodic directions", comment: "Spin-polarized; Methfessel-Paxton smearing 0.2 eV; MedeA"}
+sampling:
+  classes: {label: "Unit cells, MD bulk supercells, interstitial/vacancy supercells, surfaces and nanoparticles (Table I)"}
+datasets:
+  co: {label: "Co training set (Table I classes; 10% held out as test set)", materials: [co], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [classes]}
+methods:
+  qSNAP:
+    hp: [twoJmax, cutoffRadius]
+    loss: "Weighted least squares; energy, force and stress weights 1, 0.01 and 1e-6"
+    algorithm: "Least squares; 2Jmax and cutoff optimized on the test set"
+    impl: {lib: {local: MedeA MLPG}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  qsnap: {label: "q-SNAP for cobalt", method: qSNAP, dataset: co, settings: {twoJmax: {v: 8, loc: "Sec. II A 2"}, cutoffRadius: {v: 5.0, loc: "Sec. II A 2"}}, model: "q-SNAP Co (2024)"}
+results:
+  - {key: qsnap-train, model: qsnap, material: co, role: training, eval_data: {label: "Co training set", location: "Table II"}, metrics: [[MAE, Energy, 2.3, meV/atom, "training energy MAE on Co: q-SNAP", "Table II"], [RMSE, Energy, 4.3, meV/atom, "training energy RMSE on Co: q-SNAP", "Table II"], [R2, Energy, 1.0000, null, "training energy R2 on Co: q-SNAP", "Table II"], [MAE, Force, 30.9, meV/A, "training force MAE on Co: q-SNAP", "Table II"], [RMSE, Force, 54.2, meV/A, "training force RMSE on Co: q-SNAP", "Table II"], [R2, Force, 0.9957, null, "training force R2 on Co: q-SNAP", "Table II"], [MAE, Stress, 0.063, GPa, "training stress MAE on Co: q-SNAP", "Table II (630 bar)"], [RMSE, Stress, 0.1434, GPa, "training stress RMSE on Co: q-SNAP", "Table II (1434 bar)"], [R2, Stress, 1.0000, null, "training stress R2 on Co: q-SNAP", "Table II"]]}
+  - {key: qsnap-test, model: qsnap, material: co, role: test, eval_data: {label: "Co test set (10% of the configurations)", location: "Sec. II A 2; Table II"}, metrics: [[MAE, Energy, 8.1, meV/atom, "test energy MAE on Co: q-SNAP", "Table II"], [RMSE, Energy, 28.6, meV/atom, "test energy RMSE on Co: q-SNAP", "Table II"], [R2, Energy, 0.9999, null, "test energy R2 on Co: q-SNAP", "Table II"], [MAE, Force, 33.2, meV/A, "test force MAE on Co: q-SNAP", "Table II"], [RMSE, Force, 92.7, meV/A, "test force RMSE on Co: q-SNAP", "Table II"], [R2, Force, 0.9933, null, "test force R2 on Co: q-SNAP", "Table II"], [MAE, Stress, 0.5931, GPa, "test stress MAE on Co: q-SNAP", "Table II (5931 bar)"], [RMSE, Stress, 4.1992, GPa, "test stress RMSE on Co: q-SNAP", "Table II (41992 bar)"], [R2, Stress, 0.9998, null, "test stress R2 on Co: q-SNAP", "Table II"]]}
+gaps:
+  - "Stress errors converted exactly from bar to GPa (original values in the locations). Per-class counts of energies, forces and stresses are in Table I; no total is stated."

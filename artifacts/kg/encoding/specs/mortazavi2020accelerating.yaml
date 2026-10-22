@@ -1,0 +1,50 @@
+id: mortazavi2020accelerating
+source:
+  rank: 537
+  year: "2020"
+  first_author: "Bohayra Mortazavi"
+  title: "Accelerating first-principles estimation of thermal conductivity by machine-learning interatomic potentials: A MTP/ShengBTE solution"
+  venue: "Computer Physics Communications"
+  doi: "10.1016/j.cpc.2020.107583"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2009.03662v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5cd67805c15114cbdf7d9916f8a994990f26cd9970883f387720a6aeae47f705"
+study_label: "Mortazavi et al. (2020): MTP-based anharmonic force constants for ShengBTE lattice thermal conductivity of 2D and bulk materials"
+scope: |
+  Encoding scope: passively trained MTPs (901 or 1,009 parameters,
+  MLIP package) fitted to short AIMD runs at 50-700 K, used for
+  anharmonic force constants with ShengBTE: graphene with PBE, PBEsol
+  and revPBE, bulk diamond, Si, InAs and BAs, and five 2D monolayers. No
+  energy/force error metrics are reported; phonons and thermal
+  conductivities are properties.
+materials:
+  gr: {label: "Graphene", formula: C, class: "2D material"}
+  bulk: {label: "Bulk diamond, silicon, InAs and BAs", class: "Inorganic crystals"}
+  twod: {label: "Penta-graphene, silicene, phosphorene, F-diamane and MoS2 monolayers", class: "2D material"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, kpoints: "3x3x1 (2D), 2x2x2 (bulk)"}
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, cutoff: 500, kpoints: "3x3x1"}
+  revpbe: {type: DFT, code: VASP, xc: {local: revPBE}, cutoff: 500, kpoints: "3x3x1"}
+sampling:
+  aimd: {label: "AIMD at 50, 300, 500 and 700 K (under 1,000 steps each), every fifth step"}
+datasets:
+  d-gr-pbe: {label: "AIMD training set: Graphene (PBE)", materials: [gr], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+  d-gr-pbesol: {label: "AIMD training set: Graphene (PBEsol)", materials: [gr], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbesol, sampling: [aimd]}
+  d-gr-revpbe: {label: "AIMD training set: Graphene (revPBE)", materials: [gr], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: revpbe, sampling: [aimd]}
+  d-bulk: {label: "AIMD training set: Bulk diamond, silicon, InAs and BAs (one MTP each, PBE)", materials: [bulk], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+  d-twod: {label: "AIMD training set: Penta-graphene, silicene, phosphorene, F-diamane and MoS2 monolayers (one MTP each)", materials: [twod], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+methods:
+  MTP:
+    loss: "Energy, force and stress weights 1, 0.1 and 0.001"
+    impl: {lib: MLIP}
+    sims: [PhononCalculation]
+runs:
+  mtp-gr-pbe: {label: "MTP for Graphene (PBE)", method: MTP, dataset: d-gr-pbe, model: "MTP Graphene (PBE) (ShengBTE)"}
+  mtp-gr-pbesol: {label: "MTP for Graphene (PBEsol)", method: MTP, dataset: d-gr-pbesol, model: "MTP Graphene (PBEsol) (ShengBTE)"}
+  mtp-gr-revpbe: {label: "MTP for Graphene (revPBE)", method: MTP, dataset: d-gr-revpbe, model: "MTP Graphene (revPBE) (ShengBTE)"}
+  mtp-bulk: {label: "MTP for Bulk diamond, silicon, InAs and BAs (one MTP each, PBE)", method: MTP, dataset: d-bulk, model: "MTP Bulk diamond, silicon, InAs and BAs (one MTP each, PBE) (ShengBTE)"}
+  mtp-twod: {label: "MTP for Penta-graphene, silicene, phosphorene, F-diamane and MoS2 monolayers (one MTP each)", method: MTP, dataset: d-twod, model: "MTP Penta-graphene, silicene, phosphorene, F-diamane and MoS2 monolayers (one MTP each) (ShengBTE)"}
+results: []
+gaps:
+  - "No RMSE/MAE of the MTPs is reported in the text read; validation is through phonon dispersions and thermal conductivities, which are properties. Per-material MTPs of the bulk and 2D sets are grouped into one run each."

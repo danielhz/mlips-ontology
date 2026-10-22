@@ -1,0 +1,40 @@
+id: meng2025ternary
+source:
+  rank: 535
+  year: "2025"
+  first_author: "Fan-Shun Meng"
+  title: "A Neural Network Interatomic Potential for the Ternary α-Fe-C-H System: Toward Million-Atom Simulations of Hydrogen Embrittlement in Steel"
+  venue: "JOM"
+  doi: "10.1007/s11837-025-07721-4"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "4e906fbf076dda4010ddd44406e1c5cff9a3278280284bcd056f8f894a42a614"
+study_label: "Meng et al. (2025): n2p2 neural network potential for the alpha-Fe-C-H system and million-atom tensile simulations of hydrogen embrittlement"
+scope: |
+  Encoding scope: the Behler-Parrinello NNIP (n2p2; 24 radial and 120
+  angular symmetry functions per element) for alpha-Fe, cementite and C/H
+  in pristine and defective iron, trained on 62,743 spin-polarized VASP
+  configurations (90/10 split); the training and test RMSEs. Defect,
+  dislocation, interface and tensile results are properties.
+materials:
+  fech: {label: "alpha-Fe, Fe3C cementite and C/H in pristine and defective iron (vacancies, surfaces, grain boundaries, screw dislocations, ferrite-cementite interfaces), plus C, H2 and CH4", class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, comment: "Spin-polarized; settings as in the authors' earlier work (Ref. 28)"}
+sampling:
+  db: {label: "Unary (alpha-Fe, C, H2), binary (Fe-H, Fe-C) and ternary (Fe-C-H) configurations by the rules of Supplementary Note 1"}
+datasets:
+  fech: {label: "alpha-Fe-C-H database (62,743 configurations, 6.05 million atomic environments; 90% training)", materials: [fech], properties: [Energy, Forces], provenance: InHouse, n: {v: 62743, loc: "Methodology (total)"}, calc: vasp, sampling: [db]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff]
+    loss: "Energies and forces"
+    impl: {lib: {local: n2p2}, comment: "Cutoffs: Fe 6.5/6.0 A, C 6.0/5.0 A, H 3.8/3.6 A (radial/angular)"}
+    sims: [MolecularDynamics, NudgedElasticBand, PhononCalculation]
+runs:
+  nnip: {label: "NNIP for alpha-Fe-C-H", method: HDNNP, dataset: fech, settings: {cutoffRadius: {v: 6.5, loc: "Methodology (Fe radial)"}, angularCutoff: {v: 6.0, loc: "Methodology (Fe angular)"}}, model: "NNIP alpha-Fe-C-H (2025)"}
+results:
+  - {key: nnip-train, model: nnip, material: fech, role: training, eval_data: {label: "alpha-Fe-C-H training set (90%)", location: "Results: validation"}, metrics: [[RMSE, Energy, 3.17, meV/atom, "training energy RMSE on alpha-Fe-C-H: NNIP", "Results: validation"], [RMSE, Force, 92.6, meV/A, "training force RMSE on alpha-Fe-C-H: NNIP", "Results: validation"]]}
+  - {key: nnip-test, model: nnip, material: fech, role: test, eval_data: {label: "alpha-Fe-C-H testing set (10%)", location: "Results: validation"}, metrics: [[RMSE, Energy, 3.11, meV/atom, "test energy RMSE on alpha-Fe-C-H: NNIP", "Results: validation"], [RMSE, Force, 93.1, meV/A, "test force RMSE on alpha-Fe-C-H: NNIP", "Results: validation"]]}
+gaps:
+  - "The DFT functional and settings are deferred to Ref. 28 and not restated in the text read. Property comparisons (dislocation cores, H/C trapping, cementite elastic constants) are not metrics."
