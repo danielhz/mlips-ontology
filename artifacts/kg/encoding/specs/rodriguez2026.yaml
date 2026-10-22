@@ -1,0 +1,43 @@
+id: rodriguez2026
+source:
+  rank: 516
+  year: "2026"
+  first_author: "Austin Rodriguez"
+  title: "Projected Hessian learning: fast curvature supervision for accurate machine-learning interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/aeac9b"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.04523v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "34482d4a1acd1f2356628f819eeab6435f71d5d032a199bac8e8779ed7cfa7ef"
+study_label: "Rodriguez et al. (2026): projected Hessian learning (PHL), Hutchinson-probed Hessian-vector-product supervision for ANI potentials of organic reactions"
+scope: |
+  Encoding scope: ANI ensembles (5 seeds) trained on the OpenREACT
+  CHON reactant/transition-state/product set (wB97XD/6-31G(d) energies,
+  forces and analytic Hessians) with four supervision schemes (E-F,
+  E-F-HVP one-column, E-F-HVP PHL, E-F-H). Energy, force and Hessian
+  RMSEs on the test, IRC and NMS sets are figure-only (Fig. 3) and only
+  relative changes are stated in the text.
+materials:
+  chon: {label: "Small CHON molecules along reactions: reactants, products and transition states (median 14 atoms)", class: "Organic molecules (gas phase)"}
+reference:
+  wb97xd: {type: DFT, code: Gaussian, xc: {local: wB97XD}, basis: "6-31G(d)", comment: "Gaussian16; analytic Hessians from frequency calculations"}
+sampling:
+  rtp: {label: "Optimized reactants, transition states and products of 11,961 reactions (80/10/10 split)"}
+datasets:
+  rtp: {label: "OpenREACT CHON RTP set (35,087 structures; 80% training)", materials: [chon], properties: [Energy, Forces], provenance: Published, n: {v: 35087, loc: "Sec. 3.1"}, calc: wb97xd, sampling: [rtp]}
+methods:
+  ANI:
+    hp: [learningRate, batchSize]
+    loss: "Energy + 0.30 force + 0.09 Hessian (or HVP) terms"
+    algorithm: "AdamW for weights, SGD for biases (lr 1e-4, weight decay 1e-2); ensembles of 5 seeds"
+    impl: {lib: {local: PyTorch (PHL code)}, comment: "HVP training also added to hippynn"}
+    sims: [GeometryOptimization]
+runs:
+  ef: {label: "ANI ensemble trained with E-F (energies and forces)", method: ANI, dataset: rtp, settings: {learningRate: {v: 0.0001, loc: "SI B"}, batchSize: {v: 400, loc: "SI B"}}, model: "ANI E-F (OpenREACT RTP)"}
+  hvp1: {label: "ANI ensemble trained with E-F-HVP one-column (one-hot probes)", method: ANI, dataset: rtp, settings: {learningRate: {v: 0.0001, loc: "SI B"}, batchSize: {v: 400, loc: "SI B"}}, model: "ANI E-F-HVP one-column (OpenREACT RTP)"}
+  phl: {label: "ANI ensemble trained with E-F-HVP PHL (Gaussian Hutchinson probes)", method: ANI, dataset: rtp, settings: {learningRate: {v: 0.0001, loc: "SI B"}, batchSize: {v: 400, loc: "SI B"}}, model: "ANI E-F-HVP PHL (OpenREACT RTP)"}
+  efh: {label: "ANI ensemble trained with E-F-H (full Hessians)", method: ANI, dataset: rtp, settings: {learningRate: {v: 0.0001, loc: "SI B"}, batchSize: {v: 400, loc: "SI B"}}, model: "ANI E-F-H (OpenREACT RTP)"}
+results: []
+gaps:
+  - "RMSEs on the test (RTP), IRC (34,248) and NMS (62,527) sets are figure-only (Fig. 3); the text gives only relative changes (e.g. about 29% lower NMS energy RMSE for both HVP estimators than E-F). Per-epoch training times and DFT cost scaling are figure-only."

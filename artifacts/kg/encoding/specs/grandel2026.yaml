@@ -1,0 +1,46 @@
+id: grandel2026
+source:
+  rank: 515
+  year: "2026"
+  first_author: "Jonas Grandel"
+  title: "Targeted fine-tuning of machine-learning interatomic potentials for phonons and phase transitions"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02338-w"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2604.01017v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "bc80e083b16bdc9a9b96511beb2f5095b4c00d89bb2822298231e8daea1c11cd"
+study_label: "Grandel, Benner and George (2026): targeted fine-tuning of MACE-MP-0b3 (transfer, multi-head, LoRA via Equitrain) for phonons, thermal and elastic properties and phase transitions of 53 materials"
+scope: |
+  Encoding scope: per-material MACE models for 53 Materials Project
+  compounds (mostly chalcogenides and phase-change materials), obtained
+  by transfer learning, multi-head fine-tuning with replay, full-rank
+  LoRA in Equitrain, or training from scratch, on rattled and
+  relaxation-trajectory configurations (16 training, 4 validation per
+  material, VASP PBE). Force MAEs are figure-only (Fig. 2); phonon,
+  thermal, elastic and phase-transition errors are properties.
+materials:
+  mp53: {label: "53 crystalline materials from the Materials Project (mostly Te, Sb and Se compounds; up to 40 atoms per primitive cell)", class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "k-point spacing 0.1 1/A"}
+sampling:
+  rattle: {label: "Hiphive Monte Carlo rattling (about 0.1 A) of small or large cubic supercells, lattice perturbation (+/-2%), volume scaling (-5% to +5%), four configurations per MACE-MP-0b3 relaxation trajectory"}
+datasets:
+  ft: {label: "Per-material fine-tuning sets (16 training configurations per material; 4 unscaled-volume configurations for validation)", materials: [mp53], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [rattle]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, learningRate, numEpochs]
+    loss: "Huber losses (delta 0.01) on energies, forces and stresses, weights 10, 100, 1000"
+    algorithm: "AdamW with ReduceLROnPlateau, up to 200 epochs"
+    impl: {lib: MACE, comment: "Transfer and multi-head fine-tuning in MACE; full-rank LoRA in Equitrain"}
+    sims: [PhononCalculation, GeometryOptimization]
+runs:
+  transfer: {label: "Transfer-learned MACE-MP-0b3 models (one per material)", method: MACE, dataset: ft, settings: {cutoffRadius: {v: 6, loc: "Methods 4.3"}, numLayers: {v: 2, loc: "Methods 4.3"}, learningRate: {v: 0.01, loc: "Methods 4.3"}, numEpochs: {v: 200, loc: "Methods 4.3 (maximum)"}}, model: "MACE-MP-0b3 transfer fine-tuned (53 materials)", base_model: {label: "MACE-MP-0b3", relation: fine-tuned, location: "Methods 4.3"}}
+  multihead: {label: "Multi-head fine-tuned MACE-MP-0b3 models with 100 replay structures", method: MACE, dataset: ft, settings: {cutoffRadius: {v: 6, loc: "Methods 4.3"}, numLayers: {v: 2, loc: "Methods 4.3"}, learningRate: {v: 0.01, loc: "Methods 4.3"}, numEpochs: {v: 200, loc: "Methods 4.3 (maximum)"}}, model: "MACE-MP-0b3 multi-head fine-tuned (53 materials)", base_model: {label: "MACE-MP-0b3", relation: fine-tuned, location: "Methods 4.3"}}
+  equitrain: {label: "Full-rank LoRA fine-tuned MACE-MP-0b3 models (Equitrain)", method: MACE, dataset: ft, settings: {cutoffRadius: {v: 6, loc: "Methods 4.3"}, numLayers: {v: 2, loc: "Methods 4.3"}, learningRate: {v: 0.01, loc: "Methods 4.3"}, numEpochs: {v: 200, loc: "Methods 4.3 (maximum)"}}, model: "MACE-MP-0b3 Equitrain LoRA fine-tuned (53 materials)", base_model: {label: "MACE-MP-0b3", relation: fine-tuned, location: "Methods 4.3-4.4"}}
+  scratch: {label: "MACE models trained from scratch on the fine-tuning data", method: MACE, dataset: ft, settings: {cutoffRadius: {v: 6, loc: "Methods 4.3"}, numLayers: {v: 2, loc: "Methods 4.3"}, learningRate: {v: 0.01, loc: "Methods 4.3"}, numEpochs: {v: 200, loc: "Methods 4.3 (maximum)"}}, model: "MACE from scratch (53 materials)"}
+results: []
+resources: |
+  Training per material on an NVIDIA A100: 1.2 min (scratch and transfer), 7.3 min (Equitrain), 8.3 min (multi-head with 100 replay structures). Generating 10 large-supercell training structures took 18.8 h per material on average versus 27.3 h for DFT phonon supercells (three 48-core nodes) (Sec. 3.6).
+gaps:
+  - "Force (and energy/stress) MAEs are figure-only (Fig. 2b) or in the SI. Phonon MAEs and IQRs (Tables 1-2), thermal and elastic errors and phase-transition scores (Tables 3-4) are properties. The checkpoint is named only as MACE-MP-0b3 (no size), so it is not linked to the registry model MACE-MP-0b3-medium."

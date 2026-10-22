@@ -1,0 +1,41 @@
+id: caucci2026
+source:
+  rank: 517
+  year: "2026"
+  first_author: "Mary Kathleen Caucci"
+  title: "Ionic Diffusion Properties of Rare-Earth High-Entropy Oxides from a Machine-Learned Interatomic Potential"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.21726"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2607.21726v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3c8f8a0a6c3af8e0335eaaa1aadf12204d55456ce044be591a2d61daefb4b189"
+study_label: "Caucci et al. (2026): oxygen diffusion in rare-earth high-entropy fluorite and bixbyite oxides from CHGNet MD, with r2SCAN fine-tuning"
+scope: |
+  Encoding scope: CHGNet v0.3.0 (registry model, used for the bulk of
+  the MD), the distributed CHGNet-r2SCAN model, and CHGNet-tuned
+  (CHGNet-r2SCAN fine-tuned on the authors' r2SCAN dataset of binary
+  rare-earth oxides, rare-earth metals and RE-HEOs with f-valence
+  electrons). Benchmarks are volume and formation-enthalpy MAEs against
+  experiment (properties); diffusion coefficients, conductivities and
+  activation energies are properties. No energy/force error metrics.
+materials:
+  reheo: {label: "Rare-earth high-entropy oxides Ce_x(YLaPrSm)_(1-x)O_(2-delta) (fluorite and bixbyite), binary rare-earth oxides and rare-earth metals", class: "Oxides"}
+reference:
+  r2scan: {type: DFT, xc: {local: r2SCAN}, comment: "Authors' r2SCAN dataset with f-valence electrons for Pr, Nd, Sm (Refs. 41-42; OSF W38CM)"}
+sampling:
+  pub: {label: "Binary REOs, RE metals and RE-HEO structures of Refs. 41-42"}
+datasets:
+  ft: {label: "r2SCAN fine-tuning dataset (binary rare-earth oxides, rare-earth metals, RE-HEOs)", materials: [reheo], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: r2scan, sampling: [pub]}
+external_models: [CHGNet-0.3.0]
+methods:
+  CHGNet:
+    loss: "Transfer-learning configuration of Ref. 40"
+    impl: {lib: CHGNet, comment: "CHGNet in LAMMPS"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  r2scan: {label: "CHGNet-r2SCAN (as distributed)", method: CHGNet, model: "CHGNet-r2SCAN"}
+  tuned: {label: "CHGNet-tuned: CHGNet-r2SCAN fine-tuned on the authors' r2SCAN RE-HEO dataset", method: CHGNet, dataset: ft, model: "CHGNet-tuned RE-HEO", base_model: {run: r2scan, relation: fine-tuned, location: "Sec. 2.1"}}
+results: []
+gaps:
+  - "Volume MAEs (0.544, 0.325, 0.185 A^3) and formation-enthalpy MAEs (0.118 and 0.115 eV/atom; below 150 meV/atom for v0.3.0) are against experiment for 15 binary REOs and are property errors; not encoded. The fine-tuning dataset size is not stated in the text read."
