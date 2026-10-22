@@ -1,0 +1,40 @@
+id: marchant2023
+source:
+  rank: 567
+  year: "2023"
+  first_author: "George A. Marchant"
+  title: "Exploring the configuration space of elemental carbon with empirical and machine learned interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-023-01081-w"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "82de06e832cad2201e27ee79984276b9ee381a22e484a40b41db8ec74c8a70f0"
+study_label: "Marchant, Caro, Karasulu and Partay (2023): nested-sampling phase diagrams of carbon with Tersoff, EDIP, GAP-20 and GAP-20U, and the improved GAP-20U+gr"
+scope: |
+  Encoding scope: the published GAP-20 and GAP-20U carbon potentials
+  (as distributed) and GAP-20U+gr, refitted with the GAP-20U parameters
+  on its dataset plus 165 ordered graphite configurations
+  (optB88-vdW). Tersoff and EDIP are empirical potentials. No energy or
+  force errors are reported; phase diagrams, melting lines and
+  energy-volume landscapes are properties.
+materials:
+  c: {label: "Elemental carbon (graphite stackings, diamond, liquid and high-pressure phases)", formula: C, class: "Elemental solid and liquid carbon"}
+reference:
+  optb88: {type: DFT, code: VASP, xc: {local: optB88-vdW}, pp: PAW, cutoff: 600, kpoints: "Gamma-centred, spacing at most 0.2 1/A", comment: "Settings of the GAP-20U data; Gaussian smearing 0.1 eV"}
+sampling:
+  gr: {label: "GAP-20U dataset plus 165 AA, AB and ABC graphite configurations with c varied by +/-40% and a by +/-2%"}
+datasets:
+  gr: {label: "GAP-20U training data extended by 165 ordered graphite configurations", materials: [c], properties: [Energy, Forces, Virials], provenance: Augmented, calc: optb88, sampling: [gr]}
+methods:
+  GAP:
+    loss: "GAP-20U fitting parameters retained"
+    impl: {lib: QUIP}
+    sims: [MonteCarlo, MolecularDynamics, GeometryOptimization]
+runs:
+  gap20: {label: "GAP-20 (as distributed)", method: GAP, model: "GAP-20"}
+  gap20u: {label: "GAP-20U (as distributed)", method: GAP, model: "GAP-20U"}
+  gap20ugr: {label: "GAP-20U+gr (refitted with 165 additional graphite configurations)", method: GAP, dataset: gr, model: "GAP-20U+gr"}
+results: []
+gaps:
+  - "No RMSE/MAE is reported in the text read. GAP-20U+gr is a refit with the GAP-20U settings on the extended data, not a fine-tune, so no base model is recorded. Tersoff and EDIP are classical potentials and not encoded."

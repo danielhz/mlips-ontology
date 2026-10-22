@@ -1,0 +1,40 @@
+id: jiang2024
+source:
+  rank: 568
+  year: "2024"
+  first_author: "Chao Jiang"
+  title: "Machine learning potential assisted exploration of complex defect potential energy surfaces"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01207-8"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "3fdae7408d33069737d50f35b0c1cc31fbdd9b2d83cfcdb49e000e8daab6ee0b"
+study_label: "Jiang et al. (2024): neural network potential assisted exploration of ground states of vacancy and interstitial clusters in ThO2"
+scope: |
+  Encoding scope: the n2p2 Behler-Parrinello NNP for ThO2 (two hidden
+  layers of 21 neurons; radial and angular cutoffs 10 and 6 A) trained
+  on LDA data of defected fluorite supercells, voids, liquids and AIMD
+  snapshots (3,672 energies, 3,521,988 force components), with the
+  stated energy and force RMS deviation. Ground-state searches, cluster
+  expansion and binding energies are properties.
+materials:
+  tho2: {label: "ThO2 fluorite with vacancies, interstitials, voids, and liquid ThO2", formula: ThO2, class: "Oxides"}
+reference:
+  lda: {type: DFT, code: VASP, xc: LDA, pp: PAW, cutoff: 500, kpoints: "1x1x1 for 768-atom supercells", comment: "Charged defects with jellium background and monopole correction"}
+sampling:
+  ht: {label: "High-throughput defect structures (vacancies, interstitials, voids), liquid ThO2 and AIMD snapshots"}
+datasets:
+  tho2: {label: "ThO2 DFT database (3,672 total energies, 3,521,988 force components)", materials: [tho2], properties: [Energy, Forces], provenance: InHouse, n: {v: 3672, loc: "Results"}, calc: lda, sampling: [ht]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff, numLayers]
+    loss: "Sum of energy and force MSEs"
+    impl: {lib: {local: n2p2}, comment: "41 (Th) and 46 (O) symmetry functions"}
+    sims: [GeometryOptimization]
+runs:
+  nnp: {label: "NNP for defect-containing ThO2", method: HDNNP, dataset: tho2, settings: {cutoffRadius: {v: 10, loc: "Results"}, angularCutoff: {v: 6, loc: "Results"}, numLayers: {v: 2, loc: "Results"}}, model: "NNP ThO2 defects (Jiang 2024)"}
+results:
+  - {key: nnp-all, model: nnp, material: tho2, role: null, eval_data: {label: "ThO2 training and testing data together", location: "Results; Supplementary Fig. 2"}, metrics: [[RMSE, Energy, 3.3, meV/atom, "energy RMS deviation on ThO2 training and test data: NNP", "Results"], [RMSE, Force, 0.18, eV/A, "force RMS deviation on ThO2 training and test data: NNP", "Results"]]}
+gaps:
+  - "The RMS deviations are stated for training and testing data together, so the role is null. Property comparisons (lattice, elastic constants, defect energies) are in the SI."
