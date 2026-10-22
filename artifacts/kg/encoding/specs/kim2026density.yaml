@@ -1,0 +1,62 @@
+id: kim2026density
+source:
+  rank: 648
+  year: "2026"
+  first_author: "Minwoo Kim"
+  title: "Density diversity in training data governs thermodynamic transferability of machine learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.05733"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2605.05733v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "54f6db0117312b562832d37e4c7a4852c559c246056af81b6fc47204a26b3fd7"
+study_label: "Kim et al. (2026): density diversity in training data governs the thermodynamic transferability of MLIPs"
+scope: |
+  Encoding scope: the foundation MLIPs evaluated as distributed on Ar,
+  H2O and CO2 fluids (7net-0, 7net-OMAT, 7net-MF-OMPA, SO3LR), the
+  from-scratch SevenNet models for CO2 trained on MB-pol data with three
+  sampling strategies (NoVar, TempVar, DenVar), and the SevenNet students
+  distilled from 7net-omni for H2O with the same strategies. Models are
+  compared through pair energies, RDF similarity scores and coordination
+  numbers, so there are no results.
+materials:
+  co2: {label: "Fluid CO2 (64 molecules)", formula: CO2, class: "molecular fluid"}
+  h2o: {label: "Fluid water (64 molecules)", formula: H2O, class: "molecular fluid"}
+  ar: {label: "Fluid argon", formula: Ar, class: "noble-gas fluid"}
+reference:
+  mbpol: {type: REF, comment: "MB-pol many-body potential (MBX with i-PI; two-body cutoff 9.0, three-body cutoff 4.6)."}
+  teacher: {type: REF, comment: "Labels from the 7net-omni foundation model (teacher), without DFT."}
+sampling:
+  mbpol-md: {label: "MB-pol NVT MD of 64 CO2 molecules, frames every 0.1 ps; NoVar (baseline density and 500 K), TempVar (temperature variation) or DenVar (density variation) additions of 1024 frames"}
+  teacher-md: {label: "1 ns NVT MD of 64 H2O with 7net-omni, 512 frames per strategy (NoVar 700 K/1.0 g/cm3; TempVar adds 900 K; DenVar adds 0.6 g/cm3)"}
+datasets:
+  co2-novar: {label: "CO2 MB-pol training set, NoVar strategy (10% validation)", materials: [co2], properties: [Energy, Forces], provenance: InHouse, calc: mbpol, sampling: [mbpol-md]}
+  co2-tempvar: {label: "CO2 MB-pol training set, TempVar strategy (10% validation)", materials: [co2], properties: [Energy, Forces], provenance: InHouse, calc: mbpol, sampling: [mbpol-md]}
+  co2-denvar: {label: "CO2 MB-pol training set, DenVar strategy (10% validation)", materials: [co2], properties: [Energy, Forces], provenance: InHouse, calc: mbpol, sampling: [mbpol-md]}
+  h2o-novar: {label: "H2O distillation set labelled by 7net-omni, NoVar strategy", materials: [h2o], properties: [Energy, Forces], provenance: InHouse, n: {v: 512, loc: "Sec. 2.4"}, calc: teacher, sampling: [teacher-md]}
+  h2o-tempvar: {label: "H2O distillation set labelled by 7net-omni, TempVar strategy", materials: [h2o], properties: [Energy, Forces], provenance: InHouse, n: {v: 512, loc: "Sec. 2.4"}, calc: teacher, sampling: [teacher-md]}
+  h2o-denvar: {label: "H2O distillation set labelled by 7net-omni, DenVar strategy", materials: [h2o], properties: [Energy, Forces], provenance: InHouse, n: {v: 512, loc: "Sec. 2.4"}, calc: teacher, sampling: [teacher-md]}
+methods:
+  NequIP:
+    hp: [cutoffRadius, numFeatures, numLayers, learningRate, batchSize, numEpochs]
+    loss: "Energy, force (weight 0.1) and stress (1e-6) terms"
+    algorithm: "SevenNet (NequIP-based) with lmax = 2 (from scratch) or 1 (distilled); Adam with exponential decay 0.99"
+    impl: {lib: {local: SevenNet}}
+    sims: [MolecularDynamics]
+  SO3LR:
+    sims: [MolecularDynamics]
+runs:
+  7net-0: {label: "7net-0 (SevenNet-0, MPtrj) as distributed (release not stated)", method: NequIP, model: "SevenNet-0"}
+  7net-omat: {label: "7net-OMAT (OMat24) as distributed", method: NequIP, model: "SevenNet-OMAT"}
+  7net-mf-ompa: {label: "7net-MF-OMPA (MPtrj + sAlex + OMat24, multi-fidelity) as distributed", method: NequIP, model: "SevenNet-MF-OMPA"}
+  so3lr: {label: "SO3LR (PBE0-MBD MD database) as distributed", method: SO3LR, model: "SO3LR"}
+  7net-omni: {label: "7net-omni teacher as distributed (lmax = 3, 5 layers, 6.0 A cutoff)", method: NequIP, model: "SevenNet-omni"}
+  co2-novar: {label: "From-scratch SevenNet for CO2 (NoVar)", method: NequIP, dataset: co2-novar, settings: {cutoffRadius: {v: 5.0, loc: "Sec. 4.5"}, numFeatures: {v: 32, loc: "Sec. 4.5 (channels)"}, numLayers: {v: 3, loc: "Sec. 4.5"}, learningRate: {v: 0.005, loc: "Sec. 4.5"}, batchSize: {v: 4, loc: "Sec. 4.5"}, numEpochs: {v: 1000, loc: "Sec. 4.5"}}, model: "SevenNet CO2 MB-pol (NoVar)"}
+  co2-tempvar: {label: "From-scratch SevenNet for CO2 (TempVar)", method: NequIP, dataset: co2-tempvar, settings: {cutoffRadius: {v: 5.0, loc: "Sec. 4.5"}, numFeatures: {v: 32, loc: "Sec. 4.5 (channels)"}, numLayers: {v: 3, loc: "Sec. 4.5"}, learningRate: {v: 0.005, loc: "Sec. 4.5"}, batchSize: {v: 4, loc: "Sec. 4.5"}, numEpochs: {v: 1000, loc: "Sec. 4.5"}}, model: "SevenNet CO2 MB-pol (TempVar)"}
+  co2-denvar: {label: "From-scratch SevenNet for CO2 (DenVar)", method: NequIP, dataset: co2-denvar, settings: {cutoffRadius: {v: 5.0, loc: "Sec. 4.5"}, numFeatures: {v: 32, loc: "Sec. 4.5 (channels)"}, numLayers: {v: 3, loc: "Sec. 4.5"}, learningRate: {v: 0.005, loc: "Sec. 4.5"}, batchSize: {v: 4, loc: "Sec. 4.5"}, numEpochs: {v: 1000, loc: "Sec. 4.5"}}, model: "SevenNet CO2 MB-pol (DenVar)"}
+  h2o-novar: {label: "SevenNet student distilled from 7net-omni for H2O (NoVar)", method: NequIP, dataset: h2o-novar, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 4.6"}, numFeatures: {v: 32, loc: "Sec. 4.6 (channels)"}, numLayers: {v: 2, loc: "Sec. 4.6"}, learningRate: {v: 0.005, loc: "Sec. 4.6"}, batchSize: {v: 4, loc: "Sec. 4.6"}, numEpochs: {v: 1000, loc: "Sec. 4.6"}}, model: "Distilled SevenNet H2O (NoVar)", base_model: {run: 7net-omni, relation: distilled, location: "Sec. 2.4"}}
+  h2o-tempvar: {label: "SevenNet student distilled from 7net-omni for H2O (TempVar)", method: NequIP, dataset: h2o-tempvar, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 4.6"}, numFeatures: {v: 32, loc: "Sec. 4.6 (channels)"}, numLayers: {v: 2, loc: "Sec. 4.6"}, learningRate: {v: 0.005, loc: "Sec. 4.6"}, batchSize: {v: 4, loc: "Sec. 4.6"}, numEpochs: {v: 1000, loc: "Sec. 4.6"}}, model: "Distilled SevenNet H2O (TempVar)", base_model: {run: 7net-omni, relation: distilled, location: "Sec. 2.4"}}
+  h2o-denvar: {label: "SevenNet student distilled from 7net-omni for H2O (DenVar)", method: NequIP, dataset: h2o-denvar, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 4.6"}, numFeatures: {v: 32, loc: "Sec. 4.6 (channels)"}, numLayers: {v: 2, loc: "Sec. 4.6"}, learningRate: {v: 0.005, loc: "Sec. 4.6"}, batchSize: {v: 4, loc: "Sec. 4.6"}, numEpochs: {v: 1000, loc: "Sec. 4.6"}}, model: "Distilled SevenNet H2O (DenVar)", base_model: {run: 7net-omni, relation: distilled, location: "Sec. 2.4"}}
+gaps:
+  - "No energy or force errors are stated; models are compared by pair interaction energies, RDF similarity scores and coordination numbers across densities and temperatures (Figs. 2-6)."
+  - "SevenNet variants are mapped to NequIP as before; none of the 7net checkpoints names a release that matches a registry model, so all are paper-local runs. Training-set sizes for the CO2 baseline are not stated beyond the 1024 added frames."
