@@ -1,0 +1,49 @@
+id: alzatevargas2025
+source:
+  rank: 439
+  year: "2025"
+  first_author: "Lorena Alzate-Vargas"
+  title: "Toward machine learning interatomic potentials for modeling uranium mononitride"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae0242"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2411.14608v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "94c70adafc29b5857605ec8de90c99b310cf3491d089755c4a6d37a5e5d52e2d"
+study_label: "Alzate-Vargas et al. (2025): ANI and HIP-NN potentials for uranium mononitride from query-by-committee active learning"
+scope: |
+  Encoding scope: the PBE (spin-polarised, ferromagnetic) UN data set of
+  64-atom supercells grown by query-by-committee active learning with an
+  ANI ensemble (12,336 configurations), the ANI and HIP-NN potentials
+  trained on it, and their RMSEs over the training data (Table I).
+  Lattice and elastic constants, defect energies, migration barriers, Xe
+  incorporation and cascades are properties.
+materials:
+  un: {label: "Uranium mononitride (rock salt), with point defects, disordered and high-temperature configurations", formula: "UN", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "3x3x3", comment: "VASP 6.3.2, spin-polarised ferromagnetic U, Methfessel-Paxton 0.1 eV, 2x2x2 supercells (Sec. II C)."}
+sampling:
+  qbc: {label: "Query-by-committee active learning with an ensemble of eight ANI models; ASE MD with ramped and sinusoidally modulated temperature and density; defect configurations added manually early on"}
+datasets:
+  un: {label: "UN active-learning data set (crystalline, defect-containing and disordered 64-atom cells)", materials: [un], properties: [Energy, Forces], provenance: InHouse, n: {v: 12336, loc: "Sec. II B"}, calc: pbe, sampling: [qbc]}
+methods:
+  ANI:
+    hp: [cutoffRadius, angularCutoff, numRadialBasis]
+    loss: "Energy and force weights 1.0 and 0.1"
+    sims: [MolecularDynamics, NudgedElasticBand]
+  HIP-NN:
+    hp: [numLayers, numFeatures, numRadialBasis]
+    loss: "Energy and force weights 1.0 and 1.0"
+    impl: {lib: {local: hippynn}}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  ani: {label: "ANI potential for UN (hidden layers 96-96-64, CELU)", method: ANI, dataset: un, settings: {cutoffRadius: {v: 7.0, loc: "App. A"}, angularCutoff: {v: 5.0, loc: "App. A"}, numRadialBasis: {v: 32, loc: "App. A"}}, model: "UN ANI (Alzate-Vargas 2025)"}
+  hipnn: {label: "HIP-NN potential for UN (one interaction layer, 60 features, 20 sensitivity functions, tensor order 1)", method: HIP-NN, dataset: un, settings: {numLayers: {v: 1, loc: "App. A (interaction layers)"}, numFeatures: {v: 60, loc: "App. A"}, numRadialBasis: {v: 20, loc: "App. A (sensitivity functions)"}}, model: "UN HIP-NN (Alzate-Vargas 2025)"}
+results:
+  - {key: ani-train, model: ani, material: un, role: training, eval_data: {label: "UN training data (RMSE over the entire data set)", location: "Table I"}, metrics: [[RMSE, Energy, 2.33, meV/atom, "train energy RMSE on un: UN ANI", "Table I"], [RMSE, Force, 0.072, eV/A, "train force RMSE on un: UN ANI", "Table I"]]}
+  - {key: hipnn-train, model: hipnn, material: un, role: training, eval_data: {label: "UN training data (RMSE over the entire data set)", location: "Table I"}, metrics: [[RMSE, Energy, 2.48, meV/atom, "train energy RMSE on un: UN HIP-NN", "Table I"], [RMSE, Force, 0.113, eV/A, "train force RMSE on un: UN HIP-NN", "Table I"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Table I is titled 'Training RMSE' while the text says 'across the entire dataset'; role training follows the table. The UO2 ANI errors (2.17 meV/atom, 0.091 eV/A) are quoted from another paper and not encoded."
+  - "Lattice parameters and elastic constants (Table II), defect formation energies (Table III), migration barriers (Table IV) and Xe incorporation energies (Table V) are properties."

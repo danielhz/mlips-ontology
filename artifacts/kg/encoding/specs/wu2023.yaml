@@ -1,0 +1,42 @@
+id: wu2023
+source:
+  rank: 436
+  year: "2023"
+  first_author: "Jing Wu"
+  title: "Universal interatomic potential for perovskite oxides"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.108.l180104"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2309.06391v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6e387f73b2a9ebd7b1126812abb74a969139349a114f34910468e616eae95be9"
+study_label: "Wu et al. (2023): UniPero, a universal DPA-1 interatomic potential for perovskite oxides built by modular DP-GEN"
+scope: |
+  Encoding scope: the ABACUS PBEsol training database grown with DP-GEN
+  from 3- to 6-element perovskite oxides (19,288 configurations), the
+  DPA-1 model UniPero (DeePMD-kit; 6 A cutoff, two attention layers of
+  128 hidden dimensions, type embedding 8) and its MAEs on the training
+  database. Task I/II test errors are given only as bounds; phase
+  transitions and other properties are properties.
+materials:
+  perov: {label: "Perovskite oxides and solid solutions with up to six elements (BaTiO3, PbTiO3, SrTiO3, KNN, PZT, PMN-PT, PIN-PMN-PT and others; 14 metal elements)", class: "Oxides"}
+reference:
+  pbesol: {type: DFT, code: {local: ABACUS}, xc: {local: PBEsol}, pp: NormConserving, kpoints: "0.1 1/Bohr spacing", comment: "Numerical atomic orbitals (DZP), SG15 ONCV pseudopotentials, 100 Ry, convergence 1e-7 Ry."}
+sampling:
+  dpgen: {label: "Modular DP-GEN: concurrent learning progressing from 3-element to 4- and 6-element perovskites, starting from about 1,000 configurations of 26 perovskites"}
+datasets:
+  unipero: {label: "UniPero final training database", materials: [perov], properties: [Energy, Forces], provenance: InHouse, n: {v: 19288, loc: "Results"}, calc: pbesol, sampling: [dpgen]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, numLayers]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  unipero: {label: "UniPero: DPA-1 (se_atten descriptor with two attention layers) trained on the perovskite database", method: DeePMD, dataset: unipero, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods (attention layers)"}}, model: "UniPero (DPA-1)"}
+results:
+  - {key: unipero-train, model: unipero, material: perov, role: training, eval_data: {label: "UniPero training database (19,288 configurations)", location: "Fig. 1b-c"}, metrics: [[MAE, Energy, 1.75, meV/atom, "train total-energy MAE on perov: UniPero", "Results"], [MAE, Force, 0.054, eV/A, "train force MAE on perov: UniPero", "Results"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Task I (AIMD trajectories) and Task II (DPMD-sampled configurations recomputed with DFT) errors for 10 perovskites are given only as bounds (energy MAE below 1.45 meV/atom, force MAE below 0.052 eV/A) and in Fig. 2."
+  - "DPA-1 is encoded under DeePMD with the attention descriptor as a setting. Phase-transition temperatures, lattice constants and domain dynamics are properties."
