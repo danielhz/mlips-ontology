@@ -1,0 +1,42 @@
+id: shuang2026accuracy
+source:
+  rank: 350
+  year: "2026"
+  first_author: "Fei Shuang"
+  title: "Model accuracy and data heterogeneity shape uncertainty quantification in machine learning interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae3d80"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2508.03405v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "810505f182b9b4d958bce745671c76f3beeaf028bf153bfe5d673dec6c0d70d6"
+study_label: "Shuang et al. (2026): model accuracy and data heterogeneity in ensemble and D-optimality uncertainty quantification of linear ACE for tungsten"
+scope: |
+  Encoding scope: six-member ensembles of linear ACE models for BCC
+  tungsten (pacemaker; 15 to 945 basis functions; kappa = 0.01, at most
+  2,000 steps) trained on subsets A+B of the authors' earlier W data set,
+  with the energy and force RMSEs stated for Func-15 and Func-945 in the
+  Fig. 2 caption. The other models (4 of the 6 sizes), the A+D training
+  combination and all uncertainty-error correlations, thresholds and
+  selection rates are figure-only or UQ diagnostics.
+materials:
+  w: {label: "BCC tungsten: elastic unit cells, AIMD snapshots, vacancies, dislocations, grain boundaries, surfaces, defect clusters and crack tips (subsets A-F)", formula: "W", class: "Metals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Monkhorst-Pack, density 2pi x 0.03 1/A", comment: "EDIFF 1e-6 eV (Methods); the data set is from the authors' Ref. 24."}
+datasets:
+  ab: {label: "Tungsten subsets A (elastic unit cells) + B (AIMD snapshots and simple defects) of Ref. 24", materials: [w], properties: [Energy, Forces], provenance: Published, calc: pbe}
+methods:
+  ACE:
+    loss: "Energy and forces with force weight kappa = 0.01"
+    impl: {lib: PACE}
+runs:
+  func15: {label: "Linear ACE with 15 basis functions (six-member ensemble) trained on W subsets A+B", method: ACE, dataset: ab, model: "W linear ACE Func-15"}
+  func945: {label: "Linear ACE with 945 basis functions (six-member ensemble) trained on W subsets A+B", method: ACE, dataset: ab, model: "W linear ACE Func-945"}
+results:
+  - {key: func15-err, model: func15, material: w, role: null, eval_data: {label: "Data set of the stated RMSEs not named in the caption", location: "Fig. 2 caption"}, metrics: [[RMSE, Energy, 9.05, meV/atom, "energy RMSE on w: W linear ACE Func-15", "Fig. 2 caption"], [RMSE, Force, 171.62, meV/A, "force RMSE on w: W linear ACE Func-15", "Fig. 2 caption"]]}
+  - {key: func945-err, model: func945, material: w, role: null, eval_data: {label: "Data set of the stated RMSEs not named in the caption", location: "Fig. 2 caption"}, metrics: [[RMSE, Energy, 1.46, meV/atom, "energy RMSE on w: W linear ACE Func-945", "Fig. 2 caption"], [RMSE, Force, 51.37, meV/A, "force RMSE on w: W linear ACE Func-945", "Fig. 2 caption"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The Fig. 2 caption gives the RMSEs without saying whether they are training (A+B) or test (C+E+F) errors, so the role is null."
+  - "The four intermediate ACE models, the A+D-trained models and the clustering-enhanced local D-optimality have errors in figures only (Figs. 3-7, S1-S2); Spearman correlations, thresholds and selection rates are UQ diagnostics, not energy/force errors."

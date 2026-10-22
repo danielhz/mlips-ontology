@@ -1,0 +1,62 @@
+id: dutta2026
+source:
+  rank: 351
+  year: "2026"
+  first_author: "Soumajit Dutta"
+  title: "Characterizing Defect Dynamics in Silicon Carbide Using Symmetry-Adapted Collective Variables and Machine Learning Interatomic Potentials"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.6c00063"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2512.04242v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "936ab243a3dbf618022954bbaf2f20a59ce96167e8fce6593f8bb91cd3a21e53"
+study_label: "Dutta et al. (2026): active-learned Allegro MLIP with a Lennard-Jones prior for vacancy-defect dynamics in 3C-SiC"
+scope: |
+  Encoding scope: the Qbox PBE reference, the six-round active-learning
+  campaign (300 training and 100 validation configurations per round,
+  selected by diversity maximisation from enhanced-sampling MD on
+  symmetry-adapted collective variables), the Allegro models (cutoff 6 A,
+  Delta-learned on top of a fitted Lennard-Jones prior) of rounds 1, 2, 3
+  and 6, whose mean force MAEs are stated in the text, and the 216-atom MD
+  throughput. Energy MAEs are given only approximately; free-energy
+  barriers and multi-defect force MAEs are figure-only or properties.
+materials:
+  sic: {label: "3C-SiC with vacancy defects (divacancies, monovacancy pairs; 216-atom supercell at the 1500 K lattice constant)", formula: "SiC", class: "Elemental covalent solid"}
+reference:
+  qbox: {type: DFT, code: {local: Qbox}, xc: PBE, pp: NormConserving, comment: "Optimized norm-conserving Vanderbilt pseudopotentials, 55 Ry, neutral cell, triplet spin state (Step 3)."}
+sampling:
+  al: {label: "Active learning: unbiased MD and OPES-Explore enhanced sampling on learned symmetry-adapted collective variables, diversity-maximising selection of 300 training and 100 validation configurations per round"}
+datasets:
+  r1: {label: "Active-learning training set after round 1", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 300, loc: "Step 5"}, calc: qbox, sampling: [al]}
+  r2: {label: "Active-learning training set after round 2", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 600, loc: "Step 5"}, calc: qbox, sampling: [al]}
+  r3: {label: "Active-learning training set after round 3", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 900, loc: "Step 5"}, calc: qbox, sampling: [al]}
+  r6: {label: "Final active-learning training set (round 6)", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 1800, loc: "Sec. 3.1"}, calc: qbox, sampling: [al]}
+methods:
+  Allegro:
+    hp: [cutoffRadius]
+    loss: "MSE on energies and forces with equal weights, learned as the residual to a fitted Lennard-Jones prior"
+    algorithm: "Adam"
+    impl: {lib: Allegro}
+    sims: [MolecularDynamics]
+runs:
+  allegro-r1: {label: "Allegro SiC MLIP after active-learning round 1 (LJ prior + Delta-learning; NequIP 0.6.0, Allegro 0.2.0)", method: Allegro, dataset: r1, settings: {cutoffRadius: {v: 6, loc: "Step 6"}}, model: "SiC Allegro MLIP round 1"}
+  allegro-r2: {label: "Allegro SiC MLIP after active-learning round 2 (LJ prior + Delta-learning; NequIP 0.6.0, Allegro 0.2.0)", method: Allegro, dataset: r2, settings: {cutoffRadius: {v: 6, loc: "Step 6"}}, model: "SiC Allegro MLIP round 2"}
+  allegro-r3: {label: "Allegro SiC MLIP after active-learning round 3 (LJ prior + Delta-learning; NequIP 0.6.0, Allegro 0.2.0)", method: Allegro, dataset: r3, settings: {cutoffRadius: {v: 6, loc: "Step 6"}}, model: "SiC Allegro MLIP round 3"}
+  allegro-r6: {label: "Allegro SiC MLIP after active-learning round 6 (LJ prior + Delta-learning; NequIP 0.6.0, Allegro 0.2.0)", method: Allegro, dataset: r6, settings: {cutoffRadius: {v: 6, loc: "Step 6"}}, model: "SiC Allegro MLIP round 6", gpuHours: {v: 43, loc: "Sec. 3.1 (all training rounds together, about 43 GPU-h)"}, trainingHardware: "NVIDIA L40S"}
+results:
+  - {key: allegro-r1-train, model: allegro-r1, material: sic, role: training, eval_data: {label: "The 300 training configurations of round 1", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.089, eV/A, "train force MAE on sic: SiC Allegro MLIP round 1", "Sec. 3.1"]]}
+  - {key: allegro-r1-valid, model: allegro-r1, material: sic, role: validation, eval_data: {label: "The 100 validation configurations of round 1", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.057, eV/A, "validation force MAE on sic: SiC Allegro MLIP round 1", "Sec. 3.1"]]}
+  - {key: allegro-r2-train, model: allegro-r2, material: sic, role: training, eval_data: {label: "The 300 training configurations of round 2", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.182, eV/A, "train force MAE on sic: SiC Allegro MLIP round 2", "Sec. 3.1"]]}
+  - {key: allegro-r2-valid, model: allegro-r2, material: sic, role: validation, eval_data: {label: "The 100 validation configurations of round 2", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.067, eV/A, "validation force MAE on sic: SiC Allegro MLIP round 2", "Sec. 3.1"]]}
+  - {key: allegro-r3-train, model: allegro-r3, material: sic, role: training, eval_data: {label: "The 300 training configurations of round 3", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.081, eV/A, "train force MAE on sic: SiC Allegro MLIP round 3", "Sec. 3.1"]]}
+  - {key: allegro-r3-valid, model: allegro-r3, material: sic, role: validation, eval_data: {label: "The 100 validation configurations of round 3", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.061, eV/A, "validation force MAE on sic: SiC Allegro MLIP round 3", "Sec. 3.1"]]}
+  - {key: allegro-r6-train, model: allegro-r6, material: sic, role: training, eval_data: {label: "The 300 training configurations of round 6", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.055, eV/A, "train force MAE on sic: SiC Allegro MLIP round 6", "Sec. 3.1"]]}
+  - {key: allegro-r6-valid, model: allegro-r6, material: sic, role: validation, eval_data: {label: "The 100 validation configurations of round 6", location: "Fig. 3 caption"}, metrics: [[MAE, Force, 0.055, eV/A, "validation force MAE on sic: SiC Allegro MLIP round 6", "Sec. 3.1"]]}
+timings:
+  - {model: allegro-r6, system: "3C-SiC defect MD (system size not tied to the figure)", atoms: null, value: 6, unit: "ns/day", per_atom_us: null, hardware: "NVIDIA L40S GPU (approximate, '~6 ns/day')", result: null, location: "Sec. 3.1"}
+resources: |
+  About 240 GPU-h of unbiased and enhanced-sampling MD and about 43 GPU-h of MLIP training on an NVIDIA L40S, and about 72,000 CPU-h of Qbox DFT on Intel Xeon E5-2680 CPUs, over the six rounds (Sec. 3.1).
+gaps:
+  - "Energy MAEs are stated only approximately ('around 0.001 eV/atom' in rounds 3-6), so they are not encoded; rounds 4 and 5 are figure-only (Fig. 3)."
+  - "The 6 ns/day throughput is approximate and the system size is the default 216-atom supercell (Sec. 2.1); the paper does not tie the throughput to a system explicitly."
+  - "Force MAEs on the trivacancy and 10-vacancy 512-atom MD snapshots (Fig. 5, below about 0.10 eV/A) are figure-only; free-energy barriers (Table 1) are properties."

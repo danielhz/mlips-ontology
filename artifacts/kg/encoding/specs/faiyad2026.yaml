@@ -1,0 +1,46 @@
+id: faiyad2026
+source:
+  rank: 341
+  year: "2026"
+  first_author: "Abrar Faiyad"
+  title: "Machine Learning Interatomic Potentials Enable Molecular Dynamics Simulations of Doped MoS 2"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c02004"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2510.05339v4"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8e9d7aa351f6c4750edac36dcf79a71a3ed33a09e9176e5c626001797f6e3f82"
+study_label: "Faiyad and Martini (2026): UMA small and medium for 25 dopants in MoS2, formation-energy benchmark against DFT and heating-cooling MD"
+scope: |
+  Encoding scope: the pretrained UMA small (uma-sm-1p1) and UMA medium
+  (uma-m-1p1), OMat task, evaluated on neutral formation energies of 25
+  dopants at three sites in 48-atom MoS2 cells against fixed-cell
+  Quantum ESPRESSO PBE relaxations (Zhang-Northrup formalism), and UMA
+  small in ~3,100-atom heating-cooling MD. Formation-energy MAEs are
+  encoded as energy MAEs on external evaluation data, as in earlier
+  papers; nearest-neighbour distance errors, densities and mobilities are
+  properties.
+materials:
+  mos2: {label: "Bulk MoS2 with one of 25 dopants (Ag, Al, Au, C, Cl, Cu, F, Fe, Ir, Li, N, Na, Nb, O, Pd, Pt, Re, Rh, Ru, Si, Ta, Te, Ti, V, Zn) at S-substitution, Mo-substitution or intercalated sites", formula: "MoS2", class: "Transition-metal dichalcogenides"}
+reference:
+  qe: {type: DFT, code: QuantumESPRESSO, xc: PBE, comment: "PSLibrary 1.0.0 PAW/USPP, spin-polarized, no SOC, 124/843 Ry, Fermi-Dirac smearing, fixed-cell BFGS to 5e-3 eV/A (Methods)."}
+methods:
+  UMA:
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  uma-s: {label: "UMA small (uma-sm-1p1, OMat task) as distributed (FAIRChemCalculator 2.3.0)", method: UMA, model: "uma-sm-1p1 (omat task)"}
+  uma-m: {label: "UMA medium (uma-m-1p1, OMat task) as distributed (FAIRChemCalculator 2.3.0)", method: UMA, model: "uma-m-1p1 (omat task)"}
+results:
+  - {key: uma-s-all, model: uma-s, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, all 75 doped structures (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.374, eV, "Formation-energy MAE against DFT, all 75 doped structures: UMA small", "Results, Validation of UMA potentials"]]}
+  - {key: uma-s-s-sub, model: uma-s, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, S-site substitution (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.377, eV, "Formation-energy MAE against DFT, S-site substitution: UMA small", "Results, Validation of UMA potentials"]]}
+  - {key: uma-s-mo-sub, model: uma-s, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, Mo-site substitution (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.36, eV, "Formation-energy MAE against DFT, Mo-site substitution: UMA small", "Results, Validation of UMA potentials"]]}
+  - {key: uma-s-int, model: uma-s, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, intercalation (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.326, eV, "Formation-energy MAE against DFT, intercalation: UMA small", "Results, Validation of UMA potentials"]]}
+  - {key: uma-m-all, model: uma-m, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, all 75 doped structures (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.404, eV, "Formation-energy MAE against DFT, all 75 doped structures: UMA medium", "Results, Validation of UMA potentials"]]}
+  - {key: uma-m-s-sub, model: uma-m, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, S-site substitution (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.277, eV, "Formation-energy MAE against DFT, S-site substitution: UMA medium", "Results, Validation of UMA potentials"]]}
+  - {key: uma-m-mo-sub, model: uma-m, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, Mo-site substitution (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.398, eV, "Formation-energy MAE against DFT, Mo-site substitution: UMA medium", "Results, Validation of UMA potentials"]]}
+  - {key: uma-m-int, model: uma-m, material: mos2, role: external, eval_data: {label: "DFT formation energies of 25 dopants, intercalation (48-atom MoS2 cells)", location: "Methods; Fig. 3"}, metrics: [[MAE, Energy, 0.536, eV, "Formation-energy MAE against DFT, intercalation: UMA medium", "Results, Validation of UMA potentials"]]}
+resources: |
+  Relaxation and formation-energy calculation of the 48-atom systems for all 25 dopants took 0.53-0.97 h with UMA small and 0.6-1.2 h with UMA medium (Nvidia A100 or L40), against about 410 h with DFT on 56 CPU cores (Methods). UMA small is about twice as fast as UMA medium in steps per second.
+gaps:
+  - "The compute times are ranges over a whole workflow and two GPU types, not per-structure timings, so they are kept in resources only."
+  - "Pearson r and R2 (>0.9), per-dopant cumulative errors (Fig. 4, S1) and nearest-neighbour distance errors (Fig. 5) are figure-only or properties."

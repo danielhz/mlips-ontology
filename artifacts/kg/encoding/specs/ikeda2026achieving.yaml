@@ -1,0 +1,110 @@
+id: ikeda2026achieving
+source:
+  rank: 340
+  year: "2026"
+  first_author: "Yuji Ikeda"
+  title: "Machine-Learning Interatomic Potentials Achieving CCSD(T) Accuracy for Systems with Extended Covalent Networks and van der Waals Interactions"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c02045"
+  kg_relevance: "Method/model"
+  arxiv_id: "2508.14306v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "aa9eef4dbacbd757d0a1e505432a31b34b1d0b727811a200e91776519fe08c17"
+study_label: "Ikeda et al. (2026): Delta-learned MTPs on a GFN2-xTB baseline reaching PNO-LCCSD(T)-F12 accuracy for an extended covalent organic framework"
+scope: |
+  Encoding scope: the PNO-LCCSD(T)-F12 reference on hydrogen-terminated
+  COF fragments and their vdW multimers (Table I), the four Delta-MTP
+  training sets #2-#5 (up to 2-5 benzene rings) at MTP levels 8, 12, 16
+  and 20 (cutoff 7 A), and the per-atom energy RMSEs of Table II on the
+  training, validation and test sets. The MTP is fitted to the difference
+  between PNO-LCCSD(T)-F12 and GFN2-xTB energies; the errors are those of
+  TB+Delta-MTP against the CCSD(T)-level reference. Atomization energies,
+  bond lengths, vibrational frequencies and COF properties are properties.
+materials:
+  frag: {label: "Hydrogen-terminated fragments of the C48H30 covalent organic framework (benzene to benzerythrene, H2) and their vdW-bound dimers, trimers and tetramers", class: "Organic molecules (gas phase)"}
+reference:
+  ccsdt: {type: WF, wf: CCSDT, basis: "heavy-aug-cc-pVTZ", comment: "PNO-LCCSD(T)-F12 (F12b, 3*A ansatz, density fitting, no counterpoise correction) in MOLPRO 2024.1 on GFN2-xTB MD snapshots (Sec. II A); the MTP learns the difference to GFN2-xTB (tblite)."}
+datasets:
+  train2: {label: "Training set #2: master training configurations with up to 2 benzene rings", materials: [frag], properties: [Energy], provenance: InHouse, n: {v: 747, loc: "Fig. 2(a)"}, calc: ccsdt}
+  train3: {label: "Training set #3: master training configurations with up to 3 benzene rings", materials: [frag], properties: [Energy], provenance: InHouse, n: {v: 1125, loc: "Fig. 2(a)"}, calc: ccsdt}
+  train4: {label: "Training set #4: master training configurations with up to 4 benzene rings", materials: [frag], properties: [Energy], provenance: InHouse, n: {v: 1602, loc: "Fig. 2(a)"}, calc: ccsdt}
+  train5: {label: "Training set #5: master training configurations with up to 5 benzene rings", materials: [frag], properties: [Energy], provenance: InHouse, n: {v: 1872, loc: "Fig. 2(a)"}, calc: ccsdt}
+methods:
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    loss: "Energy per atom averaged over the training configurations (Delta-learning target E(PNO-LCCSD(T)-F12) - E(GFN2-xTB))"
+    algorithm: "BFGS (SciPy), at most 1,000 iterations; free-atom energies fixed to the quantum-chemical values"
+    sims: [GeometryOptimization, MolecularDynamics]
+  ANI: {}
+runs:
+  dmtp2-l8: {label: "Delta-MTP #2 at MTP level 8 (GFN2-xTB baseline)", method: MTP, dataset: train2, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 8, loc: "Table II"}}, model: "TB+Delta-MTP#2 level 8"}
+  dmtp2-l12: {label: "Delta-MTP #2 at MTP level 12 (GFN2-xTB baseline)", method: MTP, dataset: train2, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 12, loc: "Table II"}}, model: "TB+Delta-MTP#2 level 12"}
+  dmtp2-l16: {label: "Delta-MTP #2 at MTP level 16 (GFN2-xTB baseline)", method: MTP, dataset: train2, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 16, loc: "Table II"}}, model: "TB+Delta-MTP#2 level 16"}
+  dmtp2-l20: {label: "Delta-MTP #2 at MTP level 20 (GFN2-xTB baseline)", method: MTP, dataset: train2, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 20, loc: "Table II"}}, model: "TB+Delta-MTP#2 level 20"}
+  dmtp3-l8: {label: "Delta-MTP #3 at MTP level 8 (GFN2-xTB baseline)", method: MTP, dataset: train3, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 8, loc: "Table II"}}, model: "TB+Delta-MTP#3 level 8"}
+  dmtp3-l12: {label: "Delta-MTP #3 at MTP level 12 (GFN2-xTB baseline)", method: MTP, dataset: train3, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 12, loc: "Table II"}}, model: "TB+Delta-MTP#3 level 12"}
+  dmtp3-l16: {label: "Delta-MTP #3 at MTP level 16 (GFN2-xTB baseline)", method: MTP, dataset: train3, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 16, loc: "Table II"}}, model: "TB+Delta-MTP#3 level 16"}
+  dmtp3-l20: {label: "Delta-MTP #3 at MTP level 20 (GFN2-xTB baseline)", method: MTP, dataset: train3, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 20, loc: "Table II"}}, model: "TB+Delta-MTP#3 level 20"}
+  dmtp4-l8: {label: "Delta-MTP #4 at MTP level 8 (GFN2-xTB baseline)", method: MTP, dataset: train4, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 8, loc: "Table II"}}, model: "TB+Delta-MTP#4 level 8"}
+  dmtp4-l12: {label: "Delta-MTP #4 at MTP level 12 (GFN2-xTB baseline)", method: MTP, dataset: train4, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 12, loc: "Table II"}}, model: "TB+Delta-MTP#4 level 12"}
+  dmtp4-l16: {label: "Delta-MTP #4 at MTP level 16 (GFN2-xTB baseline)", method: MTP, dataset: train4, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 16, loc: "Table II"}}, model: "TB+Delta-MTP#4 level 16"}
+  dmtp4-l20: {label: "Delta-MTP #4 at MTP level 20 (GFN2-xTB baseline)", method: MTP, dataset: train4, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 20, loc: "Table II"}}, model: "TB+Delta-MTP#4 level 20"}
+  dmtp5-l8: {label: "Delta-MTP #5 at MTP level 8 (GFN2-xTB baseline)", method: MTP, dataset: train5, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 8, loc: "Table II"}}, model: "TB+Delta-MTP#5 level 8"}
+  dmtp5-l12: {label: "Delta-MTP #5 at MTP level 12 (GFN2-xTB baseline)", method: MTP, dataset: train5, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 12, loc: "Table II"}}, model: "TB+Delta-MTP#5 level 12"}
+  dmtp5-l16: {label: "Delta-MTP #5 at MTP level 16 (GFN2-xTB baseline)", method: MTP, dataset: train5, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 16, loc: "Table II"}}, model: "TB+Delta-MTP#5 level 16"}
+  dmtp5-l20: {label: "Delta-MTP #5 at MTP level 20 (GFN2-xTB baseline)", method: MTP, dataset: train5, settings: {cutoffRadius: {v: 7, loc: "Sec. II B 1"}, momentLevel: {v: 20, loc: "Table II"}}, model: "TB+Delta-MTP#5 level 20"}
+  ani1ccx: {label: "ANI-1ccx as distributed (TorchANI)", method: ANI, model: "ANI-1ccx"}
+results:
+  - {key: dmtp2-l8-train, model: dmtp2-l8, material: frag, role: training, eval_data: {label: "Training set #2 (747 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.451, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#2 level 8", "Table II"]]}
+  - {key: dmtp2-l8-valid, model: dmtp2-l8, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 2.671, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#2 level 8", "Table II"]]}
+  - {key: dmtp2-l8-test, model: dmtp2-l8, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 4.577, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#2 level 8", "Table II"]]}
+  - {key: dmtp2-l12-train, model: dmtp2-l12, material: frag, role: training, eval_data: {label: "Training set #2 (747 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.308, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#2 level 12", "Table II"]]}
+  - {key: dmtp2-l12-valid, model: dmtp2-l12, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 9.888, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#2 level 12", "Table II"]]}
+  - {key: dmtp2-l12-test, model: dmtp2-l12, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 15.119, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#2 level 12", "Table II"]]}
+  - {key: dmtp2-l16-train, model: dmtp2-l16, material: frag, role: training, eval_data: {label: "Training set #2 (747 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.202, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#2 level 16", "Table II"]]}
+  - {key: dmtp2-l16-valid, model: dmtp2-l16, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 1.613, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#2 level 16", "Table II"]]}
+  - {key: dmtp2-l16-test, model: dmtp2-l16, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 1.259, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#2 level 16", "Table II"]]}
+  - {key: dmtp2-l20-train, model: dmtp2-l20, material: frag, role: training, eval_data: {label: "Training set #2 (747 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.108, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#2 level 20", "Table II"]]}
+  - {key: dmtp2-l20-valid, model: dmtp2-l20, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 9.147, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#2 level 20", "Table II"]]}
+  - {key: dmtp2-l20-test, model: dmtp2-l20, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 6.797, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#2 level 20", "Table II"]]}
+  - {key: dmtp3-l8-train, model: dmtp3-l8, material: frag, role: training, eval_data: {label: "Training set #3 (1125 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.695, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#3 level 8", "Table II"]]}
+  - {key: dmtp3-l8-valid, model: dmtp3-l8, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.857, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#3 level 8", "Table II"]]}
+  - {key: dmtp3-l8-test, model: dmtp3-l8, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 1.687, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#3 level 8", "Table II"]]}
+  - {key: dmtp3-l12-train, model: dmtp3-l12, material: frag, role: training, eval_data: {label: "Training set #3 (1125 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.443, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#3 level 12", "Table II"]]}
+  - {key: dmtp3-l12-valid, model: dmtp3-l12, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.781, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#3 level 12", "Table II"]]}
+  - {key: dmtp3-l12-test, model: dmtp3-l12, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.501, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#3 level 12", "Table II"]]}
+  - {key: dmtp3-l16-train, model: dmtp3-l16, material: frag, role: training, eval_data: {label: "Training set #3 (1125 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.259, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#3 level 16", "Table II"]]}
+  - {key: dmtp3-l16-valid, model: dmtp3-l16, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.615, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#3 level 16", "Table II"]]}
+  - {key: dmtp3-l16-test, model: dmtp3-l16, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.717, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#3 level 16", "Table II"]]}
+  - {key: dmtp3-l20-train, model: dmtp3-l20, material: frag, role: training, eval_data: {label: "Training set #3 (1125 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.138, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#3 level 20", "Table II"]]}
+  - {key: dmtp3-l20-valid, model: dmtp3-l20, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.712, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#3 level 20", "Table II"]]}
+  - {key: dmtp3-l20-test, model: dmtp3-l20, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.397, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#3 level 20", "Table II"]]}
+  - {key: dmtp4-l8-train, model: dmtp4-l8, material: frag, role: training, eval_data: {label: "Training set #4 (1602 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.760, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#4 level 8", "Table II"]]}
+  - {key: dmtp4-l8-valid, model: dmtp4-l8, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.730, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#4 level 8", "Table II"]]}
+  - {key: dmtp4-l8-test, model: dmtp4-l8, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.852, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#4 level 8", "Table II"]]}
+  - {key: dmtp4-l12-train, model: dmtp4-l12, material: frag, role: training, eval_data: {label: "Training set #4 (1602 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.510, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#4 level 12", "Table II"]]}
+  - {key: dmtp4-l12-valid, model: dmtp4-l12, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.598, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#4 level 12", "Table II"]]}
+  - {key: dmtp4-l12-test, model: dmtp4-l12, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.729, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#4 level 12", "Table II"]]}
+  - {key: dmtp4-l16-train, model: dmtp4-l16, material: frag, role: training, eval_data: {label: "Training set #4 (1602 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.327, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#4 level 16", "Table II"]]}
+  - {key: dmtp4-l16-valid, model: dmtp4-l16, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.433, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#4 level 16", "Table II"]]}
+  - {key: dmtp4-l16-test, model: dmtp4-l16, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.444, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#4 level 16", "Table II"]]}
+  - {key: dmtp4-l20-train, model: dmtp4-l20, material: frag, role: training, eval_data: {label: "Training set #4 (1602 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.166, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#4 level 20", "Table II"]]}
+  - {key: dmtp4-l20-valid, model: dmtp4-l20, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.377, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#4 level 20", "Table II"]]}
+  - {key: dmtp4-l20-test, model: dmtp4-l20, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.368, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#4 level 20", "Table II"]]}
+  - {key: dmtp5-l8-train, model: dmtp5-l8, material: frag, role: training, eval_data: {label: "Training set #5 (1872 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.715, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#5 level 8", "Table II"]]}
+  - {key: dmtp5-l8-valid, model: dmtp5-l8, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.721, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#5 level 8", "Table II"]]}
+  - {key: dmtp5-l8-test, model: dmtp5-l8, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.700, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#5 level 8", "Table II"]]}
+  - {key: dmtp5-l12-train, model: dmtp5-l12, material: frag, role: training, eval_data: {label: "Training set #5 (1872 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.533, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#5 level 12", "Table II"]]}
+  - {key: dmtp5-l12-valid, model: dmtp5-l12, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.587, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#5 level 12", "Table II"]]}
+  - {key: dmtp5-l12-test, model: dmtp5-l12, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.504, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#5 level 12", "Table II"]]}
+  - {key: dmtp5-l16-train, model: dmtp5-l16, material: frag, role: training, eval_data: {label: "Training set #5 (1872 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.315, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#5 level 16", "Table II"]]}
+  - {key: dmtp5-l16-valid, model: dmtp5-l16, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.399, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#5 level 16", "Table II"]]}
+  - {key: dmtp5-l16-test, model: dmtp5-l16, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.387, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#5 level 16", "Table II"]]}
+  - {key: dmtp5-l20-train, model: dmtp5-l20, material: frag, role: training, eval_data: {label: "Training set #5 (1872 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.168, meV/atom, "train energy RMSE on frag: TB+Delta-MTP#5 level 20", "Table II"]]}
+  - {key: dmtp5-l20-valid, model: dmtp5-l20, material: frag, role: validation, eval_data: {label: "Validation set (208 configurations, one MD snapshot per system and distance)", location: "Table I"}, metrics: [[RMSE, Energy, 0.333, meV/atom, "valid energy RMSE on frag: TB+Delta-MTP#5 level 20", "Table II"]]}
+  - {key: dmtp5-l20-test, model: dmtp5-l20, material: frag, role: test, eval_data: {label: "Test set: C42H30 monomer, C6H6...C24H18...C6H6 trimer and benzene pentamer (187 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.352, meV/atom, "test energy RMSE on frag: TB+Delta-MTP#5 level 20", "Table II"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "ANI-1ccx is a comparison model only: its atomization energies, bond lengths and vibrational-frequency RMSEs (cm-1, Fig. 6) are properties, not energy/force errors."
+  - "Per-system test RMSEs (Fig. 2(b)) and cohesive-energy RMSEs against other methods (Fig. 3) are figure-only. No force errors are reported (training on energies only)."

@@ -1,0 +1,61 @@
+id: vorotnikov2025
+source:
+  rank: 346
+  year: "2025"
+  first_author: "Igor Leonidovich Vorotnikov"
+  title: "Low-rank matrix and tensor approximations for compression of machine-learning interatomic potentials"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0300163"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2509.04440v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "1157e1441a8368b398e5fbbef3eec1b0bda03b15e8599f2797eac76306b479ec"
+study_label: "Vorotnikov et al. (2025): low-rank matrix and tensor compression of the radial parameters of moment tensor potentials (and ACE)"
+scope: |
+  Encoding scope: the 20th-level MTPs fitted on the glycine
+  molecular-crystal training set (base and compressed by matrix
+  factorisation MF, Riemannian R-MF, rank-augmented MFRA and tensor-train
+  TF, each at the optimal rank and at ~50 % compression; ensembles of 10)
+  with the energy, force and stress RMSEs of Table III. The compressed
+  potentials keep the MTP functional form with a factorised tensor of
+  radial parameters, so they stay under the registry method MTP. The
+  Mo-Nb-Ta-W and FLiNaK MTPs, the ETN comparison and the compressed ACE are
+  reported in figures only (gaps).
+materials:
+  glycine: {label: "Glycine molecular crystals (alpha, beta, gamma polymorphs)", formula: "C2H5NO2", class: "Molecular crystals"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Gamma point", comment: "PBE+D3; data set taken from Ref. 27 (Table I)."}
+datasets:
+  gly: {label: "Glycine training set of Ref. 27", materials: [glycine], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 3127, loc: "Table I"}, calc: pbed3}
+methods:
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    loss: "Weighted energy, force and stress squared errors (w_e = 1 eV^-2, w_f = 0.01 (eV/A)^-2, w_s = 0.001 eV^-2 for glycine)"
+    algorithm: "BFGS, 2,000 steps; Riemannian BFGS for R-MF; rank augmentation for MFRA"
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  mtp20-base: {label: "MTP level 20, base (640 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 base"}
+  mtp20-mf-opt: {label: "MTP level 20, MF opt, rank 9 (504 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 MF opt"}
+  mtp20-mf-50pc: {label: "MTP level 20, MF 50%, rank 6 (334 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 MF 50%"}
+  mtp20-r-mf-opt: {label: "MTP level 20, R-MF opt, rank 11 (495 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 R-MF opt"}
+  mtp20-r-mf-50pc: {label: "MTP level 20, R-MF 50%, rank 7 (343 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 R-MF 50%"}
+  mtp20-mfra-opt: {label: "MTP level 20, MFRA opt, rank 9 (504 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 MFRA opt"}
+  mtp20-mfra-50pc: {label: "MTP level 20, MFRA 50%, rank 6 (334 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 MFRA 50%"}
+  mtp20-tf-opt: {label: "MTP level 20, TF opt, rank 4,10,5 (466 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 TF opt"}
+  mtp20-tf-50pc: {label: "MTP level 20, TF 50%, rank 4,8,4 (336 radial parameters, 288 linear) on glycine", method: MTP, dataset: gly, settings: {cutoffRadius: {v: 5, loc: "Sec. III A"}, momentLevel: {v: 20, loc: "Table III"}}, model: "glycine MTP-20 TF 50%"}
+results:
+  - {key: mtp20-base-fit, model: mtp20-base, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.2, meV/atom, "train energy RMSE on glycine: glycine MTP-20 base", "Table III"], [RMSE, Force, 109, meV/A, "train force RMSE on glycine: glycine MTP-20 base", "Table III"], [RMSE, Stress, 1.05, null, "train stress RMSE on glycine in eV: glycine MTP-20 base", "Table III"]]}
+  - {key: mtp20-mf-opt-fit, model: mtp20-mf-opt, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.1, meV/atom, "train energy RMSE on glycine: glycine MTP-20 MF opt", "Table III"], [RMSE, Force, 104, meV/A, "train force RMSE on glycine: glycine MTP-20 MF opt", "Table III"], [RMSE, Stress, 0.95, null, "train stress RMSE on glycine in eV: glycine MTP-20 MF opt", "Table III"]]}
+  - {key: mtp20-mf-50pc-fit, model: mtp20-mf-50pc, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.7, meV/atom, "train energy RMSE on glycine: glycine MTP-20 MF 50%", "Table III"], [RMSE, Force, 112, meV/A, "train force RMSE on glycine: glycine MTP-20 MF 50%", "Table III"], [RMSE, Stress, 1.06, null, "train stress RMSE on glycine in eV: glycine MTP-20 MF 50%", "Table III"]]}
+  - {key: mtp20-r-mf-opt-fit, model: mtp20-r-mf-opt, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.2, meV/atom, "train energy RMSE on glycine: glycine MTP-20 R-MF opt", "Table III"], [RMSE, Force, 109, meV/A, "train force RMSE on glycine: glycine MTP-20 R-MF opt", "Table III"], [RMSE, Stress, 1.02, null, "train stress RMSE on glycine in eV: glycine MTP-20 R-MF opt", "Table III"]]}
+  - {key: mtp20-r-mf-50pc-fit, model: mtp20-r-mf-50pc, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.8, meV/atom, "train energy RMSE on glycine: glycine MTP-20 R-MF 50%", "Table III"], [RMSE, Force, 117, meV/A, "train force RMSE on glycine: glycine MTP-20 R-MF 50%", "Table III"], [RMSE, Stress, 1.07, null, "train stress RMSE on glycine in eV: glycine MTP-20 R-MF 50%", "Table III"]]}
+  - {key: mtp20-mfra-opt-fit, model: mtp20-mfra-opt, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.0, meV/atom, "train energy RMSE on glycine: glycine MTP-20 MFRA opt", "Table III"], [RMSE, Force, 102, meV/A, "train force RMSE on glycine: glycine MTP-20 MFRA opt", "Table III"], [RMSE, Stress, 0.98, null, "train stress RMSE on glycine in eV: glycine MTP-20 MFRA opt", "Table III"]]}
+  - {key: mtp20-mfra-50pc-fit, model: mtp20-mfra-50pc, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.4, meV/atom, "train energy RMSE on glycine: glycine MTP-20 MFRA 50%", "Table III"], [RMSE, Force, 108, meV/A, "train force RMSE on glycine: glycine MTP-20 MFRA 50%", "Table III"], [RMSE, Stress, 1.01, null, "train stress RMSE on glycine in eV: glycine MTP-20 MFRA 50%", "Table III"]]}
+  - {key: mtp20-tf-opt-fit, model: mtp20-tf-opt, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 4.9, meV/atom, "train energy RMSE on glycine: glycine MTP-20 TF opt", "Table III"], [RMSE, Force, 101, meV/A, "train force RMSE on glycine: glycine MTP-20 TF opt", "Table III"], [RMSE, Stress, 0.92, null, "train stress RMSE on glycine in eV: glycine MTP-20 TF opt", "Table III"]]}
+  - {key: mtp20-tf-50pc-fit, model: mtp20-tf-50pc, material: glycine, role: training, eval_data: {label: "Glycine training set (fitting errors; mean of an ensemble of 10)", location: "Table III"}, metrics: [[RMSE, Energy, 5.4, meV/atom, "train energy RMSE on glycine: glycine MTP-20 TF 50%", "Table III"], [RMSE, Force, 107, meV/A, "train force RMSE on glycine: glycine MTP-20 TF 50%", "Table III"], [RMSE, Stress, 0.99, null, "train stress RMSE on glycine in eV: glycine MTP-20 TF 50%", "Table III"]]}
+resources: |
+  Fitting an MF or MFRA MTP of level 14 on Mo-Nb-Ta-W takes 542-555 CPU minutes for ranks 4-10 (Table II, ensembles of five).
+gaps:
+  - "Table III values carry 1-sigma intervals over the ensemble (e.g. base 5.2 +- 0.4 meV/atom, 109 +- 5 meV/A); only the means are encoded. Stress errors are given in eV (no schema unit for this; recorded with unit null)."
+  - "Mo-Nb-Ta-W (4,983 training and 546 validation configurations, PBE, 520 eV, 4x4x4) and FLiNaK (754 configurations, PBE+D3) MTPs at levels 12-18, the ETN comparison and the base and compressed ACE (FLiNaK) have errors in Figs. 5-10 only; these models are not encoded."
+  - "FLiNaK densities (Table IV) and glycine polymorph energies (Fig. 11) are properties."

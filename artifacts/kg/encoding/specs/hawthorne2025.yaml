@@ -1,0 +1,44 @@
+id: hawthorne2025
+source:
+  rank: 349
+  year: "2025"
+  first_author: "Felipe Hawthorne"
+  title: "Efficient and Accurate Machine Learning Interatomic Potential for Graphene: Capturing Stress–Strain and Vibrational Properties"
+  venue: "The Journal of Physical Chemistry C"
+  doi: "10.1021/acs.jpcc.5c03470"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2505.12140v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "144614bba1f5331e8d22e2dd52d3d0734c636d6d14c542dcd6f7dfd0b060e8de"
+study_label: "Hawthorne et al. (2025): a Deep Potential MLIP for graphene trained on LDA AIMD, stress-strain and vibrational properties"
+scope: |
+  Encoding scope: the GPAW LDA AIMD data set of 4- to 32-atom graphene
+  cells (NVE, NVT and strained NPT runs, 1.12 million frames plus
+  random displacements; 20 % validation), the DeePMD model (se_e2_a
+  descriptor, cutoff 8 A, embedding 50/100/200, fitting 3 x 240), and the
+  validation RMSEs per system size of Table 1. Elastic constants, phonons,
+  VDOS and fracture behaviour are properties.
+materials:
+  graphene: {label: "Graphene sheets (4-, 8-, 16- and 32-atom AIMD cells; 9,072-atom MD sheet), pristine and strained up to tearing", formula: "C", class: "2D material"}
+reference:
+  lda: {type: DFT, code: {local: GPAW}, xc: LDA, pp: PAW, cutoff: 500, kpoints: "k-point density of at least 0.05 1/A", comment: "Born-Oppenheimer AIMD in GPAW/ASE with 0.5 fs steps (Sec. 2)."}
+datasets:
+  aimd: {label: "Graphene AIMD frames (4-32 atoms; NVE, NVT at 300 K, NPT with strain rates 1e-6 to 1e-3 1/fs) plus randomly displaced geometries; 80/20 train/validation split", materials: [graphene], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 1120000, loc: "Sec. 2 (AIMD frames before displacement augmentation)"}, calc: lda}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, learningRate]
+    loss: "Energy, force and virial with prefactors ramped from (1e-2, 1, 1e3) to (1, 1e4, 10)"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  dp: {label: "Deep Potential (two-body embedding descriptor, rc = 8 A, rs = 0.5 A) for graphene, 1e8 training steps", method: DeePMD, dataset: aimd, settings: {cutoffRadius: {v: 8, loc: "Sec. 2"}, learningRate: {v: 1.0e-4, loc: "Sec. 2 (initial)"}}, model: "Graphene Deep Potential (Hawthorne 2025)"}
+results:
+  - {key: dp-4c, model: dp, material: graphene, role: validation, eval_data: {label: "Validation data of the 4-atom cells", location: "Table 1"}, metrics: [[RMSE, Energy, 19.4, meV/atom, "validation energy RMSE on graphene 4-C cells: graphene Deep Potential", "Table 1 (1.94e-2 eV/atom)"], [RMSE, Force, 7.74e-2, eV/A, "validation force RMSE on graphene 4-C cells: graphene Deep Potential", "Table 1"]]}
+  - {key: dp-8c, model: dp, material: graphene, role: validation, eval_data: {label: "Validation data of the 8-atom cells", location: "Table 1"}, metrics: [[RMSE, Energy, 22.5, meV/atom, "validation energy RMSE on graphene 8-C cells: graphene Deep Potential", "Table 1 (2.25e-2 eV/atom)"], [RMSE, Force, 5.33e-2, eV/A, "validation force RMSE on graphene 8-C cells: graphene Deep Potential", "Table 1"]]}
+  - {key: dp-16c, model: dp, material: graphene, role: validation, eval_data: {label: "Validation data of the 16-atom cells", location: "Table 1"}, metrics: [[RMSE, Energy, 14.4, meV/atom, "validation energy RMSE on graphene 16-C cells: graphene Deep Potential", "Table 1 (1.44e-2 eV/atom)"], [RMSE, Force, 3.68e-3, eV/A, "validation force RMSE on graphene 16-C cells: graphene Deep Potential", "Table 1"]]}
+  - {key: dp-32c, model: dp, material: graphene, role: validation, eval_data: {label: "Validation data of the 32-atom cells", location: "Table 1"}, metrics: [[RMSE, Energy, 87.7, meV/atom, "validation energy RMSE on graphene 32-C cells: graphene Deep Potential", "Table 1 (8.77e-2 eV/atom)"], [RMSE, Force, 5.01e-2, eV/A, "validation force RMSE on graphene 32-C cells: graphene Deep Potential", "Table 1"]]}
+resources: |
+  The time for 100 NPT steps scales linearly with system size (Fig. 3, figure-only).
+gaps:
+  - "Energy RMSEs are stated in eV/atom and converted exactly to meV/atom (the original value is in the location). Virial RMSEs (1.48e-1, 2.05e-1, 3.37e-1, 6.85e-1 in eV/A3 atom) have no schema unit and are not encoded as metrics."
+  - "Table 1 says the RMSEs are 'for different system sizes used in the AIMD training set' while Sec. 2 says they are computed across the validation datasets; the role follows Sec. 2. Elastic constants (Table 2), phonons and VDOS are properties."

@@ -1,0 +1,44 @@
+id: arnold2026
+source:
+  rank: 352
+  year: "2026"
+  first_author: "Joe E. Arnold"
+  title: "Thermodynamics and phase stability of the AlTiCrMoW high-entropy alloy simulated using machine-learned interatomic potentials"
+  venue: "Physical Review Materials"
+  doi: "10.1103/5tz1-zg9z"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "acae1ffa6d3cf4779dc1a1f2cc0bc7ff749a225edae6c179f97a28bf02ed5cea"
+study_label: "Arnold et al. (2026): fine-tuned MACE-OMAT small for thermodynamics, ordering and vacancies of the AlTiCrMoW high-entropy alloy"
+scope: |
+  Encoding scope: the VASP PBE data set of KKR-CPA-guided AlTiCrMoW
+  supercells (relaxed, sheared, rattled and shuffled; Table I), extra
+  Al, Ti and AlTi structures (Table III) and single-point test cells
+  (Table II), and the MACE small-omat-0 foundation model fine-tuned on
+  it (cutoff 6 A, two layers, 128 channels, ten Bessel functions, 75
+  epochs, 8,222,254 parameters), used for fixed-lattice Monte Carlo,
+  phonons and vacancy formation. The text states no energy, force or
+  stress errors; lattice parameters, elastic constants, equations of
+  state and phonon RMSEs are properties. The EAM baseline is not an MLIP.
+materials:
+  hea: {label: "Equiatomic AlTiCrMoW bcc high-entropy alloy supercells (2x2x2 to 6x6x6), plus fcc Al, Ti and AlTi alpha/gamma intermetallics", class: "High-entropy alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Monkhorst-Pack, maximum spacing 0.10 1/A", comment: "500 eV for cells of up to 128 atoms and 400 eV above; EDIFF 5e-6 (1e-7 for single points); relaxation then single point (Sec. II C)."}
+datasets:
+  ft: {label: "AlTiCrMoW fine-tuning data: relaxed, sheared (0.5 % and 2 %), rattled (0.1 A) and species-shuffled supercells (Table I) plus Al, Ti and AlTi structures (Table III); 10 % held out for validation", materials: [hea], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures, numRadialBasis, numEpochs]
+    loss: "Two stages: energy weight 1 and force weight 100 for 75 % of the epochs, then energy weight 1000 and force weight 100"
+    impl: {lib: MACE}
+    sims: [MonteCarlo, GeometryOptimization, PhononCalculation]
+runs:
+  omat-base: {label: "MACE-OMAT small (small-omat-0) as distributed", method: MACE, model: "mace-omat-0-small"}
+  omat-ft: {label: "MACE small-omat-0 fine-tuned on AlTiCrMoW (max_L = 0, l up to 3, correlation order 3; 8,222,254 parameters)", method: MACE, dataset: ft, settings: {cutoffRadius: {v: 6, loc: "Sec. II D"}, numLayers: {v: 2, loc: "Sec. II D"}, numFeatures: {v: 128, loc: "Sec. II D"}, numRadialBasis: {v: 10, loc: "Sec. II D"}, numEpochs: {v: 75, loc: "Sec. II D"}}, model: "AlTiCrMoW-MACE-OMAT fine-tuned", base_model: {run: omat-base, relation: fine-tuned, location: "Sec. II D"}}
+results: []
+resources: |
+  No training or inference times are given.
+gaps:
+  - "No energy, force or stress errors are stated in the main text (training accuracy with max_L = 0 is shown in Fig. S1 of the SM). Lattice parameters, cell volumes, bulk moduli, elastic constants, equation-of-state agreement (within 0.5 meV/atom), supercell energies (within 50 meV/atom, Fig. 5) and phonon-band RMSEs between the two MACE models (0.20 and 0.51 THz) are properties or figure-only."
+  - "The test-set structures (Tables I and II) are listed, but no test errors are reported in the text."
