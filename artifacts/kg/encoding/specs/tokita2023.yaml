@@ -1,0 +1,40 @@
+id: tokita2023
+source:
+  rank: 534
+  year: "2023"
+  first_author: "Alea Miako Tokita"
+  title: "How to train a neural network potential"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0160326"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2308.08859v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "780953fb3487260d712d1476064c60342eac6710a48f50e5f4a3ffba63e2e578"
+study_label: "Tokita and Behler (2023): how to train a neural network potential (tutorial), with a case study of a LiOH ion pair in water"
+scope: |
+  Encoding scope: the tutorial's case-study HDNNP (RuNNer) for one LiOH
+  ion pair with 19-23 water molecules, PBE0r-D3 references (CP-PAW),
+  built from 630 AIMD structures plus published pure-water structures
+  and extended by active learning; the final training and test RMSEs.
+  General guidance is not encoded.
+materials:
+  lioh: {label: "LiOH ion pair with 19-23 water molecules in periodic boxes (0.97-1.02 kg/dm3), plus pure water", class: "Molecular liquid"}
+reference:
+  pbe0r: {type: DFT, code: {local: CP-PAW}, xc: {local: PBE0r-D3(BJ)}, pp: PAW, kpoints: "2x2x2 for 8.2 A cubic cells", comment: "Local hybrid PBE0r with D3(BJ) dispersion"}
+sampling:
+  aimd: {label: "AIMD at 100-500 K from random packings (630 structures), published pure-water structures, then active-learning cycles"}
+datasets:
+  lioh: {label: "LiOH-water data set after active learning (training split)", materials: [lioh], properties: [Energy, Forces], provenance: InHouse, calc: pbe0r, sampling: [aimd]}
+methods:
+  HDNNP:
+    loss: "Energies and forces"
+    algorithm: "Global adaptive extended Kalman filter, early stopping on the test set"
+    impl: {lib: RuNNer}
+    sims: [MolecularDynamics]
+runs:
+  hdnnp: {label: "Most accurate HDNNP for the final LiOH-water data set", method: HDNNP, dataset: lioh, model: "HDNNP LiOH in water (tutorial)"}
+results:
+  - {key: hdnnp-train, model: hdnnp, material: lioh, role: training, eval_data: {label: "Final LiOH-water training set", location: "Sec. V B"}, metrics: [[RMSE, Energy, 1.204, meV/atom, "training energy RMSE on LiOH in water: HDNNP", "Sec. V B"], [RMSE, Force, 0.069272, null, "training force-component RMSE (eV/bohr) on LiOH in water: HDNNP", "Sec. V B"]]}
+  - {key: hdnnp-test, model: hdnnp, material: lioh, role: test, eval_data: {label: "Final LiOH-water test set", location: "Sec. V B"}, metrics: [[RMSE, Energy, 1.682, meV/atom, "test energy RMSE on LiOH in water: HDNNP", "Sec. V B"], [RMSE, Force, 0.069355, null, "test force-component RMSE (eV/bohr) on LiOH in water: HDNNP", "Sec. V B"]]}
+gaps:
+  - "Force RMSEs are printed in eV/bohr (outside the schema units) and kept with unit null. RMSEs per active-learning cycle are figure-only (Fig. 15). The final data-set size is not stated in the text read."

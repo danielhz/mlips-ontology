@@ -1,0 +1,58 @@
+id: schran2019
+source:
+  rank: 533
+  year: "2019"
+  first_author: "Christoph Schran"
+  title: "Automated Fitting of Neural Network Potentials at Coupled Cluster Accuracy: Protonated Water Clusters as Testing Ground"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.9b00805"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1908.08734v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "2c06dd9b9d002e6451b002fde1e975d5f7d47bf9973f76adaeb7e4c0ff006799"
+study_label: "Schran, Behler and Marx (2019): automated fitting of a CCSD(T*)-F12a neural network potential for protonated water clusters H3O+ to H9O4+"
+scope: |
+  Encoding scope: one RuNNer HDNNP for H2O and H3O+ to H9O4+, trained on
+  energies only at CCSD(T*)-F12a/aug-cc-pVTZ for configurations selected
+  automatically (two-network disagreement on DFT AIMD/AI-PIMD
+  ensembles, then extrapolation detection in NNP-MD/PIMD); training and
+  test energy RMSEs per cluster size (Table I) and the MADs printed in
+  Fig. 3. Errors are in kJ/mol per atom (outside the schema units) and
+  kept with unit null. Binding energies, frequencies and dynamics are
+  properties.
+materials:
+  clusters: {label: "Protonated water clusters H3O+ to H9O4+ (all four H9O4+ isomers) and the water monomer", class: "Molecular dimers and noncovalent complexes"}
+reference:
+  cc: {type: WF, wf: CCSDT, basis: "aug-cc-pVTZ", comment: "CCSD(T*)-F12a with size-consistent triples scaling (Molpro), energies only"}
+sampling:
+  auto: {label: "Configurations from RPBE-D3 AIMD and AI-PIMD (300 K) selected by maximal disagreement of two NNPs (at least 80 stages of 20 points), then extrapolated structures from NNP-MD (10-600 K) and NNP-PIMD (1.67-300 K) and constrained MD for H9O4+ isomerization"}
+datasets:
+  cc: {label: "CCSD(T*)-F12a reference set (49,242 training and 5,470 test structures)", materials: [clusters], properties: [Energy], provenance: InHouse, n: {v: 49242, loc: "Table I"}, calc: cc, sampling: [auto]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers]
+    loss: "Energies only"
+    algorithm: "Adaptive global extended Kalman filter; 90/10 train/test split"
+    impl: {lib: RuNNer, comment: "Symmetry functions of Ref. 73; two hidden layers of 30 tanh nodes; MD in CP2K"}
+    sims: [MolecularDynamics, GeometryOptimization, ThermodynamicIntegration]
+runs:
+  nnp: {label: "CCSD(T*)-F12a HDNNP for protonated water clusters", method: HDNNP, dataset: cc, settings: {cutoffRadius: {v: 6.5, loc: "Sec. III (largest cutoff about 6.5 A)"}, numLayers: {v: 2, loc: "Sec. III"}}, model: "NNP protonated water clusters CCSD(T*)"}
+results:
+  - {key: all-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, All clusters (49242 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.06, null, "training energy RMSE (kJ/mol per atom) on All clusters: CCSD(T*) NNP", "Table I"]]}
+  - {key: all-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, All clusters (5470 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.08, null, "test energy RMSE (kJ/mol per atom) on All clusters: CCSD(T*) NNP", "Table I"]]}
+  - {key: h2o-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, H2O (5933 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.03, null, "training energy RMSE (kJ/mol per atom) on H2O: CCSD(T*) NNP", "Table I"]]}
+  - {key: h2o-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, H2O (660 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.03, null, "test energy RMSE (kJ/mol per atom) on H2O: CCSD(T*) NNP", "Table I"]]}
+  - {key: h3o-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, H3O+ (6489 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.05, null, "training energy RMSE (kJ/mol per atom) on H3O+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h3o-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, H3O+ (711 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.05, null, "test energy RMSE (kJ/mol per atom) on H3O+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h5o2-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, H5O2+ (8869 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.07, null, "training energy RMSE (kJ/mol per atom) on H5O2+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h5o2-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, H5O2+ (1057 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.09, null, "test energy RMSE (kJ/mol per atom) on H5O2+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h7o3-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, H7O3+ (9356 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.07, null, "training energy RMSE (kJ/mol per atom) on H7O3+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h7o3-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, H7O3+ (973 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.08, null, "test energy RMSE (kJ/mol per atom) on H7O3+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h9o4-train, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, H9O4+ (18595 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.06, null, "training energy RMSE (kJ/mol per atom) on H9O4+: CCSD(T*) NNP", "Table I"]]}
+  - {key: h9o4-test, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, H9O4+ (2069 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 0.1, null, "test energy RMSE (kJ/mol per atom) on H9O4+: CCSD(T*) NNP", "Table I"]]}
+  - {key: all-train-mad, model: nnp, material: clusters, role: training, eval_data: {label: "Training set, all clusters", location: "Fig. 3"}, metrics: [[MAE, Energy, 0.041, null, "training energy MAD (kJ/mol per atom) on all clusters: CCSD(T*) NNP", "Fig. 3 legend"]]}
+  - {key: all-test-mad, model: nnp, material: clusters, role: test, eval_data: {label: "Independent test set, all clusters", location: "Fig. 3"}, metrics: [[MAE, Energy, 0.049, null, "test energy MAD (kJ/mol per atom) on all clusters: CCSD(T*) NNP", "Fig. 3 legend"]]}
+resources: |
+  One NNP evaluation takes about 0.1 ms versus about seven hours on one core for a CCSD(T*)-F12a calculation of H9O4+ (Sec. IV A).
+gaps:
+  - "Energy errors are in kJ/mol per atom (no schema unit), so unit is null. The hydronium force test (energy-only vs energy+force fits) is described without numbers. Binding-energy differences (Table II) are properties."
