@@ -1,0 +1,57 @@
+id: santos2025
+source:
+  rank: 464
+  year: "2025"
+  first_author: "Luan G. F. dos Santos"
+  title: "Improving Bond Dissociations of Reactive Machine Learning Potentials through Physics-Constrained Data Augmentation"
+  venue: "Journal of Chemical Information and Modeling"
+  doi: "10.1021/acs.jcim.4c01847"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "61f01ca6e6245746827a09ef6f713d8697fbd3e6e20d0b6248ec9411c62e0959"
+study_label: "dos Santos et al. (2025): physics-constrained data augmentation with Morse potentials (PCDA-Morse) for bond dissociations of ANI potentials in the CHNO methane-combustion system"
+scope: |
+  Encoding scope: three ANI models retrained with PCDA-Morse data
+  (rigid bond scans labelled by a reference MLIP near equilibrium and by
+  fitted Morse potentials elsewhere, with optional energy shifts to
+  CCSD(T) bond dissociation energies) for 30 CHNO species, plus the
+  ANI-1xnr reference model; force errors on the ANI-1xnr held-out test
+  set. Bond dissociation energies, dissociation curves, combustion MD
+  and rate constants are properties.
+hyperparameters:
+  xmin: {label: "ANI centre of the shortest radial symmetry function (X_min)", name: "X_min", datatype: decimal}
+materials:
+  chno: {label: "CHNO species of methane combustion with N2 (30 molecules and radicals)", class: "Organic molecules and molecular clusters"}
+  ani1xnr: {label: "Condensed-phase reactive CHNO systems of the ANI-1xnr dataset", class: "Organic molecules and molecular clusters"}
+reference:
+  blyp: {type: DFT, xc: {local: BLYP}, basis: TZVP, comment: "ANI-1xnr dataset level of theory"}
+  morse: {type: REF, code: MLIP, comment: "PCDA-Morse labels: reference MLIP (ANI-1xnr; ANI-1ccx for H2O, CO2, NH3, CH4 in ANI-Mcc) where its uncertainty is low, two fitted Morse potentials (repulsive, dissociative) elsewhere, smoothly switched"}
+  ccsdt: {type: WF, wf: CCSDT, comment: "Target BDEs for the energy shifts: CCCBDB CCSD(T)=FULL with aug-cc-pVQZ (35 bonds), aug-cc-pVTZ (1), cc-pVTZ (7)"}
+sampling:
+  scan: {label: "Short MD (0.1-1 ps), then a rigid scan of a randomly chosen bond to a uniform random length in 0.4-6 A, kept when the 8-model ensemble is uncertain (active learning)"}
+  pub: {label: "Published ANI-1xnr dataset"}
+datasets:
+  ani1xnr: {label: "ANI-1xnr dataset (BLYP/TZVP)", materials: [ani1xnr], properties: [Energy, Forces], provenance: Published, calc: blyp, sampling: [pub]}
+  m: {label: "PCDA-Morse dataset without energy shifts (about 40k) plus the ANI-1xnr dataset", materials: [chno, ani1xnr], properties: [Energy, Forces], provenance: Augmented, calc: morse, sampling: [scan]}
+  mcc: {label: "PCDA-Morse dataset shifted to CCSD(T) BDEs (about 35k) plus the ANI-1xnr dataset", materials: [chno, ani1xnr], properties: [Energy, Forces], provenance: Augmented, calc: morse, sampling: [scan]}
+  amcc: {label: "PCDA-Morse dataset shifted to CCSD(T) BDEs with ANI-1xnr and ANI-1ccx reference MLIPs (about 52k), no other data", materials: [chno], properties: [Energy, Forces], provenance: Augmented, calc: morse, sampling: [scan]}
+methods:
+  ANI:
+    hp: [xmin]
+    loss: "As ANI-1xnr (energies and forces)"
+    algorithm: "Ensemble of 8 models trained on 7/8 subsets (k-fold); hyperparameters as ANI-1xnr except X_min"
+    impl: {lib: TorchANI}
+    sims: [MolecularDynamics]
+runs:
+  ref: {label: "ANI-1xnr (reference MLIP, as distributed)", method: ANI, dataset: ani1xnr, model: "ANI-1xnr"}
+  ani-m: {label: "ANI-1xnr-M", method: ANI, dataset: m, settings: {xmin: {v: 0.4, loc: "Sec. 2.4"}}, model: "ANI-1xnr-M"}
+  ani-mcc: {label: "ANI-1xnr-Mcc", method: ANI, dataset: mcc, settings: {xmin: {v: 0.4, loc: "Sec. 2.4"}}, model: "ANI-1xnr-Mcc"}
+  ani-amcc: {label: "ANI-Mcc", method: ANI, dataset: amcc, settings: {xmin: {v: 0.4, loc: "Sec. 2.4"}}, model: "ANI-Mcc"}
+results:
+  - {key: ref-test, model: ref, material: ani1xnr, role: test, eval_data: {label: "ANI-1xnr held-out test set (no Morse data)", location: "Sec. 3, Fig. 5"}, metrics: [[MAE, Force, 6.306, kcal/mol/A, "ANI-1xnr test force MAE: ANI-1xnr", "Sec. 3"], [RMSE, Force, 10.340, kcal/mol/A, "ANI-1xnr test force RMSE: ANI-1xnr", "Sec. 3"]]}
+  - {key: m-test, model: ani-m, material: ani1xnr, role: test, eval_data: {label: "ANI-1xnr held-out test set (no Morse data)", location: "Sec. 3, Fig. 5"}, metrics: [[MAE, Force, 6.321, kcal/mol/A, "ANI-1xnr test force MAE: ANI-1xnr-M", "Sec. 3"], [RMSE, Force, 10.636, kcal/mol/A, "ANI-1xnr test force RMSE: ANI-1xnr-M", "Sec. 3"]]}
+  - {key: mcc-test, model: ani-mcc, material: ani1xnr, role: test, eval_data: {label: "ANI-1xnr held-out test set (no Morse data)", location: "Sec. 3, Fig. 5"}, metrics: [[MAE, Force, 6.435, kcal/mol/A, "ANI-1xnr test force MAE: ANI-1xnr-Mcc", "Sec. 3"], [RMSE, Force, 11.042, kcal/mol/A, "ANI-1xnr test force RMSE: ANI-1xnr-Mcc", "Sec. 3"]]}
+gaps:
+  - "BDE RMSEs against CCSD(T) (ANI-1xnr 16.3, ANI-1xnr-M 16.7, ANI-1xnr-Mcc 3.6, ANI-Mcc 1.2 kcal/mol; Sec. 3) are errors of a derived property, not energy/force errors on configurations; not encoded as metrics."
+  - "Morse dataset sizes are approximate (~40k, ~35k, ~52k; Table 1); no n. The paper does not say whether the PCDA models start from the ANI-1xnr weights, so no base model is encoded; ANI-1xnr acts as a labelling teacher, which the paper likens to teacher-student training without calling it distillation."

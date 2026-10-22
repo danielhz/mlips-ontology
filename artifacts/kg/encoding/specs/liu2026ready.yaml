@@ -1,0 +1,64 @@
+id: liu2026ready
+source:
+  rank: 459
+  year: "2026"
+  first_author: "Xiaoqing Liu"
+  title: "An AI-ready fine-tuning framework for accurate machine-learning interatomic potentials in solid-solid battery interfaces"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2601.17847"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2601.17847v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6d704f0c73dde8f5450568b37ace3a6a00099ba32c6d5b4a0ffbf5f8dd757ee2"
+study_label: "Liu et al. (2026): FIRE, replay-augmented fine-tuning of MACE-MPA-0 with representative sampling for solid-solid battery interfaces"
+scope: |
+  Encoding scope: six battery interface or disordered-electrolyte
+  systems, the FIRE workflow (pre-fine-tuning on 20-50 perturbed
+  structures, MD candidate pools of about 20,000, SOAP/PCA/k-means
+  selection of 500-4,000 representatives, replay-augmented fine-tuning
+  of mace-mpa-0-medium) and the one per-model error stated in the text
+  (the deployed 2,700-frame Na/Na3SbS4 model). Other errors are given as
+  ranges or in figures; diffusion, conductivity and elastic properties
+  are properties.
+materials:
+  nasbs: {label: "Na/Na3SbS4 interface", class: "Inorganic crystals"}
+  liclgaf3: {label: "LiCl/GaF3", class: "Inorganic crystals"}
+  li2co3lif: {label: "Li2CO3/LiF SEI interface", class: "Inorganic crystals"}
+  lps-lbo: {label: "Li3PS4/Li3B11O18 coating interface", class: "Inorganic crystals"}
+  li-lpscl: {label: "Li/Li6PS5Cl interface", class: "Inorganic crystals"}
+  llzo: {label: "Li7La3Zr2-xMxO12 (M = Ta, Nb) disordered electrolyte", class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, comment: "Na/Na3SbS4 labels: Gaussian smearing 0.1 eV, EDIFF 1e-6 eV, KSPACING 0.5 (Gamma only for large cells)."}
+  cp2k: {type: DFT, code: {local: CP2K}, xc: PBE, pp: {local: GTH}, comment: "LiCl/GaF3 labels: PBE-D3, MOLOPT basis, 600 Ry."}
+  published: {type: DFT, comment: "Li2CO3/LiF, Li3PS4/Li3B11O18 and Li/Li6PS5Cl data sets used as published (Refs. 42, 44, 45); LLZO data in SI S.2."}
+sampling:
+  fire: {label: "Pre-fine-tuned MACE drives NVT MD at 300-600 K; SOAP vectors of the 20 lowest-coordinated atoms, PCA to two components, k-means, one representative per cluster"}
+datasets:
+  nasbs: {label: "FIRE-selected Na/Na3SbS4 interface configurations (500-4,000 per system)", materials: [nasbs], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [fire]}
+  liclgaf3: {label: "FIRE-selected LiCl/GaF3 configurations (500-4,000 per system)", materials: [liclgaf3], properties: [Energy, Forces], provenance: InHouse, calc: cp2k, sampling: [fire]}
+  li2co3lif: {label: "FIRE-selected Li2CO3/LiF SEI interface configurations (500-4,000 per system)", materials: [li2co3lif], properties: [Energy, Forces], provenance: Augmented, calc: published, sampling: [fire]}
+  lps-lbo: {label: "FIRE-selected Li3PS4/Li3B11O18 coating interface configurations (500-4,000 per system)", materials: [lps-lbo], properties: [Energy, Forces], provenance: Augmented, calc: published, sampling: [fire]}
+  li-lpscl: {label: "FIRE-selected Li/Li6PS5Cl interface configurations (500-4,000 per system)", materials: [li-lpscl], properties: [Energy, Forces], provenance: Augmented, calc: published, sampling: [fire]}
+  llzo: {label: "FIRE-selected Li7La3Zr2-xMxO12 (M = Ta, Nb) disordered electrolyte configurations (500-4,000 per system)", materials: [llzo], properties: [Energy, Forces], provenance: Augmented, calc: published, sampling: [fire]}
+methods:
+  MACE:
+    hp: [learningRate, batchSize, numEpochs]
+    loss: "Universal loss, energy/force weights 1:10 (stress 10 for Na/Na3SbS4), SWA for the last 75 epochs; replay buffer of 1,000 pretraining configurations"
+    algorithm: "Adam, weight decay 1e-6, EMA 0.99"
+    impl: {lib: MACE, comment: "MACE 0.3.12"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  mpa0: {label: "mace-mpa-0-medium foundation model", method: MACE, model: "mace-mpa-0-medium"}
+  fire-nasbs: {label: "FIRE fine-tuned MACE-MPA-0 for Na/Na3SbS4 interface", method: MACE, dataset: nasbs, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE Na/Na3SbS4 interface", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+  fire-liclgaf3: {label: "FIRE fine-tuned MACE-MPA-0 for LiCl/GaF3", method: MACE, dataset: liclgaf3, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE LiCl/GaF3", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+  fire-li2co3lif: {label: "FIRE fine-tuned MACE-MPA-0 for Li2CO3/LiF SEI interface", method: MACE, dataset: li2co3lif, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE Li2CO3/LiF SEI interface", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+  fire-lps-lbo: {label: "FIRE fine-tuned MACE-MPA-0 for Li3PS4/Li3B11O18 coating interface", method: MACE, dataset: lps-lbo, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE Li3PS4/Li3B11O18 coating interface", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+  fire-li-lpscl: {label: "FIRE fine-tuned MACE-MPA-0 for Li/Li6PS5Cl interface", method: MACE, dataset: li-lpscl, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE Li/Li6PS5Cl interface", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+  fire-llzo: {label: "FIRE fine-tuned MACE-MPA-0 for Li7La3Zr2-xMxO12 (M = Ta, Nb) disordered electrolyte", method: MACE, dataset: llzo, settings: {learningRate: {v: 0.0005, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 300, loc: "Methods"}}, model: "FIRE MACE Li7La3Zr2-xMxO12 (M = Ta, Nb) disordered electrolyte", base_model: {run: mpa0, relation: fine-tuned, location: "Methods"}}
+results:
+  - {key: fire-nasbs-2700, model: fire-nasbs, material: nasbs, role: null, eval_data: {label: "Na/Na3SbS4 evaluation data of the deployed 2,700-frame model (split described in SI S.6)", location: "Fig. 2 caption"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "energy RMSE on nasbs: FIRE MACE (2,700 frames)", "Fig. 2 caption"], [RMSE, Force, 19, meV/A, "force RMSE on nasbs: FIRE MACE (2,700 frames)", "Fig. 2 caption"]]}
+resources: |
+  No timings are given in the main text; costs versus dataset size are in Fig. 3.
+gaps:
+  - "Per-system FIRE errors are stated only as ranges (energy RMSE 0.1-1.0 meV/atom, force RMSE 8-54 meV/A); per-system values and the from-scratch, random-sampling and vanilla fine-tuning baselines are figure-only (Figs. 2-3). The deployed Na/Na3SbS4 model's evaluation split is in the SI, so its role is null; the Na/Na3SbS4 run here stands for that 2,700-frame model."
+  - "Diffusion coefficients, conductivities, elastic moduli and stress tests are properties. Literature errors quoted for orientation are not encoded."

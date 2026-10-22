@@ -1,0 +1,71 @@
+id: dai2026
+source:
+  rank: 461
+  year: "2026"
+  first_author: "Zhenxing Dai"
+  title: "Small-supercell and Small-dataset Training Strategy of Machine Learning Interatomic Potentials for Point Defects"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.24293"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2609.24293v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "76a9ce3a89463d3f6f1176dc1071bf340a35ac02380453d75bfc84ffe321989a"
+study_label: "Dai et al. (2026): small-supercell, small-dataset Allegro training for neutral and charged point defects in GaN, SiO2 and Cu2ZnSnS4"
+scope: |
+  Encoding scope: one from-scratch Allegro model per defect and charge
+  state, trained on configurations from DFT relaxation trajectories in
+  small supercells (15-95 atoms), with the Defect-Only and Defect+Host
+  (adding size-matched pristine bulk) schemes for charged defects. Each
+  run here is the largest training set of its table; the smaller
+  incremental training sets are not separate runs. Evaluation is by
+  total-energy error and RMSD of single relaxed structures in larger
+  supercells, which are not MAE/RMSE metrics.
+hyperparameters:
+  lmax: {label: "Allegro maximum spherical-harmonic order l_max", name: "l_max", datatype: integer}
+materials:
+  gan: {label: "GaN with nitrogen vacancies", formula: GaN, class: "Inorganic crystals"}
+  sio2: {label: "SiO2 with oxygen vacancies", formula: SiO2, class: "Inorganic crystals"}
+  czts: {label: "Cu2ZnSnS4 with Cu_Zn antisites", formula: Cu2ZnSnS4, class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "Spin-polarized; cutoff 400 eV for GaN and SiO2, 295 eV for Cu2ZnSnS4; Gamma-centred k-meshes scaled with supercell size (Table I)."}
+sampling:
+  relax: {label: "Configurations sampled from DFT structural-relaxation trajectories of defect supercells, plus pristine bulk supercells where stated"}
+datasets:
+  n-gan: {label: "Training set IV for neutral V_N in GaN", materials: [gan], properties: [Energy, Forces], provenance: InHouse, n: {v: 56, loc: "Table II, training set IV"}, calc: vasp, sampling: [relax]}
+  n-sio2: {label: "Training set III for neutral V_O in SiO2", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, n: {v: 199, loc: "Table II, training set III"}, calc: vasp, sampling: [relax]}
+  n-czts: {label: "Training set III for neutral Cu_Zn in Cu2ZnSnS4", materials: [czts], properties: [Energy, Forces], provenance: InHouse, n: {v: 27, loc: "Table II, training set III"}, calc: vasp, sampling: [relax]}
+  do-gan1: {label: "Training set IV for V_N+ in GaN, Defect-Only", materials: [gan], properties: [Energy, Forces], provenance: InHouse, n: {v: 54, loc: "Table III, training set IV"}, calc: vasp, sampling: [relax]}
+  do-sio21: {label: "Training set III for V_O+ in SiO2, Defect-Only", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, n: {v: 183, loc: "Table III, training set III"}, calc: vasp, sampling: [relax]}
+  do-sio22: {label: "Training set III for V_O2+ in SiO2, Defect-Only", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, n: {v: 356, loc: "Table III, training set III"}, calc: vasp, sampling: [relax]}
+  do-czts: {label: "Training set III for Cu_Zn- in Cu2ZnSnS4, Defect-Only", materials: [czts], properties: [Energy, Forces], provenance: InHouse, n: {v: 28, loc: "Table III, training set III"}, calc: vasp, sampling: [relax]}
+  dh-gan1: {label: "Training set IV for V_N+ in GaN, Defect+Host", materials: [gan], properties: [Energy, Forces], provenance: InHouse, n: {v: 58, loc: "Table IV, training set IV"}, calc: vasp, sampling: [relax]}
+  dh-gan2: {label: "Training set IV for V_N2+ in GaN, Defect+Host", materials: [gan], properties: [Energy, Forces], provenance: InHouse, n: {v: 94, loc: "Table IV, training set IV"}, calc: vasp, sampling: [relax]}
+  dh-gan3: {label: "Training set IV for V_N3+ in GaN, Defect+Host", materials: [gan], properties: [Energy, Forces], provenance: InHouse, n: {v: 99, loc: "Table IV, training set IV"}, calc: vasp, sampling: [relax]}
+  dh-sio21: {label: "Training set III for V_O+ in SiO2, Defect+Host", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, n: {v: 186, loc: "Table IV, training set III"}, calc: vasp, sampling: [relax]}
+  dh-sio22: {label: "Training set III for V_O2+ in SiO2, Defect+Host", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, n: {v: 359, loc: "Table IV, training set III"}, calc: vasp, sampling: [relax]}
+  dh-czts: {label: "Training set III for Cu_Zn- in Cu2ZnSnS4, Defect+Host", materials: [czts], properties: [Energy, Forces], provenance: InHouse, n: {v: 31, loc: "Table IV, training set III"}, calc: vasp, sampling: [relax]}
+methods:
+  Allegro:
+    hp: [cutoffRadius, numLayers, learningRate, lmax]
+    loss: "Sum of MSEs of forces and per-atom energies, both weights 1.0"
+    algorithm: "Adam, ReduceLROnPlateau (factor 0.5, patience 20), early stopping (patience 50)"
+    impl: {lib: Allegro}
+    sims: [GeometryOptimization]
+runs:
+  r-n-gan: {label: "Allegro for neutral V_N in GaN (training set IV)", method: Allegro, dataset: n-gan, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro neutral V_N in GaN"}
+  r-n-sio2: {label: "Allegro for neutral V_O in SiO2 (training set III)", method: Allegro, dataset: n-sio2, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro neutral V_O in SiO2"}
+  r-n-czts: {label: "Allegro for neutral Cu_Zn in Cu2ZnSnS4 (training set III)", method: Allegro, dataset: n-czts, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro neutral Cu_Zn in Cu2ZnSnS4"}
+  r-do-gan1: {label: "Allegro for V_N+ in GaN, Defect-Only (training set IV)", method: Allegro, dataset: do-gan1, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_N+ in GaN, Defect-Only"}
+  r-do-sio21: {label: "Allegro for V_O+ in SiO2, Defect-Only (training set III)", method: Allegro, dataset: do-sio21, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_O+ in SiO2, Defect-Only"}
+  r-do-sio22: {label: "Allegro for V_O2+ in SiO2, Defect-Only (training set III)", method: Allegro, dataset: do-sio22, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_O2+ in SiO2, Defect-Only"}
+  r-do-czts: {label: "Allegro for Cu_Zn- in Cu2ZnSnS4, Defect-Only (training set III)", method: Allegro, dataset: do-czts, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro Cu_Zn- in Cu2ZnSnS4, Defect-Only"}
+  r-dh-gan1: {label: "Allegro for V_N+ in GaN, Defect+Host (training set IV)", method: Allegro, dataset: dh-gan1, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_N+ in GaN, Defect+Host"}
+  r-dh-gan2: {label: "Allegro for V_N2+ in GaN, Defect+Host (training set IV)", method: Allegro, dataset: dh-gan2, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_N2+ in GaN, Defect+Host"}
+  r-dh-gan3: {label: "Allegro for V_N3+ in GaN, Defect+Host (training set IV)", method: Allegro, dataset: dh-gan3, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_N3+ in GaN, Defect+Host"}
+  r-dh-sio21: {label: "Allegro for V_O+ in SiO2, Defect+Host (training set III)", method: Allegro, dataset: dh-sio21, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_O+ in SiO2, Defect+Host"}
+  r-dh-sio22: {label: "Allegro for V_O2+ in SiO2, Defect+Host (training set III)", method: Allegro, dataset: dh-sio22, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro V_O2+ in SiO2, Defect+Host"}
+  r-dh-czts: {label: "Allegro for Cu_Zn- in Cu2ZnSnS4, Defect+Host (training set III)", method: Allegro, dataset: dh-czts, settings: {cutoffRadius: {v: 6, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, lmax: {v: 2, loc: "Methods"}}, model: "Allegro Cu_Zn- in Cu2ZnSnS4, Defect+Host"}
+results: []
+gaps:
+  - "No MAE/RMSE/R2 metrics: accuracy is reported as the total-energy error and the RMSD of single relaxed structures in larger test supercells (e.g. 0.216 eV for the 323-atom SiO2 V_O2+ supercell, Defect-Only set III), in the text and Figs. 1-4. These single-structure errors are not encoded."
+  - "Smaller incremental training sets (I-III) of Tables II-IV are not separate runs. The maximum of 100,000 epochs is a cap with early stopping, so no epoch count is encoded. Train/validation splits: 8.5:1.5 (SiO2, Cu2ZnSnS4), 8:2 (GaN)."

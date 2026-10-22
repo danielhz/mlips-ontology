@@ -1,0 +1,62 @@
+id: schran2020
+source:
+  rank: 462
+  year: "2020"
+  first_author: "Christoph Schran"
+  title: "Committee neural network potentials control generalization errors and enable active learning"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0016004"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2006.01541v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "03b100453d8a6ea3e94be652c10f49b973db02ab9ee446f4e84eff7e06d97358"
+study_label: "Schran et al. (2020): committee neural network potentials (C-NNP) with query-by-committee active learning for water with classical and quantum nuclei"
+scope: |
+  Encoding scope: eight-member committees of Behler-Parrinello NNPs
+  (n2p2), built over four query-by-committee active-learning generations
+  for liquid water (300-400 K, 2 and 4 kbar), ice Ih, ice VIII and the
+  air-water interface, with classical and quantum (PIMD) nuclei; the
+  revPBE0-D3 reference; force RMSEs per generation (Fig. 5 labels),
+  the overall generation 4 errors (Fig. 7 "All" row and text) and the
+  generation 1 committee-vs-member comparison. Energy-disagreement
+  biasing is a method feature, not a separate model.
+materials:
+  water: {label: "Water (liquid, ice Ih, ice VIII, air-water interface)", formula: H2O, class: "Molecular liquid"}
+reference:
+  rpbe0: {type: DFT, code: {local: CP2K}, xc: {local: revPBE0-D3}, comment: "CP2K/Quickstep with the electronic-structure setup of Ref. 66"}
+sampling:
+  qbc: {label: "Query by committee: configurations with the highest mean force disagreement among 8 NNPs, from classical MD and (partially converged) PIMD with C-NNPs of the previous generation, mild energy-disagreement bias"}
+datasets:
+  gen1: {label: "Generation 1 training set (QbC on classical AIMD of liquid water at 300 K)", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 111, loc: "Sec. IV A"}, calc: rpbe0, sampling: [qbc]}
+  gen4: {label: "Generation 4 (final) training set", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 814, loc: "Sec. IV A"}, calc: rpbe0, sampling: [qbc]}
+  gen2: {label: "Generation 2 training set (adds about 250 configurations for ice Ih, liquid water up to 400 K and quantum nuclei)", materials: [water], properties: [Energy, Forces], provenance: InHouse, calc: rpbe0, sampling: [qbc]}
+  gen3: {label: "Generation 3 training set (adds 240 configurations)", materials: [water], properties: [Energy, Forces], provenance: InHouse, calc: rpbe0, sampling: [qbc]}
+methods:
+  HDNNP:
+    hp: [numLayers, numEpochs]
+    loss: "Energies and forces; each committee member trained on a random 90% subsample"
+    algorithm: "Parallel multistream adaptive global extended Kalman filter (32 streams for final models)"
+    impl: {lib: {local: n2p2}, comment: "Symmetry functions of Ref. 23, two hidden layers of 20 tanh neurons; committee of 8"}
+    sims: [MolecularDynamics]
+runs:
+  g1: {label: "Generation 1 C-NNP (8 members)", method: HDNNP, dataset: gen1, settings: {numLayers: {v: 2, loc: "Sec. VI"}, numEpochs: {v: 100, loc: "Sec. VI"}}, model: "C-NNP water generation 1"}
+  g2: {label: "Generation 2 C-NNP (8 members)", method: HDNNP, dataset: gen2, settings: {numLayers: {v: 2, loc: "Sec. VI"}, numEpochs: {v: 100, loc: "Sec. VI"}}, model: "C-NNP water generation 2"}
+  g3: {label: "Generation 3 C-NNP (8 members)", method: HDNNP, dataset: gen3, settings: {numLayers: {v: 2, loc: "Sec. VI"}, numEpochs: {v: 100, loc: "Sec. VI"}}, model: "C-NNP water generation 3"}
+  g4: {label: "Generation 4 (final) C-NNP (8 members)", method: HDNNP, dataset: gen4, settings: {numLayers: {v: 2, loc: "Sec. VI"}, numEpochs: {v: 100, loc: "Sec. VI"}}, model: "C-NNP water generation 4"}
+results:
+  - {key: g1-lw300, model: g1, material: water, role: test, eval_data: {label: "500 independently generated classical liquid-water configurations at 300 K", location: "Fig. 3 caption"}, metrics: [[RMSE, Force, 42, meV/A, "force RMSE on liquid water 300 K classical: generation 1 C-NNP (8 members)", "Sec. IV A"]]}
+  - {key: g1-cl, model: g1, material: water, role: test, eval_data: {label: "Independent test set, classical structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 45, meV/A, "force RMSE on classical test structures: generation 1 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g1-qu, model: g1, material: water, role: test, eval_data: {label: "Independent test set, quantum structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 131, meV/A, "force RMSE on quantum test structures: generation 1 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g2-cl, model: g2, material: water, role: test, eval_data: {label: "Independent test set, classical structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 42, meV/A, "force RMSE on classical test structures: generation 2 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g2-qu, model: g2, material: water, role: test, eval_data: {label: "Independent test set, quantum structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 82, meV/A, "force RMSE on quantum test structures: generation 2 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g3-cl, model: g3, material: water, role: test, eval_data: {label: "Independent test set, classical structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 42, meV/A, "force RMSE on classical test structures: generation 3 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g3-qu, model: g3, material: water, role: test, eval_data: {label: "Independent test set, quantum structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 54, meV/A, "force RMSE on quantum test structures: generation 3 C-NNP", "Fig. 5 bar labels"]]}
+  - {key: g4-cl, model: g4, material: water, role: test, eval_data: {label: "Independent test set, classical structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 40, meV/A, "force RMSE on classical test structures: generation 4 C-NNP", "Sec. IV B; Fig. 5"]]}
+  - {key: g4-qu, model: g4, material: water, role: test, eval_data: {label: "Independent test set, quantum structures (4000 of 8000)", location: "Sec. IV B, Sec. VI"}, metrics: [[RMSE, Force, 52, meV/A, "force RMSE on quantum test structures: generation 4 C-NNP", "Sec. IV B; Fig. 5"]]}
+  - {key: g4-all, model: g4, material: water, role: test, eval_data: {label: "Independent test set, all 8000 configurations", location: "Fig. 7 caption, Sec. VI"}, metrics: [[RMSE, Energy, 1.5, null, "energy RMSE per H2O molecule (meV/H2O) on the full test set: generation 4 C-NNP", "Fig. 7, All row"], [RMSE, Force, 46, meV/A, "force RMSE on the full test set: generation 4 C-NNP", "Fig. 7, All row"]]}
+resources: |
+  The 10 iterations of one generation-1 QbC process took 6.7 hours on a single 32-core AMD EPYC node (Sec. IV B).
+gaps:
+  - "Per-condition RMSEs of Fig. 7 (liquid water at 300/350/400 K, 2/4 kbar, ice Ih, ice VIII, slab) are printed as bar labels, but the extracted text does not tie each label pair unambiguously to classical or quantum nuclei; left out. Per-condition generation 1 RMSEs are in the SI (Fig. S5)."
+  - "The average RMSE of the individual NNPs (48 meV/A) is an average over members, not a model; left out. The approximate start (roughly 60 meV/A) and convergence values of Fig. 3 are left out."
+  - "Generation 2 and 3 training-set sizes are stated only as increments (about 250, 240); no n is encoded for them."
