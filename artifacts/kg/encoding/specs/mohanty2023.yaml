@@ -1,0 +1,48 @@
+id: mohanty2023
+source:
+  rank: 498
+  year: "2023"
+  first_author: "Shaswat Mohanty"
+  title: "Development of scalable and generalizable machine learned force field for polymers"
+  venue: "Scientific Reports"
+  doi: "10.1038/s41598-023-43804-5"
+  kg_relevance: "Software/implementation"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "8419641aa50bbdb61a8a58b969ff546719e207c326de2305d85736fea4f24611"
+study_label: "Mohanty et al. (2023): QRNN machine-learned force fields for ethylene glycol oligomers trained on monomer-to-trimer clusters, with active learning and MD of polymers up to 100 monomers"
+scope: |
+  Encoding scope: three QRNN models trained on wB97X-D3BJ/def2-TZVPD
+  clusters of ethylene glycol (M), plus diethylene glycol (M,D), plus
+  triethylene glycol (M,D,T), and the active-learning extensions. No
+  numeric energy/force errors are given in the text read (parity plots in
+  the SI); pair scans, densities, diffusivities and other properties are
+  not metrics.
+materials:
+  eg: {label: "Ethylene glycol oligomers (mono- to decaethylene glycol) and polymer chains of 25-100 monomers", class: "Polymers"}
+reference:
+  wb97x: {type: DFT, code: {local: Psi4}, xc: {local: wB97X-D3BJ}, basis: "def2-TZVPD", comment: "Energies, forces and dipoles; GFN2-xTB charges as optional charge targets"}
+sampling:
+  clusters: {label: "N-molecule clusters (up to 8 monomers, 6 dimers, 4 trimers) cut from OPLS4 MD, conformational and decomposed (bond-broken) samples"}
+  al: {label: "Two active-learning rounds: 5-model committee force variance, top and random samples from about 800,000 generated and about 313,000 QRNN-MD clusters"}
+datasets:
+  m: {label: "Monomer (ethylene glycol) conformational and decomposed clusters", materials: [eg], properties: [Energy, Forces], provenance: InHouse, calc: wb97x, sampling: [clusters]}
+  md: {label: "Monomer and dimer clusters", materials: [eg], properties: [Energy, Forces], provenance: InHouse, calc: wb97x, sampling: [clusters]}
+  mdt: {label: "Monomer, dimer and trimer clusters (217,684 DFT-labelled clusters in total before active learning)", materials: [eg], properties: [Energy, Forces], provenance: InHouse, n: {v: 217684, loc: "Methods (Dataset preparation)"}, calc: wb97x, sampling: [clusters]}
+  mdt-al: {label: "M,D,T clusters extended by two active-learning rounds", materials: [eg], properties: [Energy, Forces], provenance: InHouse, calc: wb97x, sampling: [clusters, al]}
+methods:
+  QRNN:
+    hp: [learningRate, batchSize, numEpochs]
+    loss: "Multitask loss with learned weights over energies, gradients and charges (dipoles or GFN2-xTB charges)"
+    algorithm: "Weight normalization, weight decay 1e-4; epochs of 200,000 samples"
+    impl: {lib: {local: Schrodinger QRNN}, comment: "MD via ASE and Desmond (GPU)"}
+    sims: [MolecularDynamics]
+runs:
+  qrnn-m: {label: "QRNN-M", method: QRNN, dataset: m, settings: {learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 256, loc: "Methods"}, numEpochs: {v: 500, loc: "Methods"}}, model: "QRNN-M ethylene glycol"}
+  qrnn-md: {label: "QRNN-M,D", method: QRNN, dataset: md, settings: {learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 256, loc: "Methods"}, numEpochs: {v: 500, loc: "Methods"}}, model: "QRNN-M,D ethylene glycol"}
+  qrnn-mdt: {label: "QRNN-M,D,T", method: QRNN, dataset: mdt, settings: {learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 256, loc: "Methods"}, numEpochs: {v: 500, loc: "Methods"}}, model: "QRNN-M,D,T ethylene glycol"}
+  qrnn-al: {label: "QRNN after active learning", method: QRNN, dataset: mdt-al, settings: {learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 256, loc: "Methods"}}, model: "QRNN ethylene glycol (active learning)"}
+results: []
+gaps:
+  - "Energy, force and charge parity plots are in the SI (Fig. S1); no numeric errors in the text read. The M and M,D dataset sizes are broken down in Table S1 (not read). Density, diffusivity and pair-scan comparisons are properties."
+  - "QRNN is a new registry method without origin: its introducing paper (jacobson2022) is needs-pdf."

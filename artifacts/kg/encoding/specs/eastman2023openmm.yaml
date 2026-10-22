@@ -1,0 +1,51 @@
+id: eastman2023openmm
+source:
+  rank: 497
+  year: "2023"
+  first_author: "Peter K. Eastman"
+  title: "OpenMM 8: Molecular Dynamics Simulation with Machine Learning Potentials"
+  venue: "The Journal of Physical Chemistry B"
+  doi: "10.1021/acs.jpcb.3c06662"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2310.03121v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "fc8df7d920fa0274d1ab6d5efb18036497925f4edd68fcbc1608c9b9cebd8a8a"
+study_label: "Eastman et al. (2023): OpenMM 8 with machine learning potentials, ANI-2x ML/MM speed benchmarks and an equivariant-transformer potential for the anionic GFP chromophore in water"
+scope: |
+  Encoding scope: the ML/MM speed benchmark of ANI-2x (TorchANI vs
+  NNPOps, ensemble vs single member) for a 53-atom ligand bound to CDK8
+  (Table 3), and the TorchMD-NET equivariant transformer trained on
+  revPBE-D3 AIMD/AI-PIMD data of the GFP chromophore in water, with its
+  test force RMSE and per-evaluation time. OpenMM software features,
+  classical force-field speeds and RDF/dihedral comparisons are not
+  encoded.
+materials:
+  cdk8: {label: "53-atom inhibitor (lig_30) bound to CDK8 in TIP3P-FB water (134,099 atoms, ligand treated by the MLP)", class: "Organic and biochemical molecules (C, N, O, H)"}
+  gfp: {label: "Anionic GFP chromophore (HBDI-) with 167 waters (528 atoms, periodic)", class: "Solvated molecule"}
+reference:
+  revpbe: {type: DFT, code: {local: CP2K}, xc: {local: revPBE-D3}, comment: "AIMD and AI-PIMD (r-RESPA with SCC-DFTB3 inner forces) from the authors' earlier work"}
+sampling:
+  aimd: {label: "Every 2 fs from 10 classical AIMD trajectories (about 150 ps) and AI-PIMD (15 ps)"}
+datasets:
+  gfp: {label: "GFP chromophore in water: 75,008 AIMD plus 7,500 AI-PIMD configurations (80/10/10 split)", materials: [gfp], properties: [Forces], provenance: InHouse, calc: revpbe, sampling: [aimd]}
+external_models: [ANI-2x]
+methods:
+  ANI:
+    impl: {lib: TorchANI, comment: "TorchANI and the optimized NNPOps implementation in OpenMM"}
+    sims: [MolecularDynamics]
+  TorchMD-ET:
+    hp: [numLayers, numRadialBasis, numFeatures, numEpochs]
+    loss: "Forces"
+    impl: {lib: {local: TorchMD-NET}, comment: "2 attention heads; run in OpenMM 8 via TorchForce"}
+    sims: [MolecularDynamics]
+runs:
+  et: {label: "Equivariant transformer for the GFP chromophore in water", method: TorchMD-ET, dataset: gfp, settings: {numLayers: {v: 1, loc: "Results"}, numRadialBasis: {v: 32, loc: "Results"}, numFeatures: {v: 64, loc: "Results (embedding dimension)"}, numEpochs: {v: 400, loc: "Results"}}, model: "TorchMD-ET GFP chromophore in water"}
+results:
+  - {key: et-test, model: et, material: gfp, role: test, eval_data: {label: "GFP chromophore in water test split (10%)", location: "Results"}, metrics: [[RMSE, Force, 45.7, meV/A, "test force RMSE on GFP chromophore in water: TorchMD-ET", "Results"]]}
+timings:
+  - {model: "ext:ANI-2x", system: "CDK8 with 53-atom ligand modelled by ANI-2x (ensemble, TorchANI), 2 fs steps", atoms: 53, value: 9.8, unit: "ns/day", per_atom_us: null, hardware: "NVIDIA RTX 4080", result: null, location: "Table 3"}
+  - {model: "ext:ANI-2x", system: "CDK8 with 53-atom ligand modelled by ANI-2x (ensemble, NNPOps), 2 fs steps", atoms: 53, value: 56, unit: "ns/day", per_atom_us: null, hardware: "NVIDIA RTX 4080", result: null, location: "Table 3"}
+  - {model: "ext:ANI-2x", system: "CDK8 with 53-atom ligand modelled by one ANI-2x member (NNPOps), 2 fs steps", atoms: 53, value: 105, unit: "ns/day", per_atom_us: null, hardware: "NVIDIA RTX 4080", result: null, location: "Table 3"}
+  - {model: et, system: "GFP chromophore with 167 waters, one force evaluation", atoms: 528, value: 8.7, unit: "ms per force evaluation", per_atom_us: 16.48, hardware: "NVIDIA RTX 4080 (AIMD: 13.2 s on two 64-core AMD EPYC 7763)", result: et-test, location: "Results"}
+gaps:
+  - "ANI-2x timings are for ML/MM runs where the rest of the 134,099-atom system is classical, so no per-atom time is derived. The single-member timing is attached to the ANI-2x registry model with the variant named in the system field."

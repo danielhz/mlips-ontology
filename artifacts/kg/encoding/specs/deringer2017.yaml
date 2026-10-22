@@ -1,0 +1,45 @@
+id: deringer2017
+source:
+  rank: 499
+  year: "2017"
+  first_author: "Volker L. Deringer"
+  title: "Machine learning based interatomic potential for amorphous carbon"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.95.094203"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1611.03277v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5cdc61e608dec62f858b8c708ab88e5f05bff845535d4e3166ed3d8791dc5b2a"
+study_label: "Deringer and Csanyi (2017): a GAP machine-learning potential for liquid and amorphous carbon (2b + 3b + SOAP)"
+scope: |
+  Encoding scope: the a-C GAP combining two-body, three-body and SOAP
+  descriptors, trained on CASTEP LDA single points of liquid, amorphous,
+  surface, crystalline and dimer structures built by iterative GAP-driven
+  melt-quench; the energy and force RMS errors of Table II. Simpler
+  descriptor combinations (Fig. 5), structural, elastic and surface
+  properties are not metrics or are figure-only.
+materials:
+  ac: {label: "Liquid and amorphous carbon (bulk and surfaces), diamond and graphite", formula: C, class: "Elemental solid and liquid carbon"}
+reference:
+  lda: {type: DFT, code: CASTEP, xc: LDA, cutoff: 650, kpoints: "Maximum spacing 0.03 1/A", comment: "Gaussian smearing 0.1 eV, finite-basis correction"}
+sampling:
+  mq: {label: "Snapshots from ab initio and iteratively GAP-driven melt-quench MD (1.5-3.5 g/cm3, 27-125 atoms), amorphous slabs, distorted diamond and graphite cells, carbon dimer"}
+datasets:
+  train: {label: "a-C training database (liquid, amorphous, surfaces, crystalline, dimer; 90% of the combined database)", materials: [ac], properties: [Energy, Forces, Virials], provenance: InHouse, calc: lda, sampling: [mq]}
+methods:
+  GAP:
+    hp: [cutoffRadius]
+    loss: "GAP regression; expected errors 0.002 eV and 0.2 eV/A (liquid/amorphous), 10x smaller and virials 0.2 eV for crystals"
+    algorithm: "2b and 3b terms on uniform sparse grids (15 and 200 points), SOAP with CUR sparsification (4,030 points), n_max = l_max = 8, zeta = 4"
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics]
+runs:
+  gap: {label: "GAP for amorphous carbon (2b + 3b + SOAP)", method: GAP, dataset: train, settings: {cutoffRadius: {v: 3.7, loc: "Table I (2b and SOAP; 3b 3.0 A)"}}, model: "GAP a-C (2017)"}
+results:
+  - {key: liq9000, model: gap, material: ac, role: external, eval_data: {label: "One 9000 K liquid snapshot from each of 100 GAP-MD melt-quench trajectories (125 atoms, 1.5-3.5 g/cm3), recomputed with DFT", location: "Sec. IV A, Table II"}, metrics: [[RMSE, Energy, 0.041, eV, "energy RMS error (eV as printed) on liquid (9000 k) a-C: GAP", "Table II"], [RMSE, Force, 1.27, eV/A, "force-component RMS error on liquid (9000 k) a-C: GAP", "Table II"]]}
+  - {key: liq5000, model: gap, material: ac, role: external, eval_data: {label: "One 5000 K liquid snapshot from each of the 100 GAP-MD trajectories, recomputed with DFT", location: "Sec. IV A, Table II"}, metrics: [[RMSE, Energy, 0.031, eV, "energy RMS error (eV as printed) on liquid (5000 k) a-C: GAP", "Table II"], [RMSE, Force, 1.12, eV/A, "force-component RMS error on liquid (5000 k) a-C: GAP", "Table II"]]}
+  - {key: quench, model: gap, material: ac, role: external, eval_data: {label: "One quench snapshot (about 3500 K) from each of the 100 GAP-MD trajectories, recomputed with DFT", location: "Sec. IV A, Table II"}, metrics: [[RMSE, Energy, 0.023, eV, "energy RMS error (eV as printed) on quench a-C: GAP", "Table II"], [RMSE, Force, 1.07, eV/A, "force-component RMS error on quench a-C: GAP", "Table II"]]}
+  - {key: amorph, model: gap, material: ac, role: external, eval_data: {label: "Final amorphous structure of each of the 100 GAP-MD trajectories, recomputed with DFT", location: "Sec. IV A, Table II"}, metrics: [[RMSE, Energy, 0.018, eV, "energy RMS error (eV as printed) on amorphous a-C: GAP", "Table II"], [RMSE, Force, 0.94, eV/A, "force-component RMS error on amorphous a-C: GAP", "Table II"]]}
+  - {key: cryst, model: gap, material: ac, role: test, eval_data: {label: "Crystalline structures of the 10% test set", location: "Sec. IV A, Table II"}, metrics: [[RMSE, Energy, 0.002, eV, "energy RMS error (eV as printed) on crystalline a-C: GAP", "Table II"], [RMSE, Force, 0.1, eV/A, "force-component RMS error on crystalline a-C: GAP", "Table II"]]}
+gaps:
+  - "Table II prints energy RMS errors in eV without saying whether per atom or per 125-atom structure; they are kept in eV as printed. Errors of the 2b-only and 2b+3b models are figure-only (Fig. 5). The training-database size is in the Supplementary Information."
