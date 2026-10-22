@@ -1,0 +1,50 @@
+id: petersen2026
+source:
+  rank: 315
+  year: "2026"
+  first_author: "Martin Hoffmann Petersen"
+  title: "Importance of Configurational Charge Ordering for Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.26471"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.26471v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3df2d31ad968f124bd6bce13ed7cad3298663805dfb14912b52c1d022c53d16e"
+study_label: "Petersen et al. (2026): encoding configurational Fe2+/Fe3+ charge ordering into MLIPs for Na polyanion cathodes"
+scope: |
+  Encoding scope: CHGNet, MACE and MACE-LES trained from scratch on Fe-only
+  Na polyanion cathode data with and without charge-ordering encoding
+  (Fe3+ as a surrogate species), and two MACE models trained on the full
+  filtered polyanion data set (Fe, Mn, Co, Ni) with and without encoding,
+  with the energy MAE of the latter on an out-of-distribution
+  structure-optimisation test set (Table 3). Convex hulls, GA rankings and
+  structural MAPEs are not energy/force/stress errors.
+materials:
+  na-fe: {label: "Fe-based Na polyanion cathodes (olivine and maricite NaFePO4, Na2FeSiO4, Na2.56Fe1.72(SO4)3) at varying Na content", class: "Na-ion battery cathode materials"}
+  na-tm: {label: "Na polyanion cathodes with Fe, Mn, Co and Ni (single and co-doped)", class: "Na-ion battery cathode materials"}
+reference:
+  pbe-u: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma-centred 3x1x3", comment: "VASP 6.4, Hubbard U_Fe = 5.3 eV, spin-polarised, Gaussian smearing 0.01 eV, EDIFF 1e-5, forces below 0.03 eV/A (polyanion cathode data set protocol)."}
+datasets:
+  fe-only: {label: "Fe-only Na polyanion cathode set after removing transition states and ambiguous magnetic moments (24,766 structures)", materials: [na-fe], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 24766, loc: "Sec. 4.3"}, calc: pbe-u}
+  general: {label: "Filtered full polyanion sodium cathode data set with unambiguous oxidation states and zero total charge (172,696 structures)", materials: [na-tm], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 172696, loc: "Sec. 4.3"}, calc: pbe-u}
+methods:
+  CHGNet: {impl: {lib: CHGNet}, sims: [GeometryOptimization]}
+  MACE: {impl: {lib: MACE}, sims: [GeometryOptimization]}
+  MACE-LES: {sims: [GeometryOptimization]}
+runs:
+  chgnet-plain: {label: "CHGNet trained from scratch on Fe-only data, conventional Fe species", method: CHGNet, dataset: fe-only, model: "CHGNet (no charge-ordering encoding)"}
+  chgnet-enc: {label: "CHGNet trained from scratch on Fe-only data with Fe3+ encoded as a separate species", method: CHGNet, dataset: fe-only, model: "CHGNet (charge-ordering encoded)"}
+  mace-plain: {label: "MACE (MACE-MP-0 large architecture) trained from scratch on Fe-only data, conventional Fe species", method: MACE, dataset: fe-only, model: "MACE (no charge-ordering encoding)"}
+  mace-enc: {label: "MACE (MACE-MP-0 large architecture) trained from scratch on Fe-only data with Fe3+ encoded", method: MACE, dataset: fe-only, model: "MACE (charge-ordering encoded)"}
+  maceles-plain: {label: "MACE-LES trained from scratch on Fe-only data, conventional Fe species", method: MACE-LES, dataset: fe-only, model: "MACELES (no charge-ordering encoding)"}
+  maceles-enc: {label: "MACE-LES trained from scratch on Fe-only data with Fe3+ encoded", method: MACE-LES, dataset: fe-only, model: "MACELES (charge-ordering encoded)"}
+  mace-gen-plain: {label: "MACE trained from scratch on the full filtered polyanion data, conventional species", method: MACE, dataset: general, model: "General MACE (no charge-ordering encoding)"}
+  mace-gen-enc: {label: "MACE trained from scratch on the full filtered polyanion data with Fe3+, Mn3+, Co3+ and Ni3+ encoded as surrogate species", method: MACE, dataset: general, model: "General MACE (charge-ordering encoded)"}
+results:
+  - {key: gen-plain, model: mace-gen-plain, material: na-tm, role: test, eval_data: {label: "Out-of-distribution structure-optimisation set of Ref. [32] (two to four co-doped transition metals); energies of MACE-optimised vs DFT-optimised structures", location: "Table 3"}, metrics: [[MAE, Energy, 8.202, meV/atom, "Energy MAE after structural optimisation: general MACE without charge-ordering encoding", "Table 3"]]}
+  - {key: gen-enc, model: mace-gen-enc, material: na-tm, role: test, eval_data: {label: "Out-of-distribution structure-optimisation set of Ref. [32] (two to four co-doped transition metals); energies of MACE-optimised vs DFT-optimised structures", location: "Table 3"}, metrics: [[MAE, Energy, 4.836, meV/atom, "Energy MAE after structural optimisation: general MACE with charge-ordering encoding", "Table 3"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Training curves and final training errors of the six Fe-only models are in Section A of the supplement (figures); convex-hull residual MAEs are printed only in Fig. 6. Table 3 also gives MAPEs of volume, lattice parameters and angles, which are not encoded."
+  - "MACE and MACE-LES reuse the MACE-MP-0 large hyperparameters and CHGNet the public CHGNet ones; all are trained from scratch (no fine-tuning). The GA-driving MACE model of Ref. [38] is not encoded."

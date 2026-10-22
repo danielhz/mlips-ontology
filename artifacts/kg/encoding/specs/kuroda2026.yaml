@@ -1,0 +1,53 @@
+id: kuroda2026
+source:
+  rank: 317
+  year: "2026"
+  first_author: "Naoya Kuroda"
+  title: "Expanding Universal Machine Learning Interatomic Potentials to 97 Elements Towards Nuclear Applications"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.03223"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.03223v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ce2c25803a0b8c8c001e18707dcd771af0272fc811ac506eed6c48ea8d1b0b43"
+study_label: "Kuroda et al. (2026): MACE-Osaka26, a 97-element universal MLIP with the heavy-element data set HE26"
+scope: |
+  Encoding scope: the HE26 heavy-element data set (actinides and other
+  heavy elements; built here), MACE-Osaka26 trained on MPtrj, OFF23 and
+  HE26 (graph cutoff 6.0 A, 200 epochs), and the comparison with the
+  earlier MACE-Osaka24, with energy, force and stress MAEs and RMSEs on the
+  MPtrj and OFF23 training and test splits and on the HE26 training set
+  (Table I). Lattice-parameter errors and thermal conductivities are
+  properties, not energy/force/stress errors.
+materials:
+  mptrj: {label: "Inorganic crystals of MPtrj", class: "Inorganic crystals"}
+  off23: {label: "Organic molecules of the MACE-OFF23 data (SPICE-based)", class: "Organic molecules (gas phase)"}
+  he26: {label: "Heavy-element compounds including minor actinides (Am, Cm, Cf and others): elemental solids, oxides, multi-component and fluorite oxides", class: "Heavy-element and actinide materials"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, comment: "HE26 labels: PREC Accurate, EDIFF 1e-5, Gaussian smearing 0.05 eV, LMAXMIX 6, several initial magnetic configurations (lowest energy kept); MPtrj-compatible settings."}
+datasets:
+  he26: {label: "HE26 heavy-element data set (59,438 training structures; no separate test split)", materials: [he26], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 59438, loc: "Table I"}, calc: pbe}
+  combined: {label: "MPtrj (1,502,422 training structures) + OFF23 (951,005) + HE26 (59,438)", materials: [mptrj, off23, he26], properties: [Energy, Forces, Stresses], provenance: Augmented, comment: "Combined training data of MACE-Osaka26."}
+methods:
+  MACE:
+    hp: [cutoffRadius, numEpochs]
+    impl: {lib: MACE}
+    sims: [GeometryOptimization, PhononCalculation]
+runs:
+  osaka24: {label: "MACE-Osaka24 as published (graph cutoff 4.5 A; no heavy elements)", method: MACE, model: "MACE-Osaka24"}
+  osaka26: {label: "MACE-Osaka26 trained on MPtrj + OFF23 + HE26 (97 elements)", method: MACE, dataset: combined, settings: {cutoffRadius: {v: 6.0, loc: "Fig. 2 caption"}, numEpochs: {v: 200, loc: "Fig. 7"}}, model: "MACE-Osaka26"}
+results:
+  - {key: osaka24-mptrj-train, model: osaka24, material: mptrj, role: training, eval_data: {label: "MPtrj training split (1,502,422 structures)", location: "Table I"}, metrics: [[MAE, Energy, 31.4, meV/atom, "train energy MAE on mptrj: MACE-Osaka24", "Table I"], [RMSE, Energy, 74.6, meV/atom, "train energy RMSE on mptrj: MACE-Osaka24", "Table I"], [MAE, Force, 47.4, meV/A, "train force MAE on mptrj: MACE-Osaka24", "Table I"], [RMSE, Force, 117.0, meV/A, "train force RMSE on mptrj: MACE-Osaka24", "Table I"], [MAE, Stress, 1.7, null, "train stress MAE on mptrj in meV/A3: MACE-Osaka24", "Table I"], [RMSE, Stress, 10.3, null, "train stress RMSE on mptrj in meV/A3: MACE-Osaka24", "Table I"]]}
+  - {key: osaka26-mptrj-train, model: osaka26, material: mptrj, role: training, eval_data: {label: "MPtrj training split (1,502,422 structures)", location: "Table I"}, metrics: [[MAE, Energy, 26.8, meV/atom, "train energy MAE on mptrj: MACE-Osaka26", "Table I"], [RMSE, Energy, 60.5, meV/atom, "train energy RMSE on mptrj: MACE-Osaka26", "Table I"], [MAE, Force, 47.3, meV/A, "train force MAE on mptrj: MACE-Osaka26", "Table I"], [RMSE, Force, 148.3, meV/A, "train force RMSE on mptrj: MACE-Osaka26", "Table I"], [MAE, Stress, 1.7, null, "train stress MAE on mptrj in meV/A3: MACE-Osaka26", "Table I"], [RMSE, Stress, 10.4, null, "train stress RMSE on mptrj in meV/A3: MACE-Osaka26", "Table I"]]}
+  - {key: osaka24-mptrj-test, model: osaka24, material: mptrj, role: test, eval_data: {label: "MPtrj test split (77,973 structures)", location: "Table I"}, metrics: [[MAE, Energy, 33.7, meV/atom, "test energy MAE on mptrj: MACE-Osaka24", "Table I"], [RMSE, Energy, 77.2, meV/atom, "test energy RMSE on mptrj: MACE-Osaka24", "Table I"], [MAE, Force, 61.9, meV/A, "test force MAE on mptrj: MACE-Osaka24", "Table I"], [RMSE, Force, 144.3, meV/A, "test force RMSE on mptrj: MACE-Osaka24", "Table I"], [MAE, Stress, 2.2, null, "test stress MAE on mptrj in meV/A3: MACE-Osaka24", "Table I"], [RMSE, Stress, 45.8, null, "test stress RMSE on mptrj in meV/A3: MACE-Osaka24", "Table I"]]}
+  - {key: osaka26-mptrj-test, model: osaka26, material: mptrj, role: test, eval_data: {label: "MPtrj test split (77,973 structures)", location: "Table I"}, metrics: [[MAE, Energy, 29.3, meV/atom, "test energy MAE on mptrj: MACE-Osaka26", "Table I"], [RMSE, Energy, 62.0, meV/atom, "test energy RMSE on mptrj: MACE-Osaka26", "Table I"], [MAE, Force, 62.4, meV/A, "test force MAE on mptrj: MACE-Osaka26", "Table I"], [RMSE, Force, 140.7, meV/A, "test force RMSE on mptrj: MACE-Osaka26", "Table I"], [MAE, Stress, 2.2, null, "test stress MAE on mptrj in meV/A3: MACE-Osaka26", "Table I"], [RMSE, Stress, 35.8, null, "test stress RMSE on mptrj in meV/A3: MACE-Osaka26", "Table I"]]}
+  - {key: osaka24-off23-train, model: osaka24, material: off23, role: training, eval_data: {label: "OFF23 training split (951,005 structures)", location: "Table I"}, metrics: [[MAE, Energy, 5.7, meV/atom, "train energy MAE on off23: MACE-Osaka24", "Table I"], [RMSE, Energy, 26.6, meV/atom, "train energy RMSE on off23: MACE-Osaka24", "Table I"], [MAE, Force, 39.9, meV/A, "train force MAE on off23: MACE-Osaka24", "Table I"], [RMSE, Force, 78.1, meV/A, "train force RMSE on off23: MACE-Osaka24", "Table I"]]}
+  - {key: osaka26-off23-train, model: osaka26, material: off23, role: training, eval_data: {label: "OFF23 training split (951,005 structures)", location: "Table I"}, metrics: [[MAE, Energy, 4.9, meV/atom, "train energy MAE on off23: MACE-Osaka26", "Table I"], [RMSE, Energy, 11.9, meV/atom, "train energy RMSE on off23: MACE-Osaka26", "Table I"], [MAE, Force, 44.5, meV/A, "train force MAE on off23: MACE-Osaka26", "Table I"], [RMSE, Force, 88.0, meV/A, "train force RMSE on off23: MACE-Osaka26", "Table I"]]}
+  - {key: osaka24-off23-test, model: osaka24, material: off23, role: test, eval_data: {label: "OFF23 test split (50,195 structures)", location: "Table I"}, metrics: [[MAE, Energy, 5.8, meV/atom, "test energy MAE on off23: MACE-Osaka24", "Table I"], [RMSE, Energy, 25.2, meV/atom, "test energy RMSE on off23: MACE-Osaka24", "Table I"], [MAE, Force, 41.2, meV/A, "test force MAE on off23: MACE-Osaka24", "Table I"], [RMSE, Force, 130.7, meV/A, "test force RMSE on off23: MACE-Osaka24", "Table I"]]}
+  - {key: osaka26-off23-test, model: osaka26, material: off23, role: test, eval_data: {label: "OFF23 test split (50,195 structures)", location: "Table I"}, metrics: [[MAE, Energy, 5.0, meV/atom, "test energy MAE on off23: MACE-Osaka26", "Table I"], [RMSE, Energy, 12.3, meV/atom, "test energy RMSE on off23: MACE-Osaka26", "Table I"], [MAE, Force, 45.7, meV/A, "test force MAE on off23: MACE-Osaka26", "Table I"], [RMSE, Force, 137.1, meV/A, "test force RMSE on off23: MACE-Osaka26", "Table I"]]}
+  - {key: osaka26-he26-train, model: osaka26, material: he26, role: training, eval_data: {label: "HE26 training set (59,438 structures)", location: "Table I"}, metrics: [[MAE, Energy, 44.7, meV/atom, "train energy MAE on he26: MACE-Osaka26", "Table I"], [RMSE, Energy, 117.3, meV/atom, "train energy RMSE on he26: MACE-Osaka26", "Table I"], [MAE, Force, 26.3, meV/A, "train force MAE on he26: MACE-Osaka26", "Table I"], [RMSE, Force, 73.7, meV/A, "train force RMSE on he26: MACE-Osaka26", "Table I"], [MAE, Stress, 1.3, null, "train stress MAE on he26 in meV/A3: MACE-Osaka26", "Table I"], [RMSE, Stress, 7.4, null, "train stress RMSE on he26 in meV/A3: MACE-Osaka26", "Table I"]]}
+resources: |
+  No training times are given.
+gaps:
+  - "Stress errors are in meV/A3 (no schema unit; recorded with unit null). MACE-Osaka24 is the earlier model (Ref. [48]); Table I reports it on the same training and test splits as MACE-Osaka26, and the roles follow those split labels."
+  - "Lattice-parameter RMSEs (0.4488 A for BHE, 0.0477 A for CHE; Table II for fluorite oxides) and thermal conductivities are properties. Other MACE-Osaka26 hyperparameters are not stated in the main text."

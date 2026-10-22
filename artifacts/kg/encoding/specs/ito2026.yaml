@@ -1,0 +1,68 @@
+id: ito2026
+source:
+  rank: 316
+  year: "2026"
+  first_author: "Shusuke Ito"
+  title: "Benchmarking Universal Interatomic Potentials on Zeolite"
+  venue: "The Journal of Physical Chemistry C"
+  doi: "10.1021/acs.jpcc.5c06812"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2509.07417v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c248b42ee48e1cf190c33c3832df5c7ae928f1ccb791bc397e3f43e84430fcb4"
+study_label: "Ito, Muraoka and Nakayama (2026): benchmarking universal interatomic potentials on zeolite structures"
+scope: |
+  Encoding scope: six pretrained universal MLIPs (CHGNet, ORB-v3,
+  MatterSim, eSEN-30M-OAM, PFP v7, EquiformerV2-lE4-lF100-S2EFS-OC22) with
+  D3 correction, and their RMSEs of zeolite relative energies against
+  experiment (Table 2) and PBE+D3 (Tables 3, 4). Analytic and tailor-made
+  force fields (GFN-FF, UFF, Dreiding, SLC, ClayFF, BSFF) are not MLIPs and
+  are not encoded.
+materials:
+  silica: {label: "Pure-silica zeolite frameworks (IZA topologies) relative to alpha-quartz", formula: "SiO2", class: "Zeolite (pure silica)"}
+  cu-cha: {label: "347 Cu2+/[Cu(OH)]+ exchanged aluminosilicate CHA zeolites", class: "Metal-exchanged zeolite"}
+  k-eri: {label: "1,190 ERI zeolites with potassium and hexane-1,6-bis(trimethylazanium) OSDA", class: "As-synthesised zeolite with organic template"}
+reference:
+  pbe-d3: {type: DFT, code: VASP, xc: {local: "PBE-D3"}, pp: PAW, cutoff: 520, comment: "VASP 6.2.1, MPRelax settings (pymatgen 2025.5.2, custodian), energy convergence 5e-5 eV/atom."}
+methods:
+  CHGNet: {sims: [GeometryOptimization]}
+  ORB: {sims: [GeometryOptimization]}
+  M3GNet: {sims: [GeometryOptimization]}
+  eSEN: {sims: [GeometryOptimization]}
+  TeaNet: {sims: [GeometryOptimization]}
+  EquiformerV2: {}
+runs:
+  chgnet: {label: "CHGNet as distributed", method: CHGNet, model: "CHGNet"}
+  orb-v3: {label: "ORB-v3 as distributed", method: ORB, model: "ORB-v3"}
+  mattersim: {label: "MatterSim as distributed (version not stated)", method: M3GNet, model: "MatterSim"}
+  esen: {label: "eSEN-30M-OAM as distributed", method: eSEN, model: "eSEN-30M-OAM"}
+  pfp-v7: {label: "PFP v7 as distributed", method: TeaNet, model: "PFP v7"}
+  eqv2-oc22: {label: "EquiformerV2-lE4-lF100-S2EFS-OC22 as distributed", method: EquiformerV2, model: "EquiformerV2-lE4-lF100-S2EFS-OC22"}
+results:
+  - {key: chgnet-exp, model: chgnet, material: silica, role: external, eval_data: {label: "Experimental relative energies of pure-silica zeolites vs alpha-quartz (Supplementary Table 1)", location: "Table 2"}, metrics: [[RMSE, Energy, 2.84, null, "RMSE of relative energies vs experiment in kJ/mol Si: CHGNet + D3", "Table 2"]]}
+  - {key: orb-v3-exp, model: orb-v3, material: silica, role: external, eval_data: {label: "Experimental relative energies of pure-silica zeolites vs alpha-quartz (Supplementary Table 1)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.88, null, "RMSE of relative energies vs experiment in kJ/mol Si: ORB-v3 + D3", "Table 2"]]}
+  - {key: mattersim-exp, model: mattersim, material: silica, role: external, eval_data: {label: "Experimental relative energies of pure-silica zeolites vs alpha-quartz (Supplementary Table 1)", location: "Table 2"}, metrics: [[RMSE, Energy, 2.44, null, "RMSE of relative energies vs experiment in kJ/mol Si: MatterSim + D3", "Table 2"]]}
+  - {key: esen-exp, model: esen, material: silica, role: external, eval_data: {label: "Experimental relative energies of pure-silica zeolites vs alpha-quartz (Supplementary Table 1)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.55, null, "RMSE of relative energies vs experiment in kJ/mol Si: eSEN-30M-OAM + D3", "Table 2"]]}
+  - {key: pfp-v7-exp, model: pfp-v7, material: silica, role: external, eval_data: {label: "Experimental relative energies of pure-silica zeolites vs alpha-quartz (Supplementary Table 1)", location: "Table 2"}, metrics: [[RMSE, Energy, 2.38, null, "RMSE of relative energies vs experiment in kJ/mol Si: PFP v7 + D3", "Table 2"]]}
+  - {key: chgnet-dft, model: chgnet, material: silica, role: external, eval_data: {label: "PBE+D3 relative energies of IZA pure-silica zeolites", location: "Table 3"}, metrics: [[RMSE, Energy, 3.6, null, "RMSE of relative energies vs PBE+D3 in kJ/mol Si: CHGNet + D3", "Table 3"]]}
+  - {key: orb-v3-dft, model: orb-v3, material: silica, role: external, eval_data: {label: "PBE+D3 relative energies of IZA pure-silica zeolites", location: "Table 3"}, metrics: [[RMSE, Energy, 1.01, null, "RMSE of relative energies vs PBE+D3 in kJ/mol Si: ORB-v3 + D3", "Table 3"]]}
+  - {key: mattersim-dft, model: mattersim, material: silica, role: external, eval_data: {label: "PBE+D3 relative energies of IZA pure-silica zeolites", location: "Table 3"}, metrics: [[RMSE, Energy, 1.49, null, "RMSE of relative energies vs PBE+D3 in kJ/mol Si: MatterSim + D3", "Table 3"]]}
+  - {key: esen-dft, model: esen, material: silica, role: external, eval_data: {label: "PBE+D3 relative energies of IZA pure-silica zeolites", location: "Table 3"}, metrics: [[RMSE, Energy, 0.44, null, "RMSE of relative energies vs PBE+D3 in kJ/mol Si: eSEN-30M-OAM + D3", "Table 3"]]}
+  - {key: pfp-v7-dft, model: pfp-v7, material: silica, role: external, eval_data: {label: "PBE+D3 relative energies of IZA pure-silica zeolites", location: "Table 3"}, metrics: [[RMSE, Energy, 1.33, null, "RMSE of relative energies vs PBE+D3 in kJ/mol Si: PFP v7 + D3", "Table 3"]]}
+  - {key: chgnet-cu, model: chgnet, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.76, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: CHGNet, Cu/CHA", "Table 4"]]}
+  - {key: chgnet-eri, model: chgnet, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.04, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: CHGNet, K-OSDA/ERI", "Table 4"]]}
+  - {key: orb-v3-cu, model: orb-v3, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.24, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: ORB-v3, Cu/CHA", "Table 4"]]}
+  - {key: orb-v3-eri, model: orb-v3, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.07, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: ORB-v3, K-OSDA/ERI", "Table 4"]]}
+  - {key: mattersim-cu, model: mattersim, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.52, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: MatterSim, Cu/CHA", "Table 4"]]}
+  - {key: mattersim-eri, model: mattersim, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.09, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: MatterSim, K-OSDA/ERI", "Table 4"]]}
+  - {key: esen-cu, model: esen, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.14, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: eSEN-30M-OAM, Cu/CHA", "Table 4"]]}
+  - {key: esen-eri, model: esen, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.02, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: eSEN-30M-OAM, K-OSDA/ERI", "Table 4"]]}
+  - {key: pfp-v7-cu, model: pfp-v7, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.24, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: PFP v7, Cu/CHA", "Table 4"]]}
+  - {key: pfp-v7-eri, model: pfp-v7, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.11, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: PFP v7, K-OSDA/ERI", "Table 4"]]}
+  - {key: eqv2-oc22-cu, model: eqv2-oc22, material: cu-cha, role: external, eval_data: {label: "PBE+D3 relative energies of 347 Cu/CHA structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.26, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: EqV2 (OC22), Cu/CHA", "Table 4"]]}
+  - {key: eqv2-oc22-eri, model: eqv2-oc22, material: k-eri, role: external, eval_data: {label: "PBE+D3 relative energies of 1,190 K-OSDA/ERI structures (single points at DFT geometries)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.09, null, "RMSE of relative energies vs PBE+D3 in kJ/mol atom: EqV2 (OC22), K-OSDA/ERI", "Table 4"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Errors are in kJ/mol per Si or per atom, which the schema has no unit for; they are recorded with unit null and the unit in the label."
+  - "The MatterSim version and the ORB-v3 checkpoint are not stated; all universal models are paper-local runs (PFP is a TeaNet model). Geometric errors (Fig. 1) are not encoded."

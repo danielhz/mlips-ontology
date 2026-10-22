@@ -1,0 +1,42 @@
+id: zhou2026breaking
+source:
+  rank: 310
+  year: "2026"
+  first_author: "Yuanchang Zhou"
+  title: "Breaking the Training Barrier of Billion-Parameter Universal Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2604.15821"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2604.15821v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "9bc7c6a155fc494c63fb7a2e7ad2d5345b846e5915d2685daac987a71b849c1f"
+study_label: "Zhou et al. (2026): MatRIS-MoE and the Janus framework for billion-parameter uMLIP training on Exascale systems"
+scope: |
+  Encoding scope: MatRIS-MoE (introduced here, extending MatRIS with
+  mixture-of-experts layers) in three sizes, of which only the small model
+  (1.09B parameters) is fully trained on a 473-million-configuration
+  multi-domain data set; the medium and large models are used only for
+  scaling studies. Accuracy is shown only as normalised scores (Fig. 5);
+  the HPC performance figures are training-throughput measurements.
+materials:
+  multi-domain: {label: "Molecules, periodic crystals, catalytic surfaces, molecular crystals and MOFs from OMat24, OMol25, ODAC25, Opoly26 and other data sets", class: "Universal (materials and molecules)"}
+datasets:
+  multi473: {label: "Multi-domain training set of over 473 million configurations (about 3.6 trillion edges)", materials: [multi-domain], properties: [Energy, Forces, Stresses], provenance: Published, comment: "Assembled from published DFT data sets (Refs. [8], [11]-[18])."}
+methods:
+  MatRIS-MoE:
+    hp: [numLayers, numFeatures]
+    algorithm: "Mixture-of-experts routing with multi-head self-attention; multi-task training with batch sizes up to 4K (CNIS) and 15K (LineShine); learning rate scaled by the square root of the batch-size multiplier"
+    impl: {lib: {local: "Janus", comment: "High-dimensional distributed training framework (FS-3D, expert parallelism) on CNIS and LineShine"}}
+runs:
+  matris-moe-s: {label: "MatRIS-MoE (S): 1.09B parameters (0.19B active), 72 experts, top-4 routing", method: MatRIS-MoE, dataset: multi473, settings: {numLayers: {v: 6, loc: "Table II"}, numFeatures: {v: 2560, loc: "Table II (node feature dimension)"}}, model: "MatRIS-MoE (S)"}
+results: []
+resources: |
+  Per-step training time at 1/8 machine scale (Table III): MatRIS-MoE (M)
+  5.96 s to 2.21 s on CNIS and 33.1 s to 8.08 s on LineShine after
+  optimisation; MatRIS-MoE (L) 7.71 s to 2.66 s and 40.7 s to 8.14 s. Peak
+  single-precision performance 1.2 EFLOPS (CNIS) and 1.0 EFLOPS (LineShine)
+  at 90-93% weak-scaling efficiency. These are training-cost figures for
+  the scaling models, not inference timings of the trained model.
+gaps:
+  - "Accuracy on Matcalc, Wiggle150, GMTKN55, X23, DMC ice, OC20NEB, ASD, noble-metal adsorption and MOFSimBench is shown only as normalised scores in Fig. 5; no numbers are given."
+  - "MatRIS-MoE (M) (2.47B) and (L) (11.5B) are not trained to convergence and are not encoded as models. MatRIS-MoE is a new registry method derived from MatRIS (Sec. III-B)."

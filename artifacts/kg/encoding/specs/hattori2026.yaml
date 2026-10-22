@@ -1,0 +1,52 @@
+id: hattori2026
+source:
+  rank: 309
+  year: "2026"
+  first_author: "Shinnosuke Hattori"
+  title: "Chemical intuition on bond-dissociation energies as an emergent ability of universal machine-learning interatomic potentials"
+  venue: "Nature Communications"
+  doi: "10.1038/s41467-026-74919-8"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "ec3af71b436477963e2b22f66d941c85fa48856d3e7e4558dbf4bc76210da1e7"
+study_label: "Hattori et al. (2026): emergent bond-dissociation energies in edge-decomposed Allegro potentials (E3D)"
+scope: |
+  Encoding scope: Allegro models trained on cohesive energies with an
+  edge-energy decomposition, on SPICE2, the MatPES r2SCAN subset or their
+  hybrid, with tensor sizes 64 and 128, and their MAEs of activation and
+  reaction energies on Transition1x (Table 1). Learned bond energies,
+  internal-representation entropies and scaling curves are analyses, not
+  error metrics.
+materials:
+  molecules: {label: "Drug-like molecules and small organic molecules (SPICE2) and reactions of Transition1x", class: "Organic molecules (gas phase)"}
+  inorganic: {label: "Inorganic crystals of the MatPES r2SCAN subset", class: "Inorganic crystals"}
+reference:
+  wb97md3: {type: DFT, code: {local: "Psi4"}, xc: {local: "wB97M-D3(BJ)"}, basis: "def2-TZVPPD", comment: "SPICE2 level of theory; Transition1x reactants, transition states and products recomputed at this level."}
+  r2scan: {type: DFT, xc: {local: "r2SCAN"}, comment: "MatPES r2SCAN subset."}
+datasets:
+  spice2: {label: "SPICE2", materials: [molecules], properties: [Energy, Forces], provenance: Published, calc: wb97md3}
+  matpes: {label: "MatPES r2SCAN subset", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: r2scan}
+  hybrid: {label: "Hybrid SPICE2 + MatPES (molecules in 500 A boxes with zero stress)", materials: [molecules, inorganic], properties: [Energy, Forces, Stresses], provenance: Augmented}
+methods:
+  Allegro:
+    hp: [numFeatures, cutoffRadius, numLayers, learningRate, numEpochs]
+    loss: "RMSE-type loss on per-atom cohesive energy and forces (1:1), plus stress (1:1:1) for MatPES and hybrid"
+    algorithm: "Adam; shift parameters set to zero and scales to one so that the cohesive energy is a sum of edge energies"
+    impl: {lib: NequIP, comment: "NequIP framework with the Allegro architecture"}
+runs:
+  spice2-64: {label: "Allegro (E3D, tensor size 64) trained on SPICE2", method: Allegro, dataset: spice2, settings: {numFeatures: {v: 64, loc: "Methods (tensor size)"}, cutoffRadius: {v: 5.2, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods (at least)"}}, model: "E3D Allegro, SPICE2, tensor 64"}
+  spice2-128: {label: "Allegro (E3D, tensor size 128) trained on SPICE2", method: Allegro, dataset: spice2, settings: {numFeatures: {v: 128, loc: "Methods (tensor size)"}, cutoffRadius: {v: 5.2, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods (at least)"}}, model: "E3D Allegro, SPICE2, tensor 128"}
+  hybrid-64: {label: "Allegro (E3D, tensor size 64) trained on hybrid SPICE2 + MatPES", method: Allegro, dataset: hybrid, settings: {numFeatures: {v: 64, loc: "Methods (tensor size)"}, cutoffRadius: {v: 5.2, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods (at least)"}}, model: "E3D Allegro, hybrid SPICE2 + MatPES, tensor 64"}
+  hybrid-128: {label: "Allegro (E3D, tensor size 128) trained on hybrid SPICE2 + MatPES", method: Allegro, dataset: hybrid, settings: {numFeatures: {v: 128, loc: "Methods (tensor size)"}, cutoffRadius: {v: 5.2, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods (at least)"}}, model: "E3D Allegro, hybrid SPICE2 + MatPES, tensor 128"}
+  matpes-64: {label: "Allegro (E3D, tensor size 64) trained on MatPES r2SCAN", method: Allegro, dataset: matpes, settings: {numFeatures: {v: 64, loc: "Methods (tensor size)"}, cutoffRadius: {v: 5.2, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods (at least)"}}, model: "E3D Allegro, MatPES r2SCAN, tensor 64"}
+results:
+  - {key: spice2-64, model: spice2-64, material: molecules, role: external, eval_data: {label: "Transition1x reactions recomputed at wB97M-D3(BJ)/def2-TZVPPD (out-of-distribution)", location: "Table 1"}, metrics: [[MAE, Energy, 0.61, eV, "Activation-energy MAE on T1x: Allegro SPICE2, tensor 64", "Table 1"], [MAE, Energy, 0.31, eV, "Reaction-energy MAE on T1x: Allegro SPICE2, tensor 64", "Table 1"]]}
+  - {key: spice2-128, model: spice2-128, material: molecules, role: external, eval_data: {label: "Transition1x reactions recomputed at wB97M-D3(BJ)/def2-TZVPPD (out-of-distribution)", location: "Table 1"}, metrics: [[MAE, Energy, 0.58, eV, "Activation-energy MAE on T1x: Allegro SPICE2, tensor 128", "Table 1"], [MAE, Energy, 0.33, eV, "Reaction-energy MAE on T1x: Allegro SPICE2, tensor 128", "Table 1"]]}
+  - {key: hybrid-64, model: hybrid-64, material: molecules, role: external, eval_data: {label: "Transition1x reactions recomputed at wB97M-D3(BJ)/def2-TZVPPD (out-of-distribution)", location: "Table 1"}, metrics: [[MAE, Energy, 0.49, eV, "Activation-energy MAE on T1x: Allegro Hybrid, tensor 64", "Table 1"], [MAE, Energy, 0.27, eV, "Reaction-energy MAE on T1x: Allegro Hybrid, tensor 64", "Table 1"]]}
+  - {key: hybrid-128, model: hybrid-128, material: molecules, role: external, eval_data: {label: "Transition1x reactions recomputed at wB97M-D3(BJ)/def2-TZVPPD (out-of-distribution)", location: "Table 1"}, metrics: [[MAE, Energy, 0.44, eV, "Activation-energy MAE on T1x: Allegro Hybrid, tensor 128", "Table 1"], [MAE, Energy, 0.25, eV, "Reaction-energy MAE on T1x: Allegro Hybrid, tensor 128", "Table 1"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Table 1 errors are MAEs of activation and reaction energies (eV per reaction) on Transition1x. Training and validation energy/force errors are not reported in the main text."
+  - "The tensor-size-32 models and the data-size scaling models (Figs. 1, 2, 4) are figure-only; BDE shifts, widths and entropies are representation analyses."

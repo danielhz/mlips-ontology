@@ -1,0 +1,63 @@
+id: koker2026
+source:
+  rank: 318
+  year: "2026"
+  first_author: "Teddy Koker"
+  title: "PFT: Phonon Fine-tuning for Machine Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2601.07742"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2601.07742v4"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8731ace2a319a078ccc4a8392600ea82271bdc8183d15bc84fce12adf9fba9cb"
+study_label: "Koker et al. (2026): phonon fine-tuning (PFT) of MLIPs on DFT force constants via stochastic Hessian-vector products"
+scope: |
+  Encoding scope: Nequix MP and the Nequix OAM base model trained here,
+  their phonon-fine-tuned versions (with and without MPtrj co-training),
+  and MACE-MP-0 PFT, fine-tuned on MDR Phonon PBE force constants; the
+  Matbench Discovery energy MAE and R2 of the Nequix models (Table 4) and
+  the training costs. Phonon thermodynamic, third-order force-constant,
+  thermal-conductivity and elastic errors are property errors, not
+  energy/force/stress metrics.
+materials:
+  mdr: {label: "Inorganic crystals of the MDR Phonon database (PBE recalculation)", class: "Inorganic crystals"}
+  wbm: {label: "WBM test set of Matbench Discovery", class: "Inorganic crystals"}
+reference:
+  pbe-mdr: {type: DFT, xc: PBE, comment: "MDR Phonon finite-displacement calculations recomputed with PBE in Materials Project settings (Loew et al. 2025)."}
+datasets:
+  mdr-phonon: {label: "MDR Phonon PBE force constants (training split; 1,000-material test subset held out)", materials: [mdr], properties: [Energy, Forces, Stresses], provenance: Published, calc: pbe-mdr}
+  mptrj: {label: "MPtrj (co-training data)", materials: [mdr], properties: [Energy, Forces, Stresses], provenance: Published}
+  oam: {label: "OMat24 (pretraining) then sAlex + 8 copies of MPtrj (fine-tuning)", materials: [mdr], properties: [Energy, Forces, Stresses], provenance: Published}
+methods:
+  Nequix:
+    hp: [learningRate, batchSize, numEpochs]
+    loss: "PFT: energy, force, stress and force-constant (lambda_Phi = 100) terms, the latter via a single stochastic Hessian-vector product per step; co-training on upstream data every 4 steps"
+    algorithm: "AdamW, weight decay 0.001"
+    impl: {lib: {local: "nequix", comment: "JAX backend for PFT; torch backend with OpenEquivariance for the OAM base model"}}
+    sims: [PhononCalculation, GeometryOptimization, MolecularDynamics]
+  MACE:
+    impl: {lib: {local: "FeNNol", comment: "JAX implementation of MACE used for PFT"}}
+    sims: [PhononCalculation]
+runs:
+  nequix-mp: {label: "Nequix MP as published (MPtrj)", method: Nequix, model: "Nequix MP (708K parameters)"}
+  nequix-mp-pft: {label: "Nequix MP after PFT with MPtrj co-training", method: Nequix, dataset: mdr-phonon, settings: {learningRate: {v: 0.0001, loc: "Table A.2"}, batchSize: {v: 16, loc: "Table A.2"}, numEpochs: {v: 200, loc: "Table A.2"}}, model: "Nequix MP PFT", base_model: {run: nequix-mp, relation: fine-tuned, location: "Sec. 4.1; Table A.2"}}
+  nequix-mp-pft-nc: {label: "Nequix MP after PFT without co-training", method: Nequix, dataset: mdr-phonon, settings: {learningRate: {v: 0.0001, loc: "Table A.2"}, batchSize: {v: 16, loc: "Table A.2"}, numEpochs: {v: 200, loc: "Table A.2"}}, model: "Nequix MP PFT (no cotrain)", base_model: {run: nequix-mp, relation: fine-tuned, location: "Table A.2"}}
+  nequix-oam: {label: "Nequix OAM: pretrained on OMat24 (6 epochs) and fine-tuned on sAlex + MPtrj (3 epochs)", method: Nequix, dataset: oam, settings: {batchSize: {v: 512, loc: "Table A.1"}}, model: "Nequix OAM", gpuHours: {v: 290, loc: "App. A.3.1 (about 250 + 40 A100 hours)"}, trainingHardware: "4 NVIDIA A100 80GB GPUs"}
+  nequix-oam-pft: {label: "Nequix OAM after PFT with MPtrj + sAlex co-training", method: Nequix, dataset: mdr-phonon, settings: {learningRate: {v: 0.0001, loc: "Table A.2"}, batchSize: {v: 16, loc: "Table A.2"}, numEpochs: {v: 200, loc: "Table A.2"}}, model: "Nequix OAM PFT", base_model: {run: nequix-oam, relation: fine-tuned, location: "Table A.2"}}
+  mace-mp-0-pft: {label: "MACE-MP-0 after PFT without co-training", method: MACE, dataset: mdr-phonon, model: "MACE-MP-0 PFT (no cotrain)", base_model: {label: "MACE-MP-0", relation: fine-tuned, location: "Sec. 4.1"}, gpuHours: {v: 30, loc: "Sec. 4.1 (A100 hours)"}, trainingHardware: "NVIDIA A100"}
+results:
+  - {key: nequix-mp-mbd, model: nequix-mp, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM unique prototypes)", location: "Table 4"}, metrics: [[MAE, Energy, 44.0, meV/atom, "Matbench Discovery energy MAE (0.044 eV/atom): Nequix MP", "Table 4"], [R2, Energy, 0.782, null, "Matbench Discovery R2: Nequix MP", "Table 4"]]}
+  - {key: nequix-mp-pft-mbd, model: nequix-mp-pft, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM unique prototypes)", location: "Table 4"}, metrics: [[MAE, Energy, 44.0, meV/atom, "Matbench Discovery energy MAE (0.044 eV/atom): Nequix MP PFT", "Table 4"], [R2, Energy, 0.784, null, "Matbench Discovery R2: Nequix MP PFT", "Table 4"]]}
+  - {key: nequix-mp-pft-nc-mbd, model: nequix-mp-pft-nc, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM unique prototypes)", location: "Table 4"}, metrics: [[MAE, Energy, 247.0, meV/atom, "Matbench Discovery energy MAE (0.247 eV/atom): Nequix MP PFT (no cotrain)", "Table 4"], [R2, Energy, 0.301, null, "Matbench Discovery R2: Nequix MP PFT (no cotrain)", "Table 4"]]}
+  - {key: nequix-oam-mbd, model: nequix-oam, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM unique prototypes)", location: "Table 4"}, metrics: [[MAE, Energy, 24.0, meV/atom, "Matbench Discovery energy MAE (0.024 eV/atom): Nequix OAM", "Table 4"], [R2, Energy, 0.863, null, "Matbench Discovery R2: Nequix OAM", "Table 4"]]}
+  - {key: nequix-oam-pft-mbd, model: nequix-oam-pft, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM unique prototypes)", location: "Table 4"}, metrics: [[MAE, Energy, 25.0, meV/atom, "Matbench Discovery energy MAE (0.025 eV/atom): Nequix OAM PFT", "Table 4"], [R2, Energy, 0.865, null, "Matbench Discovery R2: Nequix OAM PFT", "Table 4"]]}
+resources: |
+  PFT runs use one NVIDIA A100 80GB GPU (batch 16, 200 epochs); the
+  MACE-MP-0 PFT took 30 A100 hours (about 1% of its pretraining). The
+  Nequix OAM base model took about 250 A100 hours (OMat24) plus 40 A100
+  hours (OAM fine-tuning). Stochastic HVP training is about 30x faster and
+  uses 90x less memory than full-Hessian training for a 90K-parameter test
+  model (App. A.1).
+gaps:
+  - "Phonon-property MAEs (Table 1), third-order force-constant MAEs in meV/A3 (Table 2), kappa_SRME (Table 3) and elastic-modulus errors (Table A.3) are property errors with no metric type in the schema. Matbench Discovery MAE is in eV/atom (converted)."
+  - "Nequix is a new registry method (method paper not in the corpus). The 90K-parameter full-Hessian test models of App. A.1 are not encoded."
