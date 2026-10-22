@@ -1,0 +1,82 @@
+id: neefjes2026
+source:
+  rank: 457
+  year: "2026"
+  first_author: "Ivo Neefjes"
+  title: "Machine learning interatomic potentials with accurate long-range interactions for molecular dynamics collision simulations of atmospherically-relevant molecules"
+  venue: "Atmospheric chemistry and physics"
+  doi: "10.5194/acp-26-7631-2026"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "446dedcdba7495cc9276f9dc0df92b0a81d9b8e196da7d9695c56684a92c48a6"
+study_label: "Neefjes et al. (2026): AIMNet2 and (Delta-)PaiNN potentials with long-range interactions for collision simulations of atmospheric sulfuric-acid clusters"
+scope: |
+  Encoding scope: per-system training sets (20,000 structures each from
+  GFN1-xTB collision and umbrella-sampling MD, labelled with GFN1-xTB or
+  wB97X-3c) for H2SO4-H2SO4, H2SO4-NH(CH3)2 and H2SO4-HSO4-, AIMNet2,
+  PaiNN and Delta-PaiNN (correction to GFN1-xTB) models trained on them,
+  and their energy and force MAEs on independent test sets (Table 3).
+  PMF RMSEs (Table 4) and collision rate coefficients (Table 5) are
+  properties.
+materials:
+  aa: {label: "H2SO4-H2SO4 collision pair (gas phase)", class: "Molecular dimers and noncovalent complexes"}
+  ab: {label: "H2SO4-NH(CH3)2 collision pair (gas phase)", class: "Molecular dimers and noncovalent complexes"}
+  ai: {label: "H2SO4-HSO4- collision pair (gas phase)", class: "Molecular dimers and noncovalent complexes"}
+reference:
+  gfn1: {type: REF, comment: "GFN1-xTB semi-empirical tight binding (tblite 0.2.1)."}
+  wb97x3c: {type: DFT, code: ORCA, xc: {local: wB97X-3c}, comment: "ORCA 6.0.1 energies and gradients on GFN1-xTB structures."}
+sampling:
+  pmf: {label: "GFN1-xTB collision trajectories at 300 K and umbrella sampling at 300 and 500 K; structures binned by centre-of-mass distance and selected by PMF curvature and density with RMSD filters"}
+datasets:
+  aa-gfn: {label: "H2SO4-H2SO4 training set labelled with GFN1-xTB", materials: [aa], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: gfn1, sampling: [pmf]}
+  aa-wb: {label: "H2SO4-H2SO4 training set labelled with wB97X-3c", materials: [aa], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: wb97x3c, sampling: [pmf]}
+  ab-gfn: {label: "H2SO4-NH(CH3)2 training set labelled with GFN1-xTB", materials: [ab], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: gfn1, sampling: [pmf]}
+  ab-wb: {label: "H2SO4-NH(CH3)2 training set labelled with wB97X-3c", materials: [ab], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: wb97x3c, sampling: [pmf]}
+  ai-gfn: {label: "H2SO4-HSO4- training set labelled with GFN1-xTB", materials: [ai], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: gfn1, sampling: [pmf]}
+  ai-wb: {label: "H2SO4-HSO4- training set labelled with wB97X-3c", materials: [ai], properties: [Energy, Forces], provenance: InHouse, n: {v: 20000, loc: "Sec. 2.2.4"}, calc: wb97x3c, sampling: [pmf]}
+methods:
+  AIMNet2:
+    sims: [MolecularDynamics]
+  PaiNN:
+    impl: {lib: SchNet, comment: "SchNetPack"}
+    sims: [MolecularDynamics]
+runs:
+  aa-aimnet-gfn: {label: "AIMNet2 for H2SO4-H2SO4 trained on GFN1-xTB data", method: AIMNet2, dataset: aa-gfn, model: "H2SO4-H2SO4 AIMNet2 (gfn)"}
+  aa-aimnet-wb: {label: "AIMNet2 for H2SO4-H2SO4 trained on wB97X-3c data", method: AIMNet2, dataset: aa-wb, model: "H2SO4-H2SO4 AIMNet2 (wb)"}
+  aa-painn-gfn: {label: "PaiNN for H2SO4-H2SO4 trained on GFN1-xTB data", method: PaiNN, dataset: aa-gfn, model: "H2SO4-H2SO4 PaiNN (gfn)"}
+  aa-painn-wb: {label: "PaiNN for H2SO4-H2SO4 trained on wB97X-3c data", method: PaiNN, dataset: aa-wb, model: "H2SO4-H2SO4 PaiNN (wb)"}
+  aa-dpainn-gfn: {label: "Delta-PaiNN (GFN1-xTB baseline) for H2SO4-H2SO4 trained on GFN1-xTB data", method: PaiNN, dataset: aa-gfn, model: "H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (gfn)"}
+  aa-dpainn-wb: {label: "Delta-PaiNN (GFN1-xTB baseline) for H2SO4-H2SO4 trained on wB97X-3c data", method: PaiNN, dataset: aa-wb, model: "H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (wb)"}
+  ab-aimnet-gfn: {label: "AIMNet2 for H2SO4-NH(CH3)2 trained on GFN1-xTB data", method: AIMNet2, dataset: ab-gfn, model: "H2SO4-NH(CH3)2 AIMNet2 (gfn)"}
+  ab-aimnet-wb: {label: "AIMNet2 for H2SO4-NH(CH3)2 trained on wB97X-3c data", method: AIMNet2, dataset: ab-wb, model: "H2SO4-NH(CH3)2 AIMNet2 (wb)"}
+  ab-painn-gfn: {label: "PaiNN for H2SO4-NH(CH3)2 trained on GFN1-xTB data", method: PaiNN, dataset: ab-gfn, model: "H2SO4-NH(CH3)2 PaiNN (gfn)"}
+  ab-painn-wb: {label: "PaiNN for H2SO4-NH(CH3)2 trained on wB97X-3c data", method: PaiNN, dataset: ab-wb, model: "H2SO4-NH(CH3)2 PaiNN (wb)"}
+  ab-dpainn-wb: {label: "Delta-PaiNN (GFN1-xTB baseline) for H2SO4-NH(CH3)2 trained on wB97X-3c data", method: PaiNN, dataset: ab-wb, model: "H2SO4-NH(CH3)2 Delta-PaiNN (GFN1-xTB baseline) (wb)"}
+  ai-aimnet-gfn: {label: "AIMNet2 for H2SO4-HSO4- trained on GFN1-xTB data", method: AIMNet2, dataset: ai-gfn, model: "H2SO4-HSO4- AIMNet2 (gfn)"}
+  ai-aimnet-wb: {label: "AIMNet2 for H2SO4-HSO4- trained on wB97X-3c data", method: AIMNet2, dataset: ai-wb, model: "H2SO4-HSO4- AIMNet2 (wb)"}
+  ai-painn-gfn: {label: "PaiNN for H2SO4-HSO4- trained on GFN1-xTB data", method: PaiNN, dataset: ai-gfn, model: "H2SO4-HSO4- PaiNN (gfn)"}
+  ai-painn-wb: {label: "PaiNN for H2SO4-HSO4- trained on wB97X-3c data", method: PaiNN, dataset: ai-wb, model: "H2SO4-HSO4- PaiNN (wb)"}
+  ai-dpainn-wb: {label: "Delta-PaiNN (GFN1-xTB baseline) for H2SO4-HSO4- trained on wB97X-3c data", method: PaiNN, dataset: ai-wb, model: "H2SO4-HSO4- Delta-PaiNN (GFN1-xTB baseline) (wb)"}
+results:
+  - {key: aa-aimnet-gfn, model: aa-aimnet-gfn, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.015, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 AIMNet2 (gfn)", "Table 3"], [MAE, Force, 0.028, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 AIMNet2 (gfn)", "Table 3"]]}
+  - {key: aa-aimnet-wb, model: aa-aimnet-wb, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.056, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 AIMNet2 (wb)", "Table 3"], [MAE, Force, 0.076, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 AIMNet2 (wb)", "Table 3"]]}
+  - {key: aa-painn-gfn, model: aa-painn-gfn, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.023, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 PaiNN (gfn)", "Table 3"], [MAE, Force, 0.036, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 PaiNN (gfn)", "Table 3"]]}
+  - {key: aa-painn-wb, model: aa-painn-wb, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.039, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 PaiNN (wb)", "Table 3"], [MAE, Force, 0.051, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 PaiNN (wb)", "Table 3"]]}
+  - {key: aa-dpainn-gfn, model: aa-dpainn-gfn, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 3.4e-06, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (gfn)", "Table 3"], [MAE, Force, 1.5e-06, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (gfn)", "Table 3"]]}
+  - {key: aa-dpainn-wb, model: aa-dpainn-wb, material: aa, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.011, kcal/mol, "test energy MAE on aa: H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"], [MAE, Force, 0.027, kcal/mol/A, "test force MAE (component-wise) on aa: H2SO4-H2SO4 Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"]]}
+  - {key: ab-aimnet-gfn, model: ab-aimnet-gfn, material: ab, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.026, kcal/mol, "test energy MAE on ab: H2SO4-NH(CH3)2 AIMNet2 (gfn)", "Table 3"], [MAE, Force, 0.054, kcal/mol/A, "test force MAE (component-wise) on ab: H2SO4-NH(CH3)2 AIMNet2 (gfn)", "Table 3"]]}
+  - {key: ab-aimnet-wb, model: ab-aimnet-wb, material: ab, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.075, kcal/mol, "test energy MAE on ab: H2SO4-NH(CH3)2 AIMNet2 (wb)", "Table 3"], [MAE, Force, 0.102, kcal/mol/A, "test force MAE (component-wise) on ab: H2SO4-NH(CH3)2 AIMNet2 (wb)", "Table 3"]]}
+  - {key: ab-painn-gfn, model: ab-painn-gfn, material: ab, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.02, kcal/mol, "test energy MAE on ab: H2SO4-NH(CH3)2 PaiNN (gfn)", "Table 3"], [MAE, Force, 0.039, kcal/mol/A, "test force MAE (component-wise) on ab: H2SO4-NH(CH3)2 PaiNN (gfn)", "Table 3"]]}
+  - {key: ab-painn-wb, model: ab-painn-wb, material: ab, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.032, kcal/mol, "test energy MAE on ab: H2SO4-NH(CH3)2 PaiNN (wb)", "Table 3"], [MAE, Force, 0.062, kcal/mol/A, "test force MAE (component-wise) on ab: H2SO4-NH(CH3)2 PaiNN (wb)", "Table 3"]]}
+  - {key: ab-dpainn-wb, model: ab-dpainn-wb, material: ab, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.016, kcal/mol, "test energy MAE on ab: H2SO4-NH(CH3)2 Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"], [MAE, Force, 0.038, kcal/mol/A, "test force MAE (component-wise) on ab: H2SO4-NH(CH3)2 Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"]]}
+  - {key: ai-aimnet-gfn, model: ai-aimnet-gfn, material: ai, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.02, kcal/mol, "test energy MAE on ai: H2SO4-HSO4- AIMNet2 (gfn)", "Table 3"], [MAE, Force, 0.036, kcal/mol/A, "test force MAE (component-wise) on ai: H2SO4-HSO4- AIMNet2 (gfn)", "Table 3"]]}
+  - {key: ai-aimnet-wb, model: ai-aimnet-wb, material: ai, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.109, kcal/mol, "test energy MAE on ai: H2SO4-HSO4- AIMNet2 (wb)", "Table 3"], [MAE, Force, 0.092, kcal/mol/A, "test force MAE (component-wise) on ai: H2SO4-HSO4- AIMNet2 (wb)", "Table 3"]]}
+  - {key: ai-painn-gfn, model: ai-painn-gfn, material: ai, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.233, kcal/mol, "test energy MAE on ai: H2SO4-HSO4- PaiNN (gfn)", "Table 3"], [MAE, Force, 0.2, kcal/mol/A, "test force MAE (component-wise) on ai: H2SO4-HSO4- PaiNN (gfn)", "Table 3"]]}
+  - {key: ai-painn-wb, model: ai-painn-wb, material: ai, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.417, kcal/mol, "test energy MAE on ai: H2SO4-HSO4- PaiNN (wb)", "Table 3"], [MAE, Force, 0.241, kcal/mol/A, "test force MAE (component-wise) on ai: H2SO4-HSO4- PaiNN (wb)", "Table 3"]]}
+  - {key: ai-dpainn-wb, model: ai-dpainn-wb, material: ai, role: test, eval_data: {label: "Independent test set (about 2,000 structures) at the training level of theory", location: "Table 3"}, metrics: [[MAE, Energy, 0.037, kcal/mol, "test energy MAE on ai: H2SO4-HSO4- Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"], [MAE, Force, 0.054, kcal/mol/A, "test force MAE (component-wise) on ai: H2SO4-HSO4- Delta-PaiNN (GFN1-xTB baseline) (wb)", "Table 3"]]}
+resources: |
+  No timings are given in the encoded sections.
+gaps:
+  - "Table 3 energy MAEs are per structure in kcal/mol (Table 3 units read as kcal/mol). The Delta-PaiNN rows trained on GFN1-xTB are a sanity check (correction to the same level); Delta-PaiNN at GFN1-xTB was not trained for the two other systems."
+  - "PMF RMSEs (Table 4, at most 0.20 kcal/mol) and collision rate coefficients (Table 5) are properties; distance-resolved errors are figure-only (Fig. 2)."

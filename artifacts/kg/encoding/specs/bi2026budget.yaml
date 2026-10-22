@@ -1,0 +1,56 @@
+id: bi2026budget
+source:
+  rank: 456
+  year: "2026"
+  first_author: "Jia Bi"
+  title: "A budget-dependent crossover between coverage- and response-based training-set selection for machine-learned interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.05877"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2609.05877v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "46b46a2a5706f20482253cba5f8777c929d65fa77329fc54102dddcb2deb1e07"
+study_label: "Bi and Elena (2026): a budget-dependent crossover between coverage- and response-based training-set selection for MACE potentials"
+scope: |
+  Encoding scope: fixed 1,400-structure panels from the GAP-20 carbon
+  archive and pooled rMD17 (1,000 training, 200 validation, 200 test),
+  MACE models retrained on subsets chosen by Random, FPS/DPP coverage or
+  a response witness at 1, 5 and 20 % budgets, and the held-out mean
+  force-vector errors at the 20 % budget and for the full-data reference
+  (Table 2, 'Mean' endpoint; five-seed means). Absolute gaps, other
+  endpoints and the HEA25/MACE-MP-0 diagnostics are figure- or SI-level.
+materials:
+  carbon: {label: "Carbon structures of the GAP-20 archive (bulk and allotropes, liquid/amorphous, surfaces, defects, low-dimensional)", formula: "C", class: "Elemental solid and liquid carbon"}
+  rmd17: {label: "Ten small organic molecules of revised MD17", class: "Small organic molecules (MD trajectories)"}
+reference:
+  gap20: {type: DFT, comment: "Reference labels of the GAP-20 carbon archive (Refs. 14, 51)."}
+  rmd17ref: {type: DFT, xc: PBE, basis: "def2-SVP", comment: "rMD17 labels (Refs. 15, 52)."}
+datasets:
+  c-full: {label: "Carbon full data (1,000 training structures)", materials: [carbon], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 2.1"}, calc: gap20}
+  c-fps: {label: "Carbon FPS/DPP coverage selection, 20 % budget (200 structures)", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, n: {v: 200, loc: "Sec. 2.1"}, calc: gap20}
+  c-wit: {label: "Carbon response-witness selection, 20 % budget (200 structures)", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, n: {v: 200, loc: "Sec. 2.1"}, calc: gap20}
+  r-full: {label: "rMD17 full pooled panel (1,000 training frames)", materials: [rmd17], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 2.1"}, calc: rmd17ref}
+  r-fps: {label: "rMD17 FPS/DPP coverage selection, 20 % budget (200 frames)", materials: [rmd17], properties: [Energy, Forces], provenance: Augmented, n: {v: 200, loc: "Sec. 2.1"}, calc: rmd17ref}
+  r-wit: {label: "rMD17 response-witness selection, 20 % budget (200 frames)", materials: [rmd17], properties: [Energy, Forces], provenance: Augmented, n: {v: 200, loc: "Sec. 2.1"}, calc: rmd17ref}
+methods:
+  MACE:
+    impl: {lib: MACE}
+runs:
+  c-full: {label: "MACE trained on Carbon full data (1,000 training structures) (five training seeds)", method: MACE, dataset: c-full, model: "Carbon MACE c-full"}
+  c-fps: {label: "MACE trained on Carbon FPS/DPP coverage selection, 20 % budget (200 structures) (five training seeds)", method: MACE, dataset: c-fps, model: "Carbon MACE c-fps"}
+  c-wit: {label: "MACE trained on Carbon response-witness selection, 20 % budget (200 structures) (five training seeds)", method: MACE, dataset: c-wit, model: "Carbon MACE c-wit"}
+  r-full: {label: "MACE trained on rMD17 full pooled panel (1,000 training frames) (five training seeds)", method: MACE, dataset: r-full, model: "rMD17 MACE r-full"}
+  r-fps: {label: "MACE trained on rMD17 FPS/DPP coverage selection, 20 % budget (200 frames) (five training seeds)", method: MACE, dataset: r-fps, model: "rMD17 MACE r-fps"}
+  r-wit: {label: "MACE trained on rMD17 response-witness selection, 20 % budget (200 frames) (five training seeds)", method: MACE, dataset: r-wit, model: "rMD17 MACE r-wit"}
+results:
+  - {key: c-full-test, model: c-full, material: carbon, role: test, eval_data: {label: "Carbon held-out test set (200 structures), Mean endpoint", location: "Table 2"}, metrics: [[MAE, Force, 36.162, meV/A, "test force-vector MAE (Mean endpoint) on carbon: MACE c-full", "Table 2"]]}
+  - {key: c-fps-test, model: c-fps, material: carbon, role: test, eval_data: {label: "Carbon held-out test set (200 structures), Mean endpoint", location: "Table 2"}, metrics: [[MAE, Force, 36.38, meV/A, "test force-vector MAE (Mean endpoint) on carbon: MACE c-fps", "Table 2"]]}
+  - {key: c-wit-test, model: c-wit, material: carbon, role: test, eval_data: {label: "Carbon held-out test set (200 structures), Mean endpoint", location: "Table 2"}, metrics: [[MAE, Force, 36.214, meV/A, "test force-vector MAE (Mean endpoint) on carbon: MACE c-wit", "Table 2"]]}
+  - {key: r-full-test, model: r-full, material: rmd17, role: test, eval_data: {label: "rMD17 held-out test set (200 structures), Mean endpoint", registry: rMD17, location: "Table 2"}, metrics: [[MAE, Force, 22.519, meV/A, "test force-vector MAE (Mean endpoint) on rmd17: MACE r-full", "Table 2"]]}
+  - {key: r-fps-test, model: r-fps, material: rmd17, role: test, eval_data: {label: "rMD17 held-out test set (200 structures), Mean endpoint", registry: rMD17, location: "Table 2"}, metrics: [[MAE, Force, 22.659, meV/A, "test force-vector MAE (Mean endpoint) on rmd17: MACE r-fps", "Table 2"]]}
+  - {key: r-wit-test, model: r-wit, material: rmd17, role: test, eval_data: {label: "rMD17 held-out test set (200 structures), Mean endpoint", registry: rMD17, location: "Table 2"}, metrics: [[MAE, Force, 22.495, meV/A, "test force-vector MAE (Mean endpoint) on rmd17: MACE r-wit", "Table 2"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The Mean endpoint is the arithmetic mean of per-atom force-vector error norms (a vector MAE), averaged over five seeds. The validation-selected stratum and high-force tail endpoints (also means) and the high-novelty RMS endpoint of Table 2, the 1 % and 5 % budgets and the Random selector are not encoded."
+  - "Absolute-gap percentages (Table 1, Fig. 2), HEA25 energy-residual diagnostics and frozen MACE-MP-0 force errors (Supplementary Tables S1-S4) are not encoded."
