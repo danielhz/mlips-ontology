@@ -1,0 +1,52 @@
+id: elena2025
+source:
+  rank: 361
+  year: "2025"
+  first_author: "Alin M. Elena"
+  title: "Machine learned potential for high-throughput phonon calculations of metal—organic frameworks"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01611-8"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2412.02877v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5eedc29bbed25526a4504c26bf970deaaa6a4d813df0025a973911bfb5e6a7da"
+study_label: "Elena et al. (2025): MACE-MP-MOF0, a fine-tuned MACE-MP-0b for high-throughput phonon calculations of metal-organic frameworks"
+scope: |
+  Encoding scope: the curated PBE-D3(BJ) data set of 127 MOFs (MD
+  frames, equation-of-state strains and optimisation trajectories
+  selected by farthest-point sampling; 4,764 DFT points, 85/7.5/7.5 %),
+  the two multi-head fine-tunes of MACE-MP-0b (MACE-MP-MOF0 with a
+  random split, MACE-MP-MOF0-v2 with an FPS split; 2,500 epochs), their
+  test RMSDs (Table 3) and the out-of-sample RMSDs on 70 QMOF MOFs
+  together with MACE-MP-0b (Table 4). Lattice parameters, phonons, bulk
+  moduli and thermal expansion are properties.
+materials:
+  mof: {label: "Metal-organic frameworks (19 prototypical MOFs plus 108 QMOF structures; 24 elements; mostly closed-shell metals)", class: "Metal-organic frameworks"}
+  qmof70: {label: "70 diverse QMOF metal-organic frameworks unseen in training", class: "Metal-organic frameworks"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, comment: "PBE-D3(BJ), MPtrj-compatible settings (PAW 54), EDIFF 1e-5, EDIFFG -0.02 eV/A, atomate2 (Sec. 4.1)."}
+sampling:
+  fps: {label: "NPT MD with MACE-MP-0b+D3, equation-of-state strains (-10 % to +10 %) and geometry-optimisation trajectories, frames selected by farthest-point sampling in MACE descriptor space"}
+datasets:
+  mof: {label: "Curated MOF fine-tuning data (127 MOFs, 4,764 DFT points; 85 % train, 7.5 % validation, 7.5 % test)", materials: [mof], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 4764, loc: "Sec. 2.1"}, calc: pbed3, sampling: [fps]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures, learningRate, batchSize, numEpochs]
+    loss: "Energy, force and stress weights 1:10:100; multi-head fine-tuning with an MPtrj replay head (FPS-selected MPtrj configurations)"
+    impl: {lib: MACE, comment: "MACE >= 0.3.7 multi-head fine-tuning"}
+    sims: [GeometryOptimization, PhononCalculation]
+runs:
+  mp0b: {label: "MACE-MP-0b as distributed (release size not stated)", method: MACE, model: "MACE-MP-0b"}
+  mof0: {label: "MACE-MP-MOF0: MACE-MP-0b fine-tuned on the curated MOF data (random split)", method: MACE, dataset: mof, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 4.2"}, numLayers: {v: 2, loc: "Sec. 4.2"}, numFeatures: {v: 128, loc: "Sec. 4.2 (128x0e+128x1o)"}, learningRate: {v: 0.005, loc: "Sec. 4.2"}, batchSize: {v: 8, loc: "Sec. 4.2"}, numEpochs: {v: 2500, loc: "Sec. 4.2"}}, model: "MACE-MP-MOF0", base_model: {run: mp0b, relation: fine-tuned, location: "Sec. 4.2"}, trainingHardware: "16 NVIDIA A100 (40 GiB) GPUs"}
+  mof0-v2: {label: "MACE-MP-MOF0-v2: MACE-MP-0b fine-tuned on the curated MOF data (farthest-point-sampling split)", method: MACE, dataset: mof, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 4.2"}, numLayers: {v: 2, loc: "Sec. 4.2"}, numFeatures: {v: 128, loc: "Sec. 4.2 (128x0e+128x1o)"}, learningRate: {v: 0.005, loc: "Sec. 4.2"}, batchSize: {v: 8, loc: "Sec. 4.2"}, numEpochs: {v: 2500, loc: "Sec. 4.2"}}, model: "MACE-MP-MOF0-v2", base_model: {run: mp0b, relation: fine-tuned, location: "Sec. 4.2"}, trainingHardware: "16 NVIDIA A100 (40 GiB) GPUs"}
+results:
+  - {key: mof0-test, model: mof0, material: mof, role: test, eval_data: {label: "Test split of the curated MOF data (7.5 %; random for MOF0, FPS for MOF0-v2)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.132, eV, "test energy RMSD per structure on mof: MACE-MP-MOF0", "Table 3"], [RMSE, Energy, 1.4, meV/atom, "test energy RMSD per atom on mof: MACE-MP-MOF0", "Table 3"], [RMSE, Force, 0.014, eV/A, "test force RMSD on mof: MACE-MP-MOF0", "Table 3"], [RMSE, Stress, 0.2, null, "test stress RMSD on mof in meV/A3: MACE-MP-MOF0", "Table 3"]]}
+  - {key: mof0-v2-test, model: mof0-v2, material: mof, role: test, eval_data: {label: "Test split of the curated MOF data (7.5 %; random for MOF0, FPS for MOF0-v2)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.163, eV, "test energy RMSD per structure on mof: MACE-MP-MOF0-v2", "Table 3"], [RMSE, Energy, 3.6, meV/atom, "test energy RMSD per atom on mof: MACE-MP-MOF0-v2", "Table 3"], [RMSE, Force, 0.029, eV/A, "test force RMSD on mof: MACE-MP-MOF0-v2", "Table 3"], [RMSE, Stress, 0.3, null, "test stress RMSD on mof in meV/A3: MACE-MP-MOF0-v2", "Table 3"]]}
+  - {key: mof0-qmof70, model: mof0, material: qmof70, role: external, eval_data: {label: "70 out-of-sample QMOF MOFs (DFT)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.773, eV, "external energy RMSD per structure on qmof70: MACE-MP-MOF0", "Table 4"], [RMSE, Energy, 12, meV/atom, "external energy RMSD per atom on qmof70: MACE-MP-MOF0", "Table 4"], [RMSE, Force, 0.146, eV/A, "external force RMSD on qmof70: MACE-MP-MOF0", "Table 4"], [RMSE, Stress, 1.1, null, "external stress RMSD on qmof70 in meV/A3: MACE-MP-MOF0", "Table 4"]]}
+  - {key: mof0-v2-qmof70, model: mof0-v2, material: qmof70, role: external, eval_data: {label: "70 out-of-sample QMOF MOFs (DFT)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.792, eV, "external energy RMSD per structure on qmof70: MACE-MP-MOF0-v2", "Table 4"], [RMSE, Energy, 10, meV/atom, "external energy RMSD per atom on qmof70: MACE-MP-MOF0-v2", "Table 4"], [RMSE, Force, 0.171, eV/A, "external force RMSD on qmof70: MACE-MP-MOF0-v2", "Table 4"], [RMSE, Stress, 1.4, null, "external stress RMSD on qmof70 in meV/A3: MACE-MP-MOF0-v2", "Table 4"]]}
+  - {key: mp0b-qmof70, model: mp0b, material: qmof70, role: external, eval_data: {label: "70 out-of-sample QMOF MOFs (DFT)", location: "Table 4"}, metrics: [[RMSE, Energy, 3.543, eV, "external energy RMSD per structure on qmof70: MACE-MP-0b", "Table 4"], [RMSE, Energy, 53, meV/atom, "external energy RMSD per atom on qmof70: MACE-MP-0b", "Table 4"], [RMSE, Force, 0.2, eV/A, "external force RMSD on qmof70: MACE-MP-0b", "Table 4"], [RMSE, Stress, 1.7, null, "external stress RMSD on qmof70 in meV/A3: MACE-MP-0b", "Table 4"]]}
+resources: |
+  Fine-tuning ran on 16 NVIDIA A100 (40 GiB) GPUs; no durations are given.
+gaps:
+  - "The tables report root-mean-square deviations (RMSDs) of predictions from DFT, encoded as RMSE. Stress RMSDs are in meV/A3 (no schema unit; recorded with unit null). Training and validation errors are in the SI figures."
+  - "Element-wise energy MAEs on QMOF (0.016 eV/atom for MACE-MP-MOF0-v2, MACE-MP-0b 80 % larger) are summary statements over a figure in the SI; lattice-parameter, phonon-frequency, bulk-modulus, CTE and fractional-position deviations (Tables 2, 5-7) are properties."

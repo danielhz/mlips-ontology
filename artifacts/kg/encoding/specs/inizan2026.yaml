@@ -1,0 +1,74 @@
+id: inizan2026
+source:
+  rank: 354
+  year: "2026"
+  first_author: "Théo Jaffrelot Inizan"
+  title: "uMOF: A Universal Database, Benchmark, and Machine Learning Interatomic Potentials for Metal-Organic Frameworks"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2608.28100"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2608.28100v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0868d94d469f3a07bd4a152da09999d78369d88906c29938ef508ef63d376d1f"
+study_label: "Inizan et al. (2026): uMOF, an r2SCAN-D4 data set, experimental benchmark and fine-tuned MACE potentials for metal-organic frameworks"
+scope: |
+  Encoding scope: the uMOF r2SCAN-D4 data set (h5_mof, 85,524
+  configurations of 19,950 MOFs, 79 elements; 68,394 / 8,470 / 8,660
+  train / validation / test frames), the two fine-tuned models uMOF-MH
+  (from the r2SCAN head of MACE-MH-1) and uMOF-POLAR (from
+  MACE-POLAR-1-M) with their held-out validation RMSEs (Table 3), the
+  Cu-MOF MD ablation (Tables 4 and 5), and the foundation baselines
+  MACE-MH-1, MACE-POLAR-1-M and MACE-MP-MOF0-v2. The literature-mined
+  experimental benchmark (3,986 property records) and the Tier-1 to
+  Tier-3 property errors are properties, not energy/force errors.
+materials:
+  mof: {label: "Metal-organic frameworks (QMOF and ~90 named experimental MOFs), empty and loaded with six gas adsorbates, plus isolated atoms and molecules", class: "Metal-organic frameworks"}
+reference:
+  r2scand4: {type: DFT, code: VASP, xc: {local: "r2SCAN-D4"}, pp: PAW, cutoff: 680, comment: "VASP 6.4.2 via atomate2 (MatPES meta-GGA static settings), EDIFF 1e-5, LREAL False, spin polarization only for open-shell metals (Sec. 2.1.1)."}
+sampling:
+  noise: {label: "Gaussian-noise perturbations of QMOF structures (sigma about 0.06 A), relaxation and equation-of-state trajectories, finite-temperature MD (Cu-MOF, temperature-sampled and empty-framework sets), adsorbate-loaded frameworks"}
+datasets:
+  umof: {label: "uMOF h5_mof (r2SCAN-D4; 68,394 train / 8,470 validation / 8,660 test frames)", materials: [mof], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 85524, loc: "Table 1"}, calc: r2scand4, sampling: [noise]}
+  umof-nocu: {label: "uMOF h5_mof training frames without the Cu-MOF MD subset (ablation)", materials: [mof], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 67248, loc: "Table 4"}, calc: r2scand4, sampling: [noise]}
+methods:
+  MACE:
+    loss: "Two stages with stochastic weight averaging; force/stress-weighted second stage; replay head of the foundation training kept"
+    impl: {lib: MACE}
+    sims: [GeometryOptimization, PhononCalculation, MolecularDynamics, MonteCarlo]
+  MACE-POLAR:
+    sims: [GeometryOptimization, PhononCalculation, MolecularDynamics, MonteCarlo]
+runs:
+  mace-mh1: {label: "MACE-MH-1 as distributed (r2SCAN MatPES head)", method: MACE, model: "mace-mh-1"}
+  umof-mh: {label: "uMOF-MH: MACE-MH-1 r2SCAN head fine-tuned on uMOF (r2SCAN-D4)", method: MACE, dataset: umof, model: "uMOF-MH", base_model: {run: mace-mh1, relation: fine-tuned, location: "Sec. 3; Table 3"}}
+  mace-polar: {label: "MACE-POLAR-1-M as distributed (OMol, wB97M-V)", method: MACE-POLAR, model: "MACE-POLAR-1-M"}
+  umof-polar: {label: "uMOF-POLAR: MACE-POLAR-1-M fine-tuned on uMOF (r2SCAN-D4)", method: MACE-POLAR, dataset: umof, model: "uMOF-POLAR", base_model: {run: mace-polar, relation: fine-tuned, location: "Sec. 3; Table 3"}}
+  mof0: {label: "MACE-MP-MOF0 v2 as distributed (PBE+D3(BJ) MOF fine-tune of MACE-MP-0b)", method: MACE, model: "MACE-MP-MOF0-v2", base_model: {label: "MACE-MP-0b", relation: fine-tuned, location: "Sec. 3; Table 3"}}
+  abl-with: {label: "MD ablation: MACE-MH-1 fine-tune with the Cu-MOF MD subset", method: MACE, dataset: umof, model: "uMOF-MH ablation, with Cu-MOF MD", base_model: {run: mace-mh1, relation: fine-tuned, location: "Table 4"}}
+  abl-without: {label: "MD ablation: identical MACE-MH-1 fine-tune without the Cu-MOF MD subset", method: MACE, dataset: umof-nocu, model: "uMOF-MH ablation, without Cu-MOF MD", base_model: {run: mace-mh1, relation: fine-tuned, location: "Table 4"}}
+results:
+  - {key: umof-mh-val, model: umof-mh, material: mof, role: validation, eval_data: {label: "uMOF h5_mof validation split (8,470 frames), best epoch, r2SCAN-D4 head", location: "Table 3"}, metrics: [[RMSE, Energy, 33.2, meV/atom, "validation energy RMSE on mof: uMOF-MH", "Table 3"], [RMSE, Force, 0.066, eV/A, "validation force RMSE on mof: uMOF-MH", "Table 3"]]}
+  - {key: umof-polar-val, model: umof-polar, material: mof, role: validation, eval_data: {label: "uMOF h5_mof validation split (8,470 frames), best epoch, r2SCAN-D4 head", location: "Table 3"}, metrics: [[RMSE, Energy, 39.4, meV/atom, "validation energy RMSE on mof: uMOF-POLAR", "Table 3"], [RMSE, Force, 0.211, eV/A, "validation force RMSE on mof: uMOF-POLAR", "Table 3"]]}
+  - {key: abl-with-val, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF h5_mof validation split (8,470 frames), final model after SWA", location: "Table 4"}, metrics: [[RMSE, Energy, 37.3, meV/atom, "validation energy RMSE on mof: uMOF-MH ablation, with Cu-MOF MD", "Table 4"], [RMSE, Force, 0.081, eV/A, "validation force RMSE on mof (final): uMOF-MH ablation, with Cu-MOF MD", "Table 4"]]}
+  - {key: abl-with-qmof-noise, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type QMOF Gaussian noise (single-point) (5967)", location: "Table 5"}, metrics: [[RMSE, Force, 0.09, eV/A, "validation force RMSE on qmof-noise frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-md-cu, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type MD (Cu-MOF) (143)", location: "Table 5"}, metrics: [[RMSE, Force, 0.074, eV/A, "validation force RMSE on md-cu frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-eos, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Equation of state (116)", location: "Table 5"}, metrics: [[RMSE, Force, 0.065, eV/A, "validation force RMSE on eos frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-geo, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Geometry optimization (1253)", location: "Table 5"}, metrics: [[RMSE, Force, 0.054, eV/A, "validation force RMSE on geo frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-mof0, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type MOF0-derived (301)", location: "Table 5"}, metrics: [[RMSE, Force, 0.04, eV/A, "validation force RMSE on mof0 frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-ads, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Adsorbate-loaded (547)", location: "Table 5"}, metrics: [[RMSE, Force, 0.025, eV/A, "validation force RMSE on ads frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-empty, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Empty frameworks (71)", location: "Table 5"}, metrics: [[RMSE, Force, 0.02, eV/A, "validation force RMSE on empty frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-with-mol, model: abl-with, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Isolated molecules (72)", location: "Table 5"}, metrics: [[RMSE, Force, 0.012, eV/A, "validation force RMSE on mol frames: uMOF-MH ablation, with Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-val, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF h5_mof validation split (8,470 frames), final model after SWA", location: "Table 4"}, metrics: [[RMSE, Energy, 38.5, meV/atom, "validation energy RMSE on mof: uMOF-MH ablation, without Cu-MOF MD", "Table 4"], [RMSE, Force, 0.101, eV/A, "validation force RMSE on mof (final): uMOF-MH ablation, without Cu-MOF MD", "Table 4"]]}
+  - {key: abl-without-qmof-noise, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type QMOF Gaussian noise (single-point) (5967)", location: "Table 5"}, metrics: [[RMSE, Force, 0.113, eV/A, "validation force RMSE on qmof-noise frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-md-cu, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type MD (Cu-MOF) (143)", location: "Table 5"}, metrics: [[RMSE, Force, 0.112, eV/A, "validation force RMSE on md-cu frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-eos, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Equation of state (116)", location: "Table 5"}, metrics: [[RMSE, Force, 0.068, eV/A, "validation force RMSE on eos frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-geo, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Geometry optimization (1253)", location: "Table 5"}, metrics: [[RMSE, Force, 0.055, eV/A, "validation force RMSE on geo frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-mof0, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type MOF0-derived (301)", location: "Table 5"}, metrics: [[RMSE, Force, 0.041, eV/A, "validation force RMSE on mof0 frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-ads, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Adsorbate-loaded (547)", location: "Table 5"}, metrics: [[RMSE, Force, 0.026, eV/A, "validation force RMSE on ads frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-empty, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Empty frameworks (71)", location: "Table 5"}, metrics: [[RMSE, Force, 0.021, eV/A, "validation force RMSE on empty frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+  - {key: abl-without-mol, model: abl-without, material: mof, role: validation, eval_data: {label: "uMOF validation frames of type Isolated molecules (72)", location: "Table 5"}, metrics: [[RMSE, Force, 0.021, eV/A, "validation force RMSE on mol frames: uMOF-MH ablation, without Cu-MOF MD", "Table 5"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "Pre-SWA force RMSEs of the ablation (0.081 eV/A for both runs; Table 4) are intermediate checkpoints and are not encoded. The ablation 'with Cu-MOF MD' model has different validation errors from uMOF-MH in Table 3 (37.3 vs 33.2 meV/atom), so it is kept as a separate run."
+  - "The h5_mofgen augmentation set (37,732 train and 4,192 validation frames from MOFGen structures) degraded downstream accuracy and is not in the released models; it is not encoded as a training set."
+  - "Bulk-modulus MAEs, Cv errors, imaginary-mode fractions and INS Wasserstein distances (Table 6) and CO2/N2/CH4/H2 adsorption-enthalpy errors (Fig. 2, including UMA-ODAC and MACE-DAC) are properties; the adsorption MAE of about 4 kJ/mol is approximate and figure-based."

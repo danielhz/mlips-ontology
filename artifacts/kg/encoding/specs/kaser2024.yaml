@@ -1,0 +1,52 @@
+id: kaser2024
+source:
+  rank: 358
+  year: "2024"
+  first_author: "Silvan Käser"
+  title: "Numerical Accuracy Matters: Applications of Machine Learned Potential Energy Surfaces"
+  venue: "The Journal of Physical Chemistry Letters"
+  doi: "10.1021/acs.jpclett.3c03405"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2311.17398v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ae4edd229f17d3af715e81e2c6b310a47c1da659fa9ef0b76de413ef3d4c4833"
+study_label: "Käser and Meuwly (2024): numerical accuracy matters, single- versus double-precision PhysNet PESs for formaldehyde and malonaldehyde"
+scope: |
+  Encoding scope: four PhysNet PESs for H2CO (two trained in 32-bit and
+  two in 64-bit arithmetic, on two different splits of 3,601 MP2
+  structures) with the test MAEs and RMSEs of Table 1, and the 32- and
+  64-bit malonaldehyde PESs transfer-learned from MP2 to CCSD(T). Harmonic
+  and VPT2 frequencies and tunnelling splittings are properties.
+materials:
+  h2co: {label: "Formaldehyde (H2CO), normal-mode-sampled structures", formula: "H2CO", class: "Small organic molecule (gas phase)"}
+  mal: {label: "Malonaldehyde (H-transfer)", formula: "C3H4O2", class: "Small organic molecule (gas phase)"}
+reference:
+  mp2: {type: WF, wf: MP2, basis: "aug-cc-pVTZ", comment: "Energies, forces and dipoles (Ref. 13 for H2CO; Ref. 16 for malonaldehyde low level)."}
+  ccsdt: {type: WF, wf: CCSDT, basis: "aug-cc-pVTZ", comment: "Malonaldehyde high-level data (862 configurations, Ref. 16)."}
+datasets:
+  h2co: {label: "H2CO MP2/aug-cc-pVTZ data (3,601 normal-mode-sampled structures; 3,061/360/180 split)", materials: [h2co], properties: [Energy, Forces], provenance: Published, n: {v: 3601, loc: "p. 3"}, calc: mp2}
+  mal-ll: {label: "Malonaldehyde MP2/aug-cc-pVTZ data (about 70,000 points)", materials: [mal], properties: [Energy, Forces], provenance: Published, calc: mp2}
+  mal-hl: {label: "Malonaldehyde CCSD(T)/aug-cc-pVTZ transfer-learning data", materials: [mal], properties: [Energy, Forces], provenance: Published, n: {v: 862, loc: "p. 3"}, calc: ccsdt}
+methods:
+  PhysNet:
+    hp: [learningRate, batchSize]
+    algorithm: "Adam"
+    sims: [GeometryOptimization]
+runs:
+  nnf32-1: {label: "PhysNet H2CO PES, 32-bit training and evaluation, split 1", method: PhysNet, dataset: h2co, settings: {learningRate: {v: 1.0e-3, loc: "p. 3"}, batchSize: {v: 32, loc: "p. 3"}}, model: "H2CO PhysNet NN1 F32"}
+  nnf32-2: {label: "PhysNet H2CO PES, 32-bit training and evaluation, split 2", method: PhysNet, dataset: h2co, settings: {learningRate: {v: 1.0e-3, loc: "p. 3"}, batchSize: {v: 32, loc: "p. 3"}}, model: "H2CO PhysNet NN2 F32"}
+  nnf64-1: {label: "PhysNet H2CO PES, 64-bit training and evaluation, split 1", method: PhysNet, dataset: h2co, settings: {learningRate: {v: 1.0e-3, loc: "p. 3"}, batchSize: {v: 32, loc: "p. 3"}}, model: "H2CO PhysNet NN1 F64"}
+  nnf64-2: {label: "PhysNet H2CO PES, 64-bit training and evaluation, split 2", method: PhysNet, dataset: h2co, settings: {learningRate: {v: 1.0e-3, loc: "p. 3"}, batchSize: {v: 32, loc: "p. 3"}}, model: "H2CO PhysNet NN2 F64"}
+  mal-ll-32: {label: "PhysNet malonaldehyde PES at MP2 (32-bit)", method: PhysNet, dataset: mal-ll, model: "malonaldehyde PhysNet MP2 F32"}
+  mal-tl-32: {label: "PhysNet malonaldehyde PES transfer-learned to CCSD(T) (32-bit)", method: PhysNet, dataset: mal-hl, model: "malonaldehyde PhysNet TL CCSD(T) F32", base_model: {run: mal-ll-32, relation: fine-tuned, location: "p. 3"}}
+  mal-ll-64: {label: "PhysNet malonaldehyde PES at MP2 (64-bit)", method: PhysNet, dataset: mal-ll, model: "malonaldehyde PhysNet MP2 F64"}
+  mal-tl-64: {label: "PhysNet malonaldehyde PES transfer-learned to CCSD(T) (64-bit)", method: PhysNet, dataset: mal-hl, model: "malonaldehyde PhysNet TL CCSD(T) F64", base_model: {run: mal-ll-64, relation: fine-tuned, location: "p. 3"}}
+results:
+  - {key: nnf32-1-test, model: nnf32-1, material: h2co, role: test, eval_data: {label: "H2CO test split (180 structures)", location: "p. 3"}, metrics: [[MAE, Energy, 0.0072, kcal/mol, "test energy MAE on h2co: H2CO PhysNet NN1 F32", "Table 1"], [RMSE, Energy, 0.0072, kcal/mol, "test energy RMSE on h2co: H2CO PhysNet NN1 F32", "Table 1"], [MAE, Force, 0.0014, kcal/mol/A, "test force MAE on h2co: H2CO PhysNet NN1 F32", "Table 1"], [RMSE, Force, 0.0037, kcal/mol/A, "test force RMSE on h2co: H2CO PhysNet NN1 F32", "Table 1"]]}
+  - {key: nnf32-2-test, model: nnf32-2, material: h2co, role: test, eval_data: {label: "H2CO test split (180 structures)", location: "p. 3"}, metrics: [[MAE, Energy, 0.0013, kcal/mol, "test energy MAE on h2co: H2CO PhysNet NN2 F32", "Table 1"], [RMSE, Energy, 0.0013, kcal/mol, "test energy RMSE on h2co: H2CO PhysNet NN2 F32", "Table 1"], [MAE, Force, 0.0014, kcal/mol/A, "test force MAE on h2co: H2CO PhysNet NN2 F32", "Table 1"], [RMSE, Force, 0.0034, kcal/mol/A, "test force RMSE on h2co: H2CO PhysNet NN2 F32", "Table 1"]]}
+  - {key: nnf64-1-test, model: nnf64-1, material: h2co, role: test, eval_data: {label: "H2CO test split (180 structures)", location: "p. 3"}, metrics: [[MAE, Energy, 1.6e-05, kcal/mol, "test energy MAE on h2co: H2CO PhysNet NN1 F64", "Table 1"], [RMSE, Energy, 4.6e-05, kcal/mol, "test energy RMSE on h2co: H2CO PhysNet NN1 F64", "Table 1"], [MAE, Force, 0.0005, kcal/mol/A, "test force MAE on h2co: H2CO PhysNet NN1 F64", "Table 1"], [RMSE, Force, 0.003, kcal/mol/A, "test force RMSE on h2co: H2CO PhysNet NN1 F64", "Table 1"]]}
+  - {key: nnf64-2-test, model: nnf64-2, material: h2co, role: test, eval_data: {label: "H2CO test split (180 structures)", location: "p. 3"}, metrics: [[MAE, Energy, 1e-05, kcal/mol, "test energy MAE on h2co: H2CO PhysNet NN2 F64", "Table 1"], [RMSE, Energy, 1.5e-05, kcal/mol, "test energy RMSE on h2co: H2CO PhysNet NN2 F64", "Table 1"], [MAE, Force, 0.00028, kcal/mol/A, "test force MAE on h2co: H2CO PhysNet NN2 F64", "Table 1"], [RMSE, Force, 0.0006, kcal/mol/A, "test force RMSE on h2co: H2CO PhysNet NN2 F64", "Table 1"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "No energy or force errors are given for the malonaldehyde PESs. Harmonic and VPT2 frequency deviations (Table 2) and tunnelling-splitting correction factors (Table 3) are properties."

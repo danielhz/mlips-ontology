@@ -1,0 +1,51 @@
+id: tyagi2025
+source:
+  rank: 360
+  year: "2025"
+  first_author: "Viren Tyagi"
+  title: "Tracing Ion Migration in Halide Perovskites with Machine Learned Force Fields"
+  venue: "The Journal of Physical Chemistry Letters"
+  doi: "10.1021/acs.jpclett.5c01139"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.16051v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6c1e92d7a372e50cdcf47386357110a44a5e8c7db8b5bc7781d76929ac4fd482"
+study_label: "Tyagi et al. (2025): on-the-fly VASP MLFFs for charged iodide interstitials and vacancies in CsPbI3 and their migration"
+scope: |
+  Encoding scope: six VASP on-the-fly MLFFs (Bayesian on-the-fly
+  sampling from short AIMD at 600-750 K in 2x2x2 CsPbI3 supercells with
+  one iodide defect), one per defect charge state, trained on PBE-D3(BJ)
+  energies, forces and stresses, and used in 2 ns MD of 6x6x6 supercells
+  at 500-600 K. The force errors on 6x6x6 MD snapshots are given only as
+  an upper bound over all six models (gaps); migration barriers,
+  diffusion coefficients and activation energies are properties.
+materials:
+  cspbi3: {label: "Cubic CsPbI3 with one iodide interstitial or vacancy in charge states -1, 0, +1", formula: "CsPbI3", class: "Inorganic crystals"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "PBE-D3(BJ) without spin-orbit coupling (SI Notes 1, 4)."}
+sampling:
+  otf: {label: "VASP on-the-fly Bayesian selection of structures from short AIMD runs at 600-750 K (2x2x2 supercells)"}
+datasets:
+  ii-m: {label: "On-the-fly training structures for the iodide interstitial, charge -1 (I_I^-)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+  ii-0: {label: "On-the-fly training structures for the iodide interstitial, neutral (I_I^0)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+  ii-p: {label: "On-the-fly training structures for the iodide interstitial, charge +1 (I_I^+)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+  vi-m: {label: "On-the-fly training structures for the iodide vacancy, charge -1 (V_I^-)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+  vi-0: {label: "On-the-fly training structures for the iodide vacancy, neutral (V_I^0)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+  vi-p: {label: "On-the-fly training structures for the iodide vacancy, charge +1 (V_I^+)", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3, sampling: [otf]}
+methods:
+  VASP-MLFF:
+    impl: {lib: VASP}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  mlff-ii-m: {label: "VASP MLFF for CsPbI3 with an iodide interstitial, charge -1 (I_I^-)", method: VASP-MLFF, dataset: ii-m, model: "CsPbI3 MLFF ii-m"}
+  mlff-ii-0: {label: "VASP MLFF for CsPbI3 with an iodide interstitial, neutral (I_I^0)", method: VASP-MLFF, dataset: ii-0, model: "CsPbI3 MLFF ii-0"}
+  mlff-ii-p: {label: "VASP MLFF for CsPbI3 with an iodide interstitial, charge +1 (I_I^+)", method: VASP-MLFF, dataset: ii-p, model: "CsPbI3 MLFF ii-p"}
+  mlff-vi-m: {label: "VASP MLFF for CsPbI3 with an iodide vacancy, charge -1 (V_I^-)", method: VASP-MLFF, dataset: vi-m, model: "CsPbI3 MLFF vi-m"}
+  mlff-vi-0: {label: "VASP MLFF for CsPbI3 with an iodide vacancy, neutral (V_I^0)", method: VASP-MLFF, dataset: vi-0, model: "CsPbI3 MLFF vi-0"}
+  mlff-vi-p: {label: "VASP MLFF for CsPbI3 with an iodide vacancy, charge +1 (V_I^+)", method: VASP-MLFF, dataset: vi-p, model: "CsPbI3 MLFF vi-p"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Force errors on 600 K snapshots of 6x6x6 supercells are given only as bounds over all six MLFFs (MAE at most 54.83 meV/A, R2 above 0.94; near the defect at most 61.88 meV/A), so no per-model values are encoded; details are in SI Note 6."
+  - "MLFF vs DFT migration barriers (differences of about 0.1 eV, 0.22 eV for V_I^0; Fig. 1), diffusion coefficients and activation energies (Table 1) are properties."

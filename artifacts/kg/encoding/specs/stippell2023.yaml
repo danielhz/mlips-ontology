@@ -1,0 +1,51 @@
+id: stippell2023
+source:
+  rank: 359
+  year: "2023"
+  first_author: "Elizabeth Stippell"
+  title: "Building a DFT+U machine learning interatomic potential for uranium dioxide"
+  venue: "Artificial Intelligence Chemistry"
+  doi: "10.1016/j.aichem.2023.100042"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "cb6dcaa17c2d066967de1fc5572bd520e9a8daf83c420b43067d77371fc7ae13"
+study_label: "Stippell et al. (2023): active-learned ANI potential for UO2 at DFT, transfer-learned to DFT+U"
+scope: |
+  Encoding scope: the active-learning DFT (PBE) data set of 96-atom UO2
+  cells (query-by-committee over eight ANI models, MLIP-MD from about
+  6,500 classical-FF seed configurations; about 25k configurations after
+  removing about 400 metastable outliers), the reduced DFT+U data set
+  (about 2,000 configurations, U-J ramped to 3.99 eV), the eight-member
+  ANI ensemble trained on DFT (MLIP-DFT) and its transfer-learned DFT+U
+  version with layers 0 and 3 frozen (MLIP-DFT+U, TL(0,3)), with the
+  test RMSEs stated in the text. Thermophysical properties and defect
+  energies are properties.
+materials:
+  uo2: {label: "Uranium dioxide (fluorite UO2), bulk at 300-2500 K, strained and with point defects", formula: "UO2", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "2x2x2", comment: "96-atom supercells, ferromagnetic initial guess (Sec. 2.1)."}
+  pbeu: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "2x2x2", comment: "DFT+U with U ramped from 0.51 to 4.50 eV and J = 0.51 eV (U-J = 3.99 eV), antiferromagnetic initial guess (Sec. 2.2)."}
+sampling:
+  al: {label: "Active learning with MLIP-MD (ASE, Nose-Hoover, up to 1 ns) from about 6,500 classical-FF configurations; query by committee of eight ANI models (typical thresholds 4 kcal/mol and 1 kcal/mol/A)"}
+  reduce: {label: "Iterative data reduction selecting the hardest DFT configurations (about 8 % of the DFT set) for DFT+U"}
+datasets:
+  dft: {label: "UO2 PBE active-learning data set (about 25k configurations; 87.5/6.25/6.25 % train/validation/test per ensemble member)", materials: [uo2], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [al]}
+  dftu: {label: "UO2 DFT+U reduced data set (about 2,000 configurations)", materials: [uo2], properties: [Energy, Forces], provenance: InHouse, calc: pbeu, sampling: [reduce]}
+methods:
+  ANI:
+    hp: [learningRate, batchSize]
+    loss: "Energy and force weights 1 and 0.1, L2 regularisation 1e-6"
+    algorithm: "Adam with learning-rate annealing from 1e-3 to 1e-5, early stopping (patience 100 epochs)"
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  ani-dft: {label: "MLIP-DFT: ensemble of eight ANI models trained on the UO2 PBE data", method: ANI, dataset: dft, settings: {learningRate: {v: 0.001, loc: "Sec. 2.1 (initial)"}, batchSize: {v: 64, loc: "Sec. 2.1"}}, model: "UO2 ANI MLIP-DFT (8-member ensemble)"}
+  ani-dftu: {label: "MLIP-DFT+U: MLIP-DFT transfer-learned to DFT+U with layers 0 and 3 frozen, TL(0,3)", method: ANI, dataset: dftu, model: "UO2 ANI MLIP-DFT+U TL(0,3)", base_model: {run: ani-dft, relation: fine-tuned, location: "Sec. 2.2"}}
+results:
+  - {key: ani-dft-test, model: ani-dft, material: uo2, role: test, eval_data: {label: "Each ensemble member's random held-out 6.25 % of the DFT data (errors averaged over the eight members)", location: "Sec. 3; Fig. 2"}, metrics: [[RMSE, Energy, 0.05, null, "test energy RMSE on uo2 in kcal/mol per atom: UO2 ANI MLIP-DFT", "Sec. 3"], [RMSE, Force, 2.1, kcal/mol/A, "test force RMSE on uo2: UO2 ANI MLIP-DFT", "Sec. 3"]]}
+  - {key: ani-dftu-test, model: ani-dftu, material: uo2, role: test, eval_data: {label: "Each ensemble member's random held-out 6.25 % of the DFT+U data (errors averaged over the eight members)", location: "Sec. 3; Fig. 3"}, metrics: [[RMSE, Energy, 0.1, null, "test energy RMSE on uo2 in kcal/mol per atom: UO2 ANI MLIP-DFT+U", "Sec. 3"], [RMSE, Force, 8.8, kcal/mol/A, "test force RMSE on uo2: UO2 ANI MLIP-DFT+U", "Sec. 3"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Energy RMSEs are in kcal/mol per atom (no schema unit; recorded with unit null). MAEs are shown only in Figs. 2-3; other frozen-layer choices and the DFT+U model without transfer learning are in the SI (Tables S4-S5, Figs. S5, S9)."
+  - "Data-set sizes are given only approximately (about 25k and about 2,000), so they are not recorded as numbers. Lattice parameters, elastic constants, phonons, heat capacity, bulk modulus and defect energies (Tables 1-2, Fig. 4) are properties."

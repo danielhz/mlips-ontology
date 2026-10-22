@@ -1,0 +1,43 @@
+id: hattori2025
+source:
+  rank: 353
+  year: "2025"
+  first_author: "Shinnosuke Hattori"
+  title: "Beyond Scaling: Chemical Intuition as Emergent Ability of Universal Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2506.07579"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2506.07579v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c18431a76be240b4652331f6b7aacab891d75d625e9714e790a69fa489a69518"
+study_label: "Hattori et al. (2025): arXiv preprint of the E3D study on emergent bond-dissociation energies in edge-decomposed Allegro potentials"
+scope: |
+  Encoding scope: this is the arXiv preprint (2506.07579) of the study
+  published as hattori2026 (Nature Communications), which is encoded in
+  full. The preprint describes the same Allegro models (tensor sizes 32,
+  64, 128; lmax = 2; cutoff 5.2 A) trained on SPICE 2, MatPES and their
+  hybrid, and its Table 2 gives the same Transition1x activation- and
+  reaction-energy MAEs as Table 1 of the version of record. To avoid
+  counting the same results twice, the runs are recorded here and the
+  results only in hattori2026.
+materials:
+  molecules: {label: "Drug-like and small organic molecules (SPICE 2) and Transition1x reactions", class: "Organic molecules (gas phase)"}
+  inorganic: {label: "Inorganic structures of MatPES", class: "Inorganic crystals"}
+datasets:
+  spice2: {label: "SPICE 2", materials: [molecules], properties: [Energy, Forces], provenance: Published}
+  matpes: {label: "MatPES", materials: [inorganic], properties: [Energy, Forces], provenance: Published}
+  hybrid: {label: "Hybrid SPICE 2 + MatPES", materials: [molecules, inorganic], properties: [Energy, Forces], provenance: Augmented}
+methods:
+  Allegro:
+    hp: [numFeatures, cutoffRadius]
+runs:
+  spice2-64: {label: "Allegro (E3D, tensor size 64) trained on SPICE 2", method: Allegro, dataset: spice2, settings: {numFeatures: {v: 64, loc: "Sec. 2.2"}, cutoffRadius: {v: 5.2, loc: "Sec. 2.2"}}, model: "E3D Allegro SPICE 2, tensor 64 (preprint)"}
+  spice2-128: {label: "Allegro (E3D, tensor size 128) trained on SPICE 2", method: Allegro, dataset: spice2, settings: {numFeatures: {v: 128, loc: "Sec. 2.2"}, cutoffRadius: {v: 5.2, loc: "Sec. 2.2"}}, model: "E3D Allegro SPICE 2, tensor 128 (preprint)"}
+  hybrid-64: {label: "Allegro (E3D, tensor size 64) trained on hybrid SPICE 2 + MatPES", method: Allegro, dataset: hybrid, settings: {numFeatures: {v: 64, loc: "Sec. 2.2"}, cutoffRadius: {v: 5.2, loc: "Sec. 2.2"}}, model: "E3D Allegro hybrid, tensor 64 (preprint)"}
+  hybrid-128: {label: "Allegro (E3D, tensor size 128) trained on hybrid SPICE 2 + MatPES", method: Allegro, dataset: hybrid, settings: {numFeatures: {v: 128, loc: "Sec. 2.2"}, cutoffRadius: {v: 5.2, loc: "Sec. 2.2"}}, model: "E3D Allegro hybrid, tensor 128 (preprint)"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Table 2 (Ea MAE 0.61/0.58 eV and Delta-E MAE 0.31/0.33 eV for SPICE 2 with tensor 64/128; 0.49/0.44 and 0.27/0.25 eV for the hybrid) equals Table 1 of the version of record hattori2026, where these results are encoded; they are not repeated here. The models of the two versions are the same work but are separate nodes until a preprint-version link exists in the schema."
+  - "The level of theory of the training sets is not stated in the preprint's main text."

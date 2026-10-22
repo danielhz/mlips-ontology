@@ -1,0 +1,87 @@
+id: brunken2025
+source:
+  rank: 355
+  year: "2025"
+  first_author: "Christoph Brunken"
+  title: "Machine Learning Interatomic Potentials: library for efficient training, model development and simulation of molecular systems"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2505.22397"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2505.22397v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "bae2fccfd359a0351d2daf8b06b9f7bfe94ac07e2a63a19dfdadb8c7e4a9e227"
+study_label: "Brunken et al. (2025): the InstaDeep mlip library (JAX) for training and simulating MACE, NequIP and ViSNet potentials, with SPICE2 pre-trained models"
+scope: |
+  Encoding scope: the curated SPICE2 data set (filtered for bonding,
+  neutral charge and forces; 1,737,896 training and 87,922 validation
+  structures, 95:5 split by SMILES), the three pre-trained models
+  (MACE-large, NequIP, ViSNet; 220 epochs on H100 GPUs), the MACE-medium
+  comparison and the speed-optimised modified MACE, the MACE-medium model
+  on curated SPICE1, and the MD speed benchmarks of Tables 2 and 6.
+  Validation MAEs are shown only in Fig. 2 (gaps).
+materials:
+  mol: {label: "Drug-like molecules, dimers, amino acids, dipeptides and solvated systems of SPICE2; chignolin (1UAO) and alpha-bungarotoxin complex (1ABT) for speed tests", class: "Organic and biochemical molecules (C, N, O, H)"}
+reference:
+  spice: {type: DFT, xc: {local: "wB97M-D3(BJ)"}, basis: "def2-TZVPPD", comment: "SPICE2 level of theory."}
+datasets:
+  spice2: {label: "Curated SPICE2 (H-bond, neutral-charge and force filters; 95:5 split at SMILES level)", materials: [mol], properties: [Energy, Forces], provenance: Augmented, n: {v: 1737896, loc: "Sec. Model training methodology (training structures)"}, calc: spice}
+  spice1: {label: "Curated SPICE1", materials: [mol], properties: [Energy, Forces], provenance: Augmented, calc: spice}
+methods:
+  MACE:
+    hp: [numLayers, numFeatures, numRadialBasis, cutoffRadius, batchSize, learningRate, numEpochs]
+    loss: "MSE on energy and forces, weights 40 and 1000 flipped at epoch 115"
+    algorithm: "AMSGrad Adam, EMA 0.99, 4000 warm-up steps"
+    impl: {lib: {local: "mlip (InstaDeep, JAX)"}}
+    sims: [MolecularDynamics]
+  NequIP:
+    hp: [numLayers, numRadialBasis, cutoffRadius, batchSize, learningRate, numEpochs]
+    loss: "Huber loss on energy and forces"
+    impl: {lib: {local: "mlip (InstaDeep, JAX)"}}
+    sims: [MolecularDynamics]
+  ViSNet:
+    hp: [numLayers, numFeatures, numRadialBasis, cutoffRadius, batchSize, learningRate, numEpochs]
+    loss: "Huber loss on energy and forces"
+    impl: {lib: {local: "mlip (InstaDeep, JAX)"}}
+    sims: [MolecularDynamics]
+runs:
+  mace-large: {label: "MACE-large pre-trained on curated SPICE2 (2 layers, 128 channels, correlation 2, node symmetry 3; 2,139,152 parameters)", method: MACE, dataset: spice2, settings: {numLayers: {v: 2, loc: "Table 5"}, numFeatures: {v: 128, loc: "Table 5"}, numRadialBasis: {v: 8, loc: "Table 5"}, cutoffRadius: {v: 5, loc: "Table 5"}, batchSize: {v: 64, loc: "Table 5"}, learningRate: {v: 0.01, loc: "Table 5"}, numEpochs: {v: 220, loc: "App. A"}}, model: "mlip MACE-large SPICE2", trainingHardware: "NVIDIA H100 GPUs"}
+  nequip: {label: "NequIP pre-trained on curated SPICE2 (5 layers, lmax 2; 1,327,792 parameters)", method: NequIP, dataset: spice2, settings: {numLayers: {v: 5, loc: "Table 3"}, numRadialBasis: {v: 8, loc: "Table 3"}, cutoffRadius: {v: 5, loc: "Table 3"}, batchSize: {v: 16, loc: "Table 3"}, learningRate: {v: 0.002, loc: "Table 3"}, numEpochs: {v: 220, loc: "App. A"}}, model: "mlip NequIP SPICE2", trainingHardware: "NVIDIA H100 GPUs"}
+  visnet: {label: "ViSNet pre-trained on curated SPICE2 (4 layers, 128 channels, 8 heads, 32 RBF, lmax 2; 1,137,922 parameters)", method: ViSNet, dataset: spice2, settings: {numLayers: {v: 4, loc: "Table 4"}, numFeatures: {v: 128, loc: "Table 4"}, numRadialBasis: {v: 32, loc: "Table 4"}, cutoffRadius: {v: 5, loc: "Table 4"}, batchSize: {v: 16, loc: "Table 4"}, learningRate: {v: 0.0001, loc: "Table 4"}, numEpochs: {v: 220, loc: "App. A"}}, model: "mlip ViSNet SPICE2", trainingHardware: "NVIDIA H100 GPUs"}
+  mace-medium: {label: "MACE-medium (MACE-OFF medium hyperparameters) trained on curated SPICE2", method: MACE, dataset: spice2, model: "mlip MACE-medium SPICE2"}
+  mace-mod: {label: "Modified MACE (gated symmetric-contraction scalars and species-pair edge weights; 2,203,504 parameters) trained on curated SPICE2", method: MACE, dataset: spice2, model: "mlip modified MACE SPICE2"}
+  mace-medium-s1: {label: "MACE-medium (MACE-OFF medium hyperparameters) trained on curated SPICE1 (1,911,568 parameters)", method: MACE, dataset: spice1, model: "mlip MACE-medium SPICE1"}
+timings:
+  - {model: mace-large, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 6.3, unit: "ms per MD step", per_atom_us: 45.65, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: mace-large, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 11.6, unit: "ms per MD step", per_atom_us: 84.06, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-large, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 44.2, unit: "ms per MD step", per_atom_us: 320.29, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-large, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 66.8, unit: "ms per MD step", per_atom_us: 55.44, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: mace-large, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 99.5, unit: "ms per MD step", per_atom_us: 82.57, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-large, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 157.2, unit: "ms per MD step", per_atom_us: 130.46, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-mod, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 3.0, unit: "ms per MD step", per_atom_us: 21.74, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: mace-mod, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 6.4, unit: "ms per MD step", per_atom_us: 46.38, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-mod, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 26.6, unit: "ms per MD step", per_atom_us: 22.07, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: mace-mod, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 48.7, unit: "ms per MD step", per_atom_us: 40.41, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 2.9, unit: "ms per MD step", per_atom_us: 21.01, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 6.2, unit: "ms per MD step", per_atom_us: 44.93, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 33.8, unit: "ms per MD step", per_atom_us: 244.93, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 25.4, unit: "ms per MD step", per_atom_us: 21.08, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 46.4, unit: "ms per MD step", per_atom_us: 38.51, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: visnet, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 101.6, unit: "ms per MD step", per_atom_us: 84.32, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 3.8, unit: "ms per MD step", per_atom_us: 27.54, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 8.5, unit: "ms per MD step", per_atom_us: 61.59, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 38.7, unit: "ms per MD step", per_atom_us: 280.43, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 67.0, unit: "ms per MD step", per_atom_us: 55.6, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 105.7, unit: "ms per MD step", per_atom_us: 87.72, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 2"}
+  - {model: nequip, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 117.0, unit: "ms per MD step", per_atom_us: 97.1, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 2"}
+  - {model: mace-medium-s1, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 3.6, unit: "ms per MD step", per_atom_us: 26.09, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 6"}
+  - {model: mace-medium-s1, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 7.9, unit: "ms per MD step", per_atom_us: 57.25, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 6"}
+  - {model: mace-medium-s1, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 30.7, unit: "ms per MD step", per_atom_us: 222.46, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 6"}
+  - {model: mace-medium-s1, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 31.0, unit: "ms per MD step", per_atom_us: 25.73, hardware: "single NVIDIA H100 GPU, JAX + JAX-MD backend", result: null, location: "Table 6"}
+  - {model: mace-medium-s1, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 64.6, unit: "ms per MD step", per_atom_us: 53.61, hardware: "single NVIDIA H100 GPU, JAX + ASE backend", result: null, location: "Table 6"}
+  - {model: mace-medium-s1, system: "1ABT alpha-bungarotoxin complex, 1 ns MD", atoms: 1205, value: 104.9, unit: "ms per MD step", per_atom_us: 87.05, hardware: "single NVIDIA H100 GPU, Torch + ASE backend", result: null, location: "Table 6"}
+results: []
+resources: |
+  Training took about 245 h (NequIP), 158 h (ViSNet) and 266 h (MACE) on NVIDIA H100 GPUs (App. A; the number of GPUs is not stated, so the hours are recorded as given).
+gaps:
+  - "Validation energy and force MAEs per SPICE2 subset for all five SPICE2 models are shown only in Fig. 2; no values are given in the text. The SPICE1 MACE-medium validation errors are described only as 'equivalent to MACE-OFF'."
+  - "per_atom_us is the printed ms per MD step divided by the stated atom count (time per atom per step). Torch + ASE timings use the authors' own Torch implementations, which they say are not representative of the original codes."
