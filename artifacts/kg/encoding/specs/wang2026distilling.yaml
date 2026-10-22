@@ -1,0 +1,93 @@
+id: wang2026distilling
+source:
+  rank: 548
+  year: "2026"
+  first_author: "Xiaoyu Wang"
+  title: "Distilling latent electrostatics from foundation machine learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2606.15001"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2606.15001v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "17cd69fc180e618c00269b5e374113eb938867d6b7095f4de01028e02a6c1dda"
+study_label: "Wang and Cheng (2026): distilling latent electrostatics (LES) from foundation MLIPs into MACE-LES and CACE-LES students for Born effective charges and IR spectra"
+scope: |
+  Encoding scope: student MACE-LES models distilled from 11 foundation
+  models for liquid water (500 UMA-M(OMol) MD snapshots relabelled by
+  each teacher), MACE-LES students for 2 M HCl, CACE-LES students
+  distilled from eight foundation models for the anatase TiO2(101)-water
+  interface (3,346 configurations), and two CACE-LES models fitted
+  directly to the SCAN TiO2-water data, whose test force RMSEs are
+  stated. Student errors are given only as bounds; BECs and IR spectra
+  are properties. Teachers are named checkpoints, not registry models.
+materials:
+  water: {label: "Liquid water (64 molecules)", formula: H2O, class: "Molecular liquid"}
+  hcl: {label: "2 M HCl solution (96 H2O, 4 HCl)", class: "Molecular liquid"}
+  tio2w: {label: "Anatase TiO2(101)-water interface", class: "Solid-liquid interface"}
+reference:
+  teacher: {type: REF, code: MLIP, comment: "Energies and forces from the foundation-model teacher of each student"}
+  scan: {type: DFT, xc: SCAN, comment: "SCAN TiO2-water interface dataset of Ref. 87"}
+sampling:
+  umamd: {label: "Uncorrelated snapshots from NVT MD with UMA-M (OMol task) at 300 K (500 training, 50 test) or UMA-S for HCl at 400 K (1,100)"}
+  tio2: {label: "TiO2(101)-water interface configurations of Ref. 87 (3,346), relabelled by each teacher"}
+datasets:
+  w-macemp0l: {label: "Liquid-water snapshots labelled by MACE-MP-0(L) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-aqcat25ev2: {label: "Liquid-water snapshots labelled by AQCat25-ev2 (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-esenoc25sm: {label: "Liquid-water snapshots labelled by eSEN-OC25-sm (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-umamomol: {label: "Liquid-water snapshots labelled by UMA-M(OMol) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-maceomol: {label: "Liquid-water snapshots labelled by MACE-OMol (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-macemh1omol: {label: "Liquid-water snapshots labelled by MACE-MH-1(OMol) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-orbv3orbmol: {label: "Liquid-water snapshots labelled by Orb-v3-OrbMol (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-orbv3orbmold: {label: "Liquid-water snapshots labelled by Orb-v3-OrbMol-d (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-maceoff23s: {label: "Liquid-water snapshots labelled by MACE-OFF23(S) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-maceoff23m: {label: "Liquid-water snapshots labelled by MACE-OFF23(M) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  w-maceoff24m: {label: "Liquid-water snapshots labelled by MACE-OFF24(M) (500 training)", materials: [water], properties: [Energy, Forces], provenance: Augmented, n: {v: 500, loc: "Methods"}, calc: teacher, sampling: [umamd]}
+  hcl: {label: "2 M HCl snapshots labelled by foundation teachers (1,100)", materials: [hcl], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [umamd]}
+  t-macemp0l: {label: "TiO2-water configurations labelled by MACE-MP-0(L)", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-macemh1omat: {label: "TiO2-water configurations labelled by MACE-MH-1(OMat)", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-gemnetoc22: {label: "TiO2-water configurations labelled by GemNet-OC22", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-umamoc20: {label: "TiO2-water configurations labelled by UMA-M(OC20)", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-esenoc25sm: {label: "TiO2-water configurations labelled by eSEN-OC25-sm", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-esenoc25md: {label: "TiO2-water configurations labelled by eSEN-OC25-md", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-macemh1r2scan: {label: "TiO2-water configurations labelled by MACE-MH-1(r2SCAN)", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-petomatpes: {label: "TiO2-water configurations labelled by PET-OMATPES", materials: [tio2w], properties: [Energy, Forces], provenance: Augmented, calc: teacher, sampling: [tio2]}
+  t-scan: {label: "SCAN TiO2-water interface dataset (3,346 configurations)", materials: [tio2w], properties: [Energy, Forces], provenance: Published, n: {v: 3346, loc: "Results (TiO2-water)"}, calc: scan, sampling: [tio2]}
+methods:
+  MACE-LES:
+    hp: [cutoffRadius, numLayers]
+    loss: "Energies and forces of the teacher"
+    impl: {lib: MACE, comment: "MACE with LES; about 0.18-0.19M parameters"}
+    sims: [MolecularDynamics]
+  CACE-LES:
+    hp: [cutoffRadius, numRadialBasis, numLayers]
+    loss: "Energies and forces"
+    impl: {lib: {local: CACE}, comment: "LES-augmented CACE, c = 12, l_max = 3, nu_max = 3"}
+    sims: [MolecularDynamics]
+runs:
+  s-w-macemp0l: {label: "MACE-LES student for water distilled from MACE-MP-0(L)", method: MACE-LES, dataset: w-macemp0l, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-MP-0(L))", base_model: {label: "MACE-MP-0(L)", relation: distilled, location: "Results; Methods"}}
+  s-w-aqcat25ev2: {label: "MACE-LES student for water distilled from AQCat25-ev2", method: MACE-LES, dataset: w-aqcat25ev2, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (AQCat25-ev2)", base_model: {label: "AQCat25-ev2", relation: distilled, location: "Results; Methods"}}
+  s-w-esenoc25sm: {label: "MACE-LES student for water distilled from eSEN-OC25-sm", method: MACE-LES, dataset: w-esenoc25sm, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (eSEN-OC25-sm)", base_model: {label: "eSEN-OC25-sm", relation: distilled, location: "Results; Methods"}}
+  s-w-umamomol: {label: "MACE-LES student for water distilled from UMA-M(OMol)", method: MACE-LES, dataset: w-umamomol, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (UMA-M(OMol))", base_model: {label: "UMA-M(OMol)", relation: distilled, location: "Results; Methods"}}
+  s-w-maceomol: {label: "MACE-LES student for water distilled from MACE-OMol", method: MACE-LES, dataset: w-maceomol, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-OMol)", base_model: {label: "MACE-OMol", relation: distilled, location: "Results; Methods"}}
+  s-w-macemh1omol: {label: "MACE-LES student for water distilled from MACE-MH-1(OMol)", method: MACE-LES, dataset: w-macemh1omol, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-MH-1(OMol))", base_model: {label: "MACE-MH-1(OMol)", relation: distilled, location: "Results; Methods"}}
+  s-w-orbv3orbmol: {label: "MACE-LES student for water distilled from Orb-v3-OrbMol", method: MACE-LES, dataset: w-orbv3orbmol, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (Orb-v3-OrbMol)", base_model: {label: "Orb-v3-OrbMol", relation: distilled, location: "Results; Methods"}}
+  s-w-orbv3orbmold: {label: "MACE-LES student for water distilled from Orb-v3-OrbMol-d", method: MACE-LES, dataset: w-orbv3orbmold, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (Orb-v3-OrbMol-d)", base_model: {label: "Orb-v3-OrbMol-d", relation: distilled, location: "Results; Methods"}}
+  s-w-maceoff23s: {label: "MACE-LES student for water distilled from MACE-OFF23(S)", method: MACE-LES, dataset: w-maceoff23s, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-OFF23(S))", base_model: {label: "MACE-OFF23(S)", relation: distilled, location: "Results; Methods"}}
+  s-w-maceoff23m: {label: "MACE-LES student for water distilled from MACE-OFF23(M)", method: MACE-LES, dataset: w-maceoff23m, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-OFF23(M))", base_model: {label: "MACE-OFF23(M)", relation: distilled, location: "Results; Methods"}}
+  s-w-maceoff24m: {label: "MACE-LES student for water distilled from MACE-OFF24(M)", method: MACE-LES, dataset: w-maceoff24m, settings: {cutoffRadius: {v: 4.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES water student (MACE-OFF24(M))", base_model: {label: "MACE-OFF24(M)", relation: distilled, location: "Results; Methods"}}
+  s-hcl: {label: "MACE-LES students for 2 M HCl distilled from foundation teachers", method: MACE-LES, dataset: hcl, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}}, model: "MACE-LES HCl students", base_model: {label: "Foundation teachers (UMA-S and others)", relation: distilled, location: "Methods"}}
+  s-t-macemp0l: {label: "CACE-LES student for TiO2-water distilled from MACE-MP-0(L)", method: CACE-LES, dataset: t-macemp0l, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (MACE-MP-0(L))", base_model: {label: "MACE-MP-0(L)", relation: distilled, location: "Results"}}
+  s-t-macemh1omat: {label: "CACE-LES student for TiO2-water distilled from MACE-MH-1(OMat)", method: CACE-LES, dataset: t-macemh1omat, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (MACE-MH-1(OMat))", base_model: {label: "MACE-MH-1(OMat)", relation: distilled, location: "Results"}}
+  s-t-gemnetoc22: {label: "CACE-LES student for TiO2-water distilled from GemNet-OC22", method: CACE-LES, dataset: t-gemnetoc22, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (GemNet-OC22)", base_model: {label: "GemNet-OC22", relation: distilled, location: "Results"}}
+  s-t-umamoc20: {label: "CACE-LES student for TiO2-water distilled from UMA-M(OC20)", method: CACE-LES, dataset: t-umamoc20, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (UMA-M(OC20))", base_model: {label: "UMA-M(OC20)", relation: distilled, location: "Results"}}
+  s-t-esenoc25sm: {label: "CACE-LES student for TiO2-water distilled from eSEN-OC25-sm", method: CACE-LES, dataset: t-esenoc25sm, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (eSEN-OC25-sm)", base_model: {label: "eSEN-OC25-sm", relation: distilled, location: "Results"}}
+  s-t-esenoc25md: {label: "CACE-LES student for TiO2-water distilled from eSEN-OC25-md", method: CACE-LES, dataset: t-esenoc25md, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (eSEN-OC25-md)", base_model: {label: "eSEN-OC25-md", relation: distilled, location: "Results"}}
+  s-t-macemh1r2scan: {label: "CACE-LES student for TiO2-water distilled from MACE-MH-1(r2SCAN)", method: CACE-LES, dataset: t-macemh1r2scan, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (MACE-MH-1(r2SCAN))", base_model: {label: "MACE-MH-1(r2SCAN)", relation: distilled, location: "Results"}}
+  s-t-petomatpes: {label: "CACE-LES student for TiO2-water distilled from PET-OMATPES", method: CACE-LES, dataset: t-petomatpes, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numRadialBasis: {v: 6, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES TiO2-water student (PET-OMATPES)", base_model: {label: "PET-OMATPES", relation: distilled, location: "Results"}}
+  scan-t0: {label: "CACE-LES fitted directly to SCAN TiO2-water data (5.5 A, T = 0)", method: CACE-LES, dataset: t-scan, settings: {cutoffRadius: {v: 5.5, loc: "Methods"}, numLayers: {v: 0, loc: "Methods (T = 0)"}}, model: "CACE-LES SCAN TiO2-water (T = 0)"}
+  scan-t1: {label: "CACE-LES fitted directly to SCAN TiO2-water data (6.0 A, T = 1)", method: CACE-LES, dataset: t-scan, settings: {cutoffRadius: {v: 6.0, loc: "Methods"}, numLayers: {v: 1, loc: "Methods (T = 1)"}}, model: "CACE-LES SCAN TiO2-water (T = 1)"}
+results:
+  - {key: scan-t0-test, model: scan-t0, material: tio2w, role: test, eval_data: {label: "SCAN TiO2-water test split", location: "Methods"}, metrics: [[RMSE, Force, 73.3, meV/A, "test force RMSE on TiO2-water (SCAN): CACE-LES T = 0", "Methods"]]}
+  - {key: scan-t1-test, model: scan-t1, material: tio2w, role: test, eval_data: {label: "SCAN TiO2-water test split", location: "Methods"}, metrics: [[RMSE, Force, 67.1, meV/A, "test force RMSE on TiO2-water (SCAN): CACE-LES T = 1", "Methods"]]}
+gaps:
+  - "Student test RMSEs are given only as bounds (water: energy below 0.5 meV/atom, force below about 25 meV/A; HCl below 0.7 meV/atom and 20 meV/A; TiO2-water below 0.3 meV/atom and 80 meV/A); BEC errors and IR spectra are properties. The six students trained on RPBE-D3 AIMD water configurations and the SCAN fine-tuned students are not separate runs here."

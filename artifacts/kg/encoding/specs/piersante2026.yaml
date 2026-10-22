@@ -1,0 +1,54 @@
+id: piersante2026
+source:
+  rank: 545
+  year: "2026"
+  first_author: "Lorenzo Piersante"
+  title: "Machine learning interatomic potentials for solid-state precipitation"
+  venue: "Physical Review Materials"
+  doi: "10.1103/qyb1-7j1p"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2601.12984v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "cf7900f60dd054f385d4dface403af2740435c2a718856b071e040f55b7294e8"
+study_label: "Piersante and Natarajan (2026): ACE potentials for Mg, Nd and Mg-Nd built for solid-state precipitation (hcp-bcc pathways, phase stability, defects)"
+scope: |
+  Encoding scope: three pacemaker ACE potentials (pure Mg, pure Nd and
+  the Mg-Nd binary with 4,246 cluster functions, 7.8 A cutoff, ZBL core)
+  trained on Mahalanobis-distance-sampled VASP PBE datasets with
+  low-energy weighting and active learning; the training and validation
+  MAEs stated in Sec. IV. Phase stability, pathways, precipitate and
+  kinetic properties are not metrics.
+hyperparameters:
+  nfunc: {label: "Number of ACE basis (cluster) functions", name: "number of basis functions", datatype: integer}
+materials:
+  mg: {label: "Pure Mg (hcp and other lattices, defects)", formula: Mg, class: "Metals"}
+  nd: {label: "Pure Nd (dhcp, fcc, hcp and other lattices)", formula: Nd, class: "Metals"}
+  mgnd: {label: "Mg-Nd orderings on hcp, bcc, fcc and C15 parent lattices and precipitate phases", class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Gamma-centred, smallest spacing about 0.02 1/A", comment: "Methfessel-Paxton 0.2 eV; Nd 5s2 5p6 4f1 6s2 valence"}
+sampling:
+  maha: {label: "Structures enumerated along hcp-bcc pathways and orderings, selected by largest Mahalanobis distance in descriptor space, plus one active-learning round for Mg-Nd"}
+datasets:
+  mg: {label: "Pure Mg training set", materials: [mg], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [maha]}
+  nd: {label: "Pure Nd training set", materials: [nd], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [maha]}
+  mgnd: {label: "Mg-Nd training set", materials: [mgnd, mg, nd], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [maha]}
+methods:
+  ACE:
+    hp: [cutoffRadius, nfunc]
+    loss: "Weighted energies and forces with extra weight near the convex hull; L1/L2 regularization (about 1e-5 for Mg and Mg-Nd, 1e-8 for Nd)"
+    algorithm: "Coarse fit (ladder or subset), then fine-tuning on the full set; unary parameters fitted before binary ones"
+    impl: {lib: PACE, comment: "pacemaker; ZBL short-range repulsion"}
+    sims: [MolecularDynamics, MonteCarlo, NudgedElasticBand]
+runs:
+  ace-mg: {label: "ACE for pure Mg (694 basis functions)", method: ACE, dataset: mg, settings: {nfunc: {v: 694, loc: "Table I"}}, model: "ACE Mg (Piersante 2026)"}
+  ace-nd: {label: "ACE for pure Nd (890 basis functions)", method: ACE, dataset: nd, settings: {nfunc: {v: 890, loc: "Table I"}}, model: "ACE Nd (Piersante 2026)"}
+  ace-mgnd: {label: "ACE for Mg-Nd (4,246 cluster functions)", method: ACE, dataset: mgnd, settings: {cutoffRadius: {v: 7.8, loc: "Sec. II"}, nfunc: {v: 4246, loc: "Sec. II"}}, model: "ACE Mg-Nd (Piersante 2026)"}
+results:
+  - {key: mg-train, model: ace-mg, material: mg, role: training, eval_data: {label: "Mg training set", location: "Sec. IV A"}, metrics: [[MAE, Energy, 1.9, meV/atom, "training energy MAE on Mg: ACE", "Sec. IV A"], [MAE, Force, 1.3, meV/A, "training force MAE on Mg: ACE", "Sec. IV A"]]}
+  - {key: mg-val, model: ace-mg, material: mg, role: validation, eval_data: {label: "Mg validation set", location: "Sec. IV A"}, metrics: [[MAE, Energy, 5.6, meV/atom, "validation energy MAE on Mg: ACE", "Sec. IV A"], [MAE, Force, 6.3, meV/A, "validation force MAE on Mg: ACE", "Sec. IV A"]]}
+  - {key: nd-train, model: ace-nd, material: nd, role: training, eval_data: {label: "Nd training set", location: "Sec. IV A"}, metrics: [[MAE, Energy, 9.2, meV/atom, "training energy MAE on Nd: ACE", "Sec. IV A"], [MAE, Force, 9.4, meV/A, "training force MAE on Nd: ACE", "Sec. IV A"]]}
+  - {key: nd-val, model: ace-nd, material: nd, role: validation, eval_data: {label: "Nd held-out validation data", location: "Sec. IV A"}, metrics: [[MAE, Energy, 42.5, meV/atom, "validation energy MAE on Nd: ACE", "Sec. IV A"], [MAE, Force, 31.5, meV/A, "validation force MAE on Nd: ACE", "Sec. IV A"]]}
+  - {key: mgnd-train, model: ace-mgnd, material: mgnd, role: training, eval_data: {label: "Mg-Nd training set", location: "Sec. IV B"}, metrics: [[MAE, Energy, 6.4, meV/atom, "training energy MAE on Mg-Nd: ACE", "Sec. IV B"], [MAE, Force, 22.6, meV/A, "training force MAE on Mg-Nd: ACE", "Sec. IV B"]]}
+  - {key: mgnd-val, model: ace-mgnd, material: mgnd, role: validation, eval_data: {label: "Mg-Nd validation set", location: "Sec. IV B"}, metrics: [[MAE, Energy, 3.6, meV/atom, "validation energy MAE on Mg-Nd: ACE", "Sec. IV B"], [MAE, Force, 16.1, meV/A, "validation force MAE on Mg-Nd: ACE", "Sec. IV B"]]}
+gaps:
+  - "Training-set sizes are not stated in the text read (Table V counts enumerated orderings, about 0.5 million, not training data). The Mg basis is identical to Ref. 17; per-element cutoffs are in SI Table SI."
