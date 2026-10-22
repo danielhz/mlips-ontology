@@ -1,0 +1,37 @@
+id: tang2025
+source:
+  rank: 679
+  year: "2025"
+  first_author: "Ling Tang"
+  title: "Developing a neural network machine learning interatomic potential for molecular dynamics simulations of La–Si–P systems"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0284672"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2506.08339v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8ca7e0e6c13b6733a442d60873095ededde8a810e2e004265ea9c6fb51781585"
+study_label: "Tang et al. (2025): a neural-network interatomic potential for MD of La-Si-P systems"
+scope: |
+  Encoding scope: the DeePMD potential for the La-Si-P system trained
+  iteratively (usage-probability reweighting and data addition) on about
+  71,800 distorted crystals and 130,000 liquid snapshots. Training errors
+  are stated only approximately, so there are no results.
+materials:
+  lasip: {label: "La-Si-P system: elemental, binary and ternary crystals (including La2SiP, La5SiP3, La2SiP3, La2SiP4) and liquids", class: "rare-earth silicide phosphides"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400, kpoints: "k-point grid 2pi x 0.02 1/A (single points); Gamma for AIMD", comment: "Non-spin-polarised; 256-atom liquid AIMD with 3 fs steps."}
+sampling:
+  crystals-liquids: {label: "Volume-scaled and randomly displaced (0.2 A) crystals of Materials Project and ML-predicted phases, plus AIMD liquid snapshots across compositions, augmented iteratively"}
+datasets:
+  lasip: {label: "La-Si-P training data (about 71,800 distorted crystal and 130,000 liquid structures)", materials: [lasip], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [crystals-liquids]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, numLayers]
+    algorithm: "Fitting network of four hidden layers with 120 tanh nodes; phase-wise usage probabilities raised for poorly fitted phases"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  dp: {label: "Final ANN-ML (DeePMD) potential for La-Si-P", method: DeePMD, dataset: lasip, settings: {cutoffRadius: {v: 7.0, loc: "Sec. 2"}, numLayers: {v: 4, loc: "Sec. 2 (hidden layers)"}}, model: "DP La-Si-P (Tang 2025)"}
+gaps:
+  - "Training errors on 1320 sampled training structures are given only approximately ('~12 meV/atom' energy, 'about 0.23 eV/A' force; Fig. 3) and are not encoded."
+  - "E-V curves, liquid pair-correlation functions, melting temperatures and crystallisation are property comparisons."
