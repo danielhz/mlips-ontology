@@ -1,0 +1,66 @@
+id: parker2026
+source:
+  rank: 644
+  year: "2026"
+  first_author: "Isaac J. Parker"
+  title: "False Metallization in Short-Ranged Machine Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.04228"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.04228v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f7fff47797574ecc5268554b628e046fa9b2ce7b935a83fadb88431e6d6fa982"
+study_label: "Parker et al. (2026): false metallization in short-ranged machine-learned interatomic potentials"
+scope: |
+  Encoding scope: the short-ranged (SR) and long-ranged local-split-charge
+  (LR) MACE models trained by the authors for a copper-water interface
+  (Table S3; selected Table S8 variants) and for pure water on a published
+  revPBE0-D3 data set (Table S5), with their validation RMSEs, and the
+  MACE foundation models used as distributed. Dipole distributions, band
+  gaps and the TiO2-water BPNNP analysis (models of Ref. 95) are
+  property/analysis results.
+materials:
+  cuwater: {label: "Cu(111) slab with liquid water (4-layer 5x6 slab)", class: "metal-water interface"}
+  water: {label: "Bulk water, water slabs and ice", formula: H2O, class: "molecular liquid and ice"}
+reference:
+  pbe-d3: {type: DFT, code: {local: CP2K}, xc: {local: PBE-D3}, pp: {local: GTH}, basis: "DZVP-MOLOPT-SR-GTH", kpoints: "Gamma point", comment: "500 Ry cutoff; AIMD with deuterium masses, bottom two Cu layers fixed."}
+  revpbe0: {type: DFT, xc: {local: revPBE0-D3}, comment: "Published water data set of Ref. 63."}
+sampling:
+  aimd: {label: "Configurations with a range of net dipoles sampled from Cu-water AIMD"}
+  iterative: {label: "Three generations of SR-MACE MD sampling targeting new dipoles and water dissociation, plus LR-MACE MD configurations (1322 configurations in total)"}
+datasets:
+  cu-aimd: {label: "Cu-water AIMD subset (500 configurations; 125 for validation)", materials: [cuwater], properties: [Energy, Forces], provenance: InHouse, n: {v: 500, loc: "Model and Simulation Details"}, calc: pbe-d3, sampling: [aimd]}
+  cu-iter: {label: "Cu-water ITERATIVE data set (Gen3)", materials: [cuwater], properties: [Energy, Forces], provenance: InHouse, n: {v: 1322, loc: "Table S9"}, calc: pbe-d3, sampling: [aimd, iterative]}
+  water: {label: "revPBE0-D3 bulk water, water slab and ice data of Ref. 63", materials: [water], properties: [Energy, Forces], provenance: Published, calc: revpbe0}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures]
+    algorithm: "SR-MACE: standard MACE. LR-MACE: local split-charge MACE adding a long-range energy from predicted atomic multipoles on Gaussian basis functions"
+    impl: {lib: MACE, comment: "ASE Langevin MD"}
+    sims: [MolecularDynamics]
+runs:
+  mpa0: {label: "MACE-MPA-0 as distributed (with D3)", method: MACE, model: "MACE-MPA-0"}
+  matpes: {label: "MACE-MATPES-PBE as distributed (with D3)", method: MACE, model: "MACE-MATPES-PBE"}
+  mh1: {label: "MACE-MH-1 as distributed (omatpbe, oc20 and omol heads)", method: MACE, model: "MACE-MH-1"}
+  cu-sr: {label: "SR-MACE for Cu-water trained on AIMD data", method: MACE, dataset: cu-aimd, settings: {cutoffRadius: {v: 6.0, loc: "Model and Simulation Details"}, numLayers: {v: 2, loc: "Model and Simulation Details"}, numFeatures: {v: 128, loc: "Model and Simulation Details"}}, model: "SR-MACE Cu-water"}
+  cu-lr: {label: "LR-MACE (local split-charge) for Cu-water trained on AIMD data", method: MACE, dataset: cu-aimd, settings: {numLayers: {v: 2, loc: "Table S8"}}, model: "LR-MACE Cu-water"}
+  cu-it-4l: {label: "SR-MACE for Cu-water trained on the ITERATIVE data set (4 layers, L = 1)", method: MACE, dataset: cu-iter, settings: {numLayers: {v: 4, loc: "Table S8"}}, model: "SR-MACE Cu-water ITERATIVE 4l"}
+  cu-it-2l: {label: "SR-MACE for Cu-water trained on the ITERATIVE data set (2 layers, L = 1)", method: MACE, dataset: cu-iter, settings: {numLayers: {v: 2, loc: "Table S8"}}, model: "SR-MACE Cu-water ITERATIVE 2l"}
+  w-sr: {label: "SR-MACE for water (rcut 6.0 A, L = 1, 128 channels)", method: MACE, dataset: water, settings: {cutoffRadius: {v: 6.0, loc: "Table S5"}, numLayers: {v: 2, loc: "Table S5"}, numFeatures: {v: 128, loc: "Table S5"}}, model: "SR-MACE water (revPBE0-D3)"}
+  w-lr-a: {label: "LR-MACE-a for water (rcut 6.0 A, L = 1, 128 channels)", method: MACE, dataset: water, settings: {cutoffRadius: {v: 6.0, loc: "Table S5"}, numLayers: {v: 2, loc: "Table S5"}, numFeatures: {v: 128, loc: "Table S5"}}, model: "LR-MACE-a water (revPBE0-D3)"}
+  w-lr-b: {label: "LR-MACE-b for water (rcut 5.0 A, L = 1, 128 channels)", method: MACE, dataset: water, settings: {cutoffRadius: {v: 5.0, loc: "Table S5"}, numLayers: {v: 2, loc: "Table S5"}, numFeatures: {v: 128, loc: "Table S5"}}, model: "LR-MACE-b water (revPBE0-D3)"}
+  w-lr-c: {label: "LR-MACE-c for water (rcut 5.0 A, L = 0, 64 channels)", method: MACE, dataset: water, settings: {cutoffRadius: {v: 5.0, loc: "Table S5"}, numLayers: {v: 2, loc: "Table S5"}, numFeatures: {v: 64, loc: "Table S5"}}, model: "LR-MACE-c water (revPBE0-D3)"}
+results:
+  - {key: cu-sr-val, model: cu-sr, material: cuwater, role: validation, eval_data: {label: "Cu-water AIMD validation configurations (125)", location: "Table S3"}, metrics: [[RMSE, Energy, 0.14, meV/atom, "validation energy RMSE on cuwater: SR-MACE Cu-water", "Table S3"], [RMSE, Force, 48.58, meV/A, "validation force RMSE on cuwater: SR-MACE Cu-water", "Table S3"]]}
+  - {key: cu-lr-val, model: cu-lr, material: cuwater, role: validation, eval_data: {label: "Cu-water AIMD validation configurations (125)", location: "Table S3"}, metrics: [[RMSE, Energy, 0.14, meV/atom, "validation energy RMSE on cuwater: LR-MACE Cu-water", "Table S3"], [RMSE, Force, 46.23, meV/A, "validation force RMSE on cuwater: LR-MACE Cu-water", "Table S3"]]}
+  - {key: cu-it-4l-val, model: cu-it-4l, material: cuwater, role: validation, eval_data: {label: "Validation set of the ITERATIVE data", location: "Table S8"}, metrics: [[RMSE, Energy, 0.7, meV/atom, "validation energy RMSE on cuwater: SR-MACE Cu-water ITERATIVE 4 layers L=1", "Table S8"], [RMSE, Force, 47.9, meV/A, "validation force RMSE on cuwater: SR-MACE Cu-water ITERATIVE 4 layers L=1", "Table S8"]]}
+  - {key: cu-it-2l-val, model: cu-it-2l, material: cuwater, role: validation, eval_data: {label: "Validation set of the ITERATIVE data", location: "Table S8"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "validation energy RMSE on cuwater: SR-MACE Cu-water ITERATIVE 2 layers L=1", "Table S8"], [RMSE, Force, 48.7, meV/A, "validation force RMSE on cuwater: SR-MACE Cu-water ITERATIVE 2 layers L=1", "Table S8"]]}
+  - {key: w-sr-val, model: w-sr, material: water, role: validation, eval_data: {label: "revPBE0-D3 water validation set", location: "Table S5"}, metrics: [[RMSE, Energy, 0.3, meV/atom, "validation energy RMSE on water: SR-MACE water", "Table S5"], [RMSE, Force, 27.4, meV/A, "validation force RMSE on water: SR-MACE water", "Table S5"]]}
+  - {key: w-lr-a-val, model: w-lr-a, material: water, role: validation, eval_data: {label: "revPBE0-D3 water validation set", location: "Table S5"}, metrics: [[RMSE, Energy, 0.18, meV/atom, "validation energy RMSE on water: LR-MACE-a water", "Table S5"], [RMSE, Force, 22.89, meV/A, "validation force RMSE on water: LR-MACE-a water", "Table S5"]]}
+  - {key: w-lr-b-val, model: w-lr-b, material: water, role: validation, eval_data: {label: "revPBE0-D3 water validation set", location: "Table S5"}, metrics: [[RMSE, Energy, 0.23, meV/atom, "validation energy RMSE on water: LR-MACE-b water", "Table S5"], [RMSE, Force, 22.57, meV/A, "validation force RMSE on water: LR-MACE-b water", "Table S5"]]}
+  - {key: w-lr-c-val, model: w-lr-c, material: water, role: validation, eval_data: {label: "revPBE0-D3 water validation set", location: "Table S5"}, metrics: [[RMSE, Energy, 0.27, meV/atom, "validation energy RMSE on water: LR-MACE-c water", "Table S5"], [RMSE, Force, 24.44, meV/A, "validation force RMSE on water: LR-MACE-c water", "Table S5"]]}
+gaps:
+  - "LR-MACE (local split-charge MACE with predicted multipoles) is mapped to MACE, as for the self-consistent electrostatic MACE variants of baldwin2026; registry decision pending."
+  - "Table S8 lists 24 Cu-water model variants (AIMD versions 1-3 and ITERATIVE, 2-4 layers, L = 0/1); only two ITERATIVE models are encoded. The BPNNP of Ref. 63 (Table S5) and the TiO2-water BPNNPs of Ref. 95 are literature models."
+  - "Foundation models are compared only through dipole distributions (Fig. S2); MACE-MATPES-PBE and MACE-MH-1 are paper-local runs because no registry model exists."
+  - "Dipole distributions, band gaps, PDoS and autocorrelation functions are property analyses."
