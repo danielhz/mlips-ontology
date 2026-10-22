@@ -1,0 +1,40 @@
+id: sosso2012
+source:
+  rank: 669
+  year: "2012"
+  first_author: "Gabriele Cesare Sosso"
+  title: "Neural network interatomic potential for the phase change material GeTe"
+  venue: "Physical Review B"
+  doi: "10.1103/physrevb.85.174103"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1201.2026v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "bbbdca3ebebbfd5fcec730e4f57b1b9de629068e054a9954f61ba3a20b31c780"
+study_label: "Sosso et al. (2012): neural network interatomic potential for the phase-change material GeTe"
+scope: |
+  Encoding scope: the Behler-Parrinello NN potential for GeTe (RuNNer)
+  trained on about 30,000 PBE configurations of crystalline, liquid and
+  amorphous GeTe, with its training and test RMSEs. Crystal, liquid and
+  amorphous properties are property comparisons.
+materials:
+  gete: {label: "GeTe: trigonal crystal, liquid and amorphous phases (64-216 atom cells; 4096-atom amorphous models)", formula: GeTe, class: "phase-change chalcogenide"}
+reference:
+  pbe: {type: DFT, code: QuantumESPRESSO, xc: PBE, pp: NormConserving, kpoints: "4x4x4 Monkhorst-Pack for 64 atoms, equivalent density for larger cells", comment: "40 Ry plane-wave cutoff; outermost s and p valence electrons; configurations from CP2K AIMD (up to 3000 K) and metadynamics."}
+sampling:
+  aimd: {label: "CP2K AIMD (up to 3000 K) and metadynamics crystallisation snapshots, random distortions, off-stoichiometric models and NN-driven MD refinement"}
+datasets:
+  gete: {label: "GeTe training and test configurations (about 30,000)", materials: [gete], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [aimd]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers, numFeatures]
+    algorithm: "Three hidden layers of 20 sigmoid nodes; 159 symmetry functions"
+    impl: {lib: RuNNer, comment: "TINKER as MD driver"}
+    sims: [MolecularDynamics]
+runs:
+  nn: {label: "NN potential for GeTe", method: HDNNP, dataset: gete, settings: {cutoffRadius: {v: 6.88, loc: "Sec. II"}, numLayers: {v: 3, loc: "Sec. II"}, numFeatures: {v: 159, loc: "Sec. II (symmetry functions)"}}, model: "NN GeTe (Sosso 2012)"}
+results:
+  - {key: nn-train, model: nn, material: gete, role: training, eval_data: {label: "Training set", location: "Sec. II"}, metrics: [[RMSE, Energy, 5.01, meV/atom, "train energy RMSE on GeTe: NN potential", "Sec. II"], [RMSE, Force, 460, meV/A, "train force RMSE on GeTe: NN potential", "Sec. II (0.46 eV/A)"]]}
+  - {key: nn-test, model: nn, material: gete, role: test, eval_data: {label: "Test set", location: "Sec. II"}, metrics: [[RMSE, Energy, 5.60, meV/atom, "test energy RMSE on GeTe: NN potential", "Sec. II"], [RMSE, Force, 470, meV/A, "test force RMSE on GeTe: NN potential", "Sec. II (0.47 eV/A)"]]}
+gaps:
+  - "The data-set size is given only approximately ('about 30.000 configurations'). Maximum errors (Fig. 1 insets) are not encoded."
+  - "Structural parameters, elastic constants (Table II), coordination numbers, diffusion coefficients (Tables III-V) and amorphous structure are property comparisons."

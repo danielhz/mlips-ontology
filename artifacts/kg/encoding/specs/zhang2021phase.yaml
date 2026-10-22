@@ -1,0 +1,36 @@
+id: zhang2021phase
+source:
+  rank: 668
+  year: "2021"
+  first_author: "Linfeng Zhang"
+  title: "Phase Diagram of a Deep Potential Water Model"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.126.236001"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2102.04804v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "71456b77b063d50b929f20c3a0f6cba182112c5a3945001b429e7a04c1c7bd58"
+study_label: "Zhang, Wang, Car and E (2021): phase diagram of a Deep Potential water model (SCAN)"
+scope: |
+  Encoding scope: the DP model of water trained on SCAN-DFT data with
+  DP-GEN concurrent learning over about 0-50 GPa and 50-2000 K (31,058
+  snapshots after 36 iterations plus 3519 additional configurations), used
+  to compute the phase diagram by thermodynamic integration. Test errors
+  are stated only approximately, so there are no results.
+materials:
+  water: {label: "Water: ice phases (including superionic), molecular and ionic fluids up to about 50 GPa and 2000 K", formula: H2O, class: "molecular solid and liquid"}
+reference:
+  scan: {type: DFT, code: VASP, xc: SCAN, comment: "VASP 5.4.4; energies, forces and virials."}
+sampling:
+  dpgen: {label: "DP-GEN concurrent learning (36 iterations) across the phase diagram, plus 3519 configurations to reduce systematic deviations"}
+datasets:
+  water: {label: "SCAN water training data (31,058 + 3519 configurations)", materials: [water], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 34577, loc: "Main text (31,058 + 3519)"}, calc: scan, sampling: [dpgen]}
+methods:
+  DeePMD:
+    impl: {lib: DeePMDkit, comment: "DP-GEN; LAMMPS for DPMD"}
+    sims: [MolecularDynamics, ThermodynamicIntegration]
+runs:
+  dp: {label: "DP SCAN water model for the phase diagram", method: DeePMD, dataset: water, model: "DP-SCAN water (phase diagram)"}
+gaps:
+  - "Test errors on 5141 configurations from 67 NPT trajectories are given only approximately ('~1 meV/H2O' energy, '~50 meV/A' force RMSE, relative RMSE '~10% or less'), so they are not encoded."
+  - "Phase boundaries, triple points and melting curves are property results; hyperparameters are in the SM (not read)."
