@@ -1,0 +1,41 @@
+id: devereux2024
+source:
+  rank: 615
+  year: "2024"
+  first_author: "Christian Devereux"
+  title: "Force training neural network potential energy surface models"
+  venue: "International Journal of Chemical Kinetics"
+  doi: "10.1002/kin.21759"
+  kg_relevance: "Method/model"
+  arxiv_id: "2311.07910v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "1a51a0e2d0a3c9cfd694e4e05be9118ced083eeb6c85b6296bbec694340933e1"
+study_label: "Devereux et al. (2024): force training of neural-network potential energy surfaces for the C5H5 1,2-H shift"
+scope: |
+  Encoding scope: the energy-trained and energy+force-trained neural
+  network PES models (ANI-type atomic environment vectors after Smith et
+  al., aevmod/PyTorch) for the cyclopentadienyl 1,2-H-shift region of the
+  C5H5 PES. All energy and force errors (learning curves, F:E weight scans,
+  per-structure errors) are shown only in figures, so there are no results.
+materials:
+  c5h5: {label: "C5H5 (cyclopentadienyl, 1,2-H-shift saddle point and product, and IRC structures)", formula: C5H5, class: "hydrocarbon radical (gas phase)"}
+reference:
+  wb97xd: {type: DFT, code: {local: Q-Chem}, xc: {local: wB97X-D}, basis: "6-311++G(d,p)"}
+sampling:
+  nms: {label: "Randomised normal-mode sampling at up to T = 2000 K around 25 anchor points (3 stationary points, 22 IRC points), 434 structures each, with damped low-frequency modes"}
+datasets:
+  c5h5: {label: "C5H5 normal-mode-sampled DFT pool (25 x 435 configurations); 59-structure held-out test set; 64-structure validation sets", materials: [c5h5], properties: [Energy, Forces], provenance: InHouse, n: {v: 10875, loc: "Data section"}, calc: wb97xd, sampling: [nms]}
+methods:
+  ANI:
+    hp: [numFeatures, learningRate, batchSize]
+    loss: "Normalised energy and force L2 terms with weight lambda (0.5 for force-trained models); energy only for energy-trained models"
+    algorithm: "256-long AEV; atomic networks 256:128:64:64:1 with Gaussian activations; Adam with step-wise learning-rate decay to 1e-6, at most 50,000 epochs; ensembles with random initialisation and splits"
+    impl: {lib: {local: aevmod}, comment: "AEV and Jacobians in C++ (aevmod), networks in PyTorch"}
+    sims: [GeometryOptimization]
+runs:
+  ft: {label: "Energy+force-trained NN PES ensemble (up to 2048 training structures)", method: ANI, dataset: c5h5, settings: {numFeatures: {v: 256, loc: "Results (AEV length)"}, learningRate: {v: 0.001, loc: "Neural Network Training (initial)"}, batchSize: {v: 8, loc: "Neural Network Training"}}, model: "C5H5 NNPES (force trained)"}
+  et: {label: "Energy-only-trained NN PES ensemble (up to 2048 training structures)", method: ANI, dataset: c5h5, settings: {numFeatures: {v: 256, loc: "Results (AEV length)"}, learningRate: {v: 0.001, loc: "Neural Network Training (initial)"}, batchSize: {v: 8, loc: "Neural Network Training"}}, model: "C5H5 NNPES (energy trained)"}
+gaps:
+  - "Energy RMSE and relative force errors versus training-set size (Figs. 8-9), F:E weight ratio (Fig. 7) and epochs (Figs. 5-6) are figure-only. The fractions of structures with errors below 1 kcal/mol (82% force-trained, 46% energy-trained) are not MAE/RMSE metrics."
+  - "Zero-point energies and harmonic frequencies (force-trained ZPE within 0.5 kcal/mol; energy-trained off by 6.9, 5.4 and 13.6 kcal/mol) are property errors."
+  - "The AEV follows Smith et al. (ANI-1, ref. 80), so the models are mapped to the registry method ANI."

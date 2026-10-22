@@ -1,0 +1,57 @@
+id: ou2024
+source:
+  rank: 616
+  year: "2024"
+  first_author: "Yongliang Ou"
+  title: "Atomistic modeling of bulk and grain boundary diffusion in solid electrolyte Li 6 PS 5 Cl using machine-learning interatomic potentials"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.8.115407"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2407.04126v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f521892c2c84a6e8aaa500cc8b6f10be069e35a8b4b724b68636df6f126681cd"
+study_label: "Ou et al. (2024): MTPs for bulk and grain-boundary Li diffusion in the solid electrolyte Li6PS5Cl"
+scope: |
+  Encoding scope: the five final level-18 moment tensor potentials (807
+  parameters) trained with the quality-level-based active-learning scheme
+  for anion-ordered and anion-disordered bulk Li6PS5Cl and three grain
+  boundaries, with the training and (bulk) validation RMSEs of Table III.
+  Diffusion coefficients, Arrhenius parameters and structural data are
+  property results.
+materials:
+  lpsc-ord: {label: "Anion-ordered bulk Li6PS5Cl", formula: Li6PS5Cl, class: "argyrodite sulfide solid electrolyte"}
+  lpsc-dis: {label: "Anion-disordered bulk Li6PS5Cl", formula: Li6PS5Cl, class: "argyrodite sulfide solid electrolyte"}
+  lpsc-gb: {label: "Li6PS5Cl grain boundaries Sigma3(-112)[110], Sigma3(-111)[110] and Sigma5(001)[001]", formula: Li6PS5Cl, class: "argyrodite sulfide solid electrolyte (grain boundaries)"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Gamma-centred 2x2x2 (unit cell, tetrahedron with Bloechl corrections); Gamma point with 0.03 eV Gaussian smearing for GBs"}
+sampling:
+  al: {label: "Quality-level-based active learning: bulk AIMD initialisation, pre-training with select-add of AIMD frames, then standard MTP-MD active learning on the target structure for levels 4, 6, ... 18"}
+datasets:
+  ord: {label: "Accumulated MTP training set for the anion-ordered bulk (104-atom cells)", materials: [lpsc-ord], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2219, loc: "Table III"}, calc: pbe, sampling: [al]}
+  dis: {label: "Accumulated MTP training set for the anion-disordered bulk (208-atom cells)", materials: [lpsc-dis], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2210, loc: "Table III"}, calc: pbe, sampling: [al]}
+  gb3a: {label: "Accumulated MTP training set for the GB Sigma3(-112)[110] (312-atom cells)", materials: [lpsc-gb], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2350, loc: "Table III"}, calc: pbe, sampling: [al]}
+  gb3b: {label: "Accumulated MTP training set for the GB Sigma3(-111)[110] (156-atom cells)", materials: [lpsc-gb], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2293, loc: "Table III"}, calc: pbe, sampling: [al]}
+  gb5: {label: "Accumulated MTP training set for the GB Sigma5(001)[001] (260-atom cells)", materials: [lpsc-gb], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2241, loc: "Table III"}, calc: pbe, sampling: [al]}
+methods:
+  MTP:
+    hp: [momentLevel]
+    algorithm: "Level-18 MTP with 807 fitting parameters, reached through successively higher levels in active learning"
+    impl: {lib: MLIP, comment: "mlip package; LAMMPS for MD"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  mtp-ord: {label: "Level-18 MTP for the anion-ordered bulk", method: MTP, dataset: ord, settings: {momentLevel: {v: 18, loc: "Table III"}}, model: "MTP-18 Li6PS5Cl anion-ordered bulk"}
+  mtp-dis: {label: "Level-18 MTP for the anion-disordered bulk", method: MTP, dataset: dis, settings: {momentLevel: {v: 18, loc: "Table III"}}, model: "MTP-18 Li6PS5Cl anion-disordered bulk"}
+  mtp-gb3a: {label: "Level-18 MTP for the GB Sigma3(-112)[110]", method: MTP, dataset: gb3a, settings: {momentLevel: {v: 18, loc: "Table III"}}, model: "MTP-18 Li6PS5Cl GB Sigma3(-112)[110]"}
+  mtp-gb3b: {label: "Level-18 MTP for the GB Sigma3(-111)[110]", method: MTP, dataset: gb3b, settings: {momentLevel: {v: 18, loc: "Table III"}}, model: "MTP-18 Li6PS5Cl GB Sigma3(-111)[110]"}
+  mtp-gb5: {label: "Level-18 MTP for the GB Sigma5(001)[001]", method: MTP, dataset: gb5, settings: {momentLevel: {v: 18, loc: "Table III"}}, model: "MTP-18 Li6PS5Cl GB Sigma5(001)[001]"}
+results:
+  - {key: mtp-ord-train, model: mtp-ord, material: lpsc-ord, role: training, eval_data: {label: "Final accumulated training set (anion-ordered bulk)", location: "Table III"}, metrics: [[RMSE, Energy, 4.7, meV/atom, "train energy RMSE on lpsc-ord: MTP-18 anion-ordered bulk", "Table III"], [RMSE, Force, 132, meV/A, "train force RMSE on lpsc-ord: MTP-18 anion-ordered bulk", "Table III (0.132 eV/A)"]]}
+  - {key: mtp-ord-val, model: mtp-ord, material: lpsc-ord, role: validation, eval_data: {label: "500 configurations from separate 600 K MD of the anion-ordered bulk", location: "Appendix A; Table III"}, metrics: [[RMSE, Energy, 3.1, meV/atom, "validation energy RMSE on lpsc-ord: MTP-18 anion-ordered bulk", "Table III"], [RMSE, Force, 56, meV/A, "validation force RMSE on lpsc-ord: MTP-18 anion-ordered bulk", "Table III (0.056 eV/A)"]]}
+  - {key: mtp-dis-train, model: mtp-dis, material: lpsc-dis, role: training, eval_data: {label: "Final accumulated training set (anion-disordered bulk)", location: "Table III"}, metrics: [[RMSE, Energy, 5.1, meV/atom, "train energy RMSE on lpsc-dis: MTP-18 anion-disordered bulk", "Table III"], [RMSE, Force, 153, meV/A, "train force RMSE on lpsc-dis: MTP-18 anion-disordered bulk", "Table III (0.153 eV/A)"]]}
+  - {key: mtp-dis-val, model: mtp-dis, material: lpsc-dis, role: validation, eval_data: {label: "500 configurations from separate 600 K MD of the anion-disordered bulk", location: "Appendix A; Table III"}, metrics: [[RMSE, Energy, 6.0, meV/atom, "validation energy RMSE on lpsc-dis: MTP-18 anion-disordered bulk", "Table III"], [RMSE, Force, 95, meV/A, "validation force RMSE on lpsc-dis: MTP-18 anion-disordered bulk", "Table III (0.095 eV/A)"]]}
+  - {key: mtp-gb3a-train, model: mtp-gb3a, material: lpsc-gb, role: training, eval_data: {label: "Final accumulated training set (GB Sigma3(-112)[110])", location: "Table III"}, metrics: [[RMSE, Energy, 6.6, meV/atom, "train energy RMSE on lpsc-gb: MTP-18 GB Sigma3(-112)[110]", "Table III"], [RMSE, Force, 164, meV/A, "train force RMSE on lpsc-gb: MTP-18 GB Sigma3(-112)[110]", "Table III (0.164 eV/A)"]]}
+  - {key: mtp-gb3b-train, model: mtp-gb3b, material: lpsc-gb, role: training, eval_data: {label: "Final accumulated training set (GB Sigma3(-111)[110])", location: "Table III"}, metrics: [[RMSE, Energy, 6.9, meV/atom, "train energy RMSE on lpsc-gb: MTP-18 GB Sigma3(-111)[110]", "Table III"], [RMSE, Force, 157, meV/A, "train force RMSE on lpsc-gb: MTP-18 GB Sigma3(-111)[110]", "Table III (0.157 eV/A)"]]}
+  - {key: mtp-gb5-train, model: mtp-gb5, material: lpsc-gb, role: training, eval_data: {label: "Final accumulated training set (GB Sigma5(001)[001])", location: "Table III"}, metrics: [[RMSE, Energy, 6.1, meV/atom, "train energy RMSE on lpsc-gb: MTP-18 GB Sigma5(001)[001]", "Table III"], [RMSE, Force, 157, meV/A, "train force RMSE on lpsc-gb: MTP-18 GB Sigma5(001)[001]", "Table III (0.157 eV/A)"]]}
+gaps:
+  - "RMSEs of the MTPs of levels 4-20 (Fig. 3) and their computational cost (Fig. 4b) are figure-only; the cutoff radius is not stated in the text read."
+  - "Diffusion coefficients, Arrhenius parameters (Table V), structural and energetic data (Table IV) and comparison with experiment (Table VI) are property results."
