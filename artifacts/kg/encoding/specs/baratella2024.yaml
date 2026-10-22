@@ -1,0 +1,41 @@
+id: baratella2024
+source:
+  rank: 573
+  year: "2024"
+  first_author: "Dario Baratella"
+  title: "Crystallization kinetics in Ge-rich Ge x Te alloys from large scale simulations with a machine-learned interatomic potential"
+  venue: "Acta Materialia"
+  doi: "10.1016/j.actamat.2024.120608"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2404.15128v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "116d1d7a1993688e6b5b71d761e07cdea0ecef598275dc165f8cacaebe636f50"
+study_label: "Baratella, Abou El Kheir and Bernasconi (2024): DeePMD potential for Ge-rich GexTe and large-scale simulations of crystallization and phase separation"
+scope: |
+  Encoding scope: the DeePMD potential (attention-based embedding,
+  embedding 40-80-160, fitting 3 x 320, 7 A cutoff) for Ge, GeTe and
+  Ge2Te trained iteratively on 115,000 CP2K configurations of liquid,
+  amorphous and crystalline phases; the overall energy, force and virial
+  RMSEs. Structural, dynamical and crystallization results are
+  properties.
+materials:
+  gete: {label: "Ge, GeTe and Ge2Te in liquid, amorphous and crystalline phases", class: "Phase-change materials"}
+reference:
+  cp2k: {type: DFT, code: {local: CP2K}, comment: "Labels at 400 Ry density cutoff, 4x4x4 k-points, Fermi-Dirac smearing (300 K); MD at Gamma point with TZVP basis; functional not named in the text read (D3 used for density checks)"}
+sampling:
+  it: {label: "Iterative generations: DFT-MD of Ge (144 atoms), GeTe (108) and Ge2Te (100) liquids and amorphous phases plus crystals, enriched with high-energy NN-MD configurations and DFT-MD at other densities and temperatures (Table I)"}
+datasets:
+  gete: {label: "Ge-Te database (115,000 configurations)", materials: [gete], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 115000, loc: "Methods"}, calc: cp2k, sampling: [it]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius]
+    loss: "Energies, forces and virials"
+    algorithm: "Attention-based embedding (40, 80, 160), fitting net 3 x 320, smoothing radius 2 A, at most 80 neighbours"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  dp: {label: "DeePMD potential for Ge-rich GexTe", method: DeePMD, dataset: gete, settings: {cutoffRadius: {v: 7, loc: "Methods"}}, model: "DeePMD GexTe (Baratella 2024)"}
+results:
+  - {key: dp-all, model: dp, material: gete, role: null, eval_data: {label: "Ge, GeTe and Ge2Te configurations (split not stated)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 4.4, meV/atom, "energy RMSE on GexTe: DeePMD", "Sec. III A"], [RMSE, Force, 105, meV/A, "force RMSE on GexTe: DeePMD", "Sec. III A"], [RMSE, Stress, 14.5, null, "virial RMSE (meV/atom) on GexTe: DeePMD", "Sec. III A"]]}
+gaps:
+  - "The overall RMSEs are not attributed to a training or test split; role null. The virial RMSE is in meV/atom (unit null). Per-composition errors are figure-only (Fig. 1)."

@@ -1,0 +1,62 @@
+id: vandenhaute2023
+source:
+  rank: 571
+  year: "2023"
+  first_author: "Sander Vandenhaute"
+  title: "Machine learning potentials for metal-organic frameworks using an incremental learning approach"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-023-00969-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "36b78c23c4f4fe07351627b10a01452ca987783fdca109bca99697faae09a65e"
+study_label: "Vandenhaute et al. (2023): NequIP potentials for metal-organic frameworks built by incremental learning with metadynamics walkers"
+scope: |
+  Encoding scope: NequIP models (5 A cutoff, 4 interaction layers, about
+  200,000 weights) trained by incremental learning (50 MTD walkers on
+  the unit-cell volume per iteration) for UiO-66(Zr) and MIL-53(Al), and
+  one model trained on 10 Al/Zr frameworks (about 3,100 configurations)
+  with per-framework test force and stress MAEs at 600 K (Table 1), two
+  of the frameworks held out. Single-system errors are stated only as
+  bounds. Stiffness tensors and the MIL-53 transition pressure are
+  properties.
+materials:
+  uio66: {label: "UiO-66(Zr)", class: "Metal-organic frameworks"}
+  mil53: {label: "MIL-53(Al) (large- and closed-pore phases)", class: "Metal-organic frameworks"}
+  mofs: {label: "Al- and Zr-based MOFs (CAU-13, A-520, DUT-4, MIL-68, NOTT-300, UiO-66[CDC], UiO-67, MIL-140, MOF-808, BD899C1)", class: "Metal-organic frameworks"}
+reference:
+  pbed3: {type: DFT, xc: PBE, comment: "PBE-D3(BJ)"}
+sampling:
+  mtd: {label: "Incremental learning: 50 metadynamics walkers biased on unit-cell volume per iteration (45 training, 5 validation configurations), starting from the DFT-optimized structure"}
+datasets:
+  uio66: {label: "UiO-66(Zr) incremental-learning data (11 iterations, 600 QM evaluations)", materials: [uio66], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [mtd]}
+  mil53: {label: "MIL-53(Al) incremental-learning data (19 iterations, 1,000 QM evaluations)", materials: [mil53], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [mtd]}
+  mofs: {label: "Ten-framework incremental-learning data (about 3,100 configurations)", materials: [mofs], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [mtd]}
+methods:
+  NequIP:
+    hp: [cutoffRadius, numLayers, learningRate]
+    loss: "Weighted average of energy and force errors"
+    algorithm: "Adam; incremental learning managed with Snakemake"
+    impl: {lib: NequIP, comment: "NequIP 0.5.4, l = 1 (or 0) features; MD with YAFF and PLUMED"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  nq-uio66: {label: "NequIP for UiO-66(Zr)", method: NequIP, dataset: uio66, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 4, loc: "Methods"}, learningRate: {v: 0.005, loc: "Methods"}}, model: "NequIP UiO-66(Zr)"}
+  nq-mil53: {label: "NequIP for MIL-53(Al)", method: NequIP, dataset: mil53, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 4, loc: "Methods"}, learningRate: {v: 0.005, loc: "Methods"}}, model: "NequIP MIL-53(Al)"}
+  nq-mofs: {label: "NequIP trained on ten Al/Zr frameworks", method: NequIP, dataset: mofs, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 4, loc: "Methods"}, learningRate: {v: 0.005, loc: "Methods"}}, model: "NequIP ten MOFs"}
+results:
+  - {key: mofs-cau-13, model: nq-mofs, material: mofs, role: test, eval_data: {label: "CAU-13 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 25.7, meV/A, "test force MAE on CAU-13: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0662, GPa, "test stress MAE on CAU-13: NequIP ten MOFs", "Table 1 (66.2 MPa)"]]}
+  - {key: mofs-a-520, model: nq-mofs, material: mofs, role: test, eval_data: {label: "A-520 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 40.3, meV/A, "test force MAE on A-520: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.1003, GPa, "test stress MAE on A-520: NequIP ten MOFs", "Table 1 (100.3 MPa)"]]}
+  - {key: mofs-dut-4, model: nq-mofs, material: mofs, role: test, eval_data: {label: "DUT-4 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 20.4, meV/A, "test force MAE on DUT-4: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0367, GPa, "test stress MAE on DUT-4: NequIP ten MOFs", "Table 1 (36.7 MPa)"]]}
+  - {key: mofs-mil-68, model: nq-mofs, material: mofs, role: test, eval_data: {label: "MIL-68 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 55.0, meV/A, "test force MAE on MIL-68: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0677, GPa, "test stress MAE on MIL-68: NequIP ten MOFs", "Table 1 (67.7 MPa)"]]}
+  - {key: mofs-nott-300, model: nq-mofs, material: mofs, role: test, eval_data: {label: "NOTT-300 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 22.8, meV/A, "test force MAE on NOTT-300: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0229, GPa, "test stress MAE on NOTT-300: NequIP ten MOFs", "Table 1 (22.9 MPa)"]]}
+  - {key: mofs-uio-66-cdc, model: nq-mofs, material: mofs, role: test, eval_data: {label: "UiO-66[CDC] test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 24.8, meV/A, "test force MAE on UiO-66[CDC]: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0747, GPa, "test stress MAE on UiO-66[CDC]: NequIP ten MOFs", "Table 1 (74.7 MPa)"]]}
+  - {key: mofs-uio-67, model: nq-mofs, material: mofs, role: test, eval_data: {label: "UiO-67 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 17.2, meV/A, "test force MAE on UiO-67: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0037, GPa, "test stress MAE on UiO-67: NequIP ten MOFs", "Table 1 (3.7 MPa)"]]}
+  - {key: mofs-mil-140, model: nq-mofs, material: mofs, role: test, eval_data: {label: "MIL-140 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 22.6, meV/A, "test force MAE on MIL-140: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0585, GPa, "test stress MAE on MIL-140: NequIP ten MOFs", "Table 1 (58.5 MPa)"]]}
+  - {key: mofs-mof-808, model: nq-mofs, material: mofs, role: test, eval_data: {label: "MOF-808 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 40.0, meV/A, "test force MAE on MOF-808: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.018, GPa, "test stress MAE on MOF-808: NequIP ten MOFs", "Table 1 (18.0 MPa)"]]}
+  - {key: mofs-bd899c1, model: nq-mofs, material: mofs, role: test, eval_data: {label: "BD899C1 test configurations at 600 K", location: "Table 1"}, metrics: [[MAE, Force, 25.9, meV/A, "test force MAE on BD899C1: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0652, GPa, "test stress MAE on BD899C1: NequIP ten MOFs", "Table 1 (65.2 MPa)"]]}
+  - {key: mofs-mil-53, model: nq-mofs, material: mil53, role: external, eval_data: {label: "MIL-53 test configurations at 600 K (framework not in training)", location: "Table 1"}, metrics: [[MAE, Force, 24.7, meV/A, "test force MAE on MIL-53: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.1072, GPa, "test stress MAE on MIL-53: NequIP ten MOFs", "Table 1 (107.2 MPa)"]]}
+  - {key: mofs-uio-66-bdc, model: nq-mofs, material: uio66, role: external, eval_data: {label: "UiO-66[BDC] test configurations at 600 K (framework not in training)", location: "Table 1"}, metrics: [[MAE, Force, 21.3, meV/A, "test force MAE on UiO-66[BDC]: NequIP ten MOFs", "Table 1"], [MAE, Stress, 0.0317, GPa, "test stress MAE on UiO-66[BDC]: NequIP ten MOFs", "Table 1 (31.7 MPa)"]]}
+resources: |
+  Each incremental-learning iteration takes one to two hours; MLP training on one NVIDIA A100 (40 GB), QM and metadynamics on CPU nodes (Methods).
+gaps:
+  - "Errors of the single-system UiO-66 and MIL-53 models are stated only as bounds (below 1 meV/atom and 30 meV/A over the volume range; Fig. 4). Stress MAEs converted exactly from MPa to GPa (original values in the locations)."
