@@ -1,0 +1,72 @@
+id: brunken2026
+source:
+  rank: 660
+  year: "2026"
+  first_author: "Christoph Brunken"
+  title: "Machine Learning Interatomic Potentials: Advancing Open-Source Software for Efficient and Scalable Molecular Simulation"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.22698"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2605.22698v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7466fb1c1fb005e740ada5c3e4c40abeabb3755aed8c7fea1c3894592d9a710b"
+study_label: "Brunken et al. (2026): mlip v2, open-source software for efficient and scalable MLIP simulation"
+scope: |
+  Encoding scope: the four pre-trained models released with mlip v2
+  (MACE, NequIP, ViSNet, eSEN, with partial-charge heads) trained on a
+  curated SPICE2 subset of OMol25, with their hyperparameters (Appendix F)
+  and MD speed on a single H100 (Table 7). Validation MAEs and RMSEs are
+  shown only in Figs. 2 and 6, so there are no results. Hessian-trained
+  vibrational frequencies (Table 1) and MLIPAudit scores (Table 6) are
+  property benchmarks.
+materials:
+  organics: {label: "Organic and biomolecular systems of 17 elements (SPICE2 subset of OMol25, including charged systems)", class: "organic molecules"}
+  chignolin: {label: "1UAO chignolin (138 atoms)", class: "protein"}
+  1abt: {label: "1ABT system (1205 atoms)", class: "biomolecular system"}
+reference:
+  omol: {type: DFT, comment: "OMol25 published labels (level of theory not restated; Hessian references in Sec. 5.2 use wB97M-V/def2-TZVPD with PySCF)."}
+datasets:
+  spice2-omol: {label: "Curated SPICE2 subset of OMol25 (1,763,962 train / 172,838 validation / 17,477 test structures; SMILES-based split)", materials: [organics], properties: [Energy, Forces], provenance: Augmented, n: {v: 1763962, loc: "Appendix E"}, calc: omol}
+methods:
+  MACE:
+    hp: [numLayers, numFeatures, cutoffRadius, batchSize, learningRate, numEpochs]
+    loss: "MSE with energy 40 / force 1000 weights flipped at epoch 115, charge and partial-charge terms"
+    impl: {lib: {local: mlip}, comment: "InstaDeep mlip v2 (JAX) with e3j kernels; AMSGrad, EMA 0.99"}
+    sims: [MolecularDynamics]
+  NequIP:
+    hp: [numLayers, cutoffRadius, batchSize, learningRate, numEpochs]
+    impl: {lib: {local: mlip}}
+    sims: [MolecularDynamics]
+  ViSNet:
+    hp: [numLayers, numFeatures, cutoffRadius, batchSize, learningRate, numEpochs]
+    impl: {lib: {local: mlip}}
+    sims: [MolecularDynamics]
+  eSEN:
+    hp: [numLayers, numFeatures, numEpochs]
+    impl: {lib: {local: mlip}}
+    sims: [MolecularDynamics]
+runs:
+  mace: {label: "mlip v2 MACE pre-trained model (3,274,016 parameters)", method: MACE, dataset: spice2-omol, settings: {numLayers: {v: 2, loc: "Table 4"}, numFeatures: {v: 128, loc: "Table 4"}, cutoffRadius: {v: 5.0, loc: "Table 4"}, batchSize: {v: 128, loc: "Table 4"}, learningRate: {v: 0.002, loc: "Table 4"}, numEpochs: {v: 220, loc: "Appendix E"}}, model: "mlip-v2 MACE (SPICE2/OMol25)", trainingHardware: "NVIDIA H100 GPUs"}
+  nequip: {label: "mlip v2 NequIP pre-trained model (1,921,280 parameters)", method: NequIP, dataset: spice2-omol, settings: {numLayers: {v: 5, loc: "Table 2"}, cutoffRadius: {v: 5.0, loc: "Table 2"}, batchSize: {v: 128, loc: "Table 2"}, learningRate: {v: 0.002, loc: "Table 2"}, numEpochs: {v: 220, loc: "Appendix E"}}, model: "mlip-v2 NequIP (SPICE2/OMol25)", trainingHardware: "NVIDIA H100 GPUs"}
+  visnet: {label: "mlip v2 ViSNet pre-trained model (1,172,676 parameters)", method: ViSNet, dataset: spice2-omol, settings: {numLayers: {v: 4, loc: "Table 3"}, numFeatures: {v: 128, loc: "Table 3"}, cutoffRadius: {v: 5.0, loc: "Table 3"}, batchSize: {v: 128, loc: "Table 3"}, learningRate: {v: 0.001, loc: "Table 3"}, numEpochs: {v: 220, loc: "Appendix E"}}, model: "mlip-v2 ViSNet (SPICE2/OMol25)", trainingHardware: "NVIDIA H100 GPUs"}
+  esen: {label: "mlip v2 eSEN pre-trained model (3,210,498 parameters)", method: eSEN, dataset: spice2-omol, settings: {numLayers: {v: 2, loc: "Table 5"}, numFeatures: {v: 128, loc: "Table 5 (sphere channels)"}, numEpochs: {v: 220, loc: "Appendix E"}}, model: "mlip-v2 eSEN (SPICE2/OMol25)", trainingHardware: "NVIDIA H100 GPUs"}
+timings:
+  - {model: mace, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 2.4, unit: "ms per MD step", per_atom_us: 17.39, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: mace, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 7.3, unit: "ms per MD step", per_atom_us: 52.9, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: mace, system: "1ABT, 1 ns MD", atoms: 1205, value: 19.2, unit: "ms per MD step", per_atom_us: 15.93, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: mace, system: "1ABT, 1 ns MD", atoms: 1205, value: 43.8, unit: "ms per MD step", per_atom_us: 36.35, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: nequip, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 3.4, unit: "ms per MD step", per_atom_us: 24.64, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: nequip, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 8.9, unit: "ms per MD step", per_atom_us: 64.49, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: nequip, system: "1ABT, 1 ns MD", atoms: 1205, value: 22.0, unit: "ms per MD step", per_atom_us: 18.26, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: nequip, system: "1ABT, 1 ns MD", atoms: 1205, value: 44.6, unit: "ms per MD step", per_atom_us: 37.01, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: visnet, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 1.9, unit: "ms per MD step", per_atom_us: 13.77, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: visnet, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 7.1, unit: "ms per MD step", per_atom_us: 51.45, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: visnet, system: "1ABT, 1 ns MD", atoms: 1205, value: 13.7, unit: "ms per MD step", per_atom_us: 11.37, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: visnet, system: "1ABT, 1 ns MD", atoms: 1205, value: 30.2, unit: "ms per MD step", per_atom_us: 25.06, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: esen, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 3.0, unit: "ms per MD step", per_atom_us: 21.74, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: esen, system: "1UAO chignolin, 1 ns MD", atoms: 138, value: 8.9, unit: "ms per MD step", per_atom_us: 64.49, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+  - {model: esen, system: "1ABT, 1 ns MD", atoms: 1205, value: 22.8, unit: "ms per MD step", per_atom_us: 18.92, hardware: "single NVIDIA H100 GPU, JAX-MD backend", result: null, location: "Table 7"}
+  - {model: esen, system: "1ABT, 1 ns MD", atoms: 1205, value: 46.7, unit: "ms per MD step", per_atom_us: 38.76, hardware: "single NVIDIA H100 GPU, ASE backend", result: null, location: "Table 7"}
+gaps:
+  - "Validation MAEs and RMSEs per SPICE2 subset are shown only in Figs. 2 and 6; partial-charge errors also only in figures."
+  - "Vibrational-frequency MAEs of Hessian-trained models (Table 1), MLIPAudit scores (Table 6), NPT water properties and transition-state searches are property benchmarks."

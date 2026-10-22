@@ -1,0 +1,41 @@
+id: iwasaki2026
+source:
+  rank: 659
+  year: "2026"
+  first_author: "Yuto Iwasaki"
+  title: "Cluster-based Structural Similarity for Dataset Visualization and Data Selection for Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.39984"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2609.39984v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c93ba2e79f91730019f109208dfd7bf27a40099ac614a1bac7f3c8682d5a6f45"
+study_label: "Iwasaki and Caro (2026): cluster-based structural similarity for data-set visualisation and data selection for MLIPs"
+scope: |
+  Encoding scope: the GAP models (Turbo-GAP) trained on training sets
+  selected by farthest-point sampling with data-wise, atom-wise and
+  (distribution-aware) cluster-wise similarity, or randomly, from a 64-atom
+  amorphous-carbon pool and a Ge-Sb-Te pool. Learning-curve RMSEs are
+  shown only in figures, so there are no results; the similarity metrics
+  themselves are data-analysis tools.
+materials:
+  a-c: {label: "Amorphous carbon, 64-atom cells", formula: C, class: "amorphous elemental solid"}
+  gst: {label: "Ge-Sb-Te structures of 351-363 atoms with varying composition", class: "phase-change chalcogenide"}
+reference:
+  ac-ref: {type: DFT, comment: "Published amorphous-carbon data set labels (Ref. 3); not restated."}
+  gst-ref: {type: DFT, comment: "Published GST data set labels (Ref. 45); not restated."}
+sampling:
+  fps: {label: "Farthest-point sampling with SOAP-Turbo-based similarity (data-wise, atom-wise, cluster-wise or distribution-aware cluster-wise), versus random selection"}
+datasets:
+  ac-pool: {label: "Amorphous-carbon candidate pool (225 structures; 2168-structure test set)", materials: [a-c], properties: [Energy, Forces], provenance: Published, n: {v: 225, loc: "Sec. 2.3.2"}, calc: ac-ref, sampling: [fps]}
+  gst-pool: {label: "GST candidate pool (800 structures; 800-structure test set)", materials: [gst], properties: [Energy, Forces], provenance: Published, n: {v: 800, loc: "Sec. 2.3.2"}, calc: gst-ref, sampling: [fps]}
+methods:
+  GAP:
+    algorithm: "GAP with SOAP-Turbo descriptors; trained on FPS-selected subsets of increasing size (5 or 3 repeats)"
+    impl: {lib: {local: TurboGAP}}
+runs:
+  gap-ac: {label: "GAP models for amorphous carbon trained on similarity-selected subsets (learning-curve series)", method: GAP, dataset: ac-pool, model: "GAP a-C (similarity-based selection)"}
+  gap-gst: {label: "GAP models for GST trained on similarity-selected subsets (learning-curve series)", method: GAP, dataset: gst-pool, model: "GAP GST (similarity-based selection)"}
+gaps:
+  - "Energy and force RMSE learning curves for each selection strategy (Figs. 7-10) are figure-only."
+  - "Similarity validation on QM7b and SHIFTML-molfrags (Sec. 2.2) concerns data-set visualisation, not MLIPs; processing times (Table 1) are for similarity computation."
