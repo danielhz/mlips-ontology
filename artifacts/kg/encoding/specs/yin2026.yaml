@@ -1,0 +1,54 @@
+id: yin2026
+source:
+  rank: 513
+  year: "2026"
+  first_author: "Bangchen Yin"
+  title: "Hessian-informed machine learning interatomic potential towards bridging theory and experiments"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.25373"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.25373v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "af76672d36201989d94e18794316742e8b24bcf377cbbb32c6c068b33ca29e68"
+study_label: "Yin et al. (2026): Hessian-informed training (HINT) of AlphaNet potentials with xTB Hessian pre-training, curriculum learning and stochastic projected Hessian loss"
+scope: |
+  Encoding scope: AlphaNet models pre-trained on GFN2-xTB Hessian
+  datasets (HORM-xTB-Hess, T1x-xTB-Hess) and fine-tuned on the HORM
+  wB97X/6-31G(d) dataset with sparse Hessian labels, and the H3S model
+  fine-tuned with supercell Hessian and unit-cell data. The text states
+  only Hessian and eigenvalue MAEs (not energy/force/stress metrics);
+  energy/force MAEs are figure-only. TS search, free energies and
+  anharmonic phonons are properties.
+materials:
+  orgrx: {label: "Organic reaction configurations of Transition1x/RGD1 (HORM)", class: "Organic molecules (gas phase)"}
+  h3s: {label: "H3S at about 150 GPa (Im-3m and R3m)", formula: H3S, class: "Hydrides under pressure"}
+reference:
+  xtb: {type: REF, comment: "GFN2-xTB energies, forces and full Hessians (pre-training)"}
+  horm: {type: DFT, xc: wB97X, basis: "6-31G(d)", comment: "HORM labels with full Hessians"}
+  h3sdft: {type: DFT, comment: "Supercell Hessian of the SSCHA workflow and 30 displaced unit cells, converged k-points"}
+sampling:
+  t1x: {label: "Configurations of Transition1x (about 9.6M) relabelled with GFN2-xTB"}
+  hormconf: {label: "HORM configurations (about 1.7M)"}
+  hsub: {label: "Fine-tuning subset with full E/F labels and a small random fraction of Hessian labels (SOAP weighted-local-density or energy-based ranking)"}
+  h3srand: {label: "SSCHA supercell plus 30 unit cells with Gaussian displacements (0.4 A)"}
+datasets:
+  horm-xtb: {label: "HORM-xTB-Hess (about 1.7M configurations, GFN2-xTB Hessians)", materials: [orgrx], properties: [Energy, Forces], provenance: Augmented, calc: xtb, sampling: [hormconf]}
+  t1x-xtb: {label: "T1x-xTB-Hess (about 9.6M configurations, GFN2-xTB Hessians)", materials: [orgrx], properties: [Energy, Forces], provenance: Augmented, calc: xtb, sampling: [t1x]}
+  horm-100k: {label: "HORM fine-tuning subset of 100,000 configurations with 10-100,000 Hessian labels", materials: [orgrx], properties: [Energy, Forces], provenance: Published, n: {v: 100000, loc: "Sec. II"}, calc: horm, sampling: [hsub]}
+  horm-full: {label: "Full HORM dataset (1,725,362 configurations with Hessians)", materials: [orgrx], properties: [Energy, Forces], provenance: Published, n: {v: 1725362, loc: "Methods (HORM dataset)"}, calc: horm, sampling: [hormconf]}
+  h3s: {label: "H3S fine-tuning data (supercell Hessian and 30 displaced unit cells)", materials: [h3s], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: h3sdft, sampling: [h3srand]}
+methods:
+  AlphaNet:
+    loss: "w_E 4, w_F 100, Hessian weight ramped linearly from 0 to 0.1; stochastic Hessian-vector projection with Rademacher vectors (m = 5)"
+    algorithm: "Low-fidelity Hessian pre-training, then curriculum fine-tuning"
+    sims: [GeometryOptimization, PhononCalculation]
+runs:
+  pt-horm: {label: "AlphaNet pre-trained on HORM-xTB-Hess", method: AlphaNet, dataset: horm-xtb, model: "AlphaNet HORM-xTB-Hess pre-trained"}
+  pt-t1x: {label: "AlphaNet pre-trained on T1x-xTB-Hess", method: AlphaNet, dataset: t1x-xtb, model: "AlphaNet T1x-xTB-Hess pre-trained"}
+  hi-100k: {label: "Hi-MLIP: AlphaNet fine-tuned on 100,000 HORM configurations with sparse Hessians", method: AlphaNet, dataset: horm-100k, model: "Hi-MLIP AlphaNet HORM 100k", base_model: {run: pt-horm, relation: fine-tuned, location: "Sec. II"}}
+  hi-best: {label: "Hi-MLIP 'best': AlphaNet fine-tuned on full HORM after T1x-xTB-Hess pre-training", method: AlphaNet, dataset: horm-full, model: "Hi-MLIP AlphaNet best", base_model: {run: pt-t1x, relation: fine-tuned, location: "Sec. II"}}
+  hi-h3s: {label: "Hi-MLIP AlphaNet for H3S (OMat24 pre-training, Hessian fine-tuning)", method: AlphaNet, dataset: h3s, model: "Hi-MLIP AlphaNet H3S", base_model: {label: "AlphaNet pre-trained on OMat24", relation: fine-tuned, location: "Methods (Hessian Pre-training)"}}
+results: []
+gaps:
+  - "Stated errors are Hessian and eigenvalue MAEs (e.g. 0.105 and 0.360 eV/A^2 for hi-100k; 0.075 and 0.20 eV/A^2 for hi-best; literature AlphaNet 0.415 and 3.887), which have no schema property; energy/force MAEs are figure-only (Fig. 2a). Free-energy MAEs and TS success rates are properties."
+  - "Dataset sizes of the xTB sets are approximate (about 9.6M and 1.7M); no n. The Hessian labels themselves are not a schema property."

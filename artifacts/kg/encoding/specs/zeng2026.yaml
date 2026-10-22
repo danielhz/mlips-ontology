@@ -1,0 +1,61 @@
+id: zeng2026
+source:
+  rank: 514
+  year: "2026"
+  first_author: "Lejia Zeng"
+  title: "Developing a Machine-Learning Interatomic Potential for Non-Covalent Interactions in Proteins"
+  venue: "arXiv (Cornell University)"
+  doi: ""
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2601.11628v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "edd27b7c31f801272052037b796049e7f26f2f390d7b9a8b855704f8dd808e20"
+authors:
+  - {given: "Lejia", family: "Zeng"}
+  - {given: "Xintong", family: "Zhang"}
+  - {given: "Yuchan", family: "Pei"}
+  - {given: "Lifeng", family: "Zhao"}
+  - {given: "Lan", family: "Hua"}
+  - {given: "Jincai", family: "Yang"}
+  - {given: "Niu", family: "Huang"}
+study_label: "Zeng et al. (2026): PANIP, a NequIP ensemble for protein non-covalent interaction energies trained on the multi-fidelity active-learning PDB-FRAGID dataset"
+scope: |
+  Encoding scope: the PANIP ensemble (5 NequIP models) trained directly
+  on counterpoise-corrected wB97X-D3BJ/def2-TZVPP interaction energies
+  of about 3.15 million PDB fragment dimers selected by multi-fidelity
+  active learning (r2SCAN-3c surrogate labels), its interaction-energy
+  errors on four benchmark sets, and ANI-2x on the CSD set. Errors are
+  interaction-energy errors (kcal/mol). Binding-pose and PDB pattern
+  analyses are not metrics.
+materials:
+  pdbdimers: {label: "Protein fragment dimers (17 fragment types, 153 combinations) from high-resolution PDB structures", class: "Molecular dimers and noncovalent complexes"}
+  csd: {label: "Fragment dimers from CSD small-molecule crystal geometries", class: "Molecular dimers and noncovalent complexes"}
+reference:
+  wb97x: {type: DFT, code: ORCA, xc: {local: wB97X-D3BJ}, basis: "def2-TZVPP", comment: "RIJCOSX, ma-def2-TZVPP on anionic oxygens, counterpoise-corrected interaction energies"}
+sampling:
+  mfal: {label: "Multi-fidelity active learning: NequIP surrogate on r2SCAN-3c labels flags high-error dimers from 36.3 million PDB dimers (normalized error above 0.04 kcal/mol)"}
+datasets:
+  fragid: {label: "PDB-FRAGID (about 3.15 million dimers, wB97X-D3BJ/def2-TZVPP interaction energies)", materials: [pdbdimers], properties: [Energy], provenance: InHouse, calc: wb97x, sampling: [mfal]}
+external_models: [ANI-2x]
+methods:
+  NequIP:
+    hp: [cutoffRadius, batchSize]
+    loss: "Interaction energies"
+    algorithm: "Ensemble of 5 models by five-fold cross-validation; early stopping (patience 100)"
+    impl: {lib: NequIP}
+    sims: [GeometryOptimization]
+runs:
+  panip: {label: "PANIP (NequIP ensemble of 5)", method: NequIP, dataset: fragid, settings: {cutoffRadius: {v: 7.5, loc: "Methods"}, batchSize: {v: 512, loc: "Methods"}}, model: "PANIP"}
+results:
+  - {key: panip-low, model: panip, material: pdbdimers, role: null, eval_data: {label: "PDB-derived low-energy dimers", location: "Results, Fig. 2A"}, metrics: [[MAE, Energy, 0.09, kcal/mol, "interaction-energy MAE on PDB low-energy dimers: PANIP", "Results"], [RMSE, Energy, 0.163, kcal/mol, "interaction-energy RMSE on PDB low-energy dimers: PANIP", "Results"], [R2, Energy, 0.999, null, "interaction-energy R2 on PDB low-energy dimers: PANIP", "Results"]]}
+  - {key: panip-opt, model: panip, material: pdbdimers, role: external, eval_data: {label: "Optimized low-energy dimers", location: "Results, Fig. 2B"}, metrics: [[MAE, Energy, 0.547, kcal/mol, "interaction-energy MAE on optimized low-energy dimers: PANIP", "Results"], [RMSE, Energy, 1.207, kcal/mol, "interaction-energy RMSE on optimized low-energy dimers: PANIP", "Results"]]}
+  - {key: panip-csd, model: panip, material: csd, role: external, eval_data: {label: "CSD-derived dimer geometries", location: "Results, Fig. 2C"}, metrics: [[MAE, Energy, 0.171, kcal/mol, "interaction-energy MAE on CSD dimers: PANIP", "Results"], [RMSE, Energy, 0.507, kcal/mol, "interaction-energy RMSE on CSD dimers: PANIP", "Results"], [R2, Energy, 0.999, null, "interaction-energy R2 on CSD dimers: PANIP", "Results"]]}
+  - {key: panip-rand, model: panip, material: pdbdimers, role: external, eval_data: {label: "15,300 non-equilibrium dimers from biased random sampling", location: "Results, Fig. 2D"}, metrics: [[MAE, Energy, 0.448, kcal/mol, "interaction-energy MAE on 15,300 random dimers: PANIP", "Results"], [RMSE, Energy, 1.372, kcal/mol, "interaction-energy RMSE on 15,300 random dimers: PANIP", "Results"], [R2, Energy, 0.996, null, "interaction-energy R2 on 15,300 random dimers: PANIP", "Results"]]}
+  - {key: panip-rand-neg, model: panip, material: pdbdimers, role: external, eval_data: {label: "Random dimers with interaction energy below 0 kcal/mol (8,572)", location: "Results, Fig. S4a"}, metrics: [[MAE, Energy, 0.195, kcal/mol, "interaction-energy MAE on attractive random dimers: PANIP", "Results"], [RMSE, Energy, 0.363, kcal/mol, "interaction-energy RMSE on attractive random dimers: PANIP", "Results"], [R2, Energy, 0.999, null, "interaction-energy R2 on attractive random dimers: PANIP", "Results"]]}
+  - {key: panip-rand-pos, model: panip, material: pdbdimers, role: external, eval_data: {label: "Random dimers with interaction energy above 0 kcal/mol (6,728)", location: "Results, Fig. S4b"}, metrics: [[RMSE, Energy, 0.882, kcal/mol, "interaction-energy RMSE on repulsive random dimers: PANIP", "Results"]]}
+  - {key: ani2x-csd, model: "ext:ANI-2x", material: csd, role: external, eval_data: {label: "CSD-derived dimer geometries (interaction energies as total-energy differences)", location: "Results, Fig. 3a"}, metrics: [[MAE, Energy, 9.261, kcal/mol, "interaction-energy MAE on CSD dimers: ANI-2x", "Results"], [RMSE, Energy, 23.765, kcal/mol, "interaction-energy RMSE on CSD dimers: ANI-2x", "Results"], [R2, Energy, 0.064, null, "interaction-energy R2 on CSD dimers: ANI-2x", "Results"]]}
+  - {key: ani2x-csd-neutral, model: "ext:ANI-2x", material: csd, role: external, eval_data: {label: "CSD-derived dimers without charged fragments", location: "Results, Fig. 3b"}, metrics: [[MAE, Energy, 0.882, kcal/mol, "interaction-energy MAE on neutral CSD dimers: ANI-2x", "Results"], [RMSE, Energy, 1.25, kcal/mol, "interaction-energy RMSE on neutral CSD dimers: ANI-2x", "Results"], [R2, Energy, 0.846, null, "interaction-energy R2 on neutral CSD dimers: ANI-2x", "Results"]]}
+resources: |
+  Evaluating 15,300 random dimers on one CPU core took PANIP 6 h 11 min versus an estimated 463 days 11 h for wB97X-D3BJ/def2-TZVPP (Results).
+gaps:
+  - "The low-energy benchmark is described as the training domain without saying whether it was held out, so its role is null. The PDB-FRAGID size is approximate (about 3.15 million); no n. No DOI in the manifest; authors taken from the paper's front matter."
