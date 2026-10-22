@@ -1,0 +1,42 @@
+id: novikov2018
+source:
+  rank: 621
+  year: "2018"
+  first_author: "Ivan  Sergeyevich Novikov"
+  title: "Automated calculation of thermal rate coefficients using ring polymer molecular dynamics and machine-learning interatomic potentials with active learning"
+  venue: "Physical Chemistry Chemical Physics"
+  doi: "10.1039/c8cp06037a"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "1805.11924v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ed65bb6a4c1bb2f2bd0207bc1fcd5f75aa67a37f3c5493c0b48cc00222a36c4d"
+study_label: "Novikov, Suleimanov and Shapeev (2018): active-learning MTPs for RPMD thermal rate coefficients"
+scope: |
+  Encoding scope: the moment tensor potentials fitted on the fly (active
+  learning with extrapolation grades) to two existing reference PESs, for
+  OH + H2 -> H + H2O (NN1 PES) and CH4 + CN -> CH3 + HCN (PES2017), and
+  used in RPMDrate simulations. Accuracy is reported only as PMF and rate
+  coefficient agreement, so there are no results.
+materials:
+  ohh2: {label: "OH + H2 -> H + H2O reacting system", class: "gas-phase bimolecular reaction"}
+  ch4cn: {label: "CH4 + CN -> CH3 + HCN reacting system", class: "gas-phase bimolecular reaction"}
+reference:
+  nn1: {type: REF, comment: "NN1 neural-network PES of Ref. 55 used as the 'ab initio' reference model."}
+  pes2017: {type: REF, comment: "PES2017 semi-empirical analytical PES (34 fitted parameters) of Ref. 54 used as the reference model."}
+sampling:
+  al-rpmd: {label: "On-the-fly active learning during RPMDrate umbrella sampling and recrossing trajectories (extrapolation-grade thresholds 2 and 10)"}
+datasets:
+  ohh2: {label: "Actively selected OH + H2 configurations labelled with NN1 PES", materials: [ohh2], properties: [Energy, Forces], provenance: InHouse, calc: nn1, sampling: [al-rpmd]}
+  ch4cn: {label: "Actively selected CH4 + CN configurations labelled with PES2017", materials: [ch4cn], properties: [Energy, Forces], provenance: InHouse, calc: pes2017, sampling: [al-rpmd]}
+methods:
+  MTP:
+    hp: [cutoffRadius]
+    loss: "Squared energy and force errors with force weight wf"
+    algorithm: "92 basis functions, 4 radial functions, 12 Chebyshev radial basis functions; D-optimality extrapolation grade for active learning; used in ring-polymer MD (RPMDrate)"
+    sims: [MolecularDynamics]
+runs:
+  mtp-ohh2: {label: "Actively learned MTP for OH + H2 (about 300 parameters)", method: MTP, dataset: ohh2, settings: {cutoffRadius: {v: 4, loc: "Sec. 2.2.1"}}, model: "AL-MTP OH+H2"}
+  mtp-ch4cn: {label: "Actively learned MTP for CH4 + CN (about 500 parameters)", method: MTP, dataset: ch4cn, settings: {cutoffRadius: {v: 6, loc: "Sec. 2.2.1"}}, model: "AL-MTP CH4+CN"}
+gaps:
+  - "No energy or force errors are stated; agreement is given as PMF differences 'less than 0.3 kcal/mol' and rate-coefficient RMS deviations of 'about 20% or less' (Tables 1-2), which are bounds on properties."
+  - "Training-set sizes depend on temperature and bead number (Table 3, at most 5000); separate kQTST and kappa MTPs per condition are summarised as one run per reaction."

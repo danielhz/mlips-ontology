@@ -1,0 +1,36 @@
+id: thomas2025
+source:
+  rank: 622
+  year: "2025"
+  first_author: "Jack Thomas"
+  title: "Self-consistent Coulomb interactions for machine learning interatomic potentials"
+  venue: "Nonlinearity"
+  doi: "10.1088/1361-6544/ae0402"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2406.10915v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "28630d26c6c67a4062589709c484b9e8353ac4b6615a315fbc96a424b0fdc4cc"
+study_label: "Thomas, Baldwin, Csányi and Ortner (2025): self-consistent Coulomb interactions for machine-learning interatomic potentials"
+scope: |
+  Encoding scope: the proof-of-concept self-consistent model (energy and
+  coarse-grained density as body-ordered functions of positions and
+  electrostatic-potential features, built from MACE elements) fitted to
+  4800 FHI-aims PBE water clusters. The paper is mainly mathematical
+  analysis; its only numerical results are convergence curves in Fig. 1,
+  so there are no results.
+materials:
+  water-clusters: {label: "Small clusters of water molecules", formula: H2O, class: "molecular clusters"}
+reference:
+  pbe: {type: DFT, code: FHIaims, xc: PBE, comment: "Electron density partitioned onto atom-centred charges, dipoles and quadrupoles (Appendix C)."}
+datasets:
+  water: {label: "4800 small water clusters with energies, forces and partitioned densities", materials: [water-clusters], properties: [Energy, Forces], provenance: InHouse, n: {v: 4800, loc: "Sec. 4"}, calc: pbe}
+methods:
+  MACE:
+    hp: [bodyOrder]
+    loss: "Total energy (with Hartree term from the coarse-grained density) and nuclear forces; density coefficients fitted directly"
+    algorithm: "Self-consistent variant: local energy and density functions of positions, species and projected electrostatic-potential features (0-27 per atom), built from MACE elements"
+runs:
+  sc-mace: {label: "Self-consistent Coulomb model for water clusters (MACE-based energy and density functions)", method: MACE, dataset: water, model: "Self-consistent Coulomb MACE (water clusters)"}
+gaps:
+  - "Force RMSEs and density-coefficient errors versus body order (2-4) and number of electrostatic features are shown only in Fig. 1."
+  - "Mapped to the registry method MACE as for the self-consistent electrostatic MACE models of baldwin2026; a registry decision on such variants is pending."

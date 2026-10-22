@@ -1,0 +1,47 @@
+id: byggmastar2022multiscale
+source:
+  rank: 623
+  year: "2022"
+  first_author: "Jesper Byggmästar"
+  title: "Multiscale machine-learning interatomic potentials for ferromagnetic and liquid iron"
+  venue: "Journal of Physics Condensed Matter"
+  doi: "10.1088/1361-648x/ac6f39"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2201.10237v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f261951df2ef10c4b34e1de84581de277ffd4fb29fd62c8ddb91fc41720d0369"
+study_label: "Byggmästar et al. (2022): multiscale machine-learning potentials (tabGAP-EAM, tabGAP-3b, tabGAP, GAP-SOAP) for ferromagnetic and liquid iron"
+scope: |
+  Encoding scope: the four iron potentials of the paper, trained on the
+  same 1078-structure PBE data set: the tabulated low-dimensional GAPs
+  tabGAP-EAM, tabGAP-3b and tabGAP (2b+3b+EAM) and the GAP-SOAP. Energy
+  and force errors are given only in figures or approximately, so there
+  are no results.
+materials:
+  fe: {label: "Ferromagnetic bcc and liquid iron with vacancies, interstitial clusters, dislocations, surfaces and short-range repulsion", formula: Fe, class: "bcc transition metal"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Gamma-centred Monkhorst-Pack, spacing at most 0.15 1/A", comment: "Fe_sv PAW (16 valence electrons); 0.1 eV Methfessel-Paxton smearing; collinear spin-polarised (ferromagnetic)."}
+sampling:
+  mixed: {label: "Distorted bcc cells, finite-temperature bulk, vacancy and SIA clusters, dislocation loops and lines, surfaces, gamma-surfaces, short-range interstitials and liquids at chi-squared-distributed densities; some generated with early GAP/tabGAP versions"}
+datasets:
+  fe: {label: "Iron training set (1078 structures, 38,613 atoms) with a separate crystalline/liquid test set", materials: [fe], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 1078, loc: "Sec. II D"}, calc: pbe, sampling: [mixed]}
+methods:
+  tabGAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "Low-dimensional GAPs (repulsive + 2-body, EAM-like embedding, 3-body) tabulated onto 1D and 3D cubic splines; pair style tabgap with eam/fs in LAMMPS"
+    impl: {lib: QUIP, comment: "GAPs trained with Gaussian process regression in QUIP (Sec. II A), then tabulated"}
+    sims: [MolecularDynamics, NudgedElasticBand, GeometryOptimization]
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "SOAP descriptor with repulsive and machine-learned pair potentials"
+    impl: {lib: QUIP, comment: "Sec. II A"}
+    sims: [MolecularDynamics, NudgedElasticBand, GeometryOptimization]
+runs:
+  tabgap-eam: {label: "tabGAP-EAM (repulsion + 2-body + EAM embedding, tabulated)", method: tabGAP, dataset: fe, settings: {cutoffRadius: {v: 4.5, loc: "Table I (2b and EAM)"}}, model: "tabGAP-EAM Fe"}
+  tabgap-3b: {label: "tabGAP-3b (repulsion + 2-body + 3-body, tabulated)", method: tabGAP, dataset: fe, settings: {cutoffRadius: {v: 4.5, loc: "Table I (2b; 3b cutoff 3.7 A)"}}, model: "tabGAP-3b Fe"}
+  tabgap: {label: "tabGAP (repulsion + 2-body + 3-body + EAM embedding, tabulated)", method: tabGAP, dataset: fe, settings: {cutoffRadius: {v: 4.5, loc: "Table I (2b and EAM; 3b cutoff 3.7 A, 500 sparse points)"}}, model: "tabGAP Fe (2022)"}
+  gap-soap: {label: "GAP-SOAP (repulsion + 2-body + SOAP)", method: GAP, dataset: fe, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}, numSparseConfigs: {v: 3000, loc: "Table I (SOAP sparse environments)"}}, model: "GAP-SOAP Fe (2022)"}
+gaps:
+  - "Energy and force RMSEs are shown only in Figs. 1-3; the text gives approximate values ('at most a few meV/atom and around 0.06 eV/A' for crystals, 'around 10 meV/atom and 0.3 eV/A' for liquids), which are not encoded."
+  - "Speed is given only relative to other potentials (tabGAP 175 times faster than the untabulated GAP-3b+EAM; GAP-SOAP about 65 times slower than tabGAP), not as timings."
+  - "Bulk, surface, defect, thermal and liquid properties (Tables II-III) are property comparisons with 15 literature EAM/MEAM/ABOP/ADP potentials and GAP-D18, which are not encoded."
