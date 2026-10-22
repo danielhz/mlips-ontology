@@ -1,0 +1,57 @@
+id: armstrong2026
+source:
+  rank: 449
+  year: "2026"
+  first_author: "Jeff Armstrong"
+  title: "High-Pressure Inelastic Neutron Spectroscopy: Experimental Validation of Machine-Learned Interatomic Potential Energy Landscapes"
+  venue: "The Journal of Physical Chemistry Letters"
+  doi: "10.1021/acs.jpclett.6c00720"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.05442v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6541b29d46e3907629d5c387b1e162524a1f503e04b531981d8134b206b12077"
+study_label: "Armstrong et al. (2026): high-pressure inelastic neutron spectroscopy of 2,5-diiodothiophene as an experimental test of fine-tuned MACE potentials"
+scope: |
+  Encoding scope: the VASP training data for crystalline
+  2,5-diiodothiophene (geometry optimisation, volume scans, NPT MD at
+  0-2 GPa, non-diagonal 288-atom supercells; 1,412/176/176 split) at
+  PBE-D3(BJ) and, for a subset, r2SCAN-D4, the three fine-tuned MACE
+  models (naive fine-tune of mace_mp_0b3; multihead fine-tunes of
+  mace_omat-0 and MACE-MH-1) with the fitting RMSEs of SI S4.2, and
+  MACE-POLAR-1-L as a comparison. INS spectra, lattice parameters and MD
+  validations are properties.
+materials:
+  dit: {label: "Crystalline 2,5-diiodothiophene at 0-2 GPa", formula: "C4H2I2S", class: "Organic molecular crystal"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "0.2 1/A spacing, off Gamma", comment: "PBE-D3(BJ), Gaussian smearing 0.01 eV, MPtrj-compatible settings (SI S3.1)."}
+  r2scand4: {type: DFT, code: VASP, xc: {local: r2SCAN-D4}, pp: PAW, cutoff: 680, comment: "MatPES-compatible r2SCAN settings with a D4 correction (SI S3.1)."}
+sampling:
+  ft: {label: "DFT geometry-optimisation frames (> 50 meV apart), +-10 % volume scans, 300 K NPT MD at 0-2 GPa with MACE-descriptor farthest-point selection, and NPT MD of non-diagonal 288-atom supercells"}
+datasets:
+  pbe: {label: "PBE-D3 fine-tuning data (1,412 training, 176 validation, 176 test)", materials: [dit], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1412, loc: "SI S4.2 (training)"}, calc: pbed3, sampling: [ft]}
+  pbe-sub: {label: "PBE-D3 subset used for the multihead fine-tune (1,068 training, 133 validation/test)", materials: [dit], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1068, loc: "SI S4.2"}, calc: pbed3, sampling: [ft]}
+  r2scan: {label: "r2SCAN-D4 relabelling of the 1,068-structure subset", materials: [dit], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1068, loc: "SI S4.2"}, calc: r2scand4, sampling: [ft]}
+methods:
+  MACE:
+    hp: [learningRate, batchSize, numEpochs]
+    impl: {lib: MACE, comment: "via janus-core"}
+    sims: [MolecularDynamics, PhononCalculation, GeometryOptimization]
+  MACE-POLAR:
+    sims: [PhononCalculation]
+runs:
+  mp0b3: {label: "mace_mp_0b3 as distributed (size not stated)", method: MACE, model: "mace_mp_0b3"}
+  omat0: {label: "mace_omat-0 as distributed", method: MACE, model: "mace_omat-0"}
+  mh1: {label: "MACE-MH-1 (omat_pbe head) as distributed", method: MACE, model: "MACE-MH-1 (omat_pbe head)"}
+  ft-pbe: {label: "FT-PBE-D3: naive fine-tune of mace_mp_0b3 on the PBE-D3 data", method: MACE, dataset: pbe, settings: {learningRate: {v: 0.005, loc: "SI S4.2"}, batchSize: {v: 8, loc: "SI S4.2"}, numEpochs: {v: 2000, loc: "SI S4.2"}}, model: "FT-PBE-D3 (2,5-diiodothiophene)", base_model: {run: mp0b3, relation: fine-tuned, location: "SI S4.2"}, trainingHardware: "NVIDIA A100 (about 20 s per epoch)"}
+  ft-r2scan: {label: "FT-R2SCAN-D4: multihead fine-tune of mace_omat-0 on r2SCAN-D4 data (MP/OMAT replay)", method: MACE, dataset: r2scan, settings: {learningRate: {v: 0.0001, loc: "SI S4.2"}, batchSize: {v: 2, loc: "SI S4.2"}, numEpochs: {v: 10, loc: "SI S4.2"}}, model: "FT-R2SCAN-D4 (2,5-diiodothiophene)", base_model: {run: omat0, relation: fine-tuned, location: "SI S4.2"}, trainingHardware: "4 NVIDIA A100 (1 h 18 min per epoch)"}
+  ft-mh1: {label: "FT-MH-1-PBE-D3: multihead fine-tune of MACE-MH-1 (omat_pbe head) on PBE-D3 data with 30,000 MP replay structures", method: MACE, dataset: pbe-sub, settings: {learningRate: {v: 0.0001, loc: "SI S4.2"}, batchSize: {v: 2, loc: "SI S4.2"}, numEpochs: {v: 10, loc: "SI S4.2"}}, model: "FT-MH-1-PBE-D3 (2,5-diiodothiophene)", base_model: {run: mh1, relation: fine-tuned, location: "SI S4.2"}, trainingHardware: "4 NVIDIA A100 (56 min per epoch)"}
+  polar: {label: "MACE-POLAR-1-L as distributed", method: MACE-POLAR, model: "MACE-POLAR-1-L"}
+results:
+  - {key: ft-pbe-fit, model: ft-pbe, material: dit, role: training, eval_data: {label: "PBE-D3 fine-tuning data (fitting errors)", location: "SI S4.2"}, metrics: [[RMSE, Energy, 10.0, meV/atom, "train energy RMSE on dit: FT-PBE-D3", "SI S4.2"], [RMSE, Force, 8.4, meV/A, "train force RMSE on dit: FT-PBE-D3", "SI S4.2"], [RMSE, Stress, 0.7, null, "train stress RMSE on dit in meV/A3: FT-PBE-D3", "SI S4.2"]]}
+  - {key: ft-r2scan-fit, model: ft-r2scan, material: dit, role: training, eval_data: {label: "r2SCAN-D4 fine-tuning data (fitting results)", location: "SI S4.2"}, metrics: [[RMSE, Energy, 1.05, meV/atom, "train energy RMSE on dit: FT-R2SCAN-D4", "SI S4.2"], [RMSE, Force, 26.59, meV/A, "train force RMSE on dit: FT-R2SCAN-D4", "SI S4.2"], [RMSE, Stress, 0.48, null, "train stress RMSE on dit in meV/A3: FT-R2SCAN-D4", "SI S4.2"]]}
+  - {key: ft-mh1-fit, model: ft-mh1, material: dit, role: training, eval_data: {label: "PBE-D3 subset (fitting results)", location: "SI S4.2"}, metrics: [[RMSE, Energy, 0.94, meV/atom, "train energy RMSE on dit: FT-MH-1-PBE-D3", "SI S4.2"], [RMSE, Force, 22.24, meV/A, "train force RMSE on dit: FT-MH-1-PBE-D3", "SI S4.2"], [RMSE, Stress, 0.30, null, "train stress RMSE on dit in meV/A3: FT-MH-1-PBE-D3", "SI S4.2"]]}
+resources: |
+  Fine-tuning on one A100 (about 20 s per epoch) or four A100s (56-78 min per epoch); INS spectra from the MLIPs take minutes on a personal computer versus days of DFT (main text).
+gaps:
+  - "The SI reports 'fitting' RMSEs without naming the evaluation split; they are recorded as training errors. Stress RMSEs are in meV/A3 (unit null)."
+  - "INS spectra, peak assignments (Table 2), lattice parameters (Table 1) and MD validations (Table 3) are properties. The base checkpoints are named as in the SI; their sizes are not stated."

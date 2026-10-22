@@ -1,0 +1,46 @@
+id: shenoy2024
+source:
+  rank: 448
+  year: "2024"
+  first_author: "Lakshmi Shenoy"
+  title: "Collinear-spin machine learned interatomic potential for Fe7Cr2Ni alloy"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.8.033804"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2309.08689v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "220416807634163d59aeb36922346f55f8c98423fc7024f58ee4b362d36b38f9"
+study_label: "Shenoy et al. (2024): a collinear-spin Gaussian approximation potential (Spin GAP) for the Fe7Cr2Ni alloy"
+scope: |
+  Encoding scope: the VASP (PBE, collinear AFM spins) training database
+  DB1-8 of Fe7Cr2Ni bulk and monovacancy supercells with short-range order
+  from KKR-CPA effective-medium Monte Carlo, strains, relaxation
+  trajectories and AIMD snapshots (about 160,000 atomic environments),
+  and three GAPs (2-body plus SOAP; 6 A cutoffs): standard GAP, Spin GAP
+  with Fe spin-augmented descriptors and compressed (spin) GAP variants.
+  Errors are given only as bounds or approximate improvements (gaps);
+  elastic constants, vacancy energies and magnetic behaviour are
+  properties.
+materials:
+  fecrni: {label: "Fe7Cr2Ni austenitic alloy: bulk (256 atoms) and monovacancy (255 atoms) supercells with short-range order, strained and high-temperature configurations", class: "High-entropy alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "3x3x3", comment: "Collinear spin-polarised with single-layer AFM ordering imposed; 8, 6 and 10 valence electrons for Fe, Cr, Ni; EDIFF 1e-7 eV (Sec. II C)."}
+sampling:
+  em: {label: "Lattice Monte Carlo with KKR-CPA S(2) pair interchange parameters at 600-2000 K, then DFT relaxation; random strains, relaxation snapshots, AIMD at 1000-2000 K and intermediate geometry-optimisation snapshots (DB1-8)"}
+datasets:
+  db: {label: "Fe7Cr2Ni training database DB1-DB8 (training and test split)", materials: [fecrni], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [em]}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, GeometryOptimization, MonteCarlo]
+runs:
+  gap: {label: "GAP (2-body Gaussian kernel with 100 sparse points + SOAP with 800 sparse points, nmax = lmax = 10, zeta 4)", method: GAP, dataset: db, settings: {cutoffRadius: {v: 6.0, loc: "Table II"}, numSparseConfigs: {v: 800, loc: "Table II (SOAP)"}}, model: "Fe7Cr2Ni GAP"}
+  spin-gap: {label: "Spin GAP: GAP with collinear Fe spin information in the descriptors", method: GAP, dataset: db, settings: {cutoffRadius: {v: 6.0, loc: "Table II"}, numSparseConfigs: {v: 800, loc: "Table II (SOAP)"}}, model: "Fe7Cr2Ni Spin GAP"}
+  cgap: {label: "Compressed GAP (compressed SOAP descriptors)", method: GAP, dataset: db, model: "Fe7Cr2Ni compressed GAP"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Errors are stated only as bounds or relative changes: energy training and test errors within 2 and 6 meV/atom, force errors as low as 200 meV/A (low temperature) and 400 meV/A (high temperature) for GAP; Spin GAP lowers typical energy errors by about 1 meV/atom and force errors by about 50 meV/A. Per-model values are in figures (Figs. 3, A2)."
+  - "The spin-augmented and compressed descriptors are encoded as settings of GAP. Lattice parameters, elastic constants (Table III), vacancy formation energies and magnetic properties are properties."

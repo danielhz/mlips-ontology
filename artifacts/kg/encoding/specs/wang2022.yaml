@@ -1,0 +1,47 @@
+id: wang2022
+source:
+  rank: 447
+  year: "2022"
+  first_author: "Rui Wang"
+  title: "Classical and machine learning interatomic potentials for BCC vanadium"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.6.113603"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2209.12322v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ca29df6e27156e470825be31a3eb62d6604a0a19b9e64b83a3f0f05a1f0acea9"
+study_label: "Wang et al. (2022): classical XMEAM and machine-learned DP-HYB interatomic potentials for BCC vanadium, benchmarked with GAP-V"
+scope: |
+  Encoding scope: the VASP PBE training data for vanadium built with
+  DP-GEN (bulk, surfaces, interstitials, high-density BCC/FCC) plus
+  specialised gamma-line, cohesive-energy and vacancy sets (8,786
+  configurations, Table III), the DP-HYB-V model (hybrid descriptor,
+  DeePMD-kit), and the GAP-V of the literature used as a benchmark. No
+  energy/force errors are stated; lattice, elastic, defect, surface and
+  dislocation properties and relative speeds are properties. XMEAM-V is a
+  classical potential and not encoded.
+materials:
+  v: {label: "Vanadium: BCC (bulk, surfaces, point defects, dislocations), FCC and HCP structures", formula: "V", class: "Metals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 650, kpoints: "0.1 1/A spacing", comment: "V_sv PAW (13 valence electrons), Methfessel-Paxton 0.22 eV (Sec. II A)."}
+sampling:
+  dpgen: {label: "DP-GEN loops over bulk (50 K to 1.9 Tm, 8 pressures), surfaces, self-interstitials and high-density structures, selecting configurations by force deviation of four DP models; plus specialised gamma-line, EOS and vacancy sets"}
+datasets:
+  v: {label: "DP-HYB-V training data (Table III; weights 1-100 per data type)", materials: [v], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 8786, loc: "Table III"}, calc: pbe, sampling: [dpgen]}
+methods:
+  DeePMD:
+    hp: [learningRate]
+    loss: "Energy, force and virial prefactors 10, 1 and 10 (start and limit)"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics, GeometryOptimization, NudgedElasticBand]
+  GAP:
+    sims: [MolecularDynamics]
+runs:
+  dp-hyb-v: {label: "DP-HYB-V: DeePMD with the hybrid descriptor, best of four models further trained on all data (4e6 steps)", method: DeePMD, dataset: v, settings: {learningRate: {v: 1.0e-4, loc: "Sec. II D (initial)"}}, model: "DP-HYB-V"}
+  gap-v: {label: "GAP-V of the literature as published (benchmark)", method: GAP, model: "GAP-V"}
+results: []
+resources: |
+  For the largest system (more than 30,000 atoms, LAMMPS, 32 CPU cores) XMEAM-V is about 20 % faster than compressed DP-HYB-V, 13.3 times faster than uncompressed DP-HYB-V and 31.6 times faster than GAP-V; compression speeds DP-HYB-V up about 10 times on CPU and 6 times on a V100 GPU (Sec. III K; absolute speeds in Fig. 12).
+gaps:
+  - "No energy or force errors are stated for DP-HYB-V. Lattice parameters, elastic constants, surface energies, point-defect energies, Peierls stresses and barriers (Tables V-IX) are properties."
+  - "DP-HYB (the hybrid se_e2_a + se_e3 descriptor) is encoded under DeePMD with the descriptor as a setting. XMEAM-V is a classical MEAM and not an MLIP."
