@@ -1,0 +1,52 @@
+id: gasteiger2020coll
+source:
+  rank: 222
+  year: "2020"
+  first_author: "Johannes Gasteiger"
+  title: "Fast and Uncertainty-Aware Directional Message Passing for Non-Equilibrium Molecules"
+  venue: "arXiv"
+  doi: "10.48550/arxiv.2011.14115"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2011.14115v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c187777f22b037bb4a94811e1cd94ab989aba7cf571e4285516a91a760dc1b58"
+study_label: "Gasteiger et al. (2020): DimeNet++ and the COLL data set of colliding molecules"
+scope: |
+  Encoding scope: the COLL data set introduced here and the DimeNet++ and
+  SchNet models trained on it (Table 3), plus the DimeNet++ QM9 U0 error
+  (Table 2). The other QM9 targets, the ablation of Table 1 and the
+  ensemble's errors are not encoded.
+materials:
+  coll: {label: "Pairs of small molecules during high-energy collisions (COLL)", class: "Small organic molecules (reactive, far from equilibrium)"}
+  qm9: {label: "Small organic molecules with up to nine heavy atoms (QM9)", class: "Small organic molecules (equilibrium geometries)"}
+reference:
+  coll-dft: {type: DFT, xc: {local: "revPBE-D3"}, basis: "def2-TZVP", comment: "Broken spin symmetry; lowest of several SCF solutions from randomised initial wavefunctions; Fermi smearing at 5000 K (Sec. 3)."}
+sampling:
+  collisions: {label: "GFN2-xTB molecular-collision MD, random snapshots recomputed with DFT", comment: "140,000 random snapshots from semiempirical collision trajectories (Sec. 3)."}
+datasets:
+  coll: {label: "COLL data set (140,000 configurations; introduced here)", materials: [coll], properties: [Energy, Forces], provenance: InHouse, n: {v: 140000, loc: "Secs. 1, 3"}, calc: coll-dft, sampling: [collisions]}
+  qm9: {label: "QM9", materials: [qm9], properties: [Energy], provenance: Published}
+methods:
+  DimeNet:
+    hp: [numLayers]
+    impl: {lib: {local: "DimeNet++ reference implementation", comment: "https://www.daml.in.tum.de/dimenet"}}
+  SchNet: {}
+runs:
+  dimenetpp-coll: {label: "DimeNet++ trained on COLL", method: DimeNet, dataset: coll, settings: {numLayers: {v: 4, loc: "Sec. 2"}}, model: "DimeNet++ COLL model"}
+  dimenetpp-mve-coll: {label: "DimeNet++ with mean-variance estimation trained on COLL", method: DimeNet, dataset: coll, settings: {numLayers: {v: 4, loc: "Sec. 2"}}, model: "DimeNet++ MVE COLL model"}
+  schnet-coll: {label: "SchNet (reference implementation) trained on COLL", method: SchNet, dataset: coll, model: "SchNet COLL model"}
+  dimenetpp-qm9: {label: "DimeNet++ trained on the QM9 U0 target", method: DimeNet, dataset: qm9, settings: {numLayers: {v: 4, loc: "Sec. 2"}}, model: "DimeNet++ QM9 U0 model"}
+results:
+  - {key: dimenetpp-coll, model: dimenetpp-coll, material: coll, role: test, eval_data: {label: "COLL test set", registry: COLL}, metrics: [[MAE, Energy, 0.047, eV, "COLL energy MAE: DimeNet++", "Table 3"], [MAE, Force, 0.040, eV/A, "COLL force MAE: DimeNet++", "Table 3"]]}
+  - {key: dimenetpp-mve-coll, model: dimenetpp-mve-coll, material: coll, role: test, eval_data: {label: "COLL test set", registry: COLL}, metrics: [[MAE, Energy, 0.033, eV, "COLL energy MAE: DimeNet++ with mean-variance estimation", "Table 3"], [MAE, Force, 0.041, eV/A, "COLL force MAE: DimeNet++ with mean-variance estimation", "Table 3"]]}
+  - {key: schnet-coll, model: schnet-coll, material: coll, role: test, eval_data: {label: "COLL test set", registry: COLL}, metrics: [[MAE, Energy, 0.198, eV, "COLL energy MAE: SchNet", "Table 3"], [MAE, Force, 0.172, eV/A, "COLL force MAE: SchNet", "Table 3"]]}
+  - {key: dimenetpp-qm9, model: dimenetpp-qm9, material: qm9, role: test, eval_data: {label: "QM9 test set", registry: QM9}, metrics: [[MAE, Energy, 6.32, meV, "QM9 test MAE of U0: DimeNet++", "Table 2"]]}
+resources: |
+  Training time per epoch on COLL: SchNet 8.9 min, DimeNet++ 10.4 min, the
+  five-model ensemble 31.2 min, MVE 13.6 min (Table 3); on QM9 U0 the
+  DimeNet++ changes reduce the time per epoch from 35.4 to 4.3 min
+  (Table 1). Hardware is not stated; no inference timing is given.
+gaps:
+  - "Introduces DimeNet++ ('we start from the recently proposed DimeNet ... and propose the DimeNet++ model'); the registry treats DimeNet++ as a variant of the DimeNet method, so no derivation edge is recorded. Introduces COLL; its size and level of theory are entered in the data-set registry from this paper, and its origin-paper stub is removed."
+  - "COLL split sizes are not stated in this workshop paper; the code that ran the DFT calculations is not named."
+  - "The ensemble of DimeNet++ models (0.050 eV, 0.038 eV/A) and the uncertainty correlations of Table 3 are not encoded."

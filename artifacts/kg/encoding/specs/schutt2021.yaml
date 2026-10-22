@@ -1,0 +1,100 @@
+id: schutt2021
+source:
+  rank: 212
+  year: "2021"
+  first_author: "Kristof T. Schütt"
+  title: "Equivariant message passing for the prediction of tensorial properties and molecular spectra"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2102.03150"
+  kg_relevance: "Method/model"
+  arxiv_id: "2102.03150v4"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6dfa7b5add4dc8c5ccd799b83951b5b100bed9421bade501cdf979ccd76e5105"
+study_label: "Schütt, Unke and Gastegger (2021): polarizable atom interaction neural network (PaiNN)"
+scope: |
+  Encoding scope: PaiNN (introduced here) with its QM9 U0 error (Table II)
+  and MD17 energy and force MAEs for models trained on forces only and on
+  energies and forces (Table III); the spectra models for ethanol and
+  aspirin (errors only in the Fig. 5 inset). Other QM9 targets, the
+  ablation (Table IV), the ferrocene study and values quoted from other
+  papers are not encoded.
+materials:
+  qm9: {label: "Small organic molecules with up to nine heavy atoms (QM9)", class: "Small organic molecules (equilibrium geometries)"}
+  aspirin: {label: "Aspirin molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  ethanol: {label: "Ethanol molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  malondialdehyde: {label: "Malondialdehyde molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  naphthalene: {label: "Naphthalene molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  salicylic-acid: {label: "Salicylic acid molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  toluene: {label: "Toluene molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  uracil: {label: "Uracil molecule (MD17)", class: "Small organic molecule (gas phase)"}
+reference:
+  aspirin-pbe0: {type: DFT, code: ORCA, xc: PBE0, basis: "def2-TZVP", comment: "Tight SCF, grid levels 4 and 5, RIJK approximation; 20,000 MD17 aspirin configurations recomputed (App. A 2)."}
+  ethanol-pbe0: {type: DFT, xc: PBE0, basis: "def2-TZVP", comment: "Ethanol reference data of Ref. [38], same level without RIJK."}
+datasets:
+  qm9: {label: "QM9 training set (110k molecules)", materials: [qm9], properties: [Energy], provenance: Published, n: {v: 110000, loc: "Sec. V A"}, comment: "10k validation; three random splits."}
+  md17-aspirin: {label: "MD17 aspirin training set (950 structures)", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-ethanol: {label: "MD17 ethanol training set (950 structures)", materials: [ethanol], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-malondialdehyde: {label: "MD17 malondialdehyde training set (950 structures)", materials: [malondialdehyde], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-naphthalene: {label: "MD17 naphthalene training set (950 structures)", materials: [naphthalene], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-salicylic-acid: {label: "MD17 salicylic acid training set (950 structures)", materials: [salicylic-acid], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-toluene: {label: "MD17 toluene training set (950 structures)", materials: [toluene], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  md17-uracil: {label: "MD17 uracil training set (950 structures)", materials: [uracil], properties: [Energy, Forces], provenance: Published, n: {v: 950, loc: "Sec. V B"}, comment: "1k known structures: 950 training, 50 validation; three random splits."}
+  spectra-aspirin: {label: "Aspirin configurations from MD17 recomputed at PBE0/def2-TZVP (20,000)", materials: [aspirin], properties: [Energy, Forces], provenance: Augmented, n: {v: 20000, loc: "App. A 2"}, calc: aspirin-pbe0, comment: "Also dipole moments and polarisabilities for IR and Raman spectra."}
+  spectra-ethanol: {label: "Ethanol reference data with dipoles and polarisabilities (Ref. [38])", materials: [ethanol], properties: [Energy, Forces], provenance: Published, calc: ethanol-pbe0}
+methods:
+  PaiNN:
+    hp: [cutoffRadius, numFeatures, learningRate, batchSize]
+    loss: "Squared loss on energies and/or forces (force weight rho = 0.95 for the combined MD17 models); MAE loss for the QM9 polarisability"
+    algorithm: "Adam with weight decay, learning rate halved on validation plateau (smoothed validation loss), early stopping"
+    impl: {lib: {local: "SchNetPack", comment: "PaiNN implemented in PyTorch and SchNetPack; MD and RPMD with the SchNetPack MD module"}}
+    sims: [MolecularDynamics]
+runs:
+  painn-qm9-U0: {label: "PaiNN trained on the QM9 U0 target", method: PaiNN, dataset: qm9, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.0005, loc: "Suppl. Table 5"}, batchSize: {v: 100, loc: "Suppl. Table 5"}}, model: "PaiNN QM9 U0 model (about 600k parameters)"}
+  painn-f-aspirin: {label: "PaiNN fit to MD17 aspirin on forces only", method: PaiNN, dataset: md17-aspirin, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 aspirin model (forces only)"}
+  painn-ef-aspirin: {label: "PaiNN fit to MD17 aspirin on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-aspirin, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 aspirin model (energies and forces)"}
+  painn-f-ethanol: {label: "PaiNN fit to MD17 ethanol on forces only", method: PaiNN, dataset: md17-ethanol, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 ethanol model (forces only)"}
+  painn-ef-ethanol: {label: "PaiNN fit to MD17 ethanol on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-ethanol, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 ethanol model (energies and forces)"}
+  painn-f-malondialdehyde: {label: "PaiNN fit to MD17 malondialdehyde on forces only", method: PaiNN, dataset: md17-malondialdehyde, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 malondialdehyde model (forces only)"}
+  painn-ef-malondialdehyde: {label: "PaiNN fit to MD17 malondialdehyde on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-malondialdehyde, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 malondialdehyde model (energies and forces)"}
+  painn-f-naphthalene: {label: "PaiNN fit to MD17 naphthalene on forces only", method: PaiNN, dataset: md17-naphthalene, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 naphthalene model (forces only)"}
+  painn-ef-naphthalene: {label: "PaiNN fit to MD17 naphthalene on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-naphthalene, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 naphthalene model (energies and forces)"}
+  painn-f-salicylic-acid: {label: "PaiNN fit to MD17 salicylic acid on forces only", method: PaiNN, dataset: md17-salicylic-acid, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 salicylic acid model (forces only)"}
+  painn-ef-salicylic-acid: {label: "PaiNN fit to MD17 salicylic acid on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-salicylic-acid, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 salicylic acid model (energies and forces)"}
+  painn-f-toluene: {label: "PaiNN fit to MD17 toluene on forces only", method: PaiNN, dataset: md17-toluene, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 toluene model (forces only)"}
+  painn-ef-toluene: {label: "PaiNN fit to MD17 toluene on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-toluene, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 toluene model (energies and forces)"}
+  painn-f-uracil: {label: "PaiNN fit to MD17 uracil on forces only", method: PaiNN, dataset: md17-uracil, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 uracil model (forces only)"}
+  painn-ef-uracil: {label: "PaiNN fit to MD17 uracil on energies and forces (rho = 0.95)", method: PaiNN, dataset: md17-uracil, settings: {cutoffRadius: {v: 5.0, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.001, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN MD17 uracil model (energies and forces)"}
+  painn-spectra-aspirin: {label: "PaiNN spectra model for aspirin (energies, forces, dipoles, polarisabilities)", method: PaiNN, dataset: spectra-aspirin, settings: {cutoffRadius: {v: 2.7, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.0005, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN aspirin spectra model"}
+  painn-spectra-ethanol: {label: "PaiNN spectra model for ethanol (energies, forces, dipoles, polarisabilities)", method: PaiNN, dataset: spectra-ethanol, settings: {cutoffRadius: {v: 2.7, loc: "Suppl. Table 5"}, numFeatures: {v: 128, loc: "Sec. V"}, learningRate: {v: 0.0005, loc: "Suppl. Table 5"}, batchSize: {v: 10, loc: "Suppl. Table 5"}}, model: "PaiNN ethanol spectra model"}
+results:
+  - {key: painn-qm9-U0, model: painn-qm9-U0, material: qm9, role: test, eval_data: {label: "QM9 test molecules (remaining data)", registry: QM9}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 5.85, meV, "QM9 test MAE of U0: PaiNN", "Table II"]]}
+  - {key: painn-f-aspirin, model: painn-f-aspirin, material: aspirin, role: test, eval_data: {label: "MD17 aspirin remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.167, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 aspirin", "Table III"], [MAE, Force, 0.338, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 aspirin", "Table III"]]}
+  - {key: painn-ef-aspirin, model: painn-ef-aspirin, material: aspirin, role: test, eval_data: {label: "MD17 aspirin remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.159, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 aspirin", "Table III"], [MAE, Force, 0.371, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 aspirin", "Table III"]]}
+  - {key: painn-f-ethanol, model: painn-f-ethanol, material: ethanol, role: test, eval_data: {label: "MD17 ethanol remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.064, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 ethanol", "Table III"], [MAE, Force, 0.224, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 ethanol", "Table III"]]}
+  - {key: painn-ef-ethanol, model: painn-ef-ethanol, material: ethanol, role: test, eval_data: {label: "MD17 ethanol remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.063, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 ethanol", "Table III"], [MAE, Force, 0.23, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 ethanol", "Table III"]]}
+  - {key: painn-f-malondialdehyde, model: painn-f-malondialdehyde, material: malondialdehyde, role: test, eval_data: {label: "MD17 malondialdehyde remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.1, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 malondialdehyde", "Table III"], [MAE, Force, 0.344, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 malondialdehyde", "Table III"]]}
+  - {key: painn-ef-malondialdehyde, model: painn-ef-malondialdehyde, material: malondialdehyde, role: test, eval_data: {label: "MD17 malondialdehyde remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.091, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 malondialdehyde", "Table III"], [MAE, Force, 0.319, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 malondialdehyde", "Table III"]]}
+  - {key: painn-f-naphthalene, model: painn-f-naphthalene, material: naphthalene, role: test, eval_data: {label: "MD17 naphthalene remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.116, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 naphthalene", "Table III"], [MAE, Force, 0.077, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 naphthalene", "Table III"]]}
+  - {key: painn-ef-naphthalene, model: painn-ef-naphthalene, material: naphthalene, role: test, eval_data: {label: "MD17 naphthalene remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.117, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 naphthalene", "Table III"], [MAE, Force, 0.083, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 naphthalene", "Table III"]]}
+  - {key: painn-f-salicylic-acid, model: painn-f-salicylic-acid, material: salicylic-acid, role: test, eval_data: {label: "MD17 salicylic acid remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.116, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 salicylic acid", "Table III"], [MAE, Force, 0.195, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 salicylic acid", "Table III"]]}
+  - {key: painn-ef-salicylic-acid, model: painn-ef-salicylic-acid, material: salicylic-acid, role: test, eval_data: {label: "MD17 salicylic acid remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.114, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 salicylic acid", "Table III"], [MAE, Force, 0.209, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 salicylic acid", "Table III"]]}
+  - {key: painn-f-toluene, model: painn-f-toluene, material: toluene, role: test, eval_data: {label: "MD17 toluene remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.095, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 toluene", "Table III"], [MAE, Force, 0.094, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 toluene", "Table III"]]}
+  - {key: painn-ef-toluene, model: painn-ef-toluene, material: toluene, role: test, eval_data: {label: "MD17 toluene remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.097, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 toluene", "Table III"], [MAE, Force, 0.102, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 toluene", "Table III"]]}
+  - {key: painn-f-uracil, model: painn-f-uracil, material: uracil, role: test, eval_data: {label: "MD17 uracil remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.106, kcal/mol, "Test energy MAE: PaiNN trained on forces only, MD17 uracil", "Table III"], [MAE, Force, 0.139, kcal/mol/A, "Test force MAE: PaiNN trained on forces only, MD17 uracil", "Table III"]]}
+  - {key: painn-ef-uracil, model: painn-ef-uracil, material: uracil, role: test, eval_data: {label: "MD17 uracil remaining structures", registry: MD17}, comment: "Mean over three random splits.", metrics: [[MAE, Energy, 0.104, kcal/mol, "Test energy MAE: PaiNN trained on energies and forces, MD17 uracil", "Table III"], [MAE, Force, 0.14, kcal/mol/A, "Test force MAE: PaiNN trained on energies and forces, MD17 uracil", "Table III"]]}
+timings:
+  - {model: painn-qm9-U0, system: "Random batches of 50 QM9 molecules", atoms: null, value: 13, unit: "ms per batch", per_atom_us: null, hardware: "NVIDIA V100: 13 ms per random batch of 50 QM9 molecules (DimeNet++ reference implementation 45 ms)", result: painn-qm9-U0, location: "Sec. V A"}
+  - {model: painn-spectra-ethanol, system: "Ethanol molecule (one evaluation)", atoms: null, value: 14, unit: "ms per evaluation", per_atom_us: null, hardware: "NVIDIA V100: 14 ms per PaiNN evaluation for ethanol, against about 140 s per reference computation", result: null, location: "Sec. V D"}
+  - {model: painn-spectra-aspirin, system: "Aspirin molecule (one MD step)", atoms: null, value: 15, unit: "ms per MD step", per_atom_us: null, hardware: "15 ms per step for aspirin against 3140 s per step for the reference", result: null, location: "Sec. V D"}
+resources: |
+  Inference on an NVIDIA V100: 13 ms per batch of 50 QM9 molecules
+  (inferenceHardware on the QM9 result), 14 ms per ethanol evaluation and
+  15 ms per aspirin MD step in the spectra simulations (held in the encoding
+  input; those models have no tabulated error). Training cost is not
+  reported.
+gaps:
+  - "PaiNN extends message passing to rotationally equivariant representations; no derivation from a registry method is stated."
+  - "Only U0 of the twelve QM9 targets is encoded. The QM9 test set is 'the remaining data' of about 130k molecules."
+  - "The spectra models' errors are in the inset table of Fig. 5 and are not encoded; ethanol and aspirin spectra are not accuracy metrics. The paper gives per-molecule times only; no per-atom time is derived."
+  - "The ferrocene models (GFN2-xTB data, cutoffs 2.5 to 4.0 A) are not encoded."
+  - "The DFT levels of QM9 and MD17 are not described in this paper."

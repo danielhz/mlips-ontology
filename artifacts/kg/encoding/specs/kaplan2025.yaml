@@ -1,0 +1,106 @@
+id: kaplan2025
+source:
+  rank: 223
+  year: "2025"
+  first_author: "Aaron D. Kaplan"
+  title: "A Foundational Potential Energy Surface Dataset for Materials"
+  venue: "arXiv"
+  doi: "10.48550/arxiv.2503.04070"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2503.04070v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "4d3e14476a18f92b228f4bd2a58f071b46210ba4e4343fd8dd03124e5dd5b8f3"
+study_label: "Kaplan et al. (2025): MatPES, a foundational potential energy surface data set for materials"
+scope: |
+  Encoding scope: the MatPES data set introduced here (PBE and r2SCAN
+  subsets) and the universal MLIPs trained in MatGL on MatPES, MPF, MPtrj
+  and OMat24 (Table 1): validation and test MAEs of energy, force and
+  stress; the CPU timings of Table S5. The property benchmarks
+  (MatCalc-Benchmark, Table S4 and figures), magnetic-moment errors and
+  training-set MAEs are not encoded.
+materials:
+  inorganic: {label: "Inorganic materials across the periodic table (Materials Project ground states and their 300 K MD snapshots)", class: "Inorganic crystalline materials (equilibrium and 300 K MD)"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "VASP 6.4.x, PBE 64 pseudopotentials, MatPESStaticSet (pymatgen) settings, Gaussian smearing with pseudo-entropy below 1 meV/atom (Methods; Tables S6, S7)."}
+  r2scan: {type: DFT, code: VASP, xc: {local: "r2SCAN"}, pp: PAW, comment: "r2SCAN started from self-consistent PBE orbitals; same settings otherwise."}
+sampling:
+  md-2direct: {label: "M3GNet NpT MD at 300 K of Materials Project structures and supercells, 2DIRECT sampling", comment: "281,853,572 MD snapshots of 281,572 initial structures, clustered in M3GNet structural and atomic feature space (15,192 structural clusters); the smallest structure per cluster was computed with DFT (Methods)."}
+datasets:
+  matpes-pbe: {label: "MatPES PBE (434,712 structures; 90% training)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 434712, loc: "Results; Table S3"}, calc: pbe, sampling: [md-2direct], comment: "Random 90/5/5 training/validation/test split; the test set has 21,737 structures."}
+  matpes-r2scan: {label: "MatPES r2SCAN (387,897 structures; 90% training)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 387897, loc: "Results; Table S3"}, calc: r2scan, sampling: [md-2direct]}
+  mpf: {label: "MPF (185,877 structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 185877, loc: "Table S3"}}
+  mptrj: {label: "MPtrj (1,580,395 structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 1580395, loc: "Table S3"}}
+  omat24: {label: "OMat24 training split (100,824,585 structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 100824585, loc: "Table S3"}}
+methods:
+  M3GNet:
+    hp: [cutoffRadius, numFeatures, numLayers, learningRate]
+    loss: "L1 loss on energy, force and stress (stress weight 0.1)"
+    algorithm: "AMSGrad AdamW, learning rate 1e-3 down to 1e-5"
+    impl: {lib: {local: "MatGL", comment: "Materials Graph Library 1.13"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+  TensorNet:
+    hp: [cutoffRadius, numFeatures, numLayers, learningRate]
+    loss: "L1 loss on energy, force and stress (stress weight 0.1)"
+    algorithm: "AMSGrad AdamW, learning rate 1e-3 down to 1e-5"
+    impl: {lib: {local: "MatGL", comment: "Materials Graph Library 1.13"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+  CHGNet:
+    hp: [cutoffRadius, numFeatures, numLayers, learningRate]
+    loss: "Huber loss (delta 0.1) on energy, force, stress (0.05) and magnetic moments"
+    algorithm: "Adam, learning rate 1e-3 down to 1e-5"
+    impl: {lib: {local: "MatGL", comment: "Materials Graph Library 1.13"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  m3gnet-pbe: {label: "M3GNet trained on MatPES PBE", method: M3GNet, dataset: matpes-pbe, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 3, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "M3GNet trained on MatPES PBE (MatGL)"}
+  chgnet-pbe: {label: "CHGNet trained on MatPES PBE", method: CHGNet, dataset: matpes-pbe, settings: {cutoffRadius: {v: 6, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 5, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "CHGNet trained on MatPES PBE (MatGL)"}
+  tensornet-pbe: {label: "TensorNet trained on MatPES PBE", method: TensorNet, dataset: matpes-pbe, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 2, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "TensorNet trained on MatPES PBE (MatGL)"}
+  m3gnet-r2scan: {label: "M3GNet trained on MatPES r2SCAN", method: M3GNet, dataset: matpes-r2scan, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 3, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "M3GNet trained on MatPES r2SCAN (MatGL)"}
+  chgnet-r2scan: {label: "CHGNet trained on MatPES r2SCAN", method: CHGNet, dataset: matpes-r2scan, settings: {cutoffRadius: {v: 6, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 5, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "CHGNet trained on MatPES r2SCAN (MatGL)"}
+  tensornet-r2scan: {label: "TensorNet trained on MatPES r2SCAN", method: TensorNet, dataset: matpes-r2scan, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 2, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "TensorNet trained on MatPES r2SCAN (MatGL)"}
+  m3gnet-mpf: {label: "M3GNet trained on MPF", method: M3GNet, dataset: mpf, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 3, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "M3GNet trained on MPF (MatGL)"}
+  tensornet-mpf: {label: "TensorNet trained on MPF", method: TensorNet, dataset: mpf, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 2, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "TensorNet trained on MPF (MatGL)"}
+  chgnet-mptrj: {label: "CHGNet trained on MPtrj", method: CHGNet, dataset: mptrj, settings: {cutoffRadius: {v: 6, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 5, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "CHGNet trained on MPtrj (MatGL)"}
+  tensornet-omat24: {label: "TensorNet trained on OMat24", method: TensorNet, dataset: omat24, settings: {cutoffRadius: {v: 5, loc: "Table 2"}, numFeatures: {v: 128, loc: "Table 2"}, numLayers: {v: 2, loc: "Table 2"}, learningRate: {v: 0.001, loc: "Table 2"}}, model: "TensorNet trained on OMat24 (MatGL)"}
+results:
+  - {key: m3gnet-pbe-val, model: m3gnet-pbe, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 45, meV/atom, "Validation energy MAE: M3GNet trained on MatPES PBE", "Table 1"], [MAE, Force, 177, meV/A, "Validation force MAE: M3GNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.898, GPa, "Validation stress MAE: M3GNet trained on MatPES PBE", "Table 1"]]}
+  - {key: m3gnet-pbe-test, model: m3gnet-pbe, material: inorganic, role: test, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 45, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MatPES PBE", "Table 1"], [MAE, Force, 181, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.888, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MatPES PBE", "Table 1"]]}
+  - {key: chgnet-pbe-val, model: chgnet-pbe, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 32, meV/atom, "Validation energy MAE: CHGNet trained on MatPES PBE", "Table 1"], [MAE, Force, 124, meV/A, "Validation force MAE: CHGNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.617, GPa, "Validation stress MAE: CHGNet trained on MatPES PBE", "Table 1"]]}
+  - {key: chgnet-pbe-test, model: chgnet-pbe, material: inorganic, role: test, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 31, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MatPES PBE", "Table 1"], [MAE, Force, 136, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.642, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MatPES PBE", "Table 1"]]}
+  - {key: tensornet-pbe-val, model: tensornet-pbe, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 36, meV/atom, "Validation energy MAE: TensorNet trained on MatPES PBE", "Table 1"], [MAE, Force, 138, meV/A, "Validation force MAE: TensorNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.695, GPa, "Validation stress MAE: TensorNet trained on MatPES PBE", "Table 1"]]}
+  - {key: tensornet-pbe-test, model: tensornet-pbe, material: inorganic, role: test, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 36, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MatPES PBE", "Table 1"], [MAE, Force, 148, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MatPES PBE", "Table 1"], [MAE, Stress, 0.7, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MatPES PBE", "Table 1"]]}
+  - {key: m3gnet-r2scan-val, model: m3gnet-r2scan, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 45, meV/atom, "Validation energy MAE: M3GNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 208, meV/A, "Validation force MAE: M3GNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.982, GPa, "Validation stress MAE: M3GNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: m3gnet-r2scan-test, model: m3gnet-r2scan, material: inorganic, role: test, eval_data: {label: "MatPES r2SCAN test split", registry: MatPES}, metrics: [[MAE, Energy, 44, meV/atom, "Test energy MAE on the MatPES r2SCAN test split: M3GNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 210, meV/A, "Test force MAE on the MatPES r2SCAN test split: M3GNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.97, GPa, "Test stress MAE on the MatPES r2SCAN test split: M3GNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: chgnet-r2scan-val, model: chgnet-r2scan, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 27, meV/atom, "Validation energy MAE: CHGNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 150, meV/A, "Validation force MAE: CHGNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.705, GPa, "Validation stress MAE: CHGNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: chgnet-r2scan-test, model: chgnet-r2scan, material: inorganic, role: test, eval_data: {label: "MatPES r2SCAN test split", registry: MatPES}, metrics: [[MAE, Energy, 30, meV/atom, "Test energy MAE on the MatPES r2SCAN test split: CHGNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 156, meV/A, "Test force MAE on the MatPES r2SCAN test split: CHGNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.735, GPa, "Test stress MAE on the MatPES r2SCAN test split: CHGNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: tensornet-r2scan-val, model: tensornet-r2scan, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MatPES}, metrics: [[MAE, Energy, 34, meV/atom, "Validation energy MAE: TensorNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 163, meV/A, "Validation force MAE: TensorNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.754, GPa, "Validation stress MAE: TensorNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: tensornet-r2scan-test, model: tensornet-r2scan, material: inorganic, role: test, eval_data: {label: "MatPES r2SCAN test split", registry: MatPES}, metrics: [[MAE, Energy, 34, meV/atom, "Test energy MAE on the MatPES r2SCAN test split: TensorNet trained on MatPES r2SCAN", "Table 1"], [MAE, Force, 163, meV/A, "Test force MAE on the MatPES r2SCAN test split: TensorNet trained on MatPES r2SCAN", "Table 1"], [MAE, Stress, 0.754, GPa, "Test stress MAE on the MatPES r2SCAN test split: TensorNet trained on MatPES r2SCAN", "Table 1"]]}
+  - {key: m3gnet-mpf-val, model: m3gnet-mpf, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MPF.2021.2.8}, metrics: [[MAE, Energy, 23, meV/atom, "Validation energy MAE: M3GNet trained on MPF", "Table 1"], [MAE, Force, 72, meV/A, "Validation force MAE: M3GNet trained on MPF", "Table 1"], [MAE, Stress, 0.399, GPa, "Validation stress MAE: M3GNet trained on MPF", "Table 1"]]}
+  - {key: m3gnet-mpf-test, model: m3gnet-mpf, material: inorganic, role: external, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 334, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MPF", "Table 1"], [MAE, Force, 297, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MPF", "Table 1"], [MAE, Stress, 2.026, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): M3GNet trained on MPF", "Table 1"]]}
+  - {key: tensornet-mpf-val, model: tensornet-mpf, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MPF.2021.2.8}, metrics: [[MAE, Energy, 29, meV/atom, "Validation energy MAE: TensorNet trained on MPF", "Table 1"], [MAE, Force, 83, meV/A, "Validation force MAE: TensorNet trained on MPF", "Table 1"], [MAE, Stress, 0.471, GPa, "Validation stress MAE: TensorNet trained on MPF", "Table 1"]]}
+  - {key: tensornet-mpf-test, model: tensornet-mpf, material: inorganic, role: external, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 316, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MPF", "Table 1"], [MAE, Force, 289, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MPF", "Table 1"], [MAE, Stress, 1.984, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on MPF", "Table 1"]]}
+  - {key: chgnet-mptrj-val, model: chgnet-mptrj, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: MPtrj}, metrics: [[MAE, Energy, 30, meV/atom, "Validation energy MAE: CHGNet trained on MPtrj", "Table 1"], [MAE, Force, 70, meV/A, "Validation force MAE: CHGNet trained on MPtrj", "Table 1"], [MAE, Stress, 0.297, GPa, "Validation stress MAE: CHGNet trained on MPtrj", "Table 1"]]}
+  - {key: chgnet-mptrj-test, model: chgnet-mptrj, material: inorganic, role: external, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 698, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MPtrj", "Table 1"], [MAE, Force, 265, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MPtrj", "Table 1"], [MAE, Stress, 1.872, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): CHGNet trained on MPtrj", "Table 1"]]}
+  - {key: tensornet-omat24-val, model: tensornet-omat24, material: inorganic, role: validation, eval_data: {label: "Validation split of the training data set", registry: OMat24}, metrics: [[MAE, Energy, 26, meV/atom, "Validation energy MAE: TensorNet trained on OMat24", "Table 1"], [MAE, Force, 116, meV/A, "Validation force MAE: TensorNet trained on OMat24", "Table 1"], [MAE, Stress, 0.584, GPa, "Validation stress MAE: TensorNet trained on OMat24", "Table 1"]]}
+  - {key: tensornet-omat24-test, model: tensornet-omat24, material: inorganic, role: external, eval_data: {label: "MatPES PBE test split (21,737 structures)", registry: MatPES}, metrics: [[MAE, Energy, 202, meV/atom, "Test energy MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on OMat24", "Table 1"], [MAE, Force, 186, meV/A, "Test force MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on OMat24", "Table 1"], [MAE, Stress, 1.151, GPa, "Test stress MAE on the MatPES PBE test split (21,737 structures): TensorNet trained on OMat24", "Table 1"]]}
+timings:
+  - {model: m3gnet-pbe, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 1.957, unit: "ms per atom per step", per_atom_us: 1957.0, hardware: "Single Intel Xeon Gold core: 1.957 ms/atom/step", result: null, location: "Table S5"}
+  - {model: chgnet-pbe, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 4.915, unit: "ms per atom per step", per_atom_us: 4915.0, hardware: "Single Intel Xeon Gold core: 4.915 ms/atom/step", result: null, location: "Table S5"}
+  - {model: tensornet-pbe, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 3.014, unit: "ms per atom per step", per_atom_us: 3014.0, hardware: "Single Intel Xeon Gold core: 3.014 ms/atom/step", result: null, location: "Table S5"}
+  - {model: m3gnet-r2scan, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 1.943, unit: "ms per atom per step", per_atom_us: 1943.0, hardware: "Single Intel Xeon Gold core: 1.943 ms/atom/step", result: null, location: "Table S5"}
+  - {model: chgnet-r2scan, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 4.875, unit: "ms per atom per step", per_atom_us: 4875.0, hardware: "Single Intel Xeon Gold core: 4.875 ms/atom/step", result: null, location: "Table S5"}
+  - {model: tensornet-r2scan, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 3.052, unit: "ms per atom per step", per_atom_us: 3052.0, hardware: "Single Intel Xeon Gold core: 3.052 ms/atom/step", result: null, location: "Table S5"}
+  - {model: m3gnet-mpf, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 2.095, unit: "ms per atom per step", per_atom_us: 2095.0, hardware: "Single Intel Xeon Gold core: 2.095 ms/atom/step", result: null, location: "Table S5"}
+  - {model: tensornet-mpf, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 1.803, unit: "ms per atom per step", per_atom_us: 1803.0, hardware: "Single Intel Xeon Gold core: 1.803 ms/atom/step", result: null, location: "Table S5"}
+  - {model: chgnet-mptrj, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 4.397, unit: "ms per atom per step", per_atom_us: 4397.0, hardware: "Single Intel Xeon Gold core: 4.397 ms/atom/step", result: null, location: "Table S5"}
+  - {model: tensornet-omat24, system: "64 Si atoms, MD at 300 K and 1 bar, 50 ps with 1 fs steps", atoms: 64, value: 3.114, unit: "ms per atom per step", per_atom_us: 3114.0, hardware: "Single Intel Xeon Gold core: 3.114 ms/atom/step", result: null, location: "Table S5"}
+resources: |
+  MD cost on a single Intel Xeon Gold core for 64 Si atoms (Table S5): 1.8
+  to 4.9 ms per atom per step depending on the model (CHGNet slowest). The
+  timed system is not the material of any result, so the timings are held
+  in the encoding input. Parameters: M3GNet 664,000, TensorNet 838,000,
+  CHGNet 2,700,000.
+gaps:
+  - "Introduces MatPES (PBE and r2SCAN); its level of theory and subset sizes are entered in the data-set registry from this paper, and its origin-paper stub is removed."
+  - "Test MAEs of the MPF, MPtrj and OMat24 models are on the MatPES PBE test set (external to their training data, role external); their training and validation MAEs are on their own data sets."
+  - "Which MatPES test split the r2SCAN models are evaluated on is read as the r2SCAN split (the text describes only the PBE test set)."
+  - "Magnetic-moment MAEs of the CHGNet models, training-set MAEs, the MatCalc-Benchmark property errors and the MD stability and ionic conductivity benchmarks are not encoded."

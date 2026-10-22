@@ -1,0 +1,91 @@
+id: fan2021
+source:
+  rank: 214
+  year: "2021"
+  first_author: "Zheyong Fan"
+  title: "Neuroevolution machine learning potentials: Combining high accuracy and low cost in atomistic simulations and application to heat transport"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.104.104309"
+  kg_relevance: "Method/model"
+  arxiv_id: "2107.08119v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "333a4306052b43c7b5c889cad5f2b668e669882578a89dd54881d7ee03fcf4ca"
+study_label: "Fan et al. (2021): neuroevolution machine-learning potentials (NEP) and heat transport"
+scope: |
+  Encoding scope: the NEP method (introduced here) fitted to general-purpose
+  silicon, 2D silicene and bulk PbTe, and the GAP-SOAP, MTP and DP
+  comparison potentials the authors trained on the silicene and PbTe sets
+  (Table II), plus the general-silicon force RMSEs of NEP and DP (text).
+  Virial RMSEs, the thermal-conductivity results and the regularisation
+  study (App. D, figures) are not encoded.
+materials:
+  Si: {label: "Silicon, general purpose (bulk crystals, liquid, amorphous, surfaces, defects)", formula: "Si", class: "Elemental semiconductor", wikidata: Q670}
+  silicene: {label: "Two-dimensional silicene (60-atom rectangular cells)", formula: "Si", class: "2D material"}
+  PbTe: {label: "Bulk lead telluride (250-atom cells)", formula: "PbTe", class: "Ionic semiconductor crystal"}
+reference:
+  silicene-dft: {type: DFT, code: QuantumESPRESSO, xc: PBE, pp: NormConserving, cutoff: 40, kpoints: "3x3x1", comment: "Optimised norm-conserving Vanderbilt pseudopotential; energy cutoff 40 Ry; SCF threshold 1e-10 Ry."}
+  pbte-dft: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400, kpoints: "1x1x1", comment: "Energy cutoff 400 eV; SCF threshold 1e-7 eV."}
+sampling:
+  silicene-al: {label: "MTP active learning over 100-900 K and -1% to 1% biaxial strain", comment: "Selection threshold gamma_select = 2; stopped when six independent 10 ps MD runs selected nothing (mlip package)."}
+  pbte-md: {label: "DFT-MD at 300-900 K plus random displacements", comment: "305 cells from DFT-MD and 20 cells with small random displacements from hiphive."}
+datasets:
+  Si: {label: "General-purpose silicon data set of Ref. [47] (2,475 structures)", materials: [Si], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 2475, loc: "Sec. III A 1"}}
+  silicene: {label: "2D silicene training set (914 cells of 60 atoms)", materials: [silicene], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 914, loc: "Sec. III A 2"}, calc: silicene-dft, sampling: [silicene-al]}
+  PbTe: {label: "Bulk PbTe training set (325 cells of 250 atoms)", materials: [PbTe], properties: [Energy, Forces], provenance: InHouse, n: {v: 325, loc: "Sec. III A 3"}, calc: pbte-dft, sampling: [pbte-md], comment: "Also used for a GAP-SOAP potential in Ref. [59]; virials not used."}
+hyperparameters:
+  Nneu: {label: "NEP number of neurons in the single hidden layer N_neu", name: "N_neu", datatype: integer}
+  Ngen: {label: "NEP maximum number of generations of the natural evolution strategy N_gen", name: "N_gen", datatype: integer}
+methods:
+  NEP:
+    hp: [cutoffRadius, angularCutoff, Nneu, Ngen]
+    loss: "Energy, force and virial RMSEs plus L1 and L2 regularisation (lambda1 = lambda2 = 0.05)"
+    algorithm: "Separable natural evolution strategy (SNES), population 50"
+    impl: {lib: {local: "GPUMD", comment: "nep executable in the open-source gpumd package; GPU only"}}
+    sims: [MolecularDynamics]
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    impl: {lib: QUIP}
+  MTP:
+    hp: [cutoffRadius]
+    impl: {lib: MLIP}
+  DeePMD:
+    hp: [cutoffRadius]
+    impl: {lib: DeePMDkit}
+runs:
+  nep-Si: {label: "NEP fit to general-purpose silicon", method: NEP, dataset: Si, settings: {cutoffRadius: {v: 5, loc: "Table I"}, angularCutoff: {v: 5, loc: "Table I"}, Nneu: {v: 50, loc: "Table I"}, Ngen: {v: 200000, loc: "Table I"}}, model: "NEP general silicon potential (4,101 parameters)"}
+  nep-silicene: {label: "NEP fit to 2D silicene", method: NEP, dataset: silicene, settings: {cutoffRadius: {v: 5.5, loc: "Table I"}, angularCutoff: {v: 5.5, loc: "Table I"}, Nneu: {v: 40, loc: "Table I"}, Ngen: {v: 200000, loc: "Table I"}}, model: "NEP silicene potential (2,681 parameters)"}
+  nep-PbTe: {label: "NEP fit to bulk PbTe", method: NEP, dataset: PbTe, settings: {cutoffRadius: {v: 8, loc: "Table I"}, angularCutoff: {v: 4, loc: "Table I"}, Nneu: {v: 40, loc: "Table I"}, Ngen: {v: 200000, loc: "Table I"}}, model: "NEP PbTe potential (1,721 parameters)"}
+  gap-silicene: {label: "GAP-SOAP comparison fit to 2D silicene (trained by the authors)", method: GAP, dataset: silicene, model: "GAP-SOAP silicene potential"}
+  gap-PbTe: {label: "GAP-SOAP comparison fit to bulk PbTe (trained by the authors)", method: GAP, dataset: PbTe, settings: {cutoffRadius: {v: 6, loc: "App. B 4"}, numSparseConfigs: {v: 600, loc: "App. B 4 (SOAP n_sparse)"}}, model: "GAP-SOAP PbTe potential"}
+  mtp-silicene: {label: "MTP comparison fit to 2D silicene (trained by the authors)", method: MTP, dataset: silicene, settings: {cutoffRadius: {v: 5.5, loc: "App. B 1 (max_dist)"}}, model: "MTP silicene potential"}
+  mtp-PbTe: {label: "MTP comparison fit to bulk PbTe (trained by the authors)", method: MTP, dataset: PbTe, model: "MTP PbTe potential"}
+  dp-Si: {label: "DP (smooth edition) comparison fit to general-purpose silicon", method: DeePMD, dataset: Si, settings: {cutoffRadius: {v: 5, loc: "App. C"}}, model: "DP general silicon potential"}
+  dp-silicene: {label: "DP (smooth edition) comparison fit to 2D silicene", method: DeePMD, dataset: silicene, settings: {cutoffRadius: {v: 5.5, loc: "App. C"}}, model: "DP silicene potential"}
+  dp-PbTe: {label: "DP (smooth edition) comparison fit to bulk PbTe", method: DeePMD, dataset: PbTe, settings: {cutoffRadius: {v: 6, loc: "App. C"}}, model: "DP PbTe potential"}
+results:
+  - {key: nep-Si, model: nep-Si, material: Si, role: training, eval_data: {label: "General silicon training set"}, metrics: [[RMSE, Force, 107, meV/A, "Training-set force RMSE: NEP, general silicon", "Sec. III C"]]}
+  - {key: dp-Si, model: dp-Si, material: Si, role: training, eval_data: {label: "General silicon training set"}, metrics: [[RMSE, Force, 165, meV/A, "Training-set force RMSE: DP, general silicon", "Sec. III C"]]}
+  - {key: nep-silicene, model: nep-silicene, material: silicene, role: training, eval_data: {label: "Silicene training set"}, metrics: [[RMSE, Energy, 1.5, meV/atom, "RMSE on energy: NEP, 2D silicene", "Table II"], [RMSE, Force, 56, meV/A, "RMSE on forces: NEP, 2D silicene", "Table II"]]}
+  - {key: gap-silicene, model: gap-silicene, material: silicene, role: training, eval_data: {label: "Silicene training set"}, metrics: [[RMSE, Energy, 1.6, meV/atom, "RMSE on energy: GAP-SOAP, 2D silicene", "Table II"], [RMSE, Force, 65, meV/A, "RMSE on forces: GAP-SOAP, 2D silicene", "Table II"]]}
+  - {key: mtp-silicene, model: mtp-silicene, material: silicene, role: training, eval_data: {label: "Silicene training set"}, metrics: [[RMSE, Energy, 1.3, meV/atom, "RMSE on energy: MTP, 2D silicene", "Table II"], [RMSE, Force, 50, meV/A, "RMSE on forces: MTP, 2D silicene", "Table II"]]}
+  - {key: dp-silicene, model: dp-silicene, material: silicene, role: training, eval_data: {label: "Silicene training set"}, metrics: [[RMSE, Energy, 1.8, meV/atom, "RMSE on energy: DP, 2D silicene", "Table II"], [RMSE, Force, 65, meV/A, "RMSE on forces: DP, 2D silicene", "Table II"]]}
+  - {key: nep-PbTe, model: nep-PbTe, material: PbTe, role: training, eval_data: {label: "PbTe training set"}, metrics: [[RMSE, Energy, 0.56, meV/atom, "RMSE on energy: NEP, bulk PbTe", "Table II"], [RMSE, Force, 50, meV/A, "RMSE on forces: NEP, bulk PbTe", "Table II"]]}
+  - {key: gap-PbTe, model: gap-PbTe, material: PbTe, role: training, eval_data: {label: "PbTe training set"}, metrics: [[RMSE, Energy, 0.50, meV/atom, "RMSE on energy: GAP-SOAP, bulk PbTe", "Table II"], [RMSE, Force, 50, meV/A, "RMSE on forces: GAP-SOAP, bulk PbTe", "Table II"]]}
+  - {key: mtp-PbTe, model: mtp-PbTe, material: PbTe, role: training, eval_data: {label: "PbTe training set"}, metrics: [[RMSE, Energy, 0.63, meV/atom, "RMSE on energy: MTP, bulk PbTe", "Table II"], [RMSE, Force, 52, meV/A, "RMSE on forces: MTP, bulk PbTe", "Table II"]]}
+  - {key: dp-PbTe, model: dp-PbTe, material: PbTe, role: training, eval_data: {label: "PbTe training set"}, metrics: [[RMSE, Energy, 0.63, meV/atom, "RMSE on energy: DP, bulk PbTe", "Table II"], [RMSE, Force, 53, meV/A, "RMSE on forces: DP, bulk PbTe", "Table II"]]}
+timings:
+  - {model: nep-Si, system: "Silicon MD cell, NVT, 100 steps", atoms: 8000, value: 1.0e7, unit: "atom-steps per second, lower bound ('above 10^7')", per_atom_us: null, hardware: "One Nvidia Tesla V100: above 1e7 atom-steps per second in gpumd (Fig. 4; exact bar values per material not legible as a table)", result: nep-Si, location: "Sec. III D 1, Fig. 4"}
+resources: |
+  MD speed was measured on 8,000-atom (silicon, PbTe) and 6,000-atom
+  (silicene) cells: NEP in gpumd on one Nvidia Tesla V100 reaches above
+  1e7 atom-steps per second, more than an order of magnitude faster than
+  compressed DP on the same GPU; GAP-SOAP and MTP ran on 72 Intel Xeon-Gold
+  6240 cores (Fig. 4). The NEP timing is recorded as inferenceHardware on
+  the general-silicon result. Training cost is proportional to N_pop x
+  N_gen; no times are given.
+gaps:
+  - "NEP is introduced as a neural-network potential with a Chebyshev/Legendre descriptor trained by an evolution strategy; no derivation from a registry method is stated."
+  - "The RMSEs of Table II and of the general-silicon set are computed on the training data (Sec. III C), so their role is training. Virial RMSEs (meV/atom) have no metric property in the schema and are not encoded."
+  - "Fig. 4 prints speeds (from 2,000 to 13,000,000 atom-steps per second) next to bars; which value belongs to which potential and material is not reliably readable from the text layer, so only the 'above 1e7' statement for NEP is kept."
+  - "The GAP silicene and MTP PbTe inputs (App. B 2, B 3) are not encoded. NEP descriptor orders (n_max, l_max) and the population size are given in Table I but have no hyperparameter individual."
+  - "The DFT settings of the general-silicon data set are those of Ref. [47] (not restated here)."

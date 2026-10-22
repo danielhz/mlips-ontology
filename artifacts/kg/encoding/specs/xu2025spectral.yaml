@@ -1,0 +1,102 @@
+id: xu2025spectral
+source:
+  rank: 215
+  year: "2025"
+  first_author: "Zemin Xu"
+  title: "Spectral/Spatial Tensor Atomic Cluster Expansion with Universal Embeddings in Cartesian Space"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2509.14961"
+  kg_relevance: "Method/model"
+  arxiv_id: "2509.14961v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c397b632e82ce6a9f6d713e78e5bcafca94a26d34e087b95a1af8d1df6e12f97"
+study_label: "Xu, Xie and Hu (2025): tensor atomic cluster expansion (TACE) in Cartesian space"
+scope: |
+  Encoding scope: TACE (introduced here) with its tabulated energy and force
+  errors: four TACE variants on 3BPA (Table 1), the 32-molecule water
+  system (Table 2), the GAP17 carbon set (Table 4), the field-embedded
+  FITACE on BaTiO3 (Table 5, energy and force only), four charged systems
+  (Table 6) and MatPES-PBE (Table 10). Dipole and polarisability errors
+  (Table 3), the multi-fidelity study (Fig. 2), adsorption geometries and
+  reaction barriers (Tables 7-9) and values of other models quoted from the
+  literature are not encoded.
+materials:
+  3BPA: {label: "3-(benzyloxy)pyridin-2-amine (3BPA) molecule", class: "Flexible drug-like organic molecule (gas phase)"}
+  water: {label: "Liquid water (32-molecule system)", formula: "H2O", class: "Molecular liquid", wikidata: Q283}
+  carbon: {label: "Carbon allotropes (GAP17 data set)", formula: "C", class: "Elemental solid and liquid carbon", wikidata: Q623}
+  BaTiO3: {label: "Barium titanate under external electric fields", formula: "BaTiO3", class: "Ferroelectric perovskite"}
+  C10H2: {label: "C10H2 / C10H3+ carbon chains (neutral and positively charged)", class: "Charged system (Ko et al. benchmark)"}
+  Ag3: {label: "Ag3 trimers with total charge +1 and -1", class: "Charged system (Ko et al. benchmark)"}
+  NaCl: {label: "Na8/9Cl8+ ionic clusters", class: "Charged system (Ko et al. benchmark)"}
+  AuMgO: {label: "Au2 cluster on a MgO(001) slab", class: "Charged system (Ko et al. benchmark)"}
+  matpes: {label: "Inorganic materials of MatPES-PBE", class: "Inorganic crystalline materials"}
+reference:
+  bpa: {type: DFT, xc: wB97X, basis: "6-31G(d)", comment: "3BPA configurations reevaluated at wB97X/6-31G(d) (Sec. 2.4)."}
+datasets:
+  3BPA: {label: "3BPA training set at 300 K", materials: [3BPA], properties: [Energy, Forces], provenance: Published, calc: bpa}
+  water: {label: "32-water data set (Refs. [15, 43])", materials: [water], properties: [Energy, Forces], provenance: Published}
+  gap17: {label: "GAP17 carbon data set", materials: [carbon], properties: [Energy, Forces], provenance: Published}
+  batio3: {label: "BaTiO3 data set of Allegro-pol (59 zero-field MD frames)", materials: [BaTiO3], properties: [Energy, Forces, Stresses], provenance: Published, n: {v: 59, loc: "Sec. 2.8"}, comment: "Also polarisation, polarisability and Born effective charges."}
+  chg-C10H2: {label: "Charged-system data set of Ko et al.: C10H2 / C10H3+ carbon chains (neutral and positively charged)", materials: [C10H2], properties: [Energy, Forces], provenance: Published, comment: "Charges also used as labels."}
+  chg-Ag3: {label: "Charged-system data set of Ko et al.: Ag3 trimers with total charge +1 and -1", materials: [Ag3], properties: [Energy, Forces], provenance: Published, comment: "Charges also used as labels."}
+  chg-NaCl: {label: "Charged-system data set of Ko et al.: Na8/9Cl8+ ionic clusters", materials: [NaCl], properties: [Energy, Forces], provenance: Published, comment: "Charges also used as labels."}
+  chg-AuMgO: {label: "Charged-system data set of Ko et al.: Au2 cluster on a MgO(001) slab", materials: [AuMgO], properties: [Energy, Forces], provenance: Published, comment: "Charges also used as labels."}
+  matpes: {label: "MatPES-PBE training data", materials: [matpes], properties: [Energy, Forces, Stresses], provenance: Published}
+hyperparameters:
+  correlation-order: {label: "ACE correlation order of the product basis", name: "correlation order", datatype: integer}
+  Lmax: {label: "Maximum rank Lmax of the irreducible Cartesian tensor features", name: "Lmax", datatype: integer}
+methods:
+  TACE:
+    hp: [numFeatures, correlation-order, Lmax]
+    impl: {lib: {local: "TACE", comment: "Implementation of the paper; details in the Methods and SI"}}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  tace-3bpa-sph-spa: {label: "TACE spherical, spatial-domain ACE, correlation order 2, trained on 3BPA at 300 K", method: TACE, dataset: 3BPA, settings: {numFeatures: {v: 64, loc: "Sec. 2.4"}, correlation-order: {v: 2, loc: "Table 1 note"}}, model: "TACE spherical, spatial-domain ACE, correlation order 2 (3BPA)"}
+  tace-3bpa-cart-spa: {label: "TACE Cartesian, spatial-domain ACE, correlation order 2, trained on 3BPA at 300 K", method: TACE, dataset: 3BPA, settings: {numFeatures: {v: 64, loc: "Sec. 2.4"}, correlation-order: {v: 2, loc: "Table 1 note"}}, model: "TACE Cartesian, spatial-domain ACE, correlation order 2 (3BPA)"}
+  tace-3bpa-cart-spe2: {label: "TACE Cartesian, frequency-domain ACE, correlation order 2, trained on 3BPA at 300 K", method: TACE, dataset: 3BPA, settings: {numFeatures: {v: 64, loc: "Sec. 2.4"}, correlation-order: {v: 2, loc: "Table 1 note"}}, model: "TACE Cartesian, frequency-domain ACE, correlation order 2 (3BPA)"}
+  tace-3bpa-cart-spe3: {label: "TACE Cartesian, frequency-domain ACE, correlation order 3, trained on 3BPA at 300 K", method: TACE, dataset: 3BPA, settings: {numFeatures: {v: 64, loc: "Sec. 2.4"}, correlation-order: {v: 3, loc: "Table 1 note"}}, model: "TACE Cartesian, frequency-domain ACE, correlation order 3 (3BPA)"}
+  tace-water-64-0: {label: "TACE fit to the 32-water system, c = 64, Lmax = 0", method: TACE, dataset: water, settings: {numFeatures: {v: 64, loc: "Table 2"}, Lmax: {v: 0, loc: "Table 2"}}, model: "TACE water model 64-0"}
+  tace-water-64-2: {label: "TACE fit to the 32-water system, c = 64, Lmax = 2", method: TACE, dataset: water, settings: {numFeatures: {v: 64, loc: "Table 2"}, Lmax: {v: 2, loc: "Table 2"}}, model: "TACE water model 64-2"}
+  tace-gap17: {label: "TACE fit to the GAP17 carbon data set", method: TACE, dataset: gap17, model: "TACE GAP17 carbon model"}
+  fitace: {label: "FITACE (field-embedded TACE) trained on 59 BaTiO3 configurations", method: TACE, dataset: batio3, model: "FITACE BaTiO3 model"}
+  fitace-zbl: {label: "FITACE with a ZBL short-range term trained on 59 BaTiO3 configurations", method: TACE, dataset: batio3, model: "FITACE-ZBL BaTiO3 model"}
+  tace-chg-C10H2: {label: "TACE with charge embedding fit to C10H2 / C10H3+ carbon chains (neutral and positively charged)", method: TACE, dataset: chg-C10H2, model: "TACE charged-system model: C10H2 / C10H3+ carbon chains (neutral and positively charged)"}
+  tace-chg-Ag3: {label: "TACE with charge embedding fit to Ag3 trimers with total charge +1 and -1", method: TACE, dataset: chg-Ag3, model: "TACE charged-system model: Ag3 trimers with total charge +1 and -1"}
+  tace-chg-NaCl: {label: "TACE with charge embedding fit to Na8/9Cl8+ ionic clusters", method: TACE, dataset: chg-NaCl, model: "TACE charged-system model: Na8/9Cl8+ ionic clusters"}
+  tace-chg-AuMgO: {label: "TACE with charge embedding fit to Au2 cluster on a MgO(001) slab", method: TACE, dataset: chg-AuMgO, model: "TACE charged-system model: Au2 cluster on a MgO(001) slab"}
+  tace-matpes-agnostic: {label: "TACE element-agnostic model trained on MatPES-PBE (0.98M parameters)", method: TACE, dataset: matpes, model: "TACE MatPES-PBE element-agnostic model (0.98M parameters)"}
+  tace-matpes-aware: {label: "TACE element-aware model trained on MatPES-PBE (29.8M parameters)", method: TACE, dataset: matpes, model: "TACE MatPES-PBE element-aware model (29.8M parameters)"}
+results:
+  - {key: tace-3bpa-sph-spa-300K, model: tace-3bpa-sph-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 300K", registry: 3BPA}, metrics: [[RMSE, Energy, 4.0, meV, "RMSE on energy: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 300K", "Table 1"], [RMSE, Force, 10.2, meV/A, "RMSE on forces: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 300K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spa-300K, model: tace-3bpa-cart-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 300K", registry: 3BPA}, metrics: [[RMSE, Energy, 3.2, meV, "RMSE on energy: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 300K", "Table 1"], [RMSE, Force, 10.0, meV/A, "RMSE on forces: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 300K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe2-300K, model: tace-3bpa-cart-spe2, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 300K", registry: 3BPA}, metrics: [[RMSE, Energy, 3.5, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 300K", "Table 1"], [RMSE, Force, 10.2, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 300K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe3-300K, model: tace-3bpa-cart-spe3, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 300K", registry: 3BPA}, metrics: [[RMSE, Energy, 2.69, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 300K", "Table 1"], [RMSE, Force, 8.68, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 300K", "Table 1"]]}
+  - {key: tace-3bpa-sph-spa-600K, model: tace-3bpa-sph-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 600K", registry: 3BPA}, metrics: [[RMSE, Energy, 11.7, meV, "RMSE on energy: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 600K", "Table 1"], [RMSE, Force, 24.1, meV/A, "RMSE on forces: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 600K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spa-600K, model: tace-3bpa-cart-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 600K", registry: 3BPA}, metrics: [[RMSE, Energy, 12.9, meV, "RMSE on energy: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 600K", "Table 1"], [RMSE, Force, 23.8, meV/A, "RMSE on forces: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 600K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe2-600K, model: tace-3bpa-cart-spe2, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 600K", registry: 3BPA}, metrics: [[RMSE, Energy, 11.6, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 600K", "Table 1"], [RMSE, Force, 23.4, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 600K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe3-600K, model: tace-3bpa-cart-spe3, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 600K", registry: 3BPA}, metrics: [[RMSE, Energy, 8.1, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 600K", "Table 1"], [RMSE, Force, 19.88, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 600K", "Table 1"]]}
+  - {key: tace-3bpa-sph-spa-1200K, model: tace-3bpa-sph-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 1200K", registry: 3BPA}, metrics: [[RMSE, Energy, 30.4, meV, "RMSE on energy: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"], [RMSE, Force, 63.8, meV/A, "RMSE on forces: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spa-1200K, model: tace-3bpa-cart-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 1200K", registry: 3BPA}, metrics: [[RMSE, Energy, 30.6, meV, "RMSE on energy: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"], [RMSE, Force, 65.8, meV/A, "RMSE on forces: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe2-1200K, model: tace-3bpa-cart-spe2, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 1200K", registry: 3BPA}, metrics: [[RMSE, Energy, 29.7, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"], [RMSE, Force, 60.5, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA 1200K", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe3-1200K, model: tace-3bpa-cart-spe3, material: 3BPA, role: test, eval_data: {label: "3BPA test set: MD at 1200K", registry: 3BPA}, metrics: [[RMSE, Energy, 23.42, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 1200K", "Table 1"], [RMSE, Force, 54.26, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA 1200K", "Table 1"]]}
+  - {key: tace-3bpa-sph-spa-dihedral, model: tace-3bpa-sph-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: dihedral slices", registry: 3BPA}, metrics: [[RMSE, Energy, 14.4, meV, "RMSE on energy: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"], [RMSE, Force, 18.8, meV/A, "RMSE on forces: TACE spherical, spatial-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"]]}
+  - {key: tace-3bpa-cart-spa-dihedral, model: tace-3bpa-cart-spa, material: 3BPA, role: test, eval_data: {label: "3BPA test set: dihedral slices", registry: 3BPA}, metrics: [[RMSE, Energy, 11.4, meV, "RMSE on energy: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"], [RMSE, Force, 18.3, meV/A, "RMSE on forces: TACE Cartesian, spatial-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe2-dihedral, model: tace-3bpa-cart-spe2, material: 3BPA, role: test, eval_data: {label: "3BPA test set: dihedral slices", registry: 3BPA}, metrics: [[RMSE, Energy, 7.6, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"], [RMSE, Force, 18.9, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 2, 3BPA dihedral", "Table 1"]]}
+  - {key: tace-3bpa-cart-spe3-dihedral, model: tace-3bpa-cart-spe3, material: 3BPA, role: test, eval_data: {label: "3BPA test set: dihedral slices", registry: 3BPA}, metrics: [[RMSE, Energy, 11.0, meV, "RMSE on energy: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA dihedral", "Table 1"], [RMSE, Force, 16.45, meV/A, "RMSE on forces: TACE Cartesian, frequency-domain ACE, correlation order 3, 3BPA dihedral", "Table 1"]]}
+  - {key: tace-water-64-0, model: tace-water-64-0, material: water, eval_data: {label: "32-water benchmark test data"}, metrics: [[RMSE, Energy, 0.58, meV/atom, "RMSE on energy: TACE 64-0, 32-water system", "Table 2"], [RMSE, Force, 33.16, meV/A, "RMSE on forces: TACE 64-0, 32-water system", "Table 2"]]}
+  - {key: tace-water-64-2, model: tace-water-64-2, material: water, eval_data: {label: "32-water benchmark test data"}, metrics: [[RMSE, Energy, 0.72, meV/atom, "RMSE on energy: TACE 64-2, 32-water system", "Table 2"], [RMSE, Force, 30.31, meV/A, "RMSE on forces: TACE 64-2, 32-water system", "Table 2"]]}
+  - {key: tace-gap17, model: tace-gap17, material: carbon, eval_data: {label: "GAP17 benchmark test data"}, metrics: [[RMSE, Energy, 8.55, meV/atom, "RMSE on energy: TACE, GAP17 carbon", "Table 4"], [RMSE, Force, 299.88, meV/A, "RMSE on forces: TACE, GAP17 carbon", "Table 4"]]}
+  - {key: fitace, model: fitace, material: BaTiO3, eval_data: {label: "BaTiO3 benchmark test data"}, metrics: [[MAE, Energy, 0.32, meV/atom, "MAE on electric enthalpy: FITACE, BaTiO3, 59 training configurations", "Table 5"], [MAE, Force, 13.93, meV/A, "MAE on forces: FITACE, BaTiO3, 59 training configurations", "Table 5"]]}
+  - {key: fitace-zbl, model: fitace-zbl, material: BaTiO3, eval_data: {label: "BaTiO3 benchmark test data"}, metrics: [[MAE, Energy, 0.25, meV/atom, "MAE on electric enthalpy: FITACE-ZBL, BaTiO3, 59 training configurations", "Table 5"], [MAE, Force, 14.10, meV/A, "MAE on forces: FITACE-ZBL, BaTiO3, 59 training configurations", "Table 5"]]}
+  - {key: tace-chg-C10H2, model: tace-chg-C10H2, material: C10H2, eval_data: {label: "Ko et al. charged-system benchmark test data"}, metrics: [[RMSE, Energy, 0.21, meV/atom, "RMSE on energy: TACE, C10H2 / C10H3+ carbon chains (neutral and positively charged)", "Table 6"], [RMSE, Force, 2.13, meV/A, "RMSE on forces: TACE, C10H2 / C10H3+ carbon chains (neutral and positively charged)", "Table 6"]]}
+  - {key: tace-chg-Ag3, model: tace-chg-Ag3, material: Ag3, eval_data: {label: "Ko et al. charged-system benchmark test data"}, metrics: [[RMSE, Energy, 2.54, meV/atom, "RMSE on energy: TACE, Ag3 trimers with total charge +1 and -1", "Table 6"], [RMSE, Force, 12.22, meV/A, "RMSE on forces: TACE, Ag3 trimers with total charge +1 and -1", "Table 6"]]}
+  - {key: tace-chg-NaCl, model: tace-chg-NaCl, material: NaCl, eval_data: {label: "Ko et al. charged-system benchmark test data"}, metrics: [[RMSE, Energy, 0.55, meV/atom, "RMSE on energy: TACE, Na8/9Cl8+ ionic clusters", "Table 6"], [RMSE, Force, 1.06, meV/A, "RMSE on forces: TACE, Na8/9Cl8+ ionic clusters", "Table 6"]]}
+  - {key: tace-chg-AuMgO, model: tace-chg-AuMgO, material: AuMgO, eval_data: {label: "Ko et al. charged-system benchmark test data"}, metrics: [[RMSE, Energy, 1.18, meV/atom, "RMSE on energy: TACE, Au2 cluster on a MgO(001) slab", "Table 6"], [RMSE, Force, 3.82, meV/A, "RMSE on forces: TACE, Au2 cluster on a MgO(001) slab", "Table 6"]]}
+  - {key: tace-matpes-agnostic, model: tace-matpes-agnostic, material: matpes, role: test, eval_data: {label: "MatPES-PBE test data", registry: MatPES}, metrics: [[MAE, Energy, 35, meV/atom, "MAE on energy per atom: TACE element-agnostic, MatPES-PBE", "Table 10"], [MAE, Force, 105, meV/A, "MAE on forces: TACE element-agnostic, MatPES-PBE", "Table 10"], [MAE, Stress, 0.655, GPa, "MAE on stress: TACE element-agnostic, MatPES-PBE", "Table 10"]]}
+  - {key: tace-matpes-aware, model: tace-matpes-aware, material: matpes, role: test, eval_data: {label: "MatPES-PBE test data", registry: MatPES}, metrics: [[MAE, Energy, 31, meV/atom, "MAE on energy per atom: TACE element-aware, MatPES-PBE", "Table 10"], [MAE, Force, 101, meV/A, "MAE on forces: TACE element-aware, MatPES-PBE", "Table 10"], [MAE, Stress, 0.607, GPa, "MAE on stress: TACE element-aware, MatPES-PBE", "Table 10"]]}
+gaps:
+  - "Introduces TACE: 'Here we introduce the Tensor Atomic Cluster Expansion (TACE)', constructing 'a controlled many-body hierarchy with atomic cluster expansion (ACE)'; 'Overall, TACE follows the design framework of ACE' (Abstract, Sec. 2.3). Recorded in the registry as TACE derived from ACE. TACE is the method used by the universal model of xu2025 (TACE-v1)."
+  - "The corpus manifest gives the first author as 'Zhixing Xu'; the PDF and the DOI metadata give Zemin Xu, Wenbo Xie and P. Hu. The spec's source block was corrected to Zemin Xu."
+  - "Table 5's MAE on electric enthalpy is encoded as an energy error (meV/atom); stress (meV/A^3), polarisation, polarisability and Born effective charges are not encoded. Allegro-pol models trained by the authors are not a registry method and are not encoded."
+  - "Whether the 32-water, GAP17, BaTiO3 and charged-system errors are on test or validation splits is not stated in the tables; no role is recorded. Training settings are in the Methods and SI, which were not encoded beyond channel counts, Lmax and correlation order given with the tables."
+  - "The 3BPA column headers are reconstructed from the table note (sph/cart, spa/spe, correlation order 2 or 3)."

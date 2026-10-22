@@ -1,0 +1,64 @@
+id: pozdnyakov2023
+source:
+  rank: 216
+  year: "2023"
+  first_author: "Sergey N. Pozdnyakov"
+  title: "Smooth, exact rotational symmetrization for deep learning on point clouds"
+  venue: "neural information processing systems"
+  doi: "10.52202/075280-3478"
+  kg_relevance: "Method/model"
+  arxiv_id: "2305.19302v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "33ce0c25fb3c07afe8b294efc25ddf9e3869ef8763307436f43668273e8b3b43"
+study_label: "Pozdnyakov and Ceriotti (2023): Point Edge Transformer (PET) with equivariant coordinate system ensembles (ECSE)"
+scope: |
+  Encoding scope: the Point Edge Transformer (introduced here; PET in the
+  registry) with its tabulated errors on COLL (Tables 1, 2), MnO (Tables 1,
+  4), HME21 (Tables 1, 3), the HEA25 high-entropy alloys (Table 1), liquid water (text) and QM9
+  atomization energies (Table 5). The ECSE symmetrisation is a protocol
+  applied at inference; results of the plain (y0) and symmetrised (yS)
+  model are both encoded where tabulated. CH4 and QM9-dipole learning
+  curves (Fig. 3) and ensemble results are not encoded.
+materials:
+  coll: {label: "Small organic molecules in collision configurations (COLL)", class: "Small organic molecules (distorted)"}
+  MnO: {label: "Manganese oxide with collinear atomic spins", formula: "MnO", class: "Antiferromagnetic transition-metal oxide", wikidata: Q421135}
+  hme21: {label: "Diverse inorganic structures from high-temperature MD (HME21)", class: "Inorganic materials, multi-element"}
+  hea25: {label: "High-entropy alloys of up to 25 transition metals (distorted fcc and bcc lattices)", class: "High-entropy alloy"}
+  water: {label: "Liquid water (path-integral MD configurations)", formula: "H2O", class: "Molecular liquid", wikidata: Q283}
+  qm9: {label: "Small organic molecules with up to nine heavy atoms (QM9)", class: "Small organic molecules (equilibrium geometries)"}
+datasets:
+  coll: {label: "COLL training data", materials: [coll], properties: [Energy, Forces], provenance: Published}
+  MnO: {label: "MnO data set of Eckhoff and Behler (2,608 training structures)", materials: [MnO], properties: [Energy, Forces], provenance: Published, n: {v: 2608, loc: "App. C.3"}, comment: "200 validation and 293 test structures; atomic spins as discretised labels."}
+  hme21: {label: "HME21 training data", materials: [hme21], properties: [Energy, Forces], provenance: Published}
+  hea25: {label: "HEA25 training set (24,630 structures)", materials: [hea25], properties: [Energy, Forces], provenance: Published, n: {v: 24630, loc: "App. C.4"}, comment: "500 validation and 500 test structures."}
+  water: {label: "Liquid water data set of Ref. [85] (1,303 training structures)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 1303, loc: "App. C.5"}, comment: "100 validation and 190 test structures."}
+  qm9: {label: "QM9 training set (110,000 molecules)", materials: [qm9], properties: [Energy], provenance: Published, n: {v: 110000, loc: "App. C.7"}, comment: "10,000 validation and 10,831 test molecules."}
+hyperparameters:
+  nTL: {label: "PET number of transformer layers per message-passing block n_TL", name: "n_TL", datatype: integer}
+methods:
+  PET:
+    hp: [cutoffRadius, numLayers, numFeatures, nTL]
+    loss: "Weighted sum of energy and force mean squared errors (Eq. 8); per-atom energy MSE for HME21"
+    algorithm: "StepLR or fast-decay learning-rate schedule (App. C.2)"
+    impl: {lib: {local: "PET", comment: "Released implementation of the paper (App. D)"}}
+runs:
+  pet-coll: {label: "PET-256 fit to COLL", method: PET, dataset: coll, settings: {numFeatures: {v: 256, loc: "Table 2"}}, model: "PET-256 COLL model"}
+  pet-MnO: {label: "PET with discretised spins fit to MnO", method: PET, dataset: MnO, model: "PET MnO model (spins discretised)"}
+  pet-hme21: {label: "PET fit to HME21 (five seeds)", method: PET, dataset: hme21, model: "PET HME21 models (five random seeds)"}
+  pet-hea25: {label: "PET fit to HEA25", method: PET, dataset: hea25, model: "PET HEA25 model"}
+  pet-water: {label: "PET fit to liquid water with n_GNN = 6, n_TL = 2, Rc = 4.25 A", method: PET, dataset: water, settings: {cutoffRadius: {v: 4.25, loc: "Sec. 7"}, numLayers: {v: 6, loc: "App. C.5 (n_GNN)"}, nTL: {v: 2, loc: "App. C.5"}}, model: "PET water model 6x2, Rc 4.25 A"}
+  pet-qm9: {label: "PET fit to QM9 atomization energies", method: PET, dataset: qm9, model: "PET QM9 energy model"}
+results:
+  - {key: pet-coll-y0, model: pet-coll, material: coll, role: test, eval_data: {label: "COLL test set", registry: COLL}, metrics: [[MAE, Force, 23.1, meV/A, "COLL test force MAE: PET-256 (not symmetrised)", "Tables 1, 2"], [MAE, Energy, 12.0, meV, "COLL test energy MAE per molecule: PET-256 (not symmetrised)", "Tables 1, 2"]]}
+  - {key: pet-coll-ecse, model: pet-coll, material: coll, role: test, eval_data: {label: "COLL test set", registry: COLL}, comment: "PET-256 with ECSE symmetrisation (auxiliary PET-128-2-body model for corner cases).", metrics: [[MAE, Force, 23.1, meV/A, "COLL test force MAE: PET-ECSE", "Tables 1, 2"], [MAE, Energy, 11.9, meV, "COLL test energy MAE per molecule: PET-ECSE", "Tables 1, 2"]]}
+  - {key: pet-MnO-ecse, model: pet-MnO, material: MnO, role: test, eval_data: {label: "MnO test structures (293)"}, comment: "Symmetrised (yS) model with discretised spins.", metrics: [[RMSE, Force, 22.7, meV/A, "MnO test force error: PET (yS), discretised spins", "Table 1"], [RMSE, Energy, 0.304, meV/atom, "MnO test energy error per atom: PET (yS), discretised spins", "Table 1"]]}
+  - {key: pet-hme21, model: pet-hme21, material: hme21, role: test, eval_data: {label: "HME21 test set", registry: HME21}, comment: "Mean over five models (PET-1, not symmetrised).", metrics: [[MAE, Energy, 17.8, meV/atom, "HME21 test energy MAE per atom: PET-1, mean of five seeds", "Table 3"], [MAE, Force, 124.0, meV/A, "HME21 test force-component MAE: PET-1, mean of five seeds", "Table 3"]]}
+  - {key: pet-hea25, model: pet-hea25, material: hea25, role: test, eval_data: {label: "HEA25 test structures (500)"}, metrics: [[MAE, Force, 60.2, meV/A, "HEA25 test force MAE: PET (y0)", "Table 1"], [MAE, Energy, 1.87, meV/atom, "HEA25 test energy MAE per atom: PET (y0)", "Table 1"]]}
+  - {key: pet-water, model: pet-water, material: water, role: test, eval_data: {label: "Water test structures (190)"}, metrics: [[MAE, Force, 14.4, meV/A, "Test force MAE: PET 6x2, Rc = 4.25 A, liquid water", "Sec. 7"]]}
+  - {key: pet-qm9, model: pet-qm9, material: qm9, role: test, eval_data: {label: "QM9 test molecules (10,831)", registry: QM9}, metrics: [[MAE, Energy, 6.7, meV, "QM9 test MAE of the atomization energy per molecule: PET (not symmetrised)", "App. C.7, Table 5"]]}
+gaps:
+  - "PET is a new message-passing transformer that is not intrinsically equivariant; ECSE is a symmetrisation protocol applicable to any model. No derivation from a registry method is stated."
+  - "Table 1 labels the MnO errors RMSE, Table 4 MAE (0.30 meV, 22.7 meV/A for the same model); the Table 1 labelling is followed. The out-of-sample HEA25 errors of App. C.4 (300 K: 9.5 meV/atom and 0.13 eV/A; 5000 K: 152 meV/atom and 0.28 eV/A) do not name their statistic and are not encoded."
+  - "HME21 'MAE |f|' (140.5 meV/A, error on the force norm) is not encoded; the force-component MAE (124.0) is. Ensemble results (five models) are not encoded."
+  - "Liquid-water accuracy for other architectures and cutoffs is in Fig. 3 only. CH4 and QM9 dipole results are learning curves."
+  - "Data-set levels of theory are not described in this paper; COLL and HME21 split sizes are not restated."

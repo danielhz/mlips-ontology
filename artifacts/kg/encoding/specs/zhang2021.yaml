@@ -1,0 +1,53 @@
+id: zhang2021
+source:
+  rank: 213
+  year: "2021"
+  first_author: "Yaolong Zhang"
+  title: "Physically Motivated Recursively Embedded Atom Neural Networks: Incorporating Local Completeness and Nonlocality"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.127.156002"
+  kg_relevance: "Method/model"
+  arxiv_id: "2106.08245v5"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "793cc46930f02b56fccd509f6afafb7768f72f1c1be5c761e8f7b1677dcdbd29"
+study_label: "Zhang, Xia and Jiang (2021): recursively embedded atom neural networks (REANN)"
+scope: |
+  Encoding scope: the REANN model (introduced here) with its tabulated test
+  errors on bulk water: the water-I data set of Cheng et al. for five
+  cutoff radii (Table 1) and the water-II data set of Zhang et al. (text).
+  The CH4 completeness study (learning curves in Fig. 3 and Fig. S4) and
+  the SchNet, EANN and BPNN comparison values (Tables 1, S2) are not
+  encoded.
+materials:
+  water: {label: "Bulk liquid water (periodic cells of 64 molecules)", formula: "H2O", class: "Molecular liquid", wikidata: Q283}
+reference:
+  water-I: {type: DFT, xc: {local: "revPBE0-D3"}, comment: "Water-I data set of Ref. [45]."}
+  water-II: {type: DFT, xc: {local: "PBE0-TS"}, comment: "Water-II data set of Ref. [14] (hybrid PBE0 with Tkatchenko-Scheffler), from path-integral AIMD at 300 K."}
+datasets:
+  water-I: {label: "Bulk water data set water-I (1,593 structures of 64 molecules; 80% training)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 1593, loc: "SM Sec. I B"}, calc: water-I}
+  water-II: {label: "Bulk water data set water-II (about 1e5 structures from PI-AIMD at 300 K; 90% training)", materials: [water], properties: [Energy, Forces], provenance: Published, calc: water-II}
+methods:
+  REANN:
+    hp: [cutoffRadius, numLayers, learningRate]
+    loss: "Energies and forces with a dynamic force weight decreasing from 5 to 1"
+    algorithm: "AdamW with ReduceLROnPlateau from 1e-3 to 1e-5 (factor 0.6)"
+    impl: {lib: {local: "REANN", comment: "PyTorch package; descriptor parameters (alpha, rs, orbital coefficients) optimised with the network weights"}}
+runs:
+  reann-w1-rc3_0: {label: "REANN (T=3) fit to water-I with rc = 3.0 A", method: REANN, dataset: water-I, settings: {cutoffRadius: {v: 3.0, loc: "Table 1"}, numLayers: {v: 3, loc: "Table 1 (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-I model, T=3, rc = 3.0 A"}
+  reann-w1-rc3_5: {label: "REANN (T=3) fit to water-I with rc = 3.5 A", method: REANN, dataset: water-I, settings: {cutoffRadius: {v: 3.5, loc: "Table 1"}, numLayers: {v: 3, loc: "Table 1 (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-I model, T=3, rc = 3.5 A"}
+  reann-w1-rc4_5: {label: "REANN (T=3) fit to water-I with rc = 4.5 A", method: REANN, dataset: water-I, settings: {cutoffRadius: {v: 4.5, loc: "Table 1"}, numLayers: {v: 3, loc: "Table 1 (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-I model, T=3, rc = 4.5 A"}
+  reann-w1-rc5_5: {label: "REANN (T=3) fit to water-I with rc = 5.5 A", method: REANN, dataset: water-I, settings: {cutoffRadius: {v: 5.5, loc: "Table 1"}, numLayers: {v: 3, loc: "Table 1 (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-I model, T=3, rc = 5.5 A"}
+  reann-w1-rc6_2: {label: "REANN (T=3) fit to water-I with rc = 6.2 A", method: REANN, dataset: water-I, settings: {cutoffRadius: {v: 6.2, loc: "Table 1"}, numLayers: {v: 3, loc: "Table 1 (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-I model, T=3, rc = 6.2 A"}
+  reann-w2: {label: "REANN (T=2) fit to water-II with rc = 4.5 A", method: REANN, dataset: water-II, settings: {cutoffRadius: {v: 4.5, loc: "main text"}, numLayers: {v: 2, loc: "main text (T)"}, learningRate: {v: 0.001, loc: "SM Sec. I A (initial)"}}, model: "REANN water-II model, T=2"}
+results:
+  - {key: reann-w1-rc3_0, model: reann-w1-rc3_0, material: water, role: test, eval_data: {label: "Water-I random 20% test split"}, metrics: [[RMSE, Energy, 2.8, meV/atom, "Test RMSE on energy: REANN T=3, water-I, rc = 3.0 A", "Table 1"], [RMSE, Force, 104.4, meV/A, "Test RMSE on forces: REANN T=3, water-I, rc = 3.0 A", "Table 1"]]}
+  - {key: reann-w1-rc3_5, model: reann-w1-rc3_5, material: water, role: test, eval_data: {label: "Water-I random 20% test split"}, metrics: [[RMSE, Energy, 1.5, meV/atom, "Test RMSE on energy: REANN T=3, water-I, rc = 3.5 A", "Table 1"], [RMSE, Force, 73.1, meV/A, "Test RMSE on forces: REANN T=3, water-I, rc = 3.5 A", "Table 1"]]}
+  - {key: reann-w1-rc4_5, model: reann-w1-rc4_5, material: water, role: test, eval_data: {label: "Water-I random 20% test split"}, metrics: [[RMSE, Energy, 1.1, meV/atom, "Test RMSE on energy: REANN T=3, water-I, rc = 4.5 A", "Table 1"], [RMSE, Force, 58.0, meV/A, "Test RMSE on forces: REANN T=3, water-I, rc = 4.5 A", "Table 1"]]}
+  - {key: reann-w1-rc5_5, model: reann-w1-rc5_5, material: water, role: test, eval_data: {label: "Water-I random 20% test split"}, metrics: [[RMSE, Energy, 0.9, meV/atom, "Test RMSE on energy: REANN T=3, water-I, rc = 5.5 A", "Table 1"], [RMSE, Force, 51.1, meV/A, "Test RMSE on forces: REANN T=3, water-I, rc = 5.5 A", "Table 1"]]}
+  - {key: reann-w1-rc6_2, model: reann-w1-rc6_2, material: water, role: test, eval_data: {label: "Water-I random 20% test split"}, metrics: [[RMSE, Energy, 0.8, meV/atom, "Test RMSE on energy: REANN T=3, water-I, rc = 6.2 A", "Table 1"], [RMSE, Force, 53.2, meV/A, "Test RMSE on forces: REANN T=3, water-I, rc = 6.2 A", "Table 1"]]}
+  - {key: reann-w2, model: reann-w2, material: water, role: test, eval_data: {label: "Water-II random 10% test split"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "Test RMSE on energy: REANN T=2, water-II, rc = 4.5 A", "main text"], [RMSE, Force, 15.9, meV/A, "Test RMSE on forces: REANN T=2, water-II, rc = 4.5 A", "main text"]]}
+gaps:
+  - "REANN is introduced as 'a physical adaption of the local descriptor-based EANN model' (Summary; also the description of the T = 0 limit). Recorded in the registry as REANN derived from EANN (new registry method; the EANN method paper is not in the corpus)."
+  - "Network sizes per data set are in Table S1 (water-I: atomic NN 32x16, orbital-coefficient NN 16x16, 33 features; water-II: 512x256x128x64 and 64x32, 60 features). Table S1 lists rc 6.2 A for water-I, while Table 1 varies rc; the architecture of the smaller-cutoff models is not restated, so only rc, T and the initial learning rate are encoded."
+  - "The CH4 results are learning curves only (Fig. 3, Fig. S4). The SchNet values for water-I in Table S2 may come from models trained by the authors, but the paper does not say so; they are not encoded."
+  - "No training or inference timing is reported."

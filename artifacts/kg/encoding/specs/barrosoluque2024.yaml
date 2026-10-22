@@ -1,0 +1,78 @@
+id: barrosoluque2024
+source:
+  rank: 221
+  year: "2024"
+  first_author: "Luis Barroso-Luque"
+  title: "Open Materials 2024 (OMat24) Inorganic Materials Dataset and Models"
+  venue: "arXiv"
+  doi: "10.48550/arxiv.2410.12771"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2410.12771v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3bbcd0bb5ced6be069e22c02c5a957ee7178cc4392330b367d50056b6a5ac0cf"
+study_label: "Barroso-Luque et al. (2024): Open Materials 2024 (OMat24) data set and models"
+scope: |
+  Encoding scope: the OMat24 data set and the sAlex subset of Alexandria
+  introduced here, and the eight eSEN and EquiformerV2 models of the
+  Matbench Discovery comparison (Table 2): pretrained on OMat24 or OC20
+  and fine-tuned on MPtrj or on MPtrj and sAlex. Their energy-above-hull
+  MAE, RMSE and R2 are encoded; the classification scores, the thermal-
+  conductivity SRME, the softening analysis and the MPtrj-only models of
+  the SI are not.
+materials:
+  inorganic: {label: "Inorganic materials across the periodic table (OMat24, from Alexandria structures)", class: "Inorganic crystalline materials (equilibrium and non-equilibrium)"}
+  wbm: {label: "Inorganic crystals of the WBM test set (Matbench Discovery)", class: "Inorganic crystalline materials"}
+reference:
+  omat-dft: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "Materials Project defaults (MPRelaxSet) with PBE 54 pseudopotentials and ALGO Normal; Hubbard U for oxides and fluorides containing Co, Cr, Fe, Mn, Mo, Ni, V or W (Sec. 4.2)."}
+sampling:
+  rattled-boltzmann: {label: "Rattled Boltzmann sampling of Alexandria structures"}
+  rattled-relax: {label: "Rattled relaxations of Alexandria structures"}
+  aimd: {label: "Short AIMD runs (50 steps of 2 fs)", comment: "Time step chosen for diversity rather than accurate integration (Sec. 4.2)."}
+datasets:
+  omat24: {label: "OMat24 training split (100,824,585 structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 100824585, loc: "Table 1"}, calc: omat-dft, sampling: [rattled-boltzmann, rattled-relax, aimd], comment: "118 million structures in total with validation, WBM, ID, OOD-composition and OOD-element test splits; released under CC-BY 4.0."}
+  mptrj: {label: "MPtrj", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published}
+  mptrj-salex: {label: "MPtrj combined with sAlex (subsampled Alexandria, 10 million training structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Augmented, comment: "sAlex removes Alexandria trajectories matching WBM prototypes and structures with energy > 0 eV, force norm > 50 eV/A or stress > 80 GPa, keeping frames differing by more than 10 meV/atom (Sec. 4.3)."}
+hyperparameters:
+  Lmax: {label: "Maximum degree Lmax of the equivariant features", name: "Lmax", datatype: integer}
+methods:
+  EquiformerV2:
+    hp: [cutoffRadius, numLayers, numRadialBasis, Lmax, learningRate, batchSize, numEpochs]
+    loss: "Weighted energy, force and stress loss (coefficients 20, 20, 5) with optional DeNS denoising objective"
+    algorithm: "AdamW with cosine schedule, EMA 0.999"
+    impl: {lib: {local: "fairchem", comment: "https://github.com/FAIR-Chem/fairchem, MIT licence"}}
+  eSEN:
+    hp: [cutoffRadius, learningRate, batchSize, numEpochs]
+    loss: "Energy, force and stress loss; direct-force pretraining followed by conservative fine-tuning"
+    impl: {lib: {local: "fairchem"}}
+runs:
+  esen-30m-oam: {label: "eSEN-30M pretrained on OMat24, fine-tuned on MPtrj-sAlex", method: eSEN, dataset: mptrj-salex, settings: {cutoffRadius: {v: 6, loc: "Table G.3"}, learningRate: {v: 0.0002, loc: "Table G.3 (OAM fine-tuning)"}, batchSize: {v: 256, loc: "Table G.3"}, numEpochs: {v: 1, loc: "Table G.3"}}, model: "eSEN-30M pretrained on OMat24, fine-tuned on MPtrj-sAlex", base_model: {label: "eSEN-30M pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-l-oam: {label: "eqV2-L pretrained on OMat24, fine-tuned on MPtrj-sAlex", method: EquiformerV2, dataset: mptrj-salex, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 20, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 6, loc: "Table G.1"}, learningRate: {v: 0.0002, loc: "Table G.2 (OAM fine-tuning)"}, batchSize: {v: 256, loc: "Table G.2"}, numEpochs: {v: 8, loc: "Table G.2"}}, model: "eqV2-L pretrained on OMat24, fine-tuned on MPtrj-sAlex", base_model: {label: "eqV2-L pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-m-oam: {label: "eqV2-M pretrained on OMat24, fine-tuned on MPtrj-sAlex", method: EquiformerV2, dataset: mptrj-salex, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 10, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 6, loc: "Table G.1"}, learningRate: {v: 0.0002, loc: "Table G.2 (OAM fine-tuning)"}, batchSize: {v: 256, loc: "Table G.2"}, numEpochs: {v: 8, loc: "Table G.2"}}, registry: eqV2-M, base_model: {label: "eqV2-M pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-m-omp: {label: "eqV2-M pretrained on OMat24, fine-tuned on MPtrj", method: EquiformerV2, dataset: mptrj, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 10, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 6, loc: "Table G.1"}}, model: "eqV2-M pretrained on OMat24, fine-tuned on MPtrj", base_model: {label: "eqV2-M pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-s-oam: {label: "eqV2-S pretrained on OMat24, fine-tuned on MPtrj-sAlex", method: EquiformerV2, dataset: mptrj-salex, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 8, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 4, loc: "Table G.1"}, learningRate: {v: 0.0002, loc: "Table G.2 (OAM fine-tuning)"}, batchSize: {v: 256, loc: "Table G.2"}, numEpochs: {v: 8, loc: "Table G.2"}}, model: "eqV2-S pretrained on OMat24, fine-tuned on MPtrj-sAlex", base_model: {label: "eqV2-S pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-s-omp: {label: "eqV2-S pretrained on OMat24, fine-tuned on MPtrj", method: EquiformerV2, dataset: mptrj, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 8, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 4, loc: "Table G.1"}}, model: "eqV2-S pretrained on OMat24, fine-tuned on MPtrj", base_model: {label: "eqV2-S pretrained on OMat24", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-l-oc20: {label: "eqV2-L pretrained on OC20, fine-tuned on MPtrj", method: EquiformerV2, dataset: mptrj, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 20, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 6, loc: "Table G.1"}}, model: "eqV2-L pretrained on OC20, fine-tuned on MPtrj", base_model: {label: "eqV2-L pretrained on OC20", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+  eqv2-s-oc20: {label: "eqV2-S pretrained on OC20, fine-tuned on MPtrj", method: EquiformerV2, dataset: mptrj, settings: {cutoffRadius: {v: 12, loc: "Table G.1"}, numLayers: {v: 8, loc: "Table G.1"}, numRadialBasis: {v: 600, loc: "Table G.1"}, Lmax: {v: 4, loc: "Table G.1"}}, model: "eqV2-S pretrained on OC20, fine-tuned on MPtrj", base_model: {label: "eqV2-S pretrained on OC20", relation: fine-tuned, location: "Sec. 2.2.1, Table 2"}}
+results:
+  - {key: esen-30m-oam-matbench, model: esen-30m-oam, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 18, meV/atom, "Matbench Discovery MAE of the energy above hull: eSEN-30M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [RMSE, Energy, 67, meV/atom, "Matbench Discovery RMSE of the energy above hull: eSEN-30M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [R2, Energy, 0.866, null, "Matbench Discovery R2 of the energy above hull: eSEN-30M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"]]}
+  - {key: eqv2-l-oam-matbench, model: eqv2-l-oam, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 19, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-L (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [RMSE, Energy, 71, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-L (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [R2, Energy, 0.852, null, "Matbench Discovery R2 of the energy above hull: eqV2-L (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"]]}
+  - {key: eqv2-m-oam-matbench, model: eqv2-m-oam, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 20, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [RMSE, Energy, 72, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [R2, Energy, 0.848, null, "Matbench Discovery R2 of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"]]}
+  - {key: eqv2-m-omp-matbench, model: eqv2-m-omp, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 21, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"], [RMSE, Energy, 72, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"], [R2, Energy, 0.849, null, "Matbench Discovery R2 of the energy above hull: eqV2-M (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"]]}
+  - {key: eqv2-s-oam-matbench, model: eqv2-s-oam, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 24, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [RMSE, Energy, 80, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"], [R2, Energy, 0.811, null, "Matbench Discovery R2 of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj-sAlex fine-tuning)", "Table 2"]]}
+  - {key: eqv2-s-omp-matbench, model: eqv2-s-omp, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 26, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"], [RMSE, Energy, 81, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"], [R2, Energy, 0.807, null, "Matbench Discovery R2 of the energy above hull: eqV2-S (OMat24 pretraining, MPtrj fine-tuning)", "Table 2"]]}
+  - {key: eqv2-l-oc20-matbench, model: eqv2-l-oc20, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 29, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-L (OC20 pretraining, MPtrj fine-tuning)", "Table 2"], [RMSE, Energy, 78, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-L (OC20 pretraining, MPtrj fine-tuning)", "Table 2"], [R2, Energy, 0.823, null, "Matbench Discovery R2 of the energy above hull: eqV2-L (OC20 pretraining, MPtrj fine-tuning)", "Table 2"]]}
+  - {key: eqv2-s-oc20-matbench, model: eqv2-s-oc20, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM unique-prototype split"}, metrics: [[MAE, Energy, 33, meV/atom, "Matbench Discovery MAE of the energy above hull: eqV2-S (OC20 pretraining, MPtrj fine-tuning)", "Table 2"], [RMSE, Energy, 80, meV/atom, "Matbench Discovery RMSE of the energy above hull: eqV2-S (OC20 pretraining, MPtrj fine-tuning)", "Table 2"], [R2, Energy, 0.81, null, "Matbench Discovery R2 of the energy above hull: eqV2-S (OC20 pretraining, MPtrj fine-tuning)", "Table 2"]]}
+timings:
+  - {model: eqv2-s-oam, system: "MPtrj samples, batch size 1", atoms: null, value: 9.7, unit: "samples per GPU second", per_atom_us: null, hardware: "Nvidia A100, no inference-time optimisation: eqV2-S 9.7, eqV2-M 7.1, eqV2-L 4.5 samples per second", result: null, location: "Table G.4"}
+resources: |
+  Inference throughput of the EquiformerV2 models on an Nvidia A100 with
+  MPtrj samples at batch size 1 (Table G.4): eqV2-S (31.2M parameters)
+  9.7, eqV2-M (86.6M) 7.1, eqV2-L (153.8M) 4.5 samples per second; held
+  in the encoding input (timed on MPtrj samples, not on the Matbench
+  set). Training cost is not reported in the version read.
+gaps:
+  - "Introduces OMat24 and sAlex. The OMat24 size in the data-set registry is the sum of the six splits of Table 1 (118,164,115); its level of theory is entered from Sec. 4.2. The origin-paper stub of this paper is removed from origin-papers.csv."
+  - "Table 2's caption gives MAE and RMSE 'in units of eV/atom', but the values (18 to 33, 67 to 81) and the text ('an energy-above-hull MAE of 18 meV/atom') are in meV/atom; meV/atom is used."
+  - "eSEN is a new registry method (introduced by Fu et al. 2025, not in the corpus). The eqV2-M OAM model is the registry model eqV2-M, whose run is declared here (origin set to this paper)."
+  - "The pretrained OMat24 and OC20 checkpoints are not encoded as separate runs; they are the base models of the fine-tuned runs in the encoding input. Fine-tuning settings for the OMP (OMat24 -> MPtrj) and OC20 -> MPtrj models are not listed in Table G.2 and are not encoded."
+  - "F1, DAF, precision, recall and the other classification scores, and the thermal-conductivity SRME, are not accuracy metrics of the schema."
