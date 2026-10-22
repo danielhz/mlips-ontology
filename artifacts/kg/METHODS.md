@@ -97,14 +97,16 @@ Edges confirmed against the introducing paper (issue #4, 2026-10-22):
 Candidates not recorded:
 
 - Introducing paper not in the corpus yet (to be confirmed when it is encoded): qSNAP → SNAP (Wood and Thompson 2018), GRACE → ACE (Bochkarev et al. 2024), TACE → ACE (Xu et al. 2025), CACE-LES → CACE (Cheng 2025), 3G-HDNNP → HDNNP (Artrith et al. 2011).
-- Introducing paper in the corpus but the derivation is not stated in it: none left (MACE → ACE and Allegro → NequIP are recorded provisionally, below).
+- Introducing paper in the corpus but the derivation is not stated in it: none left (MACE → ACE and Allegro → NequIP are recorded on expert confirmation, below).
 
-Provisional edges (Daniel, 2026-10-22). The introducing paper does not state these derivations in so many words; Daniel decided to record them until Blazej Grabowski and Jong Hyun Jung, whom he asked, say otherwise. Their `derived_from_source` says "provisional"; if either expert disagrees, empty both registry cells and run `make methods-registry`.
+Edges confirmed by domain experts (2026-10-22). The introducing paper does not state these derivations in so many words, so they were recorded first as provisional (Daniel) and then confirmed by the two domain experts Daniel asked:
 
 | method | derived from | basis |
 |---|---|---|
-| MACE | ACE | batatia2022 places MACE in the multi-ACE framework of its related work ("extending the ACE framework to include methods built on equivariant MPNNs") and builds its many-body features with the ACE construction, but describes MACE itself as following the general framework of MPNNs |
-| Allegro | NequIP | musaelian2023allegro shares NequIP's irreps representation ("In both the present work and in NequIP, …") and compares with it, but does not say Allegro derives from it |
+| MACE | ACE | batatia2022 places MACE in the multi-ACE framework of its related work ("extending the ACE framework to include methods built on equivariant MPNNs") and builds its many-body features with the ACE construction. Confirmed by Jong Hyun Jung: "MACE was derived from ACE, as MACE added the message passing feature." |
+| Allegro | NequIP | musaelian2023allegro shares NequIP's irreps representation ("In both the present work and in NequIP, …") and compares with it. Confirmed by Blazej Grabowski: NequIP came first, with message passing; it was slow, so the same group developed Allegro as a faster, strictly local model that approximates NequIP. The derived method removes a feature here (message passing) rather than adding one; the property covers both directions of change. |
+
+Method families, not paper versions, are related: later papers on NequIP (e.g. framework or software updates by the same group) do not create an edge back from NequIP to Allegro, and `make methods-check` rejects cycles.
 
 Example: every method derived, directly or not, from ACE (the merged graph, or `shared/methods.ttl` alone):
 
