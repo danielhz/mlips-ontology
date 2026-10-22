@@ -1,0 +1,45 @@
+id: takahashi2017
+source:
+  rank: 479
+  year: "2017"
+  first_author: "Akira Takahashi"
+  title: "Conceptual and practical bases for the high accuracy of machine learning interatomic potentials: Application to elemental titanium"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.1.063801"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1708.02741v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b39a6274f03e5db1d4236c5c119632c7465575193da0a835214b2ef44b64ef78"
+study_label: "Takahashi, Seko and Tanaka (2017): MLIPs as embedding-energy models beyond the uniform density approximation, with pairwise and angular-dependent polynomial MLIPs for elemental Ti"
+scope: |
+  Encoding scope: two linearized polynomial MLIPs for Ti fitted by
+  linear ridge regression to energies and forces (a cubic polynomial in
+  pairwise Gaussian descriptors and a quadratic polynomial in angular
+  Fourier series descriptors with l_max = 10), with their test energy
+  RMSEs. EAM and MEAM comparisons are classical potentials; elastic
+  constants and phonons are properties.
+hyperparameters:
+  ncoef: {label: "Number of regression coefficients", name: "number of coefficients", datatype: integer}
+  lmax: {label: "Maximum angular order l_max of the angular Fourier series", name: "l_max", datatype: integer}
+materials:
+  ti: {label: "Elemental Ti (fcc, bcc, hcp, sc, omega and beta-Sn based supercells)", formula: Ti, class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400}
+sampling:
+  distort: {label: "Isotropic and random expansions, random distortions and random displacements of optimized fcc, bcc, hcp, sc, omega and beta-Sn supercells"}
+datasets:
+  train: {label: "Ti training set (2,700 configurations; 430,650 energy and force data)", materials: [ti], properties: [Energy, Forces], provenance: InHouse, n: {v: 2700, loc: "p. 4"}, calc: vasp, sampling: [distort]}
+methods:
+  PolyMLP:
+    hp: [ncoef, lmax]
+    loss: "Energies and forces"
+    algorithm: "Linear ridge regression"
+    sims: [PhononCalculation]
+runs:
+  pair: {label: "Pairwise MLIP (cubic polynomial) for Ti", method: PolyMLP, dataset: train, settings: {ncoef: {v: 2925, loc: "p. 5"}}, model: "Pairwise polynomial MLIP Ti"}
+  ang: {label: "Angular-dependent MLIP (quadratic polynomial, l_max = 10) for Ti", method: PolyMLP, dataset: train, settings: {ncoef: {v: 35245, loc: "p. 5"}, lmax: {v: 10, loc: "p. 4"}}, model: "Angular-dependent polynomial MLIP Ti"}
+results:
+  - {key: pair-test, model: pair, material: ti, role: test, eval_data: {label: "Ti test set (300 configurations)", location: "p. 4"}, metrics: [[RMSE, Energy, 3.8, meV/atom, "test energy RMSE on Ti: pairwise polynomial MLIP", "p. 5"]]}
+  - {key: ang-test, model: ang, material: ti, role: test, eval_data: {label: "Ti test set (300 configurations)", location: "p. 4"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "test energy RMSE on Ti: angular-dependent polynomial MLIP", "p. 5"]]}
+gaps:
+  - "Maximum absolute errors (23.0 and 2.8 meV/atom) are not RMSE/MAE and are not encoded; the RMSE-versus-number-of-terms curve is figure-only (Fig. 2a). The method's introducing papers (Seko et al. 2014, 2015) are not in the corpus, so the new PolyMLP registry method has no origin."

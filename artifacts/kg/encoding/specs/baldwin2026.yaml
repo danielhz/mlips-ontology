@@ -1,0 +1,55 @@
+id: baldwin2026
+source:
+  rank: 482
+  year: "2026"
+  first_author: "William J. Baldwin"
+  title: "Design Space of Self--Consistent Electrostatic Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.14700"
+  kg_relevance: "Method/model"
+  arxiv_id: "2603.14700v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "930b5c094aa9d2f71d0cb1b7d8925cfc2a1b1d0b8be1252ca0073be9d4eb30c3"
+study_label: "Baldwin et al. (2026): design space of self-consistent electrostatic MLIPs (energy-functional and fixed-point charge-density models in MACE) with MACE-LocalCharges, MACE-QEq and global-charge-embedding baselines"
+scope: |
+  Encoding scope: the families of MACE-based models trained on the
+  aluminium/water-slab/water-cluster dataset (2,590 configurations, PBE
+  FHI-aims) and on charged oxygen vacancies in alpha-quartz SiO2:
+  energy-functional and fixed-point self-consistent models, MACE-
+  LocalCharges, MACE-QEq, a local MACE and (SiO2) a global-charge-
+  embedding MACE. All share the medium MACE local part (128 channels,
+  L = 1, 6 A cutoff). Each run stands for a family of fits (Table S.I).
+  All errors are figure-only.
+materials:
+  alwater: {label: "Aluminium slabs (with applied field), liquid-water slabs and neutral or hydronium water clusters", class: "Solid-liquid interface"}
+  sio2: {label: "alpha-quartz SiO2 with oxygen vacancies in charge states -1, 0, +1", formula: SiO2, class: "Oxides"}
+reference:
+  aims: {type: DFT, code: FHIaims, xc: PBE, comment: "'tight' basis and integration grids; atomic multipoles of the Hartree potential extracted as targets"}
+  sio2dft: {type: DFT, xc: PBE, comment: "Charged-defect labels (-1, 0, +1); other settings in Sec. XII E"}
+sampling:
+  alw: {label: "Al(111)/(100) slabs and water slabs with random out-of-plane fields (-0.1 to 0.1 V/A), water clusters of up to 12 molecules, half with a hydronium ion"}
+  vac: {label: "Foundation-model MD of oxygen-vacancy supercells with a Hookean Si-Si constraint (2.4-4.5 A), relabelled in three charge states, plus relaxed geometries"}
+datasets:
+  alwater: {label: "Water-metal dataset (2,590 configurations)", materials: [alwater], properties: [Energy, Forces], provenance: InHouse, n: {v: 2590, loc: "Table II"}, calc: aims, sampling: [alw]}
+  sio2: {label: "SiO2 oxygen-vacancy dataset (300 configurations in three charge states, 374 puckered +1 configurations, relaxed geometries)", materials: [sio2], properties: [Energy, Forces], provenance: InHouse, calc: sio2dft, sampling: [vac]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numFeatures, learningRate, batchSize]
+    loss: "Energy per atom, total dipole per atom, forces and atomic multipoles (Eq. 93), plus total charge and (SiO2 fixed-point) Fermi level terms"
+    algorithm: "Schedule-free optimizer; direct, implicit-differentiation, shortcut-SCF or unrolled-SCF training stages"
+    impl: {lib: MACE}
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  aw-energy: {label: "Energy-functional self-consistent MACE models for water-metal (energy A-E)", method: MACE, dataset: alwater, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}}, model: "MACE energy-functional models (water-metal)"}
+  aw-fixed: {label: "Fixed-point self-consistent MACE models for water-metal (fixedpoint A-J)", method: MACE, dataset: alwater, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}}, model: "MACE fixed-point models (water-metal)"}
+  aw-local: {label: "Local MACE without electrostatics for water-metal (mace A)", method: MACE, dataset: alwater, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}}, model: "MACE local (water-metal)"}
+  aw-lc: {label: "MACE-LocalCharges for water-metal (localcharges A-C)", method: MACE, dataset: alwater, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}}, model: "MACE-LocalCharges (water-metal)"}
+  aw-qeq: {label: "MACE-QEq for water-metal (qeq A-B)", method: MACE, dataset: alwater, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}}, model: "MACE-QEq (water-metal)"}
+  si-global: {label: "Global-charge-embedding MACE for SiO2 vacancies", method: MACE, dataset: sio2, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}, learningRate: {v: 0.005, loc: "Table S.X"}, batchSize: {v: 4, loc: "Table S.X"}}, model: "MACE global charge embedding (SiO2)"}
+  si-qeq: {label: "MACE-QEq for SiO2 vacancies", method: MACE, dataset: sio2, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}, learningRate: {v: 0.005, loc: "Table S.XI"}, batchSize: {v: 4, loc: "Table S.XI"}}, model: "MACE-QEq (SiO2)"}
+  si-fixed: {label: "Fixed-point self-consistent MACE for SiO2 vacancies", method: MACE, dataset: sio2, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}, batchSize: {v: 4, loc: "Table S.XII"}}, model: "MACE fixed-point (SiO2)"}
+  si-energy: {label: "Energy-functional self-consistent MACE for SiO2 vacancies", method: MACE, dataset: sio2, settings: {cutoffRadius: {v: 6, loc: "Table III"}, numFeatures: {v: 128, loc: "Table III"}, learningRate: {v: 0.01, loc: "Table S.XIII"}, batchSize: {v: 4, loc: "Table S.XIII"}}, model: "MACE energy-functional (SiO2)"}
+results: []
+gaps:
+  - "Force, energy and dipole RMSEs for all models (Figs. 7-13, S1-S5) are figure-only; the text states no numeric errors. Training-dynamics comparisons, slab polarization and defect relaxations (Tables V-VI) are properties."
+  - "All variants are encoded as MACE runs: the paper builds every model on the MACE framework and does not name the energy-functional or fixed-point architectures as new methods. MACE-LocalCharges is described as almost identical to MACE-LES (except higher-order multipoles and linear charges) but is not mapped to it. Whether the self-consistent architectures deserve their own registry methods is left for review."

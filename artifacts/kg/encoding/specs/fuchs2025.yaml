@@ -1,0 +1,41 @@
+id: fuchs2025
+source:
+  rank: 480
+  year: "2025"
+  first_author: "Paul Fuchs"
+  title: "chemtrain: Learning deep potential models via automatic differentiation and statistical physics"
+  venue: "Computer Physics Communications"
+  doi: "10.1016/j.cpc.2025.109512"
+  kg_relevance: "Method/model"
+  arxiv_id: "2408.15852v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b1803b78bb25825e952721470045cda17df4216e949ffa589d00b03d1a38e485"
+study_label: "Fuchs et al. (2025): chemtrain, a JAX framework for training potential models by force matching, relative entropy minimization and differentiable trajectory reweighting"
+scope: |
+  Encoding scope: the software paper's atomistic example only, a
+  DimeNet++ Ti potential pre-trained on DFT energies, forces and virials
+  (from Rocken and Zavadlav, rocken2024) and further trained by
+  interleaving force matching on the DFT data with DiffTRe on
+  experimental elastic constants at 323 and 923 K. The alanine-dipeptide
+  example is a coarse-grained model (not an interatomic potential) and is
+  not encoded. No error metrics are reported.
+materials:
+  ti: {label: "Bulk titanium", formula: Ti, class: "Metals"}
+reference:
+  dft: {type: DFT, comment: "Curated Ti DFT dataset of energies, forces and virials (Ref. 111), as used in rocken2024"}
+  exp: {type: REF, comment: "Experimental bulk elastic constants at 323 and 923 K (Ref. 112), used by DiffTRe"}
+sampling:
+  pub: {label: "Published Ti DFT dataset of rocken2024"}
+datasets:
+  ti-dft: {label: "Ti DFT dataset (energies, forces, virials) of rocken2024", materials: [ti], properties: [Energy, Forces, Virials], provenance: Published, calc: dft, sampling: [pub]}
+methods:
+  DimeNet:
+    loss: "Force matching (energy, force and virial weights 1e-6, 1e-2, 4e-6) interleaved with DiffTRe on elastic constants and pressure"
+    algorithm: "100 repetitions of one FM epoch and one DiffTRe update per state point (InterleaveTrainers)"
+    impl: {lib: {local: chemtrain}, comment: "DimeNet++ in JAX"}
+    sims: [MolecularDynamics]
+runs:
+  ti-fused: {label: "DimeNet++ Ti model trained by fused FM and DiffTRe", method: DimeNet, dataset: ti-dft, model: "DimeNet++ Ti fused (chemtrain example)", base_model: {label: "DimeNet++ pre-trained on Ti DFT data (Rocken and Zavadlav)", relation: fine-tuned, location: "Sec. 5.2"}}
+results: []
+gaps:
+  - "Elastic constants of the pre-trained and fused models against experiment are figure-only (Fig. 4); no energy/force errors are reported. Details are deferred to rocken2024 (rank 582)."
