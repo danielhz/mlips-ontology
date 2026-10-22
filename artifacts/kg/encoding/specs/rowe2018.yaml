@@ -1,0 +1,43 @@
+id: rowe2018
+source:
+  rank: 687
+  year: "2018"
+  first_author: "Patrick Rowe"
+  title: "Development of a machine learning potential for graphene"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.97.054303"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1710.04187v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d48cd247cac47ddcd573909bbc6cbd1eef9c8008cd510aebba0bc7e8f998a679"
+study_label: "Rowe, Csányi, Alfè and Michaelides (2018): development of a machine-learning potential for graphene"
+scope: |
+  Encoding scope: the graphene GAP (2b + 3b + SOAP, QUIP) trained on
+  optB88-vdW data from iterative MD sampling, and the amorphous-carbon GAP
+  of Ref. 24 evaluated as distributed, with in-plane and out-of-plane
+  force RMSEs on an independent reference set (Table II). Empirical
+  potentials and DFTB in the same table are not MLIPs. Lattice parameters,
+  thermal expansion and phonons are property results.
+materials:
+  graphene: {label: "Free-standing graphene (200-atom cells, 300-4000 K, a = 2.460-2.480 A)", formula: C, class: "2D carbon"}
+reference:
+  optb88: {type: DFT, code: VASP, xc: {local: optB88-vdW}, pp: PAW, cutoff: 650, kpoints: "Monkhorst-Pack, maximum spacing 0.012 1/A", comment: "Gaussian smearing 0.05 eV; SCF 1e-8 eV."}
+sampling:
+  md-iter: {label: "LCBOP NVT MD at 1000-3000 K, then iterative GAP-driven MD at 300-4000 K"}
+datasets:
+  graphene: {label: "Graphene training data (1083 configurations of 200 atoms; 5% validation)", materials: [graphene], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 1083, loc: "Sec. III"}, calc: optb88, sampling: [md-iter]}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "2b (50 sparse points), 3b (200) and SOAP (650, CUR) descriptors with delta 10, 3.7 and 0.07 eV; sigma_E 1e-3 eV, sigma_f 5e-4, sigma_v 5e-3"
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  gap-graphene: {label: "Graphene GAP", method: GAP, dataset: graphene, settings: {cutoffRadius: {v: 4.0, loc: "Table I"}, numSparseConfigs: {v: 650, loc: "Table I (SOAP)"}}, model: "Graphene GAP (2018)"}
+  gap-ac: {label: "Amorphous-carbon GAP (Ref. 24) as distributed", method: GAP, model: "GAP-17 amorphous carbon"}
+results:
+  - {key: gap-graphene-test, model: gap-graphene, material: graphene, role: test, eval_data: {label: "Independent reference set (1.5e4 atomic force samples)", location: "Table II; Fig. 1"}, metrics: [[RMSE, Force, 28, meV/A, "in-plane force RMSE on graphene: graphene GAP", "Table II (0.028 eV/A)"], [RMSE, Force, 19, meV/A, "out-of-plane force RMSE on graphene: graphene GAP", "Table II (0.019 eV/A)"]]}
+  - {key: gap-ac-graphene, model: gap-ac, material: graphene, role: external, eval_data: {label: "Independent graphene reference set", location: "Table II"}, metrics: [[RMSE, Force, 270, meV/A, "in-plane force RMSE on graphene: amorphous-carbon GAP", "Table II (0.270 eV/A)"], [RMSE, Force, 258, meV/A, "out-of-plane force RMSE on graphene: amorphous-carbon GAP", "Table II (0.258 eV/A)"]]}
+gaps:
+  - "Relative computational costs (graphene GAP 340, amorphous GAP 380 relative to Tersoff) are not absolute timings. Tersoff, REBO, AIREBO, AIREBO-Morse, LCBOP, ReaxFF and DFTB errors are not MLIPs and are not encoded."
+  - "The amorphous-carbon GAP of Ref. 24 is linked to the label 'GAP-17 amorphous carbon'; the paper calls it 'the recently published GAP model for the amorphous phase'."
