@@ -1,0 +1,35 @@
+id: plettenberg2023
+source:
+  rank: 632
+  year: "2023"
+  first_author: "Pascal Plettenberg"
+  title: "Neural network interatomic potential for laser-excited materials"
+  venue: "Communications Materials"
+  doi: "10.1038/s43246-023-00389-w"
+  kg_relevance: "Method/model"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "782bf0af12250ccf4944f4743d702083b07cc176208668757514c162cb3d4350"
+study_label: "Plettenberg, Bauerhenne and Garcia (2023): electronic-temperature-dependent neural network potential for laser-excited silicon"
+scope: |
+  Encoding scope: the Te-dependent neural network interatomic potential
+  (Te-NNP, a Behler-Parrinello-type high-dimensional NNP with electronic
+  temperature as an extra input) for laser-excited Si, trained on the
+  published CHIVES thin-film data set of ref. 18. Its accuracy is given
+  only as relative error ranges and figures, so there are no results.
+materials:
+  si: {label: "Laser-excited silicon thin films and bulk at electronic temperatures 316-31,578 K", formula: Si, class: "covalent semiconductor (laser-excited)"}
+reference:
+  chives: {type: DFT, code: {local: CHIVES}, comment: "In-house Te-dependent DFT code CHIVES; the functional is not named, though the reference melting temperature is compared with LDA DFT (ref. 60)."}
+datasets:
+  si-te: {label: "Si thin-film ab initio MD data at 316 K and ten electronic temperatures 3158-31,578 K (from ref. 18)", materials: [si], properties: [Energy, Forces], provenance: Published, calc: chives}
+methods:
+  HDNNP:
+    hp: [numLayers, learningRate, batchSize, numEpochs]
+    algorithm: "Te-dependent atomic NNs with two hidden layers of 50 tanh neurons and no hidden-layer biases (cohesive energy vanishes at large distances); modified radial and angular symmetry functions (Tables 1-2); Adam"
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  te-nnp: {label: "Te-NNP for laser-excited Si", method: HDNNP, dataset: si-te, settings: {numLayers: {v: 2, loc: "Methods (hidden layers)"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 20, loc: "Methods"}, numEpochs: {v: 50, loc: "Methods"}}, model: "Te-NNP Si"}
+gaps:
+  - "Relative RMS errors are given only as bounds or ranges (energy 'below 2%' for Te < 25,000 K, forces 'between 8 and 12%'; Fig. 2b), so no metric is encoded."
+  - "Cohesive-energy curves, phonons, electronic heat capacity, RMSD after excitation, melting temperature and large-scale ablation MD are property results."
