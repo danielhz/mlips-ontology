@@ -1,0 +1,39 @@
+id: rana2025
+source:
+  rank: 590
+  year: "2025"
+  first_author: "Pradeep Kumar Rana"
+  title: "Prediction of Mechanical Properties and Thermodynamic Stability of Ti-N system using MTP Interatomic Potential"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2507.18873"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2507.18873v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f87ca551486c780a2d14bfea0c329d609c4e316de0cc51314eeca2a7073b4593"
+study_label: "Rana et al. (2025): MTPs for the Ti-N system, loss-weight tuning and prediction of mechanical properties and thermodynamic stability"
+scope: |
+  Encoding scope: three MTPs for Ti-N (Ti, Ti2N, Ti3N2, Ti4N3, Ti6N5, TiN)
+  trained on 2,398 Maxvol-selected strained and finite-temperature PBE
+  structures with energy:force:stress weights 1:0:0, 100:10:1 and
+  0.75:0.25:0.25. RMSEs are figure-only (Fig. 1); formation-energy and
+  elastic-constant errors (Tables 3-5) are property errors.
+materials:
+  tin: {label: "Ti-N phases (Ti, Ti2N, Ti3N2, Ti4N3, Ti6N5, TiN), strained and at finite temperature", class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Monkhorst-Pack, resolution below 2 pi x 0.03 1/A"}
+sampling:
+  maxvol: {label: "Strained structures and 2-13 ps finite-temperature MD (10-400 K), reduced with the Maxvol algorithm (Table 2)"}
+datasets:
+  tin: {label: "Ti-N training set (2,398 Maxvol-selected structures)", materials: [tin], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2398, loc: "Sec. 3.2"}, calc: vasp, sampling: [maxvol]}
+methods:
+  MTP:
+    loss: "Weighted energies, forces and stresses (weights per model)"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  mtp100: {label: "MTP with weights 1:0:0 (energy only)", method: MTP, dataset: tin, model: "MTP Ti-N 1-0-0"}
+  mtp10010: {label: "MTP with weights 100:10:1", method: MTP, dataset: tin, model: "MTP Ti-N 100-10-1"}
+  mtp075: {label: "MTP with weights 0.75:0.25:0.25 (selected)", method: MTP, dataset: tin, model: "MTP Ti-N 0.75-0.25-0.25"}
+results: []
+gaps:
+  - "Training and test formation-energy RMSEs are figure-only (Fig. 1). Percentage errors in elastic constants (Table 5) and formation-energy error distributions (Tables 3-4) are property errors. The MTP level is not stated in the text read."

@@ -1,0 +1,59 @@
+id: li2026multiscale
+source:
+  rank: 591
+  year: "2026"
+  first_author: "Yan Li"
+  title: "Multiscale Digital-Twin Modeling of Energy-Storage Materials by Integrating First-Principles Calculations and Machine-Learning Interatomic Potentials"
+  venue: "EAI Endorsed Transactions on Energy Web"
+  doi: "10.4108/ew.14196"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "56d7cbb393290224de18affd17b7d41f1aea9d3b62851d34fd2373f83292d8c1"
+study_label: "Li and Tang (2026): multiscale digital-twin modelling of energy-storage materials with a first-principles-informed equivariant MLIP (FP-EMLP)"
+scope: |
+  Encoding scope: the atomistic part of the FP-EMLP-DT framework: the
+  FP-EMLP potential (pretrained on 120,000 MPtrj energy-storage
+  configurations, fine-tuned on Materials Project Battery electrode data
+  and an active-learning LiFePO4/FePO4 set) and six baseline MLIPs, with
+  energy and force MAEs on the shared held-out atomistic test partition
+  (Table 2). Voltage, migration-barrier and field errors, digital-twin
+  state estimation and control results are properties.
+materials:
+  lfp: {label: "LiFePO4/FePO4 and other intercalation electrodes (LiCoO2, LiMn2O4, NMC)", class: "Inorganic crystals"}
+reference:
+  pbeu: {type: DFT, xc: PBE, cutoff: 520, comment: "PBE+U; public MPtrj, Materials Project Battery and JARVIS-DFT data plus active-learning labels"}
+sampling:
+  mix: {label: "120,000 MPtrj energy-storage configurations (pretraining), 7,840 Materials Project Battery electrode configurations, and active learning from 2,000 to 6,000 LiFePO4/FePO4 structures (joint sampling); 70/15/15 split by composition, prototype and trajectory"}
+datasets:
+  fp: {label: "FP-EMLP training data (MPtrj pretraining, Materials Project Battery fine-tuning, LiFePO4/FePO4 active-learning set)", materials: [lfp], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: pbeu, sampling: [mix]}
+methods:
+  CHGNet: {sims: [MolecularDynamics]}
+  DimeNet: {sims: [MolecularDynamics]}
+  FP-EMLP:
+    hp: [numLayers, numFeatures, cutoffRadius, learningRate, batchSize]
+    loss: "Energies and forces with auxiliary voltage and migration-barrier supervision"
+    algorithm: "AdamW, up to 500 epochs"
+    sims: [MolecularDynamics, NudgedElasticBand]
+  MACE: {sims: [MolecularDynamics]}
+  NequIP: {sims: [MolecularDynamics]}
+  PaiNN: {sims: [MolecularDynamics]}
+  SchNet: {sims: [MolecularDynamics]}
+runs:
+  schnet: {label: "SchNet baseline (training data not described separately)", method: SchNet, model: "SchNet baseline (Li and Tang 2026)"}
+  dimenet: {label: "DimeNet++ baseline (training data not described separately)", method: DimeNet, model: "DimeNet++ baseline (Li and Tang 2026)"}
+  painn: {label: "PaiNN baseline (training data not described separately)", method: PaiNN, model: "PaiNN baseline (Li and Tang 2026)"}
+  nequip: {label: "NequIP baseline (training data not described separately)", method: NequIP, model: "NequIP baseline (Li and Tang 2026)"}
+  chgnet: {label: "CHGNet baseline (training data not described separately)", method: CHGNet, model: "CHGNet baseline (Li and Tang 2026)"}
+  mace: {label: "MACE baseline (training data not described separately)", method: MACE, model: "MACE baseline (Li and Tang 2026)"}
+  fpemlp: {label: "FP-EMLP", method: FP-EMLP, dataset: fp, settings: {numLayers: {v: 4, loc: "Table 1"}, numFeatures: {v: 128, loc: "Table 1"}, cutoffRadius: {v: 5.0, loc: "Table 1"}, learningRate: {v: 0.001, loc: "Table 1"}, batchSize: {v: 16, loc: "Table 1"}}, model: "FP-EMLP"}
+results:
+  - {key: schnet-test, model: schnet, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 15.8, meV/atom, "test energy MAE: SchNet", "Table 2"], [MAE, Force, 73, meV/A, "test force MAE: SchNet", "Table 2"]]}
+  - {key: dimenet-test, model: dimenet, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 12.9, meV/atom, "test energy MAE: DimeNet++", "Table 2"], [MAE, Force, 61, meV/A, "test force MAE: DimeNet++", "Table 2"]]}
+  - {key: painn-test, model: painn, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 11.4, meV/atom, "test energy MAE: PaiNN", "Table 2"], [MAE, Force, 54, meV/A, "test force MAE: PaiNN", "Table 2"]]}
+  - {key: nequip-test, model: nequip, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 8.7, meV/atom, "test energy MAE: NequIP", "Table 2"], [MAE, Force, 42, meV/A, "test force MAE: NequIP", "Table 2"]]}
+  - {key: chgnet-test, model: chgnet, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 8.3, meV/atom, "test energy MAE: CHGNet", "Table 2"], [MAE, Force, 41, meV/A, "test force MAE: CHGNet", "Table 2"]]}
+  - {key: mace-test, model: mace, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 7.9, meV/atom, "test energy MAE: MACE", "Table 2"], [MAE, Force, 39, meV/A, "test force MAE: MACE", "Table 2"]]}
+  - {key: fpemlp-test, model: fpemlp, material: lfp, role: test, eval_data: {label: "Held-out atomistic test partition (Sec. 3.1)", location: "Table 2"}, metrics: [[MAE, Energy, 6.5, meV/atom, "test energy MAE: FP-EMLP", "Table 2"], [MAE, Force, 33, meV/A, "test force MAE: FP-EMLP", "Table 2"]]}
+gaps:
+  - "The baselines are evaluated on the same held-out partition, but their training data and hyperparameters are not described in the text read, so they have no dataset link. Voltage, migration-barrier and mesoscale field errors are property errors. FP-EMLP is a new registry method (origin li2026multiscale)."
