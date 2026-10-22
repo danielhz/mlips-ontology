@@ -1,0 +1,38 @@
+id: meng2025formation
+source:
+  rank: 604
+  year: "2025"
+  first_author: "Fan-Shun Meng"
+  title: "Formation of three-dimensional dislocation networks in α -iron twist grain boundaries: Insights from first-principles neural network interatomic potentials"
+  venue: "Computational Materials Science"
+  doi: "10.1016/j.commatsci.2025.113812"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "ab9b2983a3fd2c357732a16976f7345a25755dc9979ce6bfe60acbcb854077e1"
+study_label: "Meng et al. (2025): 3D dislocation networks in alpha-iron twist grain boundaries from a neural-network potential"
+scope: |
+  Encoding scope: the alpha-Fe-H neural-network potential of Ref. 27
+  (NNIP-0, an atom-centred-symmetry-function HDNNP) as used for twist
+  grain boundaries, and the ensemble of 12 NNIPs retrained on the same
+  database for uncertainty estimation. Their errors are stated only as
+  ranges, and the ten literature alpha-Fe MLIPs are compared on properties
+  in the SI, so there are no results.
+materials:
+  fe: {label: "Body-centred cubic alpha-iron, including (001), (110) and (111) twist grain boundaries", formula: Fe, class: "bcc transition metal"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 360, kpoints: "Minimum k-point spacing 0.03 1/A", comment: "Spin-polarised; Gaussian smearing 0.1 eV; used for the validation calculations. The NNIP database is that of Ref. 27."}
+datasets:
+  feh-db: {label: "alpha-Fe-H NNIP training database of Ref. 27", materials: [fe], properties: [Energy, Forces], provenance: Published, calc: pbe}
+methods:
+  HDNNP:
+    hp: [numFeatures]
+    algorithm: "Atom-centred symmetry functions as in Ref. 27; run in LAMMPS through the library-based interface of Singraber et al. (Ref. 31)"
+    sims: [GeometryOptimization]
+runs:
+  nnip0: {label: "NNIP-0: alpha-Fe-H NNIP of Ref. 27 as distributed", method: HDNNP, dataset: feh-db, settings: {numFeatures: {v: 24, loc: "Sec. 3.4 (24 ACSFs per atomic environment)"}}, model: "alpha-Fe-H NNIP (Meng et al. 2021)"}
+  ensemble: {label: "Ensemble of 12 NNIPs (NNIP-1 to NNIP-12) retrained with the same architecture and database, differing in random train/test split, 160 iterations each", method: HDNNP, dataset: feh-db, model: "NNIP ensemble (NNIP-1..12)"}
+gaps:
+  - "Ensemble errors are given only as ranges over the 12 NNIPs (energy RMSE 3.47-5.43 meV/atom train and 3.46-10.33 test; force RMSE 0.077-0.083 eV/A train and 0.077-0.145 test, Sec. 3.4); per-model values are in SI Table S2, which was not read. Ranges are not encoded."
+  - "NNIP-0's own errors are reported in Ref. 27 (meng2021, needs-pdf), not here. The ensemble force uncertainty ('about 10 meV/A') is approximate."
+  - "Grain-boundary energies, lattice and defect properties of ten literature alpha-Fe MLIPs (GAP, ANN, MTPs, QNML, ADP-ML, DPs; SI Table S1), EAM and MEAM are property comparisons and are not encoded."

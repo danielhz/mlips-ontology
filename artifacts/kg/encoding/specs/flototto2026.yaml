@@ -1,0 +1,60 @@
+id: flototto2026
+source:
+  rank: 603
+  year: "2026"
+  first_author: "Aaron Flötotto"
+  title: "Large‐Scale Cooperative Sulfur Vacancy Dynamics in Two‐Dimensional MoS 2 From Machine Learning Interatomic Potentials"
+  venue: "Small"
+  doi: "10.1002/smll.202510679"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2508.13790v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e4a3ad36355d9bb26c195925b7e23d01c83fb84429ce2c934f68a45a27b963ee"
+study_label: "Flötotto et al. (2026): cooperative sulfur-vacancy dynamics in monolayer MoS2 from MACE and GAP potentials"
+scope: |
+  Encoding scope: the MACE-MP-0 foundation model, two MACE models
+  fine-tuned from it (on 2,000 DFT-labelled snapshots of a foundation-model
+  MD run, and on 50,000 AIMD snapshots), and three GAP models trained
+  on the fly for sulfur-vacancy structures in 2H-MoS2, with the test RMSEs
+  of Table I. NEB barriers, RDFs, MSDs and formation energies are property
+  comparisons.
+materials:
+  mos2-vs: {label: "2H-MoS2 monolayer with sulfur vacancies (single, pairs, triplets, MoS3 vacancy)", formula: MoS2, class: "2D transition-metal dichalcogenide"}
+reference:
+  cp2k: {type: DFT, code: {local: CP2K}, xc: PBE, kpoints: "Gamma point", comment: "Quickstep with Gaussian basis sets and pseudopotentials, orbital transformation, kinetic-energy cutoff 500 eV; used for the MACE fine-tuning data."}
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 430, kpoints: "Gamma point", comment: "VASP 6.4; used for the GAP on-the-fly training data."}
+sampling:
+  aimd: {label: "CP2K AIMD of MoS2 with two adjacent sulfur vacancies at 1000 K (every second snapshot of a 100 ps run)"}
+  fm-md: {label: "Equidistant snapshots of a 10 ns MACE-MP-0 MD run of MoS2 with two adjacent sulfur vacancies, relabelled with DFT"}
+  otf: {label: "On-the-fly learning MD (1 ns, 1000 K) with refits when the Bayesian force-error estimate exceeds an adaptive threshold"}
+datasets:
+  aimd50k: {label: "50,000 AIMD snapshots of MoS2 with two adjacent sulfur vacancies (10% for validation)", materials: [mos2-vs], properties: [Energy, Forces], provenance: InHouse, n: {v: 50000, loc: "Sec. IV B 1; Table I"}, calc: cp2k, sampling: [aimd]}
+  fm2000: {label: "2,000 DFT-labelled snapshots from MACE-MP-0 MD (10% for validation)", materials: [mos2-vs], properties: [Energy, Forces], provenance: InHouse, n: {v: 2000, loc: "Table I"}, calc: cp2k, sampling: [fm-md]}
+  otf-s2: {label: "On-the-fly GAP training data for the S2 vacancy pair", materials: [mos2-vs], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [otf]}
+  otf-s3: {label: "On-the-fly GAP training data for the S3 vacancy triplet", materials: [mos2-vs], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [otf]}
+  otf-multi: {label: "On-the-fly GAP training data accumulated over the S1, S2, S3 and MoS3 vacancy structures in sequence", materials: [mos2-vs], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [otf]}
+methods:
+  MACE:
+    loss: "Energy and forces, force weight 100 times the energy weight"
+    impl: {lib: MACE}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  GAP:
+    algorithm: "On-the-fly learning during MD with VASP DFT; refits triggered by the Bayesian force-error estimate (threshold initialised at 2 meV/A)"
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  mp0: {label: "MACE-MP-0 foundation model as distributed (size not stated)", method: MACE, model: "MACE-MP-0"}
+  ft-fm2000: {label: "MACE-MP-0 fine-tuned on 2,000 snapshots of foundation-model MD", method: MACE, dataset: fm2000, model: "MACE FT (test set 2000 structures)", base_model: {run: mp0, relation: fine-tuned, location: "Sec. IV B 1"}}
+  ft-aimd50k: {label: "MACE-MP-0 fine-tuned on 50,000 AIMD snapshots (production model)", method: MACE, dataset: aimd50k, model: "MACE FT (AIMD 50000 structures)", base_model: {run: mp0, relation: fine-tuned, location: "Sec. IV B 1"}}
+  gap-s2: {label: "GAP trained on the fly for the S2 vacancy pair", method: GAP, dataset: otf-s2, model: "GAP (S2 vacancy)"}
+  gap-s3: {label: "GAP trained on the fly for the S3 vacancy triplet", method: GAP, dataset: otf-s3, model: "GAP (S3 vacancy)"}
+  gap-multi: {label: "GAP trained on the fly sequentially on four defect structures", method: GAP, dataset: otf-multi, model: "GAP (multiple defect structures)"}
+results:
+  - {key: ft-fm2000-test, model: ft-fm2000, material: mos2-vs, role: test, eval_data: {label: "150 DFT-labelled snapshots from a 10 ns MD run with the model itself", location: "Sec. IV B 3"}, metrics: [[RMSE, Energy, 10, meV/atom, "test energy RMSE on mos2-vs: MACE FT (test set 2000)", "Table I"], [RMSE, Force, 112, meV/A, "test force RMSE on mos2-vs: MACE FT (test set 2000)", "Table I"]]}
+  - {key: ft-aimd50k-test, model: ft-aimd50k, material: mos2-vs, role: test, eval_data: {label: "150 DFT-labelled snapshots from a 10 ns MD run with the model itself", location: "Sec. IV B 3"}, metrics: [[RMSE, Energy, 4.8, meV/atom, "test energy RMSE on mos2-vs: MACE FT (AIMD 50000)", "Table I"], [RMSE, Force, 42.0, meV/A, "test force RMSE on mos2-vs: MACE FT (AIMD 50000)", "Table I"]]}
+  - {key: gap-multi-test, model: gap-multi, material: mos2-vs, role: test, eval_data: {label: "150 DFT-labelled snapshots from a 10 ns MD run with the model on the three-vacancy structure", location: "Table I caption"}, metrics: [[RMSE, Energy, 26, meV/atom, "test energy RMSE on mos2-vs: GAP multiple defect structures", "Table I"], [RMSE, Force, 142, meV/A, "test force RMSE on mos2-vs: GAP multiple defect structures", "Table I"]]}
+  - {key: gap-s2-test, model: gap-s2, material: mos2-vs, role: test, eval_data: {label: "150 DFT-labelled snapshots from a 10 ns MD run with the model itself", location: "Sec. IV B 3"}, metrics: [[RMSE, Energy, 29, meV/atom, "test energy RMSE on mos2-vs: GAP S2 vacancy", "Table I"], [RMSE, Force, 73.8, meV/A, "test force RMSE on mos2-vs: GAP S2 vacancy", "Table I"]]}
+  - {key: gap-s3-test, model: gap-s3, material: mos2-vs, role: test, eval_data: {label: "150 DFT-labelled snapshots from a 10 ns MD run with the model itself", location: "Sec. IV B 3"}, metrics: [[RMSE, Energy, 23, meV/atom, "test energy RMSE on mos2-vs: GAP S3 vacancy", "Table I"], [RMSE, Force, 85.9, meV/A, "test force RMSE on mos2-vs: GAP S3 vacancy", "Table I"]]}
+gaps:
+  - "The paper calls its on-the-fly models GAP (refs. 59, 61, 62, 67) and trains them with VASP DFT and Bayesian error estimates; it does not name the VASP machine-learned force field, so they are encoded under GAP, not VASP-MLFF. GAP training-set sizes are given only as 'roughly 600' DFT calls."
+  - "MACE models fine-tuned on 200 and 2,000 AIMD snapshots and on 200 foundation-model snapshots, and the S1 GAP, appear only in NEB curves (Fig. 1); they are not encoded as runs."
+  - "NEB barriers (e.g. 0.80 eV vs. DFT 0.83 eV), RDFs, MSDs, jump rates and vacancy formation energies are property comparisons and are not encoded. The AIMD cost estimate (about 40 days for 100 ps) is a DFT cost, not an MLIP timing."

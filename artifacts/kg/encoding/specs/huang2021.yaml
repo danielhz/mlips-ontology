@@ -1,0 +1,51 @@
+id: huang2021
+source:
+  rank: 606
+  year: "2021"
+  first_author: "Jianxing Huang"
+  title: "Deep potential generation scheme and simulation protocol for the Li10GeP2S12-type superionic conductors"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0041849"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2006.03320v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b120b6e0dff46ee2f447df7c275995d908be51a6427bea00899274a5cfad3a08"
+study_label: "Huang et al. (2021): Deep Potential generation scheme and simulation protocol for Li10GeP2S12-type superionic conductors"
+scope: |
+  Encoding scope: the DP-PBE and DP-PBEsol Deep Potential models (DeePMD
+  v1.2, DP-GEN) for Li10GeP2S12, Li10SiP2S12 and Li10SnP2S12, with the
+  per-material RMSEs on the whole DP-GEN data set (Table V, mean of a
+  4-model ensemble). Diffusion coefficients, lattice parameters and
+  thermal expansion are property results.
+materials:
+  lgps: {label: "Li10GeP2S12 (ordered and Ge/P-disordered)", formula: Li10GeP2S12, class: "sulfide solid-state electrolyte"}
+  lsips: {label: "Li10SiP2S12 (ordered and Si/P-disordered)", formula: Li10SiP2S12, class: "sulfide solid-state electrolyte"}
+  lsnps: {label: "Li10SnP2S12 (ordered and Sn/P-disordered)", formula: Li10SnP2S12, class: "sulfide solid-state electrolyte"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 650, kpoints: "Reciprocal-space mesh density 0.26 1/A", comment: "VASP 5.4.4; electronic convergence 1e-6 eV."}
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, pp: PAW, cutoff: 650, kpoints: "Reciprocal-space mesh density 0.26 1/A", comment: "VASP 5.4.4; electronic convergence 1e-6 eV."}
+sampling:
+  dpgen: {label: "DP-GEN concurrent learning from 590 perturbed DFT-relaxed structures: NpT/NVT exploration at 50-1200 K on ordered, disordered and experimental-lattice cells (21 iterations, force-deviation window 0.12-0.25 eV/A)"}
+datasets:
+  dpgen-pbe: {label: "DP-GEN data set of the three LGPS-type materials labelled with PBE", materials: [lgps, lsips, lsnps], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [dpgen]}
+  dpgen-pbesol: {label: "DP-GEN data set of the three LGPS-type materials labelled with PBEsol", materials: [lgps, lsips, lsnps], properties: [Energy, Forces], provenance: InHouse, calc: pbesol, sampling: [dpgen]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius]
+    algorithm: "Smooth end-to-end Deep Potential; production models trained 4,000,000 batches with learning-rate decay every 20,000 steps; 4-model ensembles"
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit v1.2 with DP-GEN; LAMMPS for MD"}
+    sims: [MolecularDynamics]
+runs:
+  dp-pbe: {label: "DP-PBE: Deep Potential trained on PBE-labelled DP-GEN data (4-model ensemble)", method: DeePMD, dataset: dpgen-pbe, settings: {cutoffRadius: {v: 6, loc: "Sec. III A"}}, model: "DP-PBE (LGPS-type)"}
+  dp-pbesol: {label: "DP-PBEsol: Deep Potential trained on PBEsol-labelled DP-GEN data (4-model ensemble)", method: DeePMD, dataset: dpgen-pbesol, settings: {cutoffRadius: {v: 6, loc: "Sec. III A"}}, model: "DP-PBEsol (LGPS-type)"}
+results:
+  - {key: dp-pbe-lgps, model: dp-pbe, material: lgps, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 1.65, meV/atom, "train energy RMSE on lgps: DP-PBE", "Table V"], [RMSE, Force, 82.4, meV/A, "train force RMSE on lgps: DP-PBE", "Table V"]]}
+  - {key: dp-pbe-lsips, model: dp-pbe, material: lsips, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 1.82, meV/atom, "train energy RMSE on lsips: DP-PBE", "Table V"], [RMSE, Force, 82.7, meV/A, "train force RMSE on lsips: DP-PBE", "Table V"]]}
+  - {key: dp-pbe-lsnps, model: dp-pbe, material: lsnps, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 2.53, meV/atom, "train energy RMSE on lsnps: DP-PBE", "Table V"], [RMSE, Force, 92.5, meV/A, "train force RMSE on lsnps: DP-PBE", "Table V"]]}
+  - {key: dp-pbesol-lgps, model: dp-pbesol, material: lgps, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 1.33, meV/atom, "train energy RMSE on lgps: DP-PBEsol", "Table V"], [RMSE, Force, 79.6, meV/A, "train force RMSE on lgps: DP-PBEsol", "Table V"]]}
+  - {key: dp-pbesol-lsips, model: dp-pbesol, material: lsips, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 1.33, meV/atom, "train energy RMSE on lsips: DP-PBEsol", "Table V"], [RMSE, Force, 77.7, meV/A, "train force RMSE on lsips: DP-PBEsol", "Table V"]]}
+  - {key: dp-pbesol-lsnps, model: dp-pbesol, material: lsnps, role: training, eval_data: {label: "Whole DP-GEN data set (ensemble mean of 4 models)", location: "Table V"}, metrics: [[RMSE, Energy, 1.27, meV/atom, "train energy RMSE on lsnps: DP-PBEsol", "Table V"], [RMSE, Force, 77.9, meV/A, "train force RMSE on lsnps: DP-PBEsol", "Table V"]]}
+gaps:
+  - "Table V errors are on the whole DP-GEN data set (no held-out split is described), so they are encoded with role training; the ensemble standard deviations (e.g. +/-0.03 meV/atom) are not encoded."
+  - "The speed test (Fig. 6) is given only approximately ('around 4 hours' for 1 ns of a 900-atom system on one V100) and is not encoded. The data-set size is not stated."
+  - "Diffusion coefficients, activation energies, lattice parameters (Table II, DFT only) and thermal expansion are property results and are not encoded."

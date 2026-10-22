@@ -1,0 +1,50 @@
+id: bilgili2026
+source:
+  rank: 605
+  year: "2026"
+  first_author: "Emir Bilgili"
+  title: "Machine-learned interatomic potential for predictive simulation of Mo S 2 epitaxy"
+  venue: "Physical Review Materials"
+  doi: "10.1103/71xp-pjb6"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2512.15952v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "706bb1a6e893f543d6174fa744974689dc71d2e92ef093f633ab87f9c3e1396f"
+study_label: "Bilgili et al. (2026): UF3 machine-learned potential for MoS2 epitaxy"
+scope: |
+  Encoding scope: the selected UF3 potential for the Mo-S system (2- and
+  3-body B-spline potential fitted with UF3Tools), its test-set energy
+  and force errors, and the CPU timing comparison against MACE-MP-0 and
+  CHGNet on a 6,000-atom supercell. Structural, elastic, phonon, defect,
+  edge and epitaxy results are property comparisons.
+materials:
+  mos2: {label: "Mo-S system: MoS2 polymorphs (1H, 2H, 3R), slabs, monolayers, nanoribbons and non-stoichiometric Mo-S structures", formula: MoS2, class: "layered transition-metal dichalcogenide"}
+reference:
+  pbe-d3: {type: DFT, code: VASP, xc: {local: PBE-D3}, pp: PAW, cutoff: 520, kpoints: "Gamma-centred, density 40 1/A for bulk; 6x6x1 for slabs and monolayers; 12x1x1 for nanoribbons", comment: "Gaussian smearing 0.05 eV; 20 A vacuum with dipole corrections."}
+sampling:
+  gasp: {label: "GASP genetic-algorithm structure searches (stoichiometric and across Mo-S composition space) with relaxation trajectories"}
+  mixed: {label: "Materials Project polymorphs, pressure relaxations, VASPKIT strains, Phonopy distortions, AIMD at 600/1500/3000 K, slabs, surfaces, monolayers and nanoribbons; filtered by force, distance and energy windows and FPS in energy per atom"}
+datasets:
+  mos2-db: {label: "UF3 Mo-S training/test data set (28,579 structures after filtering; 25,792 train, 2,787 test)", materials: [mos2], properties: [Energy, Forces], provenance: Augmented, n: {v: 28579, loc: "Sec. 2.1"}, calc: pbe-d3, sampling: [gasp, mixed]}
+methods:
+  UF3:
+    hp: [cutoffRadius, bodyOrder]
+    algorithm: "Cubic B-spline 2-body (0.001-9 A, 54 knots) and 3-body (short legs 0.5-3.6 A with 10 knots, long leg 7.2 A with 20 knots) terms; Optuna TPE search over more than 7,000 candidate fits with property-based validation"
+    impl: {lib: {local: UF3Tools}}
+    sims: [MolecularDynamics, PhononCalculation, GeometryOptimization]
+  MACE: {}
+  CHGNet: {}
+runs:
+  uf3: {label: "Selected UF3 Mo-S potential (UF3-MoS2)", method: UF3, dataset: mos2-db, settings: {cutoffRadius: {v: 9, loc: "Sec. 2.2 (2-body cutoff)"}, bodyOrder: {v: 3, loc: "Sec. 2.2"}}, model: "UF3-MoS2"}
+  mp0: {label: "MACE-MP-0 as distributed (size not stated)", method: MACE, model: "MACE-MP-0"}
+  chgnet: {label: "CHGNet as distributed (version not stated)", method: CHGNet, model: "CHGNet pretrained"}
+results:
+  - {key: uf3-test, model: uf3, material: mos2, role: test, eval_data: {label: "2,787-structure test split", location: "Sec. 2.1; Fig. 2"}, metrics: [[RMSE, Energy, 0.117, eV, "test energy RMSE on mos2: UF3-MoS2", "Fig. 2 caption; Sec. 3.1"], [MAE, Energy, 0.064, eV, "test energy MAE on mos2: UF3-MoS2", "Fig. 2 caption"], [RMSE, Force, 420, meV/A, "test force RMSE on mos2: UF3-MoS2", "Fig. 2 caption (0.420 eV/A)"], [MAE, Force, 137, meV/A, "test force MAE on mos2: UF3-MoS2", "Fig. 2 caption (0.137 eV/A)"]]}
+timings:
+  - {model: uf3, system: "6,000-atom MoS2 supercell, 1,000 MD steps", atoms: 6000, value: 3.1, unit: "s wall time for 1,000 MD steps", per_atom_us: 0.5167, hardware: "32 AMD EPYC 9655P CPU cores, 256 GB RAM", result: uf3-test, location: "Sec. 3.6"}
+  - {model: mp0, system: "6,000-atom MoS2 supercell, 1,000 MD steps", atoms: 6000, value: 1916.9, unit: "s wall time for 1,000 MD steps", per_atom_us: 319.48, hardware: "32 AMD EPYC 9655P CPU cores, 256 GB RAM", result: null, location: "Sec. 3.6"}
+  - {model: chgnet, system: "6,000-atom MoS2 supercell, 1,000 MD steps", atoms: 6000, value: 3782.7, unit: "s wall time for 1,000 MD steps", per_atom_us: 630.45, hardware: "32 AMD EPYC 9655P CPU cores, 256 GB RAM", result: null, location: "Sec. 3.6"}
+gaps:
+  - "The energy RMSE/MAE are stated in eV without 'per atom'; they are encoded in eV as given."
+  - "The 54,000-atom, 40,000-step benchmark wall times are approximate ('~1.7 h' for UF3; SNAP '~15.2 h'; Fig. 9) and are not encoded; SNAP, ReaxFF, REBO and SW are literature or classical potentials."
+  - "Lattice constants, cohesive and binding energies (Table I), elastic constants (Table II), phonon RMS deviation ('approximately 0.6 THz'), defect and edge energies (Table III), thermal stability (Table IV) and epitaxial growth are property comparisons and are not encoded."
