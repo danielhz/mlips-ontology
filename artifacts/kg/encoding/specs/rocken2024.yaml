@@ -1,0 +1,46 @@
+id: rocken2024
+source:
+  rank: 582
+  year: "2024"
+  first_author: "Sebastien Röcken"
+  title: "Accurate machine learning force fields via experimental and simulation data fusion"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01251-4"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2308.09142v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "1694e5933afeb14fd3847cee1b81d13b49aaf6e1f6d33471cd5b5101db1c4582"
+study_label: "Rocken and Zavadlav (2024): accurate DimeNet++ force fields for titanium via fusion of DFT and experimental data (DiffTRe)"
+scope: |
+  Encoding scope: three DimeNet++ models for Ti (JaxMD, 5 A cutoff):
+  DFT pre-trained, then trained sequentially on experimental elastic
+  constants with DiffTRe, or with DFT and experimental trainers
+  alternated (fused); test-set energy, force and virial RMSE/MAE (Table
+  1). Elastic constants, lattice constants and other properties are not
+  metrics.
+materials:
+  ti: {label: "Titanium (hcp, bcc, fcc; strained, perturbed and high-temperature configurations)", formula: Ti, class: "Metals"}
+reference:
+  dft: {type: DFT, comment: "Previously published Ti DFT database (Refs. 15, 53)"}
+  exp: {type: REF, comment: "Experimental hcp Ti elastic constants at 23, 323, 623 and 923 K and lattice constants (zero-pressure target)"}
+sampling:
+  pub: {label: "Published Ti DFT database: equilibrated, strained and perturbed hcp/bcc/fcc, high-temperature MD and active-learning configurations"}
+datasets:
+  ti-dft: {label: "Ti DFT database (5,704 samples, training split)", materials: [ti], properties: [Energy, Forces, Virials], provenance: Published, calc: dft, sampling: [pub]}
+methods:
+  DimeNet:
+    hp: [cutoffRadius]
+    loss: "DFT trainer: weighted MSE (energy 1e-6, force 1e-2, virial 4e-6); EXP trainer: DiffTRe loss on elastic constants and pressure"
+    algorithm: "Alternating one-epoch DFT and EXP trainers (fused) or EXP trainer only (sequential)"
+    impl: {lib: {local: JaxMD}, comment: "DimeNet++ with embedding sizes reduced by a factor of 4"}
+    sims: [MolecularDynamics]
+runs:
+  pre: {label: "DimeNet++ Ti: DFT pre-trained", method: DimeNet, dataset: ti-dft, settings: {cutoffRadius: {v: 5, loc: "Methods"}}, model: "DimeNet++ Ti DFT pre-trained"}
+  seq: {label: "DimeNet++ Ti: DFT, EXP sequential", method: DimeNet, dataset: ti-dft, settings: {cutoffRadius: {v: 5, loc: "Methods"}}, model: "DimeNet++ Ti DFT, EXP sequential", base_model: {run: pre, relation: fine-tuned, location: "Fig. 1"}}
+  fused: {label: "DimeNet++ Ti: DFT & EXP fused", method: DimeNet, dataset: ti-dft, settings: {cutoffRadius: {v: 5, loc: "Methods"}}, model: "DimeNet++ Ti DFT & EXP fused", base_model: {run: pre, relation: fine-tuned, location: "Fig. 1"}}
+results:
+  - {key: pre-test, model: pre, material: ti, role: test, eval_data: {label: "Ti DFT test set", location: "Table 1"}, metrics: [[RMSE, Energy, 6.0, meV/atom, "test energy RMSE on Ti: DimeNet++ DFT pre-trained", "Table 1"], [MAE, Energy, 4.4, meV/atom, "test energy MAE on Ti: DimeNet++ DFT pre-trained", "Table 1"], [RMSE, Force, 92.5, meV/A, "test force RMSE on Ti: DimeNet++ DFT pre-trained", "Table 1"], [MAE, Force, 62.1, meV/A, "test force MAE on Ti: DimeNet++ DFT pre-trained", "Table 1"], [RMSE, Stress, 406.6, null, "test virial RMSE (meV/atom) on Ti: DimeNet++ DFT pre-trained", "Table 1"], [MAE, Stress, 261.2, null, "test virial MAE (meV/atom) on Ti: DimeNet++ DFT pre-trained", "Table 1"]]}
+  - {key: seq-test, model: seq, material: ti, role: test, eval_data: {label: "Ti DFT test set", location: "Table 1"}, metrics: [[RMSE, Energy, 385.1, meV/atom, "test energy RMSE on Ti: DimeNet++ DFT, EXP sequential", "Table 1"], [MAE, Energy, 384.9, meV/atom, "test energy MAE on Ti: DimeNet++ DFT, EXP sequential", "Table 1"], [RMSE, Force, 123.6, meV/A, "test force RMSE on Ti: DimeNet++ DFT, EXP sequential", "Table 1"], [MAE, Force, 83.8, meV/A, "test force MAE on Ti: DimeNet++ DFT, EXP sequential", "Table 1"], [RMSE, Stress, 401.5, null, "test virial RMSE (meV/atom) on Ti: DimeNet++ DFT, EXP sequential", "Table 1"], [MAE, Stress, 267.1, null, "test virial MAE (meV/atom) on Ti: DimeNet++ DFT, EXP sequential", "Table 1"]]}
+  - {key: fused-test, model: fused, material: ti, role: test, eval_data: {label: "Ti DFT test set", location: "Table 1"}, metrics: [[RMSE, Energy, 7.9, meV/atom, "test energy RMSE on Ti: DimeNet++ DFT & EXP fused", "Table 1"], [MAE, Energy, 6.2, meV/atom, "test energy MAE on Ti: DimeNet++ DFT & EXP fused", "Table 1"], [RMSE, Force, 111.2, meV/A, "test force RMSE on Ti: DimeNet++ DFT & EXP fused", "Table 1"], [MAE, Force, 76.6, meV/A, "test force MAE on Ti: DimeNet++ DFT & EXP fused", "Table 1"], [RMSE, Stress, 405.6, null, "test virial RMSE (meV/atom) on Ti: DimeNet++ DFT & EXP fused", "Table 1"], [MAE, Stress, 263.2, null, "test virial MAE (meV/atom) on Ti: DimeNet++ DFT & EXP fused", "Table 1"]]}
+gaps:
+  - "The sequential and fused models start from the DFT pre-trained parameters (base model, fine-tuned). Virial errors are in meV/atom (unit null). Errors on the strained/perturbed subset are in Supplementary Table S3."

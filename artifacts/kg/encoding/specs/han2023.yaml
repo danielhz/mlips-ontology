@@ -1,0 +1,55 @@
+id: han2023
+source:
+  rank: 580
+  year: "2023"
+  first_author: "Ting Han"
+  title: "Accuracy evaluation of different machine learning force field features"
+  venue: "New Journal of Physics"
+  doi: "10.1088/1367-2630/acf2bb"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "acdac52d52491b72f084bf4e2e3bb3fee673d909c1f3c96cd6030a4096f018be"
+study_label: "Han et al. (2023): accuracy evaluation of nine feature types for linear machine-learning force fields (PWmat-MLFF) on sulfur and carbon"
+scope: |
+  Encoding scope: linear-regression MLFFs on MTP, SNAP and ACE features
+  (registry methods) for amorphous sulfur (300 K, 1500 K, combined) and
+  for four carbon phases, fitted with PWmat-MLFF (pacemaker for ACE)
+  to total energies, Gaussian-averaged group energies and forces from
+  PWmat PBE AIMD; the two exact training RMSEs stated for the combined
+  sulfur set. Cosine, Gaussian and simplified DP feature types are
+  linear feature models without a registry method and are not encoded
+  as runs; most errors are approximate or figure-only.
+materials:
+  sulfur: {label: "Amorphous sulfur (S8 rings at 300 K, broken rings at 1500 K), 128 atoms", formula: S, class: "Elemental solid and liquid"}
+  carbon: {label: "Carbon phases (diamond, graphene, graphenylene, M-carbon), 64 atoms, 300-3500 K", formula: C, class: "Elemental solid and liquid carbon"}
+reference:
+  pwmat: {type: DFT, code: {local: PWmat}, xc: PBE, pp: NormConserving, kpoints: "Gamma point", comment: "60 Ry (S) and 80 Ry (C); atomic energies from energy decomposition"}
+sampling:
+  aimd: {label: "NVT AIMD trajectories, every step used (Table 1)"}
+datasets:
+  s-comb: {label: "Combined sulfur 300 K and 1500 K AIMD data (4,000 images)", materials: [sulfur], properties: [Energy, Forces], provenance: InHouse, calc: pwmat, sampling: [aimd]}
+  c4: {label: "Carbon four-phase AIMD data (4,000 images)", materials: [carbon], properties: [Energy, Forces], provenance: InHouse, n: {v: 4000, loc: "Sec. 3.1"}, calc: pwmat, sampling: [aimd]}
+methods:
+  MTP:
+    loss: "Total energy, group energy and forces"
+    algorithm: "Linear regression on about 180 features"
+    impl: {lib: {local: PWmat-MLFF}}
+  SNAP:
+    loss: "Total energy, group energy and forces"
+    algorithm: "Linear regression on about 180 features"
+    impl: {lib: {local: PWmat-MLFF}}
+  ACE:
+    loss: "Total energy and forces"
+    impl: {lib: PACE, comment: "python-ace / pacemaker linear fit"}
+runs:
+  mtp-s: {label: "Linear MTP-feature MLFF for combined sulfur data", method: MTP, dataset: s-comb, model: "PWmat-MLFF MTP sulfur"}
+  snap-s: {label: "Linear SNAP-feature MLFF for combined sulfur data", method: SNAP, dataset: s-comb, model: "PWmat-MLFF SNAP sulfur"}
+  ace-s: {label: "Linear ACE for combined sulfur data", method: ACE, dataset: s-comb, model: "Linear ACE sulfur"}
+  mtp-c: {label: "Linear MTP-feature MLFF for carbon phases", method: MTP, dataset: c4, model: "PWmat-MLFF MTP carbon"}
+  snap-c: {label: "Linear SNAP-feature MLFF for carbon phases", method: SNAP, dataset: c4, model: "PWmat-MLFF SNAP carbon"}
+results:
+  - {key: mtp-s-train, model: mtp-s, material: sulfur, role: training, eval_data: {label: "Combined sulfur training data", location: "Sec. 3.2; Fig. 5"}, metrics: [[RMSE, Energy, 0.269, eV, "training total-energy RMSE on combined sulfur: linear MTP", "Sec. 3.2"]]}
+  - {key: ace-s-train, model: ace-s, material: sulfur, role: training, eval_data: {label: "Combined sulfur training data", location: "Sec. 3.2; Fig. 5"}, metrics: [[RMSE, Force, 0.270, eV/A, "training force RMSE on combined sulfur: linear ACE", "Sec. 3.2"]]}
+gaps:
+  - "Other errors are stated approximately ('about', 'around') or only in figures (Figs. 4-7). The carbon energy sentence gives 0.101 and 0.012 eV for 'group energy, total energy' in an order inconsistent with the sulfur results, so it is not encoded. ACE failed with default pacemaker settings for carbon. The 2b/3b cosine and Gaussian and simplified DP feature models have no registry method (linear models on those descriptors)."
