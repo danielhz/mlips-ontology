@@ -1,0 +1,46 @@
+id: shaidu2025
+source:
+  rank: 440
+  year: "2025"
+  first_author: "Yusuf Shaidu"
+  title: "Transferable dispersion-aware machine learning interatomic potentials for multilayer transition metal dichalcogenide heterostructures"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01761-9"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "a591cc8f153085375ba2dbcfab12d3a9ba1b6a221cc16307d8d9ddce01cd69b3"
+study_label: "Shaidu et al. (2025): a transferable dispersion-aware neural-network potential for multilayer transition-metal dichalcogenide heterostructures"
+scope: |
+  Encoding scope: the vdW-DF-C09 (Quantum ESPRESSO) data set of TMD
+  monolayers, bilayers and hBN-supported layers from ensemble-based
+  active learning and metadynamics (about 92,600 structures; 90/10
+  split), the Behler-Parrinello-type NNP (PANNA; 8 A radial and 4 A
+  angular cutoffs) with an added species-dependent C6 van der Waals term
+  (6-12 A), and its training and test MAEs. Binding and sliding energies,
+  phonons and moire reconstructions are properties.
+materials:
+  tmd: {label: "MoS2, MoSe2, WS2, WSe2, MoTe2 and their homo-/heterobilayers and multilayers, with hexagonal BN", class: "2D lateral heterostructure"}
+reference:
+  c09: {type: DFT, code: QuantumESPRESSO, xc: {local: vdW-DF-C09}, pp: NormConserving, comment: "Norm-conserving pseudopotentials (Methods)."}
+sampling:
+  al: {label: "Active learning with a five-NNP ensemble (energy deviation above 2.5 meV/atom) on MD at 300/800 K and 0, +-1 GPa, plus metadynamics on interlayer distances and hBN-supported configurations"}
+datasets:
+  tmd: {label: "TMD/hBN data set (about 92,600 structures; 90 % of pre-hBN data plus all hBN data for training, remaining 10 % for testing)", materials: [tmd], properties: [Energy, Forces], provenance: InHouse, calc: c09, sampling: [al]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff, batchSize, learningRate]
+    loss: "Energy and force errors; long-range C6 dispersion term with geometric-mean C6 coefficients added to the network energy"
+    algorithm: "Adam, learning rate decayed by 1 % every 5,000 steps"
+    impl: {lib: {local: PANNA}}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  nnp: {label: "Dispersion-aware Behler-Parrinello NNP for TMD heterostructures (43 radial Gaussians, 16 angular centres; vdW up to 12 A)", method: HDNNP, dataset: tmd, settings: {cutoffRadius: {v: 8, loc: "Neural network potential"}, angularCutoff: {v: 4, loc: "Neural network potential"}, batchSize: {v: 16, loc: "Training and validation"}, learningRate: {v: 0.001, loc: "Training and validation (initial)"}}, model: "TMD dispersion-aware NNP (Shaidu 2025)"}
+results:
+  - {key: nnp-train, model: nnp, material: tmd, role: training, eval_data: {label: "TMD/hBN training set", location: "Training and validation"}, metrics: [[MAE, Energy, 0.75, meV/atom, "train energy MAE on tmd: dispersion-aware NNP", "Training and validation"], [MAE, Force, 14.52, meV/A, "train force MAE on tmd: dispersion-aware NNP", "Training and validation"]]}
+  - {key: nnp-test, model: nnp, material: tmd, role: test, eval_data: {label: "TMD test set (10 % of the pre-hBN data)", location: "Training and validation"}, metrics: [[MAE, Energy, 0.74, meV/atom, "test energy MAE on tmd: dispersion-aware NNP", "Training and validation"], [MAE, Force, 14.33, meV/A, "test force MAE on tmd: dispersion-aware NNP", "Training and validation"]]}
+resources: |
+  No timings are given in the encoded sections.
+gaps:
+  - "The data-set size is given only approximately (about 89,400 before and 92,600 after adding hBN), so it is not recorded as a number. The vdW term is part of the potential's functional form; it is encoded as a setting of HDNNP rather than a new method."
+  - "Interlayer binding and sliding energies, phonons and twisted-bilayer reconstructions are properties."

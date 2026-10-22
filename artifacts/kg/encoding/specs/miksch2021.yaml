@@ -1,0 +1,44 @@
+id: miksch2021
+source:
+  rank: 441
+  year: "2021"
+  first_author: "April M Miksch"
+  title: "Strategies for the construction of machine-learning potentials for accurate and efficient atomic-scale simulations"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/abfd96"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2101.10468v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d0c33e04abf60b93dd30ac4f9dbbb719bf85bb90fa1551b4f0c5d0c605c67740"
+study_label: "Miksch et al. (2021): strategies for constructing artificial-neural-network potentials, with a liquid-water worked example"
+scope: |
+  Encoding scope: the tutorial's worked example, an initial
+  Behler-Parrinello-type ANN potential for liquid water (descriptor
+  dimension 51 for H and 46 for O, 6.35 A cutoff, two hidden layers of 25
+  tanh nodes; from Refs. 88 and 91) trained on 5,369 DFT structures
+  (classical and path-integral AIMD snapshots plus randomly displaced
+  structures; 90/10 split), with the training and validation RMSEs
+  stated in Sec. IV B. The rest of the paper (descriptor choices, a LiSi
+  example from Ref. 128, active learning) is review and recipe.
+materials:
+  water: {label: "Liquid water (periodic cells of 64 H2O)", formula: "H2O", class: "Molecular liquid"}
+reference:
+  dft: {type: DFT, comment: "DFT level of the cited water studies (Refs. 88, 89, 91); not restated here."}
+sampling:
+  aimd: {label: "AIMD and path-integral AIMD snapshots at ambient conditions plus random displacements (up to 0.05 and 0.10 A)"}
+datasets:
+  water: {label: "Initial liquid-water reference set (90 % training, 10 % validation)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 5369, loc: "Sec. II B"}, calc: dft, sampling: [aimd]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers]
+    sims: [MolecularDynamics]
+runs:
+  ann-water: {label: "Initial ANN potential for liquid water (two hidden layers of 25 nodes)", method: HDNNP, dataset: water, settings: {cutoffRadius: {v: 6.35, loc: "Sec. III C"}, numLayers: {v: 2, loc: "Sec. III C"}}, model: "liquid-water ANN (initial data set)"}
+results:
+  - {key: ann-water-train, model: ann-water, material: water, role: training, eval_data: {label: "Training split (90 %) of the initial water data", location: "Sec. IV B; Fig. 9"}, metrics: [[RMSE, Energy, 1.2, null, "train energy RMSE on water in meV/H2O: initial water ANN", "Sec. IV B"], [RMSE, Force, 84.7, meV/A, "train force RMSE on water: initial water ANN", "Sec. IV B"]]}
+  - {key: ann-water-val, model: ann-water, material: water, role: validation, eval_data: {label: "Validation split (10 %) of the initial water data", location: "Sec. IV B; Fig. 9"}, metrics: [[RMSE, Energy, 1.4, null, "validation energy RMSE on water in meV/H2O: initial water ANN", "Sec. IV B"], [RMSE, Force, 83.2, meV/A, "validation force RMSE on water: initial water ANN", "Sec. IV B"]]}
+resources: |
+  Not applicable (tutorial/review).
+gaps:
+  - "Energy RMSEs are in meV per H2O (no schema unit; recorded with unit null). The DFT level and the refined (second-iteration) potential are described in the cited works, not here."
+  - "The amorphous LiSi ANN example (Ref. 128) is quoted with hyperparameters only and is not encoded."
