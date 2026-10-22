@@ -1,0 +1,53 @@
+id: seko2019
+source:
+  rank: 527
+  year: "2019"
+  first_author: "Atsuto Seko"
+  title: "Group-theoretical high-order rotational invariants for structural representations: Application to linearized machine learning interatomic potential"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.99.214108"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1901.02118v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "4b2ed3ecf0070309b4994fff4f7105c1daf6a3b299d9aa973439ed29ef726dc0"
+study_label: "Seko, Togo and Tanaka (2019): group-theoretical high-order SO(3) polynomial invariants for linearized MLIPs, applied to elemental Al"
+scope: |
+  Encoding scope: linearized polynomial MLIPs (PolyMLP) for Al built
+  from pairwise, angular-Fourier-series (second-order) and higher-order
+  (up to sixth-order) polynomial invariants, trained on 9,000 and tested
+  on 1,000 structures generated from 86 ICSD prototypes; the energy RMS
+  errors stated in the text. Phonon, vacancy and grain-boundary results
+  (Table IV) are properties.
+hyperparameters:
+  ninv: {label: "Number of polynomial invariants", name: "number of invariants", datatype: integer}
+  pmax: {label: "Maximum order of polynomial invariants p_max", name: "p_max", datatype: integer}
+materials:
+  al: {label: "Elemental Al in structures derived from 86 prototype structure generators (isotropic expansion, random distortion)", formula: Al, class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400}
+sampling:
+  proto: {label: "Structures derived from ICSD prototype structure generators by expansions, distortions and displacements; random 9,000/1,000 split"}
+datasets:
+  al: {label: "Al training set (9,000 structures)", materials: [al], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 9000, loc: "Sec. III A"}, calc: vasp, sampling: [proto]}
+methods:
+  PolyMLP:
+    hp: [cutoffRadius, ninv, pmax]
+    loss: "Energies, forces and stresses"
+    algorithm: "Linear ridge regression"
+    sims: [PhononCalculation, GeometryOptimization]
+runs:
+  p97322: {label: "PolyMLP (9-7-3-2-2), 2,399 invariants up to sixth order", method: PolyMLP, dataset: al, settings: {cutoffRadius: {v: 10, loc: "Sec. IV B"}, ninv: {v: 2399, loc: "Sec. IV B"}, pmax: {v: 6, loc: "Sec. IV B"}}, model: "PolyMLP Al (9-7-3-2-2)"}
+  pair: {label: "Pair functional MLIP for Al", method: PolyMLP, dataset: al, settings: {cutoffRadius: {v: 10, loc: "Sec. IV B"}}, model: "Pair functional MLIP Al"}
+  afs: {label: "Best MLIP with only second-order invariants (AFS features)", method: PolyMLP, dataset: al, settings: {cutoffRadius: {v: 10, loc: "Sec. IV B"}, pmax: {v: 2, loc: "Sec. IV B"}}, model: "PolyMLP Al p_max = 2"}
+  p3: {label: "Best MLIP with second- and third-order invariants", method: PolyMLP, dataset: al, settings: {cutoffRadius: {v: 10, loc: "Sec. IV B"}, pmax: {v: 3, loc: "Sec. IV B"}}, model: "PolyMLP Al p_max = 3"}
+  sym: {label: "PolyMLP (9-8-8-4-3) with only symmetrized invariants", method: PolyMLP, dataset: al, settings: {cutoffRadius: {v: 10, loc: "Sec. IV B"}, pmax: {v: 6, loc: "Sec. IV B"}}, model: "PolyMLP Al symmetrized (9-8-8-4-3)"}
+results:
+  - {key: p97322-test, model: p97322, material: al, role: test, eval_data: {label: "Al test set (1,000 structures)", location: "Sec. III A, IV B"}, metrics: [[RMSE, Energy, 2.27, meV/atom, "test energy RMS error on Al: PolyMLP (9-7-3-2-2)", "Sec. IV B"]]}
+  - {key: p97322-train, model: p97322, material: al, role: training, eval_data: {label: "Al training set (9,000 structures)", location: "Sec. IV B"}, metrics: [[RMSE, Energy, 2.23, meV/atom, "training energy RMS error on Al: PolyMLP (9-7-3-2-2)", "Sec. IV B"]]}
+  - {key: pair-test, model: pair, material: al, role: test, eval_data: {label: "Al test set (1,000 structures)", location: "Sec. IV B"}, metrics: [[RMSE, Energy, 19.88, meV/atom, "test energy RMS error on Al: pair functional MLIP", "Sec. IV B"]]}
+  - {key: afs-test, model: afs, material: al, role: test, eval_data: {label: "Al test set (1,000 structures)", location: "Sec. IV B, Fig. 2b"}, metrics: [[RMSE, Energy, 7.72, meV/atom, "test energy RMS error on Al: PolyMLP p_max = 2", "Sec. IV B"]]}
+  - {key: p3-test, model: p3, material: al, role: test, eval_data: {label: "Al test set (1,000 structures)", location: "Sec. IV B, Fig. 2b"}, metrics: [[RMSE, Energy, 2.83, meV/atom, "test energy RMS error on Al: PolyMLP p_max = 3", "Sec. IV B"]]}
+  - {key: sym-test, model: sym, material: al, role: test, eval_data: {label: "Al test set (1,000 structures)", location: "Sec. IV B, Fig. 2b"}, metrics: [[RMSE, Energy, 3.77, meV/atom, "test energy RMS error on Al: PolyMLP symmetrized (9-8-8-4-3)", "Sec. IV B"]]}
+gaps:
+  - "The text gives 2.27 meV/atom for MLIP (9-7-3-2-2) with Fig. 2a and 2.10 meV/atom for the same label with Fig. 2b; the first (with the matching 2.23 training error) is encoded. The p_max = 2, 3 and symmetrized errors are read as test errors because Fig. 2 plots test RMS errors."
+  - "Phonon RMS errors, vacancy formation and grain-boundary energies (Table IV) are properties. The cluster-functional AFS MLIP of Table IV has no stated energy error."

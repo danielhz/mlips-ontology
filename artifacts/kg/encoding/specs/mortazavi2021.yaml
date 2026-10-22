@@ -1,0 +1,46 @@
+id: mortazavi2021
+source:
+  rank: 524
+  year: "2021"
+  first_author: "Bohayra Mortazavi"
+  title: "First‐Principles Multiscale Modeling of Mechanical Properties in Graphene/Borophene Heterostructures Empowered by Machine‐Learning Interatomic Potentials"
+  venue: "Advanced Materials"
+  doi: "10.1002/adma.202102807"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "9b9b11aa50910d037e411a5bb4993a0346fc68aa720efbaeae6fad47e55c34fc"
+study_label: "Mortazavi et al. (2021): first-principles multiscale modelling of graphene/borophene heterostructures with passively fitted MTPs"
+scope: |
+  Encoding scope: MTPs (MLIP package) for pristine graphene and chi3
+  borophene (329 parameters) and one MTP per coplanar
+  graphene/borophene heterostructure model (449 parameters), each fitted
+  to subsampled AIMD trajectories of stress-free and strained cells
+  (200-1000 K) with a preliminary-MTP refinement step. No energy/force
+  error metrics are reported; stress-strain, elastic, strength and
+  phonon comparisons and the finite-element upscaling are properties.
+materials:
+  gr: {label: "Graphene", formula: C, class: "2D material"}
+  b: {label: "chi3 borophene", formula: B, class: "2D material"}
+  grb: {label: "Coplanar graphene/borophene heterostructures", class: "2D material"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, cutoff: 500, kpoints: "2x2x1 for AIMD datasets", comment: "Nose NVT AIMD with 1 fs steps"}
+sampling:
+  aimd: {label: "AIMD of stress-free and six strained cells with temperature ramped from 200 to 1000 K (under 4,500 steps), every 4th step kept, then configurations selected by a preliminary MTP"}
+  aimd-het: {label: "Heterostructure AIMD with the same procedure, plus pristine trajectories subsampled every 20th step"}
+datasets:
+  gr: {label: "Graphene AIMD training set", materials: [gr], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [aimd]}
+  b: {label: "Borophene AIMD training set", materials: [b], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [aimd]}
+  grb: {label: "Graphene/borophene heterostructure AIMD training sets (one per model)", materials: [grb, gr, b], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [aimd-het]}
+methods:
+  MTP:
+    loss: "Energies, forces and stresses (passive fitting)"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  mtp-gr: {label: "MTP for graphene (329 parameters)", method: MTP, dataset: gr, model: "MTP graphene (Mortazavi 2021)"}
+  mtp-b: {label: "MTP for chi3 borophene (329 parameters)", method: MTP, dataset: b, model: "MTP borophene (Mortazavi 2021)"}
+  mtp-grb: {label: "MTPs for graphene/borophene heterostructure models (449 parameters each)", method: MTP, dataset: grb, model: "MTPs graphene/borophene heterostructures"}
+results: []
+gaps:
+  - "No RMSE/MAE of the fitted MTPs is given in the text read; accuracy is shown through stress-strain curves against DFT (e.g. graphene armchair strength 63.6 GPa vs DFT 65.1 GPa), which are properties. MTP levels are given only as parameter counts."
