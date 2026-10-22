@@ -1,0 +1,36 @@
+id: sivak2025
+source:
+  rank: 396
+  year: "2025"
+  first_author: "Jacob T. Sivak"
+  title: "Discovering High-Entropy Oxides with a Machine-Learning Interatomic Potential"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.134.216101"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2408.06322v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e9039e79d52c100ac86b1875dc5f2b2d0a5470ee69cfb10f8bd2c24338c4d82c"
+study_label: "Sivak et al. (2025): discovering rock-salt high-entropy oxides with the pretrained CHGNet potential and bond-length/enthalpy descriptors"
+scope: |
+  Encoding scope: the pretrained CHGNet (chgnet 0.3.5 package) evaluated
+  against VASP (MPRelaxSet-compatible, PBE+U mixing) total energies of
+  160-atom rock-salt SQS for the 56 five-cation equimolar combinations
+  of Mg, Ca, Mn, Fe, Co, Ni, Cu and Zn, with the stated energy MAE, and
+  its use for high-throughput descriptor screening. Bond-length MAEs,
+  mixing enthalpies and the synthesis results are properties.
+materials:
+  heo: {label: "Rock-salt high-entropy oxides (160-atom SQS, five cations from Mg, Ca, Mn, Fe, Co, Ni, Cu, Zn)", class: "Oxides"}
+reference:
+  mp: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "VASP 6.4.1, Materials Project MPRelaxSet defaults with the GGA/GGA+U mixing scheme, ferromagnetic initialisation, forces below 50 meV/A (Methods)."}
+methods:
+  CHGNet:
+    sims: [GeometryOptimization]
+runs:
+  chgnet: {label: "CHGNet pretrained model from the chgnet 0.3.5 package (checkpoint not named)", method: CHGNet, model: "CHGNet (chgnet 0.3.5 package)"}
+results:
+  - {key: chgnet-heo, model: chgnet, material: heo, role: external, eval_data: {label: "DFT total energies of 56 equimolar five-cation rock-salt HEO SQS (160 atoms)", location: "Fig. 1a"}, metrics: [[MAE, Energy, 18.7, meV/atom, "Total-energy MAE against DFT: CHGNet, rock-salt HEO SQS", "Fig. 1a; main text"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The CHGNet MAEs of 30 meV/atom and 77 meV/A are quoted from Deng et al. and not encoded. The chgnet 0.3.5 package ships pretrained weights, but the paper does not name the checkpoint, so it is not linked to a registry model."
+  - "Bond-length MAEs (0.041 A overall, 0.018 A without Cu), lattice parameters (Table S1) and mixing enthalpies (Tables S2-S3) are structural or thermodynamic properties."

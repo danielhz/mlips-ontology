@@ -1,0 +1,46 @@
+id: tiefenbacher2025
+source:
+  rank: 400
+  year: "2025"
+  first_author: "Maximilian Xaver Tiefenbacher"
+  title: "Excited-state nonadiabatic dynamics in explicit solvent using machine learned interatomic potentials"
+  venue: "Digital Discovery"
+  doi: "10.1039/d5dd00044k"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2501.16974v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "46eceb0eea83958bf7e73df51ebcb801cc7657047adfd65412dc04619ecb0e9d"
+study_label: "Tiefenbacher et al. (2025): excited-state nonadiabatic ML/MM surface-hopping dynamics of furan in water with FieldSchNet"
+scope: |
+  Encoding scope: the QM/MM-TSH data of furan in TIP3P water (TD-DFT
+  BP86/def2-SVP in ORCA 5.0 with electrostatic embedding; 46 trajectories,
+  28,935 points; five lowest singlet states), FieldSchNet models (cutoff
+  10 A, 50 Gaussians, six interaction layers, 256 features, a 256-128-64-
+  32-16-5 read-out for five energies) trained with 'split by trajectory'
+  (37/5/4 trajectories) and 'random split' (80/10/10) partitions and time
+  subsampling, and their use in ML/MM-TSH via SHARC. Learning curves and
+  test errors are figure-only (Fig. 6); time constants are properties.
+materials:
+  furan: {label: "Furan in explicit water (QM furan, TIP3P MM solvent), five lowest singlet states", formula: "C4H4O", class: "Small organic molecule (gas phase)"}
+reference:
+  tddft: {type: DFT, code: ORCA, xc: {local: BP86}, basis: "def2-SVP", comment: "TDA TD-DFT, electrostatic QM/MM embedding, ORCA 5.0 (Sec. 3.2)."}
+sampling:
+  tsh: {label: "QM/MM trajectory surface hopping (local diabatisation), 46 trajectories of 330 fs at 0.5 fs from MM-MD snapshots (set I)"}
+datasets:
+  set1: {label: "QM/MM-TSH data set I (46 trajectories)", materials: [furan], properties: [Energy, Forces], provenance: InHouse, n: {v: 28935, loc: "Sec. 3.3"}, calc: tddft, sampling: [tsh]}
+methods:
+  FieldSchNet:
+    hp: [cutoffRadius, numRadialBasis, numLayers, numFeatures, learningRate, batchSize]
+    loss: "Augmented MSE with energy weight 1 and force weight 10"
+    algorithm: "Adam with plateau scheduler (factor 0.8 after 20 epochs), at most 5,000 epochs"
+    impl: {lib: SchNet, comment: "SchNetPack FieldSchNet interfaced with SHARC"}
+    sims: [MolecularDynamics]
+runs:
+  fsn-traj: {label: "FieldSchNet trained with the 'split by trajectory' partition (37 training trajectories)", method: FieldSchNet, dataset: set1, settings: {cutoffRadius: {v: 10, loc: "Sec. 3.3"}, numRadialBasis: {v: 50, loc: "Sec. 3.3"}, numLayers: {v: 6, loc: "Sec. 3.3"}, numFeatures: {v: 256, loc: "Sec. 3.3"}, learningRate: {v: 1.0e-5, loc: "Sec. 3.3 (initial)"}, batchSize: {v: 10, loc: "Sec. 3.3"}}, model: "furan/water FieldSchNet (split by trajectory)"}
+  fsn-random: {label: "FieldSchNet trained with the 'random split' partition (80/10/10)", method: FieldSchNet, dataset: set1, settings: {cutoffRadius: {v: 10, loc: "Sec. 3.3"}, numRadialBasis: {v: 50, loc: "Sec. 3.3"}, numLayers: {v: 6, loc: "Sec. 3.3"}, numFeatures: {v: 256, loc: "Sec. 3.3"}, learningRate: {v: 1.0e-5, loc: "Sec. 3.3 (initial)"}, batchSize: {v: 10, loc: "Sec. 3.3"}}, model: "furan/water FieldSchNet (random split)"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Energy MAEs and force RMSEs over the five states for each split and subsampling fraction (three seeds each) are figure-only (Fig. 6); weighted RMSEs are discussed only qualitatively. The subsampling variants are settings of these two runs and are not encoded separately."
+  - "Internal-conversion time constants (Table 1) and spectra are properties. FieldSchNet is a new registry method (introducing paper not in the corpus)."
