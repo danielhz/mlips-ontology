@@ -1,0 +1,54 @@
+id: fazel2026
+source:
+  rank: 653
+  year: "2026"
+  first_author: "Kamron C. Fazel"
+  title: "Development of Machine-Learned Interatomic Potentials to Predict Structure, Transport, and Reactivity in Platinum-Based Fuel Cells"
+  venue: "ACS Omega"
+  doi: "10.1021/acsomega.6c01745"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2505.01963v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "13cddcaa13105845db2470d0b5b9fa02c655e926bfc9f33a069b9bc698022d5c"
+study_label: "Fazel et al. (2026): MACE potentials for structure, transport and reactivity in Pt-Nafion-water fuel-cell interfaces"
+scope: |
+  Encoding scope: the MACE committee models of the three active-learning
+  stages (initial, iteration 1, iteration 2) trained on r2SCAN AIMD data
+  of water, Nafion fragments, a Nafion chain and Pt(111)-Nafion-water,
+  with committee-averaged validation RMSEs (Table II) and test RMSEs on a
+  common test set (Table S4). Structure, proton transport and reaction
+  barriers are property results.
+materials:
+  water: {label: "Liquid water under strain", formula: H2O, class: "molecular liquid"}
+  nafion-water: {label: "Hydrated Nafion fragments and Nafion chain (lambda 6-24, strained)", class: "polymer electrolyte"}
+  pt-nafion: {label: "Pt(111) 4x4 slab with a hydrated Nafion chain", class: "catalyst-polymer interface"}
+reference:
+  r2scan: {type: DFT, code: {local: JDFTx}, xc: {local: r2SCAN}, pp: NormConserving, kpoints: "2x2x1 Gamma-centred with Pt; Gamma only without", comment: "LibXC r2SCAN; SG15 norm-conserving pseudopotentials; 30 hartree wavefunction cutoff; 0.2 eV smearing with Pt; NVT AIMD at 300 K."}
+sampling:
+  aimd: {label: "Every 10th frame of NVT AIMD of water, fluorocarbon fragments, a Nafion chain and Pt(111)-Nafion (10 SOAP/iSIM-selected rotations) at several hydration levels and strains"}
+  al: {label: "Committee (3 MACE models) active learning from 24 x 1 ps MLIP NVT trajectories at 300 K, flagged by relative force deviation"}
+datasets:
+  initial: {label: "Initial training set (23,868 configurations; 3% validation)", materials: [water, nafion-water, pt-nafion], properties: [Energy, Forces], provenance: InHouse, n: {v: 23868, loc: "Table II"}, calc: r2scan, sampling: [aimd]}
+  it1: {label: "Training set after active-learning iteration 1 (24,541 configurations)", materials: [water, nafion-water, pt-nafion], properties: [Energy, Forces], provenance: InHouse, n: {v: 24541, loc: "Table II"}, calc: r2scan, sampling: [aimd, al]}
+  it2: {label: "Training set after active-learning iteration 2 (24,928 configurations)", materials: [water, nafion-water, pt-nafion], properties: [Energy, Forces], provenance: InHouse, n: {v: 24928, loc: "Table II"}, calc: r2scan, sampling: [aimd, al]}
+methods:
+  MACE:
+    hp: [cutoffRadius, batchSize, numEpochs]
+    algorithm: "hidden irreps 128x0e + 128x1o; AMSGrad, EMA 0.99; committee of 3 seeds"
+    impl: {lib: MACE, comment: "mace_run_train"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  mace-initial: {label: "MACE committee, active-learning stage: Initial (preliminary)", method: MACE, dataset: initial, settings: {cutoffRadius: {v: 5.0, loc: "SI Sec. II"}, batchSize: {v: 8, loc: "SI Sec. II"}, numEpochs: {v: 500, loc: "SI Sec. II (max)"}}, model: "MACE Pt-Nafion-water (Initial (preliminary))"}
+  mace-it1: {label: "MACE committee, active-learning stage: Iteration 1", method: MACE, dataset: it1, settings: {cutoffRadius: {v: 5.0, loc: "SI Sec. II"}, batchSize: {v: 8, loc: "SI Sec. II"}, numEpochs: {v: 500, loc: "SI Sec. II (max)"}}, model: "MACE Pt-Nafion-water (Iteration 1)"}
+  mace-it2: {label: "MACE committee, active-learning stage: Iteration 2", method: MACE, dataset: it2, settings: {cutoffRadius: {v: 5.0, loc: "SI Sec. II"}, batchSize: {v: 8, loc: "SI Sec. II"}, numEpochs: {v: 500, loc: "SI Sec. II (max)"}}, model: "MACE Pt-Nafion-water (Iteration 2)"}
+results:
+  - {key: mace-initial-val, model: mace-initial, material: pt-nafion, role: validation, eval_data: {label: "Validation split (committee average)", location: "Table II"}, metrics: [[RMSE, Energy, 5.03, meV/atom, "validation energy RMSE on Pt-Nafion-water data: MACE Initial (preliminary)", "Table II"], [RMSE, Force, 50.83, meV/A, "validation force RMSE on Pt-Nafion-water data: MACE Initial (preliminary)", "Table II"]]}
+  - {key: mace-initial-test, model: mace-initial, material: pt-nafion, role: test, eval_data: {label: "Common test set (committee average)", location: "Table S4"}, metrics: [[RMSE, Energy, 3.5, meV/atom, "test energy RMSE on Pt-Nafion-water data: MACE Initial (preliminary)", "Table S4"], [RMSE, Force, 49.17, meV/A, "test force RMSE on Pt-Nafion-water data: MACE Initial (preliminary)", "Table S4"]]}
+  - {key: mace-it1-val, model: mace-it1, material: pt-nafion, role: validation, eval_data: {label: "Validation split (committee average)", location: "Table II"}, metrics: [[RMSE, Energy, 4.87, meV/atom, "validation energy RMSE on Pt-Nafion-water data: MACE Iteration 1", "Table II"], [RMSE, Force, 50.87, meV/A, "validation force RMSE on Pt-Nafion-water data: MACE Iteration 1", "Table II"]]}
+  - {key: mace-it1-test, model: mace-it1, material: pt-nafion, role: test, eval_data: {label: "Common test set (committee average)", location: "Table S4"}, metrics: [[RMSE, Energy, 3.43, meV/atom, "test energy RMSE on Pt-Nafion-water data: MACE Iteration 1", "Table S4"], [RMSE, Force, 49.23, meV/A, "test force RMSE on Pt-Nafion-water data: MACE Iteration 1", "Table S4"]]}
+  - {key: mace-it2-val, model: mace-it2, material: pt-nafion, role: validation, eval_data: {label: "Validation split (committee average)", location: "Table II"}, metrics: [[RMSE, Energy, 5.47, meV/atom, "validation energy RMSE on Pt-Nafion-water data: MACE Iteration 2", "Table II"], [RMSE, Force, 50.8, meV/A, "validation force RMSE on Pt-Nafion-water data: MACE Iteration 2", "Table II"]]}
+  - {key: mace-it2-test, model: mace-it2, material: pt-nafion, role: test, eval_data: {label: "Common test set (committee average)", location: "Table S4"}, metrics: [[RMSE, Energy, 3.9, meV/atom, "test energy RMSE on Pt-Nafion-water data: MACE Iteration 2", "Table S4"], [RMSE, Force, 49.33, meV/A, "test force RMSE on Pt-Nafion-water data: MACE Iteration 2", "Table S4"]]}
+gaps:
+  - "Table II's caption swaps the units; the column headers (energy meV/atom, force meV/A) are followed. Results cover all three subsystems and are attached to the Pt-Nafion material."
+  - "Ablation models trained without parts of the data (Table S5) are not encoded as runs. Composition of the common test set is not described in the text read."
+  - "Densities, RDFs, MSDs (Table S6), proton hopping and reaction-path energies are property results."

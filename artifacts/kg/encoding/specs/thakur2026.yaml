@@ -1,0 +1,42 @@
+id: thakur2026
+source:
+  rank: 654
+  year: "2026"
+  first_author: "Atul C. Thakur"
+  title: "Dielectric Response of Short and Long Range Models of Nonuniform Liquids and Implications for Machine Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.04224"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2610.04224v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "92f588012f4ee49fbd30199e9255f8eae00729be676dc6b7a1ccd998a0bdc4c3"
+study_label: "Thakur, Dhattarwal and Remsing (2026): dielectric response of short- and long-range models of nonuniform liquids and implications for MLIPs"
+scope: |
+  Encoding scope: the three DeePMD models trained on flexible SPC/E water
+  as the reference: DP-Bulk (bulk Ewald configurations), DP-GT-Bulk (bulk
+  Gaussian-truncated electrostatics) and DP-Int (confined/interfacial
+  Ewald configurations). They are compared through dielectric profiles
+  and polarisation of water between walls, so there are no results.
+materials:
+  water: {label: "Flexible SPC/E water, bulk and confined between Lennard-Jones walls", formula: H2O, class: "molecular liquid"}
+reference:
+  spce-ewald: {type: REF, comment: "Flexible SPC/E water with Ewald (long-range) electrostatics (LAMMPS)."}
+  spce-gt: {type: REF, comment: "Flexible SPC/E water with Gaussian-truncated electrostatics (sigma = 4.5 A)."}
+sampling:
+  md: {label: "Configurations from SPC/E MD at 300 K and 2000 K (half each)"}
+datasets:
+  bulk-ewald: {label: "Bulk SPC/E Ewald configurations (3200)", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 3200, loc: "Sec. II"}, calc: spce-ewald, sampling: [md]}
+  bulk-gt: {label: "Bulk SPC/E Gaussian-truncated configurations (3200)", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 3200, loc: "Sec. II"}, calc: spce-gt, sampling: [md]}
+  conf-ewald: {label: "Confined SPC/E Ewald configurations (4800)", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 4800, loc: "Sec. II"}, calc: spce-ewald, sampling: [md]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, batchSize, learningRate]
+    algorithm: "se_e2_a descriptor; embedding (25, 50, 100) with axis neurons 16; fitting (240, 240, 240); learning rate 1e-3 to 1e-8 over 1e6 steps"
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit v2.1.1"}
+    sims: [MolecularDynamics]
+runs:
+  dp-bulk: {label: "DP-Bulk (trained on bulk Ewald SPC/E)", method: DeePMD, dataset: bulk-ewald, settings: {cutoffRadius: {v: 6, loc: "Sec. II"}, batchSize: {v: 1, loc: "Sec. II"}, learningRate: {v: 0.001, loc: "Sec. II (initial)"}}, model: "DP-Bulk SPC/E"}
+  dp-gt-bulk: {label: "DP-GT-Bulk (trained on bulk Gaussian-truncated SPC/E)", method: DeePMD, dataset: bulk-gt, settings: {cutoffRadius: {v: 6, loc: "Sec. II"}, batchSize: {v: 1, loc: "Sec. II"}, learningRate: {v: 0.001, loc: "Sec. II (initial)"}}, model: "DP-GT-Bulk SPC/E"}
+  dp-int: {label: "DP-Int (trained on confined Ewald SPC/E)", method: DeePMD, dataset: conf-ewald, settings: {cutoffRadius: {v: 6, loc: "Sec. II"}, batchSize: {v: 1, loc: "Sec. II"}, learningRate: {v: 0.001, loc: "Sec. II (initial)"}}, model: "DP-Int SPC/E"}
+gaps:
+  - "No energy or force errors are stated; the models are compared through dielectric-constant profiles, polarisation and electrostatic potentials (property analyses)."
