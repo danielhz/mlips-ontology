@@ -1,0 +1,47 @@
+id: bohm2026
+source:
+  rank: 411
+  year: "2026"
+  first_author: "Jonas Böhm"
+  title: "Predicting Crystal Structures and Ionic Conductivities in Li 3 YCl 6−x Br x Halide Solid Electrolytes Using a Fine‐Tuned Machine Learning Interatomic Potential"
+  venue: "Advanced Intelligent Systems"
+  doi: "10.1002/aisy.202501382"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2510.09861v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "1f1987c13793ce474e887be4cf99fc26a934d509633879b12df8378255378334"
+study_label: "Böhm and Champagne (2026): crystal structures and ionic conductivities of Li3YCl6-xBrx halide solid electrolytes with an iteratively fine-tuned CHGNet"
+scope: |
+  Encoding scope: M3GNet-based energy ranking of enumerated orderings,
+  the pretrained CHGNet 0.3.0 and its iterative fine-tuning on DFT (PBE)
+  labels of furthest-point-sampled MD snapshots of LYC and LYB at
+  increasing temperatures (CHGNet_T models, 200 K steps; CHGNet_600K used
+  for production), SevenNet-MF-ompa as a comparison, and the MD of the
+  Li3YCl6-xBrx series. Accuracy is stated only as upper bounds (gaps);
+  volumes, diffusivities and conductivities are properties.
+materials:
+  lycb: {label: "Li3YCl6-xBrx (x = 0-6) ordered supercells of the P-3m1 (LYC) and C2/m (LYB) parent phases", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 350, kpoints: "3x3x3 Gamma-centred (static training labels)", comment: "Energies converged to 0.5 meV/atom; 520 eV and 0.2 1/A for optimisations (Computational Methods)."}
+sampling:
+  fps: {label: "CHGNet_(T-1)-driven NpT/NVT MD of LYC0 and LYB0 at temperature T (1,000,000 steps), furthest-point sampling of 150-300 snapshots per iteration"}
+datasets:
+  ft: {label: "Iterative fine-tuning data: DFT-labelled LYC and LYB snapshots (50/50) from each temperature step", materials: [lycb], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [fps]}
+external_models: [CHGNet-0.3.0]
+methods:
+  CHGNet:
+    sims: [MolecularDynamics, GeometryOptimization]
+  M3GNet:
+    sims: [GeometryOptimization]
+  NequIP:
+    sims: [MolecularDynamics]
+runs:
+  chgnet-600k: {label: "CHGNet_600K: CHGNet 0.3.0 fine-tuned iteratively on DFT snapshots up to 600 K (frozen layers, batch size, epochs and learning rate optimised per step)", method: CHGNet, dataset: ft, model: "CHGNet_600K (LYCB)", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Computational Methods"}}
+  m3gnet: {label: "M3GNet (matgl 0.2.4; pretrained model not named) used for energy ranking", method: M3GNet, model: "M3GNet (matgl 0.2.4 default)"}
+  sevennet: {label: "SevenNet-MF-ompa (sevenn 0.11.0) as distributed", method: NequIP, model: "SevenNet-MF-ompa"}
+results: []
+resources: |
+  CHGNet relaxations take about 50 s CPU per structure against about 33 h CPU for DFT; MD with CHGNet costs about 0.8 s per atom per picosecond on a GPU for the 60- and 40-atom supercells; each fine-tuning step takes about 5-10 minutes on a GPU for 150-300 structures (Computational Methods).
+gaps:
+  - "Accuracy is stated only as bounds: pretrained CHGNet energy MAEs below 11 meV/atom at 0 K (Fig. S1) and errors up to 70 meV/atom at T >= 600 K; CHGNet_600K energy, force and stress MAEs below 3.5 meV/atom, 50 meV/A and 85 MPa on an independent 0-800 K test set (Fig. 2c). No exact values are encoded."
+  - "The intermediate CHGNet_T models (200 and 400 K) and per-iteration data sizes are not encoded separately. Timings are approximate and kept in resources. Volumes, energy differences between phases (Table 3), diffusion coefficients and conductivities are properties."

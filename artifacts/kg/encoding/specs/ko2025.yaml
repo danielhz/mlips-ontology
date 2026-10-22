@@ -1,0 +1,64 @@
+id: ko2025
+source:
+  rank: 410
+  year: "2025"
+  first_author: "Tsz Wai Ko"
+  title: "Data-efficient construction of high-fidelity graph deep learning interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01550-4"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.00957v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0194ff501e2c31dc154f2a9042f1d5763e7bbd4a4c1cc81ad34d623b5d8eb8f5"
+study_label: "Ko and Ong (2025): data-efficient multi-fidelity M3GNet potentials trained on PBE/RPBE plus a small fraction of SCAN data (silicon and water)"
+scope: |
+  Encoding scope: multi-fidelity (mfi) M3GNet models, with the fidelity
+  embedded in the global state, trained on 80 % of low-fidelity data
+  (PBE for silicon, RPBE for water) plus a fraction of SCAN data, and
+  single-fidelity (1fi) SCAN baselines; test MAEs stated in the text or
+  printed in Fig. 5, and the GAP-18 transfer test for silicon. Equations
+  of state, amorphous-silicon structure, water RDFs and ice relaxations
+  are properties.
+materials:
+  si: {label: "Silicon: crystalline polymorphs, distorted and defective diamond, amorphous and liquid structures", formula: "Si", class: "Elemental semiconductor"}
+  water: {label: "Liquid water and ice", formula: "H2O", class: "Molecular liquid"}
+reference:
+  si-pbe: {type: DFT, xc: PBE, comment: "Low-fidelity silicon data (Ref. 38)."}
+  scan: {type: DFT, code: VASP, xc: SCAN, pp: PAW, comment: "High-fidelity SCAN data (silicon, Ref. 38; water, Ref. 47); VASP 6.3.2 for new calculations."}
+  rpbe: {type: DFT, xc: {local: RPBE}, comment: "Low-fidelity water data (Zenodo record 2634098)."}
+sampling:
+  direct: {label: "DIRECT sampling (M3GNet-encoded features, PCA, clustering, stratified selection) of the SCAN fraction"}
+  random: {label: "Random selection of the SCAN fraction"}
+  narrow: {label: "Narrow selection: mostly diamond-type structures with distortions, strains and defects"}
+datasets:
+  si-mfi-direct: {label: "Silicon: 80 % PBE + 10 % SCAN (DIRECT-sampled)", materials: [si], properties: [Energy, Forces], provenance: Augmented, calc: scan, sampling: [direct]}
+  si-mfi-random: {label: "Silicon: 80 % PBE + 10 % SCAN (random)", materials: [si], properties: [Energy, Forces], provenance: Augmented, calc: scan, sampling: [random]}
+  si-mfi-narrow: {label: "Silicon: 80 % PBE + 10 % SCAN (narrow)", materials: [si], properties: [Energy, Forces], provenance: Augmented, calc: scan, sampling: [narrow]}
+  si-1fi-10: {label: "Silicon: 10 % SCAN only", materials: [si], properties: [Energy, Forces], provenance: Published, calc: scan}
+  w-mfi-10: {label: "Water: 80 % RPBE + 10 % SCAN (random)", materials: [water], properties: [Energy, Forces], provenance: Augmented, calc: scan, sampling: [random]}
+methods:
+  M3GNet:
+    hp: [cutoffRadius, numLayers, numFeatures, learningRate, batchSize]
+    loss: "MSE of energy per atom plus weighted MSE of force components"
+    algorithm: "Adam with cosine decay to 1 % in 100 epochs; early stopping after 200 epochs without improvement"
+    impl: {lib: M3GNet, comment: "matgl"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  si-mfi-direct: {label: "10%-mfi-DIRECT M3GNet for silicon (325,757 parameters)", method: M3GNet, dataset: si-mfi-direct, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, numFeatures: {v: 64, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 16, loc: "Methods"}}, model: "10%-mfi-DIRECT M3GNet for silicon"}
+  si-mfi-random: {label: "10%-mfi-random M3GNet for silicon", method: M3GNet, dataset: si-mfi-random, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, numFeatures: {v: 64, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 16, loc: "Methods"}}, model: "10%-mfi-random M3GNet for silicon"}
+  si-mfi-narrow: {label: "10%-mfi-narrow M3GNet for silicon", method: M3GNet, dataset: si-mfi-narrow, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, numFeatures: {v: 64, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 16, loc: "Methods"}}, model: "10%-mfi-narrow M3GNet for silicon"}
+  si-1fi-10: {label: "10%-1fi SCAN M3GNet for silicon (221,597 parameters)", method: M3GNet, dataset: si-1fi-10, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, numFeatures: {v: 64, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 16, loc: "Methods"}}, model: "10%-1fi SCAN M3GNet for silicon"}
+  w-mfi-10: {label: "10%-mfi M3GNet for water (325,821 parameters)", method: M3GNet, dataset: w-mfi-10, settings: {cutoffRadius: {v: 5, loc: "Methods"}, numLayers: {v: 3, loc: "Methods"}, numFeatures: {v: 64, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods"}, batchSize: {v: 4, loc: "Methods"}}, model: "10%-mfi M3GNet for water"}
+results:
+  - {key: si-mfi-direct-test, model: si-mfi-direct, material: si, role: test, eval_data: {label: "Silicon SCAN test set (half of the 20 % SCAN structures absent from all training data)", location: "Fig. 2; Fig. 5"}, metrics: [[MAE, Energy, 32, meV/atom, "test energy MAE on si: 10%-mfi-DIRECT M3GNet", "Fig. 5 (0.032 eV/atom)"], [MAE, Force, 0.1, eV/A, "test force MAE on si: 10%-mfi-DIRECT M3GNet", "Fig. 5"]]}
+  - {key: si-mfi-random-test, model: si-mfi-random, material: si, role: test, eval_data: {label: "Silicon SCAN test set (half of the 20 % SCAN structures absent from all training data)", location: "Fig. 2; Fig. 5"}, metrics: [[MAE, Energy, 31, meV/atom, "test energy MAE on si: 10%-mfi-random M3GNet", "Fig. 5 (0.031 eV/atom)"], [MAE, Force, 0.099, eV/A, "test force MAE on si: 10%-mfi-random M3GNet", "Fig. 5"]]}
+  - {key: si-mfi-narrow-test, model: si-mfi-narrow, material: si, role: test, eval_data: {label: "Silicon SCAN test set (half of the 20 % SCAN structures absent from all training data)", location: "Fig. 2; Fig. 5"}, metrics: [[MAE, Energy, 126, meV/atom, "test energy MAE on si: 10%-mfi-narrow M3GNet", "Fig. 5 (0.126 eV/atom)"], [MAE, Force, 0.121, eV/A, "test force MAE on si: 10%-mfi-narrow M3GNet", "Fig. 5"]]}
+  - {key: si-1fi-10-test, model: si-1fi-10, material: si, role: test, eval_data: {label: "Silicon SCAN test set (half of the 20 % SCAN structures absent from all training data)", location: "Fig. 2; Fig. 3"}, metrics: [[MAE, Energy, 62, meV/atom, "test energy MAE on si: 10%-1fi SCAN M3GNet", "Results, Convergence (0.062 eV; per atom as in Fig. 3)"], [MAE, Force, 0.127, eV/A, "test force MAE on si: 10%-1fi SCAN M3GNet", "Results, Convergence"]]}
+  - {key: si-mfi-random-gap18, model: si-mfi-random, material: si, role: external, eval_data: {label: "297 diverse bulk silicon structures from the GAP-18 data set, recomputed with SCAN", location: "Results, Effect of sampling"}, metrics: [[MAE, Energy, 114, meV/atom, "external energy MAE on si: 10%-mfi-random M3GNet", "Results (0.114 eV/atom)"], [MAE, Force, 0.088, eV/A, "external force MAE on si: 10%-mfi-random M3GNet", "Results"]]}
+  - {key: si-mfi-direct-gap18, model: si-mfi-direct, material: si, role: external, eval_data: {label: "297 diverse bulk silicon structures from the GAP-18 data set, recomputed with SCAN", location: "Results, Effect of sampling"}, metrics: [[MAE, Energy, 40, meV/atom, "external energy MAE on si: 10%-mfi-DIRECT M3GNet", "Results (0.040 eV/atom)"], [MAE, Force, 0.091, eV/A, "external force MAE on si: 10%-mfi-DIRECT M3GNet", "Results"]]}
+  - {key: w-mfi-10-test, model: w-mfi-10, material: water, role: test, eval_data: {label: "Water SCAN test set", location: "Fig. 9"}, metrics: [[MAE, Energy, 0.2, meV/atom, "test energy MAE on water: 10%-mfi M3GNet (water)", "Results, Water"], [MAE, Force, 0.014, eV/A, "test force MAE on water: 10%-mfi M3GNet (water)", "Results, Water"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Energy MAEs in eV/atom are converted exactly to meV/atom (original values in the locations); the 1fi silicon energy MAE is written as '0.062 eV' in the text and read as per atom from the axis of Fig. 3. Other data fractions (Fig. 3, Fig. 9) and the water 1fi models are figure-only."
+  - "Data-set sizes are not stated in the main text. Equations of state (Table 1), amorphous-silicon coordination, water RDFs and ice relaxations are properties."
