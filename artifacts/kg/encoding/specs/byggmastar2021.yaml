@@ -1,0 +1,50 @@
+id: byggmastar2021
+source:
+  rank: 477
+  year: "2021"
+  first_author: "Jesper Byggmästar"
+  title: "Modeling refractory high-entropy alloys with efficient machine-learned interatomic potentials: defects and segregation"
+  venue: "arXiv (Cornell University)"
+  doi: "10.1103/physrevb.104.104101"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2106.03369v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8bdce5533565ae35969877b8533e290f9130d737bd03857e846861714dd7d4b7"
+study_label: "Byggmastar, Nordlund and Djurabekova (2021): tabGAP, a tabulated two- and three-body GAP for Mo-Nb-Ta-V-W, applied to defects and segregation in the MoNbTaVW high-entropy alloy"
+scope: |
+  Encoding scope: the Mo-Nb-Ta-V-W GAP with a screened-Coulomb
+  repulsive pair term, GAP pair and three-body terms (5 A cutoffs,
+  squared-exponential kernels), trained with QUIP on VASP PBE data and
+  tabulated into cubic splines (tabGAP, a LAMMPS pair style); the test
+  RMSEs by structure class (Table I). Bulk, elastic, defect, ordering and
+  annealing results are properties.
+materials:
+  mnbtvw: {label: "Mo-Nb-Ta-V-W bcc crystals and alloys at all compositions, defects, surfaces and liquids", class: "High-entropy alloys"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "0.15 1/A maximum spacing, Gamma-centred Monkhorst-Pack", comment: "0.1 eV Methfessel-Paxton smearing"}
+sampling:
+  mixed: {label: "Bulk bcc crystals (random and ordered alloys), vacancies and interstitials in pure elements and the equiatomic HEA, liquids, HEA crystals with an added interstitial, surfaces (details in the Supplemental Material)"}
+datasets:
+  train: {label: "Mo-Nb-Ta-V-W training set (energies, forces, virials)", materials: [mnbtvw], properties: [Energy, Forces, Virials], provenance: InHouse, calc: vasp, sampling: [mixed]}
+methods:
+  tabGAP:
+    hp: [cutoffRadius]
+    loss: "GAP regression to total energies, forces and virials; 2b and 3b squared-exponential kernels (length scale 1 A), delta_2b^2 = 10 eV, delta_3b^2 = 1 eV, M_2b = 20 and M_3b = 300 sparse points per element combination"
+    algorithm: "GAP fit with QUIP, then cubic-spline tabulation (1D pair, 3D triplet grids)"
+    impl: {lib: QUIP, comment: "Tabulation and LAMMPS pair style from gitlab.com/jezper/tabgap"}
+    sims: [MolecularDynamics, MonteCarlo, NudgedElasticBand, GeometryOptimization]
+runs:
+  tabgap: {label: "tabGAP for Mo-Nb-Ta-V-W", method: tabGAP, dataset: train, settings: {cutoffRadius: {v: 5, loc: "Sec. II A"}}, model: "tabGAP Mo-Nb-Ta-V-W (2021)"}
+results:
+  - {key: t-pure, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Bulk pure elements (randomly displaced) (220 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.17, meV/atom, "test energy RMSE on bulk pure elements (randomly displaced): tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.15, eV/A, "test force-component RMSE on bulk pure elements (randomly displaced): tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-random, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Bulk random alloys (100 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 2.99, meV/atom, "test energy RMSE on bulk random alloys: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.11, eV/A, "test force-component RMSE on bulk random alloys: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-ordered, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Bulk ordered alloys (165 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.31, meV/atom, "test energy RMSE on bulk ordered alloys: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.04, eV/A, "test force-component RMSE on bulk ordered alloys: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-hea, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Bulk HEA (40 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.03, meV/atom, "test energy RMSE on bulk hea: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.09, eV/A, "test force-component RMSE on bulk hea: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-vac, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Vacancies in HEA (10 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.59, meV/atom, "test energy RMSE on vacancies in hea: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.09, eV/A, "test force-component RMSE on vacancies in hea: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-sia, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Interstitials in HEA (10 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 3.39, meV/atom, "test energy RMSE on interstitials in hea: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.22, eV/A, "test force-component RMSE on interstitials in hea: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-liqpure, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Liquid pure elements (225 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 28.61, meV/atom, "test energy RMSE on liquid pure elements: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.71, eV/A, "test force-component RMSE on liquid pure elements: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+  - {key: t-liqhea, model: tabgap, material: mnbtvw, role: test, eval_data: {label: "Independent test set: Liquid HEA (11 structures)", location: "Table I"}, metrics: [[RMSE, Energy, 40.03, meV/atom, "test energy RMSE on liquid hea: tabGAP Mo-Nb-Ta-V-W", "Table I"], [RMSE, Force, 0.78, eV/A, "test force-component RMSE on liquid hea: tabGAP Mo-Nb-Ta-V-W", "Table I"]]}
+resources: |
+  The tabulation gives a speed-up of about two orders of magnitude over evaluating the GAP directly, comparable to Tersoff and MEAM potentials (Sec. II B); no absolute timing is stated.
+gaps:
+  - "Training-set size, the SOAP-GAP comparison and the W-Mo test are in the Supplemental Material, not in the text read. Bulk-modulus and mixing-energy RMSEs of Fig. 1 (2.31 GPa, 3.56 meV/atom) are derived-property errors and are not encoded."

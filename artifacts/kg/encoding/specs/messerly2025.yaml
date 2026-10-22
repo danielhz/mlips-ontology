@@ -1,0 +1,75 @@
+id: messerly2025
+source:
+  rank: 476
+  year: "2025"
+  first_author: "Mitchell Messerly"
+  title: "Multi-fidelity learning for interatomic potentials: low-level forces and high-level energies are all you need*"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae040b"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2505.01590v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "4232ff9297bfd22a6026982f0068ab99c404b2fc6882276c7241ad5267cbb917"
+study_label: "Messerly et al. (2025): multi-fidelity HIP-NN training with low-level forces and high-level energies on the ANI-1x/ANI-1ccx subset"
+scope: |
+  Encoding scope: single- and multi-fidelity HIP-NN ensembles (8 models
+  each; shared interaction blocks, fidelity-specific linear output
+  layers) trained on the ~460k-structure ANI-1x subset that matches
+  ANI-1ccx, with DFT/DZ, DFT/TZ, MP2/TZ and CCSD(T)*/CBS labels; the
+  main-text test RMSEs of Tables 2-4 (ensemble means with 95%
+  confidence intervals). Conformer and torsion energy-difference errors
+  are derived properties. SI tables are not encoded.
+materials:
+  organics: {label: "Organic molecules of C, H, N, O (ANI-1x subset matching ANI-1ccx)", class: "Organic molecules (gas phase)"}
+  gdb1013: {label: "Larger organic molecules with 10-13 heavy atoms (COMP6 GDB10to13)", class: "Organic molecules (gas phase)"}
+reference:
+  dz: {type: DFT, xc: wB97X, basis: "6-31G(d)", comment: "DFT/DZ (lowest fidelity)"}
+  tz: {type: DFT, xc: wB97X, basis: "def2-TZVPP", comment: "DFT/TZ"}
+  mp2: {type: WF, wf: MP2, basis: "cc-pVTZ", comment: "MP2/TZ (energies only in training)"}
+  cc: {type: WF, wf: CCSDT, basis: "CBS", comment: "CCSD(T)*/CBS of ANI-1ccx (energies only)"}
+sampling:
+  ani: {label: "ANI-1x active-learning structures restricted to the ANI-1ccx subset; random 10% held out for testing"}
+datasets:
+  d-sf-tz-e: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for SF-TZ/E: DFT/TZ energies only", materials: [organics], properties: [Energy], provenance: Published, calc: tz, sampling: [ani]}
+  d-sf-tz-ef: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for SF-TZ/EF: DFT/TZ energies and forces", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: tz, sampling: [ani]}
+  d-mf-dze-tze: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/E-TZ/E: DFT/DZ energies and DFT/TZ energies", materials: [organics], properties: [Energy], provenance: Published, calc: tz, sampling: [ani]}
+  d-mf-dzef-tze: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/EF-TZ/E: DFT/DZ energies and forces, DFT/TZ energies", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: tz, sampling: [ani]}
+  d-mf-dzef-tzef: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/EF-TZ/EF: DFT/DZ and DFT/TZ energies and forces", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: tz, sampling: [ani]}
+  d-sf-mp2-e: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for SF-MP2/E: MP2/TZ energies only", materials: [organics], properties: [Energy], provenance: Published, calc: mp2, sampling: [ani]}
+  d-mf-dzef-mp2e: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/EF-MP2/E: DFT/DZ energies and forces, MP2/TZ energies", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: mp2, sampling: [ani]}
+  d-sf-cc-e: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for SF-CC/E: CCSD(T)*/CBS energies only", materials: [organics], properties: [Energy], provenance: Published, calc: cc, sampling: [ani]}
+  d-mf-dze-cce: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/E-CC/E: DFT/DZ energies and CCSD(T)*/CBS energies", materials: [organics], properties: [Energy], provenance: Published, calc: cc, sampling: [ani]}
+  d-mf-dzef-cce: {label: "ANI-1x/ANI-1ccx subset (about 460k structures) for MF-DZ/EF-CC/E: DFT/DZ energies and forces, CCSD(T)*/CBS energies", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: cc, sampling: [ani]}
+methods:
+  HIP-NN:
+    loss: "Sum over fidelities of energy, force (where available) and hierarchicality terms, each RMSE + MAE, all weights 1"
+    algorithm: "Multi-fidelity: shared interaction blocks, fidelity-specific linear output layers; ensembles of 8 models"
+    impl: {lib: {local: hippynn}}
+    sims: [GeometryOptimization]
+runs:
+  sf-tz-e: {label: "HIP-NN SF-TZ/E ensemble", method: HIP-NN, dataset: d-sf-tz-e, model: "HIP-NN SF-TZ/E"}
+  sf-tz-ef: {label: "HIP-NN SF-TZ/EF ensemble", method: HIP-NN, dataset: d-sf-tz-ef, model: "HIP-NN SF-TZ/EF"}
+  mf-dze-tze: {label: "HIP-NN MF-DZ/E-TZ/E ensemble", method: HIP-NN, dataset: d-mf-dze-tze, model: "HIP-NN MF-DZ/E-TZ/E"}
+  mf-dzef-tze: {label: "HIP-NN MF-DZ/EF-TZ/E ensemble", method: HIP-NN, dataset: d-mf-dzef-tze, model: "HIP-NN MF-DZ/EF-TZ/E"}
+  mf-dzef-tzef: {label: "HIP-NN MF-DZ/EF-TZ/EF ensemble", method: HIP-NN, dataset: d-mf-dzef-tzef, model: "HIP-NN MF-DZ/EF-TZ/EF"}
+  sf-mp2-e: {label: "HIP-NN SF-MP2/E ensemble", method: HIP-NN, dataset: d-sf-mp2-e, model: "HIP-NN SF-MP2/E"}
+  mf-dzef-mp2e: {label: "HIP-NN MF-DZ/EF-MP2/E ensemble", method: HIP-NN, dataset: d-mf-dzef-mp2e, model: "HIP-NN MF-DZ/EF-MP2/E"}
+  sf-cc-e: {label: "HIP-NN SF-CC/E ensemble", method: HIP-NN, dataset: d-sf-cc-e, model: "HIP-NN SF-CC/E"}
+  mf-dze-cce: {label: "HIP-NN MF-DZ/E-CC/E ensemble", method: HIP-NN, dataset: d-mf-dze-cce, model: "HIP-NN MF-DZ/E-CC/E"}
+  mf-dzef-cce: {label: "HIP-NN MF-DZ/EF-CC/E ensemble", method: HIP-NN, dataset: d-mf-dzef-cce, model: "HIP-NN MF-DZ/EF-CC/E"}
+results:
+  - {key: sf-tz-e-insample, model: sf-tz-e, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, DFT/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 2.75, kcal/mol, "in-sample test DFT/TZ energy RMSE: HIP-NN SF-TZ/E (mean of 8 models)", "Table 2"], [RMSE, Force, 13.52, kcal/mol/A, "in-sample test DFT/TZ force RMSE: HIP-NN SF-TZ/E (mean of 8 models)", "Table 2"]]}
+  - {key: sf-tz-ef-insample, model: sf-tz-ef, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, DFT/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 1.6, kcal/mol, "in-sample test DFT/TZ energy RMSE: HIP-NN SF-TZ/EF (mean of 8 models)", "Table 2"], [RMSE, Force, 3.52, kcal/mol/A, "in-sample test DFT/TZ force RMSE: HIP-NN SF-TZ/EF (mean of 8 models)", "Table 2"]]}
+  - {key: mf-dze-tze-insample, model: mf-dze-tze, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, DFT/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 2.78, kcal/mol, "in-sample test DFT/TZ energy RMSE: HIP-NN MF-DZ/E-TZ/E (mean of 8 models)", "Table 2"], [RMSE, Force, 11.92, kcal/mol/A, "in-sample test DFT/TZ force RMSE: HIP-NN MF-DZ/E-TZ/E (mean of 8 models)", "Table 2"]]}
+  - {key: mf-dzef-tze-insample, model: mf-dzef-tze, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, DFT/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 1.49, kcal/mol, "in-sample test DFT/TZ energy RMSE: HIP-NN MF-DZ/EF-TZ/E (mean of 8 models)", "Table 2"], [RMSE, Force, 4.16, kcal/mol/A, "in-sample test DFT/TZ force RMSE: HIP-NN MF-DZ/EF-TZ/E (mean of 8 models)", "Table 2"]]}
+  - {key: mf-dzef-tzef-insample, model: mf-dzef-tzef, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, DFT/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 1.34, kcal/mol, "in-sample test DFT/TZ energy RMSE: HIP-NN MF-DZ/EF-TZ/EF (mean of 8 models)", "Table 2"], [RMSE, Force, 3.42, kcal/mol/A, "in-sample test DFT/TZ force RMSE: HIP-NN MF-DZ/EF-TZ/EF (mean of 8 models)", "Table 2"]]}
+  - {key: sf-mp2-e-insample, model: sf-mp2-e, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, MP2/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 2.95, kcal/mol, "in-sample test MP2/TZ energy RMSE: HIP-NN SF-MP2/E (mean of 8 models)", "Table 3"]]}
+  - {key: sf-mp2-e-gdb, model: sf-mp2-e, material: gdb1013, role: external, eval_data: {label: "COMP6 GDB10to13 conformers within 100 kcal/mol, MP2/TZ forces", location: "Sec. 2.2.2"}, metrics: [[RMSE, Force, 8.59, kcal/mol/A, "GDB10to13 MP2/TZ force RMSE: HIP-NN SF-MP2/E (mean of 8 models)", "Table 3"]]}
+  - {key: mf-dzef-mp2e-insample, model: mf-dzef-mp2e, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, MP2/TZ labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 1.72, kcal/mol, "in-sample test MP2/TZ energy RMSE: HIP-NN MF-DZ/EF-MP2/E (mean of 8 models)", "Table 3"]]}
+  - {key: mf-dzef-mp2e-gdb, model: mf-dzef-mp2e, material: gdb1013, role: external, eval_data: {label: "COMP6 GDB10to13 conformers within 100 kcal/mol, MP2/TZ forces", location: "Sec. 2.2.2"}, metrics: [[RMSE, Force, 3.42, kcal/mol/A, "GDB10to13 MP2/TZ force RMSE: HIP-NN MF-DZ/EF-MP2/E (mean of 8 models)", "Table 3"]]}
+  - {key: sf-cc-e-insample, model: sf-cc-e, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, CCSD(T)*/CBS labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 2.78, kcal/mol, "in-sample test CCSD(T)*/CBS energy RMSE: HIP-NN SF-CC/E (mean of 8 models)", "Table 4"]]}
+  - {key: mf-dze-cce-insample, model: mf-dze-cce, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, CCSD(T)*/CBS labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 2.76, kcal/mol, "in-sample test CCSD(T)*/CBS energy RMSE: HIP-NN MF-DZ/E-CC/E (mean of 8 models)", "Table 4"]]}
+  - {key: mf-dzef-cce-insample, model: mf-dzef-cce, material: organics, role: test, eval_data: {label: "In-sample held-out 10% of the ANI-1x/ANI-1ccx subset, CCSD(T)*/CBS labels", location: "Sec. 2.2.2"}, metrics: [[RMSE, Energy, 1.52, kcal/mol, "in-sample test CCSD(T)*/CBS energy RMSE: HIP-NN MF-DZ/EF-CC/E (mean of 8 models)", "Table 4"]]}
+gaps:
+  - "Conformer (Delta E_conf) and torsion (Delta E_tors) energy-difference RMSEs of Table 4 are derived-property errors and are not encoded; nor are the ANI-1ccx comparison values (2.57, 2.62, 0.77 kcal/mol), which come from a published model evaluated on a split it may have been trained on."
+  - "Seven further models of Table 1 (SF-DZ/E, SF-DZ/EF, MF-DZ/E-TZ/EF, MF-TZ/EF-MP2/E, MF-TZ/E-CC/E, MF-TZ/EF-CC/E, MF-DZ/EF-TZ/EF-CC/E) have errors only in the Supplementary Material; not encoded. The +/- values are 95% confidence intervals over 8 models. The subset size is approximate (about 460k), so no n."
