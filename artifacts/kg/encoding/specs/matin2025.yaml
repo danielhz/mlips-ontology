@@ -1,0 +1,43 @@
+id: matin2025
+source:
+  rank: 427
+  year: "2025"
+  first_author: "Sakib Matin"
+  title: "Ensemble Knowledge Distillation for Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2503.14293"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2503.14293v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5227301a0629e34f0a1a6380a832190a9c28de4bf51ce517bb31ec35e8f96532"
+study_label: "Matin et al. (2025): ensemble knowledge distillation (EKD) of HIP-NN potentials trained on energy-only coupled-cluster data"
+scope: |
+  Encoding scope: HIP-NN teacher models trained on ANI-1ccx CCSD(T)/CBS
+  energies, student HIP-NNs trained on the energies plus
+  ensemble-averaged teacher forces (first and second generation), control
+  and baseline models, and the single-teacher distillation test with the
+  CC-COMP6 'GDB 10-13' RMSEs stated in the SI. Ensemble results
+  (Figs. 2, 4-6) and MD stability (Fig. 3) are figure-only.
+materials:
+  org: {label: "Small organic molecules with C, H, N, O (ANI-1ccx) and the larger COMP6 benchmark molecules", class: "Organic and biochemical molecules (C, N, O, H)"}
+reference:
+  ccsdt: {type: WF, wf: CCSDT, basis: "CBS", code: ORCA, comment: "ANI-1ccx CCSD(T)/CBS energies (Refs. 20, 40); the wB97x DFT labels of the same configurations are used only in Fig. 5."}
+datasets:
+  ani1ccx: {label: "ANI-1ccx (about 4.9e5 configurations; energies only)", materials: [org], properties: [Energy], provenance: Published, calc: ccsdt}
+methods:
+  HIP-NN:
+    hp: [numLayers, cutoffRadius, numRadialBasis]
+    loss: "RMSE + MAE of energies (teachers); plus scheduled force term on ensemble-averaged teacher forces (students); L2 (1e-4) and hierarchicality (0.1) regularisation"
+    impl: {lib: {local: hippynn}}
+    sims: [MolecularDynamics]
+runs:
+  teacher1: {label: "Single HIP-NN teacher trained on ANI-1ccx energies (2 interaction layers, lmax 2)", method: HIP-NN, dataset: ani1ccx, settings: {numLayers: {v: 2, loc: "SI 3.1"}, cutoffRadius: {v: 6.5, loc: "SI 3.1 (hard maximum cutoff)"}, numRadialBasis: {v: 20, loc: "SI 3.1"}}, model: "HIP-NN ANI-1ccx teacher (single)"}
+  student1: {label: "Single HIP-NN student trained on ANI-1ccx energies and the single teacher's forces", method: HIP-NN, dataset: ani1ccx, settings: {numLayers: {v: 2, loc: "SI 3.1"}, cutoffRadius: {v: 6.5, loc: "SI 3.1"}, numRadialBasis: {v: 20, loc: "SI 3.1"}}, model: "HIP-NN ANI-1ccx student (single-teacher KD)", base_model: {run: teacher1, relation: distilled, location: "SI 1"}}
+results:
+  - {key: teacher1-gdb, model: teacher1, material: org, role: external, eval_data: {label: "CC-COMP6 GDB 10-13 subset (CCSD(T)/CBS)", location: "SI 1"}, metrics: [[RMSE, Energy, 3.31, kcal/mol, "Energy RMSE on GDB 10-13: HIP-NN single teacher", "SI 1"], [RMSE, Energy, 2.45, kcal/mol, "Conformer energy difference RMSE on GDB 10-13: HIP-NN single teacher", "SI 1"]]}
+  - {key: student1-gdb, model: student1, material: org, role: external, eval_data: {label: "CC-COMP6 GDB 10-13 subset (CCSD(T)/CBS)", location: "SI 1"}, metrics: [[RMSE, Energy, 2.93, kcal/mol, "Energy RMSE on GDB 10-13: HIP-NN single-teacher student", "SI 1"], [RMSE, Energy, 2.11, kcal/mol, "Conformer energy difference RMSE on GDB 10-13: HIP-NN single-teacher student", "SI 1"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Ensemble teacher, first- and second-generation student, control and baseline errors on CC-COMP6 and DFT-COMP6 (Figs. 2, 4, 5), the TorchANI-teacher variant (Fig. 6) and MD stability (Fig. 3) are figure-only. Whether the energy RMSE is per molecule is not stated; kcal/mol is used as printed."
+  - "The ANI-1ccx data set is the registry data set ANI-1ccx; the spec's data-set node is paper-local because data-set registry links are made only through eval_data."

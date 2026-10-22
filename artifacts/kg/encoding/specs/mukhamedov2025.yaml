@@ -1,0 +1,40 @@
+id: mukhamedov2025
+source:
+  rank: 430
+  year: "2025"
+  first_author: "B. O. Mukhamedov"
+  title: "Machine learning interatomic potential for the low-modulus Ti-Nb-Zr alloys in the vicinity of dynamical instability"
+  venue: "Materials & Design"
+  doi: "10.1016/j.matdes.2025.113865"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2412.06270v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f48487ac453a83a0ce0c7c315d64617f91a0594713dea24523f2beb4a9b6a8fa"
+study_label: "Mukhamedov et al. (2025): an actively learned moment tensor potential for low-modulus Ti-Nb-Zr alloys near dynamical instability"
+scope: |
+  Encoding scope: the VASP GGA data for Ti94-xNbxZr6 SQS (128 atoms;
+  1-30 at.% Nb), the MTP (level 16g, 380 basis functions, 5 A cutoff)
+  initialised by active selection from Gamma-point AIMD and then actively
+  learned with LAMMPS MD at 300-1300 K, ending with 880 configurations,
+  and its use for elastic constants and moduli. Errors are in the SI
+  only; elastic properties are properties.
+materials:
+  tinbzr: {label: "Bcc Ti94-xNbxZr6 alloys (x = 1, 6, 15, 22, 30) as 128-atom SQS", class: "High-entropy alloys"}
+reference:
+  gga: {type: DFT, code: VASP, pp: PAW, cutoff: 700, kpoints: "4x4x4 (Gamma point only for the initial AIMD)", comment: "GGA (functional cited, not named); SQS supercells (Sec. 2.1)."}
+sampling:
+  al: {label: "Active selection from Gamma-point AIMD (10 iterations, 420 configurations), then 30 + 25 + 5 MLIP-2/LAMMPS active-learning iterations with extrapolation-grade selection at 300-1300 K; low-accuracy data removed"}
+datasets:
+  final: {label: "Final Ti-Nb-Zr training set (high-accuracy single points)", materials: [tinbzr], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 880, loc: "Sec. 2.4"}, calc: gga, sampling: [al]}
+methods:
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    impl: {lib: MLIP, comment: "MLIP-2"}
+    sims: [MolecularDynamics]
+runs:
+  mtp: {label: "MTP 16g (380 basis functions) for Ti-Nb-Zr", method: MTP, dataset: final, settings: {cutoffRadius: {v: 5, loc: "Sec. 2.2"}, momentLevel: {v: 16, loc: "Sec. 2.2 (16g)"}}, model: "Ti-Nb-Zr MTP 16g (Mukhamedov 2025)"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Accuracy checks of the MTP are in SI Sec. S1-S2; no errors are stated in the main text. Elastic constants, phonon-based stability, polycrystalline moduli and anisotropy are properties."

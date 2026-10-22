@@ -1,0 +1,57 @@
+id: wehrhan2025
+source:
+  rank: 428
+  year: "2025"
+  first_author: "Leon Wehrhan"
+  title: "MLIPAudit: A benchmarking tool for Machine Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2511.20487"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2511.20487v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3845574f2becc6e81e0e38f3251a19b67aadf581e9cace60d30eee63cb2ea6be"
+study_label: "Wehrhan et al. (2025): MLIPAudit, a benchmarking suite for MLIPs on molecular, liquid, biomolecular and reactivity tasks"
+scope: |
+  Encoding scope: the models benchmarked with MLIPAudit v0.1.0: eight
+  internal models trained with the InstaDeep mlip library (ViSNet, MACE
+  and NequIP on curated SPICE2 or Transition-1x; two ViSNet models on
+  SPICE2 + T1x recomputed in OMol25) and three external pretrained models
+  (UMA-Small, MACE-OFF, MACE-MP). Results are normalised benchmark scores
+  (Tables 2-3, 7-10) and figure-only errors, so no error metrics are
+  encoded.
+materials:
+  mol: {label: "Small organic molecules, molecular liquids, biomolecules and reactions (MLIPAudit benchmark sets)", class: "Organic and biochemical molecules (C, N, O, H)"}
+datasets:
+  spice2: {label: "Curated SPICE2 (neutral systems; as in Brunken et al.)", materials: [mol], properties: [Energy, Forces], provenance: Published}
+  t1x: {label: "Transition-1x (1M samples; 95/5 train/validation)", materials: [mol], properties: [Energy, Forces], provenance: Published}
+  omol-c: {label: "SPICE2 + Transition-1x as recomputed in OMol25 (charged; 50k T1x samples)", materials: [mol], properties: [Energy, Forces], provenance: Published}
+  omol-n: {label: "SPICE2 + Transition-1x as recomputed in OMol25 (neutral; 1M T1x samples)", materials: [mol], properties: [Energy, Forces], provenance: Published}
+methods:
+  ViSNet:
+    impl: {lib: {local: "mlip (InstaDeep, JAX)"}}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  MACE:
+    sims: [MolecularDynamics, NudgedElasticBand]
+  NequIP:
+    impl: {lib: {local: "mlip (InstaDeep, JAX)"}}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  UMA:
+    sims: [MolecularDynamics]
+runs:
+  visnet-spice2: {label: "ViSNet-SPICE2 (internal model, hyperparameters as in Brunken et al.)", method: ViSNet, dataset: spice2, model: "ViSNet-SPICE2 (MLIPAudit)"}
+  mace-spice2: {label: "MACE-SPICE2 (internal model, hyperparameters as in Brunken et al.)", method: MACE, dataset: spice2, model: "MACE-SPICE2 (MLIPAudit)"}
+  nequip-spice2: {label: "NequIP-SPICE2 (internal model, hyperparameters as in Brunken et al.)", method: NequIP, dataset: spice2, model: "NequIP-SPICE2 (MLIPAudit)"}
+  visnet-t1x: {label: "ViSNet-t1x (internal model, hyperparameters as in Brunken et al.)", method: ViSNet, dataset: t1x, model: "ViSNet-t1x (MLIPAudit)"}
+  mace-t1x: {label: "MACE-t1x (internal model, hyperparameters as in Brunken et al.)", method: MACE, dataset: t1x, model: "MACE-t1x (MLIPAudit)"}
+  nequip-t1x: {label: "NequIP-t1x (internal model, hyperparameters as in Brunken et al.)", method: NequIP, dataset: t1x, model: "NequIP-t1x (MLIPAudit)"}
+  visnet-sp-t1x-c: {label: "ViSNet-SPICE2(charged)-t1x (internal model, hyperparameters as in Brunken et al.)", method: ViSNet, dataset: omol-c, model: "ViSNet-SPICE2(charged)-t1x (MLIPAudit)"}
+  visnet-sp-t1x-n: {label: "ViSNet-SPICE2(neutral)-t1x (internal model, hyperparameters as in Brunken et al.)", method: ViSNet, dataset: omol-n, model: "ViSNet-SPICE2(neutral)-t1x (MLIPAudit)"}
+  uma-small: {label: "UMA-Small as distributed (checkpoint not named)", method: UMA, model: "UMA-Small"}
+  mace-off: {label: "MACE-OFF as distributed (size not named)", method: MACE, model: "MACE-OFF"}
+  mace-mp: {label: "MACE-MP as distributed (release not named)", method: MACE, model: "MACE-MP"}
+results: []
+resources: |
+  Benchmark run times are discussed qualitatively (biomolecular MD is the most expensive benchmark).
+gaps:
+  - "MLIPAudit reports normalised scores between 0 and 1 (overall, per category and per benchmark; Tables 2-3, 7-10), which are not energy/force errors. Dihedral-scan, conformer and reactivity MAEs/RMSEs are shown only in Figs. 2, 4 and 5 (the text gives bounds such as MAE below 0.12 kcal/mol)."
+  - "The internal SPICE2 models are trained as in Brunken et al. (brunken2025) but are separate nodes here; UMA-Small, MACE-OFF and MACE-MP checkpoints are not named precisely."
