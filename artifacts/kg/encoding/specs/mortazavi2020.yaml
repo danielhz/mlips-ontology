@@ -1,0 +1,47 @@
+id: mortazavi2020
+source:
+  rank: 323
+  year: "2020"
+  first_author: "Bohayra Mortazavi"
+  title: "Machine-learning interatomic potentials enable first-principles multiscale modeling of lattice thermal conductivity in graphene/borophene heterostructures"
+  venue: "Materials Horizons"
+  doi: "10.1039/d0mh00787k"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2006.06794v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5189241e692890742a50d4c5323385e106f22aaae16b360fbfc3181bac49d788"
+study_label: "Mortazavi et al. (2020): MTP-based multiscale modelling of lattice thermal conductivity in graphene/borophene heterostructures"
+scope: |
+  Encoding scope: moment tensor potentials trained on short PBE AIMD
+  trajectories (with extrapolation-grade selection) for pristine graphene,
+  pristine borophene and graphene/borophene heterostructures, used in NEMD
+  and BTE thermal-transport calculations feeding a finite-element model.
+  The MTP errors are in Supplementary Table S1 (not in the PDF; described
+  as 'a few meV'), so no metric is encoded.
+materials:
+  graphene: {label: "Graphene", formula: "C", class: "2D material", wikidata: Q623}
+  borophene: {label: "Borophene", formula: "B", class: "2D material"}
+  gr-b: {label: "Coplanar graphene/borophene heterostructures with ten grain-boundary configurations", class: "2D lateral heterostructure"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "3x3x1 Monkhorst-Pack for AIMD", comment: "AIMD with 1 fs time step at 100, 300, 600 and 700 K (fewer than 1,000 steps each)."}
+sampling:
+  aimd: {label: "Every 10th step of short AIMD trajectories at 100-700 K, plus configurations with high extrapolation grade from the full trajectories"}
+datasets:
+  graphene: {label: "Graphene AIMD training configurations", materials: [graphene], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+  borophene: {label: "Borophene AIMD training configurations", materials: [borophene], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+  hetero: {label: "Heterostructure AIMD training configurations (including the pristine graphene and borophene trajectories)", materials: [gr-b, graphene, borophene], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [aimd]}
+methods:
+  MTP:
+    algorithm: "Training on subsampled AIMD, then retraining after adding configurations with high extrapolation grades"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  mtp-graphene: {label: "Mono-elemental MTP for graphene", method: MTP, dataset: graphene, model: "Graphene MTP"}
+  mtp-borophene: {label: "Mono-elemental MTP for borophene", method: MTP, dataset: borophene, model: "Borophene MTP"}
+  mtp-hetero: {label: "Binary MTP for graphene/borophene heterostructures", method: MTP, dataset: hetero, model: "Graphene/borophene MTP"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "MTP accuracies on additional 4 ps AIMD test trajectories are in Supplementary Table S1, which is not part of the PDF; the main text says only that absolute-energy errors are 'in the order of a few meV'."
+  - "Thermal conductivities and interfacial conductances are properties, not error metrics. MTP levels and cutoffs are given only in the SI."

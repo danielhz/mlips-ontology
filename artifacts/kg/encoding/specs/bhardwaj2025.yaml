@@ -1,0 +1,44 @@
+id: bhardwaj2025
+source:
+  rank: 328
+  year: "2025"
+  first_author: "Utkarsh Bhardwaj"
+  title: "A robust machine learned interatomic potential for Nb: collision cascade simulations with accurate non-equilibrium properties"
+  venue: "Modelling and Simulation in Materials Science and Engineering"
+  doi: "10.1088/1361-651x/ae0505"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2502.03126v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "dba8255fa8863161d92b82e96a09c2ebfbebf6e859b48731e61784b034403b15"
+study_label: "Bhardwaj et al. (2025): a SNAP potential for Nb with correct self-interstitial configurations for collision cascades"
+scope: |
+  Encoding scope: the SNAP potential (with ZBL) for niobium trained on 550
+  PBE configurations selected by Vendi diversity scores and D-optimal
+  design, with its validation/test MAEs. Elastic, thermal, defect and
+  collision-cascade results are properties, not error metrics; the EAM and
+  Finnis-Sinclair comparison potentials are not MLIPs.
+materials:
+  nb: {label: "Niobium: strained bcc crystals, vacancies (up to four), self-interstitial configurations and liquid", formula: "Nb", class: "Refractory bcc metal"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "Energies, forces and stresses; AIMD of defect and liquid configurations (settings not stated in the main text)."}
+sampling:
+  vendi: {label: "Strained, defect and liquid configurations (AIMD frames) selected per category by Vendi-score saturation and D-optimal design"}
+datasets:
+  nb: {label: "Nb training data (550 configurations; 90% training, 10% testing/validation)", materials: [nb], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 550, loc: "Sec. 2.1"}, calc: pbe, sampling: [vendi]}
+hyperparameters:
+  twoJmax: {label: "SNAP angular order 2Jmax of the bispectrum expansion", name: "2Jmax", datatype: integer}
+methods:
+  SNAP:
+    hp: [cutoffRadius, twoJmax]
+    algorithm: "Linear regression on bispectrum components with ZBL short-range repulsion; hyperparameters by Bayesian optimisation"
+    impl: {lib: {local: "FitSNAP / LAMMPS"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  snap-nb: {label: "SNAP potential for Nb (jmax = 6, rcut = 5.11 A)", method: SNAP, dataset: nb, settings: {cutoffRadius: {v: 5.11, loc: "Sec. 2.2"}}, model: "Nb SNAP potential"}
+results:
+  - {key: snap-nb, model: snap-nb, material: nb, role: test, eval_data: {label: "Validation/test set (10% of 550 configurations)", location: "Sec. 2.2"}, metrics: [[MAE, Energy, 0.0121, meV/atom, "Validation/test energy MAE (1.21e-5 eV/atom): Nb SNAP", "Sec. 2.2"], [MAE, Force, 0.0619, meV/A, "Validation/test force MAE (6.19e-5 eV/A): Nb SNAP", "Sec. 2.2"], [MAE, Stress, 7.46e-8, null, "Validation/test stress MAE in eV/A3: Nb SNAP", "Sec. 2.2"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The paper gives 'jmax = 6'; whether this is j or 2j in the SNAP convention is not stated, so no twoJmax value is recorded. The energy and force MAEs given in eV are converted to meV; the stress MAE (eV/A3) has unit null."
+  - "The validation and test sets are reported together ('validation/test set'), so the role is test with that label."

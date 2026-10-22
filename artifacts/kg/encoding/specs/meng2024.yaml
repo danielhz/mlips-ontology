@@ -1,0 +1,55 @@
+id: meng2024
+source:
+  rank: 326
+  year: "2024"
+  first_author: "Fan-Shun Meng"
+  title: "A highly transferable and efficient machine learning interatomic potentials study of α -Fe–C binary system"
+  venue: "Acta Materialia"
+  doi: "10.1016/j.actamat.2024.120408"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "0ea6995c0713f2c6ec8c625e2875fa8b1201a7bd282b7c99dee36e866b68c1f1"
+study_label: "Meng et al. (2024): BNNP and Deep Potential for alpha-Fe-C with defects, carbides and interfaces"
+scope: |
+  Encoding scope: a Behler-Parrinello neural network potential (n2p2) and a
+  Deep Potential (DeePMD-kit 2.2.3) for the alpha-Fe-C binary system trained
+  on 32,002 spin-polarised DFT configurations (90/10 split), with training
+  and test energy and force RMSEs and the MD cost per atom and step.
+  Defect, carbide, dislocation and interface properties are not error
+  metrics.
+materials:
+  fe-c: {label: "alpha-Fe with C (vacancies, grain boundaries, screw dislocations), cementite and other carbides, ferrite-cementite interfaces", class: "Iron-carbon alloys and carbides"}
+reference:
+  dft: {type: DFT, code: VASP, comment: "Spin-polarised DFT; settings in Supplementary Table S2 (not restated in the main text)."}
+datasets:
+  fe-c: {label: "Fe-C database (32,002 configurations, 2.78e6 atomic environments; 90% training, 10% testing)", materials: [fe-c], properties: [Energy, Forces], provenance: InHouse, n: {v: 32002, loc: "Sec. 2"}, calc: dft}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff, numLayers]
+    loss: "Energies and forces (no virials)"
+    impl: {lib: {local: "n2p2"}}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+  DeePMD:
+    hp: [cutoffRadius, angularCutoff]
+    loss: "Energies and forces (no virials)"
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit 2.2.3; se_e2_a + se_e3 hybrid descriptor"}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  bnnp: {label: "BNNP for Fe-C (16 radial and 60 angular ACSFs per element, 2 x 15 hidden neurons)", method: HDNNP, dataset: fe-c, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2 (Fe radial)"}, angularCutoff: {v: 6.0, loc: "Sec. 2 (Fe angular)"}, numLayers: {v: 2, loc: "Sec. 2 (hidden layers)"}}, model: "Fe-C BNNP"}
+  dp: {label: "Deep Potential for Fe-C (se_e2_a + se_e3 hybrid descriptor)", method: DeePMD, dataset: fe-c, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2 (se_e2_a)"}, angularCutoff: {v: 5.6, loc: "Sec. 2 (se_e3)"}}, model: "Fe-C DP"}
+results:
+  - {key: bnnp-train, model: bnnp, material: fe-c, role: training, eval_data: {label: "Training set (90% of 32,002 configurations)", location: "Sec. 3.1"}, metrics: [[RMSE, Energy, 3.58, meV/atom, "Training energy RMSE: Fe-C BNNP", "Sec. 3.1"], [RMSE, Force, 83.0, meV/A, "Training force RMSE: Fe-C BNNP", "Sec. 3.1"]]}
+  - {key: bnnp-test, model: bnnp, material: fe-c, role: test, eval_data: {label: "Test set (10% of 32,002 configurations)", location: "Sec. 3.1"}, metrics: [[RMSE, Energy, 3.57, meV/atom, "Test energy RMSE: Fe-C BNNP", "Sec. 3.1"], [RMSE, Force, 83.2, meV/A, "Test force RMSE: Fe-C BNNP", "Sec. 3.1"]]}
+  - {key: dp-train, model: dp, material: fe-c, role: training, eval_data: {label: "Training set (90% of 32,002 configurations)", location: "Sec. 3.1"}, metrics: [[RMSE, Energy, 4.71, meV/atom, "Training energy RMSE: Fe-C DP", "Sec. 3.1"], [RMSE, Force, 92.5, meV/A, "Training force RMSE: Fe-C DP", "Sec. 3.1"]]}
+  - {key: dp-test, model: dp, material: fe-c, role: test, eval_data: {label: "Test set (10% of 32,002 configurations)", location: "Sec. 3.1"}, metrics: [[RMSE, Energy, 5.87, meV/atom, "Test energy RMSE: Fe-C DP", "Sec. 3.1"], [RMSE, Force, 91.2, meV/A, "Test force RMSE: Fe-C DP", "Sec. 3.1"]]}
+timings:
+  - {model: bnnp, system: "BCC Fe 27x27x27 with one C per 3x3x3 cells (39,366 Fe + 729 C atoms), MD", atoms: 40095, value: 27.38, unit: "us/atom/step", per_atom_us: 27.38, hardware: "2 Intel Xeon Gold 6150 CPUs (36 cores): 27.38 us/atom/step (BNNP)", result: bnnp-test, location: "Sec. 3.6"}
+  - {model: dp, system: "BCC Fe 27x27x27 with one C per 3x3x3 cells (39,366 Fe + 729 C atoms), MD", atoms: 40095, value: 12.71, unit: "us/atom/step", per_atom_us: 12.71, hardware: "1 CPU and 5 NVIDIA Tesla V100 GPUs: 12.71 us/atom/step (DP)", result: dp-test, location: "Sec. 3.6"}
+  - {model: dp, system: "BCC Fe 27x27x27 with one C per 3x3x3 cells (39,366 Fe + 729 C atoms), MD", atoms: 40095, value: 6.77, unit: "us/atom/step", per_atom_us: 6.77, hardware: "2 CPUs and 10 NVIDIA Tesla V100 GPUs: 6.77 us/atom/step (DP)", result: null, location: "Sec. 3.6"}
+resources: |
+  MD cost on the MASAMUNE-IMR Cray CS-Storm 500GT (Sec. 3.6): BNNP 27.38
+  us/atom/step on 36 CPU cores; DP 12.71 us/atom/step on 1 CPU + 5 V100 and
+  6.77 on 2 CPUs + 10 V100 GPUs. No training times are given.
+gaps:
+  - "The C cutoffs of the BNNP (5.5 and 5.0 A) and the DP network sizes are not encoded; the DFT settings are only in the supplement."

@@ -1,0 +1,44 @@
+id: macisaac2024
+source:
+  rank: 322
+  year: "2024"
+  first_author: "Michael MacIsaac"
+  title: "A Genetic Algorithm Trained Machine-Learned Interatomic Potential for the Silicon–Carbon System"
+  venue: "The Journal of Physical Chemistry C"
+  doi: "10.1021/acs.jpcc.4c02205"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2403.15897v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8193a37e63b663717cc86b6f7dd88cc0444b5718d46973d5510a7be17a25dcc9"
+study_label: "MacIsaac et al. (2024): a UF3 potential for the Si-C system trained on genetic-algorithm structures"
+scope: |
+  Encoding scope: the UF3 potential for Si-C (custom knot strategy)
+  trained on 41,225 PBE structures (41,145 from GASP genetic-algorithm
+  searches across the Si-C composition space, 80 from AIMD), with its
+  stated energy and force RMSEs. Mechanical properties, equations of state,
+  melting and surface reconstruction are properties, not error metrics.
+materials:
+  sic: {label: "Si-C system: SiC polytypes (3C, 2H, 4H, 6H, 15R and others), non-equimolar Si-C structures, Si and C", class: "Covalent ceramic and elemental solids"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma-centred automatic mesh, length 30", comment: "Electronic convergence 1e-6 eV, ionic 1e-5 eV."}
+sampling:
+  gasp: {label: "GASP genetic-algorithm structure searches over the whole Si-C composition space (relaxation trajectories and unrelaxed structures)"}
+  aimd: {label: "AIMD of SiC-3C (zinc blende and rock salt), SiC-2H and SiC-6H"}
+datasets:
+  sic: {label: "Si-C training data (41,225 structures: 41,145 from GASP, 80 from AIMD; trajectories assigned wholly to training or testing)", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 41225, loc: "Sec. 2.1"}, calc: pbe, sampling: [gasp, aimd]}
+methods:
+  UF3:
+    hp: [cutoffRadius, angularCutoff]
+    loss: "Energy- and force-weighted least squares with Tikhonov ridge and curvature regularisers"
+    algorithm: "Custom knot placement concentrated around the C-Si energy well (introduced here, now in UF3); grid search over regularisers and energy weight"
+    impl: {lib: {local: "uf3", comment: "LAMMPS for property simulations"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  uf3-sic: {label: "Final UF3 Si-C potential (custom knots)", method: UF3, dataset: sic, settings: {cutoffRadius: {v: 6.0, loc: "Sec. 2.2 (two-body maximum)"}, angularCutoff: {v: 5.0, loc: "Sec. 2.2 (three-body maximum (5.0, 5.0, 10.0) A)"}}, model: "UF3 Si-C MLIP"}
+results:
+  - {key: uf3-sic, model: uf3-sic, material: sic, role: null, eval_data: {label: "Si-C reference data shown in Fig. 3a, b (split not stated)", location: "Sec. 3.1"}, metrics: [[RMSE, Energy, 145, meV/atom, "Energy RMSE: UF3 Si-C MLIP", "Sec. 3.1"], [RMSE, Force, 332, meV/A, "Force RMSE: UF3 Si-C MLIP", "Sec. 3.1"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The text writes 'root mean square force and energy errors ... are 145 meV/atom and 332 meV/A, respectively'; the units identify 145 meV/atom as the energy RMSE and 332 meV/A as the force RMSE. The data set behind Fig. 3a, b is described as illustrating the training data; the split is not stated, so the role is unset."
+  - "UF3 is a new registry method (method paper not in the corpus). The two-body minimum cutoff (0.001 A), three-body minimum cutoffs (0.5 A) and regulariser values are not encoded."

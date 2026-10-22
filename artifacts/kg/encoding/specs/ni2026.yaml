@@ -1,0 +1,68 @@
+id: ni2026
+source:
+  rank: 330
+  year: "2026"
+  first_author: "Anton Z. Ni"
+  title: "Solvating machine-learning interatomic potentials for solution-phase chemistry"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.17226"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2610.17226v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "9956c969f233087798d24c0fe358f3ae7a32b96dda3de0b955e553a731317736"
+study_label: "Ni and Lee (2026): AnySolv, a transferable implicit-solvation correction potential for gas-phase MLIPs"
+scope: |
+  Encoding scope: the AnySolv models (MoE model fine-tuned from UMA-S-1.2
+  and a compact model trained from random weights) that predict DFT-SMD
+  solvation energies and forces in 36 training solvents (179 supported
+  through solvent descriptors), with test-split errors (Table II) and
+  external DFT-SMD benchmark errors of the MoE model. Errors against
+  experimental solvation free energies, SAMPL6 partition coefficients,
+  reaction barriers and coupling constants are property errors, not
+  energy/force metrics of the potential.
+materials:
+  solutes: {label: "Organic and main-group solutes from OMol25 (neutral, charged -4 to +4, open-shell, reaction paths and transition states), AIMNet2 anions and zwitterions in 36 solvents", class: "Molecules in implicit solvent"}
+reference:
+  smd: {type: DFT, code: ORCA, xc: {local: "wB97M-V"}, basis: "def2-TZVPD", comment: "ORCA 6.0.1, SMD solvation, TightSCF, DefGrid3; labels are SMD minus gas-phase energies and gradients (gas phase from OMol25)."}
+  alpb: {type: REF, comment: "GFN2-xTB/ALPB solvation labels (preliminary training stage)."}
+datasets:
+  smd-train: {label: "DFT-SMD solvation labels in 36 solvents (1,355,281 training labels; OMol25 split 95/2.5/2.5)", materials: [solutes], properties: [Energy, Forces], provenance: InHouse, n: {v: 1355281, loc: "Sec. II C; Table A2"}, calc: smd}
+  alpb-train: {label: "Preliminary GFN2-xTB/ALPB labels in 21 solvents plus DFT-SMD water labels (5,633,695 labels)", materials: [solutes], properties: [Energy, Forces], provenance: InHouse, n: {v: 5633695, loc: "Table A2"}, calc: alpb}
+methods:
+  UMA:
+    hp: [numLayers, numFeatures, cutoffRadius, learningRate, numEpochs, batchSize]
+    loss: "Per-atom MAE of the solvation energy (weight 20) and L2 norm of the solvation-force error (weight 2), normalised by 0.193 eV"
+    algorithm: "AdamW (weight decay 1e-3), 0.1-epoch warm-up and cosine decay, gradient clipping 100; solvent descriptors embedded into the system features and the MoE router"
+    impl: {lib: {local: "fairchem"}}
+    sims: [GeometryOptimization, MolecularDynamics]
+  eSEN:
+    hp: [numLayers, numFeatures, cutoffRadius, learningRate, numEpochs, batchSize]
+    impl: {lib: {local: "fairchem"}}
+runs:
+  moe-pre: {label: "AnySolv MoE after the GFN2-xTB/ALPB stage (from UMA-S-1.2 with grafted solvent embedding)", method: UMA, dataset: alpb-train, settings: {learningRate: {v: 0.00015, loc: "Table A3"}, numEpochs: {v: 4, loc: "Table A3"}}, model: "AnySolv MoE (ALPB stage)", base_model: {label: "UMA-S-1.2", relation: fine-tuned, location: "Sec. II C; Table A1"}}
+  moe: {label: "AnySolv MoE model (291.3M parameters, 64 experts), DFT-SMD stage", method: UMA, dataset: smd-train, settings: {numLayers: {v: 4, loc: "Table A1"}, numFeatures: {v: 128, loc: "Table A1 (spherical channels)"}, cutoffRadius: {v: 6, loc: "Table A1"}, learningRate: {v: 0.00005, loc: "Sec. II C"}, numEpochs: {v: 4, loc: "Sec. II C"}, batchSize: {v: 16, loc: "Sec. II C (molecules)"}}, model: "AnySolv MoE", base_model: {run: moe-pre, relation: fine-tuned, location: "Sec. II C"}, trainingHardware: "4 NVIDIA H100 GPUs (DFT-SMD stage)"}
+  compact-pre: {label: "AnySolv compact model after the GFN2-xTB/ALPB stage (random initialisation)", method: eSEN, dataset: alpb-train, settings: {learningRate: {v: 0.0004, loc: "Table A3"}, numEpochs: {v: 8, loc: "Table A3"}}, model: "AnySolv compact (ALPB stage)"}
+  compact: {label: "AnySolv compact model (6.37M parameters), DFT-SMD stage", method: eSEN, dataset: smd-train, settings: {numLayers: {v: 4, loc: "Table A1"}, numFeatures: {v: 128, loc: "Table A1 (spherical channels)"}, cutoffRadius: {v: 6, loc: "Table A1"}, learningRate: {v: 0.00005, loc: "Sec. II C"}, numEpochs: {v: 4, loc: "Sec. II C"}, batchSize: {v: 16, loc: "Sec. II C (molecules)"}}, model: "AnySolv compact", base_model: {run: compact-pre, relation: fine-tuned, location: "Sec. II C"}, trainingHardware: "2 NVIDIA A100 GPUs (DFT-SMD stage)"}
+results:
+  - {key: moe-test-all, model: moe, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, all solutes (36,847 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.016, eV, "Test solvation-energy MAE (all): AnySolv MoE", "Table II"], [MAE, Force, 0.026, eV/A, "Test solvation-force-magnitude MAE (all): AnySolv MoE", "Table II"]]}
+  - {key: compact-test-all, model: compact, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, all solutes (36,847 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.02, eV, "Test solvation-energy MAE (all): AnySolv compact", "Table II"], [MAE, Force, 0.03, eV/A, "Test solvation-force-magnitude MAE (all): AnySolv compact", "Table II"]]}
+  - {key: moe-test-neutral, model: moe, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, neutral solutes (27,523 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.012, eV, "Test solvation-energy MAE (neutral): AnySolv MoE", "Table II"], [MAE, Force, 0.021, eV/A, "Test solvation-force-magnitude MAE (neutral): AnySolv MoE", "Table II"]]}
+  - {key: compact-test-neutral, model: compact, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, neutral solutes (27,523 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.014, eV, "Test solvation-energy MAE (neutral): AnySolv compact", "Table II"], [MAE, Force, 0.024, eV/A, "Test solvation-force-magnitude MAE (neutral): AnySolv compact", "Table II"]]}
+  - {key: moe-test-cations, model: moe, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, cations solutes (4,894 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.024, eV, "Test solvation-energy MAE (cations): AnySolv MoE", "Table II"], [MAE, Force, 0.038, eV/A, "Test solvation-force-magnitude MAE (cations): AnySolv MoE", "Table II"]]}
+  - {key: compact-test-cations, model: compact, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, cations solutes (4,894 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.034, eV, "Test solvation-energy MAE (cations): AnySolv compact", "Table II"], [MAE, Force, 0.046, eV/A, "Test solvation-force-magnitude MAE (cations): AnySolv compact", "Table II"]]}
+  - {key: moe-test-anions, model: moe, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, anions solutes (4,430 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.028, eV, "Test solvation-energy MAE (anions): AnySolv MoE", "Table II"], [MAE, Force, 0.038, eV/A, "Test solvation-force-magnitude MAE (anions): AnySolv MoE", "Table II"]]}
+  - {key: compact-test-anions, model: compact, material: solutes, role: test, eval_data: {label: "Held-out DFT-SMD test split, anions solutes (4,430 labels)", location: "Table II"}, metrics: [[MAE, Energy, 0.042, eV, "Test solvation-energy MAE (anions): AnySolv compact", "Table II"], [MAE, Force, 0.052, eV/A, "Test solvation-force-magnitude MAE (anions): AnySolv compact", "Table II"]]}
+  - {key: moe-ext-mnsol, model: moe, material: solutes, role: external, eval_data: {label: "MNSol (ions included) geometries with DFT-SMD single points at the training level of theory", location: "Sec. III A"}, metrics: [[MAE, Energy, 0.0021, eV, "Solvation-energy MAE vs DFT-SMD on MNSol (ions included): AnySolv MoE", "Sec. III A"]]}
+  - {key: moe-ext-solvtum, model: moe, material: solutes, role: external, eval_data: {label: "Solv@TUM geometries with DFT-SMD single points at the training level of theory", location: "Sec. III A"}, metrics: [[MAE, Energy, 0.0027, eV, "Solvation-energy MAE vs DFT-SMD on Solv@TUM: AnySolv MoE", "Sec. III A"]]}
+  - {key: moe-ext-flexisol, model: moe, material: solutes, role: external, eval_data: {label: "FlexiSol geometries with DFT-SMD single points at the training level of theory", location: "Sec. III A"}, metrics: [[MAE, Energy, 0.0043, eV, "Solvation-energy MAE vs DFT-SMD on FlexiSol: AnySolv MoE", "Sec. III A"]]}
+resources: |
+  Training (Table A3): ALPB stage on 4 H200 GPUs (MoE 839,244 steps,
+  compact 1,678,488 steps); DFT-SMD stage on 4 H100 (MoE) or 2 A100
+  (compact) GPUs, 345,852 steps. An SNAr screen of about 4,000
+  optimisations and transition-state searches took 68 GPU-hours; one
+  metadynamics walker of alanine dipeptide ran at 84 ms per step on an A100
+  MIG instance (system size not stated). Training wall times are not
+  given.
+gaps:
+  - "Solvation energies are per molecule in eV and solvation forces are compared as force magnitudes. The compact model shares the UMA-S/eSEN backbone without experts and is recorded under the registry method eSEN; the MoE model is a UMA model."
+  - "Errors against experiment (Table III, Table A5), SAMPL6 RMSEs, zwitterion and Menshutkin errors are property errors and are not encoded. Test errors of the charge-separation augmentation are not stated separately."

@@ -1,0 +1,53 @@
+id: vazquezsalazar2025
+source:
+  rank: 324
+  year: "2025"
+  first_author: "Luis Itza Vazquez-Salazar"
+  title: "Outlier-detection for reactive machine learned potential energy surfaces"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01473-6"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2402.17686v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "80ed06a262aa16015b5c3f8a97f7ff970bcf18b448b8b9f406e4265496c1f887"
+study_label: "Vazquez-Salazar, Käser and Meuwly (2025): uncertainty-based outlier detection for reactive PhysNet potential energy surfaces"
+scope: |
+  Encoding scope: PhysNet potentials for the syn-Criegee to vinyl
+  hydroperoxide H-transfer reaction trained on 4,305 MP2/aug-cc-pVTZ
+  structures, as ensembles (Ens-3, Ens-6), deep-evidential-regression
+  variants (DER-S, DER-L, DER-M) and a Gaussian-mixture-model uncertainty
+  head (GMM), with energy and force MAEs and RMSEs on the 33,402-structure
+  hold-out test set (Table S1). Outlier-detection statistics are not
+  error metrics.
+materials:
+  criegee: {label: "syn-Criegee intermediate, transition state and vinyl hydroperoxide (C2H4O2) along the H-transfer reaction", formula: "C2H4O2", class: "Reactive small organic molecule (gas phase)"}
+reference:
+  mp2: {type: WF, wf: MP2, basis: "aug-cc-pVTZ", comment: "Reference data of earlier work (Ref. [34])."}
+sampling:
+  dmc-as: {label: "Every 10th of 37,399 reaction structures (E < 400 kcal/mol), extended by diffusion Monte Carlo and adaptive sampling"}
+datasets:
+  train: {label: "Final training data (4,305 structures; 80/20 training/validation)", materials: [criegee], properties: [Energy, Forces], provenance: InHouse, n: {v: 4305, loc: "Sec. 2.1"}, calc: mp2, sampling: [dmc-as]}
+methods:
+  PhysNet:
+    loss: "Energies, forces and dipole moments (ensembles); DER variants add a normal-inverse-gamma (DER-S, DER-L) or normal-inverse-Wishart (DER-M) negative log-likelihood"
+    impl: {lib: {local: "PhysNet"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  ens3: {label: "Ensemble of three PhysNet models (models 1, 3, 5) (Ens-3)", method: PhysNet, dataset: train, model: "Ens-3 PhysNet PES"}
+  ens6: {label: "Ensemble of six PhysNet models (Ens-6)", method: PhysNet, dataset: train, model: "Ens-6 PhysNet PES"}
+  der-s: {label: "PhysNet with deep evidential regression (simple) (DER-S)", method: PhysNet, dataset: train, model: "DER-S PhysNet PES"}
+  der-l: {label: "PhysNet with deep evidential regression, second loss modification of Sec. 2.2 (DER-L)", method: PhysNet, dataset: train, model: "DER-L PhysNet PES"}
+  der-m: {label: "PhysNet with multivariate deep evidential regression (DER-M)", method: PhysNet, dataset: train, model: "DER-M PhysNet PES"}
+  gmm: {label: "PhysNet ensemble member with a Gaussian mixture model on last-layer features (GMM)", method: PhysNet, dataset: train, model: "GMM PhysNet PES"}
+results:
+  - {key: ens3, model: ens3, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 0.44, kcal/mol, "Test energy MAE: Ens-3", "Table S1"], [RMSE, Energy, 1.8, kcal/mol, "Test energy RMSE: Ens-3", "Table S1"], [MAE, Force, 1.54, kcal/mol/A, "Test force MAE: Ens-3", "Table S1"], [RMSE, Force, 11.98, kcal/mol/A, "Test force RMSE: Ens-3", "Table S1"]]}
+  - {key: ens6, model: ens6, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 0.43, kcal/mol, "Test energy MAE: Ens-6", "Table S1"], [RMSE, Energy, 1.79, kcal/mol, "Test energy RMSE: Ens-6", "Table S1"], [MAE, Force, 1.48, kcal/mol/A, "Test force MAE: Ens-6", "Table S1"], [RMSE, Force, 11.47, kcal/mol/A, "Test force RMSE: Ens-6", "Table S1"]]}
+  - {key: der-s, model: der-s, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 1.03, kcal/mol, "Test energy MAE: DER-S", "Table S1"], [RMSE, Energy, 2.61, kcal/mol, "Test energy RMSE: DER-S", "Table S1"], [MAE, Force, 32.06, kcal/mol/A, "Test force MAE: DER-S", "Table S1"], [RMSE, Force, 90.6, kcal/mol/A, "Test force RMSE: DER-S", "Table S1"]]}
+  - {key: der-l, model: der-l, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 0.69, kcal/mol, "Test energy MAE: DER-L", "Table S1"], [RMSE, Energy, 2.35, kcal/mol, "Test energy RMSE: DER-L", "Table S1"], [MAE, Force, 31.79, kcal/mol/A, "Test force MAE: DER-L", "Table S1"], [RMSE, Force, 90.09, kcal/mol/A, "Test force RMSE: DER-L", "Table S1"]]}
+  - {key: der-m, model: der-m, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 2.19, kcal/mol, "Test energy MAE: DER-M", "Table S1"], [RMSE, Energy, 5.17, kcal/mol, "Test energy RMSE: DER-M", "Table S1"], [MAE, Force, 33.55, kcal/mol/A, "Test force MAE: DER-M", "Table S1"], [RMSE, Force, 91.54, kcal/mol/A, "Test force RMSE: DER-M", "Table S1"]]}
+  - {key: gmm, model: gmm, material: criegee, role: test, eval_data: {label: "Hold-out test set of 33,402 structures of the syn-Criegee to VHP reaction", location: "Table S1"}, metrics: [[MAE, Energy, 0.47, kcal/mol, "Test energy MAE: GMM", "Table S1"], [RMSE, Energy, 1.83, kcal/mol, "Test energy RMSE: GMM", "Table S1"], [MAE, Force, 1.68, kcal/mol/A, "Test force MAE: GMM", "Table S1"], [RMSE, Force, 9.73, kcal/mol/A, "Test force RMSE: GMM", "Table S1"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "DER-L is named in the paper without expansion in the main text; its loss modification follows Sec. 2.2. Energies are total molecular energies (kcal/mol), forces in kcal/mol/A."
+  - "Outlier-detection rates, error-uncertainty correlations, stationary-point errors and harmonic frequencies are not encoded."
