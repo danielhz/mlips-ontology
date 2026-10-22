@@ -1,0 +1,46 @@
+id: korostelev2026
+source:
+  rank: 334
+  year: "2026"
+  first_author: "Vladislav O. Korostelev"
+  title: "Can Universal Machine-Learning Interatomic Potentials Capture Small Polarons? A Geometry-Based Benchmark in Transition-Metal Oxides"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.17352"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2610.17352v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ad9b22b03d1684128a05ebfe46b854a59b33d74ff7a3f655dbc014b838514ffe"
+study_label: "Korostelev et al. (2026): can universal MLIPs capture small polarons? A Z-score geometric benchmark on H-doped transition-metal oxides"
+scope: |
+  Encoding scope: five pretrained universal MLIP checkpoints (CHGNet
+  v0.3.0, mace-mpa-0-medium, mace-omat-0-medium, uma-s-1p2 omat task,
+  matris_10m_oam) relaxed from DFT+U polaron geometries of H-doped
+  transition-metal oxides (Methods), with BFGS relaxations and linear
+  interpolations of the localized-delocalized path. Results are Z-score
+  ratios, magnetic moments and polaron-transfer barriers, not energy/force
+  error metrics.
+materials:
+  tmo: {label: "H-doped transition-metal oxides (TiO2, Sr2Fe2O5, Sr2Co2O5, Co3O4, NiO, V2O5, LiFePO4/FePO4, CrO2, Cr2O3, MnO2, Fe2O3, Fe3O4, MoO3, WO3, CeO2) with one interstitial H as electron donor", class: "Oxides"}
+reference:
+  pbeu: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "2x2x2 Gamma-centred", comment: "DFT+U (Materials Project U values on TM d states; none on Ti and Ce except the U(Ti) 0-5 eV sweep), spin-polarized, VASP 6.3.0, EDIFF 1e-6 eV, EDIFFG -0.02; climbing-image NEB for polaron-transfer barriers (Methods)."}
+methods:
+  CHGNet:
+    sims: [GeometryOptimization]
+  MACE:
+    sims: [GeometryOptimization]
+  UMA:
+    sims: [GeometryOptimization]
+  MatRIS:
+    sims: [GeometryOptimization]
+runs:
+  chgnet: {label: "CHGNet v0.3.0 as distributed (412,525 parameters; MPtrj)", method: CHGNet, model: "CHGNet v0.3.0"}
+  mace-mpa: {label: "MACE-MPA-0 medium as distributed (mace-mpa-0-medium; MPtrj + Alexandria)", method: MACE, model: "MACE-MPA-0 (mace-mpa-0-medium)"}
+  mace-omat: {label: "MACE-OMAT-0 medium as distributed (mace-omat-0-medium; OMat24)", method: MACE, model: "mace-omat-0-medium"}
+  uma: {label: "UMA-S 1.2 as distributed (uma-s-1p2, omat task)", method: UMA, model: "uma-s-1p2 (omat task)"}
+  matris: {label: "MatRIS 10M OAM as distributed (matris_10m_oam; 10,443,505 parameters; OMat24 + Alexandria + MPtrj)", method: MatRIS, model: "matris_10m_oam"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Z1/Z2 localization ratios, magnetic-moment changes and polaron-transfer barriers are properties, not energy/force/stress errors; no error metrics are reported."
+  - "The DFT+U reference has no DFT+U entry in the xc vocabulary; it is recorded as PBE with the U values in the comment."

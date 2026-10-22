@@ -1,0 +1,44 @@
+id: do2026
+source:
+  rank: 333
+  year: "2026"
+  first_author: "Tuan Minh Do"
+  title: "From sparse quantum-computing data to atomistic simulation with universal machine-learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.21536"
+  kg_relevance: "Method/model"
+  arxiv_id: "2609.21536v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b045a0940c71f682f8def2a8e5fa9ba8c1dce21cdfdc5733356040b4640562ad"
+study_label: "Do et al. (2026): fine-tuning MACE-Osaka24 on sparse quantum-computing (QSCI-TCCSD(T)) reference energies"
+scope: |
+  Encoding scope: one MACE model fine-tuned from MACE-Osaka24 Large with
+  multihead replay on 26 quantum-computing reference energies (3
+  Menshutkin, 14 HKUST-1 water, 9 HEA CO-hopping configurations; Sec. II B)
+  and the downstream Widom-insertion (Monte Carlo) and umbrella-sampling MD
+  simulations. No energy/force errors are reported: all reference
+  configurations were used for fine-tuning and the model is assessed only
+  through downstream observables (barriers, adsorption enthalpies, Henry
+  coefficients, free-energy profiles), which are properties.
+materials:
+  menshutkin: {label: "Menshutkin SN2 reaction (gas phase; CNT-confined structures for evaluation)", class: "Organic molecules (gas phase)"}
+  hkust1: {label: "Water adsorption in the Cu MOF HKUST-1", class: "Metal-organic frameworks"}
+  hea: {label: "CO on an IrPdPtRhRu high-entropy-alloy nanoparticle", class: "High-entropy alloys"}
+reference:
+  qsci: {type: WF, wf: {local: "QSCI-TCCSD(T)", comment: "Quantum-selected configuration interaction on the 144-qubit superconducting quantum computer at the University of Osaka (10,000 shots), with tailored CCSD(T) post-processing; projection-based WF-in-DFT embedding for HKUST-1 and HEA, none for Menshutkin; active spaces (4e,4o), (2e,2o), (4e,4o) (Sec. II B; data from Ref. [31])."}}
+datasets:
+  qc: {label: "Quantum-computing reference energies (3 Menshutkin + 14 HKUST-1 + 9 HEA configurations; energies only)", materials: [menshutkin, hkust1, hea], properties: [Energy], provenance: Published, n: {v: 26, loc: "Sec. II B"}, calc: qsci, comment: "Taken from the authors' previous study (Ref. [31]); combined with a 0.1 % random replay subset of the MACE-Osaka24 pretraining data (energies and forces) on a separate head."}
+methods:
+  MACE:
+    hp: [learningRate, batchSize, numEpochs]
+    impl: {lib: MACE}
+    sims: [MonteCarlo, MolecularDynamics]
+runs:
+  osaka24: {label: "MACE-Osaka24 Large as published (pretrained)", method: MACE, model: "MACE-Osaka24"}
+  ft: {label: "MACE-Osaka24 Large fine-tuned on the quantum-computing reference energies (multihead replay, target head)", method: MACE, dataset: qc, settings: {learningRate: {v: 1.0e-4, loc: "Sec. II C"}, batchSize: {v: 16, loc: "Sec. II C"}, numEpochs: {v: 301, loc: "Sec. II C (maximum)"}}, model: "MACE-Osaka24 fine-tuned on QSCI-TCCSD(T) data", base_model: {run: osaka24, relation: fine-tuned, location: "Sec. II C"}}
+results: []
+resources: |
+  No training or inference times are given.
+gaps:
+  - "No energy or force errors: all reference configurations were used for training and validation of the target head (Sec. II C). Downstream results (CNT-confined Menshutkin barrier 40.37 kcal/mol with the pretrained model vs THC-CASPT2; HKUST-1 site free-energy difference -8.4 -> -22.7 kJ/mol; Henry coefficient; CO-hopping barriers 0.34/0.15 eV -> 0.16/0.43 eV) are properties."
+  - "Fine-tuning used mace-torch 0.3.15, Adam with AMSGrad, energy/force loss weights 10/1, configuration energy weights 10/100/100 and replay-head weight 1.0 (Sec. II C)."

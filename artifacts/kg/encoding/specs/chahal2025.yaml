@@ -1,0 +1,52 @@
+id: chahal2025
+source:
+  rank: 337
+  year: "2025"
+  first_author: "Rajni Chahal"
+  title: "Liquid–Vapor Phase Equilibrium in Molten Aluminum Chloride (AlCl3) Enabled by Machine Learning Interatomic Potentials"
+  venue: "The Journal of Physical Chemistry B"
+  doi: "10.1021/acs.jpcb.4c06450"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2410.18009v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d4e61d678614df3cea83e9045e8d23b209bce3044e52ac9ccf678899147ff4df"
+study_label: "Chahal et al. (2025): liquid-vapor phase equilibrium of molten AlCl3 with a VASP on-the-fly MLFF and DeePMD potentials"
+scope: |
+  Encoding scope: the PBE-D3 AIMD reference (VASP for the MLFF, CP2K for
+  the NNIPs), the VASP on-the-fly MLFF (max 4,000 local reference
+  configurations, 8 A cutoff) with its training and test RMSEs, and the
+  DeepPot-SE models NNIP-1 and NNIP-2 (DeePMD-kit 2.1.1) used in NPT,
+  two-phase coexistence and Green-Kubo viscosity MD. The NNIP validation
+  errors and the 300-frame transferability force errors are reported as
+  "average" or "test" errors without naming MAE or RMSE, so they are not
+  encoded (gaps).
+materials:
+  alcl3: {label: "Molten aluminum chloride (Al2Cl6 dimers), liquid and vapor", formula: "AlCl3", class: "Molten salt"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "1x1x1", comment: "PBE-D3, VASP 6.3, Al 3s2 3p1 valence, EDIFF 1e-5 eV; on-the-fly AIMD for the MLFF (Sec. VASP MLFF Development)."}
+  cp2k: {type: DFT, code: {local: CP2K}, xc: PBE, pp: {local: GTH}, comment: "PBE-D3, CP2K QUICKSTEP, DZVP-MOLOPT basis, 600 Ry density cutoff, NVT AIMD with 1 fs steps for 16-80 ps (Sec. DeePMD NNIP Development)."}
+datasets:
+  mlff-otf: {label: "On-the-fly AIMD frames of 15 Al2Cl6 dimers (500-800 K NPT ramp plus 0.8 and 0.6 g/cm3 NVT)", materials: [alcl3], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1555, loc: "Sec. MLFF Training"}, calc: vasp}
+  nnip1: {label: "NNIP-1 data: 15 Al2Cl6 dimer configurations at and around the 498 K density (5-25 % compressed/expanded), 80/20 train/validation split", materials: [alcl3], properties: [Energy, Forces], provenance: InHouse, calc: cp2k, comment: "55,355 configurations at 498 K density plus 16,074 + 16,125 + 19,123 + 16,513 + 71,000 compressed/expanded (Sec. NNIP Training)."}
+  nnip2: {label: "NNIP-2 data: NNIP-1 data plus 454,839 configurations (further compressed/expanded bulk and 2-7 dimer gas-phase cells), 80/20 split", materials: [alcl3], properties: [Energy, Forces], provenance: InHouse, calc: cp2k}
+methods:
+  VASP-MLFF:
+    hp: [cutoffRadius, numSparseConfigs]
+    impl: {lib: VASP}
+    sims: [MolecularDynamics]
+  DeePMD:
+    hp: [cutoffRadius]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  mlff: {label: "VASP on-the-fly MLFF for AlCl3 (2,768 Al and 2,698 Cl local reference configurations)", method: VASP-MLFF, dataset: mlff-otf, settings: {cutoffRadius: {v: 8, loc: "Sec. MLFF Training"}, numSparseConfigs: {v: 4000, loc: "Sec. MLFF Training (maximum number of local reference configurations)"}}, model: "AlCl3 VASP MLFF"}
+  nnip1: {label: "DeepPot-SE NNIP-1 for AlCl3 (embedding {25,50,100}, fitting {240,240,240}, 800,000 steps)", method: DeePMD, dataset: nnip1, settings: {cutoffRadius: {v: 8, loc: "Sec. NNIP Training"}}, model: "AlCl3 NNIP-1"}
+  nnip2: {label: "DeepPot-SE NNIP-2 for AlCl3 (extended density and gas-phase data)", method: DeePMD, dataset: nnip2, settings: {cutoffRadius: {v: 8, loc: "Sec. NNIP Training"}}, model: "AlCl3 NNIP-2"}
+results:
+  - {key: mlff-train, model: mlff, material: alcl3, role: training, eval_data: {label: "MLFF on-the-fly training frames", location: "Sec. MLFF Training"}, metrics: [[RMSE, Energy, 0.84, meV/atom, "train energy RMSE on alcl3: VASP MLFF", "Sec. MLFF Training"], [RMSE, Force, 38.3, meV/A, "train force RMSE on alcl3: VASP MLFF", "Sec. MLFF Training"], [RMSE, Stress, 0.14, null, "train stress RMSE on alcl3 in kbar: VASP MLFF", "Sec. MLFF Training"]]}
+  - {key: mlff-test, model: mlff, material: alcl3, role: test, eval_data: {label: "MLFF test data set (composition not described)", location: "Sec. MLFF Training"}, metrics: [[RMSE, Energy, 0.96, meV/atom, "test energy RMSE on alcl3: VASP MLFF", "Sec. MLFF Training"], [RMSE, Force, 33.5, meV/A, "test force RMSE on alcl3: VASP MLFF", "Sec. MLFF Training"], [RMSE, Stress, 0.12, null, "test stress RMSE on alcl3 in kbar: VASP MLFF", "Sec. MLFF Training"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "NNIP-1 and NNIP-2 'average energy and force errors' on the validation set (0.52 meV/atom, 29.6 meV/A; 0.55 meV/atom, 30.9 meV/A) and the 300-frame transferability 'test error' of forces (MLFF 25.1, NNIP-1 24.1, NNIP-2 25.9 meV/A; Fig. S3) do not name the metric (MAE or RMSE), so they are not encoded."
+  - "Stress RMSEs are in kbar (no schema unit; recorded with unit null). Densities, coexistence curves, critical point, Raman spectra and viscosities are properties."
