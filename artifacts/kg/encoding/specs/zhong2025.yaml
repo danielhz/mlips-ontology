@@ -1,0 +1,65 @@
+id: zhong2025
+source:
+  rank: 260
+  year: "2025"
+  first_author: "Peichen Zhong"
+  title: "Machine learning interatomic potential can infer electrical response"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01911-z"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2504.05169v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "296190c915dfea7858142b041f5594463292ddc3c9148c438c8519b069d61947"
+study_label: "Zhong et al. (2025): Born effective charges and polarisation from CACE-LES (latent Ewald summation) potentials"
+scope: |
+  Encoding scope: CACE-LES potentials (called CACE-LR in the paper) for
+  RPBE-D3 bulk water (four versions, Table I), high-pressure superionic
+  water (and a model fine-tuned with BECs at 2 g/cm3 and 2000 K) and SCAN
+  PbTiO3, with their test energy and force RMSEs; MD for IR spectra,
+  ionic conductivity and ferroelectric hysteresis. BEC RMSEs (in e) have no
+  metric property and are not encoded.
+materials:
+  water: {label: "Bulk liquid water at experimental density and room temperature (64 molecules)", formula: "H2O", class: "Molecular liquid", wikidata: Q283}
+  hp-water: {label: "High-pressure water: ionic liquid, superionic ice XVIII and ice X (300-15000 K, 1-7 g/cm3)", formula: "H2O", class: "High-pressure ionic and superionic water"}
+  PbTiO3: {label: "PbTiO3 perovskite, cubic and tetragonal phases (3x3x3 cells, 135 atoms)", formula: "PbTiO3", class: "Ferroelectric perovskite oxide"}
+reference:
+  rpbe-d3: {type: DFT, xc: {local: "RPBE-D3"}, comment: "Bulk water data sets of Ref. [28]; DFPT (VASP) for the BECs of the RPBE-D3 + BEC set."}
+  hp-dft: {type: DFT, code: VASP, comment: "Superionic water training set of Ref. [42] (functional not restated); BECs from DFPT with a 400 eV cutoff at the Baldereschi point."}
+  scan: {type: DFT, xc: SCAN, comment: "PbTiO3 data set of Ref. [51] (DP-GEN MD at 300/600/900 K)."}
+  pbe-dfpt: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 680, kpoints: "Gamma point", comment: "DFPT BECs of 443 PbTiO3 configurations (PBE54 PAW); total-energy convergence 1e-6 eV."}
+datasets:
+  rpbe: {label: "RPBE-D3 bulk water data set of Ref. [28] (654 configurations of 64 molecules; 90/10 train/test)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 654, loc: "Sec. V A; Table I"}, calc: rpbe-d3}
+  rpbe-bec: {label: "RPBE-D3 + BEC water set of Ref. [28] (100 configurations at 298.2 K with Born effective charges)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 100, loc: "Sec. V A; Table I"}, calc: rpbe-d3}
+  hp: {label: "5,000 configurations randomly selected from the 17,516-structure superionic water training set of Ref. [42] (90/10 train/test)", materials: [hp-water], properties: [Energy, Forces], provenance: Published, n: {v: 5000, loc: "Sec. V B"}, calc: hp-dft}
+  hp-bec: {label: "100 water configurations at 2 g/cm3 and 2000 K with energies, forces and DFPT BECs (90/10 train/test)", materials: [hp-water], properties: [Energy, Forces], provenance: InHouse, n: {v: 100, loc: "Sec. V B"}, calc: hp-dft}
+  pto: {label: "PbTiO3 SCAN data set of Ref. [51] (4,432 training and 600 test configurations; 10% of training used for validation)", materials: [PbTiO3], properties: [Energy, Forces], provenance: Published, n: {v: 5032, loc: "Sec. V C"}, calc: scan}
+  pto-bec: {label: "443 PbTiO3 configurations with PBE energies, forces and DFPT BECs (8:1:1 split)", materials: [PbTiO3], properties: [Energy, Forces], provenance: InHouse, n: {v: 443, loc: "Sec. V C"}, calc: pbe-dfpt}
+methods:
+  CACE-LES:
+    hp: [cutoffRadius, numRadialBasis, bodyOrder, numLayers]
+    loss: "Energy and force loss (version 4 and the fine-tuned models also on Born effective charges)"
+    impl: {lib: {local: "cace", comment: "LES implemented in the CACE code (https://github.com/BingqingCheng/cace); MD through ASE"}}
+    sims: [MolecularDynamics]
+runs:
+  w-v1: {label: "CACE-LES water version 1 (E+F, RPBE-D3, rcut 5.5 A)", method: CACE-LES, dataset: rpbe, settings: {cutoffRadius: {v: 5.5, loc: "Table I"}, numRadialBasis: {v: 6, loc: "Sec. V A"}, bodyOrder: {v: 3, loc: "Sec. V A (nu_max)"}}, model: "CACE-LR water potential, version 1"}
+  w-v2: {label: "CACE-LES water version 2 (E+F, RPBE-D3, rcut 4.5 A; used in the main text)", method: CACE-LES, dataset: rpbe, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}, numRadialBasis: {v: 6, loc: "Sec. V A"}, bodyOrder: {v: 3, loc: "Sec. V A (nu_max)"}}, model: "CACE-LR water potential, version 2"}
+  w-v3: {label: "CACE-LES water version 3 (E+F, RPBE-D3 + BEC set, rcut 4.5 A)", method: CACE-LES, dataset: rpbe-bec, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}, numRadialBasis: {v: 6, loc: "Sec. V A"}, bodyOrder: {v: 3, loc: "Sec. V A (nu_max)"}}, model: "CACE-LR water potential, version 3"}
+  w-v4: {label: "CACE-LES water version 4 (E+F+BEC, RPBE-D3 + BEC set, rcut 4.5 A)", method: CACE-LES, dataset: rpbe-bec, settings: {cutoffRadius: {v: 4.5, loc: "Table I"}, numRadialBasis: {v: 6, loc: "Sec. V A"}, bodyOrder: {v: 3, loc: "Sec. V A (nu_max)"}}, model: "CACE-LR water potential, version 4"}
+  hp: {label: "CACE-LES for superionic water (E+F)", method: CACE-LES, dataset: hp, settings: {cutoffRadius: {v: 3.5, loc: "Sec. V B"}, numRadialBasis: {v: 6, loc: "Sec. V B"}, bodyOrder: {v: 3, loc: "Sec. V B (nu_max)"}, numLayers: {v: 1, loc: "Sec. V B (message passing layers)"}}, model: "CACE-LR superionic water potential"}
+  hp-ft: {label: "CACE-LES superionic water model fine-tuned on energies, forces and BECs at 2 g/cm3 and 2000 K", method: CACE-LES, dataset: hp-bec, model: "CACE-LR superionic water potential, BEC fine-tuned", base_model: {run: hp, relation: fine-tuned, location: "Sec. V B"}}
+  pto: {label: "CACE-LES E+F model for PbTiO3 (SCAN)", method: CACE-LES, dataset: pto, settings: {cutoffRadius: {v: 6.0, loc: "Sec. V C"}, numRadialBasis: {v: 6, loc: "Sec. V C"}, bodyOrder: {v: 3, loc: "Sec. V C (nu_max)"}, numLayers: {v: 1, loc: "Sec. V C (message passing layers)"}}, model: "CACE-LR PbTiO3 potential (E+F)"}
+  pto-ft: {label: "CACE-LES PbTiO3 E+F model fine-tuned on PBE energies, forces and BECs", method: CACE-LES, dataset: pto-bec, model: "CACE-LR PbTiO3 potential, BEC fine-tuned", base_model: {run: pto, relation: fine-tuned, location: "Sec. V C"}}
+results:
+  - {key: w-v1, model: w-v1, material: water, role: test, eval_data: {label: "RPBE-D3 water test split (10% of 654)", location: "Table I"}, metrics: [[RMSE, Energy, 0.22, meV/atom, "Test RMSE on energy: CACE-LR version 1, water", "Table I"], [RMSE, Force, 18.88, meV/A, "Test RMSE on forces: CACE-LR version 1, water", "Table I"]]}
+  - {key: w-v2, model: w-v2, material: water, role: test, eval_data: {label: "RPBE-D3 water test split (10% of 654)", location: "Table I"}, metrics: [[RMSE, Energy, 0.25, meV/atom, "Test RMSE on energy: CACE-LR version 2, water", "Table I"], [RMSE, Force, 21.01, meV/A, "Test RMSE on forces: CACE-LR version 2, water", "Table I"]]}
+  - {key: w-v3, model: w-v3, material: water, role: test, eval_data: {label: "Test split of the RPBE-D3 + BEC water set", location: "Table I"}, metrics: [[RMSE, Energy, 0.26, meV/atom, "Test RMSE on energy: CACE-LR version 3, water", "Table I"], [RMSE, Force, 23.84, meV/A, "Test RMSE on forces: CACE-LR version 3, water", "Table I"]]}
+  - {key: w-v4, model: w-v4, material: water, role: test, eval_data: {label: "Test split of the RPBE-D3 + BEC water set", location: "Table I"}, metrics: [[RMSE, Energy, 0.19, meV/atom, "Test RMSE on energy: CACE-LR version 4, water", "Table I"], [RMSE, Force, 25.34, meV/A, "Test RMSE on forces: CACE-LR version 4, water", "Table I"]]}
+  - {key: hp, model: hp, material: hp-water, role: test, eval_data: {label: "Superionic water test split (10% of 5,000)", location: "Sec. V B"}, metrics: [[RMSE, Energy, 7, meV/atom, "Test RMSE on energy: CACE-LR, superionic water", "Sec. III B; Sec. V B"], [RMSE, Force, 327, meV/A, "Test RMSE on forces: CACE-LR, superionic water", "Sec. III B; Sec. V B"]]}
+  - {key: hp-ft, model: hp-ft, material: hp-water, role: test, eval_data: {label: "Test split of the 100 configurations at 2 g/cm3 and 2000 K", location: "Sec. V B"}, metrics: [[RMSE, Energy, 0.67, meV/atom, "Test RMSE on energy after BEC fine-tuning: CACE-LR, water at 2 g/cm3 and 2000 K", "Sec. V B"], [RMSE, Force, 101, meV/A, "Test RMSE on forces after BEC fine-tuning: CACE-LR, water at 2 g/cm3 and 2000 K", "Sec. V B"]]}
+  - {key: pto, model: pto, material: PbTiO3, role: test, eval_data: {label: "PbTiO3 test set of Ref. [51] (600 configurations)", location: "Sec. V C"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "Test RMSE on energy: CACE-LR, PbTiO3", "Sec. III C"], [RMSE, Force, 79.8, meV/A, "Test RMSE on forces: CACE-LR, PbTiO3", "Sec. III C"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "CACE-LR in the paper is the CACE short-range model plus latent Ewald summation, i.e. the registry method CACE-LES."
+  - "The errors of the original MLIPs of Refs. [28] (0.8 meV/atom, 60 meV/A), [42] (N2P2: 14 meV/atom, 740 meV/A) and [51] (1 meV/atom, 350 meV/A) are quoted from those papers and not encoded. The pre-fine-tuning errors of the superionic model on the 2000 K set (4.5 meV/atom, 103 meV/A, 0.136 e) are not encoded because their split is not stated; Born-effective-charge RMSEs (e) have no metric property."
+  - "Other CACE settings (c = 12 channels, l_max = 3, N_embedding, LES sigma = 1 A, k_c = pi) have no hyperparameter individual; the water models use no message passing. The fine-tuned models' settings are those of their base models and are not repeated."

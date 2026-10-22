@@ -1,0 +1,74 @@
+id: lahouari2026
+source:
+  rank: 248
+  year: "2026"
+  first_author: "Adam Lahouari"
+  title: "MolCryst-MLIPs: A Machine-Learned Interatomic Potentials Database for Molecular Crystals"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.6c00735"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2604.13897v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "1756eed459c83575654cdf85c3a8b7a3d3f54442870793d2e47b3e867f11ef3d"
+study_label: "Lahouari et al. (2026): MolCryst-MLIPs, fine-tuned MACE potentials for nine molecular crystals"
+scope: |
+  Encoding scope: the nine MACE models fine-tuned from MACE-MH-1 (omol head)
+  for the molecular crystals of the MolCryst-MLIPs database, with their
+  validation MAEs (Table 2), and their PBE-D4 training data built with AMLP.
+  Lattice-energy ranking metrics against foundation models (Table 3),
+  structural agreement (Table 4) and MD stability are not energy or force
+  errors of the schema and are not encoded.
+materials:
+  benzoic-acid: {label: "Benzoic acid molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  benzamide: {label: "Benzamide molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  coumarin: {label: "Coumarin molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  durene: {label: "Durene molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  isonicotinamide: {label: "Isonicotinamide molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  nicotinic-acid: {label: "Nicotinic acid molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  niacinamide: {label: "Niacinamide molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  pyrazinamide: {label: "Pyrazinamide molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+  resorcinol: {label: "Resorcinol molecular crystal polymorphs (CSD structures)", class: "Organic molecular crystal"}
+reference:
+  pbe-d4: {type: DFT, code: VASP, xc: PBE, cutoff: 650, comment: "Grimme D4 dispersion; Gamma-centred Monkhorst-Pack meshes scaled to the cell; EDIFF 1e-7 eV; Fermi smearing 0.05 eV (Tables S1, S2)."}
+sampling:
+  amlp: {label: "DFT cell optimisations, Langevin AIMD at 25-600 K (0.75 fs, 50,000 steps) and active learning on structures that failed in NVT runs (AMLP)"}
+datasets:
+  benzoic-acid: {label: "Benzoic acid PBE-D4 training set (MolCryst-MLIPs)", materials: [benzoic-acid], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  benzamide: {label: "Benzamide PBE-D4 training set (MolCryst-MLIPs)", materials: [benzamide], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  coumarin: {label: "Coumarin PBE-D4 training set (MolCryst-MLIPs)", materials: [coumarin], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  durene: {label: "Durene PBE-D4 training set (MolCryst-MLIPs)", materials: [durene], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  isonicotinamide: {label: "Isonicotinamide PBE-D4 training set (MolCryst-MLIPs)", materials: [isonicotinamide], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  nicotinic-acid: {label: "Nicotinic acid PBE-D4 training set (MolCryst-MLIPs)", materials: [nicotinic-acid], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  niacinamide: {label: "Niacinamide PBE-D4 training set (MolCryst-MLIPs)", materials: [niacinamide], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  pyrazinamide: {label: "Pyrazinamide PBE-D4 training set (MolCryst-MLIPs)", materials: [pyrazinamide], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+  resorcinol: {label: "Resorcinol PBE-D4 training set (MolCryst-MLIPs)", materials: [resorcinol], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d4, sampling: [amlp]}
+methods:
+  MACE:
+    algorithm: "Adam with AMSGrad, early stopping, then stochastic weight averaging; float64"
+    impl: {lib: MACE}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  mace-mh-1: {label: "MACE-MH-1 foundation model (omol head) as distributed", method: MACE, model: "MACE-MH-1 (omol head)"}
+  ft-benzoic-acid: {label: "MACE-MH-1 (omol head) fine-tuned on Benzoic acid", method: MACE, dataset: benzoic-acid, model: "MolCryst-MLIPs MACE model for Benzoic acid", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-benzamide: {label: "MACE-MH-1 (omol head) fine-tuned on Benzamide", method: MACE, dataset: benzamide, model: "MolCryst-MLIPs MACE model for Benzamide", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-coumarin: {label: "MACE-MH-1 (omol head) fine-tuned on Coumarin", method: MACE, dataset: coumarin, model: "MolCryst-MLIPs MACE model for Coumarin", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-durene: {label: "MACE-MH-1 (omol head) fine-tuned on Durene", method: MACE, dataset: durene, model: "MolCryst-MLIPs MACE model for Durene", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-isonicotinamide: {label: "MACE-MH-1 (omol head) fine-tuned on Isonicotinamide", method: MACE, dataset: isonicotinamide, model: "MolCryst-MLIPs MACE model for Isonicotinamide", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-nicotinic-acid: {label: "MACE-MH-1 (omol head) fine-tuned on Nicotinic acid", method: MACE, dataset: nicotinic-acid, model: "MolCryst-MLIPs MACE model for Nicotinic acid", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-niacinamide: {label: "MACE-MH-1 (omol head) fine-tuned on Niacinamide", method: MACE, dataset: niacinamide, model: "MolCryst-MLIPs MACE model for Niacinamide", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-pyrazinamide: {label: "MACE-MH-1 (omol head) fine-tuned on Pyrazinamide", method: MACE, dataset: pyrazinamide, model: "MolCryst-MLIPs MACE model for Pyrazinamide", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+  ft-resorcinol: {label: "MACE-MH-1 (omol head) fine-tuned on Resorcinol", method: MACE, dataset: resorcinol, model: "MolCryst-MLIPs MACE model for Resorcinol", trainingHardware: "Single NVIDIA A100 GPU; about 22 to over 100 h depending on the data set", base_model: {run: mace-mh-1, relation: fine-tuned, location: "Sec. 2"}}
+results:
+  - {key: ft-benzoic-acid, model: ft-benzoic-acid, material: benzoic-acid, role: validation, eval_data: {label: "Benzoic acid validation set"}, metrics: [[MAE, Energy, 0.128, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Benzoic acid", "Table 2"], [MAE, Force, 0.762, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Benzoic acid", "Table 2"]]}
+  - {key: ft-benzamide, model: ft-benzamide, material: benzamide, role: validation, eval_data: {label: "Benzamide validation set"}, metrics: [[MAE, Energy, 0.069, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Benzamide", "Table 2"], [MAE, Force, 0.848, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Benzamide", "Table 2"]]}
+  - {key: ft-coumarin, model: ft-coumarin, material: coumarin, role: validation, eval_data: {label: "Coumarin validation set"}, metrics: [[MAE, Energy, 0.161, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Coumarin", "Table 2"], [MAE, Force, 0.414, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Coumarin", "Table 2"]]}
+  - {key: ft-durene, model: ft-durene, material: durene, role: validation, eval_data: {label: "Durene validation set"}, metrics: [[MAE, Energy, 0.159, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Durene", "Table 2"], [MAE, Force, 0.501, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Durene", "Table 2"]]}
+  - {key: ft-isonicotinamide, model: ft-isonicotinamide, material: isonicotinamide, role: validation, eval_data: {label: "Isonicotinamide validation set"}, metrics: [[MAE, Energy, 0.184, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Isonicotinamide", "Table 2"], [MAE, Force, 1.043, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Isonicotinamide", "Table 2"]]}
+  - {key: ft-nicotinic-acid, model: ft-nicotinic-acid, material: nicotinic-acid, role: validation, eval_data: {label: "Nicotinic acid validation set"}, metrics: [[MAE, Energy, 0.116, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Nicotinic acid", "Table 2"], [MAE, Force, 0.562, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Nicotinic acid", "Table 2"]]}
+  - {key: ft-niacinamide, model: ft-niacinamide, material: niacinamide, role: validation, eval_data: {label: "Niacinamide validation set"}, metrics: [[MAE, Energy, 0.146, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Niacinamide", "Table 2"], [MAE, Force, 0.695, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Niacinamide", "Table 2"]]}
+  - {key: ft-pyrazinamide, model: ft-pyrazinamide, material: pyrazinamide, role: validation, eval_data: {label: "Pyrazinamide validation set"}, metrics: [[MAE, Energy, 0.158, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Pyrazinamide", "Table 2"], [MAE, Force, 0.627, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Pyrazinamide", "Table 2"]]}
+  - {key: ft-resorcinol, model: ft-resorcinol, material: resorcinol, role: validation, eval_data: {label: "Resorcinol validation set"}, metrics: [[MAE, Energy, 0.151, null, "Validation energy MAE (kJ/mol/atom): fine-tuned MACE, Resorcinol", "Table 2"], [MAE, Force, 0.377, null, "Validation force MAE (kJ/mol/A): fine-tuned MACE, Resorcinol", "Table 2"]]}
+gaps:
+  - "Errors are in kJ/mol per atom and kJ/mol/A, which have no unit individuals; mlips:hasUnit is omitted and the units are in the labels."
+  - "Hyperparameters and per-system training times are in the SI (Tables S3-S6) and are not encoded; data-set sizes per compound are not in the main text."
+  - "The three foundation models compared on polymorph lattice energies are not encoded (ranking metrics only)."

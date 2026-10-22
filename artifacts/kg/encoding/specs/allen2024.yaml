@@ -1,0 +1,92 @@
+id: allen2024
+source:
+  rank: 255
+  year: "2024"
+  first_author: "Alice E. A. Allen"
+  title: "Learning together: Towards foundation models for machine learning interatomic potentials with meta-learning"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01339-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2307.04012v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e195f3787adfb6fe7f6c2b59f1c7edf4c748f9d42666abd6af206a20f69cd4ae"
+study_label: "Allen et al. (2024): meta-learning (Reptile) to pre-train ANI potentials on data sets with different levels of theory"
+scope: |
+  Encoding scope: ANI potentials (ANI-1x architecture in TorchANI)
+  pre-trained with the Reptile meta-learning algorithm or by joint fitting
+  (k = 1) on data sets computed at different levels of theory and refitted
+  to a new level of theory: the aspirin MP2 test (Sec. III A), the
+  CCSD(T) ANI-1ccx refits after pre-training on ANI-1x or on the six-data-
+  set organic pre-training set (Sec. III C), and the CCSD(T) errors after
+  pre-training on single data sets (Table S1). The QM9 study (Fig. 4) and
+  the 3BPA learning curves, torsion scans and bond dissociation (Figs. 6,
+  7, S4-S8) are figure-only and not encoded.
+materials:
+  aspirin: {label: "Aspirin molecule", formula: "C9H8O4", class: "Small organic molecule (gas phase)", wikidata: Q18216}
+  organics: {label: "Organic molecules (H, C, N, O) of ANI-1x, ANI-1ccx, QMugs, GEOM, QM7-x and Transition-1x", class: "Organic molecules (gas phase)"}
+reference:
+  asp-wb97x: {type: DFT, xc: wB97X, basis: "6-31G*", comment: "Aspirin 300 K structures (Sec. II C 1)."}
+  asp-b3lyp: {type: DFT, xc: {local: "B3LYP"}, basis: "def2-TZVP", comment: "Aspirin 600 K structures (Sec. II C 1)."}
+  asp-hf: {type: WF, wf: HF, basis: "def2-SVP", comment: "Aspirin 900 K structures (Sec. II C 1)."}
+  asp-mp2: {type: WF, wf: MP2, basis: "def2-SVP", comment: "Aspirin refit and test data (Sec. II C 1)."}
+  ani1x-dz: {type: DFT, xc: wB97X, basis: "6-31G*", comment: "ANI-1x (Table I); Gaussian."}
+  ani1x-tz: {type: DFT, xc: wB97X, basis: "def2-TZVPP", comment: "ANI-1x (Table I)."}
+  ccsdt: {type: WF, wf: CCSDT, basis: "CBS", comment: "ANI-1ccx, CCSD(T)*/CBS (Table I)."}
+  qmugs-dft: {type: DFT, xc: {local: "wB97X-D"}, basis: "def2-SVP", comment: "QMugs (Table I)."}
+  geom-dft: {type: DFT, xc: {local: "r2SCAN-3c"}, basis: "mTZVPP", comment: "GEOM (Table I)."}
+  qm7x-dft: {type: DFT, xc: PBE0, comment: "QM7-x, PBE0+MBD (Table I)."}
+  t1x-dft: {type: DFT, xc: wB97X, basis: "6-31G(d)", code: ORCA, comment: "Transition-1x (Table I; ORCA, Sec. II C 3)."}
+sampling:
+  dftb-md: {label: "DFTB molecular dynamics of aspirin at 300, 600 and 900 K (400 structures per temperature)"}
+datasets:
+  asp-wb97x: {label: "Aspirin pre-training data, 300 K structures at wB97x/6-31G* (400)", materials: [aspirin], properties: [Energy, Forces], provenance: InHouse, n: {v: 400, loc: "Sec. II C 1"}, calc: asp-wb97x, sampling: [dftb-md]}
+  asp-b3lyp: {label: "Aspirin pre-training data, 600 K structures at B3LYP/def2-TZVP (400)", materials: [aspirin], properties: [Energy, Forces], provenance: InHouse, n: {v: 400, loc: "Sec. II C 1"}, calc: asp-b3lyp, sampling: [dftb-md]}
+  asp-hf: {label: "Aspirin pre-training data, 900 K structures at HF/def2-SVP (400)", materials: [aspirin], properties: [Energy, Forces], provenance: InHouse, n: {v: 400, loc: "Sec. II C 1"}, calc: asp-hf, sampling: [dftb-md]}
+  asp-mp2: {label: "Aspirin MP2/def2-SVP refit set (400 MD configurations at 300 K)", materials: [aspirin], properties: [Energy, Forces], provenance: InHouse, n: {v: 400, loc: "Sec. II C 1"}, calc: asp-mp2, sampling: [dftb-md]}
+  ani1ccx: {label: "ANI-1ccx CCSD(T)*/CBS data set (489,571 conformers)", materials: [organics], properties: [Energy], provenance: Published, n: {v: 489571, loc: "Table I"}, calc: ccsdt}
+  ani1x: {label: "ANI-1x at wB97x/6-31G* and wB97x/def2-TZVPP", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: ani1x-dz, comment: "Both levels of theory are used as separate tasks."}
+  multi: {label: "Organic pre-training set from ANI-1x (dz, tz), QMugs, QM7-x, GEOM and Transition-1x after three rounds of error-based selection (3,149,452 structures)", materials: [organics], properties: [Energy, Forces], provenance: Augmented, n: {v: 3149452, loc: "Table S2"}, comment: "100,000 random structures per data set, extended three times with the highest-error structures (Sec. II E, SI S1.6)."}
+methods:
+  ANI:
+    hp: [batchSize, learningRate]
+    loss: "Energy and force loss"
+    algorithm: "Reptile meta-learning over data sets at different levels of theory (k steps per task, epsilon = 1); k = 1 is joint training"
+    impl: {lib: TorchANI}
+runs:
+  asp-nopre: {label: "ANI trained on aspirin MP2 data without pre-training", method: ANI, dataset: asp-mp2, settings: {batchSize: {v: 8, loc: "Sec. II C 1"}}, model: "ANI aspirin potential, no pre-training"}
+  asp-k1: {label: "ANI jointly pre-trained (k = 1) on the three aspirin levels of theory and refitted to MP2", method: ANI, dataset: asp-mp2, settings: {batchSize: {v: 8, loc: "Sec. II C 1"}}, model: "ANI aspirin potential, k = 1 pre-training", base_model: {label: "ANI pre-trained with k = 1 on the wB97x, B3LYP and HF aspirin data", relation: fine-tuned, location: "Sec. III A"}}
+  ccx-meta: {label: "ANI meta-learned on ANI-1x (two levels of theory) and refitted to ANI-1ccx", method: ANI, dataset: ani1ccx, model: "ANI-1ccx refit after meta-learning on ANI-1x", base_model: {label: "ANI meta-learned on ANI-1x wB97x/6-31G* and wB97x/def2-TZVPP", relation: fine-tuned, location: "Sec. III C"}}
+  ccx-tl-dz: {label: "ANI trained on ANI-1x wB97x/6-31G* and transfer-learned to ANI-1ccx", method: ANI, dataset: ani1ccx, model: "ANI-1ccx refit after training on ANI-1x (6-31G*)", base_model: {label: "ANI trained on ANI-1x wB97x/6-31G*", relation: fine-tuned, location: "Sec. III C"}}
+  ccx-tl-tz: {label: "ANI trained on ANI-1x wB97x/def2-TZVPP and transfer-learned to ANI-1ccx", method: ANI, dataset: ani1ccx, model: "ANI-1ccx refit after training on ANI-1x (def2-TZVPP)", base_model: {label: "ANI trained on ANI-1x wB97x/def2-TZVPP", relation: fine-tuned, location: "Sec. III C"}}
+  multi-meta: {label: "ANI meta-learned on the six organic data sets (pre-trained model)", method: ANI, dataset: multi, model: "Meta-learning organic pre-trained ANI potential"}
+  ccx-multi-meta: {label: "Meta-learned organic ANI potential refitted to ANI-1ccx", method: ANI, dataset: ani1ccx, model: "ANI-1ccx refit after organic meta-learning", base_model: {run: multi-meta, relation: fine-tuned, location: "Sec. III C"}}
+  ccx-multi-k1: {label: "ANI jointly pre-trained (k = 1) on the six organic data sets and refitted to ANI-1ccx", method: ANI, dataset: ani1ccx, model: "ANI-1ccx refit after organic k = 1 pre-training", base_model: {label: "ANI jointly pre-trained (k = 1) on the six organic data sets", relation: fine-tuned, location: "Sec. III C"}}
+  s1-ani1x-dz: {label: "ANI pre-trained on 10,000 structures of ANI-1x dz (wB97x/6-31G*) and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on ANI-1x dz (wB97x/6-31G*)", base_model: {label: "ANI pre-trained on ANI-1x dz (wB97x/6-31G*)", relation: fine-tuned, location: "Table S1"}}
+  s1-ani1x-tz: {label: "ANI pre-trained on 10,000 structures of ANI-1x tz (wB97x/def2-TZVPP) and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on ANI-1x tz (wB97x/def2-TZVPP)", base_model: {label: "ANI pre-trained on ANI-1x tz (wB97x/def2-TZVPP)", relation: fine-tuned, location: "Table S1"}}
+  s1-geom: {label: "ANI pre-trained on 10,000 structures of GEOM and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on GEOM", base_model: {label: "ANI pre-trained on GEOM", relation: fine-tuned, location: "Table S1"}}
+  s1-t1x: {label: "ANI pre-trained on 10,000 structures of Transition-1x and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on Transition-1x", base_model: {label: "ANI pre-trained on Transition-1x", relation: fine-tuned, location: "Table S1"}}
+  s1-qm7x: {label: "ANI pre-trained on 10,000 structures of QM7-x and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on QM7-x", base_model: {label: "ANI pre-trained on QM7-x", relation: fine-tuned, location: "Table S1"}}
+  s1-qmugs: {label: "ANI pre-trained on 10,000 structures of QMugs and refitted to CCSD(T) (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) refit after pre-training on QMugs", base_model: {label: "ANI pre-trained on QMugs", relation: fine-tuned, location: "Table S1"}}
+  s1-none: {label: "ANI fitted directly to the CCSD(T) subset, no pre-training (Table S1)", method: ANI, dataset: ani1ccx, model: "CCSD(T) ANI without pre-training"}
+results:
+  - {key: asp-nopre, model: asp-nopre, material: aspirin, role: test, eval_data: {label: "Aspirin MP2/def2-SVP test set (MD structures at 300, 600 and 900 K)", location: "Sec. II C 1"}, metrics: [[RMSE, Force, 5.35, kcal/mol/A, "Test-set force RMSE (5.35 +/- 0.41): ANI, no pre-training, aspirin MP2", "Sec. III A; Fig. 3 caption"]]}
+  - {key: asp-k1, model: asp-k1, material: aspirin, role: test, eval_data: {label: "Aspirin MP2/def2-SVP test set (MD structures at 300, 600 and 900 K)", location: "Sec. II C 1"}, metrics: [[RMSE, Force, 3.38, kcal/mol/A, "Test-set force RMSE (3.38 +/- 0.16): ANI, k = 1 pre-training, aspirin MP2", "Sec. III A"]]}
+  - {key: ccx-meta, model: ccx-meta, material: organics, role: null, eval_data: {label: "CCSD(T) (ANI-1ccx) specialisation task; split not stated", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.39, kcal/mol, "CCSD(T) energy RMSE: ANI after meta-learning on ANI-1x (2.39 +/- 0.00)", "Sec. III C"]]}
+  - {key: ccx-tl-dz, model: ccx-tl-dz, material: organics, role: null, eval_data: {label: "CCSD(T) (ANI-1ccx) specialisation task; split not stated", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.2, kcal/mol, "CCSD(T) energy RMSE: ANI after training on ANI-1x wB97x/6-31G* then transfer learning (2.20 +/- 0.01)", "Sec. III C"]]}
+  - {key: ccx-tl-tz, model: ccx-tl-tz, material: organics, role: null, eval_data: {label: "CCSD(T) (ANI-1ccx) specialisation task; split not stated", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.09, kcal/mol, "CCSD(T) energy RMSE: ANI after training on ANI-1x wB97x/def2-TZVPP then transfer learning (2.09 +/- 0.02)", "Sec. III C"]]}
+  - {key: ccx-multi-meta, model: ccx-multi-meta, material: organics, role: null, eval_data: {label: "CCSD(T) (ANI-1ccx) specialisation task; split not stated", location: "Sec. III C"}, metrics: [[RMSE, Energy, 2.89, kcal/mol, "CCSD(T) energy RMSE: ANI after organic meta-learning pre-training", "Sec. III C"]]}
+  - {key: ccx-multi-k1, model: ccx-multi-k1, material: organics, role: null, eval_data: {label: "CCSD(T) (ANI-1ccx) specialisation task; split not stated", location: "Sec. III C"}, metrics: [[RMSE, Energy, 3.32, kcal/mol, "CCSD(T) energy RMSE: ANI after organic k = 1 pre-training", "Sec. III C"]]}
+  - {key: s1-ani1x-dz, model: s1-ani1x-dz, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 6.44, kcal/mol, "CCSD(T) error after pre-training on ANI-1x dz (wB97x/6-31G*)", "Table S1"]]}
+  - {key: s1-ani1x-tz, model: s1-ani1x-tz, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 6.98, kcal/mol, "CCSD(T) error after pre-training on ANI-1x tz (wB97x/def2-TZVPP)", "Table S1"]]}
+  - {key: s1-geom, model: s1-geom, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 16.46, kcal/mol, "CCSD(T) error after pre-training on GEOM", "Table S1"]]}
+  - {key: s1-t1x, model: s1-t1x, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 11.73, kcal/mol, "CCSD(T) error after pre-training on Transition-1x", "Table S1"]]}
+  - {key: s1-qm7x, model: s1-qm7x, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 8.26, kcal/mol, "CCSD(T) error after pre-training on QM7-x", "Table S1"]]}
+  - {key: s1-qmugs, model: s1-qmugs, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 14.69, kcal/mol, "CCSD(T) error after pre-training on QMugs", "Table S1"]]}
+  - {key: s1-none, model: s1-none, material: organics, role: null, eval_data: {label: "CCSD(T) data (7,650-structure subset used for the hyperparameter tests)", location: "SI S1.2"}, metrics: [[RMSE, Energy, 13.9, kcal/mol, "CCSD(T) error after pre-training on no pre-training", "Table S1"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "The meta-learning (Reptile) refit errors of the aspirin study (minimum near k = 400), of the QM9 study and of 3BPA are shown only in figures. The k = 1 ANI-1x pre-training error for the CCSD(T) task is stated as 3.30 +/- 0.10 kcal/mol in the text and 3.47 kcal/mol in the Fig. 5 caption, so that model is not encoded; the k used for the meta-learned ANI-1x model is not stated in the text (k = 50 in the Fig. 5 caption)."
+  - "The CCSD(T) errors are taken to be energy RMSEs in kcal/mol (Sec. III C states RMSEs; Table S1 says 'CCSD(T) error' and its no-pre-training value matches the 13.90 kcal/mol RMSE of Fig. S2). The split of the Sec. III C errors is not stated, so they have no role."
+  - "ANI hyperparameters are those of ANI-1x (Ref. [31]) and are not restated; the Reptile parameters k, epsilon and the 150-epoch refit limit have no hyperparameter individual. Batch size 250 and the learning-rate schedule (0.001 halved on plateau down to 1e-5) of SI S1.2/S1.5 are not tied to a specific model."
+  - "QMugs, GEOM, QM7-x and Transition-1x enter only through the combined pre-training set; QMugs and GEOM provide energies only (SI S1.2). QM9 (228 levels of theory) is used only in the figure-only study and is not encoded as a data set."

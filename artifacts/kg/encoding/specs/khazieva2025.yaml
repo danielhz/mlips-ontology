@@ -1,0 +1,50 @@
+id: khazieva2025
+source:
+  rank: 259
+  year: "2025"
+  first_author: "E. O. Khazieva"
+  title: "Accuracy and limitations of machine-learned interatomic potentials for magnetic systems: A case study on Fe-Cr-C"
+  venue: "Physical review. E"
+  doi: "10.1103/913y-p6qf"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2507.18935v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "600a3b292c56b8c716577305ea3ddf4d6b874affef09deb611644bd36a405e79"
+study_label: "Khazieva et al. (2025): non-magnetic vs spin-polarised Deep Potentials for Fe-Cr-C"
+scope: |
+  Encoding scope: two Deep Potentials for the Fe-Cr-C system, DP-NM trained
+  on spin-unpolarised DFT data from a DP-GEN active-learning workflow and
+  DP-M obtained by fine-tuning DP-NM (all but the last layer frozen) on 600
+  spin-polarised configurations, applied in MD to densities, melting
+  temperatures (two-phase method) and viscosities. The paper reports no
+  energy/force/stress errors; the property comparisons with experiment
+  (Table 1, Figs. 2-8) are not error metrics and are not encoded.
+materials:
+  FeCrC: {label: "Fe-Cr-C alloys over the whole ternary composition space (liquid and crystalline)", formula: "FeCrC", class: "Ternary metallic alloy (magnetic)"}
+reference:
+  nm: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Generalised Monkhorst-Pack grids (KpLib)", comment: "Spin-unpolarised."}
+  sp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Generalised Monkhorst-Pack grids (KpLib)", comment: "Collinear spin-polarised, initialised ferromagnetic."}
+sampling:
+  aimd: {label: "Spin-unpolarised NPT AIMD of 20 disordered 128-atom Fe-Cr-C supercells at 3000 K and 0, 10 and 50 GPa (seed set)"}
+  al: {label: "DP-GEN active learning: 14 iterations of DP-NM MD at 0-10 GPa with heating-cooling between 500 and 3000 K, 350 new labelled configurations per iteration"}
+  spin-relax: {label: "150 frames selected by SOAP sparsification, four spin-polarised ionic relaxation steps each at fixed cell"}
+datasets:
+  nm: {label: "Non-magnetic Fe-Cr-C data set (about 5,000 configurations with energies, forces and virials)", materials: [FeCrC], properties: [Energy, Forces, Virials], provenance: InHouse, calc: nm, sampling: [aimd, al]}
+  sp: {label: "Spin-polarised Fe-Cr-C fine-tuning set (600 configurations, 4 snapshots x 150 frames)", materials: [FeCrC], properties: [Energy, Forces], provenance: InHouse, n: {v: 600, loc: "Sec. II C"}, calc: sp, sampling: [spin-relax]}
+methods:
+  DeePMD:
+    impl: {lib: DeePMDkit}
+    algorithm: "DP-GEN active learning; transfer learning with all weights except the output layer frozen (DP-M)"
+    sims: [MolecularDynamics]
+runs:
+  dp-nm: {label: "DP-NM, Deep Potential trained on non-magnetic DFT data", method: DeePMD, dataset: nm, model: "DP-NM Fe-Cr-C potential"}
+  dp-m: {label: "DP-M, DP-NM fine-tuned on spin-polarised DFT data", method: DeePMD, dataset: sp, model: "DP-M Fe-Cr-C potential", base_model: {run: dp-nm, relation: fine-tuned, location: "Sec. II C"}}
+results: []
+resources: |
+  Spin-polarised DFT is stated to be roughly twice as expensive per
+  electronic step and to need almost an order of magnitude more computer
+  time overall; transfer learning reduces the cost of building the magnetic
+  potential by more than an order of magnitude. No times are given.
+gaps:
+  - "No energy, force or virial errors of DP-NM or DP-M are reported; the validation is against experimental densities, lattice constants, melting temperatures (Table 1) and viscosities, which are properties rather than error metrics."
+  - "The size of the non-magnetic data set is stated only as approximately 5,000 configurations (the AL text also mentions a 5000-configuration set), so no count is attached; the DeePMD network sizes and cutoff are given only by reference to Ref. [8]."

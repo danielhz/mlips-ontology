@@ -1,0 +1,105 @@
+id: fan2022
+source:
+  rank: 250
+  year: "2022"
+  first_author: "Zheyong Fan"
+  title: "GPUMD: A package for constructing accurate machine-learned potentials and performing highly efficient atomistic simulations"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0106617"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2205.10046v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "55cb9c2a457852b32d2f3ce2a385d12c10372bd92c0ace6181100cdc6ee4cefe"
+study_label: "Fan et al. (2022): GPUMD, NEP3 machine-learned potentials and comparison with DP, GAP, MTP and REANN"
+scope: |
+  Encoding scope: the NEP2 and NEP3 models for the MgAlCu alloy (Table I)
+  and the carbon comparison of Table II (NEP3 at two cutoffs against DP,
+  GAP, MTP and REANN, with RMSEs on the 450-structure test set and the MD
+  speed of each potential). The silicon and azobenzene comparisons (Figs. 4
+  and 5, figure-only values), the active-learning study (Fig. 9), the
+  diamond properties of Table III and the heat-transport applications are
+  not encoded.
+materials:
+  MgAlCu: {label: "Mg-Al-Cu alloys in the full concentration space", formula: "MgAlCu", class: "Ternary metallic alloy"}
+  C: {label: "Carbon (bulk crystals, liquid and amorphous bulk, amorphous surfaces, dimers)", formula: "C", class: "Elemental solid and liquid carbon", wikidata: Q623}
+datasets:
+  MgAlCu: {label: "MgAlCu data set of Ref. [122] (141,409 structures; 90% training, 10% test)", materials: [MgAlCu], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 141409, loc: "Sec. III A"}, comment: "Previously used for a Deep Potential (Jiang et al., Chin. Phys. B 30, 050706 (2021))."}
+  C-train: {label: "Carbon training set of Ref. [10] (4,080 structures, 256,628 atoms)", materials: [C], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 4080, loc: "Sec. III B 3"}, comment: "Deringer and Csanyi, Phys. Rev. B 95, 094203 (2017); DFT-LDA reference; some structures carry virials."}
+hyperparameters:
+  Nneu: {label: "NEP number of neurons in the hidden layer N_neu", name: "N_neu", datatype: integer}
+  Ngen: {label: "NEP maximum number of generations of the separable natural evolution strategy N_gen", name: "N_gen", datatype: integer}
+methods:
+  NEP:
+    hp: [cutoffRadius, angularCutoff, Nneu, Ngen, batchSize]
+    loss: "Energy, force and virial RMSEs plus L1 and L2 regularisation"
+    algorithm: "Separable natural evolution strategy (SNES), population 50"
+    impl: {lib: {local: "GPUMD", comment: "nep executable of the open-source gpumd package (GPU)"}}
+    sims: [MolecularDynamics]
+  DeePMD:
+    hp: [cutoffRadius, angularCutoff]
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+  GAP:
+    sims: [MolecularDynamics]
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics]
+  REANN:
+    hp: [cutoffRadius, batchSize, numEpochs]
+    impl: {lib: {local: "REANN", comment: "reann package (PyTorch)"}}
+    sims: [MolecularDynamics]
+runs:
+  nep2-MgAlCu: {label: "NEP2 fit to MgAlCu", method: NEP, dataset: MgAlCu, settings: {cutoffRadius: {v: 6, loc: "Sec. III A (nep.in)"}, angularCutoff: {v: 3.5, loc: "Sec. III A (nep.in)"}, Nneu: {v: 50, loc: "Sec. III A (nep.in)"}, Ngen: {v: 500000, loc: "Sec. III A (nep.in)"}, batchSize: {v: 1000, loc: "Sec. III A (nep.in)"}}, model: "NEP2 MgAlCu potential"}
+  nep3-MgAlCu: {label: "NEP3 fit to MgAlCu", method: NEP, dataset: MgAlCu, settings: {cutoffRadius: {v: 6, loc: "Sec. III A (nep.in)"}, angularCutoff: {v: 3.5, loc: "Sec. III A (nep.in)"}, Nneu: {v: 50, loc: "Sec. III A (nep.in)"}, Ngen: {v: 500000, loc: "Sec. III A (nep.in)"}, batchSize: {v: 1000, loc: "Sec. III A (nep.in)"}}, model: "NEP3 MgAlCu potential"}
+  nep-C-4.2: {label: "NEP3 fit to carbon, NEP (4.2 A)", method: NEP, dataset: C-train, settings: {cutoffRadius: {v: 4.2, loc: "Sec. III B 3"}, angularCutoff: {v: 3.7, loc: "Sec. III B 3"}, Nneu: {v: 100, loc: "Sec. III B 3"}, Ngen: {v: 500000, loc: "Sec. III B 3"}}, model: "NEP (4.2 A) carbon potential (C_2022_NEP3)"}
+  nep-C-3.7: {label: "NEP3 fit to carbon, NEP (3.7 A)", method: NEP, dataset: C-train, settings: {cutoffRadius: {v: 3.7, loc: "Sec. III B 3"}, angularCutoff: {v: 3.2, loc: "Sec. III B 3"}, Nneu: {v: 50, loc: "Sec. III B 3"}, Ngen: {v: 500000, loc: "Sec. III B 3"}}, model: "NEP (3.7 A) carbon potential"}
+  dp-C-se2: {label: "DP (smooth edition, se_a descriptor) fit to carbon, DP (se2)", method: DeePMD, dataset: C-train, settings: {cutoffRadius: {v: 6, loc: "Sec. III B 3"}}, model: "DP (se2) carbon potential"}
+  dp-C-se2se3: {label: "DP (smooth edition, se_e2_a plus se_e3 descriptors) fit to carbon, DP (se2+se3)", method: DeePMD, dataset: C-train, settings: {cutoffRadius: {v: 6, loc: "Sec. III B 3 (se_e2_a)"}, angularCutoff: {v: 3.8, loc: "Sec. III B 3 (se_e3)"}}, model: "DP (se2+se3) carbon potential"}
+  gap-C: {label: "GAP carbon potential of Ref. [10] (results taken from Ref. [10])", method: GAP, model: "GAP carbon potential of Deringer and Csanyi (2017)"}
+  mtp-C-4: {label: "MTP fit to carbon, MTP (4 A)", method: MTP, dataset: C-train, settings: {cutoffRadius: {v: 4, loc: "Sec. III B 3"}, momentLevel: {v: 22, loc: "Sec. III B 3"}}, model: "MTP (4 A) carbon potential"}
+  mtp-C-5: {label: "MTP fit to carbon, MTP (5 A)", method: MTP, dataset: C-train, settings: {cutoffRadius: {v: 5, loc: "Sec. III B 3"}, momentLevel: {v: 22, loc: "Sec. III B 3"}}, model: "MTP (5 A) carbon potential"}
+  mtp-C-6: {label: "MTP fit to carbon, MTP (6 A)", method: MTP, dataset: C-train, settings: {cutoffRadius: {v: 6, loc: "Sec. III B 3"}, momentLevel: {v: 22, loc: "Sec. III B 3"}}, model: "MTP (6 A) carbon potential"}
+  reann-C-3: {label: "REANN fit to carbon, REANN (3 A)", method: REANN, dataset: C-train, settings: {cutoffRadius: {v: 3, loc: "Sec. III B 3"}, batchSize: {v: 32, loc: "Sec. III B 3"}, numEpochs: {v: 10000, loc: "Sec. III B 3"}}, model: "REANN (3 A) carbon potential"}
+  reann-C-4: {label: "REANN fit to carbon, REANN (4 A)", method: REANN, dataset: C-train, settings: {cutoffRadius: {v: 4, loc: "Sec. III B 3"}, batchSize: {v: 32, loc: "Sec. III B 3"}, numEpochs: {v: 10000, loc: "Sec. III B 3"}}, model: "REANN (4 A) carbon potential"}
+  reann-C-6: {label: "REANN fit to carbon, REANN (6 A)", method: REANN, dataset: C-train, settings: {cutoffRadius: {v: 6, loc: "Sec. III B 3"}, batchSize: {v: 32, loc: "Sec. III B 3"}, numEpochs: {v: 10000, loc: "Sec. III B 3"}}, model: "REANN (6 A) carbon potential"}
+results:
+  - {key: nep2-MgAlCu, model: nep2-MgAlCu, material: MgAlCu, role: test, eval_data: {label: "MgAlCu test set (10% of 141,409 structures)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 11, meV/atom, "RMSE for energies: NEP2, MgAlCu", "Table I"], [RMSE, Force, 68, meV/A, "RMSE for forces: NEP2, MgAlCu", "Table I"]]}
+  - {key: nep3-MgAlCu, model: nep3-MgAlCu, material: MgAlCu, role: test, eval_data: {label: "MgAlCu test set (10% of 141,409 structures)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 10, meV/atom, "RMSE for energies: NEP3, MgAlCu", "Table I"], [RMSE, Force, 63, meV/A, "RMSE for forces: NEP3, MgAlCu", "Table I"]]}
+  - {key: nep-C-4.2, model: nep-C-4.2, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 42, meV/atom, "Energy RMSE: NEP (4.2 A), carbon", "Table II"], [RMSE, Force, 690, meV/A, "Force RMSE: NEP (4.2 A), carbon", "Table II"]]}
+  - {key: nep-C-3.7, model: nep-C-3.7, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 44, meV/atom, "Energy RMSE: NEP (3.7 A), carbon", "Table II"], [RMSE, Force, 700, meV/A, "Force RMSE: NEP (3.7 A), carbon", "Table II"]]}
+  - {key: dp-C-se2, model: dp-C-se2, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 80, meV/atom, "Energy RMSE: DP (se2), carbon", "Table II"], [RMSE, Force, 1100, meV/A, "Force RMSE: DP (se2), carbon", "Table II"]]}
+  - {key: dp-C-se2se3, model: dp-C-se2se3, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 44, meV/atom, "Energy RMSE: DP (se2+se3), carbon", "Table II"], [RMSE, Force, 800, meV/A, "Force RMSE: DP (se2+se3), carbon", "Table II"]]}
+  - {key: gap-C, model: gap-C, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 46, meV/atom, "Energy RMSE: GAP, carbon", "Table II"], [RMSE, Force, 1100, meV/A, "Force RMSE: GAP, carbon", "Table II"]]}
+  - {key: mtp-C-4, model: mtp-C-4, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 36, meV/atom, "Energy RMSE: MTP (4 A), carbon", "Table II"], [RMSE, Force, 650, meV/A, "Force RMSE: MTP (4 A), carbon", "Table II"]]}
+  - {key: mtp-C-5, model: mtp-C-5, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 35, meV/atom, "Energy RMSE: MTP (5 A), carbon", "Table II"], [RMSE, Force, 630, meV/A, "Force RMSE: MTP (5 A), carbon", "Table II"]]}
+  - {key: mtp-C-6, model: mtp-C-6, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 35, meV/atom, "Energy RMSE: MTP (6 A), carbon", "Table II"], [RMSE, Force, 650, meV/A, "Force RMSE: MTP (6 A), carbon", "Table II"]]}
+  - {key: reann-C-3, model: reann-C-3, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 41, meV/atom, "Energy RMSE: REANN (3 A), carbon", "Table II"], [RMSE, Force, 700, meV/A, "Force RMSE: REANN (3 A), carbon", "Table II"]]}
+  - {key: reann-C-4, model: reann-C-4, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 31, meV/atom, "Energy RMSE: REANN (4 A), carbon", "Table II"], [RMSE, Force, 640, meV/A, "Force RMSE: REANN (4 A), carbon", "Table II"]]}
+  - {key: reann-C-6, model: reann-C-6, material: C, role: test, eval_data: {label: "Carbon test set of Ref. [10] (450 structures, 28,337 atoms, no dimers)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 28, meV/atom, "Energy RMSE: REANN (6 A), carbon", "Table II"], [RMSE, Force, 670, meV/A, "Force RMSE: REANN (6 A), carbon", "Table II"]]}
+timings:
+  - {model: nep3-MgAlCu, system: "MgAlCu MD with the NEP3 model (system size not stated)", atoms: null, value: 1.5e7, unit: "atom-steps per second (about)", per_atom_us: null, hardware: "One Nvidia Tesla A100 GPU in gpumd: about 1.5e7 atom-steps per second", result: nep3-MgAlCu, location: "Sec. III A"}
+  - {model: nep-C-4.2, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 3600, unit: "atom-steps per ms", per_atom_us: 0.2778, hardware: "One 32-GB Nvidia Tesla V100 GPU: 3600 atom-steps per ms (NEP (4.2 A))", result: nep-C-4.2, location: "Table II"}
+  - {model: nep-C-3.7, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 4600, unit: "atom-steps per ms", per_atom_us: 0.2174, hardware: "One 32-GB Nvidia Tesla V100 GPU: 4600 atom-steps per ms (NEP (3.7 A))", result: nep-C-3.7, location: "Table II"}
+  - {model: dp-C-se2, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 290, unit: "atom-steps per ms", per_atom_us: 3.448, hardware: "One 32-GB Nvidia Tesla V100 GPU (DP after model compression): 290 atom-steps per ms (DP (se2))", result: dp-C-se2, location: "Table II"}
+  - {model: dp-C-se2se3, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 150, unit: "atom-steps per ms", per_atom_us: 6.667, hardware: "One 32-GB Nvidia Tesla V100 GPU (DP after model compression): 150 atom-steps per ms (DP (se2+se3))", result: dp-C-se2se3, location: "Table II"}
+  - {model: gap-C, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 6.1, unit: "atom-steps per ms", per_atom_us: 163.934, hardware: "72 Intel Xeon-Gold 6240 CPU cores: 6.1 atom-steps per ms (GAP)", result: gap-C, location: "Table II"}
+  - {model: mtp-C-4, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 110, unit: "atom-steps per ms", per_atom_us: 9.091, hardware: "72 Intel Xeon-Gold 6240 CPU cores: 110 atom-steps per ms (MTP (4 A))", result: mtp-C-4, location: "Table II"}
+  - {model: mtp-C-5, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 61, unit: "atom-steps per ms", per_atom_us: 16.393, hardware: "72 Intel Xeon-Gold 6240 CPU cores: 61 atom-steps per ms (MTP (5 A))", result: mtp-C-5, location: "Table II"}
+  - {model: mtp-C-6, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 27, unit: "atom-steps per ms", per_atom_us: 37.037, hardware: "72 Intel Xeon-Gold 6240 CPU cores: 27 atom-steps per ms (MTP (6 A))", result: mtp-C-6, location: "Table II"}
+  - {model: reann-C-3, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 280, unit: "atom-steps per ms", per_atom_us: 3.571, hardware: "One 32-GB Nvidia Tesla V100 GPU: 280 atom-steps per ms (REANN (3 A))", result: reann-C-3, location: "Table II"}
+  - {model: reann-C-4, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 170, unit: "atom-steps per ms", per_atom_us: 5.882, hardware: "One 32-GB Nvidia Tesla V100 GPU: 170 atom-steps per ms (REANN (4 A))", result: reann-C-4, location: "Table II"}
+  - {model: reann-C-6, system: "Cubic diamond cell, NVT MD at 300 K for 100 steps (cell size not stated)", atoms: null, value: 62, unit: "atom-steps per ms", per_atom_us: 16.129, hardware: "One 32-GB Nvidia Tesla V100 GPU: 62 atom-steps per ms (REANN (6 A))", result: reann-C-6, location: "Table II"}
+resources: |
+  Table II gives the MD speed (atom-steps per ms) for a diamond cell at
+  300 K: DP (compressed), REANN and NEP on one 32-GB Tesla V100 GPU, GAP and
+  MTP on 72 Intel Xeon-Gold 6240 cores; per-atom times are 1000/speed. NEP3
+  on one Tesla A100 reaches about 1.5e7 atom-steps per second. The maximum
+  number of atoms on one V100 (Nmax: 240e3 and 220e3 for DP, 4,100e3 and
+  5,800e3 for NEP, 290e3, 180e3 and 64e3 for REANN) is not encoded. No
+  training times are given.
+gaps:
+  - "NEP2 and NEP3 are versions of the registry method NEP (fan2021): NEP3 changes the radial functions to linear combinations of Chebyshev basis functions and adds four- and five-body angular descriptor components; both are encoded as runs of NEP."
+  - "Virial RMSEs (meV/atom; Table I and Table II) have no metric property in the schema and are not encoded. The GAP RMSEs of Table II are taken from Ref. [10]; this paper does not train the GAP model, so no training data set is attached to it. Its SOAP n_max = l_max = 8 is not encoded."
+  - "NEP radial/angular basis sizes (n_max, N_bas, l_max), the population size and the regularisation weights have no hyperparameter individual; DP network sizes, learning-rate schedules and loss weights, and the REANN network sizes are not encoded."
+  - "Silicon (Fig. 4) and azobenzene/rMD17 (Fig. 5) accuracy-versus-cost comparisons are given only as figures and are not encoded; Table III elastic constants and lattice constant of diamond are properties, not error metrics, and are not encoded."

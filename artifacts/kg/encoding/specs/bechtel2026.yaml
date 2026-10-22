@@ -1,0 +1,74 @@
+id: bechtel2026
+source:
+  rank: 247
+  year: "2026"
+  first_author: "Maximilian A. Bechtel"
+  title: "Vibrational power spectra as a tool to benchmark universal machine-learning interatomic potentials for molecular systems: the OMOL-1k-MD data set"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02286-5"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "becb6500dda30e1010f5fd5e08a4b5bea7640fd968360f00dd32bb56d0f4b400"
+study_label: "Bechtel and Steffen (2026): OMOL-1k-MD, vibrational power spectra as a benchmark of universal MLIPs for molecules"
+scope: |
+  Encoding scope: the OMOL-1k-MD data set introduced here (PBE-D3 AIMD of
+  1,000 OMOL25 molecules) and the ten pretrained universal MLIPs whose
+  vibrational free energies from MD power spectra are compared with it
+  (Table 1: MAE per atom, and the MD time for molecule No. 1). GFN2-xTB and
+  GFN-FF are not MLIPs and are not encoded; peak-position errors, stability
+  analyses and the larger-system tests are not encoded.
+materials:
+  omol1k: {label: "1,000 neutral closed-shell molecules of up to 50 atoms randomly drawn from OMOL25", class: "Organic and main-group molecules (gas phase)"}
+  c4h9n3o: {label: "C4H9N3O molecule (No. 1 of OMOL-1k-MD)", formula: "C4H9N3O", class: "Small organic molecule (gas phase)"}
+reference:
+  pbe-d3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 450, comment: "VASP 6.5.0, Grimme D3(BJ), 20 A cubic box, Fermi smearing at 300 K; NVT AIMD at 300 K with a Nose-Hoover thermostat."}
+sampling:
+  aimd: {label: "Three independent 11 ps AIMD trajectories (1 fs steps, first 1 ps equilibration) per molecule at 300 K"}
+datasets:
+  omol1k: {label: "OMOL-1k-MD (30 million AIMD structures of 1,000 molecules)", materials: [omol1k], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d3, sampling: [aimd], comment: "Benchmark and training resource; molecules selected from OMOL25-train4M."}
+external_models: [MatterSim-v1]
+methods:
+  EquiformerV2: {sims: [MolecularDynamics]}
+  MACE: {sims: [MolecularDynamics]}
+  NequIP: {sims: [MolecularDynamics]}
+  ORB: {sims: [MolecularDynamics]}
+  PaiNN: {sims: [MolecularDynamics]}
+  SchNet: {sims: [MolecularDynamics]}
+  UMA: {sims: [MolecularDynamics]}
+  eSCN: {sims: [MolecularDynamics]}
+runs:
+  mace-mp-0b: {label: "MACE MP-0 (mp-0b agnesi-medium) as distributed", method: MACE, model: "MACE MP-0 (mp-0b agnesi-medium)"}
+  mace-mh-1: {label: "MACE MH-1 (OMat head) as distributed", method: MACE, model: "MACE MH-1 (OMat head)"}
+  uma-omat: {label: "UMA (OMat head) as distributed", method: UMA, model: "UMA (OMat head)"}
+  orb-v3: {label: "Orb-v3-conservative-inf-OMAT as distributed", method: ORB, model: "Orb-v3-conservative-inf-OMAT"}
+  eqv2-oc20: {label: "EquiformerV2-153M-S2EF-OC20-All+MD as distributed", method: EquiformerV2, model: "EquiformerV2-153M-S2EF-OC20-All+MD"}
+  escn-oc20: {label: "eSCN-L6-M3-Lay20-S2EF-OC20-All+MD as distributed", method: eSCN, model: "eSCN-L6-M3-Lay20-S2EF-OC20-All+MD"}
+  schnet-oc20: {label: "SchNet-S2EF-OC20-All as distributed", method: SchNet, model: "SchNet-S2EF-OC20-All"}
+  painn-oc20: {label: "PaiNN-S2EF-OC20-All as distributed", method: PaiNN, model: "PaiNN-S2EF-OC20-All"}
+  sevennet-mf-ompa: {label: "SevenNet-MF-OMPA (MPA head) as distributed", method: NequIP, model: "SevenNet-MF-OMPA (MPA head)"}
+results:
+  - {key: mace-mp-0b, model: "mace-mp-0b", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 4.95726, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: MACE MP-0 (mp-0b agnesi-medium)", "Table 1"]]}
+  - {key: mace-mh-1, model: "mace-mh-1", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 5.83958, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: MACE MH-1 (OMat head)", "Table 1"]]}
+  - {key: uma-omat, model: "uma-omat", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 5.82331, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: UMA (OMat head)", "Table 1"]]}
+  - {key: orb-v3, model: "orb-v3", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 5.54472, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: Orb-v3-conservative-inf-OMAT", "Table 1"]]}
+  - {key: eqv2-oc20, model: "eqv2-oc20", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 26.97684, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: EquiformerV2-153M-S2EF-OC20-All+MD", "Table 1"]]}
+  - {key: escn-oc20, model: "escn-oc20", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 28.32587, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: eSCN-L6-M3-Lay20-S2EF-OC20-All+MD", "Table 1"]]}
+  - {key: schnet-oc20, model: "schnet-oc20", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 6.25959, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: SchNet-S2EF-OC20-All", "Table 1"]]}
+  - {key: painn-oc20, model: "painn-oc20", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 38.87818, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: PaiNN-S2EF-OC20-All", "Table 1"]]}
+  - {key: mattersim-v1, model: "ext:MatterSim-v1", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 5.59557, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: MatterSim-v1.0.0-5M", "Table 1"]]}
+  - {key: sevennet-mf-ompa, model: "sevennet-mf-ompa", material: omol1k, role: external, eval_data: {label: "OMOL-1k-MD vibrational free energies (PBE-D3 AIMD reference)"}, metrics: [[MAE, Energy, 5.3325, meV/atom, "MAE per atom of the vibrational free energy from MD power spectra: SevenNet-MF-OMPA (MPA head)", "Table 1"]]}
+timings:
+  - {model: "mace-mp-0b", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 7, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 7 min for the MD of molecule No. 1", result: mace-mp-0b, location: "Table 1"}
+  - {model: "mace-mh-1", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 18, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 18 min for the MD of molecule No. 1", result: mace-mh-1, location: "Table 1"}
+  - {model: "uma-omat", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 18, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 18 min for the MD of molecule No. 1", result: uma-omat, location: "Table 1"}
+  - {model: "orb-v3", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 5, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 5 min for the MD of molecule No. 1", result: orb-v3, location: "Table 1"}
+  - {model: "eqv2-oc20", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 32, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 32 min for the MD of molecule No. 1", result: eqv2-oc20, location: "Table 1"}
+  - {model: "escn-oc20", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 42, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 42 min for the MD of molecule No. 1", result: escn-oc20, location: "Table 1"}
+  - {model: "schnet-oc20", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 3, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 3 min for the MD of molecule No. 1", result: schnet-oc20, location: "Table 1"}
+  - {model: "painn-oc20", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 3, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 3 min for the MD of molecule No. 1", result: painn-oc20, location: "Table 1"}
+  - {model: "ext:MatterSim-v1", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 7, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 7 min for the MD of molecule No. 1", result: mattersim-v1, location: "Table 1"}
+  - {model: "sevennet-mf-ompa", system: "C4H9N3O (No. 1 of OMOL-1k-MD), full MD simulation", atoms: null, value: 19, unit: "min of total simulation time on one GPU", per_atom_us: null, hardware: "One GPU: 19 min for the MD of molecule No. 1", result: sevennet-mf-ompa, location: "Table 1"}
+gaps:
+  - "The errors are on vibrational free energies integrated from MD power spectra, encoded as energy MAEs in meV/atom; they reflect sampling of the potential energy surface rather than single-point energy errors."
+  - "The OCP models (EquiformerV2, eSCN, SchNet, PaiNN) are the OC20 S2EF checkpoints of the fairchem calculator; eSCN is a new registry method. The timing is for a whole simulation of one molecule, so no per-atom time is derived (the trajectory length is not restated in Table 1)."
