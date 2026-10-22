@@ -1,0 +1,48 @@
+id: liu2024constructing
+source:
+  rank: 488
+  year: "2024"
+  first_author: "Junlan Liu"
+  title: "Constructing accurate machine-learned potentials and performing highly efficient atomistic simulations to predict structural and thermal properties"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2411.10911"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2411.10911v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0ea1ebe01f63268348b9dc6b09ebbf9df505ca1f9ea598cfbeb049fc83793d2b"
+study_label: "Liu et al. (2024): MTP and NEP potentials for the argyrodite superionic conductor Cu7PS6, with RDF, phonon DOS and speed comparisons"
+scope: |
+  Encoding scope: an MTP trained on 354 actively learned Cu7PS6
+  configurations (PBEsol) and a NEP for the same system, with their
+  training and validation RMSEs (Figs. 1-2, text). RDFs and phonon DOS
+  are properties; the speed comparison (Fig. 5) is figure-only.
+materials:
+  cu7ps6: {label: "Cu7PS6 argyrodite superionic conductor (cubic phase)", formula: Cu7PS6, class: "Inorganic ionic conductors"}
+reference:
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, pp: PAW, cutoff: 500, kpoints: "3x3x3 for the training labels"}
+sampling:
+  al: {label: "300 AIMD snapshots of a 448-atom supercell up to 700 K, extended by MTP active learning in LAMMPS at 300, 500 and 700 K (gamma_select 3, gamma_break 10)"}
+datasets:
+  cu7ps6: {label: "Cu7PS6 training configurations (354 after active learning; 10% held out for validation)", materials: [cu7ps6], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 354, loc: "Methods"}, calc: pbesol, sampling: [al]}
+methods:
+  MTP:
+    hp: [cutoffRadius]
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics]
+  NEP:
+    hp: [cutoffRadius, angularCutoff]
+    loss: "Energy, force and stress weights 1, 0.01, 0.001"
+    impl: {lib: {local: GPUMD}}
+    sims: [MolecularDynamics]
+runs:
+  mtp: {label: "MTP for Cu7PS6", method: MTP, dataset: cu7ps6, settings: {cutoffRadius: {v: 6, loc: "Methods"}}, model: "MTP Cu7PS6"}
+  nep: {label: "NEP for Cu7PS6", method: NEP, dataset: cu7ps6, settings: {cutoffRadius: {v: 7.0, loc: "Methods"}, angularCutoff: {v: 5.0, loc: "Methods"}}, model: "NEP Cu7PS6"}
+results:
+  - {key: mtp-train, model: mtp, material: cu7ps6, role: training, eval_data: {label: "Cu7PS6 training set", location: "Fig. 1"}, metrics: [[RMSE, Energy, 0.56, meV/atom, "training energy RMSE on Cu7PS6: MTP", "Sec. II; Fig. 1"], [RMSE, Force, 0.044, eV/A, "training force RMSE on Cu7PS6: MTP", "Sec. II; Fig. 1"]]}
+  - {key: mtp-val, model: mtp, material: cu7ps6, role: validation, eval_data: {label: "Cu7PS6 validation set (10%)", location: "Sec. II"}, metrics: [[RMSE, Energy, 0.59, meV/atom, "validation energy RMSE on Cu7PS6: MTP", "Sec. II; Fig. 1"], [RMSE, Force, 0.046, eV/A, "validation force RMSE on Cu7PS6: MTP", "Sec. II; Fig. 1"]]}
+  - {key: nep-train, model: nep, material: cu7ps6, role: training, eval_data: {label: "Cu7PS6 training set", location: "Sec. II"}, metrics: [[RMSE, Energy, 0.44, meV/atom, "training energy RMSE on Cu7PS6: NEP", "Sec. II"], [RMSE, Force, 0.036, eV/A, "training force RMSE on Cu7PS6: NEP", "Sec. II"]]}
+  - {key: nep-val, model: nep, material: cu7ps6, role: validation, eval_data: {label: "Cu7PS6 validation set (10%)", location: "Sec. II"}, metrics: [[RMSE, Energy, 0.45, meV/atom, "validation energy RMSE on Cu7PS6: NEP", "Sec. II"], [RMSE, Force, 0.037, eV/A, "validation force RMSE on Cu7PS6: NEP", "Sec. II"]]}
+resources: |
+  NEP on one NVIDIA RTX 3080 (GPUMD) is stated to be about 15 times faster than GPU DeepMD and about 41 times faster than MTP (CPU, 64 Intel Xeon Platinum 8375C cores); absolute speeds are figure-only (Fig. 5).
+gaps:
+  - "The paper does not say explicitly that NEP was trained on the same 354 configurations as MTP; the NEP run is linked to that dataset because the paper describes one training set and 'a similar protocol'. The DeepMD model of the speed comparison is not described and not encoded."

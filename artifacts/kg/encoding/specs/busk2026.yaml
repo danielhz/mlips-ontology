@@ -1,0 +1,46 @@
+id: busk2026
+source:
+  rank: 484
+  year: "2026"
+  first_author: "Jonas Busk"
+  title: "SoLiD26: A First Principles Solid-Liquid Interface Dataset for Machine-learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2609.28013"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2609.28013v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "fa2c5e46f08ecacb8a8740bac5da748b8b1a16dbf1353bbb66b831fe307b3d31"
+study_label: "Busk et al. (2026): SoLiD26, a 15.4-million-structure PBE-D3 dataset of solid-liquid interfaces, validated with pretrained, fine-tuned and from-scratch MACE models"
+scope: |
+  Encoding scope: the SoLiD26 dataset (15,379,823 VASP PBE-D3
+  structures, up to 576 atoms, 15 elements; mostly AIMD of aqueous metal
+  and electrode-electrolyte interfaces) and its technical validation:
+  MACE-MATPES-PBE-0 with D3 as distributed, the same model naively
+  fine-tuned on SoLiD26, and a MACE trained from scratch, evaluated on
+  the test split of all structures with more than 200 atoms (Table 1).
+  The PaiNN models used for outlier filtering are not encoded.
+materials:
+  solid: {label: "Solid-liquid interfaces (aqueous coinage-metal and electrode-electrolyte systems) and bulk references; H, Li, C, N, O, F, Na, Al, Cl, K, Ca, Cu, Cs, Pt, Au", class: "Solid-liquid interface"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, comment: "D3 dispersion correction; plane-wave cutoffs of 350, 400 or 450 eV kept, others excluded"}
+sampling:
+  aimd: {label: "Consolidated DTU Energy calculations, mostly AIMD, filtered (max force 10 eV/A, duplicates, rare elements, PaiNN 5-fold outliers)"}
+datasets:
+  solid-train: {label: "SoLiD26 training split (15,006,934 structures of at most 200 atoms)", materials: [solid], properties: [Energy, Forces], provenance: InHouse, n: {v: 15006934, loc: "Technical Validation"}, calc: pbed3, sampling: [aimd]}
+methods:
+  MACE:
+    hp: [learningRate]
+    loss: "Two stages: energy/force weights 1:10, then 10:1"
+    impl: {lib: MACE}
+runs:
+  mpes: {label: "MACE-MATPES-PBE-0 with D3 dispersion (as distributed)", method: MACE, model: "MACE-MATPES-PBE-0"}
+  ft: {label: "MACE-SoLiD26-ft (MACE-MATPES-PBE-0 naively fine-tuned on SoLiD26)", method: MACE, dataset: solid-train, settings: {learningRate: {v: 0.0005, loc: "Technical Validation"}}, model: "MACE-SoLiD26-ft", base_model: {run: mpes, relation: fine-tuned, location: "Technical Validation"}}
+  scratch: {label: "MACE-SoLiD26 (trained from scratch, hyperparameters similar to MACE-MATPES-PBE-0)", method: MACE, dataset: solid-train, model: "MACE-SoLiD26"}
+results:
+  - {key: mpes-test, model: mpes, material: solid, role: test, eval_data: {label: "SoLiD26 test split: all 272,889 structures with more than 200 atoms (H, C, O, K, Pt, Au)", location: "Technical Validation"}, metrics: [[MAE, Energy, 1.3341, eV, "test energy MAE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1"], [RMSE, Energy, 2.0506, eV, "test energy RMSE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1"], [MAE, Energy, 4.6, meV/atom, "test energy-per-atom MAE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1 (0.0046 eV/atom)"], [RMSE, Energy, 6.5, meV/atom, "test energy-per-atom RMSE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1 (0.0065 eV/atom)"], [MAE, Force, 0.0501, eV/A, "test force MAE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1"], [RMSE, Force, 0.0696, eV/A, "test force RMSE on SoLiD26: MACE-MATPES-PBE-0 + D3", "Table 1"]]}
+  - {key: ft-test, model: ft, material: solid, role: test, eval_data: {label: "SoLiD26 test split: all 272,889 structures with more than 200 atoms (H, C, O, K, Pt, Au)", location: "Technical Validation"}, metrics: [[MAE, Energy, 0.8665, eV, "test energy MAE on SoLiD26: MACE-SoLiD26-ft", "Table 1"], [RMSE, Energy, 1.5807, eV, "test energy RMSE on SoLiD26: MACE-SoLiD26-ft", "Table 1"], [MAE, Energy, 2.7, meV/atom, "test energy-per-atom MAE on SoLiD26: MACE-SoLiD26-ft", "Table 1 (0.0027 eV/atom)"], [RMSE, Energy, 4.1, meV/atom, "test energy-per-atom RMSE on SoLiD26: MACE-SoLiD26-ft", "Table 1 (0.0041 eV/atom)"], [MAE, Force, 0.0118, eV/A, "test force MAE on SoLiD26: MACE-SoLiD26-ft", "Table 1"], [RMSE, Force, 0.0253, eV/A, "test force RMSE on SoLiD26: MACE-SoLiD26-ft", "Table 1"]]}
+  - {key: scratch-test, model: scratch, material: solid, role: test, eval_data: {label: "SoLiD26 test split: all 272,889 structures with more than 200 atoms (H, C, O, K, Pt, Au)", location: "Technical Validation"}, metrics: [[MAE, Energy, 0.8866, eV, "test energy MAE on SoLiD26: MACE-SoLiD26", "Table 1"], [RMSE, Energy, 1.679, eV, "test energy RMSE on SoLiD26: MACE-SoLiD26", "Table 1"], [MAE, Energy, 2.7, meV/atom, "test energy-per-atom MAE on SoLiD26: MACE-SoLiD26", "Table 1 (0.0027 eV/atom)"], [RMSE, Energy, 4.3, meV/atom, "test energy-per-atom RMSE on SoLiD26: MACE-SoLiD26", "Table 1 (0.0043 eV/atom)"], [MAE, Force, 0.0118, eV/A, "test force MAE on SoLiD26: MACE-SoLiD26", "Table 1"], [RMSE, Force, 0.0236, eV/A, "test force RMSE on SoLiD26: MACE-SoLiD26", "Table 1"]]}
+resources: |
+  Training and evaluation on NVIDIA H100 and H200 GPUs; no times stated.
+gaps:
+  - "MACE-MATPES-PBE-0 is not a registry model, so its run is paper-local. SoLiD26 is not added to the data-set registry (used only here so far); candidate registry data set with origin busk2026."

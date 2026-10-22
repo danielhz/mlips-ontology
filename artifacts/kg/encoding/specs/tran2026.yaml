@@ -1,0 +1,50 @@
+id: tran2026
+source:
+  rank: 486
+  year: "2026"
+  first_author: "Viet-Anh Tran"
+  title: "Fine-Tuned Machine-Learned Interatomic Potentials for Structural and Vibrational Properties of Twisted 2D Materials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2606.22234"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2606.22234v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d668c60d13a7eeb7e379602f4999c61a768541b0c983e658b8ea1ca6dac8d92b"
+study_label: "Tran et al. (2026): fine-tuned MACE-OMAT potentials for reconstruction, strain and phonons of twisted bilayer graphene, h-BN and MoS2"
+scope: |
+  Encoding scope: one MACE model per material, fine-tuned from the
+  MACE-OMAT foundation model on 150-260 PBE-D3 configurations selected
+  with SOAP from MACE-OMAT MD of twisted bilayers (21.79 deg down to
+  about 3.15 deg) plus high-symmetry stackings, with the stated energy
+  and force RMSEs. Interlayer distances, stacking energies, strain fields
+  and phonons are properties.
+materials:
+  gr: {label: "Twisted bilayer graphene (moire superlattices and high-symmetry stackings)", formula: C, class: "2D material"}
+  hbn: {label: "Twisted bilayer h-BN (moire superlattices and high-symmetry stackings)", formula: BN, class: "2D material"}
+  mos2: {label: "Twisted bilayer MoS2 (moire superlattices and high-symmetry stackings)", formula: MoS2, class: "2D material"}
+reference:
+  pbed3: {type: DFT, code: VASP, xc: PBE, comment: "D3 dispersion correction"}
+sampling:
+  soap: {label: "20-30 SOAP-selected snapshots per twist angle from 300 K MACE-OMAT MD of twisted bilayers, plus high-symmetry registries and intermediate translations (Table S2)"}
+datasets:
+  d-gr: {label: "Twisted bilayer graphene fine-tuning set (about 150-260 configurations, 80:20 train/test)", materials: [gr], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [soap]}
+  d-hbn: {label: "Twisted bilayer h-BN fine-tuning set (about 150-260 configurations, 80:20 train/test)", materials: [hbn], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [soap]}
+  d-mos2: {label: "Twisted bilayer MoS2 fine-tuning set (about 150-260 configurations, 80:20 train/test)", materials: [mos2], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [soap]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers]
+    loss: "Energy and force loss, weights 1:10"
+    impl: {lib: MACE}
+    sims: [GeometryOptimization, PhononCalculation, MolecularDynamics]
+runs:
+  omat: {label: "MACE-OMAT foundation model with additive D3 (as distributed)", method: MACE, model: "MACE-OMAT (as distributed)"}
+  ft-gr: {label: "Fine-tuned MACE for twisted bilayer graphene", method: MACE, dataset: d-gr, settings: {cutoffRadius: {v: 6, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}}, model: "Fine-tuned MACE graphene bilayer", base_model: {run: omat, relation: fine-tuned, location: "Sec. II A"}}
+  ft-hbn: {label: "Fine-tuned MACE for twisted bilayer h-bn", method: MACE, dataset: d-hbn, settings: {cutoffRadius: {v: 6, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}}, model: "Fine-tuned MACE h-BN bilayer", base_model: {run: omat, relation: fine-tuned, location: "Sec. II A"}}
+  ft-mos2: {label: "Fine-tuned MACE for twisted bilayer mos2", method: MACE, dataset: d-mos2, settings: {cutoffRadius: {v: 6, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}}, model: "Fine-tuned MACE MoS2 bilayer", base_model: {run: omat, relation: fine-tuned, location: "Sec. II A"}}
+results:
+  - {key: ft-gr, model: ft-gr, material: gr, role: null, eval_data: {label: "Twisted bilayer graphene training and test configurations together (parity plots)", location: "Sec. III A, Fig. 3"}, metrics: [[RMSE, Energy, 0.49, meV/atom, "energy RMSE on graphene bilayer configurations: fine-tuned MACE", "Sec. III A"], [RMSE, Force, 9.0, meV/A, "force RMSE on graphene bilayer configurations: fine-tuned MACE", "Sec. III A"]]}
+  - {key: ft-hbn, model: ft-hbn, material: hbn, role: null, eval_data: {label: "Twisted bilayer h-BN training and test configurations together (parity plots)", location: "Sec. III A, Fig. 3"}, metrics: [[RMSE, Energy, 0.21, meV/atom, "energy RMSE on h-BN bilayer configurations: fine-tuned MACE", "Sec. III A"], [RMSE, Force, 6.81, meV/A, "force RMSE on h-BN bilayer configurations: fine-tuned MACE", "Sec. III A"]]}
+  - {key: ft-mos2, model: ft-mos2, material: mos2, role: null, eval_data: {label: "Twisted bilayer MoS2 training and test configurations together (parity plots)", location: "Sec. III A, Fig. 3"}, metrics: [[RMSE, Energy, 0.51, meV/atom, "energy RMSE on MoS2 bilayer configurations: fine-tuned MACE", "Sec. III A"], [RMSE, Force, 3.48, meV/A, "force RMSE on MoS2 bilayer configurations: fine-tuned MACE", "Sec. III A"]]}
+gaps:
+  - "The stated RMSEs pool training and test configurations, so the role is null. Component-resolved force errors of MACE-OMAT-D3 and the fine-tuned models on the 3.1 deg graphene bilayer (Fig. S1, labelled RMSE2) and phonon RMSEs (below 4.1 cm-1) are not encoded."
+  - "The MACE-OMAT checkpoint is not identified by version, so it is a paper-local run."
