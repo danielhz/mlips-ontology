@@ -1,0 +1,52 @@
+id: yan2026
+source:
+  rank: 303
+  year: "2026"
+  first_author: "Zihan Yan"
+  title: "Improving Robustness and Training Efficiency of Machine-Learned Potentials by Incorporating Short-Range Empirical Potentials"
+  venue: "Journal of Chemical Information and Modeling"
+  doi: "10.1021/acs.jcim.5c02335"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2504.15925v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "cb9b966c68ba589907ba426d31f8928e83f5f80cbbbcb5b02fc0efb3e420fb50"
+study_label: "Yan, Fan and Zhu (2026): NEP with an empirical ZBL short-range repulsion for robust LLZO force fields"
+scope: |
+  Encoding scope: NEP4 models for Li7La3Zr2O12 (LLZO): the reference
+  NEPstd trained on DFT data of earlier work, NEP802 trained by active
+  learning on NEPstd-labelled structures, and the hybrid NEP-ZBL models
+  NEP802-ZBL, NEP25-ZBL and NEP207-ZBL; the stated training RMSEs of
+  NEPstd and NEP802. Phase-transition, RDF, MSD and dimer analyses are
+  properties, not error metrics.
+materials:
+  llzo: {label: "Li7La3Zr2O12 (tetragonal and cubic, with Li-O Schottky defects in the reference set)", formula: "Li7La3Zr2O12", class: "Garnet Li solid electrolyte"}
+reference:
+  dft-prev: {type: DFT, comment: "DFT training data of the earlier LLZO work (Ref. [22]); settings not restated."}
+  nepstd-labels: {type: REF, comment: "Energies, forces and stresses predicted by the NEPstd model (calorine) instead of DFT."}
+sampling:
+  al: {label: "Active learning from 100 randomly perturbed tetragonal LLZO cells (dpdata): MD at 100-1200 K for 20-500 ps with descriptor-based farthest-point sampling (GPUMDkit)"}
+  fps25: {label: "Farthest-point sampling of 25 structures from the 802-structure set (PyNEP)"}
+datasets:
+  std: {label: "NEPstd training set of Ref. [22] (2,024 structures: 1,978 stoichiometric cubic and tetragonal, 46 with Li-O Schottky defects)", materials: [llzo], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 2024, loc: "Sec. III"}, calc: dft-prev}
+  s802: {label: "802 actively learned LLZO structures labelled with NEPstd", materials: [llzo], properties: [Energy, Forces, Virials], provenance: Augmented, n: {v: 802, loc: "Sec. II"}, calc: nepstd-labels, sampling: [al]}
+  s25: {label: "25-structure farthest-point subset of the 802-structure set", materials: [llzo], properties: [Energy, Forces, Virials], provenance: Augmented, n: {v: 25, loc: "Sec. II"}, calc: nepstd-labels, sampling: [fps25]}
+  s207: {label: "207 structures from three aggressive active-learning iterations with NEP-ZBL", materials: [llzo], properties: [Energy, Forces, Virials], provenance: Augmented, n: {v: 207, loc: "Sec. III; Table I"}, calc: nepstd-labels, sampling: [al]}
+methods:
+  NEP:
+    algorithm: "NEP4 in GPUMD; NEP-ZBL hybrid with the universal ZBL screening potential inside 0.9 A, smoothly switched to NEP up to 1.8 A"
+    impl: {lib: {local: "GPUMD"}}
+    sims: [MolecularDynamics]
+runs:
+  nepstd: {label: "NEPstd (reference NEP for LLZO, retrained with adjusted hyperparameters)", method: NEP, dataset: std, model: "NEPstd LLZO potential"}
+  nep802: {label: "NEP802 (purely data-driven NEP on 802 structures)", method: NEP, dataset: s802, model: "NEP802 LLZO potential"}
+  nep802-zbl: {label: "NEP802-ZBL (NEP with ZBL repulsion on 802 structures)", method: NEP, dataset: s802, model: "NEP802-ZBL LLZO potential"}
+  nep25-zbl: {label: "NEP25-ZBL (NEP with ZBL repulsion on 25 structures)", method: NEP, dataset: s25, model: "NEP25-ZBL LLZO potential"}
+  nep207-zbl: {label: "NEP207-ZBL (NEP with ZBL repulsion from three aggressive active-learning iterations)", method: NEP, dataset: s207, model: "NEP207-ZBL LLZO potential"}
+results:
+  - {key: nepstd, model: nepstd, material: llzo, role: training, eval_data: {label: "NEPstd training set (DFT)", location: "Sec. III; Fig. S1"}, metrics: [[RMSE, Energy, 0.74, meV/atom, "Training energy RMSE: NEPstd", "Sec. III"], [RMSE, Force, 80.31, meV/A, "Training force RMSE: NEPstd", "Sec. III"], [RMSE, Stress, 0.089, GPa, "Training stress RMSE: NEPstd", "Sec. III"]]}
+  - {key: nep802, model: nep802, material: llzo, role: training, eval_data: {label: "NEP802 training set (NEPstd labels)", location: "Sec. III; Fig. S2"}, metrics: [[RMSE, Energy, 0.22, meV/atom, "Training energy RMSE vs NEPstd labels: NEP802", "Sec. III"], [RMSE, Force, 24.96, meV/A, "Training force RMSE vs NEPstd labels: NEP802", "Sec. III"], [RMSE, Stress, 0.037, GPa, "Training stress RMSE vs NEPstd labels: NEP802", "Sec. III"]]}
+resources: |
+  MD in GPUMD on 4x4x4 supercells of 12,288 atoms; no timings are given.
+gaps:
+  - "The NEP802 errors are against NEPstd-predicted labels, not DFT. Training errors of the ZBL models are only in the SI (figures) and are not encoded."
+  - "Failure ratios of the active-learning iterations (Table I: up to 57.9% without ZBL) and Li-Li breakdown distances are robustness indicators, not error metrics. The NEP-ZBL hybrid is recorded as the registry method NEP."

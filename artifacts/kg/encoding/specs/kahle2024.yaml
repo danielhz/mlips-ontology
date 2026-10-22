@@ -1,0 +1,45 @@
+id: kahle2024
+source:
+  rank: 297
+  year: "2024"
+  first_author: "Leonid Kahle"
+  title: "A dual-cutoff machine-learned potential for condensed organic systems obtained via uncertainty-guided active learning"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2408.03058"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2408.03058v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a95bd8c3007bc781857d5cf20663469290f7b62d70976d22176c01d092dc5f02"
+study_label: "Kahle et al. (2024): dual-cutoff ACE potential for condensed alcohols, alkanes and an adipate from uncertainty-guided active learning"
+scope: |
+  Encoding scope: the final dual-cutoff ACE potential (short-range cutoff
+  3 A for all pairs, long-range cutoff 7 A for C-C) trained with pacemaker
+  on 2,641 revPBE-vdW configurations from 18 active-learning steps, with
+  its test energy and force RMSEs. Densities, vibrational frequencies,
+  heat capacities, vaporisation enthalpies and diffusion coefficients are
+  properties, not error metrics.
+materials:
+  organics: {label: "Linear alkanes, alkanols (C4-C12) and an adipate (dap), as single molecules and condensed liquids", class: "Condensed organic liquids"}
+reference:
+  revpbe-vdw: {type: DFT, code: VASP, xc: {local: "revPBE-vdW"}, pp: PAW, cutoff: 500, kpoints: "Gamma point", comment: "Precision Accurate; functional selected against experimental organic crystal data (SI S.1)."}
+sampling:
+  pcff: {label: "PCFF+ force-field MD of molecular liquids and isolated molecules with random displacements (initial set)"}
+  al: {label: "Uncertainty-guided exploration with intermediate ACE-MLPs (extrapolation grade gamma), unphysical-bond detection and stretched-bond fragments"}
+datasets:
+  final: {label: "Final training set after 18 active-learning steps and cleaning (2,641 configurations; 2% held out for testing)", materials: [organics], properties: [Energy, Forces], provenance: InHouse, n: {v: 2641, loc: "Table S1"}, calc: revpbe-vdw, sampling: [pcff, al]}
+methods:
+  ACE:
+    hp: [cutoffRadius, batchSize]
+    loss: "Energy and force loss with kappa = 0.001 and L2 regularisation 1e-8"
+    algorithm: "BFGS (maxiter 500); dual descriptor: second C-C pair basis with a long-range cutoff"
+    impl: {lib: PACE, comment: "pacemaker (tensorpot backend)"}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  ace-dual: {label: "Final dual-cutoff ACE-MLP (rc short 3 A, rc long 7 A for C-C, 1,500 functions per element)", method: ACE, dataset: final, settings: {cutoffRadius: {v: 3.0, loc: "SI S.5 (short-range rcut)"}, batchSize: {v: 140, loc: "SI S.5"}}, model: "Dual-cutoff ACE-MLP for organic liquids"}
+results:
+  - {key: ace-dual, model: ace-dual, material: organics, role: test, eval_data: {label: "Test set (2% of the final configurations)", location: "Sec. 2.5.6; Fig. S6"}, metrics: [[RMSE, Energy, 3.22, meV/atom, "Test potential-energy RMSE: dual-cutoff ACE-MLP", "Sec. 2.5.6"], [RMSE, Force, 95.65, meV/A, "Test force RMSE: dual-cutoff ACE-MLP", "Sec. 2.5.6"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "The long-range C-C cutoff (7 A) has no separate hyperparameter individual; only the short-range cutoff is encoded as cutoffRadius. The ACE basis sizes (nradmax 25/15/5, lmax 0/3/2) and the hyperparameter grid of SI S.5 are not encoded."
+  - "The vibrational-frequency RMSE (below 1 THz) and the property deviations from experiment (densities within 4%, heat capacities within 11%) are not energy/force/stress errors."

@@ -1,0 +1,35 @@
+id: maevskiy2025
+source:
+  rank: 305
+  year: "2025"
+  first_author: "A. Maevskiy"
+  title: "Predicting ionic conductivity in solids from the machine-learned potential energy landscape"
+  venue: "Physical Review Research"
+  doi: "10.1103/physrevresearch.7.023167"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2411.06804v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b8e04ba27cb3ff9f7a8731e785d5bb875094ba8deed992274d0adbd8e9816ec7"
+study_label: "Maevskiy et al. (2025): ranking Li superionic conductors from frozen-framework PES descriptors computed with M3GNet"
+scope: |
+  Encoding scope: the pretrained M3GNet (Materials Project) used for
+  frozen-framework single-ion PES scans whose descriptors rank 1,302
+  Materials Project Li compounds, and SevenNet used for MD validation of
+  the top-ranked structures, with AIMD checks (SIESTA). Ranking scores,
+  conductivities and diffusivities are not error metrics.
+materials:
+  li-compounds: {label: "Li-containing Materials Project compounds without transition metals (band gap >= 0.5 eV, E_hull <= 0.05 eV/atom)", class: "Li solid-electrolyte candidates"}
+reference:
+  siesta: {type: DFT, code: {local: "SIESTA"}, comment: "GGA (vdW-DF LMKLL for molecular solids), Troullier-Martins pseudopotentials, DZP basis; AIMD validation of top-ranked candidates."}
+external_models: [M3GNet-MPF-2021.2.8]
+methods:
+  M3GNet: {sims: [GeometryOptimization]}
+  NequIP: {sims: [MolecularDynamics]}
+runs:
+  sevennet: {label: "SevenNet as distributed (version not stated)", method: NequIP, model: "SevenNet"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "The M3GNet model 'trained by the authors of the original work on the entire Materials Project dataset' is taken to be the registry model M3GNet-MPF-2021.2.8; SevenNet is a NequIP implementation."
+  - "Descriptor scores (truncated ROC areas), predicted conductivities and AIMD/SevenNet-MD diffusivities are not energy/force/stress errors."

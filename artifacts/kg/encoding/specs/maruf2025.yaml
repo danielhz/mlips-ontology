@@ -1,0 +1,74 @@
+id: maruf2025
+source:
+  rank: 306
+  year: "2025"
+  first_author: "Moin Uddin Maruf"
+  title: "Learning Long-Range Interactions in Equivariant Machine Learning Interatomic Potentials via Electronic Degrees of Freedom"
+  venue: "The Journal of Physical Chemistry Letters"
+  doi: "10.1021/acs.jpclett.5c02352"
+  kg_relevance: "Method/model"
+  arxiv_id: "2503.17949v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3ca6e88225675100098223b068013c417973558de969b6630352056d64a32ec2"
+study_label: "Maruf, Kim and Ahmad (2025): NequIP-LR, an equivariant MLIP with charge equilibration and long-range electrostatics"
+scope: |
+  Encoding scope: NequIP-LR (introduced here) and NequIP trained on five
+  data sets with long-range or charge-transfer effects (Au2 on MgO(001),
+  BTA on Cu(111) with and without water, Ag3 clusters, carbon chains),
+  with the force and energy RMSEs of Table 1 and the 3 A NequIP-LR on
+  BTA-Cu. The 4G-HDNNP values of Table 1 are quoted from Ko et al. and not
+  encoded; inference times are figure-only.
+materials:
+  au2-mgo: {label: "Au2 cluster on undoped and Al-doped MgO(001)", class: "Supported metal cluster on oxide"}
+  bta-cu: {label: "Benzotriazole chemisorbed and physisorbed on Cu(111)", class: "Molecule-metal interface"}
+  bta-h2o-cu: {label: "BTAH and BTA- on Cu(111) in water (with H3O+)", class: "Solvated molecule-metal interface"}
+  ag3: {label: "Ag3 clusters with total charge +1 and -1", class: "Charged metal clusters"}
+  c-chain: {label: "C10H2 and C10H3+ carbon chains", class: "Charged organic molecules"}
+reference:
+  ko2021: {type: DFT, comment: "Data sets of Ko et al. (Nat. Commun. 2021) for Au2-MgO, Ag3 and carbon chains; settings not restated."}
+  bta-dft: {type: DFT, comment: "AIMD of BTA on Cu(111) generated in this work (with Hirshfeld charges); settings not stated in the main text."}
+datasets:
+  au2-mgo: {label: "Au2-MgO(001) data set of Ko et al.", materials: [au2-mgo], properties: [Energy, Forces], provenance: Published, calc: ko2021}
+  bta-cu: {label: "BTA-Cu(111) AIMD data set (400 steps, half chemisorbed, half physisorbed)", materials: [bta-cu], properties: [Energy, Forces], provenance: InHouse, n: {v: 400, loc: "Results"}, calc: bta-dft}
+  bta-h2o-cu: {label: "BTA(H2O)-Cu(111) AIMD data set (300 steps each for BTAH and BTA-)", materials: [bta-h2o-cu], properties: [Energy, Forces], provenance: InHouse, n: {v: 600, loc: "Results"}, calc: bta-dft}
+  ag3: {label: "Ag3 cluster data set of Ko et al. (5,000 structures used for training)", materials: [ag3], properties: [Energy, Forces], provenance: Published, calc: ko2021}
+  c-chain: {label: "Carbon-chain data set of Ko et al. (5,000 of 10,019 structures used for training)", materials: [c-chain], properties: [Energy, Forces], provenance: Published, calc: ko2021}
+methods:
+  NequIP:
+    hp: [cutoffRadius, numLayers, numEpochs, batchSize]
+    impl: {lib: NequIP}
+  NequIP-LR:
+    hp: [cutoffRadius, numLayers, numEpochs, batchSize]
+    loss: "Energy (alpha_E = 1), forces (alpha_F = N_at) and Hirshfeld charges (alpha_Q = 10)"
+    algorithm: "Charge equilibration of Gaussian charges from predicted electronegativities, with total-charge constraint"
+    impl: {lib: {local: "nequip-charge", comment: "github.com/ahmad-research-group/nequip-charge"}}
+runs:
+  nq-au2-mgo: {label: "NequIP trained on the au2-mgo data set", method: NequIP, dataset: au2-mgo, settings: {cutoffRadius: {v: 5.5, loc: "Table S3"}, numLayers: {v: 6, loc: "Table S3"}, numEpochs: {v: 156, loc: "Table S3"}, batchSize: {v: 15, loc: "Table S3"}}, model: "NequIP au2-mgo model"}
+  lr-au2-mgo: {label: "NequIP-LR trained on the au2-mgo data set", method: NequIP-LR, dataset: au2-mgo, settings: {cutoffRadius: {v: 5.5, loc: "Table S3"}, numLayers: {v: 6, loc: "Table S3"}, numEpochs: {v: 1056, loc: "Table S3"}, batchSize: {v: 10, loc: "Table S3"}}, model: "NequIP-LR au2-mgo model"}
+  nq-bta-cu: {label: "NequIP trained on the bta-cu data set", method: NequIP, dataset: bta-cu, settings: {cutoffRadius: {v: 5, loc: "Table S1"}, numLayers: {v: 6, loc: "Table S1"}, numEpochs: {v: 85, loc: "Table S1"}, batchSize: {v: 1, loc: "Table S1"}}, model: "NequIP bta-cu model"}
+  lr-bta-cu: {label: "NequIP-LR trained on the bta-cu data set", method: NequIP-LR, dataset: bta-cu, settings: {cutoffRadius: {v: 5, loc: "Table S1"}, numLayers: {v: 6, loc: "Table S1"}, numEpochs: {v: 2000, loc: "Table S1"}, batchSize: {v: 1, loc: "Table S1"}}, model: "NequIP-LR bta-cu model"}
+  nq-bta-h2o-cu: {label: "NequIP trained on the bta-h2o-cu data set", method: NequIP, dataset: bta-h2o-cu, settings: {cutoffRadius: {v: 4, loc: "Table S2"}, numLayers: {v: 6, loc: "Table S2"}, numEpochs: {v: 112, loc: "Table S2"}, batchSize: {v: 1, loc: "Table S2"}}, model: "NequIP bta-h2o-cu model"}
+  lr-bta-h2o-cu: {label: "NequIP-LR trained on the bta-h2o-cu data set", method: NequIP-LR, dataset: bta-h2o-cu, settings: {cutoffRadius: {v: 4, loc: "Table S2"}, numLayers: {v: 6, loc: "Table S2"}, numEpochs: {v: 171, loc: "Table S2"}, batchSize: {v: 1, loc: "Table S2"}}, model: "NequIP-LR bta-h2o-cu model"}
+  nq-ag3: {label: "NequIP trained on the ag3 data set", method: NequIP, dataset: ag3, settings: {cutoffRadius: {v: 5.29, loc: "Table S4"}, numLayers: {v: 8, loc: "Table S4"}, numEpochs: {v: 280, loc: "Table S4"}, batchSize: {v: 15, loc: "Table S4"}}, model: "NequIP ag3 model"}
+  lr-ag3: {label: "NequIP-LR trained on the ag3 data set", method: NequIP-LR, dataset: ag3, settings: {cutoffRadius: {v: 5.29, loc: "Table S4"}, numLayers: {v: 8, loc: "Table S4"}, numEpochs: {v: 1596, loc: "Table S4"}, batchSize: {v: 100, loc: "Table S4"}}, model: "NequIP-LR ag3 model"}
+  nq-c-chain: {label: "NequIP trained on the c-chain data set", method: NequIP, dataset: c-chain, settings: {cutoffRadius: {v: 5, loc: "Table S5"}, numLayers: {v: 8, loc: "Table S5"}, numEpochs: {v: 681, loc: "Table S5"}, batchSize: {v: 50, loc: "Table S5"}}, model: "NequIP c-chain model"}
+  lr-c-chain: {label: "NequIP-LR trained on the c-chain data set", method: NequIP-LR, dataset: c-chain, settings: {cutoffRadius: {v: 5, loc: "Table S5"}, numLayers: {v: 8, loc: "Table S5"}, numEpochs: {v: 2517, loc: "Table S5"}, batchSize: {v: 100, loc: "Table S5"}}, model: "NequIP-LR c-chain model"}
+  lr-bta-cu-3a: {label: "NequIP-LR with a 3 A cutoff trained on the BTA-Cu data set", method: NequIP-LR, dataset: bta-cu, settings: {cutoffRadius: {v: 3, loc: "Hyperparameters section"}, numLayers: {v: 6, loc: "Fig. 5b"}}, model: "NequIP-LR BTA-Cu model (3 A cutoff)"}
+results:
+  - {key: nq-au2-mgo, model: nq-au2-mgo, material: au2-mgo, role: null, eval_data: {label: "au2-mgo data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 34.32, meV/A, "Force RMSE: NequIP, au2-mgo", "Table 1"], [RMSE, Energy, 1.03, meV/atom, "Energy RMSE: NequIP, au2-mgo", "Table 1"]]}
+  - {key: lr-au2-mgo, model: lr-au2-mgo, material: au2-mgo, role: null, eval_data: {label: "au2-mgo data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 21.99, meV/A, "Force RMSE: NequIP-LR, au2-mgo", "Table 1"], [RMSE, Energy, 0.173, meV/atom, "Energy RMSE: NequIP-LR, au2-mgo", "Table 1"]]}
+  - {key: nq-bta-cu, model: nq-bta-cu, material: bta-cu, role: null, eval_data: {label: "bta-cu data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 7.82, meV/A, "Force RMSE: NequIP, bta-cu", "Table 1"], [RMSE, Energy, 0.482, meV/atom, "Energy RMSE: NequIP, bta-cu", "Table 1"]]}
+  - {key: lr-bta-cu, model: lr-bta-cu, material: bta-cu, role: null, eval_data: {label: "bta-cu data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 2.33, meV/A, "Force RMSE: NequIP-LR, bta-cu", "Table 1"], [RMSE, Energy, 0.432, meV/atom, "Energy RMSE: NequIP-LR, bta-cu", "Table 1"]]}
+  - {key: nq-bta-h2o-cu, model: nq-bta-h2o-cu, material: bta-h2o-cu, role: null, eval_data: {label: "bta-h2o-cu data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 10.38, meV/A, "Force RMSE: NequIP, bta-h2o-cu", "Table 1"], [RMSE, Energy, 0.709, meV/atom, "Energy RMSE: NequIP, bta-h2o-cu", "Table 1"]]}
+  - {key: lr-bta-h2o-cu, model: lr-bta-h2o-cu, material: bta-h2o-cu, role: null, eval_data: {label: "bta-h2o-cu data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 11.23, meV/A, "Force RMSE: NequIP-LR, bta-h2o-cu", "Table 1"], [RMSE, Energy, 0.284, meV/atom, "Energy RMSE: NequIP-LR, bta-h2o-cu", "Table 1"]]}
+  - {key: nq-ag3, model: nq-ag3, material: ag3, role: null, eval_data: {label: "ag3 data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 2144.68, meV/A, "Force RMSE: NequIP, ag3", "Table 1"], [RMSE, Energy, 498.394, meV/atom, "Energy RMSE: NequIP, ag3", "Table 1"]]}
+  - {key: lr-ag3, model: lr-ag3, material: ag3, role: null, eval_data: {label: "ag3 data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 21.01, meV/A, "Force RMSE: NequIP-LR, ag3", "Table 1"], [RMSE, Energy, 0.816, meV/atom, "Energy RMSE: NequIP-LR, ag3", "Table 1"]]}
+  - {key: nq-c-chain, model: nq-c-chain, material: c-chain, role: null, eval_data: {label: "c-chain data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 70.83, meV/A, "Force RMSE: NequIP, c-chain", "Table 1"], [RMSE, Energy, 1.333, meV/atom, "Energy RMSE: NequIP, c-chain", "Table 1"]]}
+  - {key: lr-c-chain, model: lr-c-chain, material: c-chain, role: null, eval_data: {label: "c-chain data set (Table 1; split not stated)", location: "Table 1"}, metrics: [[RMSE, Force, 54.59, meV/A, "Force RMSE: NequIP-LR, c-chain", "Table 1"], [RMSE, Energy, 0.844, meV/atom, "Energy RMSE: NequIP-LR, c-chain", "Table 1"]]}
+  - {key: lr-bta-cu-3a, model: lr-bta-cu-3a, material: bta-cu, role: null, eval_data: {label: "BTA-Cu data set (split not stated)", location: "Hyperparameters section"}, metrics: [[RMSE, Force, 5.53, meV/A, "Force RMSE: NequIP-LR (3 A cutoff), BTA-Cu", "Hyperparameters section"], [RMSE, Energy, 0.241, meV/atom, "Energy RMSE: NequIP-LR (3 A cutoff), BTA-Cu", "Hyperparameters section"]]}
+resources: |
+  NequIP-LR needs more epochs to converge than NequIP; inference times on
+  GPU and CPU are shown only in Fig. 5e, f. No numbers are given.
+gaps:
+  - "NequIP-LR is a new registry method introduced here, derived from NequIP (the paper implements its framework on NequIP); its charge scheme is described as similar to 4G-HDNNP, which is not recorded as a derivation. The 4G-HDNNP comparison values in Table 1 come from Ko et al. and are not encoded."
+  - "The text states the Au2-MgO energy RMSEs in 'meV/A' (a typo); Table 1 gives meV/atom, which is used. The split behind Table 1 is not stated (the parity plots are on a test set), so roles are unset. Learning curves (Fig. 5c, d) are figure-only."

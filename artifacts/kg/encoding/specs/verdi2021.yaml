@@ -1,0 +1,49 @@
+id: verdi2021
+source:
+  rank: 302
+  year: "2021"
+  first_author: "Carla Verdi"
+  title: "Thermal transport and phase transitions of zirconia by on-the-fly machine-learned interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-021-00630-5"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2109.15002v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "cfd70f241a45f419378d9557ee02b5fd7c5d09d9e0f847470165be442e0b6bda"
+study_label: "Verdi et al. (2021): on-the-fly kernel MLFF for zirconia phase transitions and Green-Kubo thermal transport"
+scope: |
+  Encoding scope: the on-the-fly machine-learned force field for ZrO2
+  trained in VASP (592 PBEsol structures of 96 atoms selected from about
+  145,000 MD steps up to 2800 K), with Bayesian-linear-regression and SVD
+  variants and their training and test RMSEs (Table 1). Phonon-energy
+  errors, structural parameters, phase-transition temperatures and
+  thermal conductivities are properties, not energy/force/stress errors.
+materials:
+  zro2: {label: "Zirconia (monoclinic, tetragonal and cubic ZrO2) up to 2800 K", formula: "ZrO2", class: "Transition-metal oxide"}
+reference:
+  pbesol: {type: DFT, code: VASP, xc: {local: "PBEsol"}, pp: PAW, cutoff: 600, kpoints: "4x4x4 Monkhorst-Pack for 12-atom cells", comment: "Structures optimised to forces below 1e-4 eV/A."}
+sampling:
+  otf: {label: "On-the-fly NPT MD of a 96-atom cell (heating 1600-2800 K and 500-1600 K over 180 ps each, plus 100 K steps), DFT called when the Bayesian force error is large"}
+datasets:
+  zro2: {label: "On-the-fly ZrO2 training set (592 structures of 96 atoms; 831 Zr and 1,090 O local reference configurations)", materials: [zro2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 592, loc: "Methods C"}, calc: pbesol, sampling: [otf]}
+methods:
+  VASP-MLFF:
+    hp: [cutoffRadius, numRadialBasis]
+    loss: "Linear regression on energies (weighted 10x), forces and stresses"
+    algorithm: "Bayesian linear regression or singular value decomposition for the kernel coefficients; CUR sparsification of three-body descriptors; dot-product kernel zeta = 4"
+    impl: {lib: VASP}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  blr: {label: "ZrO2 MLFF with Bayesian linear regression (BLR)", method: VASP-MLFF, dataset: zro2, settings: {cutoffRadius: {v: 6, loc: "Methods C"}, numRadialBasis: {v: 15, loc: "Methods C"}}, model: "ZrO2 MLFF (BLR)"}
+  svd: {label: "ZrO2 MLFF with singular value decomposition (SVD)", method: VASP-MLFF, dataset: zro2, settings: {cutoffRadius: {v: 6, loc: "Methods C"}, numRadialBasis: {v: 15, loc: "Methods C"}}, model: "ZrO2 MLFF (SVD)"}
+results:
+  - {key: blr-train, model: blr, material: zro2, role: training, eval_data: {label: "Training dataset (592 structures)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.70, meV/atom, "Training energy RMSE: ZrO2 MLFF (BLR)", "Table 1"], [RMSE, Force, 0.13, eV/A, "Training force RMSE: ZrO2 MLFF (BLR)", "Table 1"], [RMSE, Stress, 0.187, GPa, "Training stress RMSE (1.87 kbar): ZrO2 MLFF (BLR)", "Table 1"]]}
+  - {key: blr-test, model: blr, material: zro2, role: test, eval_data: {label: "Test set of 200 structures from MD heating monoclinic ZrO2 from 300 to 2800 K", location: "Table 1; Fig. 2"}, metrics: [[RMSE, Energy, 1.78, meV/atom, "Test energy RMSE: ZrO2 MLFF (BLR)", "Table 1"], [RMSE, Force, 0.13, eV/A, "Test force RMSE: ZrO2 MLFF (BLR)", "Table 1"], [RMSE, Stress, 0.189, GPa, "Test stress RMSE (1.89 kbar): ZrO2 MLFF (BLR)", "Table 1"]]}
+  - {key: svd-train, model: svd, material: zro2, role: training, eval_data: {label: "Training dataset (592 structures)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.45, meV/atom, "Training energy RMSE: ZrO2 MLFF (SVD)", "Table 1"], [RMSE, Force, 0.11, eV/A, "Training force RMSE: ZrO2 MLFF (SVD)", "Table 1"], [RMSE, Stress, 0.167, GPa, "Training stress RMSE (1.67 kbar): ZrO2 MLFF (SVD)", "Table 1"]]}
+  - {key: svd-test, model: svd, material: zro2, role: test, eval_data: {label: "Test set of 200 structures from MD heating monoclinic ZrO2 from 300 to 2800 K", location: "Table 1; Fig. 2"}, metrics: [[RMSE, Energy, 1.42, meV/atom, "Test energy RMSE: ZrO2 MLFF (SVD)", "Table 1"], [RMSE, Force, 0.11, eV/A, "Test force RMSE: ZrO2 MLFF (SVD)", "Table 1"], [RMSE, Stress, 0.176, GPa, "Test stress RMSE (1.76 kbar): ZrO2 MLFF (SVD)", "Table 1"]]}
+resources: |
+  Only 592 DFT calculations were needed out of almost 145,000 on-the-fly MD
+  steps; no timings are given.
+gaps:
+  - "Stress RMSEs given in kbar are converted to GPa. Phonon-energy RMSEs (Table 1: e.g. 1.59, 0.80 and 0.55 meV for cubic, tetragonal and monoclinic with SVD) are phonon properties and are not encoded."
+  - "VASP-MLFF is a new registry method for the on-the-fly kernel force field of Jinnouchi et al. (introduced in jinnouchi2019, later in the queue); the Gaussian width 0.4 A, lmax = 4 and the 2,048 descriptors have no hyperparameter individual."

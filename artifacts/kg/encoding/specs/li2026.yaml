@@ -1,0 +1,64 @@
+id: li2026
+source:
+  rank: 298
+  year: "2026"
+  first_author: "Shuwei Li"
+  title: "Melt-Quench Failures and Practical Solutions for Universal Machine-Learning Interatomic Potentials in Amorphous Structure Generation"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2606.16385"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2606.16385v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a5003891af090473500b84a0064585844b74068c7d1f5fcae8e590ce97403d22"
+study_label: "Li et al. (2026): melt-quench failures of universal MLIPs for amorphous IrO2 and practical remedies"
+scope: |
+  Encoding scope: eight universal MLIPs (Table S1) and an IrO2 MTP used in
+  melt-quench MD of amorphous IrO2, the UPET (PET-OAM-XL) energy, mean-force
+  and pressure errors against AIMD configurations before and after
+  pressure-targeted fine-tuning (Fig. 4). Densities and the 30-material
+  density benchmark (Table S2) are properties, not error metrics.
+materials:
+  a-iro2: {label: "Amorphous IrO2 (96-atom AIMD cells and melt-quench models)", formula: "IrO2", class: "Amorphous oxide electrocatalyst"}
+reference:
+  aimd: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400, kpoints: "Gamma point", comment: "NPT melt-quench AIMD (Parrinello-Rahman, Langevin): 3000 K melt, quench to 100 K over 5 ps, 300 K equilibration; EDIFF 1e-5."}
+  static: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Monkhorst-Pack with k_i |a_i| >= 20 A", comment: "Static references for configurations from MLIP trajectories."}
+sampling:
+  aimd-traj: {label: "Configurations from the IrO2 AIMD melt-quench trajectory"}
+  mtp-al: {label: "AIMD snapshots of rutile (120 atoms) and disordered (96 atoms) IrO2 at 300-2500 K with +-5% strain, then learning-on-the-fly active learning in NVT and NPT melt-quench"}
+datasets:
+  aimd-ft: {label: "IrO2 AIMD configurations for UPET fine-tuning (0.8/0.1/0.1 split)", materials: [a-iro2], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: aimd, sampling: [aimd-traj]}
+  mtp-train: {label: "IrO2 MTP training set (1,800 initial DFT snapshots plus active-learning additions)", materials: [a-iro2], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: static, sampling: [mtp-al]}
+external_models: [MatterSim-v1]
+methods:
+  GRACE: {sims: [MolecularDynamics]}
+  ORB: {sims: [MolecularDynamics]}
+  NequIP: {sims: [MolecularDynamics]}
+  MACE: {sims: [MolecularDynamics]}
+  M3GNet: {sims: [MolecularDynamics]}
+  UMA: {sims: [MolecularDynamics]}
+  PET:
+    hp: [learningRate, numEpochs]
+    loss: "0.1 energy + 0.1 force + 10.0 stress (pressure-targeted fine-tuning)"
+    sims: [MolecularDynamics]
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    impl: {lib: MLIP, comment: "MLIP-3; LAMMPS"}
+    sims: [MolecularDynamics]
+runs:
+  grace-2l: {label: "GRACE-2L-OMAT as distributed", method: GRACE, model: "GRACE-2L-OMAT"}
+  orb-v3: {label: "ORB-v3 as distributed (MPtrj + Alex + OMat24)", method: ORB, model: "ORB-v3"}
+  7net-omni: {label: "SevenNet-Omni-i12 as distributed", method: NequIP, model: "SevenNet-Omni-i12"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed", method: MACE, model: "MACE-MPA-0"}
+  uma-s: {label: "UMA-S as distributed", method: UMA, model: "UMA-S"}
+  upet: {label: "UPET PET-OAM-XL as distributed (pet-oam-xl-v1.0.0)", method: PET, model: "PET-OAM-XL v1.0.0"}
+  nequip-oam-xl: {label: "NequIP-OAM-XL as distributed", method: NequIP, model: "NequIP-OAM-XL"}
+  upet-ft: {label: "UPET fine-tuned on IrO2 AIMD configurations with stress-weighted loss (UPET-FT)", method: PET, dataset: aimd-ft, settings: {learningRate: {v: 0.00001, loc: "Methods"}, numEpochs: {v: 100, loc: "Methods"}}, model: "UPET-FT (IrO2)", base_model: {run: upet, relation: fine-tuned, location: "Methods"}}
+  mtp: {label: "MTP for IrO2 trained with active learning", method: MTP, dataset: mtp-train, settings: {cutoffRadius: {v: 5.0, loc: "Methods"}, momentLevel: {v: 16, loc: "Methods (levmax)"}}, model: "IrO2 MTP"}
+results:
+  - {key: upet, model: upet, material: a-iro2, role: external, eval_data: {label: "Configurations sampled during the IrO2 AIMD", location: "Fig. 4a-c"}, metrics: [[MAE, Energy, 44.6, meV/atom, "Energy MAE vs AIMD: UPET (PET-OAM-XL)", "Fig. 4a"], [R2, Energy, 0.963, null, "Energy R2 vs AIMD: UPET", "Fig. 4a"], [MAE, Force, 0.029, eV/A, "Mean-atomic-force-magnitude MAE vs AIMD: UPET", "Fig. 4b"], [R2, Force, 0.998, null, "Mean-force R2 vs AIMD: UPET", "Fig. 4b"], [MAE, Stress, 7.94142, GPa, "Virial-pressure MAE vs AIMD (79,414.2 bar): UPET", "Fig. 4c"], [R2, Stress, -9.574, null, "Virial-pressure R2 vs AIMD: UPET", "Fig. 4c"]]}
+  - {key: upet-ft, model: upet-ft, material: a-iro2, role: null, eval_data: {label: "Configurations sampled during the IrO2 AIMD (split not stated for the parity plots)", location: "Fig. 4d-f"}, metrics: [[MAE, Energy, 41.6, meV/atom, "Energy MAE vs AIMD: UPET-FT", "Fig. 4d"], [R2, Energy, 0.977, null, "Energy R2 vs AIMD: UPET-FT", "Fig. 4d"], [MAE, Force, 0.046, eV/A, "Mean-atomic-force-magnitude MAE vs AIMD: UPET-FT", "Fig. 4e"], [R2, Force, 0.995, null, "Mean-force R2 vs AIMD: UPET-FT", "Fig. 4e"], [MAE, Stress, 0.19803, GPa, "Virial-pressure MAE vs AIMD (1,980.3 bar): UPET-FT", "Fig. 4f"], [R2, Stress, 0.988, null, "Virial-pressure R2 vs AIMD: UPET-FT", "Fig. 4f"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The force metric is the MAE of the per-configuration mean atomic force magnitude (Eq. 2) and the stress metric the MAE of the virial pressure (Eq. 3); pressures in bar are converted to GPa. Whether the UPET-FT parity configurations are the test split is not stated, so the role is unset."
+  - "GRACE, MTP and NequIP parity plots (Figs. S3, S4) and the density results (Figs. 1, 5, 6; Table S2: NVT-quench density MAE 0.35 g/cm3 vs 2.46 g/cm3 for NPT-quench against AIMD) are not energy/force/stress errors. MatterSim-v1-5M is the registry model MatterSim-v1; the other universal models are paper-local runs."

@@ -1,0 +1,42 @@
+id: marks2026
+source:
+  rank: 299
+  year: "2026"
+  first_author: "Jonah Marks"
+  title: "Reliable and Efficient Automated Transition-State Searches with Machine-Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2604.00405"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2604.00405v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6ae28d87140303fde61fa7b8a5abf8bc0723364413939c441a7f12a78061386c"
+study_label: "Marks, Vandezande and Gomes (2026): MLIP-accelerated transition-state searches with the freezing-string method and CI-NEB"
+scope: |
+  Encoding scope: five pretrained MLIPs (MACE-OMol25, UMA-S 1.1, UMA-M
+  1.1, eSEN-S OMol25 conserving, AIMNet2) used for reaction-path finding
+  (freezing-string method, CI-NEB) and low-level transition-state
+  refinement, validated by wB97X-V/def2-TZVP refinement on 58 reactions.
+  Results are success rates and numbers of DFT gradient evaluations, not
+  error metrics; GFN2-xTB is semi-empirical and not encoded.
+materials:
+  reactions: {label: "58 reactions: Baker and Sharada organic sets, polymerisation chemistry, transition-metal complexes and organometallic C-H activation", class: "Molecular reactions (gas phase)"}
+reference:
+  wb97xv: {type: DFT, code: {local: "Q-Chem"}, xc: {local: "wB97X-V"}, basis: "def2-TZVP", comment: "Q-Chem 6.0, SG-2 grid; P-RFO refinement and frequency validation of the transition states."}
+methods:
+  MACE: {sims: [NudgedElasticBand, GeometryOptimization]}
+  UMA: {sims: [NudgedElasticBand, GeometryOptimization]}
+  eSEN: {sims: [NudgedElasticBand, GeometryOptimization]}
+  AIMNet2: {sims: [NudgedElasticBand, GeometryOptimization]}
+runs:
+  mace-omol25: {label: "MACE-OMol25 as distributed", method: MACE, model: "MACE-OMol25"}
+  uma-s: {label: "UMA Small 1.1 as distributed", method: UMA, model: "UMA-S 1.1"}
+  uma-m: {label: "UMA Medium 1.1 as distributed", method: UMA, model: "UMA-M 1.1"}
+  esen-s: {label: "OMol25 eSEN conserving small as distributed", method: eSEN, model: "eSEN-S (OMol25, conserving)"}
+  aimnet2: {label: "AIMNet2 as distributed", method: AIMNet2, model: "AIMNet2"}
+results: []
+resources: |
+  MACE-OMol25 needs fewer than four DFT gradient evaluations per organic
+  reaction (96.6% success), a 94-96% reduction relative to DFT-only
+  searches; no MLIP timings are given.
+gaps:
+  - "Transition-state search success rates, DFT gradient counts, energies relative to reference saddle points and reactive-core geometries (Tables 1-6) are not energy/force/stress error metrics."

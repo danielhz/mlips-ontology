@@ -1,0 +1,39 @@
+id: jakob2025
+source:
+  rank: 304
+  year: "2025"
+  first_author: "Konstantin S. Jakob"
+  title: "Universally Accurate or Specifically Inadequate? Stress‐Testing General Purpose Machine Learning Interatomic Potentials"
+  venue: "Advanced Intelligent Discovery"
+  doi: "10.1002/aidi.202500031"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "submittedVersion"
+  pdf_sha256: "bb04e63e7b0ee2df41b58f7b6b9fcaa6627dd79e6b0b1a071e4d82d5858ad66b"
+study_label: "Jakob, Reuter and Margraf (2025): stress-testing M3GNet and MACE-MP-0 in element-substitution crystal structure prediction"
+scope: |
+  Encoding scope: the default M3GNet model (m3gnet 0.2.4, MP relaxation
+  trajectories) and MACE-MP-0b (medium) used to relax about 160,000
+  element-substitution trial structures for 100 target compositions,
+  compared with a full PBE workflow, and their RMSEs of the energy above
+  the ground state against DFT single points on 16,126 relaxed structures.
+  Discovery statistics, false-positive rates and Wasserstein distances are
+  not error metrics.
+materials:
+  inorganic: {label: "Inorganic crystals of 100 target compositions from the Materials Project (element-substitution trial structures)", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, comment: "VASP 5.4.4 with MPRelaxSet/MPStaticSet (pymatgen 2022.9.8), Hubbard U for selected transition-metal oxides and fluorides."}
+external_models: [M3GNet-MPF-2021.2.8]
+methods:
+  M3GNet: {sims: [GeometryOptimization]}
+  MACE: {sims: [GeometryOptimization]}
+runs:
+  mace-mp-0b: {label: "MACE-MP-0b (medium) as distributed (mace 0.3.9)", method: MACE, model: "MACE-MP-0b (medium)"}
+results:
+  - {key: m3gnet, model: "ext:M3GNet-MPF-2021.2.8", material: inorganic, role: external, eval_data: {label: "DFT single points on 16,126 MLIP-relaxed structures (10% of the trial candidates): energy above the Materials Project ground state", location: "Sec. 2.3"}, metrics: [[RMSE, Energy, 175, meV/atom, "RMSE of the energy above the ground state vs PBE: M3GNet", "Sec. 2.3"]]}
+  - {key: mace-mp-0b, model: mace-mp-0b, material: inorganic, role: external, eval_data: {label: "DFT single points on 16,126 MLIP-relaxed structures (10% of the trial candidates): energy above the Materials Project ground state", location: "Sec. 2.3"}, metrics: [[RMSE, Energy, 117, meV/atom, "RMSE of the energy above the ground state vs PBE: MACE-MP-0b (medium)", "Sec. 2.3"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The m3gnet package default model is described as trained on 190k MP relaxation configurations and is taken to be the registry model M3GNet-MPF-2021.2.8 (alias 'M3GNet'). MACE-MP-0b (not 0b3) is a paper-local run."
+  - "Relaxation failure rates, numbers of low-energy and validated structures, false-positive rates (56% and 30%) and Wasserstein distances (0.12 and 0.09) are not energy/force/stress errors."
