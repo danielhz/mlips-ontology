@@ -1,0 +1,39 @@
+id: omranpour2024
+source:
+  rank: 662
+  year: "2024"
+  first_author: "Amir Omranpour"
+  title: "A high-dimensional neural network potential for Co3O4"
+  venue: "Journal of Physics Condensed Matter"
+  doi: "10.1088/1361-648x/ad9f09"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.11037v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d0c92c9fd1c6f9ece62650f14c827600c64bb738145a6f137e2a79bdaebb48ed"
+study_label: "Omranpour and Behler (2024): a high-dimensional neural network potential for Co3O4"
+scope: |
+  Encoding scope: the HDNNP for bulk Co3O4 spinel (RuNNer training, n2p2
+  in LAMMPS) trained on optPBE-vdW+U data, with its training and test
+  RMSEs. Structural, elastic, vibrational and thermodynamic properties are
+  property comparisons.
+materials:
+  co3o4: {label: "Bulk Co3O4 spinel (56-atom cells, 0-700 K)", formula: Co3O4, class: "transition-metal oxide spinel"}
+reference:
+  optpbe-u: {type: DFT, code: VASP, xc: {local: optPBE-vdW+U}, pp: PAW, cutoff: 500, kpoints: "5x5x5", comment: "Spin-polarised; Dudarev U = 2.43 eV on Co; Gaussian smearing."}
+sampling:
+  aimd-al: {label: "NPT AIMD snapshots plus HDNNP-ensemble active learning (high committee disagreement) over 0-700 K"}
+datasets:
+  co3o4: {label: "Co3O4 DFT data set (9,692 training and 1,074 test structures)", materials: [co3o4], properties: [Energy, Forces], provenance: InHouse, n: {v: 10766, loc: "Sec. III B (9,692 + 1,074)"}, calc: optpbe-u, sampling: [aimd-al]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers]
+    algorithm: "Atomic NNs with three hidden layers of 25, 20 and 15 neurons; radial and angular ACSFs (SI Tables I-II)"
+    impl: {lib: RuNNer, comment: "n2p2 library in LAMMPS for MD"}
+    sims: [MolecularDynamics, PhononCalculation, GeometryOptimization]
+runs:
+  hdnnp: {label: "HDNNP for Co3O4", method: HDNNP, dataset: co3o4, settings: {cutoffRadius: {v: 6.35, loc: "Sec. II C (12 bohr)"}, numLayers: {v: 3, loc: "Sec. II C (hidden layers)"}}, model: "HDNNP Co3O4"}
+results:
+  - {key: hdnnp-train, model: hdnnp, material: co3o4, role: training, eval_data: {label: "Training set (9,692 structures)", location: "Sec. III B"}, metrics: [[RMSE, Energy, 0.409, meV/atom, "train energy RMSE on Co3O4: HDNNP", "Sec. III B"], [RMSE, Force, 55, meV/A, "train force RMSE on Co3O4: HDNNP", "Sec. III B (0.055 eV/A)"]]}
+  - {key: hdnnp-test, model: hdnnp, material: co3o4, role: test, eval_data: {label: "Independent test set (1,074 structures)", location: "Sec. III B"}, metrics: [[RMSE, Energy, 0.434, meV/atom, "test energy RMSE on Co3O4: HDNNP", "Sec. III B"], [RMSE, Force, 56, meV/A, "test force RMSE on Co3O4: HDNNP", "Sec. III B (0.056 eV/A)"]]}
+gaps:
+  - "Lattice parameters, band gaps, magnetic moments (Table I), bulk and elastic properties (Table II), phonons, thermal expansion and free energies are property comparisons."

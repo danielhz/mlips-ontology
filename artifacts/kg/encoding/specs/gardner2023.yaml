@@ -1,0 +1,58 @@
+id: gardner2023
+source:
+  rank: 663
+  year: "2023"
+  first_author: "John L. A. Gardner"
+  title: "Synthetic pre-training for neural-network interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ad1626"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2307.15714v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "840df468d9334e04ef877ff6c62abfc04340df052a74418e1e2fb961c9102f33"
+study_label: "Gardner, Baker and Deringer (2023): synthetic pre-training for neural-network interatomic potentials"
+scope: |
+  Encoding scope: NequIP models for carbon trained directly on the
+  C-GAP-17 DFT training data, and NequIP models pre-trained on the
+  C-SYNTH-23M structures re-labelled by C-ACE, C-GAP-20U, LCBOP or EDIP
+  and then fine-tuned on the same DFT data; the encoded results are the
+  mean test energy RMSEs with 3200 DFT structures (Table 1). Smaller
+  training-set sizes, force learning curves, MD stability and the
+  alchemical (Si) experiments are not encoded.
+materials:
+  carbon: {label: "Liquid, amorphous and crystalline carbon (C-GAP-17 data; C-SYNTH-23M structures at 1.0-3.5 g/cm3)", formula: C, class: "elemental carbon phases"}
+reference:
+  cgap17-dft: {type: DFT, comment: "C-GAP-17 training/test labels (published DFT; not restated)."}
+  synth: {type: REF, comment: "Synthetic labels from C-ACE, C-GAP-20U, LCBOP or EDIP on C-SYNTH-23M structures."}
+datasets:
+  cgap17: {label: "C-GAP-17 DFT training data (subsets of 25-3200 structures)", materials: [carbon], properties: [Energy, Forces], provenance: Published, calc: cgap17-dft}
+  synth-ace: {label: "C-SYNTH-23M structures labelled with C-ACE", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, calc: synth}
+  synth-gap: {label: "C-SYNTH-23M structures labelled with C-GAP-20U", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, calc: synth}
+  synth-lcbop: {label: "C-SYNTH-23M structures labelled with LCBOP", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, calc: synth}
+  synth-edip: {label: "C-SYNTH-23M structures labelled with EDIP", materials: [carbon], properties: [Energy, Forces], provenance: Augmented, calc: synth}
+methods:
+  NequIP:
+    hp: [numLayers, numFeatures, cutoffRadius]
+    loss: "Per-atom energy MSE and force MSE weighted 4:1"
+    algorithm: "Adam with EMA 0.99; fine-tuning updates all weights of the best pre-trained model"
+    impl: {lib: NequIP}
+    sims: [MolecularDynamics]
+runs:
+  direct: {label: "NequIP trained directly on 3200 C-GAP-17 DFT structures", method: NequIP, dataset: cgap17, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (direct, 3200 DFT)", trainingHardware: "single NVIDIA RTX A6000 (about 590 GPU hours for all models)"}
+  pre-ace: {label: "NequIP pre-trained on C-SYNTH-23M with C-ACE labels", method: NequIP, dataset: synth-ace, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (pre-trained on C-ACE labels)"}
+  ft-ace: {label: "NequIP pre-trained on C-ACE labels, fine-tuned on 3200 C-GAP-17 DFT structures", method: NequIP, dataset: cgap17, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (C-ACE pre-training, 3200 DFT)", base_model: {run: pre-ace, relation: fine-tuned, location: "Sec. 3.2"}}
+  pre-gap: {label: "NequIP pre-trained on C-SYNTH-23M with C-GAP-20U labels", method: NequIP, dataset: synth-gap, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (pre-trained on C-GAP-20U labels)"}
+  ft-gap: {label: "NequIP pre-trained on C-GAP-20U labels, fine-tuned on 3200 C-GAP-17 DFT structures", method: NequIP, dataset: cgap17, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (C-GAP-20U pre-training, 3200 DFT)", base_model: {run: pre-gap, relation: fine-tuned, location: "Sec. 3.2"}}
+  pre-lcbop: {label: "NequIP pre-trained on C-SYNTH-23M with LCBOP labels", method: NequIP, dataset: synth-lcbop, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (pre-trained on LCBOP labels)"}
+  ft-lcbop: {label: "NequIP pre-trained on LCBOP labels, fine-tuned on 3200 C-GAP-17 DFT structures", method: NequIP, dataset: cgap17, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (LCBOP pre-training, 3200 DFT)", base_model: {run: pre-lcbop, relation: fine-tuned, location: "Sec. 3.2"}}
+  pre-edip: {label: "NequIP pre-trained on C-SYNTH-23M with EDIP labels", method: NequIP, dataset: synth-edip, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (pre-trained on EDIP labels)"}
+  ft-edip: {label: "NequIP pre-trained on EDIP labels, fine-tuned on 3200 C-GAP-17 DFT structures", method: NequIP, dataset: cgap17, settings: {numLayers: {v: 4, loc: "Sec. 3.4"}, numFeatures: {v: 32, loc: "Sec. 3.4"}, cutoffRadius: {v: 4.0, loc: "Sec. 3.4"}}, model: "NequIP C (EDIP pre-training, 3200 DFT)", base_model: {run: pre-edip, relation: fine-tuned, location: "Sec. 3.2"}}
+results:
+  - {key: direct-test, model: direct, material: carbon, role: test, eval_data: {label: "C-GAP-17 test set", location: "Table 1"}, metrics: [[RMSE, Energy, 51.0, meV/atom, "test energy RMSE on carbon (3200 DFT structures): NequIP direct training (mean of 5, +/-6.2, one run diverged)", "Table 1"]]}
+  - {key: ft-ace-test, model: ft-ace, material: carbon, role: test, eval_data: {label: "C-GAP-17 test set", location: "Table 1"}, metrics: [[RMSE, Energy, 45.4, meV/atom, "test energy RMSE on carbon (3200 DFT structures): NequIP with C-ACE pre-training (mean of 5, +/-0.4)", "Table 1"]]}
+  - {key: ft-gap-test, model: ft-gap, material: carbon, role: test, eval_data: {label: "C-GAP-17 test set", location: "Table 1"}, metrics: [[RMSE, Energy, 45.9, meV/atom, "test energy RMSE on carbon (3200 DFT structures): NequIP with C-GAP-20U pre-training (mean of 5, +/-0.5)", "Table 1"]]}
+  - {key: ft-lcbop-test, model: ft-lcbop, material: carbon, role: test, eval_data: {label: "C-GAP-17 test set", location: "Table 1"}, metrics: [[RMSE, Energy, 48.2, meV/atom, "test energy RMSE on carbon (3200 DFT structures): NequIP with LCBOP pre-training (mean of 5, +/-0.9)", "Table 1"]]}
+  - {key: ft-edip-test, model: ft-edip, material: carbon, role: test, eval_data: {label: "C-GAP-17 test set", location: "Table 1"}, metrics: [[RMSE, Energy, 88.2, meV/atom, "test energy RMSE on carbon (3200 DFT structures): NequIP with EDIP pre-training (mean of 5, +/-72.3)", "Table 1"]]}
+gaps:
+  - "Only the 3200-structure column of Table 1 is encoded; the rows for 25-1600 DFT structures (e.g. direct 192.3 vs C-ACE 70.3 meV/atom at 25) form learning curves. Standard deviations are kept in the labels. The direct and EDIP values at 3200 are flagged in the paper as including diverged runs."
+  - "Force RMSE learning curves (Figs. 2-3), MD stability tests and alchemical Si pre-training (Sec. 5.3) are figure-only or property results."
