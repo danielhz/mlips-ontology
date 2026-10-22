@@ -1,0 +1,54 @@
+id: weinreich2020
+source:
+  rank: 559
+  year: "2020"
+  first_author: "Jan Weinreich"
+  title: "Properties of $α$-Brass Nanoparticles I: Neural Network Potential Energy Surface"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2001.10906"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2001.10906v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7bcf7d95a4d623e23754289f6117ccc0d3e7de38be419a822ba8f37c266dd109"
+study_label: "Weinreich, Romer, Paleico and Behler (2020): properties of alpha-brass nanoparticles I, a high-dimensional neural network potential for Cu-Zn"
+scope: |
+  Encoding scope: RuNNer HDNNPs for Cu-Zn (alpha-brass) trained on
+  53,841 PBE structures (bulk, slabs, cut-out clusters of 179-344 atoms,
+  molten structures) selected by committee disagreement; training and
+  test RMSEs for five atomic-network architectures (Table 2, 20-20
+  selected). Bulk, surface, cluster melting and cohesive-energy results
+  are properties.
+materials:
+  cuzn: {label: "Cu-Zn (alpha-brass) bulk, surfaces, clusters and melts", class: "Metals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "12x12x12 for the conventional fcc cell, same density elsewhere; Gamma point for large clusters"}
+sampling:
+  cl: {label: "Bulk, slab and cluster structures from NVT/NpT MD with semi-grand-canonical Monte Carlo swaps, clusters cut from 1,103-atom nanoparticles, chosen by disagreement of preliminary HDNNPs; molten structures at 1400 K"}
+datasets:
+  cuzn: {label: "Cu-Zn reference set (53,841 structures, 2,967,780 atomic environments)", materials: [cuzn], properties: [Energy, Forces], provenance: InHouse, n: {v: 53841, loc: "Sec. 4.1"}, calc: vasp, sampling: [cl]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers, numFeatures]
+    loss: "Energies and forces"
+    algorithm: "Global extended Kalman filter, Nguyen-Widrow initialization"
+    impl: {lib: RuNNer, comment: "Atom-centred symmetry functions as in the earlier copper HDNNP"}
+    sims: [MolecularDynamics, MonteCarlo, GeometryOptimization]
+runs:
+  nn-1010: {label: "HDNNP for Cu-Zn with 10-10 atomic networks", method: HDNNP, dataset: cuzn, settings: {cutoffRadius: {v: 6, loc: "Sec. 3.2"}, numLayers: {v: 2, loc: "Table 2"}, numFeatures: {v: 10, loc: "Table 2 (nodes per layer)"}}, model: "HDNNP alpha-brass 10-10"}
+  nn-1515: {label: "HDNNP for Cu-Zn with 15-15 atomic networks", method: HDNNP, dataset: cuzn, settings: {cutoffRadius: {v: 6, loc: "Sec. 3.2"}, numLayers: {v: 2, loc: "Table 2"}, numFeatures: {v: 15, loc: "Table 2 (nodes per layer)"}}, model: "HDNNP alpha-brass 15-15"}
+  nn-151515: {label: "HDNNP for Cu-Zn with 15-15-15 atomic networks", method: HDNNP, dataset: cuzn, settings: {cutoffRadius: {v: 6, loc: "Sec. 3.2"}, numLayers: {v: 3, loc: "Table 2"}, numFeatures: {v: 15, loc: "Table 2 (nodes per layer)"}}, model: "HDNNP alpha-brass 15-15-15"}
+  nn-2020: {label: "HDNNP for Cu-Zn with 20-20 atomic networks", method: HDNNP, dataset: cuzn, settings: {cutoffRadius: {v: 6, loc: "Sec. 3.2"}, numLayers: {v: 2, loc: "Table 2"}, numFeatures: {v: 20, loc: "Table 2 (nodes per layer)"}}, model: "HDNNP alpha-brass 20-20"}
+  nn-202020: {label: "HDNNP for Cu-Zn with 20-20-20 atomic networks", method: HDNNP, dataset: cuzn, settings: {cutoffRadius: {v: 6, loc: "Sec. 3.2"}, numLayers: {v: 3, loc: "Table 2"}, numFeatures: {v: 20, loc: "Table 2 (nodes per layer)"}}, model: "HDNNP alpha-brass 20-20-20"}
+results:
+  - {key: nn-1010-train, model: nn-1010, material: cuzn, role: training, eval_data: {label: "Cu-Zn training set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.88, meV/atom, "training energy RMSE on Cu-Zn: HDNNP 10-10", "Table 2"], [RMSE, Force, 41.7, meV/A, "training force RMSE on Cu-Zn: HDNNP 10-10", "Table 2"]]}
+  - {key: nn-1010-test, model: nn-1010, material: cuzn, role: test, eval_data: {label: "Cu-Zn test set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.76, meV/atom, "test energy RMSE on Cu-Zn: HDNNP 10-10", "Table 2"], [RMSE, Force, 41.1, meV/A, "test force RMSE on Cu-Zn: HDNNP 10-10", "Table 2"]]}
+  - {key: nn-1515-train, model: nn-1515, material: cuzn, role: training, eval_data: {label: "Cu-Zn training set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.82, meV/atom, "training energy RMSE on Cu-Zn: HDNNP 15-15", "Table 2"], [RMSE, Force, 40.9, meV/A, "training force RMSE on Cu-Zn: HDNNP 15-15", "Table 2"]]}
+  - {key: nn-1515-test, model: nn-1515, material: cuzn, role: test, eval_data: {label: "Cu-Zn test set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.71, meV/atom, "test energy RMSE on Cu-Zn: HDNNP 15-15", "Table 2"], [RMSE, Force, 40.3, meV/A, "test force RMSE on Cu-Zn: HDNNP 15-15", "Table 2"]]}
+  - {key: nn-151515-train, model: nn-151515, material: cuzn, role: training, eval_data: {label: "Cu-Zn training set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.84, meV/atom, "training energy RMSE on Cu-Zn: HDNNP 15-15-15", "Table 2"], [RMSE, Force, 41.3, meV/A, "training force RMSE on Cu-Zn: HDNNP 15-15-15", "Table 2"]]}
+  - {key: nn-151515-test, model: nn-151515, material: cuzn, role: test, eval_data: {label: "Cu-Zn test set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.75, meV/atom, "test energy RMSE on Cu-Zn: HDNNP 15-15-15", "Table 2"], [RMSE, Force, 40.7, meV/A, "test force RMSE on Cu-Zn: HDNNP 15-15-15", "Table 2"]]}
+  - {key: nn-2020-train, model: nn-2020, material: cuzn, role: training, eval_data: {label: "Cu-Zn training set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.77, meV/atom, "training energy RMSE on Cu-Zn: HDNNP 20-20", "Table 2"], [RMSE, Force, 39.5, meV/A, "training force RMSE on Cu-Zn: HDNNP 20-20", "Table 2"]]}
+  - {key: nn-2020-test, model: nn-2020, material: cuzn, role: test, eval_data: {label: "Cu-Zn test set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.67, meV/atom, "test energy RMSE on Cu-Zn: HDNNP 20-20", "Table 2"], [RMSE, Force, 38.8, meV/A, "test force RMSE on Cu-Zn: HDNNP 20-20", "Table 2"]]}
+  - {key: nn-202020-train, model: nn-202020, material: cuzn, role: training, eval_data: {label: "Cu-Zn training set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.75, meV/atom, "training energy RMSE on Cu-Zn: HDNNP 20-20-20", "Table 2"], [RMSE, Force, 39.6, meV/A, "training force RMSE on Cu-Zn: HDNNP 20-20-20", "Table 2"]]}
+  - {key: nn-202020-test, model: nn-202020, material: cuzn, role: test, eval_data: {label: "Cu-Zn test set (after 20 epochs)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.66, meV/atom, "test energy RMSE on Cu-Zn: HDNNP 20-20-20", "Table 2"], [RMSE, Force, 39.0, meV/A, "test force RMSE on Cu-Zn: HDNNP 20-20-20", "Table 2"]]}
+gaps:
+  - "Sec. 4.1 quotes the selected 20-20 model with rounded RMSEs (1.8 and 1.7 meV/atom, 39.5 and 38.7 meV/A), slightly different from Table 2 (38.8 meV/A test force); Table 2 values are encoded. Errors on 150 annealed 216-atom clusters are shown as histograms (Fig. 11)."

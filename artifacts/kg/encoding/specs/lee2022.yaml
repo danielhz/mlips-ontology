@@ -1,0 +1,46 @@
+id: lee2022
+source:
+  rank: 558
+  year: "2022"
+  first_author: "Kyeongpung Lee"
+  title: "$\\textit{Ab initio}$ construction of full phase diagram of MgO-CaO eutectic system using neural network interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2208.11863"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2208.11863v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5cf0bb984067cd6a17bf5ba1a0112e2aaebc9421e83ec3a8dbb8798f27087c71"
+study_label: "Lee, Park and Han (2022): ab initio MgO-CaO eutectic phase diagram from PBE and SCAN neural network potentials with free-energy and semigrand simulations"
+scope: |
+  Encoding scope: two SIMPLE-NN Behler-Parrinello NNPs (PBE-NNP and
+  SCAN-NNP) for MgO-CaO trained on 5,670 structures (strained crystals,
+  random rocksalt alloys and their heating/melting MD), with training and
+  validation RMSEs (Table I). Elastic, defect, melting and phase-diagram
+  results are properties.
+materials:
+  mgocao: {label: "MgO-CaO rocksalt crystals, random alloys Mg_xCa_(1-x)O and melts", class: "Oxides"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "3x3x3 for the conventional cell, scaled for supercells"}
+  scan: {type: DFT, code: VASP, xc: SCAN, pp: PAW, cutoff: 500, kpoints: "3x3x3 for the conventional cell, scaled for supercells"}
+sampling:
+  md: {label: "Strained pure crystals, 100-atom random alloys (x = 0.08, 0.2, 0.8, 0.92), NPT and NVT heating MD of solids and melts (300-8000 K), sampled every 40 or 10 fs and relabelled"}
+datasets:
+  pbe: {label: "PBE MgO-CaO data set (5,670 structures, 552,096 atoms; 10% validation)", materials: [mgocao], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 5670, loc: "Sec. III A"}, calc: pbe, sampling: [md]}
+  scan: {label: "SCAN MgO-CaO data set (5,670 structures, 552,096 atoms; 10% validation)", materials: [mgocao], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 5670, loc: "Sec. III A"}, calc: scan, sampling: [md]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff, numLayers, learningRate, numEpochs]
+    loss: "Energies, forces and stresses"
+    algorithm: "PCA whitening of 24 radial and 108 angular ACSFs; learning rate decaying exponentially from 0.01 to 0.0005"
+    impl: {lib: {local: SIMPLE-NN}, comment: "Two hidden layers of 60 nodes"}
+    sims: [MolecularDynamics, MonteCarlo, ThermodynamicIntegration]
+runs:
+  pbe-nnp: {label: "PBE-NNP for MgO-CaO", method: HDNNP, dataset: pbe, settings: {cutoffRadius: {v: 7.0, loc: "Sec. II A"}, angularCutoff: {v: 4.5, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}, learningRate: {v: 0.01, loc: "Sec. II A (initial)"}, numEpochs: {v: 190, loc: "Sec. II A"}}, model: "PBE-NNP MgO-CaO"}
+  scan-nnp: {label: "SCAN-NNP for MgO-CaO", method: HDNNP, dataset: scan, settings: {cutoffRadius: {v: 7.0, loc: "Sec. II A"}, angularCutoff: {v: 4.5, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}, learningRate: {v: 0.01, loc: "Sec. II A (initial)"}, numEpochs: {v: 190, loc: "Sec. II A"}}, model: "SCAN-NNP MgO-CaO"}
+results:
+  - {key: pbe-train, model: pbe-nnp, material: mgocao, role: training, eval_data: {label: "PBE training set", location: "Table I"}, metrics: [[RMSE, Energy, 4.0, meV/atom, "training energy RMSE on MgO-CaO: PBE-NNP", "Table I"], [RMSE, Force, 0.24, eV/A, "training force-vector RMSE on MgO-CaO: PBE-NNP", "Table I"]]}
+  - {key: pbe-val, model: pbe-nnp, material: mgocao, role: validation, eval_data: {label: "PBE validation set (10%)", location: "Table I"}, metrics: [[RMSE, Energy, 4.1, meV/atom, "validation energy RMSE on MgO-CaO: PBE-NNP", "Table I"], [RMSE, Force, 0.28, eV/A, "validation force-vector RMSE on MgO-CaO: PBE-NNP", "Table I"]]}
+  - {key: scan-train, model: scan-nnp, material: mgocao, role: training, eval_data: {label: "SCAN training set", location: "Table I"}, metrics: [[RMSE, Energy, 5.1, meV/atom, "training energy RMSE on MgO-CaO: SCAN-NNP", "Table I"], [RMSE, Force, 0.24, eV/A, "training force-vector RMSE on MgO-CaO: SCAN-NNP", "Table I"]]}
+  - {key: scan-val, model: scan-nnp, material: mgocao, role: validation, eval_data: {label: "SCAN validation set (10%)", location: "Table I"}, metrics: [[RMSE, Energy, 5.5, meV/atom, "validation energy RMSE on MgO-CaO: SCAN-NNP", "Table I"], [RMSE, Force, 0.29, eV/A, "validation force-vector RMSE on MgO-CaO: SCAN-NNP", "Table I"]]}
+gaps:
+  - "Force RMSEs use the 3D Euclidean distance between DFT and NNP force vectors (Table I caption), not per-component errors."
