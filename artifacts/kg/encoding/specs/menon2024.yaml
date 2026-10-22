@@ -1,0 +1,50 @@
+id: menon2024
+source:
+  rank: 672
+  year: "2024"
+  first_author: "Sarath Kumar Menon"
+  title: "From electrons to phase diagrams with machine learning potentials using pyiron based automated workflows"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01441-0"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "b7cf99abda7b9fd444ddd79342bc65f9ad6fa645c77ac674affef216cf1f199c"
+study_label: "Menon et al. (2024): from electrons to phase diagrams with machine-learning potentials using pyiron workflows (Al-Li)"
+scope: |
+  Encoding scope: the HDNNP (RuNNer) and ACE (pacemaker) potentials for
+  the Al-Li system trained on the pyiron-generated PBE data set, with
+  energy and force RMSE/MAE on their training data and on a common test
+  set (Table 1). The EAM potential fitted in the same workflow is
+  classical and not encoded. Elastic constants, phase diagrams and
+  free energies are property results.
+materials:
+  alli: {label: "Al-Li system: fcc Al, bcc Li and Al-Li binary phases, random and perturbed structures", class: "light-metal binary alloy"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 750, kpoints: "k-mesh spacing 0.1 1/A", comment: "VASP 5.4; Fermi smearing 0.1 eV."}
+sampling:
+  pyiron: {label: "Domain-knowledge Materials Project prototypes with deformations and displacements, active learning during validation, and random structure search with relaxations and perturbations (pyiron workflows)"}
+datasets:
+  hdnnp-set: {label: "HDNNP training data (50,834 structures after filtering; 90/10 split)", materials: [alli], properties: [Energy, Forces], provenance: InHouse, n: {v: 50834, loc: "Table 1"}, calc: pbe, sampling: [pyiron]}
+  ace-set: {label: "ACE training data (51,082 structures; 95/5 split)", materials: [alli], properties: [Energy, Forces], provenance: InHouse, n: {v: 51082, loc: "Table 1"}, calc: pbe, sampling: [pyiron]}
+methods:
+  HDNNP:
+    algorithm: "Hyperparameters (ACSFs, cutoff, Kalman-filter settings) from a RuNNerASE grid search (SI Note 4)"
+    impl: {lib: RuNNer}
+    sims: [MolecularDynamics, ThermodynamicIntegration]
+  ACE:
+    algorithm: "1000 basis functions per element, 7 A cutoff, energy weights by distance to the convex hull, core repulsion below 2 A"
+    impl: {lib: PACE, comment: "pacemaker"}
+    sims: [MolecularDynamics, ThermodynamicIntegration]
+runs:
+  hdnnp: {label: "HDNNP for Al-Li", method: HDNNP, dataset: hdnnp-set, model: "HDNNP Al-Li (pyiron)"}
+  ace: {label: "ACE for Al-Li (1000 functions per element)", method: ACE, dataset: ace-set, model: "ACE Al-Li (pyiron)"}
+results:
+  - {key: hdnnp-train, model: hdnnp, material: alli, role: training, eval_data: {label: "HDNNP training data", location: "Table 1 (first sub-column)"}, metrics: [[RMSE, Energy, 10.6, meV/atom, "train energy RMSE on Al-Li: HDNNP", "Table 1"], [MAE, Energy, 7.1, meV/atom, "train energy MAE on Al-Li: HDNNP", "Table 1"], [RMSE, Force, 64.2, meV/A, "train force RMSE on Al-Li: HDNNP", "Table 1"], [MAE, Force, 30.6, meV/A, "train force MAE on Al-Li: HDNNP", "Table 1"]]}
+  - {key: hdnnp-test, model: hdnnp, material: alli, role: test, eval_data: {label: "Common test set within 1 eV/atom of the convex hull", location: "Table 1 (second sub-column)"}, metrics: [[RMSE, Energy, 10.2, meV/atom, "test energy RMSE on Al-Li: HDNNP", "Table 1"], [MAE, Energy, 6.9, meV/atom, "test energy MAE on Al-Li: HDNNP", "Table 1"], [RMSE, Force, 49.2, meV/A, "test force RMSE on Al-Li: HDNNP", "Table 1"], [MAE, Force, 21.0, meV/A, "test force MAE on Al-Li: HDNNP", "Table 1"]]}
+  - {key: ace-train, model: ace, material: alli, role: training, eval_data: {label: "ACE training data", location: "Table 1 (first sub-column)"}, metrics: [[RMSE, Energy, 12.2, meV/atom, "train energy RMSE on Al-Li: ACE", "Table 1"], [MAE, Energy, 7.5, meV/atom, "train energy MAE on Al-Li: ACE", "Table 1"], [RMSE, Force, 41.4, meV/A, "train force RMSE on Al-Li: ACE", "Table 1"], [MAE, Force, 16.9, meV/A, "train force MAE on Al-Li: ACE", "Table 1"]]}
+  - {key: ace-test, model: ace, material: alli, role: test, eval_data: {label: "Common test set within 1 eV/atom of the convex hull", location: "Table 1 (second sub-column)"}, metrics: [[RMSE, Energy, 9.6, meV/atom, "test energy RMSE on Al-Li: ACE", "Table 1"], [MAE, Energy, 6.6, meV/atom, "test energy MAE on Al-Li: ACE", "Table 1"], [RMSE, Force, 26.5, meV/A, "test force RMSE on Al-Li: ACE", "Table 1"], [MAE, Force, 11.7, meV/A, "test force MAE on Al-Li: ACE", "Table 1"]]}
+gaps:
+  - "Table 1 gives two unlabelled sub-columns under each of E and F. They are read as training then test, because the text states that 'the test error metrics are smaller than those for the training datasets' and the second value is smaller in every row."
+  - "The EAM potential (atomicrex) is classical and not encoded. HDNNP and ACE hyperparameters are in SI Notes 4-5 (not read)."
+  - "Murnaghan curves, elastic constants (Table 2), phase diagram features (Table 3) and free-energy calculations are property results."
