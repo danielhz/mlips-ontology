@@ -1,0 +1,60 @@
+id: farris2026
+source:
+  rank: 552
+  year: "2026"
+  first_author: "Riccardo Farris"
+  title: "Bayesian neural networks versus deep ensembles for uncertainty quantification in machine learning interatomic potentials"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae9de8"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2509.19180v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e446633e9cb622bc99978b58ee113d2e8a8cbb663607437dcd947441d2a571fb"
+study_label: "Farris et al. (2026): Bayesian neural networks versus deep ensembles for uncertainty quantification in Behler-Parrinello MLIPs (TiO2 and QM7)"
+scope: |
+  Encoding scope: aenet-PyTorch Behler-Parrinello networks (two hidden
+  layers of 15 tanh units) trained as variational BNNs (LRT and RAD
+  guides) or deep ensembles on the TiO2 dataset (high-data 6,330 and
+  low-data 1,265 training structures) and on QM7 (energies only); test
+  energy MAE/RMSE as averages over five runs (Tables 4 and 7). NLL and
+  UQ calibration metrics are not schema metrics.
+materials:
+  tio2: {label: "TiO2 bulk phases (aenet benchmark set)", formula: TiO2, class: "Oxides"}
+  qm7: {label: "QM7 organic molecules (C, H, N, O, S; up to 23 atoms)", class: "Small organic molecules (equilibrium geometries)"}
+reference:
+  pbe: {type: DFT, xc: PBE, comment: "TiO2 dataset of Ref. 28"}
+  pbe0: {type: DFT, xc: PBE0, comment: "QM7 atomization energies"}
+sampling:
+  split: {label: "Random 80/10/10 splits; low-data regime keeps 20% of training and validation"}
+datasets:
+  tio2-high: {label: "TiO2 training set, high-data regime (6,330 structures)", materials: [tio2], properties: [Energy, Forces], provenance: Published, n: {v: 6330, loc: "Sec. 3.1"}, calc: pbe, sampling: [split]}
+  tio2-low: {label: "TiO2 training set, low-data regime (1,265 structures)", materials: [tio2], properties: [Energy, Forces], provenance: Published, n: {v: 1265, loc: "Sec. 3.1"}, calc: pbe, sampling: [split]}
+  qm7: {label: "QM7 training split (80%, energies only)", materials: [qm7], properties: [Energy], provenance: Published, calc: pbe0, sampling: [split]}
+methods:
+  HDNNP:
+    hp: [numLayers]
+    loss: "Energy-force likelihood (ELBO for BNNs; per-member loss for ensembles)"
+    algorithm: "Hyperparameters by Optuna; Bayes by Backprop for BNNs (TyXe/Pyro)"
+    impl: {lib: {local: aenet-PyTorch}, comment: "70 ACSFs per species for TiO2, 490 for QM7"}
+runs:
+  tio2-high-lrt: {label: "TiO2 BPNN, variational BNN, mean-field AutoNormal guide with local reparameterization (LRT), high-data regime", method: HDNNP, dataset: tio2-high, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 LRT (high-data)"}
+  tio2-high-rad: {label: "TiO2 BPNN, variational BNN, radial guide (RAD), high-data regime", method: HDNNP, dataset: tio2-high, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 RAD (high-data)"}
+  tio2-high-de: {label: "TiO2 BPNN, deep ensemble (DE), high-data regime", method: HDNNP, dataset: tio2-high, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 DE (high-data)"}
+  tio2-low-lrt: {label: "TiO2 BPNN, variational BNN, mean-field AutoNormal guide with local reparameterization (LRT), low-data regime", method: HDNNP, dataset: tio2-low, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 LRT (low-data)"}
+  tio2-low-rad: {label: "TiO2 BPNN, variational BNN, radial guide (RAD), low-data regime", method: HDNNP, dataset: tio2-low, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 RAD (low-data)"}
+  tio2-low-de: {label: "TiO2 BPNN, deep ensemble (DE), low-data regime", method: HDNNP, dataset: tio2-low, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN TiO2 DE (low-data)"}
+  qm7-lrt: {label: "QM7 BPNN, variational BNN, mean-field AutoNormal guide with local reparameterization (LRT)", method: HDNNP, dataset: qm7, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN QM7 LRT"}
+  qm7-rad: {label: "QM7 BPNN, variational BNN, radial guide (RAD)", method: HDNNP, dataset: qm7, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN QM7 RAD"}
+  qm7-de: {label: "QM7 BPNN, deep ensemble (DE)", method: HDNNP, dataset: qm7, settings: {numLayers: {v: 2, loc: "Sec. 3.3.1"}}, model: "aenet BPNN QM7 DE"}
+results:
+  - {key: tio2-high-lrt-test, model: tio2-high-lrt, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 21, meV/atom, "test energy MAE on TiO2 (high-data): LRT (mean of 5 runs)", "Table 4"], [RMSE, Energy, 39, meV/atom, "test energy RMSE on TiO2 (high-data): LRT (mean of 5 runs)", "Table 4"]]}
+  - {key: tio2-high-rad-test, model: tio2-high-rad, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 21, meV/atom, "test energy MAE on TiO2 (high-data): RAD (mean of 5 runs)", "Table 4"], [RMSE, Energy, 38, meV/atom, "test energy RMSE on TiO2 (high-data): RAD (mean of 5 runs)", "Table 4"]]}
+  - {key: tio2-high-de-test, model: tio2-high-de, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 6, meV/atom, "test energy MAE on TiO2 (high-data): DE (mean of 5 runs)", "Table 4"], [RMSE, Energy, 9, meV/atom, "test energy RMSE on TiO2 (high-data): DE (mean of 5 runs)", "Table 4"]]}
+  - {key: tio2-low-lrt-test, model: tio2-low-lrt, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 54, meV/atom, "test energy MAE on TiO2 (low-data): LRT (mean of 5 runs)", "Table 4"], [RMSE, Energy, 259, meV/atom, "test energy RMSE on TiO2 (low-data): LRT (mean of 5 runs)", "Table 4"]]}
+  - {key: tio2-low-rad-test, model: tio2-low-rad, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 77, meV/atom, "test energy MAE on TiO2 (low-data): RAD (mean of 5 runs)", "Table 4"], [RMSE, Energy, 466, meV/atom, "test energy RMSE on TiO2 (low-data): RAD (mean of 5 runs)", "Table 4"]]}
+  - {key: tio2-low-de-test, model: tio2-low-de, material: tio2, role: test, eval_data: {label: "TiO2 test set (781 structures)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 35, meV/atom, "test energy MAE on TiO2 (low-data): DE (mean of 5 runs)", "Table 4"], [RMSE, Energy, 291, meV/atom, "test energy RMSE on TiO2 (low-data): DE (mean of 5 runs)", "Table 4"]]}
+  - {key: qm7-lrt-test, model: qm7-lrt, material: qm7, role: test, eval_data: {label: "QM7 test split (10%)", location: "Sec. 3.2"}, metrics: [[MAE, Energy, 7.7, meV/atom, "test energy MAE on QM7: LRT (mean of 5 runs)", "Table 7"], [RMSE, Energy, 13.3, meV/atom, "test energy RMSE on QM7: LRT (mean of 5 runs)", "Table 7"]]}
+  - {key: qm7-rad-test, model: qm7-rad, material: qm7, role: test, eval_data: {label: "QM7 test split (10%)", location: "Sec. 3.2"}, metrics: [[MAE, Energy, 7.5, meV/atom, "test energy MAE on QM7: RAD (mean of 5 runs)", "Table 7"], [RMSE, Energy, 13.0, meV/atom, "test energy RMSE on QM7: RAD (mean of 5 runs)", "Table 7"]]}
+  - {key: qm7-de-test, model: qm7-de, material: qm7, role: test, eval_data: {label: "QM7 test split (10%)", location: "Sec. 3.2"}, metrics: [[MAE, Energy, 7.1, meV/atom, "test energy MAE on QM7: DE (mean of 5 runs)", "Table 7"], [RMSE, Energy, 15.2, meV/atom, "test energy RMSE on QM7: DE (mean of 5 runs)", "Table 7"]]}
+gaps:
+  - "Force errors are not reported in the text read. The +/- values are standard deviations over five runs. NLL, RMSCE, sharpness, overlap and Spearman metrics are not encoded. BNN vs ensemble is a training-scheme setting of the same HDNNP method."
