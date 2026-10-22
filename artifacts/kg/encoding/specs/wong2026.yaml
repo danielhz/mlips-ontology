@@ -1,0 +1,53 @@
+id: wong2026
+source:
+  rank: 592
+  year: "2026"
+  first_author: "Yee Chit Wong"
+  title: "Long-Range Machine Learning Interatomic Potentials for Defect Energetics in SrTiO$_3$"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2610.00794"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2610.00794v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "14879ef40e8fb196bd6b61bcfa9141b32b690d820bdc71ffa6b954a60004e6ee"
+study_label: "Wong, Langer, Maurer and Hine (2026): long-range MLIPs (MACE-LES, MACE-POLAR, LOREM) versus local MACE for Schottky-defect energetics in SrTiO3"
+scope: |
+  Encoding scope: the four models trained on the SrTiO3 DFT data (bulk
+  MD, 1D strain and Sr-O Schottky defect configurations; PBE, FHI-aims),
+  with energy and force RMSEs relative to DFT along NEB paths at three
+  Sr-O separations (Table V). Synthetic point-charge and formal-charge
+  Ewald benchmarks are reported as pass/fail tables and figure panels and
+  are not encoded; activation barriers are properties.
+materials:
+  sto: {label: "SrTiO3 bulk (MD, strain) and Sr-O Schottky defect pairs", formula: SrTiO3, class: "Oxides"}
+reference:
+  aims: {type: DFT, code: FHIaims, xc: PBE, comment: "Frozen core below -600 eV, non-spin-polarized"}
+sampling:
+  mix: {label: "Cubic SrTiO3 MD (MACE-OMAT-0 and NOMAD trajectories), 1D strains and Schottky-defect configurations at varying separations"}
+datasets:
+  sto: {label: "SrTiO3 DFT training data (bulk MD, strain, Schottky defects)", materials: [sto], properties: [Energy, Forces], provenance: InHouse, calc: aims, sampling: [mix]}
+methods:
+  MACE: {impl: {lib: MACE}, sims: [NudgedElasticBand, MolecularDynamics]}
+  MACE-LES: {impl: {lib: MACE}, sims: [NudgedElasticBand]}
+  MACE-POLAR: {impl: {lib: MACE}, sims: [NudgedElasticBand]}
+  LOREM: {sims: [NudgedElasticBand]}
+runs:
+  mace: {label: "MACE trained on SrTiO3 DFT data", method: MACE, dataset: sto, model: "MACE SrTiO3 (Wong 2026)"}
+  les: {label: "MACE-LES trained on SrTiO3 DFT data", method: MACE-LES, dataset: sto, model: "MACE-LES SrTiO3 (Wong 2026)"}
+  polar: {label: "MACE-POLAR trained on SrTiO3 DFT data", method: MACE-POLAR, dataset: sto, model: "MACE-POLAR SrTiO3 (Wong 2026)"}
+  lorem: {label: "LOREM trained on SrTiO3 DFT data", method: LOREM, dataset: sto, model: "LOREM SrTiO3 (Wong 2026)"}
+results:
+  - {key: mace-neb-close, model: mace, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, close separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 114.3, meV, "NEB energy RMSE (close separation) on SrTiO3: MACE", "Table V"], [RMSE, Force, 5.5, meV/A, "NEB force RMSE (close separation) on SrTiO3: MACE", "Table V"]]}
+  - {key: les-neb-close, model: les, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, close separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 14.8, meV, "NEB energy RMSE (close separation) on SrTiO3: MACE-LES", "Table V"], [RMSE, Force, 3.9, meV/A, "NEB force RMSE (close separation) on SrTiO3: MACE-LES", "Table V"]]}
+  - {key: polar-neb-close, model: polar, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, close separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 24.4, meV, "NEB energy RMSE (close separation) on SrTiO3: MACE-POLAR", "Table V"], [RMSE, Force, 3.6, meV/A, "NEB force RMSE (close separation) on SrTiO3: MACE-POLAR", "Table V"]]}
+  - {key: lorem-neb-close, model: lorem, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, close separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 41.1, meV, "NEB energy RMSE (close separation) on SrTiO3: LOREM", "Table V"], [RMSE, Force, 6.1, meV/A, "NEB force RMSE (close separation) on SrTiO3: LOREM", "Table V"]]}
+  - {key: mace-neb-mid, model: mace, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, mid separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 72.2, meV, "NEB energy RMSE (mid separation) on SrTiO3: MACE", "Table V"], [RMSE, Force, 5.5, meV/A, "NEB force RMSE (mid separation) on SrTiO3: MACE", "Table V"]]}
+  - {key: les-neb-mid, model: les, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, mid separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 41.4, meV, "NEB energy RMSE (mid separation) on SrTiO3: MACE-LES", "Table V"], [RMSE, Force, 3.4, meV/A, "NEB force RMSE (mid separation) on SrTiO3: MACE-LES", "Table V"]]}
+  - {key: polar-neb-mid, model: polar, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, mid separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 47.7, meV, "NEB energy RMSE (mid separation) on SrTiO3: MACE-POLAR", "Table V"], [RMSE, Force, 3.3, meV/A, "NEB force RMSE (mid separation) on SrTiO3: MACE-POLAR", "Table V"]]}
+  - {key: lorem-neb-mid, model: lorem, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, mid separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 27.6, meV, "NEB energy RMSE (mid separation) on SrTiO3: LOREM", "Table V"], [RMSE, Force, 5.9, meV/A, "NEB force RMSE (mid separation) on SrTiO3: LOREM", "Table V"]]}
+  - {key: mace-neb-far, model: mace, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, far separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 61.6, meV, "NEB energy RMSE (far separation) on SrTiO3: MACE", "Table V"], [RMSE, Force, 5.3, meV/A, "NEB force RMSE (far separation) on SrTiO3: MACE", "Table V"]]}
+  - {key: les-neb-far, model: les, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, far separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 23.5, meV, "NEB energy RMSE (far separation) on SrTiO3: MACE-LES", "Table V"], [RMSE, Force, 2.9, meV/A, "NEB force RMSE (far separation) on SrTiO3: MACE-LES", "Table V"]]}
+  - {key: polar-neb-far, model: polar, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, far separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 8.9, meV, "NEB energy RMSE (far separation) on SrTiO3: MACE-POLAR", "Table V"], [RMSE, Force, 2.8, meV/A, "NEB force RMSE (far separation) on SrTiO3: MACE-POLAR", "Table V"]]}
+  - {key: lorem-neb-far, model: lorem, material: sto, role: external, eval_data: {label: "NEB images for Sr-O vacancy migration, far separation regime", location: "Table V"}, metrics: [[RMSE, Energy, 17.8, meV, "NEB energy RMSE (far separation) on SrTiO3: LOREM", "Table V"], [RMSE, Force, 5.9, meV/A, "NEB force RMSE (far separation) on SrTiO3: LOREM", "Table V"]]}
+gaps:
+  - "Test-set errors per data category (bulk MD, strain, Schottky; Fig. 10) and synthetic-benchmark MAEs (Figs. 8-9) are figure-only; pass/fail tables are not metrics. Models trained on the synthetic Ewald data are not separate runs. LOREM is a new registry method without origin."
