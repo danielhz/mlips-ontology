@@ -1,0 +1,78 @@
+id: eugenio2025
+source:
+  rank: 289
+  year: "2025"
+  first_author: "Niccolò Di Eugenio"
+  title: "Machine-Learned Interatomic Potentials for Structural and Defect Properties of YBa$_2$Cu$_3$O$_{7-δ}$"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2511.22592"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2511.22592v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0cd4f81c7728607d6d2d5a654b646229a535c1ce82b651938e80852eda1088fb"
+study_label: "Di Eugenio et al. (2025): ACE, MACE, GAP and tabGAP potentials for YBa2Cu3O7-delta structure and defects"
+scope: |
+  Encoding scope: the YBCO DFT database built here (2,712 structures of
+  YBCO7, YBCO6, Y, Ba, Cu, O and binary oxides with volume, strain, thermal,
+  defect and amorphous perturbations plus active learning), the YBCO ACE,
+  MACE, GAP and tabGAP potentials trained on it, their validation RMSEs
+  printed in Fig. 3 and the MD speeds of Table I. Lattice parameters,
+  elastic, thermal-expansion, defect and NEB results are properties, not
+  error metrics.
+materials:
+  ybco: {label: "YBa2Cu3O7-delta (YBCO7 and YBCO6) with point defects, plus Y, Ba, Cu, O, Y2O3, BaO and Cu2O", formula: "YBa2Cu3O7", class: "High-temperature superconducting cuprate"}
+reference:
+  pbe: {type: DFT, code: {local: "CP2K"}, xc: PBE, pp: NormConserving, kpoints: "Gamma point (supercells converged to 1 meV/atom)", comment: "CP2K Quickstep GPW, 400 Ry cutoff, DZVP basis, GTH pseudopotentials, non-spin-polarised."}
+sampling:
+  perturb: {label: "Volume (-10% to +200%), random strain (+-5%, angle sd about 2.5 deg) and Lindemann-limited thermal displacements of relaxed cells; interstitials, vacancies and antisites in YBCO7; random-displacement amorphous cells"}
+  al: {label: "Active learning: MD with preliminary MLPs, re-evaluated with DFT"}
+datasets:
+  ybco: {label: "YBCO training database (2,712 structures, 7,174,977 force components) after force (> 80 eV/A) and SOAP farthest-point filtering", materials: [ybco], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2712, loc: "Sec. II E"}, calc: pbe, sampling: [perturb, al]}
+methods:
+  ACE:
+    hp: [cutoffRadius, batchSize]
+    loss: "Weighted energy (1) and force (10) loss, kappa = 0.3"
+    algorithm: "BFGS, up to 2,000 iterations; ZBL core repulsion"
+    impl: {lib: PACE}
+    sims: [MolecularDynamics, GeometryOptimization, NudgedElasticBand]
+  MACE:
+    hp: [cutoffRadius, numFeatures, numLayers, bodyOrder, numRadialBasis, batchSize, numEpochs]
+    loss: "Weighted energy (1) and force (10) loss"
+    algorithm: "AMSGrad, gradient clipping 5, weight decay 5e-7, EMA 0.99, SWA from epoch 425 (stage-one model selected)"
+    impl: {lib: MACE, comment: "MACE 0.3.14; LAMMPS via symmetrix"}
+    sims: [MolecularDynamics, GeometryOptimization, NudgedElasticBand]
+  GAP:
+    hp: [cutoffRadius, angularCutoff, numSparseConfigs]
+    algorithm: "Two-body, three-body and EAM descriptors; hyperparameters by Bayesian optimisation (BoTorch); screened Coulomb repulsion"
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, GeometryOptimization]
+  tabGAP:
+    impl: {lib: {local: "tabgap", comment: "LAMMPS pair_style tabgap"}}
+    sims: [MolecularDynamics, GeometryOptimization, NudgedElasticBand]
+runs:
+  ace: {label: "YBCO ACE", method: ACE, dataset: ybco, settings: {cutoffRadius: {v: 6.5, loc: "App. B"}, batchSize: {v: 100, loc: "App. B"}}, model: "YBCO ACE potential (700 basis functions per element)"}
+  mace: {label: "YBCO MACE (stage-one model)", method: MACE, dataset: ybco, settings: {cutoffRadius: {v: 6.5, loc: "App. C"}, numFeatures: {v: 128, loc: "App. C"}, numLayers: {v: 2, loc: "App. C"}, bodyOrder: {v: 3, loc: "App. C (correlation order)"}, numRadialBasis: {v: 8, loc: "App. C"}, batchSize: {v: 6, loc: "App. C"}, numEpochs: {v: 600, loc: "App. C (maximum)"}}, model: "YBCO MACE potential"}
+  gap: {label: "YBCO GAP (2b + 3b + EAM)", method: GAP, dataset: ybco, settings: {cutoffRadius: {v: 6.5, loc: "Table II (two-body, EAM)"}, angularCutoff: {v: 4.5, loc: "Table II (three-body)"}, numSparseConfigs: {v: 550, loc: "Table II (three-body sparse points)"}}, model: "YBCO GAP potential"}
+  tabgap: {label: "YBCO tabGAP (tabulated YBCO GAP)", method: tabGAP, dataset: ybco, model: "YBCO tabGAP potential (tabulation of the YBCO GAP)"}
+results:
+  - {key: mace, model: mace, material: ybco, role: validation, eval_data: {label: "Independent validation set of about 750 YBCO7 and YBCO6 structures (volumes, thermal perturbations, strains), not used for training", location: "Sec. III A; Fig. 3"}, metrics: [[RMSE, Energy, 0.0092, null, "Validation energy RMSE as printed in Fig. 3 (unit not stated): YBCO MACE", "Fig. 3"], [RMSE, Force, 0.0786, eV/A, "Validation force RMSE: YBCO MACE", "Fig. 3"]]}
+  - {key: ace, model: ace, material: ybco, role: validation, eval_data: {label: "Independent validation set of about 750 YBCO7 and YBCO6 structures (volumes, thermal perturbations, strains), not used for training", location: "Sec. III A; Fig. 3"}, metrics: [[RMSE, Energy, 0.0059, null, "Validation energy RMSE as printed in Fig. 3 (unit not stated): YBCO ACE", "Fig. 3"], [RMSE, Force, 0.0949, eV/A, "Validation force RMSE: YBCO ACE", "Fig. 3"]]}
+  - {key: gap, model: gap, material: ybco, role: validation, eval_data: {label: "Independent validation set of about 750 YBCO7 and YBCO6 structures (volumes, thermal perturbations, strains), not used for training", location: "Sec. III A; Fig. 3"}, metrics: [[RMSE, Energy, 0.0035, null, "Validation energy RMSE as printed in Fig. 3 (unit not stated): YBCO GAP", "Fig. 3"], [RMSE, Force, 0.1123, eV/A, "Validation force RMSE: YBCO GAP", "Fig. 3"]]}
+  - {key: tabgap, model: tabgap, material: ybco, role: validation, eval_data: {label: "Independent validation set of about 750 YBCO7 and YBCO6 structures (volumes, thermal perturbations, strains), not used for training", location: "Sec. III A; Fig. 3"}, metrics: [[RMSE, Energy, 0.0037, null, "Validation energy RMSE as printed in Fig. 3 (unit not stated): YBCO tabGAP", "Fig. 3"], [RMSE, Force, 0.1132, eV/A, "Validation force RMSE: YBCO tabGAP", "Fig. 3"]]}
+timings:
+  - {model: mace, system: "YBCO7 supercell, NVE MD with 1 fs step, 936 atoms (LAMMPS 12Jun2025)", atoms: 936, value: 0.9, unit: "ns/day", per_atom_us: 102.6, hardware: "48 cores of a dual AMD EPYC 9334 node: 0.9 ns/day (YBCO MACE)", result: null, location: "Table I"}
+  - {model: ace, system: "YBCO7 supercell, NVE MD with 1 fs step, 936 atoms (LAMMPS 12Jun2025)", atoms: 936, value: 33.84, unit: "ns/day", per_atom_us: 2.7, hardware: "48 cores of a dual AMD EPYC 9334 node: 33.84 ns/day (YBCO ACE)", result: null, location: "Table I"}
+  - {model: tabgap, system: "YBCO7 supercell, NVE MD with 1 fs step, 936 atoms (LAMMPS 12Jun2025)", atoms: 936, value: 53.24, unit: "ns/day", per_atom_us: 1.7, hardware: "48 cores of a dual AMD EPYC 9334 node: 53.24 ns/day (YBCO tabGAP)", result: null, location: "Table I"}
+  - {model: mace, system: "YBCO7 supercell, NVE MD with 1 fs step, 7488 atoms (LAMMPS 12Jun2025)", atoms: 7488, value: 0.56, unit: "ns/day", per_atom_us: 20.6, hardware: "Four NVIDIA A100 SXM 80GB GPUs (Kokkos, symmetrix): 0.56 ns/day (YBCO MACE)", result: null, location: "Table I"}
+  - {model: ace, system: "YBCO7 supercell, NVE MD with 1 fs step, 3833856 atoms (LAMMPS 12Jun2025)", atoms: 3833856, value: 0.09, unit: "ns/day", per_atom_us: 0.2504, hardware: "Four NVIDIA A100 SXM 80GB GPUs (Kokkos): 0.09 ns/day (YBCO ACE)", result: null, location: "Table I"}
+  - {model: tabgap, system: "YBCO7 supercell, NVE MD with 1 fs step, 3833856 atoms (LAMMPS 12Jun2025)", atoms: 3833856, value: 0.46, unit: "ns/day", per_atom_us: 0.049, hardware: "Four NVIDIA A100 SXM 80GB GPUs (Kokkos): 0.46 ns/day (YBCO tabGAP)", result: null, location: "Table I"}
+resources: |
+  Table I: on 48 CPU cores (936 atoms) MACE 0.90, ACE 33.84 and tabGAP
+  53.24 ns/day; on four A100 GPUs MACE 0.56 ns/day for 7,488 atoms, ACE 0.09
+  and tabGAP 0.46 ns/day for 3,833,856 atoms. Per-atom times are 86,400 s /
+  (ns/day x 1e6 steps) / atoms, i.e. wall time on the whole CPU set or GPU
+  node. No training times are given.
+gaps:
+  - "Fig. 3 prints energy RMSEs (0.0092, 0.0059, 0.0035, 0.0037) without a unit; they are recorded with unit null. The assignment of the two RMSE lines per panel to the models follows the force ranking stated in Sec. III A (MACE best, then ACE, GAP, tabGAP) and the statement that GAP and tabGAP have the lowest energy errors."
+  - "tabGAP is a new registry method; the paper describes it as GAP descriptor tabulation introduced by Glielmo et al. and extended by Byggmastar et al. (derivation from GAP not recorded here). The YBCO tabGAP is a tabulation of the YBCO GAP (App. F); tabulation is neither fine-tuning nor distillation, so no base model is recorded."
+  - "ACE body order (up to seven-body terms) and the GAP theta/delta hyperparameters have no hyperparameter individual in this encoding."

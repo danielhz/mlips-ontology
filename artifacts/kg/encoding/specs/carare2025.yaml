@@ -1,0 +1,57 @@
+id: carare2025
+source:
+  rank: 286
+  year: "2025"
+  first_author: "Vlad Cărare"
+  title: "Global properties of the energy landscape: a testing and training arena for machine learned potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01878-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "96448317e5c3a774277700d34346251bc58e9c486a37827620ebc24e1ef1676c"
+study_label: "Cărare et al. (2025): Landscape17, kinetic transition networks of rMD17 molecules as a test and training arena for MLIPs"
+scope: |
+  Encoding scope: the Landscape17 data set introduced here (wB97X/6-31G(d)
+  minima, transition states and approximate steepest-descent pathways of
+  six rMD17 molecules), NequIP, MACE and Allegro models trained per molecule
+  on rMD17 only (N-L) or on rMD17 plus 40% of the Landscape17 pathways (L),
+  and the pretrained ANI2x, AIMNet2, MACE-MP-0b3 (medium) and SO3LR used to
+  construct MLIP energy landscapes. All errors are given in figures or in
+  Supplementary Tables S2-S5 that are not part of the PDF, so no metric is
+  encoded.
+materials:
+  rmd17-mols: {label: "Ethanol, malonaldehyde, salicylic acid, azobenzene, paracetamol and aspirin (rMD17 molecules with several minima)", class: "Small organic molecules (gas phase)"}
+reference:
+  wb97x: {type: DFT, code: {local: "Psi4"}, xc: wB97X, basis: "6-31G(d)", comment: "Restricted Kohn-Sham, energy and density convergence 1e-9, (100, 770) integration grid; basin hopping, TopSearch/OPTIM transition-state searches."}
+sampling:
+  dps: {label: "Basin-hopping global optimisation and single- and double-ended transition-state searches (discrete path sampling), with approximate steepest-descent paths from each transition state"}
+datasets:
+  landscape17: {label: "Landscape17: 28 minima, 67 transition states and pathway configurations of six rMD17 molecules with energies, forces and Hessian eigenspectra", materials: [rmd17-mols], properties: [Energy, Forces], provenance: InHouse, calc: wb97x, sampling: [dps], comment: "Estimated cost above 1e5 CPU hours; publicly available (Ref. [80])."}
+  rmd17-train: {label: "rMD17 training split (950/50 split as in the original papers) for the six molecules", materials: [rmd17-mols], properties: [Energy, Forces], provenance: Published}
+  rmd17-l: {label: "rMD17 training split plus 40% of the Landscape17 pathway configurations (up to 500 structures per molecule)", materials: [rmd17-mols], properties: [Energy, Forces], provenance: Augmented, calc: wb97x}
+external_models: [ANI-2x, MACE-MP-0b3-medium]
+methods:
+  NequIP: {sims: [GeometryOptimization, NudgedElasticBand]}
+  MACE: {sims: [GeometryOptimization, NudgedElasticBand]}
+  Allegro: {sims: [GeometryOptimization, NudgedElasticBand]}
+  ANI: {sims: [GeometryOptimization, NudgedElasticBand]}
+  AIMNet2: {sims: [GeometryOptimization, NudgedElasticBand]}
+  SO3LR: {sims: [GeometryOptimization, NudgedElasticBand]}
+runs:
+  nequip-nl: {label: "NequIP trained per molecule on rMD17 (non-landscape, N-L)", method: NequIP, dataset: rmd17-train, model: "NequIP N-L models (one per molecule)"}
+  nequip-l: {label: "NequIP trained per molecule on rMD17 plus Landscape17 pathways (L)", method: NequIP, dataset: rmd17-l, model: "NequIP L models (one per molecule)"}
+  mace-nl: {label: "MACE trained per molecule on rMD17 (N-L)", method: MACE, dataset: rmd17-train, model: "MACE N-L models (one per molecule)"}
+  mace-l: {label: "MACE trained per molecule on rMD17 plus Landscape17 pathways (L)", method: MACE, dataset: rmd17-l, model: "MACE L models (one per molecule)"}
+  allegro-nl: {label: "Allegro trained per molecule on rMD17 (N-L)", method: Allegro, dataset: rmd17-train, model: "Allegro N-L models (one per molecule)"}
+  allegro-l: {label: "Allegro trained per molecule on rMD17 plus Landscape17 pathways (L)", method: Allegro, dataset: rmd17-l, model: "Allegro L models (one per molecule)"}
+  aimnet2: {label: "AIMNet2 as distributed", method: AIMNet2, model: "AIMNet2"}
+  so3lr: {label: "SO3LR as distributed", method: SO3LR, model: "SO3LR"}
+results: []
+resources: |
+  ANI2x and AIMNet2 were evaluated on single CPUs, the other models on
+  single NVIDIA A100 GPUs; the DFT landscapes cost more than 1e5 CPU hours.
+  No MLIP timings are given.
+gaps:
+  - "Energy and force RMSEs on stationary points and test sets are shown only as relative errors in Fig. 2 and in Supplementary Tables S2-S5, which are not in the PDF; counts of unphysical and matched stationary points (Figs. 3, 4) are not error metrics."
+  - "The system-specific models are trained per molecule with the hyperparameters of their original publications (not restated); each run stands for six per-molecule models. SO3LR is a new registry method (method paper not in the corpus); GFN2-xTB is semi-empirical and not encoded."

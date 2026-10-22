@@ -1,0 +1,70 @@
+id: shuang2026
+source:
+  rank: 293
+  year: "2026"
+  first_author: "Fei Shuang"
+  title: "Benchmarking chemically scalable machine-learning interatomic potentials for large-scale simulations of multicomponent alloys"
+  venue: "Physical Review Materials"
+  doi: "10.1103/1qc9-ypyb"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2604.01642v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "58e732484866d56ad935e3bde924e966c9710cd56db4b163f1def4d2bcf1489a"
+study_label: "Shuang et al. (2026): benchmarking UNEP-v1 (NEP) and GRACE potentials for 16 metals and their multicomponent alloys"
+scope: |
+  Encoding scope: the published UNEP-v1 NEP4 model and the GRACE-FS-S/M/L
+  and GRACE-2L models trained here on the UNEP-v1 data set of 16 metals and
+  their binary alloys, with training and test energy, force and stress
+  MAEs and RMSEs (Tables I and II), the training cost of GRACE-FS-M (Fig.
+  1d) and the stated inference speeds (Fig. 3). Ensemble averages (Table
+  III), uncertainty correlations, MD energy drift and the spall simulations
+  are not encoded.
+materials:
+  metals16: {label: "16 elemental metals (Ag, Al, Au, Cr, Cu, Mg, Mo, Ni, Pb, Pd, Pt, Ta, Ti, V, W, Zr) and their alloys under diverse deformation states", class: "Metals and multicomponent alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Monkhorst-Pack, reciprocal density 2 pi x 0.03 1/A (VASPKIT)", comment: "EDIFF 1e-6 eV (for newly generated configurations)."}
+datasets:
+  unep: {label: "UNEP-v1 training set of Ref. [38] (16 metals, unary and binary structures)", materials: [metals16], properties: [Energy, Forces, Virials], provenance: Published, calc: pbe, comment: "Zenodo 10.5281/zenodo.11533864."}
+methods:
+  NEP:
+    impl: {lib: {local: "GPUMD", comment: "GPUMD v5.0 for inference benchmarks"}}
+    sims: [MolecularDynamics]
+  GRACE:
+    hp: [cutoffRadius]
+    impl: {lib: {local: "gracemaker", comment: "GRACE / tensorpotential; LAMMPS with Kokkos"}}
+    sims: [MolecularDynamics]
+runs:
+  unep-v1: {label: "UNEP-v1 (NEP4) as published in Ref. [38] (not retrained)", method: NEP, model: "UNEP-v1 (70,401 parameters)"}
+  grace-fs-s: {label: "GRACE-FS-S trained on the UNEP-v1 data", method: GRACE, dataset: unep, settings: {cutoffRadius: {v: 6, loc: "Methods"}}, model: "GRACE-FS-S (9,312 parameters)"}
+  grace-fs-m: {label: "GRACE-FS-M trained on the UNEP-v1 data", method: GRACE, dataset: unep, settings: {cutoffRadius: {v: 6, loc: "Methods"}}, model: "GRACE-FS-M (17,824 parameters)", gpuHours: {v: 24, loc: "Fig. 1d"}, trainingHardware: "Single NVIDIA A100 GPU, converged within one day in fewer than 2,000 epochs"}
+  grace-fs-l: {label: "GRACE-FS-L trained on the UNEP-v1 data", method: GRACE, dataset: unep, settings: {cutoffRadius: {v: 6, loc: "Methods"}}, model: "GRACE-FS-L (28,592 parameters)"}
+  grace-2l: {label: "GRACE-2L (two-layer graph model) trained on the UNEP-v1 data", method: GRACE, dataset: unep, settings: {cutoffRadius: {v: 6, loc: "Methods"}}, model: "GRACE-2L (1,289,704 parameters)"}
+results:
+  - {key: unep-v1-train, model: unep-v1, material: metals16, role: training, eval_data: {label: "Training set (UNEP-v1 data)", location: "Table I"}, metrics: [[MAE, Energy, 11.1, meV/atom, "Training energy MAE: UNEP-v1", "Table I"], [RMSE, Energy, 17.13, meV/atom, "Training energy RMSE: UNEP-v1", "Table I"], [MAE, Force, 111.08, meV/A, "Training force MAE: UNEP-v1", "Table I"], [RMSE, Force, 171.9, meV/A, "Training force RMSE: UNEP-v1", "Table I"], [MAE, Stress, 0.45, GPa, "Training stress MAE: UNEP-v1", "Table I"], [RMSE, Stress, 1.18, GPa, "Training stress RMSE: UNEP-v1", "Table I"]]}
+  - {key: unep-v1-test, model: unep-v1, material: metals16, role: test, eval_data: {label: "Test set of Ref. [38] (pure metals and alloys under diverse deformation states)", location: "Table II"}, metrics: [[MAE, Energy, 24.44, meV/atom, "Test energy MAE: UNEP-v1", "Table II"], [RMSE, Energy, 57.99, meV/atom, "Test energy RMSE: UNEP-v1", "Table II"], [MAE, Force, 114.24, meV/A, "Test force MAE: UNEP-v1", "Table II"], [RMSE, Force, 260.09, meV/A, "Test force RMSE: UNEP-v1", "Table II"], [MAE, Stress, 0.67, GPa, "Test stress MAE: UNEP-v1", "Table II"], [RMSE, Stress, 2.13, GPa, "Test stress RMSE: UNEP-v1", "Table II"]]}
+  - {key: grace-fs-s-train, model: grace-fs-s, material: metals16, role: training, eval_data: {label: "Training set (UNEP-v1 data)", location: "Table I"}, metrics: [[MAE, Energy, 11.81, meV/atom, "Training energy MAE: GRACE-FS-S", "Table I"], [RMSE, Energy, 23.75, meV/atom, "Training energy RMSE: GRACE-FS-S", "Table I"], [MAE, Force, 103.85, meV/A, "Training force MAE: GRACE-FS-S", "Table I"], [RMSE, Force, 168.59, meV/A, "Training force RMSE: GRACE-FS-S", "Table I"], [MAE, Stress, 0.53, GPa, "Training stress MAE: GRACE-FS-S", "Table I"], [RMSE, Stress, 2.46, GPa, "Training stress RMSE: GRACE-FS-S", "Table I"]]}
+  - {key: grace-fs-s-test, model: grace-fs-s, material: metals16, role: test, eval_data: {label: "Test set of Ref. [38] (pure metals and alloys under diverse deformation states)", location: "Table II"}, metrics: [[MAE, Energy, 20.07, meV/atom, "Test energy MAE: GRACE-FS-S", "Table II"], [RMSE, Energy, 62.97, meV/atom, "Test energy RMSE: GRACE-FS-S", "Table II"], [MAE, Force, 102.13, meV/A, "Test force MAE: GRACE-FS-S", "Table II"], [RMSE, Force, 424.51, meV/A, "Test force RMSE: GRACE-FS-S", "Table II"], [MAE, Stress, 0.65, GPa, "Test stress MAE: GRACE-FS-S", "Table II"], [RMSE, Stress, 3.07, GPa, "Test stress RMSE: GRACE-FS-S", "Table II"]]}
+  - {key: grace-fs-m-train, model: grace-fs-m, material: metals16, role: training, eval_data: {label: "Training set (UNEP-v1 data)", location: "Table I"}, metrics: [[MAE, Energy, 10.42, meV/atom, "Training energy MAE: GRACE-FS-M", "Table I"], [RMSE, Energy, 21.02, meV/atom, "Training energy RMSE: GRACE-FS-M", "Table I"], [MAE, Force, 99.11, meV/A, "Training force MAE: GRACE-FS-M", "Table I"], [RMSE, Force, 159.14, meV/A, "Training force RMSE: GRACE-FS-M", "Table I"], [MAE, Stress, 0.51, GPa, "Training stress MAE: GRACE-FS-M", "Table I"], [RMSE, Stress, 2.52, GPa, "Training stress RMSE: GRACE-FS-M", "Table I"]]}
+  - {key: grace-fs-m-test, model: grace-fs-m, material: metals16, role: test, eval_data: {label: "Test set of Ref. [38] (pure metals and alloys under diverse deformation states)", location: "Table II"}, metrics: [[MAE, Energy, 19.89, meV/atom, "Test energy MAE: GRACE-FS-M", "Table II"], [RMSE, Energy, 55.85, meV/atom, "Test energy RMSE: GRACE-FS-M", "Table II"], [MAE, Force, 98.98, meV/A, "Test force MAE: GRACE-FS-M", "Table II"], [RMSE, Force, 408.41, meV/A, "Test force RMSE: GRACE-FS-M", "Table II"], [MAE, Stress, 0.62, GPa, "Test stress MAE: GRACE-FS-M", "Table II"], [RMSE, Stress, 2.47, GPa, "Test stress RMSE: GRACE-FS-M", "Table II"]]}
+  - {key: grace-fs-l-train, model: grace-fs-l, material: metals16, role: training, eval_data: {label: "Training set (UNEP-v1 data)", location: "Table I"}, metrics: [[MAE, Energy, 9.3, meV/atom, "Training energy MAE: GRACE-FS-L", "Table I"], [RMSE, Energy, 18.93, meV/atom, "Training energy RMSE: GRACE-FS-L", "Table I"], [MAE, Force, 95.95, meV/A, "Training force MAE: GRACE-FS-L", "Table I"], [RMSE, Force, 153.73, meV/A, "Training force RMSE: GRACE-FS-L", "Table I"], [MAE, Stress, 0.5, GPa, "Training stress MAE: GRACE-FS-L", "Table I"], [RMSE, Stress, 2.64, GPa, "Training stress RMSE: GRACE-FS-L", "Table I"]]}
+  - {key: grace-fs-l-test, model: grace-fs-l, material: metals16, role: test, eval_data: {label: "Test set of Ref. [38] (pure metals and alloys under diverse deformation states)", location: "Table II"}, metrics: [[MAE, Energy, 18.94, meV/atom, "Test energy MAE: GRACE-FS-L", "Table II"], [RMSE, Energy, 68.0, meV/atom, "Test energy RMSE: GRACE-FS-L", "Table II"], [MAE, Force, 95.23, meV/A, "Test force MAE: GRACE-FS-L", "Table II"], [RMSE, Force, 457.09, meV/A, "Test force RMSE: GRACE-FS-L", "Table II"], [MAE, Stress, 0.61, GPa, "Test stress MAE: GRACE-FS-L", "Table II"], [RMSE, Stress, 2.86, GPa, "Test stress RMSE: GRACE-FS-L", "Table II"]]}
+  - {key: grace-2l-train, model: grace-2l, material: metals16, role: training, eval_data: {label: "Training set (UNEP-v1 data)", location: "Table I"}, metrics: [[MAE, Energy, 3.29, meV/atom, "Training energy MAE: GRACE-2L", "Table I"], [RMSE, Energy, 14.09, meV/atom, "Training energy RMSE: GRACE-2L", "Table I"], [MAE, Force, 55.15, meV/A, "Training force MAE: GRACE-2L", "Table I"], [RMSE, Force, 88.15, meV/A, "Training force RMSE: GRACE-2L", "Table I"], [MAE, Stress, 0.35, GPa, "Training stress MAE: GRACE-2L", "Table I"], [RMSE, Stress, 4.74, GPa, "Training stress RMSE: GRACE-2L", "Table I"]]}
+  - {key: grace-2l-test, model: grace-2l, material: metals16, role: test, eval_data: {label: "Test set of Ref. [38] (pure metals and alloys under diverse deformation states)", location: "Table II"}, metrics: [[MAE, Energy, 11.54, meV/atom, "Test energy MAE: GRACE-2L", "Table II"], [RMSE, Energy, 64.61, meV/atom, "Test energy RMSE: GRACE-2L", "Table II"], [MAE, Force, 62.0, meV/A, "Test force MAE: GRACE-2L", "Table II"], [RMSE, Force, 334.0, meV/A, "Test force RMSE: GRACE-2L", "Table II"], [MAE, Stress, 0.37, GPa, "Test stress MAE: GRACE-2L", "Table II"], [RMSE, Stress, 2.18, GPa, "Test stress RMSE: GRACE-2L", "Table II"]]}
+timings:
+  - {model: unep-v1, system: "Pure Cu, MD, 2,050,000 atoms", atoms: 2050000, value: 29.4, unit: "million atom-steps per second", per_atom_us: 0.034, hardware: "NVIDIA H100 (GPUMD v5.0, single precision): 29.4 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3a"}
+  - {model: unep-v1, system: "Pure Cu, MD, 2,050,000 atoms", atoms: 2050000, value: 15.4, unit: "million atom-steps per second", per_atom_us: 0.0649, hardware: "NVIDIA A100 (GPUMD v5.0, single precision): 15.4 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3a"}
+  - {model: grace-fs-m, system: "Pure Cu, MD, 2,050,000 atoms", atoms: 2050000, value: 0.503, unit: "million atom-steps per second", per_atom_us: 1.9881, hardware: "192 AMD EPYC 9654 CPU cores (double precision): 0.503 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3a"}
+  - {model: unep-v1, system: "Al31Cr6Cu22Ni32V9 high-entropy alloy, MD, 256,000 atoms", atoms: 256000, value: 19.7, unit: "million atom-steps per second", per_atom_us: 0.0508, hardware: "NVIDIA H100 (GPUMD v5.0, single precision): 19.7 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3b"}
+  - {model: unep-v1, system: "Al31Cr6Cu22Ni32V9 high-entropy alloy, MD, 256,000 atoms", atoms: 256000, value: 10.6, unit: "million atom-steps per second", per_atom_us: 0.0943, hardware: "NVIDIA A100 (GPUMD v5.0, single precision): 10.6 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3b"}
+  - {model: grace-fs-m, system: "Al31Cr6Cu22Ni32V9 high-entropy alloy, MD, 256,000 atoms", atoms: 256000, value: 0.571, unit: "million atom-steps per second", per_atom_us: 1.7513, hardware: "192 AMD EPYC 9654 CPU cores (double precision): 0.571 Matom-step/s", result: null, location: "Sec. Computational efficiency; Fig. 3b"}
+resources: |
+  GRACE-FS-M trained on one A100 within one day (24 GPU hours, Fig. 1d);
+  UNEP-v1 had needed ten days on four A100 GPUs (960 GPU hours) in its
+  original training. Inference (Fig. 3): UNEP-v1 29.4 (H100) and 15.4
+  (A100) Matom-step/s for 2.05 million Cu atoms, 19.7 and 10.6 for the HEA
+  at 256 thousand atoms; GRACE-FS-M 0.503 (Cu) and 0.571 (HEA) Matom-step/s
+  on 192 CPU cores and about 0.73-0.78 on H100 (range not encoded). Per-atom
+  times are 1/speed.
+gaps:
+  - "The quoted Cu speed of 29.4 Matom-step/s is stated at 2.05 million atoms; the A100 and CPU Cu values are 'at the same system size'. The HEA CPU value is stated without a system size and is attached to the 256-thousand-atom case of the same paragraph (Fig. 3b)."
+  - "UNEP-v1 is the model of song2024 (not retrained here); it is a paper-local run. Ensemble-averaged errors (Table III), Spearman correlations of uncertainty, energy drift and spall strengths are not encoded."

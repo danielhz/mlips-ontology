@@ -1,0 +1,63 @@
+id: kwon2026
+source:
+  rank: 295
+  year: "2026"
+  first_author: "Jaehong Kwon"
+  title: "Fine-tuning a universal machine-learned interatomic potential for oxygen plasma interactions with WS2"
+  venue: "Journal of Vacuum Science & Technology A Vacuum Surfaces and Films"
+  doi: "10.1116/6.0005737"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2606.21632v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a0ef79b8a36822018ec9b556a0384258cc62535a880b5e579f4132c988860d6c"
+study_label: "Kwon, Rosen and Graves (2026): iterative fine-tuning of UMA-S (OC20 task) for oxygen-plasma interactions with WS2"
+scope: |
+  Encoding scope: the pretrained uma-s-1p1 model (OC20 task) and its
+  iterative fine-tunings (rounds R1-R3 with layer freezing; full
+  fine-tuning and LoRA r = 8 and r = 1 on the final 2,610 configurations)
+  on PBE+D3+U spin-polarised W-S-O data, with the stated test MAEs on the
+  held-out R4 and larger-cell R4b sets. Plasma-surface observables
+  (chemisorbed S and O coverage) are not error metrics.
+materials:
+  ws2-o: {label: "Oxidising WS2 layers (flat 3x3x2 and stepped slabs) under 15 eV O+ and O2+ bombardment", class: "2D transition-metal dichalcogenide surface with oxygen"}
+reference:
+  pbe-d3-u: {type: DFT, code: QuantumESPRESSO, xc: {local: "PBE+D3+U"}, kpoints: "Gamma-centred 2x2x1", comment: "Spin-polarised, Hubbard U = 2.87 eV on W 5d, SSSP 1.3.0 efficiency (GBRV ultrasoft W, S; PAW O), 55/430 Ry cutoffs (Quantum ESPRESSO 7)."}
+  oc20-dft: {type: DFT, code: VASP, xc: {local: "RPBE"}, pp: PAW, comment: "OC20 setting (non-spin-polarised, no U, PBE 54 PAW) used only to score the pretrained model on R4 (quacc)."}
+sampling:
+  loop: {label: "Iterative loop: MD exploration with the current model, SOAP + PCA + farthest-point sampling, DFT labelling; next round's configurations form the test set"}
+datasets:
+  r1: {label: "Round-1 fine-tuning set (configurations explored by the pretrained model; size not stated)", materials: [ws2-o], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe-d3-u, sampling: [loop]}
+  r1-r2: {label: "Cumulative R1-R2 fine-tuning set (size not stated)", materials: [ws2-o], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe-d3-u, sampling: [loop]}
+  r1-r3: {label: "Cumulative R1-R3 fine-tuning set (2,610 W-S-O configurations, 90/10 training/validation)", materials: [ws2-o], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 2610, loc: "App. A.5"}, calc: pbe-d3-u, sampling: [loop]}
+methods:
+  UMA:
+    hp: [numEpochs]
+    loss: "MSE on per-atom energy (w 5), Huber (delta 2 eV/A) on forces (w 60), MSE on stress (w 10), in force-RMS-normalised space"
+    algorithm: "Cosine schedule with 5-epoch warm-up, EMA; layer freezing, full fine-tuning or LoRA on the MoLE experts"
+    impl: {lib: {local: "fairchem", comment: "FairChem with custom fine-tuning code"}}
+    sims: [MolecularDynamics]
+runs:
+  uma-s: {label: "uma-s-1p1 (OC20 task) as distributed", method: UMA, model: "UMA-S uma-s-1p1 (OC20 task)"}
+  r1: {label: "UMA-S fine-tuned, round 1 (layer freezing)", method: UMA, dataset: r1, settings: {numEpochs: {v: 55, loc: "Sec. 2.2"}}, model: "R1 fine-tuned UMA-S", base_model: {run: uma-s, relation: fine-tuned, location: "Sec. 2.2"}}
+  r2: {label: "UMA-S fine-tuned, round 2 (layer freezing)", method: UMA, dataset: r1-r2, settings: {numEpochs: {v: 55, loc: "Sec. 2.2"}}, model: "R2 fine-tuned UMA-S", base_model: {run: r1, relation: fine-tuned, location: "Sec. 2.2"}}
+  r3: {label: "UMA-S fine-tuned, round 3 (layers 2 and 4 frozen; final model, 73.4M trainable parameters)", method: UMA, dataset: r1-r3, settings: {numEpochs: {v: 55, loc: "Sec. 2.2"}}, model: "R3 fine-tuned UMA-S (final)", base_model: {run: r2, relation: fine-tuned, location: "Sec. 2.2"}}
+  full: {label: "UMA-S full fine-tuning on the 2,610 configurations (146.6M trainable parameters)", method: UMA, dataset: r1-r3, model: "UMA-S full fine-tuning", base_model: {run: uma-s, relation: fine-tuned, location: "App. A.5"}}
+  lora8: {label: "UMA-S LoRA r = 8 fine-tuning on the 2,610 configurations (6.8M trainable parameters)", method: UMA, dataset: r1-r3, model: "UMA-S LoRA r = 8", base_model: {run: uma-s, relation: fine-tuned, location: "App. A.5"}}
+  lora1: {label: "UMA-S LoRA r = 1 fine-tuning on the 2,610 configurations (2.5M trainable parameters)", method: UMA, dataset: r1-r3, model: "UMA-S LoRA r = 1", base_model: {run: uma-s, relation: fine-tuned, location: "App. A.5"}}
+results:
+  - {key: uma-oc20, model: uma-s, material: ws2-o, role: external, eval_data: {label: "R4 test set recomputed in the OC20 DFT setting (RPBE, no spin, no U)", location: "App. A.2; Fig. A1"}, metrics: [[MAE, Energy, 13, meV/atom, "R4 energy MAE (0.013 eV/atom) in the native OC20 setting: pretrained UMA-S", "App. A.2"], [R2, Energy, 0.998, null, "R4 energy R2 in the OC20 setting: pretrained UMA-S", "Fig. A1"], [MAE, Force, 0.112, eV/A, "R4 force MAE in the OC20 setting: pretrained UMA-S", "App. A.2"], [R2, Force, 0.971, null, "R4 force R2 in the OC20 setting: pretrained UMA-S", "Fig. A1"]]}
+  - {key: uma-d3-pbeu, model: uma-s, material: ws2-o, role: external, eval_data: {label: "R4 test set, PBE+D3+U spin-polarised reference (D3 added to UMA-S)", location: "App. A.2; Fig. A1c"}, metrics: [[MAE, Force, 0.230, eV/A, "R4 force MAE vs PBE+D3+U: pretrained UMA-S + D3", "App. A.2"], [R2, Force, 0.852, null, "R4 force R2 vs PBE+D3+U: pretrained UMA-S + D3", "Fig. A1c"]]}
+  - {key: r1-r4, model: r1, material: ws2-o, role: test, eval_data: {label: "R4 held-out test set (PBE+D3+U)", location: "Sec. 3.1"}, metrics: [[MAE, Energy, 28, meV/atom, "R4 energy MAE (2.8e-2 eV/atom): R1 fine-tuned UMA-S", "Sec. 3.1"]]}
+  - {key: r3-r4, model: r3, material: ws2-o, role: test, eval_data: {label: "R4 held-out test set (PBE+D3+U)", location: "Sec. 3.1; Fig. 4"}, metrics: [[MAE, Energy, 4.5, meV/atom, "R4 energy MAE (4.5e-3 eV/atom): R3 fine-tuned UMA-S", "Fig. 4"], [R2, Energy, 0.999, null, "R4 energy R2: R3 fine-tuned UMA-S", "Fig. 4"], [MAE, Force, 0.076, eV/A, "R4 force MAE: R3 fine-tuned UMA-S", "Fig. 4"], [R2, Force, 0.981, null, "R4 force R2: R3 fine-tuned UMA-S", "Fig. 4"], [MAE, Stress, 0.034, GPa, "R4 stress MAE: R3 fine-tuned UMA-S", "Fig. 4"], [R2, Stress, 0.872, null, "R4 stress R2: R3 fine-tuned UMA-S", "Fig. 4"]]}
+  - {key: r3-r4b, model: r3, material: ws2-o, role: test, eval_data: {label: "R4b larger-cell (4x4x3) test set, 18 configurations", location: "App. A.4; Fig. A4"}, metrics: [[MAE, Energy, 3.1, meV/atom, "R4b energy MAE (3.1e-3 eV/atom): R3 fine-tuned UMA-S", "Fig. A4"], [R2, Energy, 0.999, null, "R4b energy R2: R3 fine-tuned UMA-S", "Fig. A4"], [MAE, Force, 0.072, eV/A, "R4b force MAE: R3 fine-tuned UMA-S", "Fig. A4"], [R2, Force, 0.982, null, "R4b force R2: R3 fine-tuned UMA-S", "Fig. A4"]]}
+  - {key: full-r4b, model: full, material: ws2-o, role: test, eval_data: {label: "R4b larger-cell test set, 18 configurations", location: "Fig. A5"}, metrics: [[MAE, Force, 0.076, eV/A, "R4b force MAE: UMA-S full fine-tuning", "Fig. A5"], [R2, Force, 0.979, null, "R4b force R2: UMA-S full fine-tuning", "Fig. A5"]]}
+  - {key: lora8-r4b, model: lora8, material: ws2-o, role: test, eval_data: {label: "R4b larger-cell test set, 18 configurations", location: "Fig. A5"}, metrics: [[MAE, Force, 0.073, eV/A, "R4b force MAE: UMA-S LoRA r = 8", "Fig. A5"], [R2, Force, 0.982, null, "R4b force R2: UMA-S LoRA r = 8", "Fig. A5"]]}
+  - {key: lora1-r4b, model: lora1, material: ws2-o, role: test, eval_data: {label: "R4b larger-cell test set, 18 configurations", location: "Fig. A5"}, metrics: [[MAE, Force, 0.073, eV/A, "R4b force MAE: UMA-S LoRA r = 1", "Fig. A5"], [R2, Force, 0.982, null, "R4b force R2: UMA-S LoRA r = 1", "Fig. A5"]]}
+  - {key: full-r4, model: full, material: ws2-o, role: test, eval_data: {label: "R4 held-out test set (single training-subset resample at 2,610 configurations)", location: "App. A.5; Fig. A7"}, metrics: [[MAE, Force, 0.079, eV/A, "R4 force MAE (one resample): UMA-S full fine-tuning", "App. A.5"]]}
+  - {key: lora8-r4, model: lora8, material: ws2-o, role: test, eval_data: {label: "R4 held-out test set (single training-subset resample at 2,610 configurations)", location: "App. A.5; Fig. A7"}, metrics: [[MAE, Force, 0.080, eV/A, "R4 force MAE (one resample): UMA-S LoRA r = 8", "App. A.5"]]}
+  - {key: lora1-r4, model: lora1, material: ws2-o, role: test, eval_data: {label: "R4 held-out test set (single training-subset resample at 2,610 configurations)", location: "App. A.5; Fig. A7"}, metrics: [[MAE, Force, 0.082, eV/A, "R4 force MAE (one resample): UMA-S LoRA r = 1", "App. A.5"]]}
+resources: |
+  No training or inference times are given.
+gaps:
+  - "Round-by-round force MAEs of R1 and R2 and the learning curves over training-subset sizes (Figs. 5, 6, A6) are figure-only. Energy MAEs given in eV/atom are converted to meV/atom; energies are total energies per atom."
+  - "The R1 and R2 data sets are the first one and two rounds of the cumulative 2,610-configuration set; their sizes are not stated. The pretrained model's energy against PBE+D3+U is not comparable and is not reported."

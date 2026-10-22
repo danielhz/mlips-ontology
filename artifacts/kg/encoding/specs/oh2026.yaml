@@ -1,0 +1,78 @@
+id: oh2026
+source:
+  rank: 296
+  year: "2026"
+  first_author: "Sangmin Oh"
+  title: "A Lightweight Universal Machine-Learning Interatomic Potential via Knowledge Distillation for Scalable Atomistic Simulations"
+  venue: "arXiv (Cornell University)"
+  doi: ""
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2604.10887v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "80eb173d4dc66c164e27cbc30aae30c03157bff17323aecfdda2f60a2d84476d"
+authors:
+  - {given: "Sangmin", family: "Oh"}
+  - {given: "Jinmu", family: "You"}
+  - {given: "Jaesun", family: "Kim"}
+  - {given: "Jiho", family: "Lee"}
+  - {given: "Hyungmin", family: "An"}
+  - {given: "Seungwu", family: "Han"}
+  - {given: "Youngho", family: "Kang"}
+study_label: "Oh et al. (2026): SevenNet-Nano, a lightweight universal MLIP distilled from SevenNet-Omni"
+scope: |
+  Encoding scope: the four SevenNet-Nano models (cutoff 4.5, 5.0, 5.5 and
+  6.0 A; 105k parameters) distilled from the mpa channel of SevenNet-Omni
+  on teacher-labelled structures of the SevenNet-Omni training databases,
+  the fine-tuned SevenNet-Nano-5.0 models, and the MD throughputs on
+  amorphous SiO2 (Sec. on speed, Fig. 11). Benchmark accuracies (Figs.
+  2-10) are figure-only; validation MAEs are stated only as ranges over the
+  four cutoffs.
+materials:
+  universal: {label: "Inorganic crystals, molecules, surfaces, MOFs and multi-domain structures of the SevenNet-Omni training databases", class: "Universal (materials and molecules)"}
+  sse: {label: "Li solid-state electrolytes (eight argyrodites, LLZO, LATP, LGPS, Li7P3S11, Li3YCl6, Li3YBr6, Li3N, Li9S3N)", class: "Li solid electrolytes"}
+  sio2: {label: "Amorphous SiO2 (70 to 70,000 atoms)", formula: "SiO2", class: "Amorphous oxide"}
+reference:
+  teacher: {type: REF, comment: "Labels are inferences of the SevenNet-Omni teacher (mpa channel, PBE level) including atomic energies; no DFT labels are used for training."}
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, comment: "Benchmark DFT (MPtrj-consistent, spin-polarised)."}
+datasets:
+  omni-distill: {label: "SevenNet-Omni-labelled distillation set from MPtrj, MPtrj-r2SCAN, Alex, OMat24, MatPES, OMol25, SPICE, QCML, OC20, OC22, ODAC23 and MAD structures (with oversampling)", materials: [universal], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: teacher}
+  lsn-ft: {label: "SevenNet-Omni-labelled fine-tuning set from SevenNet-Nano-5.0 MD of the solid electrolytes (7,515 configurations, 90/10 split)", materials: [sse], properties: [Energy, Forces, Stresses], provenance: Augmented, n: {v: 7515, loc: "Li diffusion section"}, calc: teacher}
+methods:
+  NequIP:
+    hp: [cutoffRadius, numFeatures, numLayers, numEpochs, learningRate]
+    loss: "MAE-type loss on energy (1.0), forces (1.0), stress (2e-4) and atomic energies (0.5) from the teacher"
+    algorithm: "Knowledge distillation from SevenNet-Omni (AdamW, two epochs); fine-tuning with Adam, warm-up to 0.03 then cosine annealing"
+    impl: {lib: {local: "SevenNet", comment: "SevenNet; LAMMPS with FlashTP"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+  MACE: {sims: [MolecularDynamics]}
+runs:
+  7net-omni: {label: "SevenNet-Omni as distributed (teacher, 26M parameters)", method: NequIP, model: "SevenNet-Omni"}
+  7net-0: {label: "SevenNet-0 as distributed (MPtrj)", method: NequIP, model: "SevenNet-0 (7net-0)"}
+  mace-mp-0-small: {label: "MACE-mp-0-small as distributed", method: MACE, model: "MACE-MP-0 small"}
+  nano-45: {label: "SevenNet-Nano-4.5 distilled from SevenNet-Omni (mpa channel)", method: NequIP, dataset: omni-distill, settings: {cutoffRadius: {v: 4.5, loc: "Training of 7net-Nano"}, numFeatures: {v: 32, loc: "Training of 7net-Nano"}, numLayers: {v: 3, loc: "Training of 7net-Nano"}, numEpochs: {v: 2, loc: "Training of 7net-Nano"}}, model: "SevenNet-Nano-4.5 (105k parameters)", base_model: {run: 7net-omni, relation: distilled, location: "Training of 7net-Nano"}}
+  nano-50: {label: "SevenNet-Nano-5.0 distilled from SevenNet-Omni (mpa channel)", method: NequIP, dataset: omni-distill, settings: {cutoffRadius: {v: 5.0, loc: "Training of 7net-Nano"}, numFeatures: {v: 32, loc: "Training of 7net-Nano"}, numLayers: {v: 3, loc: "Training of 7net-Nano"}, numEpochs: {v: 2, loc: "Training of 7net-Nano"}}, model: "SevenNet-Nano-5.0 (105k parameters)", base_model: {run: 7net-omni, relation: distilled, location: "Training of 7net-Nano"}}
+  nano-55: {label: "SevenNet-Nano-5.5 distilled from SevenNet-Omni (mpa channel)", method: NequIP, dataset: omni-distill, settings: {cutoffRadius: {v: 5.5, loc: "Training of 7net-Nano"}, numFeatures: {v: 32, loc: "Training of 7net-Nano"}, numLayers: {v: 3, loc: "Training of 7net-Nano"}, numEpochs: {v: 2, loc: "Training of 7net-Nano"}}, model: "SevenNet-Nano-5.5 (105k parameters)", base_model: {run: 7net-omni, relation: distilled, location: "Training of 7net-Nano"}}
+  nano-60: {label: "SevenNet-Nano-6.0 distilled from SevenNet-Omni (mpa channel)", method: NequIP, dataset: omni-distill, settings: {cutoffRadius: {v: 6.0, loc: "Training of 7net-Nano"}, numFeatures: {v: 32, loc: "Training of 7net-Nano"}, numLayers: {v: 3, loc: "Training of 7net-Nano"}, numEpochs: {v: 2, loc: "Training of 7net-Nano"}}, model: "SevenNet-Nano-6.0 (105k parameters)", base_model: {run: 7net-omni, relation: distilled, location: "Training of 7net-Nano"}}
+  ft-nano-50: {label: "SevenNet-Nano-5.0 fine-tuned on teacher-labelled solid-electrolyte MD snapshots", method: NequIP, dataset: lsn-ft, settings: {numEpochs: {v: 100, loc: "Li diffusion section"}, learningRate: {v: 0.03, loc: "Li diffusion section (peak)"}}, model: "FT-7net-Nano-5.0 (solid electrolytes)", base_model: {run: nano-50, relation: fine-tuned, location: "Li diffusion section"}}
+results: []
+timings:
+  - {model: 7net-omni, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70 atoms", atoms: 70, value: 3.695, unit: "ns/day", per_atom_us: 334.04, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 3.695 ns/day (SevenNet-Omni)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: 7net-omni, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 15,120 atoms", atoms: 15120, value: 0.093, unit: "ns/day", per_atom_us: 61.44, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 0.093 ns/day (SevenNet-Omni)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: 7net-0, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70 atoms", atoms: 70, value: 6.356, unit: "ns/day", per_atom_us: 194.19, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 6.356 ns/day (SevenNet-0)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: 7net-0, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 15,120 atoms", atoms: 15120, value: 0.525, unit: "ns/day", per_atom_us: 10.88, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 0.525 ns/day (SevenNet-0)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: 7net-0, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70,000 atoms", atoms: 70000, value: 0.104, unit: "ns/day", per_atom_us: 11.87, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 0.104 ns/day (SevenNet-0)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: mace-mp-0-small, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70 atoms", atoms: 70, value: 4.703, unit: "ns/day", per_atom_us: 262.45, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 4.703 ns/day (MACE-mp-0-small)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: mace-mp-0-small, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70,000 atoms", atoms: 70000, value: 0.166, unit: "ns/day", per_atom_us: 7.44, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 0.166 ns/day (MACE-mp-0-small)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: nano-60, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70 atoms", atoms: 70, value: 9.895, unit: "ns/day", per_atom_us: 124.74, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 9.895 ns/day (SevenNet-Nano-6.0)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: nano-60, system: "Amorphous SiO2, NVT MD at 300 K, 1 fs step, 70,000 atoms", atoms: 70000, value: 0.17, unit: "ns/day", per_atom_us: 7.26, hardware: "NVIDIA RTX PRO 6000 GPU (80 GB): 0.17 ns/day (SevenNet-Nano-6.0)", result: null, location: "Speed section; Fig. 11a"}
+  - {model: nano-55, system: "SiO2 etching simulation with CF2/CF3, 9 nm2 surface model (atom count not stated)", atoms: null, value: 26.8, unit: "MD steps per second", per_atom_us: null, hardware: "NVIDIA RTX PRO 6000 GPU: 26.8 steps/s (SevenNet-Nano-5.5)", result: null, location: "Implications and Outlook"}
+resources: |
+  Throughput on one NVIDIA RTX PRO 6000 (80 GB) for amorphous SiO2 (Fig.
+  11): SevenNet-Omni 3.695 ns/day (70 atoms) to 0.093 ns/day (15,120 atoms,
+  out of memory beyond), SevenNet-0 6.356 to 0.104 ns/day (70 to 70,000
+  atoms), MACE-mp-0-small 4.703 to 0.166 ns/day, SevenNet-Nano-6.0 9.895 to
+  0.170 ns/day; per-atom times are 86,400 s / (ns/day x 1e6) / atoms. The
+  distilled models train for two epochs; training times are not given.
+gaps:
+  - "Validation MAEs on the teacher-labelled data are stated only as ranges over the four cutoffs (23-27 meV/atom, 0.078-0.083 eV/A, 4.52-4.82 kbar), and benchmark results (Matbench, defects, molecules, MOFs, adsorption, diffusivity, densities) are figure-only or in Supplementary Tables; none is encoded."
+  - "The solvent fine-tuning of SevenNet-Nano-5.0 (1,203 configurations of DFEC, cis-DFEC and trans-DFEC) and the SiO2 etching fine-tuning are not encoded as separate runs. Authors are taken from the front matter (the manifest row has no DOI)."
