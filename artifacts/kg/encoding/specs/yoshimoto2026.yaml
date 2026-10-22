@@ -1,0 +1,56 @@
+id: yoshimoto2026
+source:
+  rank: 645
+  year: "2026"
+  first_author: "Yuta Yoshimoto"
+  title: "Active Learning of a Neural Network Potential for Large-Scale Atomistic Simulations of Polymer Electrolyte Membranes"
+  venue: "The Journal of Physical Chemistry B"
+  doi: "10.1021/acs.jpcb.6c04744"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2503.20412v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "2594579e07015498d70e49c023255be2e07301481d67f93d8bf41538f74b884b"
+study_label: "Yoshimoto et al. (2026): active learning of a Deep Potential for large-scale simulations of Nafion polymer electrolyte membranes"
+scope: |
+  Encoding scope: the final DeePMD (se_e2_a) model after 17 active-learning
+  loops for Nafion at hydration levels 0, 1, 7 and 13 and for pure water,
+  with its per-system training and validation RMSEs at iteration 17
+  (Table S1). Earlier iterations (10, 13, 16) in the same table are not
+  encoded. Structural, dynamical and proton-transport results are
+  properties.
+materials:
+  naf0: {label: "Nafion, hydration level lambda = 0 (4 monomers)", class: "perfluorosulfonic acid polymer electrolyte"}
+  naf1: {label: "Nafion, lambda = 1 (3 monomers, 3 H2O)", class: "perfluorosulfonic acid polymer electrolyte"}
+  naf7: {label: "Nafion, lambda = 7 (3 monomers, 21 H2O)", class: "perfluorosulfonic acid polymer electrolyte"}
+  naf13: {label: "Nafion, lambda = 13 (2 monomers, 26 H2O)", class: "perfluorosulfonic acid polymer electrolyte"}
+  water: {label: "Liquid water (32 molecules)", formula: H2O, class: "molecular liquid"}
+reference:
+  revpbe-d3: {type: DFT, code: QuantumESPRESSO, xc: {local: revPBE-D3}, pp: PAW, kpoints: "Gamma point (Nafion); four k-points (water)", comment: "Wavefunction cutoff 70 Ry, charge-density cutoff 280 Ry."}
+sampling:
+  aimd: {label: "1 ps AIMD at 400 K (Nafion) and 353 K (water), frames every 50 fs (1000 frames)"}
+  al: {label: "17 active-learning loops: DPMD (NVT/NPT) and non-equilibrium volume-change MD sampling, ensemble and structural-feature screening, 1000 structures labelled per loop"}
+datasets:
+  nafion: {label: "Accumulated Nafion and water DFT data after 17 AL loops (8:2 train/validation per iteration)", materials: [naf0, naf1, naf7, naf13, water], properties: [Energy, Forces], provenance: InHouse, calc: revpbe-d3, sampling: [aimd, al]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, batchSize, learningRate]
+    algorithm: "se_e2_a descriptor; embedding (25, 50, 100) and fitting (120, 120, 120) ResNet-like networks; exponential learning-rate decay 1e-3 to 1e-8; 2,000,000 steps in iteration 17"
+    impl: {lib: DeePMDkit, comment: "DeePMD-kit 2.2.4"}
+    sims: [MolecularDynamics]
+runs:
+  dp17: {label: "Final DP model for Nafion and water (AL iteration 17)", method: DeePMD, dataset: nafion, settings: {cutoffRadius: {v: 6, loc: "Sec. 2.1.2"}, batchSize: {v: 1, loc: "Sec. 2.1.2"}, learningRate: {v: 0.001, loc: "Sec. 2.1.2 (initial)"}}, model: "DP Nafion (iteration 17)"}
+results:
+  - {key: dp17-naf0-training, model: dp17, material: naf0, role: training, eval_data: {label: "Training split, Nafion lambda=0 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.73, meV/atom, "training energy RMSE on Nafion lambda=0: DP iteration 17", "Table S1"], [RMSE, Force, 62.5, meV/A, "training force RMSE on Nafion lambda=0: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf0-validation, model: dp17, material: naf0, role: validation, eval_data: {label: "Validation split, Nafion lambda=0 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.92, meV/atom, "validation energy RMSE on Nafion lambda=0: DP iteration 17", "Table S1"], [RMSE, Force, 63.3, meV/A, "validation force RMSE on Nafion lambda=0: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf1-training, model: dp17, material: naf1, role: training, eval_data: {label: "Training split, Nafion lambda=1 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 1.02, meV/atom, "training energy RMSE on Nafion lambda=1: DP iteration 17", "Table S1"], [RMSE, Force, 63.5, meV/A, "training force RMSE on Nafion lambda=1: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf1-validation, model: dp17, material: naf1, role: validation, eval_data: {label: "Validation split, Nafion lambda=1 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 1.02, meV/atom, "validation energy RMSE on Nafion lambda=1: DP iteration 17", "Table S1"], [RMSE, Force, 64.6, meV/A, "validation force RMSE on Nafion lambda=1: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf7-training, model: dp17, material: naf7, role: training, eval_data: {label: "Training split, Nafion lambda=7 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.7, meV/atom, "training energy RMSE on Nafion lambda=7: DP iteration 17", "Table S1"], [RMSE, Force, 64.0, meV/A, "training force RMSE on Nafion lambda=7: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf7-validation, model: dp17, material: naf7, role: validation, eval_data: {label: "Validation split, Nafion lambda=7 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 1.02, meV/atom, "validation energy RMSE on Nafion lambda=7: DP iteration 17", "Table S1"], [RMSE, Force, 64.8, meV/A, "validation force RMSE on Nafion lambda=7: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf13-training, model: dp17, material: naf13, role: training, eval_data: {label: "Training split, Nafion lambda=13 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.92, meV/atom, "training energy RMSE on Nafion lambda=13: DP iteration 17", "Table S1"], [RMSE, Force, 63.6, meV/A, "training force RMSE on Nafion lambda=13: DP iteration 17", "Table S1"]]}
+  - {key: dp17-naf13-validation, model: dp17, material: naf13, role: validation, eval_data: {label: "Validation split, Nafion lambda=13 (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 0.69, meV/atom, "validation energy RMSE on Nafion lambda=13: DP iteration 17", "Table S1"], [RMSE, Force, 63.2, meV/A, "validation force RMSE on Nafion lambda=13: DP iteration 17", "Table S1"]]}
+  - {key: dp17-water-training, model: dp17, material: water, role: training, eval_data: {label: "Training split, water (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 1.05, meV/atom, "training energy RMSE on water: DP iteration 17", "Table S1"], [RMSE, Force, 47.4, meV/A, "training force RMSE on water: DP iteration 17", "Table S1"]]}
+  - {key: dp17-water-validation, model: dp17, material: water, role: validation, eval_data: {label: "Validation split, water (iteration 17)", location: "Table S1"}, metrics: [[RMSE, Energy, 1.01, meV/atom, "validation energy RMSE on water: DP iteration 17", "Table S1"], [RMSE, Force, 48.2, meV/A, "validation force RMSE on water: DP iteration 17", "Table S1"]]}
+gaps:
+  - "RMSEs of the models at iterations 10, 13 and 16 (Table S1) are not encoded; only the final production model is a run."
+  - "The total number of labelled structures is given per loop in Table 1, not as a total; no data-set size is encoded."
+  - "Densities, water clustering, proton transport, backbone dynamics and the omegaB97M-D3BJ cross-checks are property analyses."

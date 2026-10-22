@@ -1,0 +1,61 @@
+id: liu2026mixture
+source:
+  rank: 646
+  year: "2026"
+  first_author: "Yuzhi Liu"
+  title: "Mixture of experts architectures for machine learning interatomic potentials"
+  venue: "npj Artificial Intelligence"
+  doi: "10.1038/s44387-026-00144-9"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "153a936fffe4ecb16370c7a322f4ee7b47fb90e976c211e12cef85f6f04eea5f"
+study_label: "Liu et al. (2026): mixture-of-experts architectures for machine-learning interatomic potentials (DPA3-MoE)"
+scope: |
+  Encoding scope: the mixture-of-experts DPA3 models introduced in the
+  paper (registry method DPA3-MoE, origin) and the dense DPA3 baselines on
+  OMol25, OC20M and OMat24, and the halved-dimension CHGNet baseline and
+  its MoE-E extension on MPtrj with their stated test MAEs (Sec.
+  'Transferability to CHGNET'). DPA3 results are reported as normalised
+  MAE ratios or only in figures, so they have no results.
+materials:
+  molecules: {label: "OMol25 molecular systems (83 elements, solvation, charge and spin states)", class: "molecules"}
+  catalysts: {label: "OC20 adsorbate-catalyst surfaces", class: "heterogeneous catalysts"}
+  inorganic: {label: "Inorganic bulk materials (OMat24, MPtrj)", class: "inorganic materials"}
+reference:
+  omol: {type: DFT, comment: "OMol25 published labels."}
+  oc20: {type: DFT, comment: "OC20 published labels."}
+  omat: {type: DFT, comment: "OMat24 published labels."}
+  mp: {type: DFT, comment: "MPtrj published labels."}
+datasets:
+  omol25: {label: "OMol25", materials: [molecules], properties: [Energy, Forces], provenance: Published, calc: omol}
+  oc20m: {label: "OC20M (OC20 2M subset)", materials: [catalysts], properties: [Energy, Forces], provenance: Published, calc: oc20}
+  omat24: {label: "OMat24", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: omat}
+  mptrj: {label: "MPtrj", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: mp}
+methods:
+  DPA3-MoE:
+    algorithm: "6-layer DPA3 with dense feed-forward blocks replaced by MoE-E (64 experts, K = 6 activated, 3 shared; element-wise routing) or MoLE-E (linear aggregation, all experts active)"
+  DPA3:
+    algorithm: "6-layer (about 1.3M parameters) and 12-layer dense baselines and a widened 6x-parameter variant"
+  CHGNet:
+    hp: [numEpochs]
+    algorithm: "Halved feature and hidden dimensions; MoE-E variant with 32 experts, K = 2/4/6 activated (1/2/3 shared)"
+runs:
+  dpa3-6l-omol25: {label: "Dense 6-layer DPA3 baseline on OMol25", method: DPA3, dataset: omol25, model: "DPA3 6-layer (OMol25)"}
+  moe-e-omol25: {label: "DPA3 MoE-E (64 experts, K = 6, 3 shared) on OMol25", method: DPA3-MoE, dataset: omol25, model: "DPA3-MoE-E (OMol25)"}
+  mole-e-omol25: {label: "DPA3 MoLE-E (64 experts, 3 shared) on OMol25", method: DPA3-MoE, dataset: omol25, model: "DPA3-MoLE-E (OMol25)"}
+  dpa3-6l-oc20m: {label: "Dense 6-layer DPA3 baseline on OC20M", method: DPA3, dataset: oc20m, model: "DPA3 6-layer (OC20M)"}
+  moe-e-oc20m: {label: "DPA3 MoE-E (64 experts, K = 6, 3 shared) on OC20M", method: DPA3-MoE, dataset: oc20m, model: "DPA3-MoE-E (OC20M)"}
+  mole-e-oc20m: {label: "DPA3 MoLE-E (64 experts, 3 shared) on OC20M", method: DPA3-MoE, dataset: oc20m, model: "DPA3-MoLE-E (OC20M)"}
+  dpa3-6l-omat24: {label: "Dense 6-layer DPA3 baseline on OMat24", method: DPA3, dataset: omat24, model: "DPA3 6-layer (OMat24)"}
+  moe-e-omat24: {label: "DPA3 MoE-E (64 experts, K = 6, 3 shared) on OMat24", method: DPA3-MoE, dataset: omat24, model: "DPA3-MoE-E (OMat24)"}
+  mole-e-omat24: {label: "DPA3 MoLE-E (64 experts, 3 shared) on OMat24", method: DPA3-MoE, dataset: omat24, model: "DPA3-MoLE-E (OMat24)"}
+  chgnet-half: {label: "Halved-dimension CHGNet baseline trained on MPtrj (20 epochs)", method: CHGNet, dataset: mptrj, settings: {numEpochs: {v: 20, loc: "Transferability to CHGNET"}}, model: "CHGNet halved baseline (MPtrj)"}
+  chgnet-moe-k6: {label: "Halved-dimension CHGNet with MoE-E (32 experts, K = 6, 3 shared) trained on MPtrj (20 epochs)", method: CHGNet, dataset: mptrj, settings: {numEpochs: {v: 20, loc: "Transferability to CHGNET"}}, model: "CHGNet MoE-E K=6 (MPtrj)"}
+results:
+  - {key: chgnet-half-test, model: chgnet-half, material: inorganic, role: test, eval_data: {label: "MPtrj test set", registry: MPtrj, location: "Transferability to CHGNET; Supplementary Table 7"}, metrics: [[MAE, Energy, 35.9, meV/atom, "test energy MAE on MPtrj: halved CHGNet baseline", "Transferability to CHGNET"], [MAE, Force, 80.8, meV/A, "test force MAE on MPtrj: halved CHGNet baseline", "Transferability to CHGNET"], [MAE, Stress, 0.3636, GPa, "test stress MAE on MPtrj: halved CHGNet baseline", "Transferability to CHGNET"]]}
+  - {key: chgnet-moe-k6-test, model: chgnet-moe-k6, material: inorganic, role: test, eval_data: {label: "MPtrj test set", registry: MPtrj, location: "Transferability to CHGNET; Supplementary Table 7"}, metrics: [[MAE, Energy, 32.4, meV/atom, "test energy MAE on MPtrj: halved CHGNet with MoE-E (K = 6)", "Transferability to CHGNET"], [MAE, Force, 75.9, meV/A, "test force MAE on MPtrj: halved CHGNet with MoE-E (K = 6)", "Transferability to CHGNET"], [MAE, Stress, 0.3468, GPa, "test stress MAE on MPtrj: halved CHGNet with MoE-E (K = 6)", "Transferability to CHGNET"]]}
+gaps:
+  - "DPA3 ablations report validation MAEs normalised by the 6-layer dense DPA3 (Table 1, Fig. 2; e.g. MoE-E with 64 experts 0.771 energy and 0.779 force); ratios are not encoded. Absolute OC20M/OMol25/OMat24 MAEs and RMSEs are only in Fig. 3 and Supplementary Note 2 (not read)."
+  - "The 12-layer and 6x-parameter DPA3 baselines and global-routing variants are not encoded as runs; the CHGNet MoE-E with K = 2 and 4 is only in Supplementary Table 7."
+  - "The CHGNet MoE-E extension is kept under CHGNet; DPA3-MoE covers only the DPA3-based models."
