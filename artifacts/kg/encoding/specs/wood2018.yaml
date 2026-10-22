@@ -1,0 +1,75 @@
+id: wood2018
+source:
+  rank: 201
+  year: "2018"
+  first_author: "Mitchell A. Wood"
+  title: "Extending the accuracy of the SNAP interatomic potential form"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/1.5017641"
+  kg_relevance: "Method/model"
+  arxiv_id: "1711.11131v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8d373c91e986b6b9f3f513dc49ac56c4c5ca1ad5a408bd299135650f07e3b9b7"
+study_label: "Wood and Thompson (2018): quadratic SNAP, with linear and quadratic SNAP fits for tantalum"
+scope: |
+  Encoding scope: the quadratic SNAP form (introduced here) and the linear
+  and quadratic SNAP fits to the tantalum training set of Thompson et al.
+  (2015) whose training energy errors are tabulated (Tables SI and SII,
+  Jmax = 1 to 7 linear and 1 to 5 quadratic, each at its optimised radial
+  cutoff). Errors shown only in figures (Figs. 2, 3, 5) are not encoded.
+materials:
+  Ta: {label: "Tantalum (crystalline A15, bcc, fcc phases, liquid, surfaces and generalised stacking faults)", formula: "Ta", class: "Elemental metal", wikidata: Q1123}
+datasets:
+  Ta-snap: {label: "Tantalum SNAP training set of Thompson et al. (2015)", materials: [Ta], properties: [Energy, Forces], provenance: Published, n: {v: 362, loc: "Sec. V"}, comment: "Reused from Ref. [19]: displaced A15/bcc/fcc supercells, elastic and volume deformations of the crystals, liquid, surfaces and generalised stacking faults on (110) and (112); 362 energy and 15,297 force training points (308 energies and 6,900 forces from defect-free groups, 54 energies and 8,397 forces from disordered groups)."}
+hyperparameters:
+  Jmax: {label: "Maximum order of the bispectrum components Jmax", name: "Jmax", datatype: integer}
+methods:
+  SNAP:
+    hp: [cutoffRadius, Jmax]
+    loss: "Weighted linear least squares on energies and forces with optional L1 or L2 regularisation (Eq. 1); unweighted and unregularised for the cutoff search"
+    impl: {lib: {local: "LAMMPS", comment: "pair_style snap; MD timings on one Intel Broadwell node"}}
+    sims: [MolecularDynamics]
+  qSNAP:
+    hp: [cutoffRadius, Jmax]
+    loss: "Weighted linear least squares on energies and forces with optional L1 or L2 regularisation (Eq. 1); unweighted and unregularised for the cutoff search"
+    impl: {lib: {local: "LAMMPS"}}
+    sims: [MolecularDynamics]
+runs:
+  snap-J1: {label: "Linear SNAP fit to tantalum, Jmax = 1, rcut = 3.94 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 1, loc: "Table SI"}, cutoffRadius: {v: 3.94, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 1"}
+  snap-J2: {label: "Linear SNAP fit to tantalum, Jmax = 2, rcut = 4.589 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 2, loc: "Table SI"}, cutoffRadius: {v: 4.589, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 2"}
+  snap-J3: {label: "Linear SNAP fit to tantalum, Jmax = 3, rcut = 5.493 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 3, loc: "Table SI"}, cutoffRadius: {v: 5.493, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 3"}
+  snap-J4: {label: "Linear SNAP fit to tantalum, Jmax = 4, rcut = 5.672 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 4, loc: "Table SI"}, cutoffRadius: {v: 5.672, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 4"}
+  snap-J5: {label: "Linear SNAP fit to tantalum, Jmax = 5, rcut = 5.412 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 5, loc: "Table SI"}, cutoffRadius: {v: 5.412, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 5"}
+  snap-J6: {label: "Linear SNAP fit to tantalum, Jmax = 6, rcut = 5.149 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 6, loc: "Table SI"}, cutoffRadius: {v: 5.149, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 6"}
+  snap-J7: {label: "Linear SNAP fit to tantalum, Jmax = 7, rcut = 5.506 A", method: SNAP, dataset: Ta-snap, settings: {Jmax: {v: 7, loc: "Table SI"}, cutoffRadius: {v: 5.506, loc: "Table SI"}}, model: "Linear SNAP tantalum model, Jmax = 7"}
+  qsnap-J1: {label: "Quadratic SNAP fit to tantalum, Jmax = 1, rcut = 3.575 A", method: qSNAP, dataset: Ta-snap, settings: {Jmax: {v: 1, loc: "Table SII"}, cutoffRadius: {v: 3.575, loc: "Table SII"}}, model: "Quadratic SNAP tantalum model, Jmax = 1"}
+  qsnap-J2: {label: "Quadratic SNAP fit to tantalum, Jmax = 2, rcut = 5.861 A", method: qSNAP, dataset: Ta-snap, settings: {Jmax: {v: 2, loc: "Table SII"}, cutoffRadius: {v: 5.861, loc: "Table SII"}}, model: "Quadratic SNAP tantalum model, Jmax = 2"}
+  qsnap-J3: {label: "Quadratic SNAP fit to tantalum, Jmax = 3, rcut = 5.093 A", method: qSNAP, dataset: Ta-snap, settings: {Jmax: {v: 3, loc: "Table SII"}, cutoffRadius: {v: 5.093, loc: "Table SII"}}, model: "Quadratic SNAP tantalum model, Jmax = 3"}
+  qsnap-J4: {label: "Quadratic SNAP fit to tantalum, Jmax = 4, rcut = 5.594 A", method: qSNAP, dataset: Ta-snap, settings: {Jmax: {v: 4, loc: "Table SII"}, cutoffRadius: {v: 5.594, loc: "Table SII"}}, model: "Quadratic SNAP tantalum model, Jmax = 4"}
+  qsnap-J5: {label: "Quadratic SNAP fit to tantalum, Jmax = 5, rcut = 7.039 A", method: qSNAP, dataset: Ta-snap, settings: {Jmax: {v: 5, loc: "Table SII"}, cutoffRadius: {v: 7.039, loc: "Table SII"}}, model: "Quadratic SNAP tantalum model, Jmax = 5"}
+results:
+  - {key: snap-J1, model: snap-J1, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.71663, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 1, optimised rcut = 3.94 A", "Table SI"]]}
+  - {key: snap-J2, model: snap-J2, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.13793, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 2, optimised rcut = 4.589 A", "Table SI"]]}
+  - {key: snap-J3, model: snap-J3, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.04545, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 3, optimised rcut = 5.493 A", "Table SI"]]}
+  - {key: snap-J4, model: snap-J4, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.03041, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 4, optimised rcut = 5.672 A", "Table SI"]]}
+  - {key: snap-J5, model: snap-J5, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.02446, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 5, optimised rcut = 5.412 A", "Table SI"]]}
+  - {key: snap-J6, model: snap-J6, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.0204, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 6, optimised rcut = 5.149 A", "Table SI"]]}
+  - {key: snap-J7, model: snap-J7, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.01939, null, "Training MAE on energy in eV/atom: linear SNAP, Jmax = 7, optimised rcut = 5.506 A", "Table SI"]]}
+  - {key: qsnap-J1, model: qsnap-J1, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 2.04045, null, "Training MAE on energy in eV/atom: quadratic SNAP, Jmax = 1, optimised rcut = 3.575 A", "Table SII"]]}
+  - {key: qsnap-J2, model: qsnap-J2, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.16786, null, "Training MAE on energy in eV/atom: quadratic SNAP, Jmax = 2, optimised rcut = 5.861 A", "Table SII"]]}
+  - {key: qsnap-J3, model: qsnap-J3, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.03229, null, "Training MAE on energy in eV/atom: quadratic SNAP, Jmax = 3, optimised rcut = 5.093 A", "Table SII"]]}
+  - {key: qsnap-J4, model: qsnap-J4, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.00898, null, "Training MAE on energy in eV/atom: quadratic SNAP, Jmax = 4, optimised rcut = 5.594 A", "Table SII"]]}
+  - {key: qsnap-J5, model: qsnap-J5, material: Ta, role: training, eval_data: {label: "Tantalum SNAP training set (all groups)"}, metrics: [[MAE, Energy, 0.00163, null, "Training MAE on energy in eV/atom: quadratic SNAP, Jmax = 5, optimised rcut = 7.039 A", "Table SII"]]}
+resources: |
+  MD speed (atom-timesteps/s) of every linear and quadratic SNAP potential
+  versus atom count on one Intel Broadwell node (two 18-core E5-2695v4) is
+  shown only in Figure 1; the text gives no per-atom number for SNAP (it
+  quotes peak speeds of 5e6 for a MEAM and 5e2 atom-timesteps/s for a GAP
+  tungsten potential). Quadratic SNAP is less than twofold slower than
+  linear SNAP at equal Jmax.
+gaps:
+  - "Introduces quadratic SNAP: 'An extension of the SNAP form is proposed that includes quadratic terms in the bispectrum components' (Abstract; Sec. IV). Recorded in the method registry as qSNAP derived from SNAP."
+  - "The training energy errors are in eV/atom, for which the vocabulary has no unit individual; mlips:hasUnit is omitted and the unit is in the metric label. The values are the training errors of the unweighted fits used to optimise the cutoff (Tables SI, SII)."
+  - "Force errors, the cutoff scans (Fig. 3) and the cross-validation of the GSF(110) group (Fig. 5) are shown only in figures and not encoded; the group-weight optimisation with a genetic algorithm (DAKOTA) yields potentials whose errors are not tabulated."
+  - "The DFT settings of the training set are not stated in this paper (they are those of Ref. [19], encoded in thompson2014); the data set therefore carries no reference calculation here."
+  - "The configuration count (362) is the number of energy training points listed in Sec. V, one per DFT calculation."

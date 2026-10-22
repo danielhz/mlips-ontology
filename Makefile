@@ -39,7 +39,7 @@ LATEX_SECTIONS = $(DIST_SECTIONS)/appendix-classes.tex \
 
 PAPERS = $(notdir $(basename $(wildcard artifacts/kg/papers/*.ttl)))
 
-.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check methods-registry duplicates-report result-labels result-labels-check datasets-registry datasets-check consistency-check reason-kg cq cq-check clean
+.PHONY: all release darus codemeta wikidata-fetch wikidata-check venv ontology xml-check roundtrip-check roundtrip-check-computed listings listings-computed term-appendices figures compute reason shacl methods-check methods-registry encode encoding-check duplicates-report result-labels result-labels-check datasets-registry datasets-check consistency-check reason-kg cq cq-check clean
 
 all: release
 
@@ -207,6 +207,19 @@ methods-check: | $(VENV_STAMP)
 
 methods-registry: | $(VENV_STAMP)
 	$(PY) artifacts/scripts/methods_registry.py
+
+# === Encoding inputs ===
+#
+# Per-paper encoding inputs (artifacts/kg/encoding/specs/<id>.yaml and the
+# author metadata cache bib/<id>.json; see artifacts/kg/encoding/README.md).
+# `encode` regenerates the papers named in PAPERS; `encoding-check` fails
+# if any committed paper file differs from what its input generates.
+
+encode: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/encode_paper.py $(PAPERS)
+
+encoding-check: | $(VENV_STAMP)
+	$(PY) artifacts/scripts/encode_paper.py --check
 
 # Same-label instance report per class (a lower bound on duplicated
 # entities); see artifacts/kg/IDENTITY.md. Informational, not a gate.
