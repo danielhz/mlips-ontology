@@ -1,0 +1,100 @@
+id: shaidu2024
+source:
+  rank: 446
+  year: "2024"
+  first_author: "Yusuf Shaidu"
+  title: "Incorporating long-range electrostatics in neural network potentials via variational charge equilibration from shortsighted ingredients"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01225-6"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "06357e847a0ef15f9f7344a40f0f4e49f563a3c136e89ba370f09771d81d9108"
+study_label: "Shaidu et al. (2024): long-range electrostatics in neural-network potentials via variational charge equilibration from short-range ingredients"
+scope: |
+  Encoding scope: short-range (SR, 2G-like) and long-range (LR) PANNA
+  potentials, the LR model trained with Hirshfeld-charge targets
+  (gamma_q > 0) or without (gamma_q = 0), on the four 4G-HDNNP benchmark
+  data sets of Ref. 20 (Tables 1-4), on a molten-NaCl data set (Ref. 11)
+  and on Li adsorbed on graphene, with the training and validation RMSEs
+  stated. Rows for 2G- and 4G-HDNNP in Tables 1-4 are quoted from Ref. 20
+  and not encoded. Charges in milli-e are not energy/force metrics.
+materials:
+  cc: {label: "Carbon chains C10H2 and C10H3+", class: "Small organic molecule (gas phase)"}
+  ag: {label: "Silver trimers Ag3+ and Ag3-", class: "Metal cluster"}
+  nacl: {label: "NaCl clusters Na9Cl8+ and Na8Cl8", class: "Metal cluster"}
+  au: {label: "Au dimer on MgO(001)", class: "Supported metal nanoparticle catalyst / oxide surface"}
+  molten: {label: "Crystalline and molten NaCl and NaCl dimers", formula: "NaCl", class: "Molten salt"}
+  ligr: {label: "Li adsorbed on graphene", class: "2D material"}
+reference:
+  ref20: {type: DFT, comment: "Reference energies, forces and Hirshfeld charges of the 4G-HDNNP benchmark sets (Ref. 20)."}
+  ref11: {type: DFT, comment: "Molten-NaCl data set of Ref. 11 (no atomic charges)."}
+  ligr-dft: {type: DFT, xc: PBE, comment: "Li/graphene data; details in Supplementary Note 3."}
+datasets:
+  cc: {label: "Carbon-chain benchmark data (Ref. 20)", materials: [cc], properties: [Energy, Forces], provenance: Published, calc: ref20}
+  ag: {label: "Silver-trimer benchmark data (Ref. 20)", materials: [ag], properties: [Energy, Forces], provenance: Published, calc: ref20}
+  nacl: {label: "NaCl-cluster benchmark data (Ref. 20)", materials: [nacl], properties: [Energy, Forces], provenance: Published, calc: ref20}
+  au: {label: "Au2/MgO(001) benchmark data (Ref. 20)", materials: [au], properties: [Energy, Forces], provenance: Published, calc: ref20}
+  molten: {label: "Molten-salt NaCl data (about 112,000 configurations; 80/20 split)", materials: [molten], properties: [Energy, Forces], provenance: Published, calc: ref11}
+  ligr: {label: "Li/graphene data", materials: [ligr], properties: [Energy, Forces], provenance: InHouse, calc: ligr-dft}
+methods:
+  HDNNP:
+    impl: {lib: {local: PANNA}}
+    sims: [MolecularDynamics]
+  PANNA-LR:
+    hp: [cutoffRadius]
+    impl: {lib: {local: PANNA}}
+    sims: [MolecularDynamics]
+runs:
+  cc-sr: {label: "short-range PANNA NNP (2G-like) for carbon chains C10H2 and C10H3+ (ref. 20 data)", method: HDNNP, dataset: cc, model: "cc sr (Shaidu 2024)"}
+  cc-lrq: {label: "long-range PANNA model trained with charges (gamma_q > 0) for carbon chains C10H2 and C10H3+ (ref. 20 data)", method: PANNA-LR, dataset: cc, model: "cc lrq (Shaidu 2024)"}
+  cc-lr0: {label: "long-range PANNA model trained without charges (gamma_q = 0) for carbon chains C10H2 and C10H3+ (ref. 20 data)", method: PANNA-LR, dataset: cc, model: "cc lr0 (Shaidu 2024)"}
+  ag-sr: {label: "short-range PANNA NNP (2G-like) for silver trimers Ag3+ and Ag3- (ref. 20 data)", method: HDNNP, dataset: ag, model: "ag sr (Shaidu 2024)"}
+  ag-lrq: {label: "long-range PANNA model trained with charges (gamma_q > 0) for silver trimers Ag3+ and Ag3- (ref. 20 data)", method: PANNA-LR, dataset: ag, model: "ag lrq (Shaidu 2024)"}
+  ag-lr0: {label: "long-range PANNA model trained without charges (gamma_q = 0) for silver trimers Ag3+ and Ag3- (ref. 20 data)", method: PANNA-LR, dataset: ag, model: "ag lr0 (Shaidu 2024)"}
+  nacl-sr: {label: "short-range PANNA NNP (2G-like) for NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", method: HDNNP, dataset: nacl, model: "nacl sr (Shaidu 2024)"}
+  nacl-lrq: {label: "long-range PANNA model trained with charges (gamma_q > 0) for NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", method: PANNA-LR, dataset: nacl, model: "nacl lrq (Shaidu 2024)"}
+  nacl-lr0: {label: "long-range PANNA model trained without charges (gamma_q = 0) for NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", method: PANNA-LR, dataset: nacl, model: "nacl lr0 (Shaidu 2024)"}
+  au-sr: {label: "short-range PANNA NNP (2G-like) for Au dimer on MgO(001) (ref. 20 data)", method: HDNNP, dataset: au, model: "au sr (Shaidu 2024)"}
+  au-lrq: {label: "long-range PANNA model trained with charges (gamma_q > 0) for Au dimer on MgO(001) (ref. 20 data)", method: PANNA-LR, dataset: au, model: "au lrq (Shaidu 2024)"}
+  au-lr0: {label: "long-range PANNA model trained without charges (gamma_q = 0) for Au dimer on MgO(001) (ref. 20 data)", method: PANNA-LR, dataset: au, model: "au lr0 (Shaidu 2024)"}
+  molten-sr: {label: "Short-range PANNA NNP for molten NaCl", method: HDNNP, dataset: molten, model: "molten NaCl SR (Shaidu 2024)"}
+  molten-lr: {label: "Long-range PANNA model for molten NaCl (descriptor cutoff 10 Bohr; total charge only)", method: PANNA-LR, dataset: molten, model: "molten NaCl LR (Shaidu 2024)"}
+  ligr-sr: {label: "Short-range PANNA NNP for Li on graphene", method: HDNNP, dataset: ligr, model: "Li/graphene SR (Shaidu 2024)"}
+  ligr-lr: {label: "Long-range PANNA model for Li on graphene", method: PANNA-LR, dataset: ligr, model: "Li/graphene LR (Shaidu 2024)"}
+results:
+  - {key: cc-sr-train, model: cc-sr, material: cc, role: training, eval_data: {label: "Training split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.48, meV/atom, "training energy RMSE on cc: cc sr", "Table 1"], [RMSE, Force, 117, meV/A, "training force RMSE on cc: cc sr", "Table 1"]]}
+  - {key: cc-sr-valid, model: cc-sr, material: cc, role: validation, eval_data: {label: "Validation split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.47, meV/atom, "validation energy RMSE on cc: cc sr", "Table 1"], [RMSE, Force, 117, meV/A, "validation force RMSE on cc: cc sr", "Table 1"]]}
+  - {key: cc-lrq-train, model: cc-lrq, material: cc, role: training, eval_data: {label: "Training split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.17, meV/atom, "training energy RMSE on cc: cc lrq", "Table 1"], [RMSE, Force, 78, meV/A, "training force RMSE on cc: cc lrq", "Table 1"]]}
+  - {key: cc-lrq-valid, model: cc-lrq, material: cc, role: validation, eval_data: {label: "Validation split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.17, meV/atom, "validation energy RMSE on cc: cc lrq", "Table 1"], [RMSE, Force, 79, meV/A, "validation force RMSE on cc: cc lrq", "Table 1"]]}
+  - {key: cc-lr0-train, model: cc-lr0, material: cc, role: training, eval_data: {label: "Training split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.15, meV/atom, "training energy RMSE on cc: cc lr0", "Table 1"], [RMSE, Force, 72, meV/A, "training force RMSE on cc: cc lr0", "Table 1"]]}
+  - {key: cc-lr0-valid, model: cc-lr0, material: cc, role: validation, eval_data: {label: "Validation split of the carbon chains C10H2 and C10H3+ (ref. 20 data)", location: "Table 1"}, metrics: [[RMSE, Energy, 1.15, meV/atom, "validation energy RMSE on cc: cc lr0", "Table 1"], [RMSE, Force, 73, meV/A, "validation force RMSE on cc: cc lr0", "Table 1"]]}
+  - {key: ag-sr-train, model: ag-sr, material: ag, role: training, eval_data: {label: "Training split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 320.3, meV/atom, "training energy RMSE on ag: ag sr", "Table 2"], [RMSE, Force, 1438, meV/A, "training force RMSE on ag: ag sr", "Table 2"]]}
+  - {key: ag-sr-valid, model: ag-sr, material: ag, role: validation, eval_data: {label: "Validation split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 303.1, meV/atom, "validation energy RMSE on ag: ag sr", "Table 2"], [RMSE, Force, 1463, meV/A, "validation force RMSE on ag: ag sr", "Table 2"]]}
+  - {key: ag-lrq-train, model: ag-lrq, material: ag, role: training, eval_data: {label: "Training split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.9, meV/atom, "training energy RMSE on ag: ag lrq", "Table 2"], [RMSE, Force, 20, meV/A, "training force RMSE on ag: ag lrq", "Table 2"]]}
+  - {key: ag-lrq-valid, model: ag-lrq, material: ag, role: validation, eval_data: {label: "Validation split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.8, meV/atom, "validation energy RMSE on ag: ag lrq", "Table 2"], [RMSE, Force, 20, meV/A, "validation force RMSE on ag: ag lrq", "Table 2"]]}
+  - {key: ag-lr0-train, model: ag-lr0, material: ag, role: training, eval_data: {label: "Training split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.8, meV/atom, "training energy RMSE on ag: ag lr0", "Table 2"], [RMSE, Force, 19, meV/A, "training force RMSE on ag: ag lr0", "Table 2"]]}
+  - {key: ag-lr0-valid, model: ag-lr0, material: ag, role: validation, eval_data: {label: "Validation split of the silver trimers Ag3+ and Ag3- (ref. 20 data)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.8, meV/atom, "validation energy RMSE on ag: ag lr0", "Table 2"], [RMSE, Force, 19, meV/A, "validation force RMSE on ag: ag lr0", "Table 2"]]}
+  - {key: nacl-sr-train, model: nacl-sr, material: nacl, role: training, eval_data: {label: "Training split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 1.6, meV/atom, "training energy RMSE on nacl: nacl sr", "Table 3"], [RMSE, Force, 48, meV/A, "training force RMSE on nacl: nacl sr", "Table 3"]]}
+  - {key: nacl-sr-valid, model: nacl-sr, material: nacl, role: validation, eval_data: {label: "Validation split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 1.6, meV/atom, "validation energy RMSE on nacl: nacl sr", "Table 3"], [RMSE, Force, 48, meV/A, "validation force RMSE on nacl: nacl sr", "Table 3"]]}
+  - {key: nacl-lrq-train, model: nacl-lrq, material: nacl, role: training, eval_data: {label: "Training split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "training energy RMSE on nacl: nacl lrq", "Table 3"], [RMSE, Force, 19, meV/A, "training force RMSE on nacl: nacl lrq", "Table 3"]]}
+  - {key: nacl-lrq-valid, model: nacl-lrq, material: nacl, role: validation, eval_data: {label: "Validation split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "validation energy RMSE on nacl: nacl lrq", "Table 3"], [RMSE, Force, 19, meV/A, "validation force RMSE on nacl: nacl lrq", "Table 3"]]}
+  - {key: nacl-lr0-train, model: nacl-lr0, material: nacl, role: training, eval_data: {label: "Training split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "training energy RMSE on nacl: nacl lr0", "Table 3"], [RMSE, Force, 19, meV/A, "training force RMSE on nacl: nacl lr0", "Table 3"]]}
+  - {key: nacl-lr0-valid, model: nacl-lr0, material: nacl, role: validation, eval_data: {label: "Validation split of the NaCl clusters Na9Cl8+ and Na8Cl8 (ref. 20 data)", location: "Table 3"}, metrics: [[RMSE, Energy, 0.4, meV/atom, "validation energy RMSE on nacl: nacl lr0", "Table 3"], [RMSE, Force, 19, meV/A, "validation force RMSE on nacl: nacl lr0", "Table 3"]]}
+  - {key: au-sr-train, model: au-sr, material: au, role: training, eval_data: {label: "Training split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 2.3, meV/atom, "training energy RMSE on au: au sr", "Table 4"], [RMSE, Force, 125, meV/A, "training force RMSE on au: au sr", "Table 4"]]}
+  - {key: au-sr-valid, model: au-sr, material: au, role: validation, eval_data: {label: "Validation split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 2.3, meV/atom, "validation energy RMSE on au: au sr", "Table 4"], [RMSE, Force, 135, meV/A, "validation force RMSE on au: au sr", "Table 4"]]}
+  - {key: au-lrq-train, model: au-lrq, material: au, role: training, eval_data: {label: "Training split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "training energy RMSE on au: au lrq", "Table 4"], [RMSE, Force, 44, meV/A, "training force RMSE on au: au lrq", "Table 4"]]}
+  - {key: au-lrq-valid, model: au-lrq, material: au, role: validation, eval_data: {label: "Validation split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "validation energy RMSE on au: au lrq", "Table 4"], [RMSE, Force, 52, meV/A, "validation force RMSE on au: au lrq", "Table 4"]]}
+  - {key: au-lr0-train, model: au-lr0, material: au, role: training, eval_data: {label: "Training split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "training energy RMSE on au: au lr0", "Table 4"], [RMSE, Force, 39, meV/A, "training force RMSE on au: au lr0", "Table 4"]]}
+  - {key: au-lr0-valid, model: au-lr0, material: au, role: validation, eval_data: {label: "Validation split of the Au dimer on MgO(001) (ref. 20 data)", location: "Table 4"}, metrics: [[RMSE, Energy, 0.2, meV/atom, "validation energy RMSE on au: au lr0", "Table 4"], [RMSE, Force, 43, meV/A, "validation force RMSE on au: au lr0", "Table 4"]]}
+  - {key: molten-lr, model: molten-lr, material: molten, role: null, eval_data: {label: "Molten-NaCl data (set not specified in the text)", location: "Results, molten salt"}, metrics: [[RMSE, Energy, 0.990, meV/atom, "energy RMSE on molten NaCl: LR model", "Results"], [RMSE, Force, 30.22, meV/A, "force RMSE on molten NaCl: LR model", "Results"]]}
+  - {key: molten-sr, model: molten-sr, material: molten, role: null, eval_data: {label: "Molten-NaCl data (set not specified in the text)", location: "Results, molten salt"}, metrics: [[RMSE, Energy, 1.349, meV/atom, "energy RMSE on molten NaCl: SR model", "Results"], [RMSE, Force, 40.58, meV/A, "force RMSE on molten NaCl: SR model", "Results"]]}
+  - {key: ligr-sr-train, model: ligr-sr, material: ligr, role: training, eval_data: {label: "Li/graphene training set", location: "Results, Li on graphene"}, metrics: [[RMSE, Energy, 2.05, meV/atom, "training energy RMSE on Li/graphene: SR model", "Results"], [RMSE, Force, 45.4, meV/A, "training force RMSE on Li/graphene: SR model", "Results"]]}
+  - {key: ligr-sr-valid, model: ligr-sr, material: ligr, role: validation, eval_data: {label: "Li/graphene validation set", location: "Results, Li on graphene"}, metrics: [[RMSE, Energy, 2.1, meV/atom, "validation energy RMSE on Li/graphene: SR model", "Results"], [RMSE, Force, 45.75, meV/A, "validation force RMSE on Li/graphene: SR model", "Results"]]}
+  - {key: ligr-lr-train, model: ligr-lr, material: ligr, role: training, eval_data: {label: "Li/graphene training set", location: "Results, Li on graphene"}, metrics: [[RMSE, Energy, 1.57, meV/atom, "training energy RMSE on Li/graphene: LR model", "Results"], [RMSE, Force, 43.48, meV/A, "training force RMSE on Li/graphene: LR model", "Results"]]}
+  - {key: ligr-lr-valid, model: ligr-lr, material: ligr, role: validation, eval_data: {label: "Li/graphene validation set", location: "Results, Li on graphene"}, metrics: [[RMSE, Energy, 1.65, meV/atom, "validation energy RMSE on Li/graphene: LR model", "Results"], [RMSE, Force, 44.21, meV/A, "validation force RMSE on Li/graphene: LR model", "Results"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Tables 1-4 label their rows train/test while the captions and text call them training and validation; the role follows the captions. Charge RMSEs (milli-e) and the 2G/4G-HDNNP rows (quoted from Ref. 20) are not encoded. The molten-NaCl RMSEs do not say whether they are training or validation errors (role null)."
+  - "Equations of state, RDFs, Li diffusion coefficients and dimer energy curves are properties. Reference-level details for the Ref. 20 and Ref. 11 data are in those papers."

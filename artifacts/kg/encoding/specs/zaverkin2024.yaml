@@ -1,0 +1,80 @@
+id: zaverkin2024
+source:
+  rank: 444
+  year: "2024"
+  first_author: "Viktor Zaverkin"
+  title: "Uncertainty-biased molecular dynamics for learning uniformly accurate interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-024-01254-1"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2312.01416v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3c9b4fc0e922611e3058af73fa7b183ae88aa5c711fbbbb85812a43af5371632"
+study_label: "Zaverkin et al. (2024): uncertainty-biased molecular dynamics with calibrated gradient-based uncertainties for active learning of GM-NN potentials"
+scope: |
+  Encoding scope: Gaussian moment neural network (GM-NN) potentials
+  obtained by active learning (up to 512 configurations; five repeats)
+  with candidate pools from random selection, unbiased MD, metadynamics
+  or uncertainty-biased MD (bias forces and bias stress), for alanine
+  dipeptide (AMBER ff19SB labels) and MIL-53(Al) (CP2K PBE-D3(BJ)), and
+  the test RMSEs of the final models of each experiment (Tables 1-2;
+  means over five runs). CV-space coverage and auto-correlation times
+  are exploration diagnostics.
+materials:
+  ala: {label: "Alanine dipeptide in vacuum", formula: "C6H12N2O3", class: "Biomolecule (peptide)"}
+  mil53: {label: "Flexible metal-organic framework MIL-53(Al) (closed- and large-pore states)", class: "Metal-organic frameworks"}
+reference:
+  amber: {type: REF, comment: "AMBER ff19SB force field as the reference for alanine dipeptide."}
+  pbed3: {type: DFT, code: {local: CP2K}, xc: PBE, pp: {local: GTH}, comment: "PBE-D3(BJ), TZVP/plane-wave hybrid basis, 1000 Ry cutoff, CP2K 2023.1."}
+datasets:
+  ala-al: {label: "Alanine-dipeptide configurations acquired by active learning (at most 512 per experiment)", materials: [ala], properties: [Energy, Forces], provenance: InHouse, calc: amber}
+  mil-al: {label: "MIL-53(Al) configurations acquired by active learning from 32 perturbed closed-pore structures (at most 512 per experiment)", materials: [mil53], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbed3}
+methods:
+  GMNN:
+    algorithm: "Adam with early stopping; batch selection maximising distances in sketched gradient-feature space"
+    sims: [MolecularDynamics]
+runs:
+  ala-rs300: {label: "GM-NN for alanine dipeptide after AL with random sel. (300 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (random sel. (300 K))"}
+  ala-rs600: {label: "GM-NN for alanine dipeptide after AL with random sel. (600 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (random sel. (600 K))"}
+  ala-rs1200: {label: "GM-NN for alanine dipeptide after AL with random sel. (1200 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (random sel. (1200 K))"}
+  ala-u300: {label: "GM-NN for alanine dipeptide after AL with unbiased MD (300 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (unbiased MD (300 K))"}
+  ala-u600: {label: "GM-NN for alanine dipeptide after AL with unbiased MD (600 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (unbiased MD (600 K))"}
+  ala-u1200: {label: "GM-NN for alanine dipeptide after AL with unbiased MD (1200 K)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (unbiased MD (1200 K))"}
+  ala-b-wh: {label: "GM-NN for alanine dipeptide after AL with biased MD (300 K, tau = 0.25, with H)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, with H))"}
+  ala-b-woh: {label: "GM-NN for alanine dipeptide after AL with biased MD (300 K, tau = 0.25, without H)", method: GMNN, dataset: ala-al, model: "alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, without H))"}
+  mil600-rs0: {label: "GM-NN for MIL-53(Al) after AL with 600 K random sel. (0 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K random sel. (0 MPa))"}
+  mil600-rs250: {label: "GM-NN for MIL-53(Al) after AL with 600 K random sel. (250 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K random sel. (250 MPa))"}
+  mil600-u0: {label: "GM-NN for MIL-53(Al) after AL with 600 K unbiased MD (0 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K unbiased MD (0 MPa))"}
+  mil600-u250: {label: "GM-NN for MIL-53(Al) after AL with 600 K unbiased MD (250 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K unbiased MD (250 MPa))"}
+  mil600-meta: {label: "GM-NN for MIL-53(Al) after AL with 600 K metadynamics (0 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K metadynamics (0 MPa))"}
+  mil600-b: {label: "GM-NN for MIL-53(Al) after AL with 600 K biased MD (0 MPa, tau = 0.5)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (600 K biased MD (0 MPa, tau = 0.5))"}
+  mil300-rs0: {label: "GM-NN for MIL-53(Al) after AL with 300 K random sel. (0 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (300 K random sel. (0 MPa))"}
+  mil300-rs250: {label: "GM-NN for MIL-53(Al) after AL with 300 K random sel. (250 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (300 K random sel. (250 MPa))"}
+  mil300-u0: {label: "GM-NN for MIL-53(Al) after AL with 300 K unbiased MD (0 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (300 K unbiased MD (0 MPa))"}
+  mil300-u250: {label: "GM-NN for MIL-53(Al) after AL with 300 K unbiased MD (250 MPa)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (300 K unbiased MD (250 MPa))"}
+  mil300-b: {label: "GM-NN for MIL-53(Al) after AL with 300 K biased MD (0 MPa, tau = 0.5)", method: GMNN, dataset: mil-al, model: "MIL-53(Al) GM-NN (300 K biased MD (0 MPa, tau = 0.5))"}
+results:
+  - {key: ala-rs300, model: ala-rs300, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 34.09, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (random sel. (300 K))", "Table 1"], [RMSE, Force, 0.191, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (random sel. (300 K))", "Table 1"]]}
+  - {key: ala-rs600, model: ala-rs600, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 31.44, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (random sel. (600 K))", "Table 1"], [RMSE, Force, 0.143, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (random sel. (600 K))", "Table 1"]]}
+  - {key: ala-rs1200, model: ala-rs1200, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 19.83, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (random sel. (1200 K))", "Table 1"], [RMSE, Force, 0.116, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (random sel. (1200 K))", "Table 1"]]}
+  - {key: ala-u300, model: ala-u300, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 30.29, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (unbiased MD (300 K))", "Table 1"], [RMSE, Force, 0.149, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (unbiased MD (300 K))", "Table 1"]]}
+  - {key: ala-u600, model: ala-u600, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 26.03, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (unbiased MD (600 K))", "Table 1"], [RMSE, Force, 0.116, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (unbiased MD (600 K))", "Table 1"]]}
+  - {key: ala-u1200, model: ala-u1200, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 1.47, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (unbiased MD (1200 K))", "Table 1"], [RMSE, Force, 0.055, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (unbiased MD (1200 K))", "Table 1"]]}
+  - {key: ala-b-wh, model: ala-b-wh, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 5.09, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, with H))", "Table 1"], [RMSE, Force, 0.082, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, with H))", "Table 1"]]}
+  - {key: ala-b-woh, model: ala-b-woh, material: ala, role: test, eval_data: {label: "2,000 configurations from a 1200 K MD trajectory (AMBER ff19SB)", location: "Table 1; Methods"}, metrics: [[RMSE, Energy, 1.97, meV/atom, "test energy RMSE on ala: alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, without H))", "Table 1"], [RMSE, Force, 0.071, eV/A, "test force RMSE on ala: alanine dipeptide GM-NN (biased MD (300 K, tau = 0.25, without H))", "Table 1"]]}
+  - {key: mil600-rs0, model: mil600-rs0, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.62, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (0 MPa))", "Table 2"], [RMSE, Force, 0.062, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (0 MPa))", "Table 2"], [RMSE, Stress, 0.1453, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (0 MPa))", "Table 2 (145.3 MPa)"]]}
+  - {key: mil600-rs250, model: mil600-rs250, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.84, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (250 MPa))", "Table 2"], [RMSE, Force, 0.057, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (250 MPa))", "Table 2"], [RMSE, Stress, 0.0638, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K random sel. (250 MPa))", "Table 2 (63.8 MPa)"]]}
+  - {key: mil600-u0, model: mil600-u0, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.17, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (0 MPa))", "Table 2"], [RMSE, Force, 0.058, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (0 MPa))", "Table 2"], [RMSE, Stress, 0.09081, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (0 MPa))", "Table 2 (90.81 MPa)"]]}
+  - {key: mil600-u250, model: mil600-u250, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.57, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (250 MPa))", "Table 2"], [RMSE, Force, 0.052, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (250 MPa))", "Table 2"], [RMSE, Stress, 0.04272, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K unbiased MD (250 MPa))", "Table 2 (42.72 MPa)"]]}
+  - {key: mil600-meta, model: mil600-meta, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.58, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K metadynamics (0 MPa))", "Table 2"], [RMSE, Force, 0.058, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K metadynamics (0 MPa))", "Table 2"], [RMSE, Stress, 0.07483, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K metadynamics (0 MPa))", "Table 2 (74.83 MPa)"]]}
+  - {key: mil600-b, model: mil600-b, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.57, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (600 K biased MD (0 MPa, tau = 0.5))", "Table 2"], [RMSE, Force, 0.051, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (600 K biased MD (0 MPa, tau = 0.5))", "Table 2"], [RMSE, Stress, 0.0366, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (600 K biased MD (0 MPa, tau = 0.5))", "Table 2 (36.6 MPa)"]]}
+  - {key: mil300-rs0, model: mil300-rs0, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 1.04, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (0 MPa))", "Table 2"], [RMSE, Force, 0.058, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (0 MPa))", "Table 2"], [RMSE, Stress, 0.07049, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (0 MPa))", "Table 2 (70.49 MPa)"]]}
+  - {key: mil300-rs250, model: mil300-rs250, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.58, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (250 MPa))", "Table 2"], [RMSE, Force, 0.055, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (250 MPa))", "Table 2"], [RMSE, Stress, 0.05219, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (300 K random sel. (250 MPa))", "Table 2 (52.19 MPa)"]]}
+  - {key: mil300-u0, model: mil300-u0, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.88, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (0 MPa))", "Table 2"], [RMSE, Force, 0.056, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (0 MPa))", "Table 2"], [RMSE, Stress, 0.05857, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (0 MPa))", "Table 2 (58.57 MPa)"]]}
+  - {key: mil300-u250, model: mil300-u250, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.48, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (250 MPa))", "Table 2"], [RMSE, Force, 0.054, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (250 MPa))", "Table 2"], [RMSE, Stress, 0.03988, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (300 K unbiased MD (250 MPa))", "Table 2 (39.88 MPa)"]]}
+  - {key: mil300-b, model: mil300-b, material: mil53, role: test, eval_data: {label: "MIL-53(Al) test set from first-principles MD at 600 K (Ref. 41)", location: "Table 2"}, metrics: [[RMSE, Energy, 0.49, meV/atom, "test energy RMSE on mil53: MIL-53(Al) GM-NN (300 K biased MD (0 MPa, tau = 0.5))", "Table 2"], [RMSE, Force, 0.052, eV/A, "test force RMSE on mil53: MIL-53(Al) GM-NN (300 K biased MD (0 MPa, tau = 0.5))", "Table 2"], [RMSE, Stress, 0.03389, GPa, "test stress RMSE on mil53: MIL-53(Al) GM-NN (300 K biased MD (0 MPa, tau = 0.5))", "Table 2 (33.89 MPa)"]]}
+resources: |
+  Evaluating uncertainty gradients increases inference time by a factor of 1.4-1.7 over unbiased MD (Discussion); total AL wall times are in the SI.
+gaps:
+  - "All values are means over five AL repeats (standard deviations not encoded); stress RMSEs in MPa are converted exactly to GPa. The alanine-dipeptide reference is a classical force field (REF), not DFT."
+  - "Ensemble-based and distance-based uncertainty variants and the 1024-sample scaling runs are in the SI (Tables S1-S7). CV-space coverage and auto-correlation times are exploration diagnostics, not errors."

@@ -1,0 +1,48 @@
+id: kang2025accelerating
+source:
+  rank: 445
+  year: "2025"
+  first_author: "Kisung Kang"
+  title: "Accelerating the training and improving the reliability of machine-learned interatomic potentials for strongly anharmonic materials through active learning"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.9.063801"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2409.11808v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "500799a2ce0b4f2912671ad76d94700ea1a9665b30d26ad1613c3ae8eb4ad800"
+study_label: "Kang et al. (2025): uncertainty- and anharmonicity-aware active learning (ALmoMD) of NequIP potentials for strongly anharmonic materials"
+scope: |
+  Encoding scope: NequIP models (rmax 5 A, lmax 3, 32 features, four
+  layers, eight radial basis functions; float64) trained for 112 bulk
+  materials from the aiMD data of an earlier anharmonicity study (FHI-aims
+  PBEsol), and the ALmoMD active-learning workflow (ensemble of six
+  models; acquisition by energy, maximum-force or anharmonicity
+  uncertainty), with CuI and AgGaSe2 as worked cases. All errors are
+  shown in histograms or curves (Figs. 4, 8, 11); phonon lifetimes,
+  NEB paths and thermal conductivities are properties.
+materials:
+  anh: {label: "112 bulk materials with strong anharmonicity (e.g. CuI, AgGaSe2, AgGaS2, InNaO2, CsBr, CsCl, LiBr, LiCl, LiI, Na2Te) in 160-256-atom supercells", class: "Inorganic crystals"}
+reference:
+  pbesol: {type: DFT, code: FHIaims, xc: {local: PBEsol}, comment: "All-electron FHI-aims with light default basis, same k-point densities as the original aiMD data (Refs. 59, 71)."}
+sampling:
+  almomd: {label: "ALmoMD active learning: NVT MLIP-MD at 300 K, sampling by probability functions of the uncertainty (energy, maximum force or degree of anharmonicity) and of the potential energy; 30 new DFT points per step (25 training, 5 validation initially)"}
+datasets:
+  aimd: {label: "aiMD trajectories of 112 materials (PBEsol; Knoop et al. data repository)", materials: [anh], properties: [Energy, Forces], provenance: Published, calc: pbesol}
+  al-cui: {label: "CuI data from ALmoMD with maximum-force uncertainty", materials: [anh], properties: [Energy, Forces], provenance: InHouse, calc: pbesol, sampling: [almomd]}
+  al-agse: {label: "AgGaSe2 data from ALmoMD with maximum-force uncertainty", materials: [anh], properties: [Energy, Forces], provenance: InHouse, calc: pbesol, sampling: [almomd]}
+methods:
+  NequIP:
+    hp: [cutoffRadius, numLayers, numFeatures, numRadialBasis]
+    loss: "Per-atom energy MSE and force MSE in a 1:1 ratio"
+    impl: {lib: NequIP, comment: "NequIP 0.5.6, float64, one NVIDIA A100"}
+    sims: [MolecularDynamics, NudgedElasticBand, PhononCalculation]
+runs:
+  nequip-aimd: {label: "NequIP models trained on aiMD data for each of the 112 materials (standard training)", method: NequIP, dataset: aimd, settings: {cutoffRadius: {v: 5, loc: "Sec. III"}, numLayers: {v: 4, loc: "Sec. III"}, numFeatures: {v: 32, loc: "Sec. III"}, numRadialBasis: {v: 8, loc: "Sec. III"}}, model: "NequIP per-material aiMD models (Kang 2025)"}
+  nequip-al-cui: {label: "NequIP for CuI after ALmoMD with maximum-force uncertainty", method: NequIP, dataset: al-cui, settings: {cutoffRadius: {v: 5, loc: "Sec. III"}, numLayers: {v: 4, loc: "Sec. III"}, numFeatures: {v: 32, loc: "Sec. III"}, numRadialBasis: {v: 8, loc: "Sec. III"}}, model: "CuI NequIP (ALmoMD, UCE_maxF)"}
+  nequip-al-agse: {label: "NequIP for AgGaSe2 after ALmoMD with maximum-force uncertainty", method: NequIP, dataset: al-agse, settings: {cutoffRadius: {v: 5, loc: "Sec. III"}, numLayers: {v: 4, loc: "Sec. III"}, numFeatures: {v: 32, loc: "Sec. III"}, numRadialBasis: {v: 8, loc: "Sec. III"}}, model: "AgGaSe2 NequIP (ALmoMD, UCE_maxF)"}
+results: []
+resources: |
+  MLIP training on a single NVIDIA A100; no timings are stated.
+gaps:
+  - "Energy and force MAEs for the 112 materials are shown only as histograms (Fig. 4), and the convergence of test MAEs with training size for CuI and AgGaSe2 only as curves (Figs. 8, 11; the text states only that MAEs below 0.5 meV/atom are acceptable)."
+  - "The per-material models are summarised as one run because the paper does not list them individually. Minimum-energy paths, defect formation in MD, phonon lifetimes and thermal conductivities are properties."
