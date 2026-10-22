@@ -1,0 +1,50 @@
+id: galib2026
+source:
+  rank: 510
+  year: "2026"
+  first_author: "Musanna Galib"
+  title: "AtomProNet: data flow to and from machine learning interatomic potentials in materials science"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae72ec"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2501.14039v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "0ff119a9e6b944b901fd3e0e19b62f53136ae11fdbd3e395c8767100d6498c1e"
+study_label: "Galib, Isiet and Ponga (2026): AtomProNet, a data pipeline for MLIPs, demonstrated with Allegro and MACE potentials for alumina"
+scope: |
+  Encoding scope: the alumina case study, Allegro and MACE trained on
+  hydrostatically strained, vacancy-containing Al2O3 supercells (VASP
+  PBE; 14,000 training, 1,500 test, 500 validation structures), with the
+  R2 values stated in the text. Lattice, elastic, cohesive and vacancy
+  properties (Table 1) and CPU performance (Fig. 4) against ReaxFF and
+  COMB3 are properties or figure-only.
+materials:
+  al2o3: {label: "Alumina (Al2O3) with Al and O vacancies, hydrostatically strained 80-atom supercells", formula: Al2O3, class: "Oxides"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, kpoints: "4x4x4 Monkhorst-Pack", comment: "Gaussian smearing 0.026 eV"}
+sampling:
+  strain: {label: "Relaxed vacancy-containing supercells strained hydrostatically by up to +/-10% of the lattice parameter in steps of 0.01%"}
+datasets:
+  al2o3: {label: "Al2O3 strained-supercell dataset (16,000 structures; 14,000 training)", materials: [al2o3], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 14000, loc: "Sec. 3.2"}, calc: vasp, sampling: [strain]}
+methods:
+  Allegro:
+    hp: [cutoffRadius, numEpochs]
+    loss: "Equal force and total-energy weights"
+    algorithm: "Adam"
+    impl: {lib: Allegro, comment: "lmax 1, two-body latent MLP [32, 64, 128], SiLU, float64"}
+    sims: [MolecularDynamics, GeometryOptimization]
+  MACE:
+    hp: [cutoffRadius, numFeatures, numEpochs]
+    loss: "Energy/force weights 1:100, then 1000:100"
+    algorithm: "Adam"
+    impl: {lib: MACE, comment: "MACE 0.3.8, lmax 1, 128x0e + 128x1o, float64"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  allegro: {label: "Allegro for Al2O3", method: Allegro, dataset: al2o3, settings: {cutoffRadius: {v: 3.0, loc: "Sec. 3.2"}, numEpochs: {v: 150, loc: "Sec. 3.2"}}, model: "Allegro Al2O3 (AtomProNet)"}
+  mace: {label: "MACE for Al2O3", method: MACE, dataset: al2o3, settings: {cutoffRadius: {v: 3.0, loc: "Sec. 3.2"}, numFeatures: {v: 128, loc: "Sec. 3.2"}, numEpochs: {v: 150, loc: "Sec. 3.2"}}, model: "MACE Al2O3 (AtomProNet)"}
+results:
+  - {key: allegro-val, model: allegro, material: al2o3, role: validation, eval_data: {label: "Al2O3 validation set (500 structures)", location: "Sec. 3.2"}, metrics: [[R2, Energy, 0.99, null, "validation energy R2 on Al2O3: Allegro", "Sec. 3.2"], [R2, Force, 0.96, null, "validation force R2 on Al2O3: Allegro", "Sec. 3.2"]]}
+  - {key: mace-val, model: mace, material: al2o3, role: validation, eval_data: {label: "Al2O3 validation set (500 structures)", location: "Sec. 3.2"}, metrics: [[R2, Energy, 0.99, null, "validation energy R2 on Al2O3: MACE", "Sec. 3.2"], [R2, Force, 1, null, "validation force R2 on Al2O3: MACE (as printed)", "Sec. 3.2"]]}
+gaps:
+  - "MAE and RMSE values are printed in the Fig. 3 parity-plot panels, which are not in the extracted text; not encoded. Error percentiles (50/80/90% below 0.02/0.04/0.05 eV/atom) are not schema metrics."
+  - "Sec. 3.1 describes 12,000 strained cases while Sec. 3.2 uses 16,000 structures; the encoding follows Sec. 3.2."

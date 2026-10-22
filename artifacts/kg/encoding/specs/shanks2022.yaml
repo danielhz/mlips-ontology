@@ -1,0 +1,50 @@
+id: shanks2022
+source:
+  rank: 506
+  year: "2022"
+  first_author: "Brennon L. Shanks"
+  title: "Uncertainty quantification design principles for machine learning interatomic potentials: lessons learned from hierarchical Bayesian inference"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2206.08744"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2206.08744v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3b27ec5f61c36723a261210e4eda2e8d5021f0dec442983f4f24797aef87524e"
+study_label: "Shanks et al. (2022): uncertainty-quantification design principles for MLIPs from hierarchical Bayesian GP inference, benchmarked against fine-tuned MACE ensembles on CCSD(T) argon clusters"
+scope: |
+  Encoding scope: the argon dimer/trimer CCSD(T) dataset (1,921
+  configurations, nested training sets of 20-100, 1,821 held out), the
+  fine-tuned MACE seed ensemble (five seeds from MACE-MH-0) and the MACE
+  foundation committee (MH-0, MH-1, MPA-0, OMAT-0 each fine-tuned), with
+  the energy RMSEs printed in Fig. 2 for energy+force training. The
+  hierarchical GP potential (pair-distance descriptors, Mie prior mean,
+  HMC hyperposterior) awaits a registry decision on GP regression
+  potentials (as for holzenkamp2025) and is not encoded as a run. CRPS
+  and coverage are not schema metrics.
+materials:
+  ar: {label: "Argon dimers (41) and trimers (1,880)", formula: Ar, class: "Molecular dimers and noncovalent complexes"}
+reference:
+  ccsdt: {type: WF, code: ORCA, wf: CCSDT, basis: "aug-cc-pVQZ", comment: "Counterpoise-corrected; forces by symmetric finite differences (1e-4 A)"}
+sampling:
+  grid: {label: "Dimers at 3-7 A; trimers with bond lengths 3-7 A and angles 0-180 degrees; nested random training subsets"}
+datasets:
+  ar20: {label: "Argon cluster training set of 20 configurations (energies and forces)", materials: [ar], properties: [Energy, Forces], provenance: InHouse, n: {v: 20, loc: "Sec. II E"}, calc: ccsdt, sampling: [grid]}
+  ar100: {label: "Argon cluster training set of 100 configurations (energies and forces)", materials: [ar], properties: [Energy, Forces], provenance: InHouse, n: {v: 100, loc: "Sec. II E"}, calc: ccsdt, sampling: [grid]}
+methods:
+  MACE:
+    loss: "Energies and forces (energy+force setting)"
+    algorithm: "Fine-tuning of foundation checkpoints (multi-head checkpoints from one head)"
+    impl: {lib: MACE}
+runs:
+  seed-20: {label: "MACE seed ensemble (5 seeds fine-tuned from MACE-MH-0, MATPES r2SCAN head), 20 training configurations", method: MACE, dataset: ar20, model: "MACE-MH-0 seed ensemble Ar (20)", base_model: {label: "MACE-MH-0 (MATPES r2SCAN head)", relation: fine-tuned, location: "Sec. II E"}}
+  comm-20: {label: "MACE foundation committee (MH-0 r2SCAN head, MH-1 OMOL head, MPA-0, OMAT-0, each fine-tuned), 20 training configurations", method: MACE, dataset: ar20, model: "MACE foundation committee Ar (20)", base_model: {label: "MACE-MH-0, MACE-MH-1, MACE-MPA-0 and MACE-OMAT-0", relation: fine-tuned, location: "Sec. II E"}}
+  seed-100: {label: "MACE seed ensemble (5 seeds fine-tuned from MACE-MH-0, MATPES r2SCAN head), 100 training configurations", method: MACE, dataset: ar100, model: "MACE-MH-0 seed ensemble Ar (100)", base_model: {label: "MACE-MH-0 (MATPES r2SCAN head)", relation: fine-tuned, location: "Sec. II E"}}
+  comm-100: {label: "MACE foundation committee (MH-0 r2SCAN head, MH-1 OMOL head, MPA-0, OMAT-0, each fine-tuned), 100 training configurations", method: MACE, dataset: ar100, model: "MACE foundation committee Ar (100)", base_model: {label: "MACE-MH-0, MACE-MH-1, MACE-MPA-0 and MACE-OMAT-0", relation: fine-tuned, location: "Sec. II E"}}
+results:
+  - {key: seed-20, model: seed-20, material: ar, role: test, eval_data: {label: "Held-out argon cluster test set (1,821 configurations, energies)", location: "Sec. II E"}, metrics: [[RMSE, Energy, 0.57, meV/atom, "test energy RMSE on Ar clusters: MACE seed ensemble (20 training configurations, energy+force)", "Fig. 2 legend"]]}
+  - {key: seed-100, model: seed-100, material: ar, role: test, eval_data: {label: "Held-out argon cluster test set (1,821 configurations, energies)", location: "Sec. II E"}, metrics: [[RMSE, Energy, 0.58, meV/atom, "test energy RMSE on Ar clusters: MACE seed ensemble (100 training configurations, energy+force)", "Fig. 2 legend"]]}
+  - {key: comm-20, model: comm-20, material: ar, role: test, eval_data: {label: "Held-out argon cluster test set (1,821 configurations, energies)", location: "Sec. II E"}, metrics: [[RMSE, Energy, 0.66, meV/atom, "test energy RMSE on Ar clusters: MACE foundation committee (20 training configurations, energy+force)", "Fig. 2 legend"]]}
+  - {key: comm-100, model: comm-100, material: ar, role: test, eval_data: {label: "Held-out argon cluster test set (1,821 configurations, energies)", location: "Sec. II E"}, metrics: [[RMSE, Energy, 0.34, meV/atom, "test energy RMSE on Ar clusters: MACE foundation committee (100 training configurations, energy+force)", "Fig. 2 legend"]]}
+gaps:
+  - "Hierarchical GP results (energy-only RMSE 0.23, energy+force 0.15 meV/atom at N = 100; 1.12 at N = 20; hyperprior variants 0.91-1.10 meV/atom) are not encoded because GP regression potentials have no registry method yet (decision pending, see holzenkamp2025)."
+  - "Energy-only MACE results are figure-only (Fig. 1). CRPS, coverage and Spearman correlations are not schema metrics. The MACE checkpoints are not registry models."

@@ -1,0 +1,54 @@
+id: gambino2026
+source:
+  rank: 511
+  year: "2026"
+  first_author: "Davide Gambino"
+  title: "The diffusion-driven orthorhombic to tetragonal transition in YBa2Cu3O7 derived with a machine learning interatomic potential"
+  venue: "npj Quantum Materials"
+  doi: "10.1038/s41535-026-00891-7"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2509.26095v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "2273887c04886e38e8faa82e74eedd135af431c4670a387004ec5c7bcb9637fd"
+study_label: "Gambino et al. (2026): ACE potential for YBa2Cu3O7 and the diffusion-driven orthorhombic-to-tetragonal transition"
+scope: |
+  Encoding scope: the pacemaker ACE potential for YBCO (1,000 functions
+  per element, 7 A cutoff, ZBL core repulsion) trained on 1,368 VASP PBE
+  configurations (MD of defect-free and defected cells, volume scans,
+  amorphous-like cells, oxygen Frenkel pairs and approximate transition
+  states); overall and per-subset training/test RMSEs (Sec. II A,
+  Table I). Elastic, phonon, defect and transition properties are not
+  metrics.
+hyperparameters:
+  nfunc: {label: "Number of ACE basis functions per element", name: "functions per element", datatype: integer}
+materials:
+  ybco: {label: "YBa2Cu3O7 with vacancies, interstitials, oxygen Frenkel pairs and amorphous-like configurations", formula: YBa2Cu3O7, class: "Oxides"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Gamma-centred 2x2x1 (k-spacing below 0.09 1/A)", comment: "Non-spin-polarized; Gaussian smearing 0.05 eV"}
+sampling:
+  mixed: {label: "MD snapshots (416-atom cells, 20-1250 K) with a preliminary ACE, volume scans, randomized amorphous-like 52-atom cells, perturbed oxygen Frenkel pairs and midpoint transition states"}
+datasets:
+  ybco: {label: "YBCO dataset (1,368 configurations, 545,267 atoms; 95% training, 5% test)", materials: [ybco], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1368, loc: "Sec. II A"}, calc: vasp, sampling: [mixed]}
+methods:
+  ACE:
+    hp: [cutoffRadius, nfunc]
+    loss: "pacemaker energy-based weighting; configurations with forces above 25 eV/A excluded"
+    impl: {lib: PACE, comment: "pacemaker; simplified Bessel radial functions, Finnis-Sinclair embedding, ZBL core repulsion"}
+    sims: [MolecularDynamics, NudgedElasticBand, PhononCalculation]
+runs:
+  ace: {label: "ACE potential for YBa2Cu3O7", method: ACE, dataset: ybco, settings: {cutoffRadius: {v: 7, loc: "Methods C"}, nfunc: {v: 1000, loc: "Methods C"}}, model: "ACE YBCO"}
+results:
+  - {key: ace-overall-train, model: ace, material: ybco, role: training, eval_data: {label: "Full YBCO training set (95%)", location: "Sec. II A"}, metrics: [[RMSE, Energy, 10, meV/atom, "training energy RMSE on YBCO: ACE (overall)", "Sec. II A"], [RMSE, Force, 70, meV/A, "training force RMSE on YBCO: ACE (overall)", "Sec. II A"]]}
+  - {key: ace-overall-test, model: ace, material: ybco, role: test, eval_data: {label: "Full YBCO test set (random 5%)", location: "Sec. II A"}, metrics: [[RMSE, Energy, 10, meV/atom, "test energy RMSE on YBCO: ACE (overall)", "Sec. II A"], [RMSE, Force, 70, meV/A, "test force RMSE on YBCO: ACE (overall)", "Sec. II A"]]}
+  - {key: ace-free-train, model: ace, material: ybco, role: training, eval_data: {label: "YBCO training subset: Defect free (468 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 14.015, meV/atom, "training energy RMSE on YBCO defect free: ACE", "Table I"], [RMSE, Force, 71.482, meV/A, "training force RMSE on YBCO defect free: ACE", "Table I"]]}
+  - {key: ace-free-test, model: ace, material: ybco, role: test, eval_data: {label: "YBCO test subset: Defect free (26 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 12.132, meV/atom, "test energy RMSE on YBCO defect free: ACE", "Table I"], [RMSE, Force, 53.187, meV/A, "test force RMSE on YBCO defect free: ACE", "Table I"]]}
+  - {key: ace-vac-train, model: ace, material: ybco, role: training, eval_data: {label: "YBCO training subset: Vacancies (404 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 2.669, meV/atom, "training energy RMSE on YBCO vacancies: ACE", "Table I"], [RMSE, Force, 53.561, meV/A, "training force RMSE on YBCO vacancies: ACE", "Table I"]]}
+  - {key: ace-vac-test, model: ace, material: ybco, role: test, eval_data: {label: "YBCO test subset: Vacancies (20 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 3.146, meV/atom, "test energy RMSE on YBCO vacancies: ACE", "Table I"], [RMSE, Force, 61.416, meV/A, "test force RMSE on YBCO vacancies: ACE", "Table I"]]}
+  - {key: ace-int-train, model: ace, material: ybco, role: training, eval_data: {label: "YBCO training subset: Interstitials (127 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 1.474, meV/atom, "training energy RMSE on YBCO interstitials: ACE", "Table I"], [RMSE, Force, 50.923, meV/A, "training force RMSE on YBCO interstitials: ACE", "Table I"]]}
+  - {key: ace-int-test, model: ace, material: ybco, role: test, eval_data: {label: "YBCO test subset: Interstitials (6 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 2.123, meV/atom, "test energy RMSE on YBCO interstitials: ACE", "Table I"], [RMSE, Force, 63.41, meV/A, "test force RMSE on YBCO interstitials: ACE", "Table I"]]}
+  - {key: ace-amo-train, model: ace, material: ybco, role: training, eval_data: {label: "YBCO training subset: Amorphous (62 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 30.418, meV/atom, "training energy RMSE on YBCO amorphous: ACE", "Table I"], [RMSE, Force, 346.052, meV/A, "training force RMSE on YBCO amorphous: ACE", "Table I"]]}
+  - {key: ace-amo-test, model: ace, material: ybco, role: test, eval_data: {label: "YBCO test subset: Amorphous (3 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 25.9, meV/atom, "test energy RMSE on YBCO amorphous: ACE", "Table I"], [RMSE, Force, 515.334, meV/A, "test force RMSE on YBCO amorphous: ACE", "Table I"]]}
+  - {key: ace-fp-train, model: ace, material: ybco, role: training, eval_data: {label: "YBCO training subset: O FPs and TS (239 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 1.062, meV/atom, "training energy RMSE on YBCO o fps and ts: ACE", "Table I"], [RMSE, Force, 68.64, meV/A, "training force RMSE on YBCO o fps and ts: ACE", "Table I"]]}
+  - {key: ace-fp-test, model: ace, material: ybco, role: test, eval_data: {label: "YBCO test subset: O FPs and TS (13 configurations)", location: "Table I"}, metrics: [[RMSE, Energy, 0.713, meV/atom, "test energy RMSE on YBCO o fps and ts: ACE", "Table I"], [RMSE, Force, 54.097, meV/A, "test force RMSE on YBCO o fps and ts: ACE", "Table I"]]}
+gaps:
+  - "Errors after recomputing the problematic defect-free configuration are approximate (about 4 meV/atom, at most 15 meV/A); not encoded."
