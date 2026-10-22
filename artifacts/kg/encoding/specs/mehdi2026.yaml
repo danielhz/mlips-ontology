@@ -1,0 +1,48 @@
+id: mehdi2026
+source:
+  rank: 649
+  year: "2026"
+  first_author: "Shams Mehdi"
+  title: "Knowing when to trust machine-learned interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.00640"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2605.00640v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e001364cfbdf46fda55d5511a3495e34654b1c226176a220d51c9b30171cbf6a"
+study_label: "Mehdi, Cho and Isayev (2026): PROBE, knowing when to trust machine-learned interatomic potentials"
+scope: |
+  Encoding scope: the AIMNet2 models trained by the authors (a 4-model
+  ensemble on the 20M-molecule B97-3c data; retrospective active-learning
+  cycles selected by PROBE or by ensemble spread, with test RMSEs in
+  Table 4) and MACE-OFF23 large used as distributed. PROBE itself is a
+  reliability classifier on frozen MLIP embeddings, not a potential; its
+  classification metrics are not encoded.
+materials:
+  organics: {label: "Neutral and charged organic molecules (14 elements)", class: "organic molecules"}
+reference:
+  b973c: {type: DFT, xc: {local: B97-3c}, basis: "def2-mTZVP", comment: "AIMNet2 training data (about 20M hybrid-DFT calculations)."}
+sampling:
+  al: {label: "Retrospective active learning from a fixed pool of about 20M molecules: 1M stratified random molecules (cycle 0), then 1M added per cycle by PROBE P(unreliable) or by ensemble standard deviation"}
+datasets:
+  c0: {label: "Cycle-0 AIMNet2 training set (1M molecules)", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: b973c, sampling: [al]}
+  c2-probe: {label: "Cycle-2 training set selected by PROBE (3M molecules)", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: b973c, sampling: [al]}
+  c2-ens: {label: "Cycle-2 training set selected by ensemble spread (3M molecules)", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: b973c, sampling: [al]}
+methods:
+  AIMNet2:
+    algorithm: "Default AIMNet2 architecture and training procedure; parameters carried over between active-learning cycles"
+  MACE: {}
+runs:
+  mace-off23-l: {label: "MACE-OFF23 large as distributed (frozen backbone for PROBE)", method: MACE, model: "MACE-OFF23 large"}
+  c0-single: {label: "Cycle-0 single AIMNet2 model (one member of the 4-model ensemble)", method: AIMNet2, dataset: c0, model: "AIMNet2 cycle 0 (single)"}
+  c0-ens: {label: "Cycle-0 4-model AIMNet2 ensemble", method: AIMNet2, dataset: c0, model: "AIMNet2 cycle 0 (ensemble)"}
+  c2-probe: {label: "Cycle-2 AIMNet2 retrained on PROBE-selected data", method: AIMNet2, dataset: c2-probe, model: "AIMNet2 cycle 2 (PROBE selection)", base_model: {run: c0-single, relation: fine-tuned, location: "Sec. 2.6"}}
+  c2-ens: {label: "Cycle-2 AIMNet2 ensemble retrained on ensemble-selected data", method: AIMNet2, dataset: c2-ens, model: "AIMNet2 cycle 2 (ensemble selection)", base_model: {run: c0-ens, relation: fine-tuned, location: "Sec. 2.6"}}
+results:
+  - {key: c0-single-test, model: c0-single, material: organics, role: test, eval_data: {label: "Held-out test set of 13.6M molecules", location: "Table 4"}, metrics: [[RMSE, Energy, 3.234, kcal/mol, "test energy RMSE on organics: AIMNet2 cycle 0 (single)", "Table 4"]]}
+  - {key: c0-ens-test, model: c0-ens, material: organics, role: test, eval_data: {label: "Held-out test set of 13.6M molecules", location: "Table 4"}, metrics: [[RMSE, Energy, 3.030, kcal/mol, "test energy RMSE on organics: AIMNet2 cycle 0 (ensemble)", "Table 4"]]}
+  - {key: c2-probe-test, model: c2-probe, material: organics, role: test, eval_data: {label: "Held-out test set of 13.6M molecules", location: "Table 4"}, metrics: [[RMSE, Energy, 2.709, kcal/mol, "test energy RMSE on organics: AIMNet2 cycle 2 (PROBE selection)", "Table 4"]]}
+  - {key: c2-ens-test, model: c2-ens, material: organics, role: test, eval_data: {label: "Held-out test set of 13.6M molecules", location: "Table 4"}, metrics: [[RMSE, Energy, 2.817, kcal/mol, "test energy RMSE on organics: AIMNet2 cycle 2 (ensemble selection)", "Table 4"]]}
+gaps:
+  - "Cycle-1 RMSEs (PROBE 2.903, ensemble 2.907 kcal/mol) are intermediate models and are not encoded as runs. Continued training from the previous cycle is recorded as base_model with relation fine-tuned."
+  - "PROBE classification accuracy, MCC, F1 and per-class mean errors (Tables 1-3) and UQ comparisons (Tables 2, 5) are classifier metrics, not MLIP errors. The full 4-model AIMNet2 ensemble trained on the 20M data is not separately evaluated in the text read."
