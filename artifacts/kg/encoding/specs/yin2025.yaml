@@ -1,0 +1,59 @@
+id: yin2025
+source:
+  rank: 566
+  year: "2025"
+  first_author: "Bangchen Yin"
+  title: "AlphaNet: scaling up local-frame-based neural network interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01817-w"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "6493422e218bd6c180772df43ed4340e6baf2baac20f132876c6ad9b35ad5bb4"
+study_label: "Yin et al. (2025): AlphaNet, a scalable local-frame-based equivariant neural network interatomic potential"
+scope: |
+  Encoding scope: AlphaNet models trained on formate decomposition on
+  Cu(110), defected (bilayer) graphene, 16 zeolite frameworks, the OC20
+  S2EF 2M subset (AlphaNet-M) and MPtrj (AlphaNet-S/L for Matbench
+  Discovery); the AlphaNet energy and force MAEs of Tables 1-3. Baseline
+  columns may be literature values and are not encoded; Matbench
+  classification metrics and elastic-property errors (Table 4) are not
+  energy/force metrics.
+materials:
+  formate: {label: "Formate decomposition on Cu(110) (HCOO* -> H* + CO2)", class: "Solid-liquid interface"}
+  graphene: {label: "Defected and bilayer graphene", formula: C, class: "2D material"}
+  zeolite: {label: "16 zeolite frameworks", class: "Inorganic crystals"}
+  oc20: {label: "OC20 adsorbate-catalyst surfaces", class: "Inorganic crystals"}
+  mp: {label: "Inorganic crystals of MPtrj", class: "Inorganic crystals"}
+reference:
+  pub: {type: DFT, comment: "Published datasets as provided (formate, graphene, zeolite, OC20, MPtrj)"}
+sampling:
+  pub: {label: "Published datasets with their splits (OC20: 2M S2EF subset)"}
+datasets:
+  formate: {label: "Formate decomposition dataset", materials: [formate], properties: [Energy, Forces], provenance: Published, calc: pub, sampling: [pub]}
+  graphene: {label: "Defected graphene dataset", materials: [graphene], properties: [Energy, Forces], provenance: Published, calc: pub, sampling: [pub]}
+  zeolite: {label: "Zeolite dataset (16 frameworks)", materials: [zeolite], properties: [Energy, Forces], provenance: Published, calc: pub, sampling: [pub]}
+  oc20: {label: "OC20 S2EF 2M training subset", materials: [oc20], properties: [Energy, Forces], provenance: Published, n: {v: 2000000, loc: "Table 3 caption"}, calc: pub, sampling: [pub]}
+  mptrj: {label: "MPtrj", materials: [mp], properties: [Energy, Forces, Stresses], provenance: Published, calc: pub, sampling: [pub]}
+methods:
+  AlphaNet:
+    loss: "Energy and force (and stress for MPtrj) losses; OC20: lambda_F = 100, lambda_E = 4 or 20"
+    algorithm: "Local frames with rotary position embedding"
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  an-formate: {label: "AlphaNet for formate decomposition", method: AlphaNet, dataset: formate, model: "AlphaNet formate"}
+  an-graphene: {label: "AlphaNet for defected graphene", method: AlphaNet, dataset: graphene, model: "AlphaNet defected graphene"}
+  an-zeolite: {label: "AlphaNet for zeolites", method: AlphaNet, dataset: zeolite, model: "AlphaNet zeolites"}
+  an-m4: {label: "AlphaNet-M (6.1M parameters, lambda_E = 4) on OC20 2M", method: AlphaNet, dataset: oc20, model: "AlphaNet-M OC20 (lambda_E = 4)"}
+  an-m20: {label: "AlphaNet-M (6.1M parameters, lambda_E = 20) on OC20 2M", method: AlphaNet, dataset: oc20, model: "AlphaNet-M OC20 (lambda_E = 20)"}
+  an-s: {label: "AlphaNet-S (Bessel radial basis, 4.5M parameters) on MPtrj", method: AlphaNet, dataset: mptrj, model: "AlphaNet-S MPtrj"}
+  an-l: {label: "AlphaNet-L (Gaussian radial basis, 16.2M parameters) on MPtrj", method: AlphaNet, dataset: mptrj, model: "AlphaNet-L MPtrj"}
+results:
+  - {key: an-formate, model: an-formate, material: formate, role: test, eval_data: {label: "Formate decomposition test set", location: "Table 1"}, metrics: [[MAE, Energy, 0.23, meV/atom, "energy MAE on formate decomposition: AlphaNet", "Table 1"], [MAE, Force, 42.5, meV/A, "force MAE on formate decomposition: AlphaNet", "Table 1"]]}
+  - {key: an-graphene, model: an-graphene, material: graphene, role: test, eval_data: {label: "Defected graphene test set", location: "Table 1"}, metrics: [[MAE, Energy, 1.2, meV/atom, "energy MAE on defected graphene: AlphaNet", "Table 1"], [MAE, Force, 19.4, meV/A, "force MAE on defected graphene: AlphaNet", "Table 1"]]}
+  - {key: an-zeolite, model: an-zeolite, material: zeolite, role: test, eval_data: {label: "Zeolite test sets, averaged over 16 frameworks", location: "Table 2"}, metrics: [[MAE, Energy, 17.1, meV, "energy MAE averaged over zeolites: AlphaNet", "Table 2"], [MAE, Force, 15.9, meV/A, "force MAE averaged over zeolites: AlphaNet", "Table 2"]]}
+  - {key: an-m4, model: an-m4, material: oc20, role: validation, eval_data: {label: "OC20 S2EF validation set", registry: OC20, location: "Table 3"}, metrics: [[MAE, Energy, 0.25, eV, "OC20 validation energy MAE: AlphaNet-M (lambda_E = 4)", "Table 3"], [MAE, Force, 0.040, eV/A, "OC20 validation force MAE: AlphaNet-M (lambda_E = 4)", "Table 3"]]}
+  - {key: an-m20, model: an-m20, material: oc20, role: validation, eval_data: {label: "OC20 S2EF validation set", registry: OC20, location: "Table 3"}, metrics: [[MAE, Energy, 0.24, eV, "OC20 validation energy MAE: AlphaNet-M (lambda_E = 20)", "Table 3"], [MAE, Force, 0.062, eV/A, "OC20 validation force MAE: AlphaNet-M (lambda_E = 20)", "Table 3"]]}
+gaps:
+  - "Table 1-2 baseline columns (NequIP, MACE, MatterSim, GRACE, Deep Potential) and Table 3 baselines are not attributed to new training in the text read; not encoded. Matbench Discovery F1/DAF/MAE/R2 (Table 5) concern hull-energy classification; elastic errors (Table 4) are properties. The test/validation role of Tables 1-2 is taken from the datasets' splits shown in Fig. 1."
+  - "AlphaNet registry origin set to yin2025 (this paper); the first-100 note that the method paper was not in the corpus is superseded."
