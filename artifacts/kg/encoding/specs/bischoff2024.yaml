@@ -1,0 +1,51 @@
+id: bischoff2024
+source:
+  rank: 451
+  year: "2024"
+  first_author: "Thomas Bischoff"
+  title: "Hydrogen under Pressure as a Benchmark for Machine-Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2409.13390"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2409.13390v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "85c17ed0d048fae9d70e4d338ac3acc8aacc460e6f2f7dfbaa02ce8ac1817828"
+study_label: "Bischoff et al. (2024): warm dense hydrogen across the liquid-liquid phase transition (h-llpt-24) as a benchmark for MLIPs"
+scope: |
+  Encoding scope: the h-llpt-24 data set (612 PBE NVT AIMD runs of 128
+  hydrogen atoms at six temperatures and 17 Wigner-Seitz radii, Quantum
+  ESPRESSO; five runs per state point for training, one for testing),
+  the MLIPs benchmarked on it (UF3 two- and three-body, PACE, MACE) with
+  their test-set energy and force errors (Table 2). Hellinger distances
+  of MD-derived properties (Table 1) are property-level scores; the
+  Yukawa and Tersoff baselines are not MLIPs.
+materials:
+  h: {label: "Warm dense hydrogen (128 atoms) across the liquid-liquid phase transition, 1000-1500 K", formula: "H", class: "Material-specific benchmark system (solid acid, electrolyte, alloy, layered material or molecular liquid)"}
+reference:
+  pbe: {type: DFT, code: QuantumESPRESSO, xc: PBE, comment: "NVT ab initio MD, 10k steps per run; 2 equilibration and 12 production snapshots per run used (Sec. 4)."}
+datasets:
+  h: {label: "h-llpt-24 training part (five of six AIMD runs per temperature and density)", materials: [h], properties: [Energy, Forces], provenance: InHouse, calc: pbe}
+methods:
+  UF3:
+    sims: [MolecularDynamics]
+  ACE:
+    impl: {lib: PACE}
+    sims: [MolecularDynamics]
+  MACE:
+    impl: {lib: MACE}
+    sims: [MolecularDynamics]
+runs:
+  ufp2: {label: "UF3 two-body (cubic B-splines) trained on h-llpt-24", method: UF3, dataset: h, model: "h-llpt-24 UFP2"}
+  ufp3: {label: "UF3 three-body trained on h-llpt-24", method: UF3, dataset: h, model: "h-llpt-24 UFP3"}
+  pace: {label: "PACE (semi-linear ACE) trained on h-llpt-24", method: ACE, dataset: h, model: "h-llpt-24 PACE"}
+  mace: {label: "MACE trained on h-llpt-24", method: MACE, dataset: h, model: "h-llpt-24 MACE"}
+results:
+  - {key: ufp2-test, model: ufp2, material: h, role: test, eval_data: {label: "h-llpt-24 test part (one AIMD run per temperature and density)", location: "Table 2"}, metrics: [[MAE, Energy, 21, meV/atom, "test energy MAE on h: UFP2", "Table 2"], [RMSE, Energy, 31, meV/atom, "test energy RMSE on h: UFP2", "Table 2"], [MAE, Force, 646, meV/A, "test force MAE (component-wise) on h: UFP2", "Table 2"], [RMSE, Force, 912, meV/A, "test force RMSE (component-wise) on h: UFP2", "Table 2"]]}
+  - {key: ufp3-test, model: ufp3, material: h, role: test, eval_data: {label: "h-llpt-24 test part (one AIMD run per temperature and density)", location: "Table 2"}, metrics: [[MAE, Energy, 8.3, meV/atom, "test energy MAE on h: UFP3", "Table 2"], [RMSE, Energy, 13, meV/atom, "test energy RMSE on h: UFP3", "Table 2"], [MAE, Force, 406, meV/A, "test force MAE (component-wise) on h: UFP3", "Table 2"], [RMSE, Force, 611, meV/A, "test force RMSE (component-wise) on h: UFP3", "Table 2"]]}
+  - {key: pace-test, model: pace, material: h, role: test, eval_data: {label: "h-llpt-24 test part (one AIMD run per temperature and density)", location: "Table 2"}, metrics: [[MAE, Energy, 6.0, meV/atom, "test energy MAE on h: PACE", "Table 2"], [RMSE, Energy, 7.5, meV/atom, "test energy RMSE on h: PACE", "Table 2"], [MAE, Force, 210, meV/A, "test force MAE (component-wise) on h: PACE", "Table 2"], [RMSE, Force, 351, meV/A, "test force RMSE (component-wise) on h: PACE", "Table 2"]]}
+  - {key: mace-test, model: mace, material: h, role: test, eval_data: {label: "h-llpt-24 test part (one AIMD run per temperature and density)", location: "Table 2"}, metrics: [[MAE, Energy, 1.6, meV/atom, "test energy MAE on h: MACE", "Table 2"], [RMSE, Energy, 2.1, meV/atom, "test energy RMSE on h: MACE", "Table 2"], [MAE, Force, 86, meV/A, "test force MAE (component-wise) on h: MACE", "Table 2"], [RMSE, Force, 129, meV/A, "test force RMSE (component-wise) on h: MACE", "Table 2"]]}
+resources: |
+  The benchmark runs 1,224 LAMMPS MD simulations per MLIP; no timings are given.
+gaps:
+  - "Maximum errors, range-normalised errors and log(1 - R2) (Table 2) are not encoded. Hellinger distances for pressure, molecular fraction, diffusion and RDF (Table 1, Table SI2) score MD-derived properties, not energy/force errors. Yukawa and Tersoff are reparametrised empirical potentials."
+  - "MLIP hyperparameters are in the SI; the training-set size is not stated in the main text."

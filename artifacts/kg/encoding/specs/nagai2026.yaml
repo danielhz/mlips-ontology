@@ -1,0 +1,50 @@
+id: nagai2026
+source:
+  rank: 453
+  year: "2026"
+  first_author: "Yuki Nagai"
+  title: "Target-Distribution-Guided Cross-Functional Fine-Tuning of Machine-Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.25032"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2605.25032v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8d75628e882c0865ea3d4e4adeecff573e0551bc4d3a85398cfcf4b9041a5820"
+study_label: "Nagai et al. (2026): target-distribution-guided (SLHMC) cross-functional fine-tuning of MACE-MP-0 for rutile TiO2 at PBE, r2SCAN and HSE06"
+scope: |
+  Encoding scope: the small MACE-MP-0 foundation model sequentially
+  fine-tuned on self-learning hybrid Monte Carlo (SLHMC) data for 48-atom
+  rutile TiO2, with target energies and forces at PBE, r2SCAN or HSE06
+  (VASP), and the forward-in-time force RMSEs at the final analysed
+  updates stated in the text. Nearest-neighbour distributions, RDFs and
+  NPT cell parameters are properties.
+materials:
+  tio2: {label: "Rutile TiO2 (48-atom 2x2x2 and 216-atom 3x3x4 supercells), 300-600 K", formula: "TiO2", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma point", comment: "VASP 6.5.1, Ti_pv and O PAW, spin unpolarised, Gaussian smearing 0.05 eV, EDIFF 1e-4 eV (Sec. 4.1)."}
+  r2scan: {type: DFT, code: VASP, xc: {local: r2SCAN}, pp: PAW, cutoff: 520, kpoints: "Gamma point", comment: "Same numerical settings as PBE (Sec. 4.1)."}
+  hse06: {type: DFT, code: VASP, xc: HSE06, pp: PAW, cutoff: 520, kpoints: "Gamma point", comment: "25 % short-range exact exchange, screening 0.2 1/A; same numerical settings (Sec. 4.1)."}
+sampling:
+  slhmc: {label: "Self-learning hybrid Monte Carlo (PIMD driver): MACE-proposed trajectories accepted or rejected with target-functional energies; accepted and rejected DFT-labelled endpoints kept for sequential fine-tuning"}
+datasets:
+  d-pbe: {label: "SLHMC data for rutile TiO2 at PBE (48 atoms, 300 K NVT)", materials: [tio2], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [slhmc]}
+  d-r2scan: {label: "SLHMC data for rutile TiO2 at r2SCAN", materials: [tio2], properties: [Energy, Forces], provenance: InHouse, calc: r2scan, sampling: [slhmc]}
+  d-hse: {label: "SLHMC data for rutile TiO2 at HSE06", materials: [tio2], properties: [Energy, Forces], provenance: InHouse, calc: hse06, sampling: [slhmc]}
+methods:
+  MACE:
+    impl: {lib: MACE, comment: "MACE 0.3.14 via the PIMD-MACE interface"}
+    sims: [MonteCarlo, MolecularDynamics]
+runs:
+  mp0s: {label: "MACE-MP-0 small, public release (128 channels, two layers)", method: MACE, model: "MACE-MP-0 small"}
+  ft-pbe: {label: "MACE-MP-0 small sequentially fine-tuned on PBE SLHMC data", method: MACE, dataset: d-pbe, model: "TiO2 MACE SLHMC-PBE", base_model: {run: mp0s, relation: fine-tuned, location: "Sec. 4.3"}}
+  ft-r2scan: {label: "MACE-MP-0 small sequentially fine-tuned on r2SCAN SLHMC data", method: MACE, dataset: d-r2scan, model: "TiO2 MACE SLHMC-r2SCAN", base_model: {run: mp0s, relation: fine-tuned, location: "Sec. 4.3"}}
+  ft-hse: {label: "MACE-MP-0 small sequentially fine-tuned on HSE06 SLHMC data", method: MACE, dataset: d-hse, model: "TiO2 MACE SLHMC-HSE06", base_model: {run: mp0s, relation: fine-tuned, location: "Sec. 4.3"}}
+results:
+  - {key: ft-pbe-fwd, model: ft-pbe, material: tio2, role: test, eval_data: {label: "Subsequent PBE SLHMC configurations (forward-in-time evaluation, final analysed update)", location: "Sec. 2.2; Fig. 2"}, metrics: [[RMSE, Force, 32, meV/A, "forward force RMSE on tio2: SLHMC-PBE MACE", "Sec. 2.2"]]}
+  - {key: ft-r2scan-fwd, model: ft-r2scan, material: tio2, role: test, eval_data: {label: "Subsequent r2SCAN SLHMC configurations (forward-in-time evaluation, final analysed update)", location: "Sec. 2.2; Fig. 2"}, metrics: [[RMSE, Force, 16, meV/A, "forward force RMSE on tio2: SLHMC-r2SCAN MACE", "Sec. 2.2"]]}
+  - {key: ft-hse-fwd, model: ft-hse, material: tio2, role: test, eval_data: {label: "Subsequent HSE06 SLHMC configurations (forward-in-time evaluation, final analysed update)", location: "Sec. 2.2; Fig. 2"}, metrics: [[RMSE, Force, 15, meV/A, "forward force RMSE on tio2: SLHMC-HSE06 MACE", "Sec. 2.2"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Forward (prequential) errors evaluate each model on configurations generated after its training data; the role is test with that meaning. Energy RMSEs and earlier updates are figure-only (Fig. 2; initial force RMSE about 98-103 meV/A)."
+  - "The NPT and off-target HSE06 control models are not encoded separately. Nearest-neighbour distances, RDFs, coordination numbers and cell parameters (Table 1) are properties."

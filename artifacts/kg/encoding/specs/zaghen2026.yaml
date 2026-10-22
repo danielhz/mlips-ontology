@@ -1,0 +1,40 @@
+id: zaghen2026
+source:
+  rank: 452
+  year: "2026"
+  first_author: "Olga Zaghen"
+  title: "Uncertainty-aware Machine Learning Interatomic Potentials via Learned Functional Perturbations"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.19939"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2605.19939v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b4bf1833303a85053e96e67bbadc24547b68bca07013c288cf022983710b9e9b"
+study_label: "Zaghen et al. (2026): uncertainty-aware MLIPs via learned functional perturbations trained with the CRPS (P-EGNN, P-Orb)"
+scope: |
+  Encoding scope: the silica-glass experiment: an Orb-v3 foundation model
+  fine-tuned on the SiO2 benchmark of Coscia et al. (2025) as P-Orb
+  (learned weight perturbations, CRPS loss) and as BLIP-Orb (variational
+  baseline), with the test force MAEs at 1,024 training structures
+  (Table 2). The N-body experiment (EGNN predicting particle positions)
+  is not an interatomic-potential task and is not encoded; CRPS,
+  spread-to-skill ratios and Spearman correlations are UQ metrics.
+materials:
+  sio2: {label: "Silica glass (699 atoms per structure)", formula: "SiO2", class: "Amorphous metal oxide"}
+datasets:
+  sio2: {label: "Silica-glass benchmark of Coscia et al. (2025), 1,024 training structures", materials: [sio2], properties: [Energy, Forces], provenance: Published, n: {v: 1024, loc: "Table 2"}}
+methods:
+  ORB:
+    loss: "Continuous Ranked Probability Score on energies and forces (P-Orb); MSE + KL (BLIP-Orb)"
+runs:
+  orbv3: {label: "Orb-v3 pretrained model (variant not stated)", method: ORB, model: "Orb-v3 (variant not stated)"}
+  p-orb: {label: "P-Orb: Orb-v3 fine-tuned with learned functional perturbations and CRPS", method: ORB, dataset: sio2, model: "P-Orb (silica)", base_model: {run: orbv3, relation: fine-tuned, location: "Sec. 4.2"}}
+  blip-orb: {label: "BLIP-Orb: Orb-v3 fine-tuned with the BLIP variational method", method: ORB, dataset: sio2, model: "BLIP-Orb (silica)", base_model: {run: orbv3, relation: fine-tuned, location: "Sec. 4.2"}}
+results:
+  - {key: p-orb-test, model: p-orb, material: sio2, role: test, eval_data: {label: "Silica-glass test set (mean over 4 seeds, n = 1,024)", location: "Table 2"}, metrics: [[MAE, Force, 1.38, meV/A, "test force MAE on sio2: P-Orb", "Table 2"]]}
+  - {key: blip-orb-test, model: blip-orb, material: sio2, role: test, eval_data: {label: "Silica-glass test set (mean over 4 seeds, n = 1,024)", location: "Table 2"}, metrics: [[MAE, Force, 1.61, meV/A, "test force MAE on sio2: BLIP-Orb", "Table 2"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "Force CRPS and Spearman correlations (Table 2) are UQ metrics; energy results are deferred by the authors because of seed variance. Smaller training sizes (32, 128) are figure-only (Fig. 2)."
+  - "The N-body EGNN experiments (Table 1) predict particle positions, not an interatomic potential, and are not encoded."
