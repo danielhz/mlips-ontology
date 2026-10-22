@@ -1,0 +1,43 @@
+id: magorrian2025
+source:
+  rank: 540
+  year: "2025"
+  first_author: "S. J. Magorrian"
+  title: "Strong atomic reconstruction in twisted bilayers of highly flexible InSe: Machine-learned interatomic potential and continuum model approaches"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.9.014004"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2406.19462v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "41c0d98fece57c557a7e2072be0813bde7f828f26fcb4a21d840c7e06b062cf3"
+study_label: "Magorrian, Siddiqui and Hine (2025): MACE potential and continuum model for strong atomic reconstruction in twisted InSe bilayers"
+scope: |
+  Encoding scope: the single-purpose MACE potential for InSe trained on
+  666 optB88-vdW configurations (strained primitive and MD-displaced 6x6
+  monolayers, 572 rigidly shifted primitive bilayers, large-angle
+  twisted bilayers) with the stated training and validation RMSEs; the
+  MACE-MP-0 model used only to generate MD snapshots is not a trained
+  model of this paper. Reconstruction patterns and the continuum model
+  are not metrics.
+materials:
+  inse: {label: "InSe monolayers and parallel/antiparallel (twisted) bilayers", formula: InSe, class: "2D material"}
+reference:
+  qe: {type: DFT, code: QuantumESPRESSO, xc: {local: optB88-vdW}, comment: "SSSP pseudopotentials (PSlibrary In, GBRV Se), 80 Ry"}
+sampling:
+  mixed: {label: "Strained primitive monolayers (25), final frames of MACE-MP-0 Langevin MD of 6x6 monolayers at 7 temperatures and 9 strains (63), rigid bilayer shifts and separations (572), rigid and relaxed 21.79 and 13.17 degree twisted bilayers"}
+datasets:
+  inse: {label: "InSe training set (666 configurations; 90/5/5 train/test/validation)", materials: [inse], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 666, loc: "Sec. II A (total)"}, calc: qe, sampling: [mixed]}
+methods:
+  MACE:
+    hp: [numLayers, cutoffRadius, batchSize, numEpochs, learningRate]
+    loss: "Energy:force:stress weights 1:10:1 for 200 epochs, then 100:10:1 with stochastic weight averaging"
+    algorithm: "AMSGrad Adam"
+    impl: {lib: MACE}
+    sims: [GeometryOptimization]
+runs:
+  mace: {label: "MACE potential for InSe bilayers", method: MACE, dataset: inse, settings: {numLayers: {v: 2, loc: "Sec. II A"}, cutoffRadius: {v: 8, loc: "Sec. II A"}, batchSize: {v: 10, loc: "Sec. II A"}, numEpochs: {v: 1200, loc: "Sec. II A"}, learningRate: {v: 0.01, loc: "Sec. II A"}}, model: "MACE InSe (twisted bilayers)"}
+results:
+  - {key: mace-train, model: mace, material: inse, role: training, eval_data: {label: "InSe training portion (90%)", location: "Sec. II A"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "training energy RMSE on InSe: MACE", "Sec. II A"], [RMSE, Force, 6.4, meV/A, "training force RMSE on InSe: MACE", "Sec. II A"]]}
+  - {key: mace-val, model: mace, material: inse, role: validation, eval_data: {label: "InSe validation portion (5%)", location: "Sec. II A"}, metrics: [[RMSE, Energy, 0.1, meV/atom, "validation energy RMSE on InSe: MACE", "Sec. II A"], [RMSE, Force, 7.1, meV/A, "validation force RMSE on InSe: MACE", "Sec. II A"]]}
+gaps:
+  - "Test-portion errors are not stated. Binding-energy comparisons (Figs. 2b, 3) are figure-only."

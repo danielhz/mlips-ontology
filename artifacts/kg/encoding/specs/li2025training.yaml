@@ -1,0 +1,73 @@
+id: li2025training
+source:
+  rank: 538
+  year: "2025"
+  first_author: "Yifan Li"
+  title: "Training Dataset Matters for Machine Learning Interatomic Potentials: Water Simulation as an Example"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2512.23939"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2512.23939v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ae52e8b48defa090992ebda281917d36479ebfff5d40ccd60816f5b969236275"
+study_label: "Li et al. (2025): training-set convergence for revPBE0-D3 water and ice MLIPs (DP, BPNN, NEP) and its effect on melting, density maximum and nuclear quantum effects"
+scope: |
+  Encoding scope: revPBE0-D3 water/ice models trained on three
+  datasets (SET1 of the original BPNN, SET2 from DP-GEN, SET3 from
+  further BPNN active learning): the published BPNN1 and NEP of Ref. 4
+  (as distributed), DP, BPNN2, BPNN3 and a NEP trained on SET3; their
+  liquid and ice test RMSEs on independent AIMD sets (Figs. S6-S8, SI
+  S4, S6). Melting temperatures, densities and Tdm are properties.
+materials:
+  liq: {label: "Liquid water (classical and quantum nuclei)", formula: H2O, class: "Molecular liquid"}
+  ice: {label: "Ice Ih", formula: H2O, class: "Molecular crystal"}
+reference:
+  rpbe0: {type: DFT, code: {local: CP2K}, xc: {local: revPBE0-D3}, comment: "Settings of Cheng et al. (Ref. 1) with 800 Ry plane-wave cutoff (400 Ry for SET1 and the Ref. 4 data)"}
+sampling:
+  set1: {label: "SET1: training configurations of the original BPNN (Ref. 1)"}
+  dpgen: {label: "DP-GEN active learning from 100 liquid configurations: classical MD and 32-bead PIMD of liquid (270-350 K) and ice Ih (150-300 K) in 64-molecule cells, candidates with force deviation 0.2-0.35 eV/A"}
+  bpal: {label: "Further BPNN committee active learning from SET2 with the same criteria"}
+datasets:
+  set1: {label: "SET1 (1,593 configurations)", materials: [liq], properties: [Energy, Forces], provenance: Published, n: {v: 1593, loc: "Table S1"}, calc: rpbe0, sampling: [set1]}
+  set2: {label: "SET2 (1,778 configurations)", materials: [liq, ice], properties: [Energy, Forces], provenance: InHouse, n: {v: 1778, loc: "Table S1"}, calc: rpbe0, sampling: [dpgen]}
+  set3: {label: "SET3 (2,556 configurations)", materials: [liq, ice], properties: [Energy, Forces], provenance: InHouse, n: {v: 2556, loc: "Table S1"}, calc: rpbe0, sampling: [dpgen, bpal]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, learningRate]
+    loss: "Energy and force prefactors 0.02 to 2 and 1000 to 1; no virials"
+    algorithm: "400,000 steps, learning rate 1e-3 to 1e-8"
+    impl: {lib: DeePMDkit, comment: "se_e2_a descriptor; DP-GEN"}
+    sims: [MolecularDynamics, ThermodynamicIntegration]
+  HDNNP:
+    hp: [numLayers, numEpochs]
+    loss: "Energies and forces (force weight 1)"
+    algorithm: "Kalman filter; 20% internal test"
+    impl: {lib: {local: n2p2}, comment: "12-bohr symmetry-function cutoff, two hidden layers of 25 neurons"}
+    sims: [MolecularDynamics]
+  NEP:
+    hp: [cutoffRadius, angularCutoff, batchSize]
+    loss: "Energy and force weights 1, no virials, L1 and L2 0.05"
+    algorithm: "Separable natural evolution strategy, 400,000 generations, population 52"
+    impl: {lib: {local: GPUMD}, comment: "NEP3"}
+    sims: [MolecularDynamics]
+runs:
+  bpnn1: {label: "BPNN1: revPBE0-D3 water BPNN of Ref. 1 (as distributed)", method: HDNNP, dataset: set1, model: "BPNN1 revPBE0-D3 water (Ref. 1)"}
+  nep4: {label: "NEP of Ref. 4 (as distributed)", method: NEP, model: "NEP revPBE0-D3 water (Ref. 4)"}
+  dp: {label: "DP model trained on SET2", method: DeePMD, dataset: set2, settings: {cutoffRadius: {v: 6, loc: "Main text"}, learningRate: {v: 0.001, loc: "SI S5 (initial)"}}, model: "DP revPBE0-D3 water/ice (SET2)"}
+  bpnn2: {label: "BPNN2 trained on SET2", method: HDNNP, dataset: set2, settings: {numLayers: {v: 2, loc: "SI S5"}, numEpochs: {v: 200, loc: "SI S5"}}, model: "BPNN2 revPBE0-D3 water (SET2)"}
+  bpnn3: {label: "BPNN3 trained on SET3", method: HDNNP, dataset: set3, settings: {numLayers: {v: 2, loc: "SI S5"}, numEpochs: {v: 200, loc: "SI S5"}}, model: "BPNN3 revPBE0-D3 water (SET3)"}
+  nep3: {label: "NEP trained on SET3", method: NEP, dataset: set3, settings: {cutoffRadius: {v: 8, loc: "SI S6.1"}, angularCutoff: {v: 6, loc: "SI S6.1"}, batchSize: {v: 25, loc: "SI S6.1"}}, model: "NEP revPBE0-D3 water/ice (SET3)"}
+results:
+  - {key: bpnn1-liq, model: bpnn1, material: liq, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 liquid water configurations (400 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 1.41, meV/atom, "test energy RMSE on liquid water: BPNN1 (Ref. 1, trained on SET1)", "Fig. S6"], [RMSE, Force, 56.46, meV/A, "test force-component RMSE on liquid water: BPNN1 (Ref. 1, trained on SET1)", "Fig. S6"]]}
+  - {key: bpnn1-ice, model: bpnn1, material: ice, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 ice Ih configurations (400 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.58, meV/atom, "test energy RMSE on ice Ih: BPNN1 (Ref. 1, trained on SET1)", "Fig. S6"], [RMSE, Force, 50.1, meV/A, "test force-component RMSE on ice Ih: BPNN1 (Ref. 1, trained on SET1)", "Fig. S6"]]}
+  - {key: bpnn3-liq, model: bpnn3, material: liq, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 liquid water configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "test energy RMSE on liquid water: BPNN3 (SET3)", "SI S4; Fig. S6"], [RMSE, Force, 32.23, meV/A, "test force-component RMSE on liquid water: BPNN3 (SET3)", "SI S4; Fig. S6"]]}
+  - {key: bpnn3-ice, model: bpnn3, material: ice, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 ice Ih configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.24, meV/atom, "test energy RMSE on ice Ih: BPNN3 (SET3)", "SI S4; Fig. S6"], [RMSE, Force, 40.47, meV/A, "test force-component RMSE on ice Ih: BPNN3 (SET3)", "SI S4; Fig. S6"]]}
+  - {key: dp-liq, model: dp, material: liq, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 liquid water configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.7, meV/atom, "test energy RMSE on liquid water: DP (SET2)", "Fig. S6"], [RMSE, Force, 30.59, meV/A, "test force-component RMSE on liquid water: DP (SET2)", "Fig. S6"]]}
+  - {key: dp-ice, model: dp, material: ice, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 ice Ih configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.33, meV/atom, "test energy RMSE on ice Ih: DP (SET2)", "Fig. S6"], [RMSE, Force, 23.61, meV/A, "test force-component RMSE on ice Ih: DP (SET2)", "Fig. S6"]]}
+  - {key: nep4-liq, model: nep4, material: liq, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 liquid water configurations (400 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 1.82, meV/atom, "test energy RMSE on liquid water: NEP of Ref. 4", "Fig. S7"], [RMSE, Force, 51.44, meV/A, "test force-component RMSE on liquid water: NEP of Ref. 4", "Fig. S7"]]}
+  - {key: nep4-ice, model: nep4, material: ice, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 ice Ih configurations (400 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 1.01, meV/atom, "test energy RMSE on ice Ih: NEP of Ref. 4", "Fig. S7"], [RMSE, Force, 46.37, meV/A, "test force-component RMSE on ice Ih: NEP of Ref. 4", "Fig. S7"]]}
+  - {key: nep3-liq, model: nep3, material: liq, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 liquid water configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.57, meV/atom, "test energy RMSE on liquid water: NEP trained on SET3", "Fig. S8"], [RMSE, Force, 37.34, meV/A, "test force-component RMSE on liquid water: NEP trained on SET3", "Fig. S8"]]}
+  - {key: nep3-ice, model: nep3, material: ice, role: test, eval_data: {label: "Independent NpT AIMD test set at 300 K, 1 bar: 50 ice Ih configurations (800 Ry cutoff)", location: "SI S1.3"}, metrics: [[RMSE, Energy, 0.26, meV/atom, "test energy RMSE on ice Ih: NEP trained on SET3", "Fig. S8"], [RMSE, Force, 28.84, meV/A, "test force-component RMSE on ice Ih: NEP trained on SET3", "Fig. S8"]]}
+  - {key: nep3-train, model: nep3, material: liq, role: training, eval_data: {label: "Full SET3 training set (liquid and ice)", location: "SI S6.1"}, metrics: [[RMSE, Energy, 0.455, meV/atom, "training energy RMSE on SET3: NEP (SET3)", "SI S6.1"], [RMSE, Force, 51.52, meV/A, "training force RMSE on SET3: NEP (SET3)", "SI S6.1"]]}
+gaps:
+  - "BPNN2 has no test errors (it is unstable in extended NpT runs). The training-set result of the SET3 NEP covers liquid and ice and is attached to the liquid material. The BPNN cutoff is given as 12 bohr and not converted."
