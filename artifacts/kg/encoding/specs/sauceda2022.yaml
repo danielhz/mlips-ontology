@@ -1,0 +1,67 @@
+id: sauceda2022
+source:
+  rank: 504
+  year: "2022"
+  first_author: "Huziel E. Sauceda"
+  title: "BIGDML—Towards accurate quantum machine learning force fields for materials"
+  venue: "Nature Communications"
+  doi: "10.1038/s41467-022-31093-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2106.04229v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "4fa74c60325d8944449b3b1c6a39f4c9e6a4bdd7fe4d9d346d485afd3e9d03f0"
+study_label: "Sauceda et al. (2022): BIGDML, Bravais-inspired gradient-domain machine learning force fields for periodic materials and interfaces"
+scope: |
+  Encoding scope: BIGDML models (sGDML extended with periodic global
+  Coulomb-matrix descriptors and translational/Bravais symmetries) for
+  graphene, Pd, Na, Au, H in Pd, Pd1/MgO(100) and benzene on graphene,
+  each trained on at most about 100 AIMD configurations. Errors are given
+  only as approximate values or learning curves; phonons, diffusivities
+  and PIMD results are properties.
+materials:
+  gr: {label: "Graphene (5x5 supercell)", class: "2D material"}
+  pd: {label: "Bulk Pd (fcc, 3x3x3 supercell)", class: "Metals"}
+  na: {label: "Bulk Na (bcc, 3x3x3 supercell)", class: "Metals"}
+  au: {label: "Bulk Au (fcc, 3x3x3 supercell)", class: "Metals"}
+  hpd: {label: "H interstitial in Pd (32 Pd + 1 H)", class: "Metals"}
+  pdmgo: {label: "Single Pd atom on MgO(100) (2x2, three layers)", class: "Oxides"}
+  bzgr: {label: "Benzene adsorbed on graphene", class: "2D material"}
+reference:
+  qe-gr: {type: DFT, code: QuantumESPRESSO, xc: PBE, pp: Ultrasoft, comment: "40 Ry, 3x3x1 Monkhorst-Pack"}
+  qe-metal: {type: DFT, code: QuantumESPRESSO, xc: PBE, comment: "3x3x3 Monkhorst-Pack, spin-polarized for bulk metals"}
+  qe-mgo: {type: DFT, code: QuantumESPRESSO, xc: PBE, comment: "50 Ry, Gamma point"}
+  aims: {type: DFT, code: FHIaims, xc: PBE, comment: "All-electron PBE with many-body dispersion (MBD)"}
+  unstated: {type: DFT, comment: "Reference for Au not described in the Methods"}
+sampling:
+  s-gr: {label: "Graphene (5x5 supercell): AIMD at 500 K, 10,000 steps of 0.5 fs"}
+  s-pd: {label: "Bulk Pd (fcc, 3x3x3 supercell): AIMD at 500 K and 1000 K, 1 fs steps"}
+  s-na: {label: "Bulk Na (bcc, 3x3x3 supercell): AIMD at 300 K, 1 fs steps"}
+  s-au: {label: "Bulk Au (fcc, 3x3x3 supercell): not described in the Methods"}
+  s-hpd: {label: "H interstitial in Pd (32 Pd + 1 H): AIMD at 1000 K for 6 ps, 1 fs steps"}
+  s-pdmgo: {label: "Single Pd atom on MgO(100) (2x2, three layers): AIMD at 500 K, 10,000 steps of 1 fs"}
+  s-bzgr: {label: "Benzene adsorbed on graphene: AIMD at 500 K, 15,000 steps of 1 fs"}
+datasets:
+  d-gr: {label: "Graphene (5x5 supercell) AIMD configurations", materials: [gr], properties: [Energy, Forces], provenance: InHouse, calc: qe-gr, sampling: [s-gr]}
+  d-pd: {label: "Bulk Pd (fcc, 3x3x3 supercell) AIMD configurations", materials: [pd], properties: [Energy, Forces], provenance: InHouse, calc: qe-metal, sampling: [s-pd]}
+  d-na: {label: "Bulk Na (bcc, 3x3x3 supercell) AIMD configurations", materials: [na], properties: [Energy, Forces], provenance: InHouse, calc: qe-metal, sampling: [s-na]}
+  d-au: {label: "Bulk Au (fcc, 3x3x3 supercell) AIMD configurations", materials: [au], properties: [Energy, Forces], provenance: InHouse, calc: unstated, sampling: [s-au]}
+  d-hpd: {label: "H interstitial in Pd (32 Pd + 1 H) AIMD configurations", materials: [hpd], properties: [Energy, Forces], provenance: InHouse, calc: qe-metal, sampling: [s-hpd]}
+  d-pdmgo: {label: "Single Pd atom on MgO(100) (2x2, three layers) AIMD configurations", materials: [pdmgo], properties: [Energy, Forces], provenance: InHouse, calc: qe-mgo, sampling: [s-pdmgo]}
+  d-bzgr: {label: "Benzene adsorbed on graphene AIMD configurations", materials: [bzgr], properties: [Energy, Forces], provenance: InHouse, calc: aims, sampling: [s-bzgr]}
+methods:
+  BIGDML:
+    loss: "Gradient-domain Gaussian process on forces with energy integration"
+    algorithm: "Closed-form kernel regression with periodic Coulomb-matrix descriptor and Bravais/translational permutation symmetries"
+    impl: {lib: {local: sGDML}, comment: "ASE calculator; i-PI interface for MD and PIMD"}
+    sims: [MolecularDynamics, PhononCalculation, NudgedElasticBand]
+runs:
+  b-gr: {label: "BIGDML for graphene (5x5 supercell)", method: BIGDML, dataset: d-gr, model: "BIGDML Graphene (5x5 supercell)"}
+  b-pd: {label: "BIGDML for bulk pd (fcc, 3x3x3 supercell)", method: BIGDML, dataset: d-pd, model: "BIGDML Bulk Pd (fcc, 3x3x3 supercell)"}
+  b-na: {label: "BIGDML for bulk na (bcc, 3x3x3 supercell)", method: BIGDML, dataset: d-na, model: "BIGDML Bulk Na (bcc, 3x3x3 supercell)"}
+  b-au: {label: "BIGDML for bulk au (fcc, 3x3x3 supercell)", method: BIGDML, dataset: d-au, model: "BIGDML Bulk Au (fcc, 3x3x3 supercell)"}
+  b-hpd: {label: "BIGDML for h interstitial in pd (32 pd + 1 h)", method: BIGDML, dataset: d-hpd, model: "BIGDML H interstitial in Pd (32 Pd + 1 H)"}
+  b-pdmgo: {label: "BIGDML for single pd atom on mgo(100) (2x2, three layers)", method: BIGDML, dataset: d-pdmgo, model: "BIGDML Single Pd atom on MgO(100) (2x2, three layers)"}
+  b-bzgr: {label: "BIGDML for benzene adsorbed on graphene", method: BIGDML, dataset: d-bzgr, model: "BIGDML Benzene adsorbed on graphene"}
+results: []
+gaps:
+  - "Errors are stated only approximately (e.g. graphene with 100 samples: about 1 meV (0.02 meV/atom) energy and about 6 meV/A force MAE; Pd about 10 meV/A with about 70 samples) or as learning curves (Figs. 2-3); not encoded. Phonon RMSEs (0.85, 0.35, 0.38 meV) are properties."

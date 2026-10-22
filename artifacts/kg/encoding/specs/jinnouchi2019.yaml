@@ -1,0 +1,49 @@
+id: jinnouchi2019
+source:
+  rank: 505
+  year: "2019"
+  first_author: "Ryosuke Jinnouchi"
+  title: "Phase Transitions of Hybrid Perovskites Simulated by Machine-Learning Force Fields Trained on the Fly with Bayesian Inference"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.122.225701"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1903.09613v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "4df858d4155fb32753904feda5c2c705efb73f19476b660401b434a951f533a2"
+study_label: "Jinnouchi et al. (2019): on-the-fly machine-learning force fields with Bayesian inference in VASP, applied to phase transitions of hybrid and inorganic lead-halide perovskites"
+scope: |
+  Encoding scope: the on-the-fly MLFF scheme (GAP-variant kernel
+  regression on SOAP-variant descriptors, Bayesian error deciding when
+  to run first-principles calculations, integrated in VASP) and its
+  force fields for MAPbI3, CsPbI3 and other ABX3 perovskites (A = Cs, Fr;
+  X = I, Br, Cl). The only accuracy figures (2.6 meV/atom, 0.07 eV/A,
+  0.82 kbar) are not named as RMSE or MAE in the text read. Lattice
+  constants, transition temperatures and order parameters are
+  properties.
+materials:
+  mapbi3: {label: "MAPbI3 (orthorhombic, tetragonal, cubic)", formula: CH3NH3PbI3, class: "Hybrid organic-inorganic perovskite"}
+  cspbi3: {label: "CsPbI3", formula: CsPbI3, class: "Inorganic crystals"}
+  abx3: {label: "Inorganic perovskites ABX3 (A = Cs or Fr, B = Pb, X = I, Br or Cl)", class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, comment: "Meta-GGA functional of Ref. 27 (not named in the text read); training in 2x2x2 unit cells"}
+sampling:
+  otf: {label: "On-the-fly sampling during NPT MD in all three phases: first-principles calculations only when the Bayesian force error exceeds an adaptive threshold (99% skipped)"}
+datasets:
+  mapbi3: {label: "MAPbI3 on-the-fly training structures", materials: [mapbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [otf]}
+  cspbi3: {label: "CsPbI3 on-the-fly training structures", materials: [cspbi3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [otf]}
+  abx3: {label: "ABX3 on-the-fly training structures", materials: [abx3], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vasp, sampling: [otf]}
+methods:
+  VASP-MLFF:
+    loss: "Bayesian linear regression on energies, forces and stresses; sigma_v and sigma_w from the evidence approximation"
+    algorithm: "On-the-fly learning with Bayesian error estimates"
+    impl: {lib: VASP}
+    sims: [MolecularDynamics]
+runs:
+  mlff-mapbi3: {label: "On-the-fly MLFF for MAPbI3", method: VASP-MLFF, dataset: mapbi3, model: "VASP on-the-fly MLFF MAPbI3 (2019)"}
+  mlff-cspbi3: {label: "On-the-fly MLFF for CsPbI3", method: VASP-MLFF, dataset: cspbi3, model: "VASP on-the-fly MLFF CsPbI3 (2019)"}
+  mlff-abx3: {label: "On-the-fly MLFFs for other ABX3 perovskites", method: VASP-MLFF, dataset: abx3, model: "VASP on-the-fly MLFFs ABX3 (2019)"}
+results: []
+resources: |
+  During training 99% of the first-principles calculations are skipped, reducing the computational time by almost a factor of 100 (p. 2).
+gaps:
+  - "MAPbI3 accuracy of 2.6 meV/atom, 0.07 eV/A and 0.82 kbar is described as 'near-FP quality' without naming the metric (details in SM Section C); not encoded. The meta-GGA functional is not named in the text read."
