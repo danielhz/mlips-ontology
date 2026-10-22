@@ -1,0 +1,60 @@
+id: muller2021
+source:
+  rank: 565
+  year: "2021"
+  first_author: "E Muller"
+  title: "Machine learning potentials for complex aqueous systems made simple"
+  venue: "Spiral (Imperial College London)"
+  doi: "10.1073/pnas.2110077118"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2106.00048v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b93e36e21c24032157f10c124095316f902de8f310279070b1c7106efa61dddf"
+study_label: "Schran et al. (2021): machine learning potentials for complex aqueous systems made simple, committee NNPs from short AIMD with automated active learning"
+scope: |
+  Encoding scope: six committee NNPs (8 n2p2 Behler-Parrinello members,
+  two hidden layers of 20 neurons, 12 bohr cutoff) trained by query by
+  committee on about 300 structures selected from AIMD trajectories of
+  aqueous systems with different reference functionals. Accuracy is
+  summarized as RDF, VDOS and force scores (Fig. 2); species-resolved
+  force RMSEs appear only in figure panels and are not encoded.
+materials:
+  fluoride: {label: "Fluoride ion in water (64 H2O)", class: "Molecular liquid"}
+  sulfate: {label: "Sulfate ion in water (64 H2O)", class: "Molecular liquid"}
+  cnt: {label: "Water in a (12,12) carbon nanotube", class: "Solid-liquid interface"}
+  bnnt: {label: "Water in a (12,12) hexagonal boron nitride nanotube", class: "Solid-liquid interface"}
+  mos2: {label: "Water confined between MoS2 sheets", class: "Solid-liquid interface"}
+  tio2: {label: "Water film on rutile TiO2(110)", class: "Solid-liquid interface"}
+reference:
+  rpbe0: {type: DFT, code: {local: CP2K}, xc: {local: revPBE0-D3}, comment: "CP2K, 400 Ry, TZV2P, GTH, ADMM"}
+  blyp: {type: DFT, code: {local: CP2K}, xc: {local: BLYP-D3}, comment: "CP2K, 280 Ry, TZV2P, GTH"}
+  pbed3: {type: DFT, code: {local: CP2K}, xc: {local: PBE-D3}, comment: "CP2K, 460 Ry, DZVP-MOLOPT, GTH"}
+  optb88: {type: DFT, code: {local: CP2K}, xc: {local: optB88-vdW}, comment: "CP2K, 550 Ry, DZVP-MOLOPT, GTH"}
+  optb88tio: {type: DFT, code: {local: CP2K}, xc: {local: optB88-vdW}, comment: "CP2K, 400 Ry, DZVP-MOLOPT, GTH"}
+sampling:
+  qbc: {label: "15 query-by-committee steps on 2,000 random AIMD structures per step, 20 highest mean-force-disagreement structures added each step (about 300 in total)"}
+datasets:
+  d-fluoride: {label: "Fluoride ion in water (64 H2O): QbC-selected AIMD structures (about 300)", materials: [fluoride], properties: [Energy, Forces], provenance: InHouse, calc: rpbe0, sampling: [qbc]}
+  d-sulfate: {label: "Sulfate ion in water (64 H2O): QbC-selected AIMD structures (about 300)", materials: [sulfate], properties: [Energy, Forces], provenance: InHouse, calc: blyp, sampling: [qbc]}
+  d-cnt: {label: "Water in a (12,12) carbon nanotube: QbC-selected AIMD structures (about 300)", materials: [cnt], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [qbc]}
+  d-bnnt: {label: "Water in a (12,12) hexagonal boron nitride nanotube: QbC-selected AIMD structures (about 300)", materials: [bnnt], properties: [Energy, Forces], provenance: InHouse, calc: pbed3, sampling: [qbc]}
+  d-mos2: {label: "Water confined between MoS2 sheets: QbC-selected AIMD structures (about 300)", materials: [mos2], properties: [Energy, Forces], provenance: InHouse, calc: optb88, sampling: [qbc]}
+  d-tio2: {label: "Water film on rutile TiO2(110): QbC-selected AIMD structures (about 300)", materials: [tio2], properties: [Energy, Forces], provenance: InHouse, calc: optb88tio, sampling: [qbc]}
+methods:
+  HDNNP:
+    hp: [numLayers, numEpochs]
+    loss: "Energies and forces"
+    algorithm: "Committee of 8 (90% subsampling each), parallel multistream adaptive global extended Kalman filter"
+    impl: {lib: {local: n2p2}, comment: "AML active-learning package; automatically generated symmetry functions with 12 bohr cutoff"}
+    sims: [MolecularDynamics]
+runs:
+  cnnp-fluoride: {label: "C-NNP for fluoride ion in water (64 h2o)", method: HDNNP, dataset: d-fluoride, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Fluoride ion in water (64 H2O)"}
+  cnnp-sulfate: {label: "C-NNP for sulfate ion in water (64 h2o)", method: HDNNP, dataset: d-sulfate, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Sulfate ion in water (64 H2O)"}
+  cnnp-cnt: {label: "C-NNP for water in a (12,12) carbon nanotube", method: HDNNP, dataset: d-cnt, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Water in a (12,12) carbon nanotube"}
+  cnnp-bnnt: {label: "C-NNP for water in a (12,12) hexagonal boron nitride nanotube", method: HDNNP, dataset: d-bnnt, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Water in a (12,12) hexagonal boron nitride nanotube"}
+  cnnp-mos2: {label: "C-NNP for water confined between mos2 sheets", method: HDNNP, dataset: d-mos2, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Water confined between MoS2 sheets"}
+  cnnp-tio2: {label: "C-NNP for water film on rutile tio2(110)", method: HDNNP, dataset: d-tio2, settings: {numLayers: {v: 2, loc: "SI (C-NNP models)"}, numEpochs: {v: 50, loc: "SI (final models)"}}, model: "C-NNP Water film on rutile TiO2(110)"}
+results: []
+gaps:
+  - "Force RMSEs per species (e.g. 55.8, 29.7, 56.8 meV/A for the fluoride system) are printed in figure panels whose species labels do not extract unambiguously; RDF/VDOS/force scores are not schema metrics. Training-set sizes are approximate (about 300); no n."
+  - "The manifest lists the first author as 'E Muller'; the paper and CrossRef list Christoph Schran first."

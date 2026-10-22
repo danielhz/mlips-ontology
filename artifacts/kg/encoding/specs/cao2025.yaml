@@ -1,0 +1,61 @@
+id: cao2025
+source:
+  rank: 564
+  year: "2025"
+  first_author: "Yifan Cao"
+  title: "Capturing short-range order in high-entropy alloys with machine learning potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01722-2"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2401.06622v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8a2e9e5ba3bde3ef6a085ae6fd225d4c66cba27808acb4c2e71ea75bf00a3583"
+study_label: "Cao, Sheriff and Freitas (2025): capturing short-range order in the CrCoNi high-entropy alloy with ensembles of moment tensor potentials"
+scope: |
+  Encoding scope: MTP ensembles (5 A cutoff; capacities levmax 6-20;
+  20 independent potentials per setting) trained on training sets TS-0
+  to TS-5 and the final TS-f for CrCoNi; the liquid energy RMSEs stated
+  for TS-0 and TS-3. Warren-Cowley parameters, liquid stability,
+  stacking-fault and phase-stability results are properties.
+materials:
+  crconi: {label: "CrCoNi medium-entropy alloy (fcc, hcp, liquid; random and short-range ordered)", class: "High-entropy alloys"}
+reference:
+  dft: {type: DFT, comment: "DFT settings of Ref. 23 (not restated in the text read)"}
+sampling:
+  s-ts0: {label: "TS-0 (training set of Ref. 23 without chemical sampling; adapted from the NbMoTaW approach)"}
+  s-ts1: {label: "TS-1 (chemically random equiatomic fcc supercells)"}
+  s-ts2: {label: "TS-2 (fcc with DFT Monte Carlo SRO configurations)"}
+  s-ts3: {label: "TS-3 (fcc with SRO plus liquid)"}
+  s-ts4: {label: "TS-4 (fcc with SRO, smaller)"}
+  s-ts5: {label: "TS-5 (fcc and hcp with SRO)"}
+  s-tsf: {label: "TS-f (final training set combining the successful elements)"}
+datasets:
+  d-ts0: {label: "TS-0 (83,970 atoms; 68% fcc, 32% liquid)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts0]}
+  d-ts1: {label: "TS-1 (54,540 atoms)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts1]}
+  d-ts2: {label: "TS-2 (54,540 atoms)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts2]}
+  d-ts3: {label: "TS-3 (108,684 atoms; 50% fcc, 50% liquid)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts3]}
+  d-ts4: {label: "TS-4 (36,720 atoms)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts4]}
+  d-ts5: {label: "TS-5 (73,440 atoms; 50% fcc, 50% hcp)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-ts5]}
+  d-tsf: {label: "TS-f (Table 1)", materials: [crconi], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: dft, sampling: [s-tsf]}
+methods:
+  MTP:
+    hp: [cutoffRadius, momentLevel]
+    loss: "Energies, forces and stresses"
+    algorithm: "Ensembles of identically trained potentials (20 per setting)"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, MonteCarlo]
+runs:
+  mtp-ts0: {label: "MTP ensemble trained on TS-0", method: MTP, dataset: d-ts0, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-0"}
+  mtp-ts1: {label: "MTP ensemble trained on TS-1", method: MTP, dataset: d-ts1, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-1"}
+  mtp-ts2: {label: "MTP ensemble trained on TS-2", method: MTP, dataset: d-ts2, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-2"}
+  mtp-ts3: {label: "MTP ensemble trained on TS-3", method: MTP, dataset: d-ts3, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-3"}
+  mtp-ts4: {label: "MTP ensemble trained on TS-4", method: MTP, dataset: d-ts4, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-4"}
+  mtp-ts5: {label: "MTP ensemble trained on TS-5", method: MTP, dataset: d-ts5, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-5"}
+  mtp-tsf: {label: "MTP ensemble trained on TS-f", method: MTP, dataset: d-tsf, settings: {cutoffRadius: {v: 5, loc: "Results"}}, model: "MTP CrCoNi TS-f"}
+results:
+  - {key: ts0-liq1800, model: mtp-ts0, material: crconi, role: external, eval_data: {label: "Liquid CrCoNi configurations at 1800 K", location: "Results (liquid phase)"}, metrics: [[RMSE, Energy, 5.3, meV/atom, "energy RMSE on liquid CrCoNi at 1800 K: MTP TS-0", "Results"]]}
+  - {key: ts3-liq1800, model: mtp-ts3, material: crconi, role: external, eval_data: {label: "Liquid CrCoNi configurations at 1800 K", location: "Results (liquid phase)"}, metrics: [[RMSE, Energy, 5.6, meV/atom, "energy RMSE on liquid CrCoNi at 1800 K: MTP TS-3", "Results"]]}
+  - {key: ts0-liq2684, model: mtp-ts0, material: crconi, role: external, eval_data: {label: "Liquid CrCoNi configurations at 2684 K", location: "Results (liquid phase)"}, metrics: [[RMSE, Energy, 7.6, meV/atom, "energy RMSE on liquid CrCoNi at 2684 K: MTP TS-0", "Results"]]}
+  - {key: ts3-liq2684, model: mtp-ts3, material: crconi, role: external, eval_data: {label: "Liquid CrCoNi configurations at 2684 K", location: "Results (liquid phase)"}, metrics: [[RMSE, Energy, 6.6, meV/atom, "energy RMSE on liquid CrCoNi at 2684 K: MTP TS-3", "Results"]]}
+gaps:
+  - "Training-set sizes are given in atoms (Table 1), not configurations; no n. The liquid RMSEs are not attributed to a specific ensemble member or capacity. Energy errors versus capacity and cost (Figs. 1c, 4) are figure-only."
