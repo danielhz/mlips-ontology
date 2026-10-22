@@ -1,0 +1,41 @@
+id: lebeda2026
+source:
+  rank: 270
+  year: "2026"
+  first_author: "M. Lebeda"
+  title: "Revealing interstitial energetics in Ti-23Nb-0.7Ta-2Zr gum metal base alloy via universal machine learning interatomic potentials"
+  venue: "Journal of Materials Research and Technology"
+  doi: "10.1016/j.jmrt.2026.02.204"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2512.05568v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6cb8f2395e45c4d31344074272040f193ca0ba86fbd87916303fb0e5cef285ec"
+study_label: "Lebeda et al. (2026): interstitial C, N, O and H energetics in Ti-23Nb-0.7Ta-2Zr gum metal with universal MLIPs"
+scope: |
+  Encoding scope: three pretrained universal MLIPs (MACE-MATPES-PBE-0,
+  Orb-v3, SevenNet-0) used for geometry optimisation of 6,750 interstitial
+  configurations in three 250-atom SQS cells of the Ti-23Nb-0.7Ta-2Zr gum
+  metal base alloy, with DFT checks of six O and six H configurations. The
+  DFT comparisons are given only in figures (energy orderings and 4.2-4.8 eV
+  energy differences for H), so no error metric is encoded.
+materials:
+  gum: {label: "Ti-23Nb-0.7Ta-2Zr gum metal base alloy (bcc SQS, 250 atoms) with one C, N, O or H interstitial", formula: "Ti74Nb23Ta0.8Zr2", class: "Multicomponent bcc titanium alloy with interstitials"}
+methods:
+  MACE: {sims: [GeometryOptimization]}
+  ORB: {sims: [GeometryOptimization]}
+  NequIP: {sims: [GeometryOptimization]}
+runs:
+  mace-matpes: {label: "MACE-MATPES-PBE-0 as distributed", method: MACE, model: "MACE-MATPES-PBE-0"}
+  orb-v3: {label: "Orb-v3 as distributed (checkpoint not stated)", method: ORB, model: "Orb-v3"}
+  sevennet-0: {label: "SevenNet-0 as distributed (version not stated)", method: NequIP, model: "SevenNet-0"}
+results: []
+timings:
+  - {model: orb-v3, system: "Geometry optimisation of a 250-atom SQS cell with one interstitial (positions and cell, BFGS, fmax 0.005 eV/A)", atoms: 251, value: 1, unit: "min per geometry optimisation (typically less than)", per_atom_us: null, hardware: "NVIDIA RTX 4090 GPU: typically less than 1 min per full optimisation with the uMLIPs (DFT up to 24 h)", result: null, location: "Sec. 4.3"}
+resources: |
+  A full uMLIP geometry optimisation typically took less than 1 minute on
+  an RTX 4090 GPU, against up to 24 hours for the corresponding DFT
+  optimisation (VASP, PBE, 620 eV, Gamma point), a speed-up of more than
+  1400. The timing applies to all three uMLIPs; it is recorded once.
+gaps:
+  - "The Orb-v3 checkpoint and the SevenNet-0 version are not stated, so the three universal models are paper-local runs; SevenNet is a NequIP implementation."
+  - "DFT validation (Figs. 6-8) compares energy orderings and relative energies of six O and six H configurations graphically; no MAE or RMSE is stated."

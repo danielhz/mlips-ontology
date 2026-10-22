@@ -1,0 +1,58 @@
+id: kim2025forgetting
+source:
+  rank: 269
+  year: "2025"
+  first_author: "Jisu Kim"
+  title: "An efficient forgetting-aware fine-tuning framework for pretrained universal machine-learning interatomic potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01895-w"
+  kg_relevance: "Software/implementation"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "ae77c92fc8c6a4af26d0282840e74fb6df0073db36f7053ef438bcbf09ad606d"
+study_label: "Kim et al. (2025): forgetting-aware fine-tuning (EWC, Replay, reEWC) of SevenNet-0 for Li solid-state electrolytes"
+scope: |
+  Encoding scope: SevenNet-0 (11 July 2024, MPtrj) fine-tuned on Li6PS5Cl
+  (LPSC) AIMD data with six strategies (Vanilla, layer freezing, lower
+  learning rate, Replay, EWC, reEWC), evaluated on argyrodite and
+  non-argyrodite Li solid-electrolyte AIMD test sets and in MD
+  diffusivities. Energy/force MAEs and softening scales are shown only as
+  violin plots and composite losses; the validation RMSEs are stated only
+  approximately, so no error metric is encoded.
+materials:
+  lpsc: {label: "Li6PS5Cl argyrodite (52-atom unit cell, 50% Cl@4c)", formula: "Li6PS5Cl", class: "Argyrodite Li solid electrolyte"}
+  argyrodites: {label: "126 argyrodite compounds Li(24+x)M4S20X4 (M = Si, Ge, Sn, P, As, Sb; X = Cl, Br, I) with five S/X disorder levels", class: "Argyrodite Li solid electrolytes"}
+  li-sse: {label: "Nine non-argyrodite Li solid electrolytes (LLZO, LATP, LGPS, Li7P3S11, Li3YCl6, Li3YBr6, Li3N, Li9S3N, LiBH4)", class: "Li solid electrolytes (oxides, sulfides, halides, nitrides, hydrides)"}
+  mptrj: {label: "Materials Project relaxation trajectories (inorganic crystals)", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, kpoints: "Gamma point for AIMD", comment: "MPtrj-consistent settings; cutoff and k-points converged to 10 meV/atom, 0.02 eV/A and 10 kbar."}
+sampling:
+  lpsc-aimd: {label: "NVT AIMD of LPSC at 600 and 1000 K, 100 ps, 2 fs step, 500 structures per temperature sampled every 200 fs"}
+datasets:
+  lpsc: {label: "LPSC fine-tuning set (1,000 structures, 9:1 training/validation)", materials: [lpsc], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1000, loc: "Sec. 2.2"}, calc: pbe, sampling: [lpsc-aimd]}
+  replay: {label: "Replay set: random 10% of MPtrj", materials: [mptrj], properties: [Energy, Forces, Stresses], provenance: Published}
+external_models: [SevenNet-0]
+methods:
+  NequIP:
+    hp: [learningRate, numEpochs]
+    loss: "Huber loss (delta 0.01) on per-atom energy, forces (weight 1) and stress (weight 0.01); EWC adds a diagonal-Fisher penalty (lambda 10 for EWC, 1e5 for reEWC)"
+    algorithm: "Adam with two cycles of linear warm-up and cosine annealing; Replay alternates mini-batches from the fine-tuning and Replay sets"
+    impl: {lib: {local: "SevenNet", comment: "SevenNet implementation of NequIP; MD with LAMMPS"}}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  vanilla: {label: "SevenNet-0 after Vanilla fine-tuning on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}, learningRate: {v: 0.0001, loc: "Sec. 4.2 (peak of the schedule)"}}, model: "SevenNet-0 LPSC Vanilla fine-tuning model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+  freeze: {label: "SevenNet-0 after layer-freezing fine-tuning (output block only) on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}, learningRate: {v: 0.0001, loc: "Sec. 4.2 (peak of the schedule)"}}, model: "SevenNet-0 LPSC layer-freezing fine-tuning (output block only) model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+  lowlr: {label: "SevenNet-0 after lower-learning-rate fine-tuning (one tenth of the learning rate) on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}}, model: "SevenNet-0 LPSC lower-learning-rate fine-tuning (one tenth of the learning rate) model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+  replay: {label: "SevenNet-0 after Replay fine-tuning on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}, learningRate: {v: 0.0001, loc: "Sec. 4.2 (peak of the schedule)"}}, model: "SevenNet-0 LPSC Replay fine-tuning model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+  ewc: {label: "SevenNet-0 after EWC fine-tuning on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}, learningRate: {v: 0.0001, loc: "Sec. 4.2 (peak of the schedule)"}}, model: "SevenNet-0 LPSC EWC fine-tuning model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+  reewc: {label: "SevenNet-0 after reEWC (Replay + EWC) fine-tuning on LPSC", method: NequIP, dataset: lpsc, settings: {numEpochs: {v: 400, loc: "Sec. 4.2"}, learningRate: {v: 0.0001, loc: "Sec. 4.2 (peak of the schedule)"}}, model: "SevenNet-0 LPSC reEWC (Replay + EWC) fine-tuning model", base_model: {registry: SevenNet-0, relation: fine-tuned, location: "Sec. 2.2"}}
+results: []
+resources: |
+  The diagonal Fisher information matrix is computed once on 1,154,095
+  low-loss MPtrj configurations on 10 NVIDIA A100 (80 GB) GPUs in about 4 h
+  15 min (about 40 A100 GPU-hours). Replay and reEWC cost about twice the
+  CPU time of Vanilla and EWC fine-tuning (Table 1).
+gaps:
+  - "All accuracy results are figure-only (violin plots of energy and force MAEs and softening scales, Figs. 4 and 5; composite losses E_RMSE + F_RMSE + 0.01 S_RMSE, Figs. 2, 3, 12, 13). The text gives only approximate validation RMSEs for EWC and reEWC (about 1 meV/atom, 70 meV/A, 1.5 kbar), which are not encoded."
+  - "The lower-learning-rate run uses one tenth of the 0.0001 peak learning rate; since the paper does not restate the value, no learning rate is attached to it. Diffusivity MPE/MAPE values and the quasi-melting WMAE (Figs. 6, 7) are not error metrics of the schema."
+  - "The Replay and reEWC runs also train on the Replay set (10% of MPtrj, or a Li-focused set in Fig. 3); only the LPSC fine-tuning set is attached as their data set."

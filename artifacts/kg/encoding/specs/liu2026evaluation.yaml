@@ -1,0 +1,100 @@
+id: liu2026evaluation
+source:
+  rank: 274
+  year: "2026"
+  first_author: "Ryan Liu"
+  title: "From Evaluation to Design: Using Potential Energy Surface Smoothness Metrics to Guide Machine Learning Interatomic Potential Architectures"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2602.04861"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2602.04861v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "695944b622bcd5d236f8a4145160a3e9d08ecdaa70520980640fd3a6f057145d"
+study_label: "Liu et al. (2026): Bond Smoothness Characterization Test (BSCT) and the MinDScAIP architecture"
+scope: |
+  Encoding scope: the MinDScAIP attention-based MLIP introduced here,
+  trained on SPICE (MACE-OFF split) in the ablations of Table 2 (smoothness
+  designs, prediction heads, model sizes) with the MACE and GemNet-T
+  baselines, its per-subset SPICE test errors (Table 4), the MPtrj-trained
+  MinDScAIP-60M on Matbench Discovery (Table 5) and the inference
+  throughput benchmark (Table 6). The BSCT force-smoothness deviation (FSD),
+  NVE energy drift, F1, kappa_SRME and RMSD are not error metrics of the
+  schema and are not encoded; other models' Table 4 and Table 5 values are
+  quoted from the literature and leaderboard and are not encoded.
+materials:
+  spice: {label: "SPICE drug-like molecules, peptides, dimers and water clusters (MACE-OFF split)", class: "Organic molecules and molecular clusters"}
+  mptrj: {label: "Materials Project relaxation trajectories (inorganic crystals)", class: "Inorganic crystals"}
+  wbm: {label: "WBM test set of Matbench Discovery (inorganic crystals)", class: "Inorganic crystals"}
+  diamond: {label: "Diamond supercells (216 to 2,744 atoms)", formula: "C", class: "Elemental covalent solid", wikidata: Q623}
+datasets:
+  spice: {label: "SPICE training split of MACE-OFF", materials: [spice], properties: [Energy, Forces], provenance: Published}
+  mptrj: {label: "MPtrj", materials: [mptrj], properties: [Energy, Forces, Stresses], provenance: Published}
+methods:
+  MinDScAIP:
+    hp: [numFeatures, numLayers, numRadialBasis, cutoffRadius, batchSize, numEpochs]
+    loss: "Energy (weight 1) and force (weight 2; 4 when fine-tuning on MPtrj) MAE-type loss, stress weight 10 on MPtrj"
+    algorithm: "Weight decay, EMA 0.999, gradient clipping 100; MPtrj models pretrained with direct forces and DeNS, then fine-tuned with gradient forces"
+    impl: {lib: {local: "fairchem", comment: "Diff-kNN released in the fairchem repository"}}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+  MACE: {sims: [MolecularDynamics]}
+  GemNet: {sims: [MolecularDynamics]}
+  eSEN: {}
+runs:
+  m-wd: {label: "MinDScAIP on SPICE, weight decay 0.05", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (weight decay 0.05)"}
+  m-smear: {label: "MinDScAIP on SPICE, smearing scale 5", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (smearing scale 5)"}
+  m-temp: {label: "MinDScAIP on SPICE, attention temperature 10", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (attention temperature 10)"}
+  m-smeartemp: {label: "MinDScAIP on SPICE, smearing 5 and temperature 10 (Smear. & Temp.)", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (smearing 5 and temperature 10 (Smear. & Temp.))"}
+  m-direct: {label: "MinDScAIP on SPICE, direct-force head", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (direct-force head)"}
+  m-gradknn: {label: "MinDScAIP on SPICE, gradient forces with standard kNN", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (gradient forces with standard kNN)"}
+  m-large: {label: "MinDScAIP on SPICE, gradient forces with Diff-kNN, Large (60M; vanilla)", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 512, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (gradient forces with Diff-kNN, Large (60M; vanilla))"}
+  m-small: {label: "MinDScAIP on SPICE, gradient forces with Diff-kNN, Small (3.8M)", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 128, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (gradient forces with Diff-kNN, Small (3.8M))"}
+  m-medium: {label: "MinDScAIP on SPICE, gradient forces with Diff-kNN, Medium (15M)", method: MinDScAIP, dataset: spice, settings: {numFeatures: {v: 256, loc: "Table 7 (embedding dimension)"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 128, loc: "Table 7"}, numEpochs: {v: 100, loc: "Table 7"}}, model: "MinDScAIP SPICE model (gradient forces with Diff-kNN, Medium (15M))"}
+  mace-spice: {label: "MACE Large (4.7M) trained on SPICE, baseline", method: MACE, dataset: spice, model: "MACE Large (4.7M), SPICE"}
+  gemnet-t: {label: "GemNet-T trained on SPICE, baseline", method: GemNet, dataset: spice, model: "GemNet-T, SPICE"}
+  m-mptrj-60m: {label: "MinDScAIP-60M trained on MPtrj (final model, smearing 10, temperature 10)", method: MinDScAIP, dataset: mptrj, settings: {numFeatures: {v: 512, loc: "Table 7"}, numLayers: {v: 8, loc: "Table 7"}, numRadialBasis: {v: 128, loc: "Table 7"}, cutoffRadius: {v: 6, loc: "Table 7"}, batchSize: {v: 256, loc: "Table 7 (fine-tuning; 128 in pretraining)"}, numEpochs: {v: 40, loc: "Table 7 (fine-tuning; 60 in pretraining)"}}, model: "MinDScAIP-60M (MPtrj)"}
+  mace-mp-16m: {label: "MACE-MP-16M as distributed (timing comparison)", method: MACE, model: "MACE-MP-16M"}
+  esen-oam: {label: "eSEN-30M-OAM as distributed (timing comparison)", method: eSEN, model: "eSEN-30M-OAM"}
+results:
+  - {key: m-wd, model: m-wd, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.09, meV/atom, "SPICE test energy MAE: MinDScAIP weight decay 0.05", "Table 2"], [MAE, Force, 2.94, meV/A, "SPICE test force MAE: MinDScAIP weight decay 0.05", "Table 2"]]}
+  - {key: m-smear, model: m-smear, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.1, meV/atom, "SPICE test energy MAE: MinDScAIP smearing scale 5", "Table 2"], [MAE, Force, 2.86, meV/A, "SPICE test force MAE: MinDScAIP smearing scale 5", "Table 2"]]}
+  - {key: m-temp, model: m-temp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.1, meV/atom, "SPICE test energy MAE: MinDScAIP attention temperature 10", "Table 2"], [MAE, Force, 3.06, meV/A, "SPICE test force MAE: MinDScAIP attention temperature 10", "Table 2"]]}
+  - {key: m-smeartemp, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.12, meV/atom, "SPICE test energy MAE: MinDScAIP smearing 5 and temperature 10 (Smear. & Temp.)", "Table 2"], [MAE, Force, 2.94, meV/A, "SPICE test force MAE: MinDScAIP smearing 5 and temperature 10 (Smear. & Temp.)", "Table 2"]]}
+  - {key: m-direct, model: m-direct, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.15, meV/atom, "SPICE test energy MAE: MinDScAIP direct-force head", "Table 2"], [MAE, Force, 4.22, meV/A, "SPICE test force MAE: MinDScAIP direct-force head", "Table 2"]]}
+  - {key: m-gradknn, model: m-gradknn, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.08, meV/atom, "SPICE test energy MAE: MinDScAIP gradient forces with standard kNN", "Table 2"], [MAE, Force, 3.01, meV/A, "SPICE test force MAE: MinDScAIP gradient forces with standard kNN", "Table 2"]]}
+  - {key: m-large, model: m-large, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.09, meV/atom, "SPICE test energy MAE: MinDScAIP gradient forces with Diff-kNN, Large (60M; vanilla)", "Table 2"], [MAE, Force, 3.02, meV/A, "SPICE test force MAE: MinDScAIP gradient forces with Diff-kNN, Large (60M; vanilla)", "Table 2"]]}
+  - {key: m-small, model: m-small, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.23, meV/atom, "SPICE test energy MAE: MinDScAIP gradient forces with Diff-kNN, Small (3.8M)", "Table 2"], [MAE, Force, 6.63, meV/A, "SPICE test force MAE: MinDScAIP gradient forces with Diff-kNN, Small (3.8M)", "Table 2"]]}
+  - {key: m-medium, model: m-medium, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.12, meV/atom, "SPICE test energy MAE: MinDScAIP gradient forces with Diff-kNN, Medium (15M)", "Table 2"], [MAE, Force, 4.01, meV/A, "SPICE test force MAE: MinDScAIP gradient forces with Diff-kNN, Medium (15M)", "Table 2"]]}
+  - {key: mace-spice, model: mace-spice, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.79, meV/atom, "SPICE test energy MAE: MACE Large (4.7M)", "Table 2"], [MAE, Force, 14.3, meV/A, "SPICE test force MAE: MACE Large (4.7M)", "Table 2"]]}
+  - {key: gemnet-t, model: gemnet-t, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF held-out test set", registry: SPICE, location: "Table 2"}, metrics: [[MAE, Energy, 0.3, meV/atom, "SPICE test energy MAE: GemNet-T", "Table 2"], [MAE, Force, 7.11, meV/A, "SPICE test force MAE: GemNet-T", "Table 2"]]}
+  - {key: t4-1, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, PubChem subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.14, meV/atom, "SPICE PubChem test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 3.38, meV/A, "SPICE PubChem test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-2, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, DES370K Monomers subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.06, meV/atom, "SPICE DES370K Monomers test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 0.99, meV/A, "SPICE DES370K Monomers test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-3, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, DES370K Dimers subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.09, meV/atom, "SPICE DES370K Dimers test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 0.9, meV/A, "SPICE DES370K Dimers test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-4, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, Dipeptides subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.09, meV/atom, "SPICE Dipeptides test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 1.48, meV/A, "SPICE Dipeptides test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-5, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, Solvated amino acids subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.13, meV/atom, "SPICE Solvated amino acids test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 3.96, meV/A, "SPICE Solvated amino acids test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-6, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, Water subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.13, meV/atom, "SPICE Water test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 2.29, meV/A, "SPICE Water test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: t4-7, model: m-smeartemp, material: spice, role: test, eval_data: {label: "SPICE MACE-OFF test set, QMugs subset", registry: SPICE, location: "Table 4"}, metrics: [[MAE, Energy, 0.16, meV/atom, "SPICE QMugs test energy MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"], [MAE, Force, 2.86, meV/A, "SPICE QMugs test force MAE: MinDScAIP-60M Smear. & Temp.", "Table 4"]]}
+  - {key: mbd, model: m-mptrj-60m, material: wbm, role: external, eval_data: {label: "Matbench Discovery (WBM), leaderboard of 6 May 2026", location: "Table 5"}, metrics: [[MAE, Energy, 35, meV/atom, "Matbench Discovery MAE (0.035 eV/atom): MinDScAIP-60M", "Table 5"], [R2, Energy, 0.789, null, "Matbench Discovery R2: MinDScAIP-60M", "Table 5"]]}
+timings:
+  - {model: m-mptrj-60m, system: "Diamond supercell MD, 216 atoms", atoms: 216, value: 1.15, unit: "million steps per day", per_atom_us: 347.8, hardware: "One NVIDIA A100 80GB: 1.15 million steps/day at 216 atoms (MinDScAIP-60M)", result: null, location: "Table 6"}
+  - {model: m-mptrj-60m, system: "Diamond supercell MD, 512 atoms", atoms: 512, value: 0.51, unit: "million steps per day", per_atom_us: 330.9, hardware: "One NVIDIA A100 80GB: 0.51 million steps/day at 512 atoms (MinDScAIP-60M)", result: null, location: "Table 6"}
+  - {model: m-mptrj-60m, system: "Diamond supercell MD, 1000 atoms", atoms: 1000, value: 0.26, unit: "million steps per day", per_atom_us: 332.3, hardware: "One NVIDIA A100 80GB: 0.26 million steps/day at 1000 atoms (MinDScAIP-60M)", result: null, location: "Table 6"}
+  - {model: m-mptrj-60m, system: "Diamond supercell MD, 1728 atoms", atoms: 1728, value: 0.15, unit: "million steps per day", per_atom_us: 333.3, hardware: "One NVIDIA A100 80GB: 0.15 million steps/day at 1728 atoms (MinDScAIP-60M)", result: null, location: "Table 6"}
+  - {model: m-mptrj-60m, system: "Diamond supercell MD, 2744 atoms", atoms: 2744, value: 0.09, unit: "million steps per day", per_atom_us: 349.9, hardware: "One NVIDIA A100 80GB: 0.09 million steps/day at 2744 atoms (MinDScAIP-60M)", result: null, location: "Table 6"}
+  - {model: mace-mp-16m, system: "Diamond supercell MD, 216 atoms", atoms: 216, value: 1.49, unit: "million steps per day", per_atom_us: 268.5, hardware: "One NVIDIA A100 80GB: 1.49 million steps/day at 216 atoms (MACE-MP-16M)", result: null, location: "Table 6"}
+  - {model: mace-mp-16m, system: "Diamond supercell MD, 512 atoms", atoms: 512, value: 0.72, unit: "million steps per day", per_atom_us: 234.4, hardware: "One NVIDIA A100 80GB: 0.72 million steps/day at 512 atoms (MACE-MP-16M)", result: null, location: "Table 6"}
+  - {model: mace-mp-16m, system: "Diamond supercell MD, 1000 atoms", atoms: 1000, value: 0.37, unit: "million steps per day", per_atom_us: 233.5, hardware: "One NVIDIA A100 80GB: 0.37 million steps/day at 1000 atoms (MACE-MP-16M)", result: null, location: "Table 6"}
+  - {model: mace-mp-16m, system: "Diamond supercell MD, 1728 atoms", atoms: 1728, value: 0.23, unit: "million steps per day", per_atom_us: 217.4, hardware: "One NVIDIA A100 80GB: 0.23 million steps/day at 1728 atoms (MACE-MP-16M)", result: null, location: "Table 6"}
+  - {model: mace-mp-16m, system: "Diamond supercell MD, 2744 atoms", atoms: 2744, value: 0.15, unit: "million steps per day", per_atom_us: 209.9, hardware: "One NVIDIA A100 80GB: 0.15 million steps/day at 2744 atoms (MACE-MP-16M)", result: null, location: "Table 6"}
+  - {model: esen-oam, system: "Diamond supercell MD, 216 atoms", atoms: 216, value: 0.09, unit: "million steps per day", per_atom_us: 4444.4, hardware: "One NVIDIA A100 80GB: 0.09 million steps/day at 216 atoms (eSEN-30M-OAM)", result: null, location: "Table 6"}
+resources: |
+  Inference throughput (Table 6, one A100 80 GB, diamond): MinDScAIP-60M
+  1.15 to 0.09 million steps per day from 216 to 2,744 atoms, MACE-MP-16M
+  1.49 to 0.15, eSEN-30M-OAM 0.09 at 216 atoms and out of memory above;
+  per-atom times are 86,400 s / (steps per day x atoms). FSD on BSCT takes
+  about 40 minutes on one A6000 GPU against about 40 hours for the MD
+  stability test. No training times are given.
+gaps:
+  - "MinDScAIP is a new registry method (origin this paper); the paper presents it as a neutral testbed similar to a Swin Transformer and states no derivation from a registry method. The 'Gradient Diff-kNN' and 'Large' rows of Table 2 are the same model (identical values) and are encoded once."
+  - "Appendix F says the SPICE results of Table 4 come from the MPtrj-trained Smear. & Temp. model, while Table 4 and Table 7 describe a SPICE-trained Smear. & Temp. 60M model; the Table 4 values are attached to the SPICE Smear. & Temp. run."
+  - "The provenance of the MACE Large (4.7M) and GemNet-T SPICE baselines (trained here or taken from earlier work) is not stated. The MACE, EScAIP and eSEN columns of Table 4 and the other models of Table 5 are literature or leaderboard values and are not encoded."
+  - "MACE-MP-16M and eSEN-30M-OAM are named without further identification and are paper-local runs. FSD, NVE energy drift, max kinetic-temperature jumps, F1, kappa_SRME and RMSD (Tables 1-3, 5) are not encoded."

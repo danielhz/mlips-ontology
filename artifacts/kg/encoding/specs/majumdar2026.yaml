@@ -1,0 +1,72 @@
+id: majumdar2026
+source:
+  rank: 277
+  year: "2026"
+  first_author: "Sauradeep Majumdar"
+  title: "Reweighting free energy profiles between universal machine learning interatomic potentials for fast consensus building"
+  venue: "arXiv (Cornell University)"
+  doi: ""
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2605.15630v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "592b3e3b530702524109fc298e1da0ec7ed35773e0d06cd2dad5d6d9d15ef473"
+authors:
+  - {given: "Sauradeep", family: "Majumdar"}
+  - {given: "Miguel", family: "Steiner"}
+  - {given: "Johannes C. B.", family: "Dietschreit"}
+  - {given: "Swagata", family: "Roy"}
+  - {given: "Daniel", family: "Willimetz"}
+  - {given: "Lukaš", family: "Grajciar"}
+  - {given: "Rafael", family: "Gómez-Bombarelli"}
+study_label: "Majumdar et al. (2026): reweighting free-energy profiles of Li+ transport in a zeolite between universal MLIPs"
+scope: |
+  Encoding scope: eight universal MLIP set-ups (Table 1) evaluated against
+  PBE+D3 energies and forces of 1,100 Li-zeolite-water configurations
+  (601 atoms), and the MACE model fine-tuned here from MACE-MATPES-r2SCAN on
+  r2SCAN-D4 zeolite data with its test errors (SI S2). The PMF reweighting
+  results (entropy scores, free energies) are not error metrics and are
+  not encoded. Errors are in kJ/mol units, which the schema has no unit for;
+  they are kept in the labels with unit null.
+materials:
+  li-cha: {label: "Li+ in a water-solvated chabazite (CHA) zeolite pore channel with one Al substitution (601 atoms)", class: "Ion in a nanoconfined electrolyte (aluminosilicate zeolite)"}
+  zeolites: {label: "Siliceous and aluminosilicate zeolites with Na and Li", class: "Zeolites"}
+reference:
+  pbe-d3: {type: DFT, xc: {local: "PBE-D3"}, comment: "Reference for the 1,100 configurations, from the authors' previous work (Ref. [16])."}
+  r2scan-d4: {type: DFT, xc: {local: "r2SCAN-D4"}, comment: "Zeolite database of Erlebach et al. recomputed at r2SCAN-D4 plus Li-substituted structures (SI S2)."}
+sampling:
+  li-swap: {label: "SOAP farthest-point sampling of 5,000 Na environments, 75% Na replaced by Li, 20 ps MACE-MP0 MD, Li-centred SOAP-FPS of the last 5 ps"}
+datasets:
+  zeolite-ft: {label: "Zeolite fine-tuning set: 10,000 configurations (5,000 Na-based and 5,000 Li-substituted) at r2SCAN-D4", materials: [zeolites], properties: [Energy, Forces], provenance: InHouse, n: {v: 10000, loc: "SI S2"}, calc: r2scan-d4, sampling: [li-swap]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numFeatures, numEpochs]
+    impl: {lib: MACE}
+    sims: [MolecularDynamics]
+  UMA: {sims: [MolecularDynamics]}
+  PET: {sims: [MolecularDynamics]}
+  ORB: {sims: [MolecularDynamics]}
+runs:
+  mace-mp0: {label: "MACE-MP0 as distributed (MPtrj; source of the umbrella-sampling trajectory)", method: MACE, model: "MACE-MP0"}
+  uma: {label: "UMA (OMat24 task) as distributed", method: UMA, model: "UMA (OMat24)"}
+  pet-mad: {label: "PET-MAD-1.0.2 as distributed", method: PET, model: "PET-MAD-1.0.2"}
+  orb-v3: {label: "ORB-v3 (OMat24) as distributed", method: ORB, model: "ORB-v3 (OMat24)"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed", method: MACE, model: "MACE-MPA-0"}
+  mace-matpes: {label: "MACE-MATPES-r2SCAN as distributed", method: MACE, model: "MACE-MATPES (r2SCAN)"}
+  mace-ft: {label: "MACE-MATPES-r2SCAN fine-tuned on r2SCAN-D4 zeolite data (MACE-fine-tuned)", method: MACE, dataset: zeolite-ft, settings: {cutoffRadius: {v: 5, loc: "SI S2"}, numFeatures: {v: 128, loc: "SI S2 (channels)"}, numEpochs: {v: 50, loc: "SI S2"}}, model: "MACE-fine-tuned zeolite potential", base_model: {run: mace-matpes, relation: fine-tuned, location: "Sec. 2.2; SI S2"}}
+results:
+  - {key: mace-mp0, model: mace-mp0, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 6.04, null, "Force MAE vs PBE+D3 in kJ/mol/A: MACE-MP0, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.07, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: MACE-MP0, Li-zeolite-H2O", "Table 1"]]}
+  - {key: uma, model: uma, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 1.81, null, "Force MAE vs PBE+D3 in kJ/mol/A: UMA, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.02, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: UMA, Li-zeolite-H2O", "Table 1"]]}
+  - {key: pet-mad, model: pet-mad, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 9.1, null, "Force MAE vs PBE+D3 in kJ/mol/A: PET-MAD-1.0.2, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.15, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: PET-MAD-1.0.2, Li-zeolite-H2O", "Table 1"]]}
+  - {key: orb-v3, model: orb-v3, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 2.72, null, "Force MAE vs PBE+D3 in kJ/mol/A: ORB-v3, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.04, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: ORB-v3, Li-zeolite-H2O", "Table 1"]]}
+  - {key: mace-mp0-d3, model: mace-mp0, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 6.02, null, "Force MAE vs PBE+D3 in kJ/mol/A: MACE-MP0 with D3 (TorchDFTD3) at inference, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.14, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: MACE-MP0 with D3 (TorchDFTD3) at inference, Li-zeolite-H2O", "Table 1"]]}
+  - {key: mace-mpa-0, model: mace-mpa-0, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 4.61, null, "Force MAE vs PBE+D3 in kJ/mol/A: MACE-MPA-0, Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.09, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: MACE-MPA-0, Li-zeolite-H2O", "Table 1"]]}
+  - {key: mace-matpes, model: mace-matpes, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 15.47, null, "Force MAE vs PBE+D3 in kJ/mol/A: MACE-MATPES (r2SCAN), Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.08, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: MACE-MATPES (r2SCAN), Li-zeolite-H2O", "Table 1"]]}
+  - {key: mace-ft, model: mace-ft, material: li-cha, role: external, eval_data: {label: "1,100 Li-zeolite-H2O configurations (601 atoms) along the CV with PBE+D3 references; energies referenced to the minimum-energy structure", location: "Table 1; Figs. S4, S5"}, metrics: [[MAE, Force, 14.31, null, "Force MAE vs PBE+D3 in kJ/mol/A: MACE-fine-tuned (r2SCAN-D4), Li-zeolite-H2O", "Table 1"], [MAE, Energy, 0.07, null, "Energy MAE vs PBE+D3 in kJ/mol/atom: MACE-fine-tuned (r2SCAN-D4), Li-zeolite-H2O", "Table 1"]]}
+resources: |
+  The reweighting evaluates 540,000 downsampled frames (601 atoms) with each
+  target MLIP in batches on GPUs instead of rerunning 54-window umbrella
+  sampling; no timings are given.
+gaps:
+  - "Table 1 errors are in kJ/mol/A (forces) and kJ/mol/atom (energies), which the schema has no unit for; they are recorded with unit null and the unit in the label. MACE-MP0-D3 is the MACE-MP0 model with a D3 correction added at inference and is recorded as a second result of that run."
+  - "The fine-tuned model's 'test errors' (0.23 kJ/mol/atom, 3.65 kJ/mol/A; MACE-MATPES with post hoc D4 on the same test set: 1.48 and 6.22) do not state the error type (MAE or RMSE) and are not encoded."
+  - "The MACE-MP0, UMA and ORB-v3 checkpoints are not identified beyond their training data, so all universal models are paper-local runs. Authors are taken from the front matter (the manifest row has no DOI)."

@@ -1,0 +1,57 @@
+id: shinagawa2026
+source:
+  rank: 265
+  year: "2026"
+  first_author: "Chikashi Shinagawa"
+  title: "Matlantis-PFP v8: Universal Machine Learning Interatomic Potential with Better Experimental Agreements via r2SCAN Functional"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.11063"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.11063v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "20772a2cb51160a58f7d9b0da4ba71adffdceb82ae2e992c9a92b58dd1f2e97a"
+study_label: "Shinagawa et al. (2026): Matlantis PFP v8, a TeaNet universal MLIP with an r2SCAN calculation mode"
+scope: |
+  Encoding scope: PFP v8 (TeaNet architecture) trained jointly on the new
+  PFP-R2SCAN data set, the PFP-PBE/PBE+U and PFP-WB97XD data sets and OC20
+  through calculation-mode labels, with its formation-energy MAEs against
+  experiment (Table 3) and surface-energy MAEs against experiment (Table
+  5) per calculation mode. GMTKN55 WTMAD-2 scores (Table 4) are weighted
+  deviations, not plain MAEs, and melting-point MAEs are in K; neither is
+  encoded. DFT reference rows of Tables 3-5 are not MLIP results.
+materials:
+  expt-crystals: {label: "1,100 crystals of the Kingsbury experimental formation-enthalpy set restricted to the 70 PFP-R2SCAN elements with Materials Project r2SCAN data", class: "Inorganic crystals"}
+  fcc-metals: {label: "fcc (100), (110) and (111) surfaces of Al, Cu, Ru, Rh, Pd, Ag, Pt and Au (30-layer slabs)", class: "Metal surfaces"}
+  pfp-domains: {label: "Molecules, bulk crystals, slabs, disordered high-temperature structures, clusters and adsorption structures over up to 96 elements", class: "Universal (molecules and materials)"}
+reference:
+  r2scan: {type: DFT, code: VASP, xc: {local: "r2SCAN"}, pp: PAW, cutoff: 680, kpoints: "KSPACING = 0.22", comment: "VASP 6.4.3 (GPU), PBE_64 PAW set, collinear spin-polarised with several initial magnetic orderings (lowest energy kept), no Hubbard U, Gaussian smearing 0.05 eV, EDIFF 1e-6, ALGO All (Table S1)."}
+  pbe-u: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "1000 k-points per reciprocal atom", comment: "PFP-PBE+U with Hubbard U and PFP-PBE without; PBE_54 PAW set, EDIFF 1e-4 (Table S1; Ref. [26])."}
+  wb97xd: {type: DFT, xc: {local: "wB97X-D"}, comment: "PFP-WB97XD molecular data set (Ref. [26])."}
+datasets:
+  pfp-r2scan: {label: "PFP-R2SCAN data set (about 3e6 structures, 70 elements; molecule, bulk, slab and disorder domains)", materials: [pfp-domains], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: r2scan}
+  pfp-pbe: {label: "PFP-PBE/+U data set (about 6e7 structures, 96 elements)", materials: [pfp-domains], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe-u}
+  pfp-wb97xd: {label: "PFP-WB97XD molecular data set (about 6e6 structures, 9 elements)", materials: [pfp-domains], properties: [Energy, Forces], provenance: InHouse, calc: wb97xd}
+  oc20: {label: "OC20 (about 1e8 structures, 56 elements; PBE)", materials: [pfp-domains], properties: [Energy, Forces], provenance: Published}
+methods:
+  TeaNet:
+    loss: "Energies, forces and stresses with Bader charges as an auxiliary target; calculation-mode label embedded in the node features"
+    impl: {lib: {local: "PFP / PFVM", comment: "Trained in PyTorch; inference with the proprietary PFVM engine (Matlantis) on NVIDIA GPUs"}}
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  pfp-v8: {label: "PFP v8 trained on PFP-R2SCAN, PFP-PBE/+U, PFP-WB97XD and OC20 with calculation modes", method: TeaNet, dataset: pfp-r2scan, model: "PFP v8 (Matlantis)"}
+results:
+  - {key: fe-r2scan, model: pfp-v8, material: expt-crystals, role: external, eval_data: {label: "Experimental standard formation enthalpies (expt_formation_enthalpy_kingsbury, Matminer), 1,100 structures", location: "Table 3"}, metrics: [[MAE, Energy, 80, meV/atom, "Formation-energy MAE vs experiment (0.080 eV/atom): PFP v8 R2SCAN mode", "Table 3"]]}
+  - {key: fe-pbeu, model: pfp-v8, material: expt-crystals, role: external, eval_data: {label: "Experimental standard formation enthalpies (expt_formation_enthalpy_kingsbury, Matminer), 1,100 structures", location: "Table 3"}, metrics: [[MAE, Energy, 121, meV/atom, "Formation-energy MAE vs experiment (0.121 eV/atom): PFP v8 PBE/PBE+U modes with MP mixing correction", "Table 3"]]}
+  - {key: fe-pbe, model: pfp-v8, material: expt-crystals, role: external, eval_data: {label: "Experimental standard formation enthalpies (expt_formation_enthalpy_kingsbury, Matminer), 1,100 structures", location: "Table 3"}, metrics: [[MAE, Energy, 162, meV/atom, "Formation-energy MAE vs experiment (0.162 eV/atom): PFP v8 PBE mode, uncorrected", "Table 3"]]}
+  - {key: se-r2scan-d3, model: pfp-v8, material: fcc-metals, role: external, eval_data: {label: "Experimental surface energies of eight fcc metals (average of three facets)", location: "Table 5"}, metrics: [[MAE, Energy, 0.21, null, "Surface-energy MAE vs experiment in J/m2: PFP v8 R2SCAN+D3 mode", "Table 5"]]}
+  - {key: se-r2scan, model: pfp-v8, material: fcc-metals, role: external, eval_data: {label: "Experimental surface energies of eight fcc metals (average of three facets)", location: "Table 5"}, metrics: [[MAE, Energy, 0.27, null, "Surface-energy MAE vs experiment in J/m2: PFP v8 R2SCAN mode", "Table 5"]]}
+  - {key: se-pbe-d3, model: pfp-v8, material: fcc-metals, role: external, eval_data: {label: "Experimental surface energies of eight fcc metals (average of three facets)", location: "Table 5"}, metrics: [[MAE, Energy, 0.29, null, "Surface-energy MAE vs experiment in J/m2: PFP v8 PBE+D3 mode", "Table 5"]]}
+  - {key: se-pbe, model: pfp-v8, material: fcc-metals, role: external, eval_data: {label: "Experimental surface energies of eight fcc metals (average of three facets)", location: "Table 5"}, metrics: [[MAE, Energy, 0.45, null, "Surface-energy MAE vs experiment in J/m2: PFP v8 PBE mode", "Table 5"]]}
+resources: |
+  r2SCAN calculations take about four times longer than PBE; the PFP-R2SCAN
+  data set took about one year to build (the PFP-PBE/+U set about five
+  years). No training or inference times are given.
+gaps:
+  - "PFP v8 is one model with calculation modes (R2SCAN, PBE, PBE+U, WB97XD and +D3 variants); the run records PFP-R2SCAN as its data set and the other three data sets are listed separately. Data-set sizes are given only to one significant figure (Table 1) and are kept in the labels. PFP v8 is not a registry model."
+  - "GMTKN55 WTMAD-2 scores (Table 4; e.g. 9.28 kcal/mol for R2SCAN+D3) are weighted deviations and are not encoded as MAE; surface-energy MBE and MAPE (Table 5) and melting-point MAEs (133 K and 279 K, Fig. 4) have no metric type or unit in the schema."
+  - "The cutoff of the last two graph-convolution layers is 0.9 nm (0.6 nm before v8); other architecture settings are not stated. The D3(BJ) correction (14 A cutoff, torch-dftd) is added outside the network."

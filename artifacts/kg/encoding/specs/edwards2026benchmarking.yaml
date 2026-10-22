@@ -1,0 +1,47 @@
+id: edwards2026benchmarking
+source:
+  rank: 272
+  year: "2026"
+  first_author: "Connor Edwards"
+  title: "Benchmarking Universal Machine-Learned Interatomic Potentials for High-Temperature Metal-Organic Framework Chemistry"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2604.25262"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2604.25262v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d1b5bddb41bedfb5c9700aae4bbbdf977614f250411add35eb22bf1babe2b382"
+study_label: "Edwards and Evans (2026): benchmarking universal MLIPs on high-temperature AIMD of nine MOFs"
+scope: |
+  Encoding scope: the new 40 ps PBE-D3 AIMD data set of nine Zn and Zr
+  MOFs at 300, 1000 and 2000 K, and the energy, force and stress MAEs of
+  the universal models ORB-v3, MACE-MP-0a and MACE-MPA-0 on it (Table 1,
+  averaged over MOFs and temperatures; 300 K values of ORB-v3 from the
+  Conclusion). The two fairchem models are not encoded (architecture not
+  named). Per-temperature and per-MOF errors (Fig. 3) and the ORB-v3 ramp
+  MD losses (Fig. 4) are figure-only.
+materials:
+  mofs: {label: "Nine MOFs: ZIF-8, CALF-20, MOF-10, MOF-5, MIP-206, UiO-66, UiO-67, UiO-66-NH2 and NU-1000", class: "Zn and Zr metal-organic frameworks"}
+reference:
+  pbe-d3: {type: DFT, code: {local: "CP2K"}, xc: {local: "PBE-D3"}, pp: NormConserving, comment: "CP2K 2023.2 Quickstep, TZV2P-type triple-zeta valence polarised basis, GTH pseudopotentials; 500 Ry cutoff and 50 Ry relative cutoff for MD (1000/60 Ry for optimisation); SCF 1e-6 Ha."}
+sampling:
+  aimd: {label: "NVT AIMD of each MOF at 300, 1000 and 2000 K for 40 ps (0.5 fs step, CSVR thermostat)"}
+datasets:
+  mof-aimd: {label: "High-temperature MOF AIMD data set (nine MOFs x three temperatures, 40 ps each)", materials: [mofs], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe-d3, sampling: [aimd], comment: "Extends the 16 ps ZIF-8 and CALF-20 trajectories of Ref. [16]; Figshare 10.25909/32061111."}
+methods:
+  ORB: {sims: [MolecularDynamics]}
+  MACE: {sims: [MolecularDynamics]}
+runs:
+  orb-v3: {label: "ORB-v3 as distributed (orb-models 0.5.5)", method: ORB, model: "ORB-v3"}
+  mace-mp-0a: {label: "MACE-MP-0a as distributed (MACE-torch 0.3.14)", method: MACE, model: "MACE-MP-0a"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed (MACE-torch 0.3.14)", method: MACE, model: "MACE-MPA-0"}
+results:
+  - {key: orb-v3, model: orb-v3, material: mofs, role: external, eval_data: {label: "1,000 random structures per MOF and temperature from the 40 ps AIMD trajectories, averaged over all MOFs and temperatures", location: "Sec. 2; Table 1"}, metrics: [[MAE, Energy, 3.59, meV/atom, "Energy MAE: ORB-v3, MOF AIMD (all temperatures)", "Table 1"], [MAE, Force, 119.58, meV/A, "Force MAE: ORB-v3, MOF AIMD (all temperatures)", "Table 1"], [MAE, Stress, 0.32535, GPa, "Stress MAE (325.35 MPa): ORB-v3, MOF AIMD (all temperatures)", "Table 1"]]}
+  - {key: mace-mpa-0, model: mace-mpa-0, material: mofs, role: external, eval_data: {label: "1,000 random structures per MOF and temperature from the 40 ps AIMD trajectories, averaged over all MOFs and temperatures", location: "Sec. 2; Table 1"}, metrics: [[MAE, Energy, 12.63, meV/atom, "Energy MAE: MACE-MPA-0, MOF AIMD (all temperatures)", "Table 1"], [MAE, Force, 200.84, meV/A, "Force MAE: MACE-MPA-0, MOF AIMD (all temperatures)", "Table 1"], [MAE, Stress, 0.33636, GPa, "Stress MAE (336.36 MPa): MACE-MPA-0, MOF AIMD (all temperatures)", "Table 1"]]}
+  - {key: mace-mp-0a, model: mace-mp-0a, material: mofs, role: external, eval_data: {label: "1,000 random structures per MOF and temperature from the 40 ps AIMD trajectories, averaged over all MOFs and temperatures", location: "Sec. 2; Table 1"}, metrics: [[MAE, Energy, 17.61, meV/atom, "Energy MAE: MACE-MP-0a, MOF AIMD (all temperatures)", "Table 1"], [MAE, Force, 196.62, meV/A, "Force MAE: MACE-MP-0a, MOF AIMD (all temperatures)", "Table 1"], [MAE, Stress, 0.2706, GPa, "Stress MAE (270.60 MPa): MACE-MP-0a, MOF AIMD (all temperatures)", "Table 1"]]}
+  - {key: orb-v3-300k, model: orb-v3, material: mofs, role: external, eval_data: {label: "300 K AIMD structures of the nine MOFs", location: "Sec. 5"}, metrics: [[MAE, Energy, 0.66, meV/atom, "Energy MAE at 300 K: ORB-v3, MOF AIMD", "Sec. 5"], [MAE, Force, 97.77, meV/A, "Force MAE at 300 K: ORB-v3, MOF AIMD", "Sec. 5"], [MAE, Stress, 0.117, GPa, "Stress MAE at 300 K (117.00 MPa): ORB-v3, MOF AIMD", "Sec. 5"]]}
+resources: |
+  No timings are given. ORB-v3 ramp MD (1 ns, 300 to 2000 K) was run for
+  all nine MOFs and 300 sampled structures per MOF were recomputed with DFT.
+gaps:
+  - "The fairchem ODAC23 and OMAT models are named only by their training data (fairchem 2.13.0); their architecture is not stated, so they are not encoded as runs. Their Table 1 MAEs are 11.31 and 3.21 meV/atom, 188.30 and 94.01 meV/A, 401.66 and 293.98 MPa (300 K for OMAT: 0.67 meV/atom, 83.49 meV/A, 89.12 MPa)."
+  - "The ORB-v3 and MACE-MP-0a checkpoints (size, conservative or direct) are not stated, so all models are paper-local runs. Stress MAEs in MPa are converted to GPa. The weighted loss (energy:force:stress 1:100:1) of Table 1 is not encoded."
