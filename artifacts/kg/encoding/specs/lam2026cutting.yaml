@@ -1,0 +1,48 @@
+id: lam2026cutting
+source:
+  rank: 689
+  year: "2026"
+  first_author: "Terry C. W. Lam"
+  title: "Cutting Through the Noise: On-the-fly Outlier Detection for Robust Training of Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2602.08849"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2602.08849v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d991660defe5e0e5aec0e0b41ed689eb5ef02125a3f2c4ba7ddb47f6eb516959"
+study_label: "Lam, O'Neill, Schran and Schaaf (2026): on-the-fly outlier detection (bootstrapping) for robust MLIP training"
+scope: |
+  Encoding scope: MACE models trained with and without the on-the-fly
+  outlier down-weighting on noisy data: aspirin with 10% MD17 forces mixed
+  into revMD17, liquid water from loosely converged revPBE calculations
+  (plus a reference model on clean data), and the SPICE v2 data set. The
+  only numbers stated in the text are median force errors and approximate
+  values, so there are no results.
+materials:
+  aspirin: {label: "Aspirin (revMD17 with 10% MD17 force labels)", class: "small organic molecule"}
+  water: {label: "Liquid water (126 molecules)", formula: H2O, class: "molecular liquid"}
+  organics: {label: "SPICE v2 molecules", class: "organic and biomolecular systems"}
+reference:
+  pbe-svp: {type: DFT, xc: PBE, basis: "def2-SVP", comment: "revMD17 labels; 10% of forces replaced by MD17 values to emulate noise."}
+  revpbe: {type: DFT, code: FHIaims, xc: {local: revPBE}, comment: "Loose SCF thresholds for the noisy set; tight thresholds for the clean reference set."}
+  spice: {type: DFT, xc: {local: wB97M-D3(BJ)}, basis: "def2-TZVPPD", comment: "SPICE v2 (Psi4)."}
+datasets:
+  aspirin: {label: "1000 revMD17 aspirin samples with 10% MD17 forces", materials: [aspirin], properties: [Energy, Forces], provenance: Augmented, n: {v: 1000, loc: "Methods"}, calc: pbe-svp}
+  water-noisy: {label: "Noisy water data (1616 loosely converged configurations)", materials: [water], properties: [Energy, Forces], provenance: InHouse, n: {v: 1616, loc: "Methods"}, calc: revpbe}
+  water-clean: {label: "Clean water data (tightly converged)", materials: [water], properties: [Energy, Forces], provenance: InHouse, calc: revpbe}
+  spice: {label: "SPICE v2", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: spice}
+methods:
+  MACE:
+    algorithm: "Per-configuration loss weights updated on the fly from the convergence rate of each configuration's error (bootstrapping), versus standard training and iterative refinement"
+    impl: {lib: MACE, comment: "Symmetrix pair style in LAMMPS for MD"}
+    sims: [MolecularDynamics]
+runs:
+  aspirin-std: {label: "MACE on noisy aspirin data, standard training", method: MACE, dataset: aspirin, model: "MACE aspirin (standard, noisy)"}
+  aspirin-boot: {label: "MACE on noisy aspirin data with bootstrapped outlier detection", method: MACE, dataset: aspirin, model: "MACE aspirin (bootstrapped)"}
+  water-ref: {label: "MACE water reference model on clean data", method: MACE, dataset: water-clean, model: "MACE water (clean reference)"}
+  water-std: {label: "MACE water on noisy data, standard training", method: MACE, dataset: water-noisy, model: "MACE water (standard, noisy)"}
+  water-boot: {label: "MACE water on noisy data with bootstrapping", method: MACE, dataset: water-noisy, model: "MACE water (bootstrapped)"}
+  spice-boot: {label: "MACE trained on SPICE v2 with bootstrapping", method: MACE, dataset: spice, model: "MACE SPICE v2 (bootstrapped)"}
+gaps:
+  - "The aspirin result is stated as a median force error (27.0 meV/A bootstrapped vs 94.0 meV/A standard) on the re-evaluated validation set; medians are not MAE/RMSE and are not encoded. Other errors are approximate ('~30 meV/A') or figure-only (Figs. 2-6)."
+  - "Water self-diffusion coefficients and RDFs are property results."

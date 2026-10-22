@@ -1,0 +1,61 @@
+id: kavanagh2026
+source:
+  rank: 690
+  year: "2026"
+  first_author: "Seán R. Kavanagh"
+  title: "Fast and Accurate Equivariant Foundation Models for Atomistic Simulation"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.28461"
+  kg_relevance: "Method/model"
+  arxiv_id: "2607.28461v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "06c42ef66879ac1ce89635704856e93afac9829c90c296046e9df5281a8259a8"
+study_label: "Kavanagh et al. (2026): fast and accurate equivariant foundation models (NequIP and Allegro) for atomistic simulation"
+scope: |
+  Encoding scope: the NequIP and Allegro foundation models trained in the
+  paper on MPtrj (MP) and on OAM (OMat24 pre-training followed by MPA
+  fine-tuning), with hyperparameters from Table 1 and the Matbench
+  Discovery energy-above-hull MAEs on the WBM test set (Table 2).
+  Geometry RMSDs, thermal conductivity, heat capacity, force-softening
+  ratios, phonon and MatCalc benchmarks are property results. DIRECT and
+  MPA-only models appear only in figures.
+materials:
+  inorganic: {label: "Inorganic crystals (Materials Project, Alexandria, OMat24)", class: "inorganic materials"}
+  wbm: {label: "WBM hypothetical crystals (Matbench Discovery test set, about 250,000)", class: "inorganic materials"}
+reference:
+  mp: {type: DFT, comment: "MPtrj / MPA / OMat24 published labels (PBE(+U) Materials Project settings)."}
+datasets:
+  mptrj: {label: "MPtrj (about 1.58M structures)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: mp}
+  oam: {label: "OAM: OMat24 (pre-training) then MPA = MPtrj + sAlex (fine-tuning), about 113M structures", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: mp}
+methods:
+  NequIP:
+    hp: [cutoffRadius]
+    impl: {lib: NequIP, comment: "OpenEquivariance/cuEquivariance kernels, mixed precision, distributed training; LAMMPS inference"}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+  Allegro:
+    hp: [cutoffRadius]
+    impl: {lib: Allegro}
+    sims: [MolecularDynamics, GeometryOptimization, PhononCalculation]
+runs:
+  allegro-mp-l: {label: "Allegro-MP-L (12.7M parameters), trained on MPtrj", method: Allegro, dataset: mptrj, settings: {cutoffRadius: {v: 7, loc: "Table 1"}}, model: "Allegro-MP-L", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  nequip-mp-l: {label: "NequIP-MP-L (6.8M parameters), trained on MPtrj", method: NequIP, dataset: mptrj, settings: {cutoffRadius: {v: 6, loc: "Table 1"}}, model: "NequIP-MP-L", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  allegro-oam-s: {label: "Allegro-OAM-S (1.4M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: Allegro, dataset: oam, settings: {cutoffRadius: {v: 5, loc: "Table 1"}}, model: "Allegro-OAM-S", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  allegro-oam-m: {label: "Allegro-OAM-M (7.2M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: Allegro, dataset: oam, settings: {cutoffRadius: {v: 6, loc: "Table 1"}}, model: "Allegro-OAM-M", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  allegro-oam-l: {label: "Allegro-OAM-L (12.7M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: Allegro, dataset: oam, settings: {cutoffRadius: {v: 7, loc: "Table 1"}}, model: "Allegro-OAM-L", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  nequip-oam-s: {label: "NequIP-OAM-S (0.6M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: NequIP, dataset: oam, settings: {cutoffRadius: {v: 4.5, loc: "Table 1"}}, model: "NequIP-OAM-S", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  nequip-oam-m: {label: "NequIP-OAM-M (3.2M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: NequIP, dataset: oam, settings: {cutoffRadius: {v: 6, loc: "Table 1"}}, model: "NequIP-OAM-M", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  nequip-oam-l: {label: "NequIP-OAM-L (6.8M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: NequIP, dataset: oam, settings: {cutoffRadius: {v: 6, loc: "Table 1"}}, model: "NequIP-OAM-L", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+  nequip-oam-xl: {label: "NequIP-OAM-XL (32.1M parameters), pre-trained on OMat24 and fine-tuned on MPA", method: NequIP, dataset: oam, settings: {cutoffRadius: {v: 6, loc: "Table 1"}}, model: "NequIP-OAM-XL", trainingHardware: "NVIDIA A100 GPUs (NERSC Perlmutter)"}
+results:
+  - {key: allegro-mp-l-wbm, model: allegro-mp-l, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 44.3, meV/atom, "Matbench Discovery MAE of the energy above hull: Allegro-MP-L", "Table 2"]]}
+  - {key: nequip-mp-l-wbm, model: nequip-mp-l, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 42.7, meV/atom, "Matbench Discovery MAE of the energy above hull: NequIP-MP-L", "Table 2"]]}
+  - {key: allegro-oam-s-wbm, model: allegro-oam-s, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 32.9, meV/atom, "Matbench Discovery MAE of the energy above hull: Allegro-OAM-S", "Table 2"]]}
+  - {key: allegro-oam-m-wbm, model: allegro-oam-m, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 24.7, meV/atom, "Matbench Discovery MAE of the energy above hull: Allegro-OAM-M", "Table 2"]]}
+  - {key: allegro-oam-l-wbm, model: allegro-oam-l, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 21.4, meV/atom, "Matbench Discovery MAE of the energy above hull: Allegro-OAM-L", "Table 2"]]}
+  - {key: nequip-oam-s-wbm, model: nequip-oam-s, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 45.9, meV/atom, "Matbench Discovery MAE of the energy above hull: NequIP-OAM-S", "Table 2"]]}
+  - {key: nequip-oam-m-wbm, model: nequip-oam-m, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 24.5, meV/atom, "Matbench Discovery MAE of the energy above hull: NequIP-OAM-M", "Table 2"]]}
+  - {key: nequip-oam-l-wbm, model: nequip-oam-l, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 21.5, meV/atom, "Matbench Discovery MAE of the energy above hull: NequIP-OAM-L", "Table 2"]]}
+  - {key: nequip-oam-xl-wbm, model: nequip-oam-xl, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set", location: "Table 2"}, metrics: [[MAE, Energy, 19.7, meV/atom, "Matbench Discovery MAE of the energy above hull: NequIP-OAM-XL", "Table 2"]]}
+gaps:
+  - "The extracted Table 1 does not show unambiguously which of the 'MLP depth' and 'message-passing layers' columns holds which numbers, so layer counts are not encoded; only radial cutoffs and parameter counts (in labels) are kept."
+  - "Geometry RMSD, kappa SRME, Cv MAE and force ratios (Table 2), MatCalc (Table 3) and MDR phonon results (Table S1) are property benchmarks. Training throughput and LAMMPS inference speeds are figure-only (Fig. 1, Fig. S13)."
