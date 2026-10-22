@@ -1,0 +1,42 @@
+id: bhatia2025
+source:
+  rank: 613
+  year: "2025"
+  first_author: "Nitik Bhatia"
+  title: "Leveraging active learning-enhanced machine-learned interatomic potential for efficient infrared spectra prediction"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01827-8"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2506.13486v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "14a7ddd9fbd66b224056d693c153faa190bc62584f0797d4b764d1d1a5759161"
+study_label: "Bhatia, Rinke and Krejčí (2025): PALIRS, active-learning MACE potentials for infrared spectra of small organic molecules"
+scope: |
+  Encoding scope: the final MACE MLIP (first member of the 3-model
+  committee after 40 active-learning iterations) trained on 16,067
+  FHI-aims PBE structures of 24 small organic molecules, with its energy
+  and force errors on the 480-structure MLMD test set (Table 1). Harmonic
+  frequencies, dipole-model errors and IR spectra are not energy/force
+  metrics of the potential.
+materials:
+  organics: {label: "24 small organic molecules with H, C, N, O and up to two carbon atoms (from QM9)", class: "small organic molecules"}
+reference:
+  pbe-ts: {type: DFT, code: FHIaims, xc: PBE, basis: "tier-1, light grids", comment: "ZORA scalar relativity; Hirshfeld (Tkatchenko-Scheffler) van der Waals correction."}
+sampling:
+  nms: {label: "Normal-mode sampling (first 10 geometries per mode) of DFT-optimised QM9 geometries"}
+  al: {label: "Committee active learning: 15 most uncertain structures per molecule and iteration from 5 ps MLMD at 300, 500 and 700 K"}
+datasets:
+  final: {label: "Final PALIRS training data (2085 normal-mode structures plus active-learning additions; 80:20 split)", materials: [organics], properties: [Energy, Forces], provenance: InHouse, n: {v: 16067, loc: "Sec. 5.4; Fig. 3"}, calc: pbe-ts, sampling: [nms, al]}
+methods:
+  MACE:
+    hp: [numFeatures, cutoffRadius, numLayers, bodyOrder]
+    algorithm: "L=1 equivariant messages; 3-model committee differing in random seed"
+    impl: {lib: MACE, comment: "MACE 0.3.5; ASE for MLMD; PALIRS workflow"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  mace: {label: "Final MACE MLIP (iteration 40, first committee member)", method: MACE, dataset: final, settings: {numFeatures: {v: 128, loc: "Sec. 5.1 (channels)"}, cutoffRadius: {v: 3.0, loc: "Sec. 5.1"}, numLayers: {v: 2, loc: "Sec. 5.1"}, bodyOrder: {v: 2, loc: "Sec. 5.1"}}, model: "PALIRS MACE MLIP", trainingHardware: "NVIDIA V100 GPUs"}
+results:
+  - {key: mace-test, model: mace, material: organics, role: test, eval_data: {label: "480 structures clustered (MBTR, k-means) from 100 ps 300 K MLMD of each molecule", location: "Sec. 5.6; Table 1"}, metrics: [[MAE, Energy, 2.64, meV, "test energy MAE on organics: PALIRS MACE", "Table 1"], [RMSE, Energy, 3.61, meV, "test energy RMSE on organics: PALIRS MACE", "Table 1"], [MAE, Force, 3.96, meV/A, "test force MAE on organics: PALIRS MACE", "Table 1"], [RMSE, Force, 5.69, meV/A, "test force RMSE on organics: PALIRS MACE", "Table 1"]]}
+gaps:
+  - "Harmonic-frequency errors (MAE 4.37 and RMSE 10.51 cm-1 for the final model) are property errors; the per-iteration energy and force errors are only in Fig. 2."
+  - "The MACE dipole model (test MAE 7.62, RMSE 12.46 mDebye) is not an interatomic potential and is not encoded. IR spectral similarity scores (Tables 2-3) are property comparisons."

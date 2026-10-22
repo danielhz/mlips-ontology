@@ -1,0 +1,51 @@
+id: xie2020
+source:
+  rank: 612
+  year: "2020"
+  first_author: "Xiaowei Xie"
+  title: "Incorporating Electronic Information into Machine Learning Potential Energy Surfaces via Approaching the Ground-State Electronic Energy as a Function of Atom-Based Electronic Populations"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.0c00217"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2003.01893v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "238b1f3b07f37b33cf4cd37415fba38bef5b74c171cb4a15038c35c0d89a9799"
+study_label: "Xie, Persson and Small (2020): bpopNN, machine-learning PES as a function of atom-based electronic populations"
+scope: |
+  Encoding scope: the bpopNN model introduced in the paper (registry
+  method bpopNN, origin), trained on constrained-DFT (CDFT) energies,
+  nuclear forces and population gradients of LinHn clusters in charge
+  states +1, 0 and -1, with its validation MAE and the energy MAEs on the
+  Li29H29 sparse and Li32H32 non-sparse test sets (Table I). Charge errors,
+  geometry-optimisation energies, IP/EA and reaction-path profiles are not
+  energy/force error metrics of the potential.
+hyperparameters:
+  gamma: {label: "Loss weight of the nuclear-force and population-gradient terms (gamma1 = gamma2)", name: "gamma", datatype: decimal}
+materials:
+  lih: {label: "LinHn clusters (n = 1-32; sparse LiH assemblies and dense cubic structures; charges +1, 0, -1)", class: "lithium hydride clusters"}
+reference:
+  cdft: {type: DFT, code: {local: Q-Chem}, xc: {local: B3LYP}, basis: "def2-SVPD", comment: "Constrained DFT on Becke populations with random charge fluctuations of up to 0.05 e per atom (10 CDFT calculations per geometry and charge state); structures from B3LYP-D3(BJ) or B3LYP optimisations and wB97X-D AIMD at 500 K, all re-labelled with B3LYP."}
+sampling:
+  traj: {label: "Every 2nd-7th frame of DFT geometry-optimisation trajectories (sparse and non-sparse) and 500 K AIMD trajectories (non-sparse)"}
+datasets:
+  lih-cdft: {label: "LinHn CDFT training data (about 37,000 points; 95% train, 5% validation)", materials: [lih], properties: [Energy, Forces], provenance: InHouse, calc: cdft, sampling: [traj]}
+methods:
+  bpopNN:
+    hp: [cutoffRadius, numLayers, gamma]
+    loss: "Per-atom squared errors of CDFT energy, nuclear forces and population gradients (gamma1 = gamma2 = 1.5)"
+    algorithm: "Element-wise NNs with two hidden layers of 30 neurons and a modified softplus; SOAP variant split by element channels with electronic population terms; Adam"
+    sims: [GeometryOptimization]
+runs:
+  bpopnn: {label: "bpopNN model of LinHn clusters", method: bpopNN, dataset: lih-cdft, settings: {cutoffRadius: {v: 13.2, loc: "Sec. II B 1"}, numLayers: {v: 2, loc: "Sec. II B 2 (hidden layers)"}, gamma: {v: 1.5, loc: "Eq. 13"}}, model: "bpopNN (LinHn)"}
+results:
+  - {key: bpopnn-val, model: bpopnn, material: lih, role: validation, eval_data: {label: "5% random validation split of the CDFT data", location: "Sec. III A"}, metrics: [[MAE, Energy, 1.523, kcal/mol, "validation energy MAE per molecule on lih: bpopNN", "Sec. III A"]]}
+  - {key: bpopnn-sparse-neutral, model: bpopnn, material: lih, role: test, eval_data: {label: "Li29H29 sparse test set, neutral", location: "Table I"}, metrics: [[MAE, Energy, 0.188, null, "test energy MAE in kcal/mol/atom on lih (Li29H29 sparse, neutral): bpopNN", "Table I"]]}
+  - {key: bpopnn-sparse-cation, model: bpopnn, material: lih, role: test, eval_data: {label: "Li29H29 sparse test set, cation", location: "Table I"}, metrics: [[MAE, Energy, 0.136, null, "test energy MAE in kcal/mol/atom on lih (Li29H29 sparse, cation): bpopNN", "Table I"]]}
+  - {key: bpopnn-sparse-anion, model: bpopnn, material: lih, role: test, eval_data: {label: "Li29H29 sparse test set, anion", location: "Table I"}, metrics: [[MAE, Energy, 0.121, null, "test energy MAE in kcal/mol/atom on lih (Li29H29 sparse, anion): bpopNN", "Table I"]]}
+  - {key: bpopnn-dense-neutral, model: bpopnn, material: lih, role: test, eval_data: {label: "Li32H32 non-sparse test set, neutral", location: "Table I"}, metrics: [[MAE, Energy, 0.235, null, "test energy MAE in kcal/mol/atom on lih (Li32H32 non-sparse, neutral): bpopNN", "Table I"]]}
+  - {key: bpopnn-dense-cation, model: bpopnn, material: lih, role: test, eval_data: {label: "Li32H32 non-sparse test set, cation", location: "Table I"}, metrics: [[MAE, Energy, 0.281, null, "test energy MAE in kcal/mol/atom on lih (Li32H32 non-sparse, cation): bpopNN", "Table I"]]}
+  - {key: bpopnn-dense-anion, model: bpopnn, material: lih, role: test, eval_data: {label: "Li32H32 non-sparse test set, anion", location: "Table I"}, metrics: [[MAE, Energy, 0.168, null, "test energy MAE in kcal/mol/atom on lih (Li32H32 non-sparse, anion): bpopNN", "Table I"]]}
+gaps:
+  - "Table I test MAEs are in kcal/mol/atom, which has no unit individual; they are kept with unit null and the unit in the label. Charge MAEs (e/atom, Table I) are not energy/force metrics."
+  - "Geometry-optimisation energies, IP and EA (Table II), reaction-path profiles (Figs. 5-6) and the charge-separation example (Table III) are property comparisons."
+  - "The descriptor is described as 'a variant of SOAP' and the implementation as built on TensorMol; neither is stated as the method bpopNN derives from, so no derived_from edge is recorded."
