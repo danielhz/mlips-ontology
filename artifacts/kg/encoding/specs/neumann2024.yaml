@@ -1,0 +1,74 @@
+id: neumann2024
+source:
+  rank: 203
+  year: "2024"
+  first_author: "Mark Neumann"
+  title: "Orb: A Fast, Scalable Neural Network Potential"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2410.22570"
+  kg_relevance: "Method/model"
+  arxiv_id: "2410.22570v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c7685a950b193d18d43cdf70fcb95cf592d7bdd72f62bdbd8938e8dfb2cb20e1"
+study_label: "Neumann et al. (2024): Orb, a fast scalable neural network potential (technical report)"
+scope: |
+  Encoding scope: the Orb architecture (introduced here; ORB in the
+  registry), the universal Orb models trained on MPtrj and Alexandria
+  (and on MPtrj only), the D3-corrected Orb-D3, and the four molecule-
+  specific Orb models fine-tuned on MD17-10k. Results: the Matbench
+  Discovery energy MAE and R2 (Table 1) and the MD17 test force MAEs of the
+  fine-tuned models (Table 2). Stability, h(r), the zero-shot MD17 study
+  (Table 3), MOF-5 MD and Mg-MOF-74 adsorption are not accuracy metrics of
+  the schema; baseline values quoted from other papers are not encoded.
+materials:
+  wbm: {label: "Inorganic crystals of the WBM test set (Matbench Discovery)", class: "Inorganic crystalline materials"}
+  aspirin: {label: "Aspirin molecule (MD17)", formula: "C9H8O4", class: "Small organic molecule (gas phase)", wikidata: Q18216}
+  ethanol: {label: "Ethanol molecule (MD17)", formula: "C2H6O", class: "Small organic molecule (gas phase)", wikidata: Q153}
+  naphthalene: {label: "Naphthalene molecule (MD17)", formula: "C10H8", class: "Small organic molecule (gas phase)", wikidata: Q179724}
+  salicylic-acid: {label: "Salicylic acid molecule (MD17)", formula: "C7H6O3", class: "Small organic molecule (gas phase)", wikidata: Q193572}
+  inorganic: {label: "Inorganic materials of the Materials Project and Alexandria databases", class: "Inorganic crystalline materials"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, comment: "MPtrj and Alexandria: PBE with Hubbard U corrections for transition-metal oxides, no dispersion correction, VASP (Sec. 2.3.3); D3 added for the Orb-D3 training data (Sec. 2.4)."}
+datasets:
+  mptrj-alex: {label: "MPtrj combined with Alexandria (PBE geometry-optimisation trajectories)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: pbe, comment: "Fine-tuning data of the universal Orb models; sizes not stated in the paper. Pretraining used a curated set of ground-state structures from several sources regardless of functional (Sec. 2.3.3)."}
+  mptrj: {label: "MPtrj (Materials Project trajectory data set)", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Published, calc: pbe}
+  mptrj-alex-d3: {label: "MPtrj and Alexandria with D3 dispersion corrections added", materials: [inorganic], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: pbe}
+  md17-aspirin: {label: "MD17-10k aspirin training data", materials: [aspirin], properties: [Energy, Forces], provenance: Published, comment: "MD17-10k protocol of Fu et al. (Ref. [33])."}
+  md17-ethanol: {label: "MD17-10k ethanol training data", materials: [ethanol], properties: [Energy, Forces], provenance: Published}
+  md17-naphthalene: {label: "MD17-10k naphthalene training data", materials: [naphthalene], properties: [Energy, Forces], provenance: Published}
+  md17-salicylic-acid: {label: "MD17-10k salicylic acid training data", materials: [salicylic-acid], properties: [Energy, Forces], provenance: Published}
+methods:
+  ORB:
+    hp: [cutoffRadius, learningRate, numEpochs, batchSize]
+    loss: "Weighted sum of the energy error (per atom, relative to a linear stoichiometric reference), force MAE and stress MAE; preceded by a denoising-diffusion (epsilon prediction) pretraining objective"
+    algorithm: "Adam (beta1 0.9, beta2 0.999) with cosine-annealing schedule and exponential moving average of weights"
+    impl: {lib: {local: "orb-models", comment: "PyTorch, Apache 2.0, https://github.com/orbital-materials/orb-models"}}
+    sims: [MolecularDynamics, GeometryOptimization, MonteCarlo]
+runs:
+  orb-v2: {label: "Orb universal model trained on MPtrj and Alexandria", method: ORB, dataset: mptrj-alex, settings: {cutoffRadius: {v: 10, loc: "App. 6.2"}, learningRate: {v: 0.0003, loc: "App. 6.2"}, numEpochs: {v: 200, loc: "App. 6.2 (pretraining maximum)"}, batchSize: {v: 240, loc: "App. 6.2 (average per GPU, dynamic)"}}, model: "Orb (MPtraj + Alexandria)", trainingHardware: "8 NVIDIA A100 GPUs for diffusion pretraining; fine-tuning on a single A100"}
+  orb-mptrj: {label: "Orb trained on MPtrj only", method: ORB, dataset: mptrj, registry: ORB-MPtrj, trainingHardware: "8 NVIDIA A100 GPUs for diffusion pretraining; fine-tuning on a single A100"}
+  orb-d3: {label: "Orb-D3 trained on D3-corrected MPtrj and Alexandria", method: ORB, dataset: mptrj-alex-d3, model: "Orb-D3"}
+  orb-aspirin: {label: "Orb fine-tuned on MD17-10k aspirin", method: ORB, dataset: md17-aspirin, model: "Orb fine-tuned for aspirin", base_model: {label: "Orb (variant not stated)", relation: fine-tuned, location: "Sec. 3.4"}}
+  orb-ethanol: {label: "Orb fine-tuned on MD17-10k ethanol", method: ORB, dataset: md17-ethanol, model: "Orb fine-tuned for ethanol", base_model: {label: "Orb (variant not stated)", relation: fine-tuned, location: "Sec. 3.4"}}
+  orb-naphthalene: {label: "Orb fine-tuned on MD17-10k naphthalene", method: ORB, dataset: md17-naphthalene, model: "Orb fine-tuned for naphthalene", base_model: {label: "Orb (variant not stated)", relation: fine-tuned, location: "Sec. 3.4"}}
+  orb-salicylic-acid: {label: "Orb fine-tuned on MD17-10k salicylic acid", method: ORB, dataset: md17-salicylic-acid, model: "Orb fine-tuned for salicylic acid", base_model: {label: "Orb (variant not stated)", relation: fine-tuned, location: "Sec. 3.4"}}
+results:
+  - {key: orb-v2-matbench, model: orb-v2, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set"}, metrics: [[MAE, Energy, 0.028, null, "Matbench Discovery MAE of the predicted energy above the convex hull (eV/atom): Orb", "Table 1"], [R2, Energy, 0.824, null, "Matbench Discovery R2 of the predicted energy above the convex hull: Orb", "Table 1"]]}
+  - {key: orb-v2-matbench-noproto, model: orb-v2, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set (Alexandria training data without protostructure overlap)"}, comment: "Orb retrained without Alexandria entries whose protostructures overlap the WBM test set (Table 1, last row).", metrics: [[MAE, Energy, 0.029, null, "Matbench Discovery MAE of the energy above hull (eV/atom): Orb, no protostructure overlap", "Table 1"], [R2, Energy, 0.823, null, "Matbench Discovery R2 of the energy above hull: Orb, no protostructure overlap", "Table 1"]]}
+  - {key: orb-mptrj-matbench, model: orb-mptrj, material: wbm, role: external, eval_data: {label: "Matbench Discovery WBM test set"}, metrics: [[MAE, Energy, 0.045, null, "Matbench Discovery MAE of the energy above hull (eV/atom): Orb (MPtrj only)", "Table 1"], [R2, Energy, 0.756, null, "Matbench Discovery R2 of the energy above hull: Orb (MPtrj only)", "Table 1"]]}
+  - {key: orb-aspirin, model: orb-aspirin, material: aspirin, role: test, eval_data: {label: "MD17-10k aspirin test set", registry: MD17}, metrics: [[MAE, Force, 2.4, meV/A, "Test force MAE: Orb fine-tuned on MD17-10k aspirin", "Table 2"]]}
+  - {key: orb-ethanol, model: orb-ethanol, material: ethanol, role: test, eval_data: {label: "MD17-10k ethanol test set", registry: MD17}, metrics: [[MAE, Force, 1.7, meV/A, "Test force MAE: Orb fine-tuned on MD17-10k ethanol", "Table 2"]]}
+  - {key: orb-naphthalene, model: orb-naphthalene, material: naphthalene, role: test, eval_data: {label: "MD17-10k naphthalene test set", registry: MD17}, metrics: [[MAE, Force, 1.0, meV/A, "Test force MAE: Orb fine-tuned on MD17-10k naphthalene", "Table 2"]]}
+  - {key: orb-salicylic-acid, model: orb-salicylic-acid, material: salicylic-acid, role: test, eval_data: {label: "MD17-10k salicylic acid test set", registry: MD17}, metrics: [[MAE, Force, 1.8, meV/A, "Test force MAE: Orb fine-tuned on MD17-10k salicylic acid", "Table 2"]]}
+resources: |
+  Pretraining on 8 NVIDIA A100 GPUs, fine-tuning on one A100 (App. 6.2);
+  durations are not given. Speed is reported only relative to MACE (3-6
+  times faster forward pass at large system sizes, Fig. 3) without per-atom
+  figures.
+gaps:
+  - "Orb is non-conservative: forces come from a separate head, with net-force and net-torque removal (Sec. 2.2, App. 6.3). The backbone is a Graph Network Simulator with smoothed graph attention; GNS is not a registry method, so no derivation edge is recorded."
+  - "Training-set sizes of MPtrj, Alexandria and the pretraining set are not given. The neighbour radius is 'a max radius of 10' with 20 nearest neighbours; the unit is not stated."
+  - "Matbench Discovery MAE and R2 refer to the energy above the convex hull after relaxation with Orb (eV/atom, no unit individual); F1, DAF, precision, recall and accuracy are classification scores and are not encoded."
+  - "Which Orb variant was fine-tuned for the four MD17 molecules is not stated; the base model is recorded in the encoding input as 'Orb (variant not stated)'."
+  - "The registry model ORB-MPtrj (label from its first evaluating paper, loew2025) is the MPtrj-only Orb of Table 1; this paper does not state its parameter count."
+  - "Orb-D3 is used only for the Mg-MOF-74 heat of adsorption (-54.9 kJ/mol against -44 kJ/mol experiment), which is not an accuracy metric of the schema."

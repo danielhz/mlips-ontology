@@ -1,0 +1,96 @@
+id: liu2021spherical
+source:
+  rank: 206
+  year: "2021"
+  first_author: "Yi Liu"
+  title: "Spherical Message Passing for 3D Graph Networks"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2102.05013"
+  kg_relevance: "Method/model"
+  arxiv_id: "2102.05013v5"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7ba7c522bccfcfa165f18d7d6b02a58d69f5add84aff328f36c30b77a57372a7"
+study_label: "Liu et al. (2022): spherical message passing and SphereNet for 3D molecular graphs"
+scope: |
+  Encoding scope: SphereNet (introduced here) and its tabulated energy and
+  force errors: OC20 IS2RE energy MAE per split (Table 1), the QM9 U0
+  target (Table 2) and MD17 force MAEs for the two force-over-energy loss
+  weights (Table 3). Other QM9 targets, the SMP/Q-MP comparison (Table 4),
+  the ablation (Table 5) and values quoted from other papers are not
+  encoded. The final hyperparameters are not published (only search
+  spaces, Tables 6-8), so no setting is encoded.
+materials:
+  oc20: {label: "Adsorbate-catalyst systems (OC20)", class: "Heterogeneous catalysis: adsorbates on inorganic surfaces"}
+  qm9: {label: "Small organic molecules with up to nine heavy atoms (QM9)", class: "Small organic molecules (equilibrium geometries)"}
+  aspirin: {label: "Aspirin molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  benzene: {label: "Benzene molecule (MD17; Benzene17)", class: "Small organic molecule (gas phase)"}
+  ethanol: {label: "Ethanol molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  malonaldehyde: {label: "Malonaldehyde molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  naphthalene: {label: "Naphthalene molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  salicylic-acid: {label: "Salicylic acid molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  toluene: {label: "Toluene molecule (MD17)", class: "Small organic molecule (gas phase)"}
+  uracil: {label: "Uracil molecule (MD17)", class: "Small organic molecule (gas phase)"}
+datasets:
+  oc20-is2re: {label: "OC20 IS2RE All training data", materials: [oc20], properties: [Energy], provenance: Published, comment: "Direct approach: relaxed energy predicted from the initial structure."}
+  qm9: {label: "QM9 training set (110,000 molecules)", materials: [qm9], properties: [Energy], provenance: Published, n: {v: 110000, loc: "Sec. 6.3"}, comment: "10,000 validation and 10,831 test molecules."}
+  md17-aspirin: {label: "MD17 aspirin training set (1,000 samples)", materials: [aspirin], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-benzene: {label: "MD17 benzene training set (1,000 samples)", materials: [benzene], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-ethanol: {label: "MD17 ethanol training set (1,000 samples)", materials: [ethanol], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-malonaldehyde: {label: "MD17 malonaldehyde training set (1,000 samples)", materials: [malonaldehyde], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-naphthalene: {label: "MD17 naphthalene training set (1,000 samples)", materials: [naphthalene], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-salicylic-acid: {label: "MD17 salicylic acid training set (1,000 samples)", materials: [salicylic-acid], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-toluene: {label: "MD17 toluene training set (1,000 samples)", materials: [toluene], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+  md17-uracil: {label: "MD17 uracil training set (1,000 samples)", materials: [uracil], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. 6.4"}}
+methods:
+  SphereNet:
+    loss: "Joint energy and force loss with force-over-energy weight (WoFE) 100 or 1000 for MD17"
+    algorithm: "Adam; hyperparameters by grid search"
+    impl: {lib: {local: "DIG", comment: "Dive into Graphs library, https://github.com/divelab/DIG"}}
+runs:
+  sn-oc20: {label: "SphereNet trained on OC20 IS2RE (All)", method: SphereNet, dataset: oc20-is2re, model: "SphereNet OC20 IS2RE model"}
+  sn-qm9-U0: {label: "SphereNet trained on the QM9 U0 target", method: SphereNet, dataset: qm9, model: "SphereNet QM9 U0 model (1,898,566 parameters)"}
+  sn-aspirin-w100: {label: "SphereNet fit to MD17 aspirin with force-over-energy weight 100", method: SphereNet, dataset: md17-aspirin, model: "SphereNet MD17 aspirin model (WoFE 100)"}
+  sn-aspirin-w1000: {label: "SphereNet fit to MD17 aspirin with force-over-energy weight 1000", method: SphereNet, dataset: md17-aspirin, model: "SphereNet MD17 aspirin model (WoFE 1000)"}
+  sn-benzene-w100: {label: "SphereNet fit to MD17 benzene with force-over-energy weight 100", method: SphereNet, dataset: md17-benzene, model: "SphereNet MD17 benzene model (WoFE 100)"}
+  sn-benzene-w1000: {label: "SphereNet fit to MD17 benzene with force-over-energy weight 1000", method: SphereNet, dataset: md17-benzene, model: "SphereNet MD17 benzene model (WoFE 1000)"}
+  sn-ethanol-w100: {label: "SphereNet fit to MD17 ethanol with force-over-energy weight 100", method: SphereNet, dataset: md17-ethanol, model: "SphereNet MD17 ethanol model (WoFE 100)"}
+  sn-ethanol-w1000: {label: "SphereNet fit to MD17 ethanol with force-over-energy weight 1000", method: SphereNet, dataset: md17-ethanol, model: "SphereNet MD17 ethanol model (WoFE 1000)"}
+  sn-malonaldehyde-w100: {label: "SphereNet fit to MD17 malonaldehyde with force-over-energy weight 100", method: SphereNet, dataset: md17-malonaldehyde, model: "SphereNet MD17 malonaldehyde model (WoFE 100)"}
+  sn-malonaldehyde-w1000: {label: "SphereNet fit to MD17 malonaldehyde with force-over-energy weight 1000", method: SphereNet, dataset: md17-malonaldehyde, model: "SphereNet MD17 malonaldehyde model (WoFE 1000)"}
+  sn-naphthalene-w100: {label: "SphereNet fit to MD17 naphthalene with force-over-energy weight 100", method: SphereNet, dataset: md17-naphthalene, model: "SphereNet MD17 naphthalene model (WoFE 100)"}
+  sn-naphthalene-w1000: {label: "SphereNet fit to MD17 naphthalene with force-over-energy weight 1000", method: SphereNet, dataset: md17-naphthalene, model: "SphereNet MD17 naphthalene model (WoFE 1000)"}
+  sn-salicylic-acid-w100: {label: "SphereNet fit to MD17 salicylic acid with force-over-energy weight 100", method: SphereNet, dataset: md17-salicylic-acid, model: "SphereNet MD17 salicylic acid model (WoFE 100)"}
+  sn-salicylic-acid-w1000: {label: "SphereNet fit to MD17 salicylic acid with force-over-energy weight 1000", method: SphereNet, dataset: md17-salicylic-acid, model: "SphereNet MD17 salicylic acid model (WoFE 1000)"}
+  sn-toluene-w100: {label: "SphereNet fit to MD17 toluene with force-over-energy weight 100", method: SphereNet, dataset: md17-toluene, model: "SphereNet MD17 toluene model (WoFE 100)"}
+  sn-toluene-w1000: {label: "SphereNet fit to MD17 toluene with force-over-energy weight 1000", method: SphereNet, dataset: md17-toluene, model: "SphereNet MD17 toluene model (WoFE 1000)"}
+  sn-uracil-w100: {label: "SphereNet fit to MD17 uracil with force-over-energy weight 100", method: SphereNet, dataset: md17-uracil, model: "SphereNet MD17 uracil model (WoFE 100)"}
+  sn-uracil-w1000: {label: "SphereNet fit to MD17 uracil with force-over-energy weight 1000", method: SphereNet, dataset: md17-uracil, model: "SphereNet MD17 uracil model (WoFE 1000)"}
+results:
+  - {key: sn-oc20, model: sn-oc20, material: oc20, role: test, eval_data: {label: "OC20 IS2RE test splits (ID, OOD Ads, OOD Cat, OOD Both)", registry: OC20}, metrics: [[MAE, Energy, 0.5632, eV, "IS2RE energy MAE, in-domain: SphereNet", "Table 1"], [MAE, Energy, 0.6682, eV, "IS2RE energy MAE, OOD adsorbates: SphereNet", "Table 1"], [MAE, Energy, 0.5590, eV, "IS2RE energy MAE, OOD catalysts: SphereNet", "Table 1"], [MAE, Energy, 0.6190, eV, "IS2RE energy MAE, OOD both: SphereNet", "Table 1"], [MAE, Energy, 0.6024, eV, "IS2RE energy MAE, average of the four splits: SphereNet", "Table 1"]]}
+  - {key: sn-qm9-U0, model: sn-qm9-U0, material: qm9, role: test, eval_data: {label: "QM9 test set (10,831 molecules)", registry: QM9}, metrics: [[MAE, Energy, 6.26, meV, "QM9 test MAE of U0: SphereNet", "Table 2"]]}
+  - {key: sn-aspirin-w100, model: sn-aspirin-w100, material: aspirin, role: test, eval_data: {label: "MD17 aspirin test set", registry: MD17}, metrics: [[MAE, Force, 0.43, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 aspirin, WoFE 100", "Table 3"]]}
+  - {key: sn-aspirin-w1000, model: sn-aspirin-w1000, material: aspirin, role: test, eval_data: {label: "MD17 aspirin test set", registry: MD17}, metrics: [[MAE, Force, 0.209, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 aspirin, WoFE 1000", "Table 3"]]}
+  - {key: sn-benzene-w100, model: sn-benzene-w100, material: benzene, role: test, eval_data: {label: "MD17 benzene test set", registry: MD17}, metrics: [[MAE, Force, 0.178, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 benzene, WoFE 100", "Table 3"]]}
+  - {key: sn-benzene-w1000, model: sn-benzene-w1000, material: benzene, role: test, eval_data: {label: "MD17 benzene test set", registry: MD17}, metrics: [[MAE, Force, 0.147, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 benzene, WoFE 1000", "Table 3"]]}
+  - {key: sn-ethanol-w100, model: sn-ethanol-w100, material: ethanol, role: test, eval_data: {label: "MD17 ethanol test set", registry: MD17}, metrics: [[MAE, Force, 0.208, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 ethanol, WoFE 100", "Table 3"]]}
+  - {key: sn-ethanol-w1000, model: sn-ethanol-w1000, material: ethanol, role: test, eval_data: {label: "MD17 ethanol test set", registry: MD17}, metrics: [[MAE, Force, 0.091, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 ethanol, WoFE 1000", "Table 3"]]}
+  - {key: sn-malonaldehyde-w100, model: sn-malonaldehyde-w100, material: malonaldehyde, role: test, eval_data: {label: "MD17 malonaldehyde test set", registry: MD17}, metrics: [[MAE, Force, 0.34, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 malonaldehyde, WoFE 100", "Table 3"]]}
+  - {key: sn-malonaldehyde-w1000, model: sn-malonaldehyde-w1000, material: malonaldehyde, role: test, eval_data: {label: "MD17 malonaldehyde test set", registry: MD17}, metrics: [[MAE, Force, 0.172, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 malonaldehyde, WoFE 1000", "Table 3"]]}
+  - {key: sn-naphthalene-w100, model: sn-naphthalene-w100, material: naphthalene, role: test, eval_data: {label: "MD17 naphthalene test set", registry: MD17}, metrics: [[MAE, Force, 0.178, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 naphthalene, WoFE 100", "Table 3"]]}
+  - {key: sn-naphthalene-w1000, model: sn-naphthalene-w1000, material: naphthalene, role: test, eval_data: {label: "MD17 naphthalene test set", registry: MD17}, metrics: [[MAE, Force, 0.048, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 naphthalene, WoFE 1000", "Table 3"]]}
+  - {key: sn-salicylic-acid-w100, model: sn-salicylic-acid-w100, material: salicylic-acid, role: test, eval_data: {label: "MD17 salicylic acid test set", registry: MD17}, metrics: [[MAE, Force, 0.36, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 salicylic acid, WoFE 100", "Table 3"]]}
+  - {key: sn-salicylic-acid-w1000, model: sn-salicylic-acid-w1000, material: salicylic-acid, role: test, eval_data: {label: "MD17 salicylic acid test set", registry: MD17}, metrics: [[MAE, Force, 0.113, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 salicylic acid, WoFE 1000", "Table 3"]]}
+  - {key: sn-toluene-w100, model: sn-toluene-w100, material: toluene, role: test, eval_data: {label: "MD17 toluene test set", registry: MD17}, metrics: [[MAE, Force, 0.155, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 toluene, WoFE 100", "Table 3"]]}
+  - {key: sn-toluene-w1000, model: sn-toluene-w1000, material: toluene, role: test, eval_data: {label: "MD17 toluene test set", registry: MD17}, metrics: [[MAE, Force, 0.054, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 toluene, WoFE 1000", "Table 3"]]}
+  - {key: sn-uracil-w100, model: sn-uracil-w100, material: uracil, role: test, eval_data: {label: "MD17 uracil test set", registry: MD17}, metrics: [[MAE, Force, 0.267, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 uracil, WoFE 100", "Table 3"]]}
+  - {key: sn-uracil-w1000, model: sn-uracil-w1000, material: uracil, role: test, eval_data: {label: "MD17 uracil test set", registry: MD17}, metrics: [[MAE, Force, 0.106, null, "Test force MAE (unit not stated in the table): SphereNet, MD17 uracil, WoFE 1000", "Table 3"]]}
+resources: |
+  Training time per epoch on the QM9 U0 task on an NVIDIA GeForce RTX 2080
+  Ti 11GB: 340 s for SphereNet (Table 9); 324 s per epoch on MD17 (average
+  over the eight molecules, Table 4). No inference timing is reported.
+gaps:
+  - "SphereNet follows the input/interaction/output block design of SchNet, PhysNet and DimeNet, which the paper calls special cases of its spherical message passing (Secs. 3.3, 4); it does not state that SphereNet is built on one of them, so no derivation edge is recorded."
+  - "Table 3 gives MD17 force MAEs without a unit; the baselines are 'taken or adapted (if the unit varies)' from their papers, which use kcal/mol/A, but the unit is not stated, so mlips:hasUnit is omitted. Benzene is the Benzene17 trajectory."
+  - "The QM9 repeats over three random splits for four targets (U0 6.28 +- 0.05 meV) are not encoded separately; EwT percentages on OC20 are not accuracy metrics of the schema."
+  - "Only search spaces of the hyperparameters are published (App. D); the selected values are not, so no setting is encoded."
+  - "The DFT levels of OC20, QM9 and MD17 are not described in this paper."

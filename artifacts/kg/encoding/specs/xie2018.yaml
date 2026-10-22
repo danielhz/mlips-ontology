@@ -1,0 +1,47 @@
+id: xie2018
+source:
+  rank: 207
+  year: "2018"
+  first_author: "Tian Xie"
+  title: "Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.120.145301"
+  kg_relevance: "Method/model"
+  arxiv_id: "1710.10324v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e9b5693d1a5b4daa25f7bf61c8f97d5f55657669581a8208e2e8637b226d0970"
+study_label: "Xie and Grossman (2018): crystal graph convolutional neural networks (CGCNN) for material properties"
+scope: |
+  Encoding scope: CGCNN (introduced here) trained on Materials Project
+  data, with the energy-valued test errors only: formation energy per atom
+  with the two convolution functions (Eqs. 4, 5), absolute energy per atom
+  (Table I) and the perovskite energy above hull (Fig. 3). Band gap, Fermi
+  energy, elastic moduli, Poisson ratio and the metal/semiconductor
+  classification are not energies or forces and are not encoded.
+materials:
+  mp: {label: "Inorganic crystals of the Materials Project (87 elements, 7 lattice systems, 216 space groups)", class: "Inorganic crystalline materials"}
+  perovskites: {label: "ABX3 perovskite crystals (X = O, N, S, F)", class: "Perovskite oxides, nitrides, sulfides and fluorides"}
+datasets:
+  mp: {label: "Materials Project crystals with DFT properties (46,744 materials; 60% for training)", materials: [mp], properties: [Energy], provenance: Published, n: {v: 28046, loc: "Table I"}, comment: "46,744 materials after removing ill-converged crystals; 60% training, 20% validation, 20% test (9,350 crystals)."}
+  perovskites: {label: "Perovskite energy-above-hull data set (18,928 crystals)", materials: [perovskites], properties: [Energy], provenance: Published, n: {v: 18928, loc: "Sec. on perovskites"}, comment: "Database of Ref. [26]; 3,787 test perovskites."}
+methods:
+  CGCNN:
+    hp: [numLayers]
+    loss: "Cost function J between predicted and DFT property (MAE-type regression; cross entropy for classification)"
+    algorithm: "Stochastic gradient descent with backpropagation"
+runs:
+  cgcnn-ef-eq5: {label: "CGCNN with the gated convolution (Eq. 5) trained on formation energy per atom", method: CGCNN, dataset: mp, model: "CGCNN formation-energy model (Eq. 5 convolution)"}
+  cgcnn-ef-eq4: {label: "CGCNN with the simple convolution (Eq. 4) trained on formation energy per atom", method: CGCNN, dataset: mp, model: "CGCNN formation-energy model (Eq. 4 convolution)"}
+  cgcnn-eabs: {label: "CGCNN trained on absolute energy per atom", method: CGCNN, dataset: mp, model: "CGCNN absolute-energy model"}
+  cgcnn-pv: {label: "CGCNN with linear pooling trained on perovskite total energy above hull", method: CGCNN, dataset: perovskites, model: "CGCNN perovskite energy-above-hull model (linear pooling, Eq. 4)"}
+results:
+  - {key: cgcnn-ef-eq5, model: cgcnn-ef-eq5, material: mp, role: test, eval_data: {label: "9,350 Materials Project test crystals"}, metrics: [[MAE, Energy, 0.039, null, "Test MAE of formation energy per atom (eV/atom): CGCNN, Eq. 5 convolution", "Table I; Fig. 2(c)"]]}
+  - {key: cgcnn-ef-eq4, model: cgcnn-ef-eq4, material: mp, role: test, eval_data: {label: "9,350 Materials Project test crystals"}, metrics: [[MAE, Energy, 0.136, null, "Best test MAE of formation energy per atom (eV/atom): CGCNN, Eq. 4 convolution", "Sec. results; Fig. 2(b)"]]}
+  - {key: cgcnn-eabs, model: cgcnn-eabs, material: mp, role: test, eval_data: {label: "Materials Project test set"}, metrics: [[MAE, Energy, 0.072, null, "Test MAE of absolute energy per atom (eV/atom): CGCNN", "Table I"]]}
+  - {key: cgcnn-pv, model: cgcnn-pv, material: perovskites, role: test, eval_data: {label: "3,787 test perovskites"}, metrics: [[MAE, Energy, 0.130, null, "Test MAE of energy above hull per atom (eV/atom): CGCNN with linear pooling", "Fig. 3(b)"]]}
+gaps:
+  - "CGCNN predicts crystal properties from the crystal graph; it has no force output in this paper. It appears in the registry because later papers use it as an energy/force baseline."
+  - "The errors are in eV/atom, which has no unit individual; mlips:hasUnit is omitted and the unit is in the labels. The validation MAEs (0.108 and 0.039 eV/atom) used for model selection are not encoded separately."
+  - "Hyperparameters are in the Supplemental Material (Table S1), which is not part of the version read; none is encoded."
+  - "The DFT settings of the Materials Project data and of the perovskite database are not described in this paper."
+  - "No derivation from an earlier registry method is stated."

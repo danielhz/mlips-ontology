@@ -1,0 +1,90 @@
+id: cheng2025
+source:
+  rank: 208
+  year: "2025"
+  first_author: "Bingqing Cheng"
+  title: "Latent Ewald summation for machine learning of long-range interactions"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01577-7"
+  kg_relevance: "Method/model"
+  arxiv_id: "2408.15165v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6ab8c09ed43c8d727bc72da3754a8d685ccbd5fcc9b001814582f8a6fe6d80fb"
+study_label: "Cheng (2025): latent Ewald summation (LES) for long-range interactions, combined with CACE (CACE-LES)"
+scope: |
+  Encoding scope: the latent Ewald summation combined with CACE (CACE-LES
+  in the registry; introduced here) and the short-range CACE models it is
+  compared with: the three molecular dimer classes (test RMSEs printed in
+  Fig. 1), molten NaCl, bulk liquid water and the water liquid-vapour
+  interface. Only the dimer errors are given as numbers in an energy or
+  force unit; NaCl errors are percentages (Table I) and the water errors are
+  learning curves (Figs. 2, 5, 7), so those models have no result.
+materials:
+  CC: {label: "Charged-charged molecular dimer (CC) in a periodic 30 A box", class: "Molecular dimer (BioFragment Database)"}
+  CP: {label: "Charged-polar molecular dimer (CP) in a periodic 30 A box", class: "Molecular dimer (BioFragment Database)"}
+  PP: {label: "Polar-polar molecular dimer (PP) in a periodic 30 A box", class: "Molecular dimer (BioFragment Database)"}
+  NaCl: {label: "Molten sodium chloride (64 Na and 64 Cl atoms)", formula: "NaCl", class: "Molten salt", wikidata: Q2314}
+  water: {label: "Bulk liquid water", formula: "H2O", class: "Molecular liquid", wikidata: Q283}
+  interface: {label: "Liquid-vapour interface of water (slabs of 522 molecules)", formula: "H2O", class: "Liquid-vapour interface"}
+reference:
+  dimer-dft: {type: DFT, xc: HSE06, comment: "HSE06 hybrid functional with a many-body dispersion correction (data set of Ref. [7], from the BioFragment Database)."}
+  water-dft: {type: DFT, xc: {local: "revPBE0-D3"}, comment: "Bulk water data set of Ref. [36]."}
+  interface-dft: {type: DFT, xc: {local: "revPBE-D3"}, comment: "Liquid-vapour interface data set of Ref. [4]."}
+datasets:
+  CC: {label: "CC dimer binding-curve training set (10 configurations, separations 5-12 A)", materials: [CC], properties: [Energy, Forces], provenance: Published, n: {v: 10, loc: "Sec. I B"}, calc: dimer-dft, comment: "Test set: 3 configurations at separations of about 12 to 15 A."}
+  CP: {label: "CP dimer binding-curve training set (10 configurations, separations 5-12 A)", materials: [CP], properties: [Energy, Forces], provenance: Published, n: {v: 10, loc: "Sec. I B"}, calc: dimer-dft, comment: "Test set: 3 configurations at separations of about 12 to 15 A."}
+  PP: {label: "PP dimer binding-curve training set (10 configurations, separations 5-12 A)", materials: [PP], properties: [Energy, Forces], provenance: Published, n: {v: 10, loc: "Sec. I B"}, calc: dimer-dft, comment: "Test set: 3 configurations at separations of about 12 to 15 A."}
+  NaCl: {label: "Molten NaCl data set (1,014 structures; 80% training)", materials: [NaCl], properties: [Energy, Forces], provenance: Published, n: {v: 1014, loc: "Sec. I C"}, comment: "Data set of Ref. [25]; 80% training, 20% validation."}
+  water: {label: "Bulk liquid water data set (1,593 configurations of 64 molecules)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 1593, loc: "Sec. I D"}, calc: water-dft}
+  interface: {label: "Water liquid-vapour interface subset (500 configurations of 522 molecules)", materials: [interface], properties: [Energy, Forces], provenance: Published, n: {v: 500, loc: "Sec. I E"}, calc: interface-dft, comment: "Subset of the data set of Ref. [4]; three random 90/10 splits."}
+hyperparameters:
+  radial-channels: {label: "CACE number of radial channels c", name: "c", datatype: integer}
+  n-embedding: {label: "CACE dimension of the element embedding N_embedding", name: "N_embedding", datatype: integer}
+  q-dim: {label: "LES dimension of the latent variable q", name: "dim(q)", datatype: integer}
+  les-sigma: {label: "LES Ewald smearing factor sigma (A)", name: "sigma", datatype: double}
+  les-kc: {label: "LES reciprocal-space cutoff k_c", name: "k_c", datatype: string}
+methods:
+  CACE:
+    hp: [cutoffRadius, numRadialBasis, radial-channels, numAngularBasis, bodyOrder, n-embedding, numLayers]
+    impl: {lib: {local: "cace", comment: "PyTorch, https://github.com/BingqingCheng/cace; MD through ASE"}}
+    sims: [MolecularDynamics]
+  CACE-LES:
+    hp: [cutoffRadius, numRadialBasis, radial-channels, numAngularBasis, bodyOrder, n-embedding, numLayers, q-dim, les-sigma, les-kc]
+    impl: {lib: {local: "cace", comment: "LES implemented as an Ewald module in CACE (O(N^1.5) Ewald summation)"}}
+    sims: [MolecularDynamics]
+runs:
+  sr-CC: {label: "Short-range CACE fit to the CC dimer", method: CACE, dataset: CC, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}}, model: "Short-range CACE model, CC dimer"}
+  lr-CC: {label: "CACE-LES (long-range) fit to the CC dimer", method: CACE-LES, dataset: CC, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}, q-dim: {v: 4, loc: "Sec. I B"}, les-sigma: {v: 1.0, loc: "Sec. I B"}, les-kc: {v: "2pi/3", loc: "Sec. I B"}}, model: "CACE-LES model, CC dimer"}
+  sr-CP: {label: "Short-range CACE fit to the CP dimer", method: CACE, dataset: CP, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}}, model: "Short-range CACE model, CP dimer"}
+  lr-CP: {label: "CACE-LES (long-range) fit to the CP dimer", method: CACE-LES, dataset: CP, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}, q-dim: {v: 4, loc: "Sec. I B"}, les-sigma: {v: 1.0, loc: "Sec. I B"}, les-kc: {v: "2pi/3", loc: "Sec. I B"}}, model: "CACE-LES model, CP dimer"}
+  sr-PP: {label: "Short-range CACE fit to the PP dimer", method: CACE, dataset: PP, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}}, model: "Short-range CACE model, PP dimer"}
+  lr-PP: {label: "CACE-LES (long-range) fit to the PP dimer", method: CACE-LES, dataset: PP, settings: {cutoffRadius: {v: 5, loc: "Sec. I B"}, numRadialBasis: {v: 6, loc: "Sec. I B"}, radial-channels: {v: 8, loc: "Sec. I B"}, numAngularBasis: {v: 2, loc: "Sec. I B (lmax)"}, bodyOrder: {v: 2, loc: "Sec. I B (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I B"}, numLayers: {v: 1, loc: "Sec. I B (T)"}, q-dim: {v: 4, loc: "Sec. I B"}, les-sigma: {v: 1.0, loc: "Sec. I B"}, les-kc: {v: "2pi/3", loc: "Sec. I B"}}, model: "CACE-LES model, PP dimer"}
+  lr-NaCl-T0: {label: "CACE-LES fit to molten NaCl, T=0", method: CACE-LES, dataset: NaCl, settings: {cutoffRadius: {v: 6, loc: "Sec. I C"}, numRadialBasis: {v: 6, loc: "Sec. I C"}, radial-channels: {v: 12, loc: "Sec. I C"}, numAngularBasis: {v: 3, loc: "Sec. I C (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I C (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I C"}, numLayers: {v: 0, loc: "Sec. I C (T)"}, q-dim: {v: 4, loc: "Sec. I C"}, les-sigma: {v: 1.0, loc: "Sec. I C"}, les-kc: {v: "2pi/3", loc: "Sec. I C"}}, model: "CACE-LR NaCl model, T=0"}
+  lr-NaCl-T1: {label: "CACE-LES fit to molten NaCl, T=1", method: CACE-LES, dataset: NaCl, settings: {cutoffRadius: {v: 6, loc: "Sec. I C"}, numRadialBasis: {v: 6, loc: "Sec. I C"}, radial-channels: {v: 12, loc: "Sec. I C"}, numAngularBasis: {v: 3, loc: "Sec. I C (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I C (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I C"}, numLayers: {v: 1, loc: "Sec. I C (T)"}, q-dim: {v: 4, loc: "Sec. I C"}, les-sigma: {v: 1.0, loc: "Sec. I C"}, les-kc: {v: "2pi/3", loc: "Sec. I C"}}, model: "CACE-LR NaCl model, T=1"}
+  sr-water-T0: {label: "Short-range CACE fit to bulk water, T=0", method: CACE, dataset: water, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I D"}, numRadialBasis: {v: 6, loc: "Sec. I D"}, radial-channels: {v: 12, loc: "Sec. I D"}, numAngularBasis: {v: 3, loc: "Sec. I D (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I D (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I D"}, numLayers: {v: 0, loc: "Sec. I D (T)"}}, model: "Short-range CACE water model, T=0"}
+  lr-water-T0: {label: "CACE-LES fit to bulk water, T=0", method: CACE-LES, dataset: water, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I D"}, numRadialBasis: {v: 6, loc: "Sec. I D"}, radial-channels: {v: 12, loc: "Sec. I D"}, numAngularBasis: {v: 3, loc: "Sec. I D (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I D (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I D"}, numLayers: {v: 0, loc: "Sec. I D (T)"}, q-dim: {v: 4, loc: "Sec. I D"}, les-sigma: {v: 1.0, loc: "Sec. I D"}, les-kc: {v: "pi", loc: "Sec. I D"}}, model: "CACE-LES water model, T=0"}
+  sr-water-T1: {label: "Short-range CACE fit to bulk water, T=1", method: CACE, dataset: water, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I D"}, numRadialBasis: {v: 6, loc: "Sec. I D"}, radial-channels: {v: 12, loc: "Sec. I D"}, numAngularBasis: {v: 3, loc: "Sec. I D (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I D (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I D"}, numLayers: {v: 1, loc: "Sec. I D (T)"}}, model: "Short-range CACE water model, T=1"}
+  lr-water-T1: {label: "CACE-LES fit to bulk water, T=1", method: CACE-LES, dataset: water, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I D"}, numRadialBasis: {v: 6, loc: "Sec. I D"}, radial-channels: {v: 12, loc: "Sec. I D"}, numAngularBasis: {v: 3, loc: "Sec. I D (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I D (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I D"}, numLayers: {v: 1, loc: "Sec. I D (T)"}, q-dim: {v: 4, loc: "Sec. I D"}, les-sigma: {v: 1.0, loc: "Sec. I D"}, les-kc: {v: "pi", loc: "Sec. I D"}}, model: "CACE-LES water model, T=1"}
+  sr-interface-T0: {label: "Short-range CACE fit to the water interface, T=0", method: CACE, dataset: interface, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I E"}, numRadialBasis: {v: 6, loc: "Sec. I E"}, radial-channels: {v: 12, loc: "Sec. I E"}, numAngularBasis: {v: 3, loc: "Sec. I E (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I E (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I E"}, numLayers: {v: 0, loc: "Sec. I E (T)"}}, model: "Short-range CACE interface model, T=0"}
+  lr-interface-T0: {label: "CACE-LES fit to the water interface, T=0", method: CACE-LES, dataset: interface, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I E"}, numRadialBasis: {v: 6, loc: "Sec. I E"}, radial-channels: {v: 12, loc: "Sec. I E"}, numAngularBasis: {v: 3, loc: "Sec. I E (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I E (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I E"}, numLayers: {v: 0, loc: "Sec. I E (T)"}, q-dim: {v: 4, loc: "Sec. I D"}, les-sigma: {v: 1.0, loc: "Sec. I D"}, les-kc: {v: "pi", loc: "Sec. I D"}}, model: "CACE-LES interface model, T=0"}
+  sr-interface-T1: {label: "Short-range CACE fit to the water interface, T=1", method: CACE, dataset: interface, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I E"}, numRadialBasis: {v: 6, loc: "Sec. I E"}, radial-channels: {v: 12, loc: "Sec. I E"}, numAngularBasis: {v: 3, loc: "Sec. I E (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I E (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I E"}, numLayers: {v: 1, loc: "Sec. I E (T)"}}, model: "Short-range CACE interface model, T=1"}
+  lr-interface-T1: {label: "CACE-LES fit to the water interface, T=1", method: CACE-LES, dataset: interface, settings: {cutoffRadius: {v: 5.5, loc: "Sec. I E"}, numRadialBasis: {v: 6, loc: "Sec. I E"}, radial-channels: {v: 12, loc: "Sec. I E"}, numAngularBasis: {v: 3, loc: "Sec. I E (lmax)"}, bodyOrder: {v: 3, loc: "Sec. I E (nu_max)"}, n-embedding: {v: 3, loc: "Sec. I E"}, numLayers: {v: 1, loc: "Sec. I E (T)"}, q-dim: {v: 4, loc: "Sec. I D"}, les-sigma: {v: 1.0, loc: "Sec. I D"}, les-kc: {v: "pi", loc: "Sec. I D"}}, model: "CACE-LES interface model, T=1"}
+results:
+  - {key: sr-CC, model: sr-CC, material: CC, role: test, eval_data: {label: "CC dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 372.4, meV, "Test RMSE on binding energy: short-range CACE, CC dimer", "Fig. 1 inset"], [RMSE, Force, 49.0, meV/A, "Test RMSE on force components: short-range CACE, CC dimer", "Fig. 1 inset"]]}
+  - {key: lr-CC, model: lr-CC, material: CC, role: test, eval_data: {label: "CC dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 15.5, meV, "Test RMSE on binding energy: CACE-LES, CC dimer", "Fig. 1 inset"], [RMSE, Force, 5.9, meV/A, "Test RMSE on force components: CACE-LES, CC dimer", "Fig. 1 inset"]]}
+  - {key: sr-CP, model: sr-CP, material: CP, role: test, eval_data: {label: "CP dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 81.5, meV, "Test RMSE on binding energy: short-range CACE, CP dimer", "Fig. 1 inset"], [RMSE, Force, 52.3, meV/A, "Test RMSE on force components: short-range CACE, CP dimer", "Fig. 1 inset"]]}
+  - {key: lr-CP, model: lr-CP, material: CP, role: test, eval_data: {label: "CP dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 6.7, meV, "Test RMSE on binding energy: CACE-LES, CP dimer", "Fig. 1 inset"], [RMSE, Force, 16.5, meV/A, "Test RMSE on force components: CACE-LES, CP dimer", "Fig. 1 inset"]]}
+  - {key: sr-PP, model: sr-PP, material: PP, role: test, eval_data: {label: "PP dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 14.9, meV, "Test RMSE on binding energy: short-range CACE, PP dimer", "Fig. 1 inset"], [RMSE, Force, 8.8, meV/A, "Test RMSE on force components: short-range CACE, PP dimer", "Fig. 1 inset"]]}
+  - {key: lr-PP, model: lr-PP, material: PP, role: test, eval_data: {label: "PP dimer test configurations at 12-15 A separation"}, metrics: [[RMSE, Energy, 3.7, meV, "Test RMSE on binding energy: CACE-LES, PP dimer", "Fig. 1 inset"], [RMSE, Force, 3.0, meV/A, "Test RMSE on force components: CACE-LES, PP dimer", "Fig. 1 inset"]]}
+resources: |
+  MD timings of the short- and long-range water models on one NVIDIA L40S
+  GPU (48 GB) are shown only in Fig. 8: LR models run at roughly half the
+  speed of SR models and fit about 10,000 atoms on the GPU (SR about
+  30,000). No per-atom number is given.
+gaps:
+  - "Introduces LES and combines it with CACE: 'In the present work, we combine LES with Cartesian atomic cluster expansion (CACE) MLIP' (Introduction). Recorded in the registry as CACE-LES derived from CACE. LES is described as applicable to other MLIPs (HDNNP, GAP, MTP, ACE, NequIP, MACE); only the CACE combination is used here."
+  - "The NaCl errors are root-mean-square percentage errors (CACE-LR T=0: 1.9% energy, 2.3% force; T=1: 1.4%, 1.8%; Table I), which the metric types of the schema do not cover; they are not encoded."
+  - "The bulk-water and interface errors appear only as learning curves (Figs. 2, 5, 7); those models have no result. The text says force MAEs of about 14 to 27 meV/A on the interface data at 90% training."
+  - "For the water models the text says 'no message passing (T = 0) or no message passing layer (T = 1)'; T = 1 is read as one message-passing layer, as in the rest of the paper. The interface models use 'the same settings' as bulk water, so the water settings are repeated there."
+  - "The dimer molecules are not named beyond their class (charged or polar); energy errors are on binding energies in meV per dimer."
+  - "The DFT code and numerical settings of the three data sets are not given in this paper; the NaCl data set's level of theory is not stated."
