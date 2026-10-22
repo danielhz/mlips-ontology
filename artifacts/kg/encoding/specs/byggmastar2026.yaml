@@ -1,0 +1,43 @@
+id: byggmastar2026
+source:
+  rank: 684
+  year: "2026"
+  first_author: "Jesper Byggmästar"
+  title: "Nine-element machine-learned interatomic potentials for multiphase refractory alloys"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2603.04147"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2603.04147v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d56f0a7d73d6219ccb939c2f6c893d4e0f2d6d61808349057e1032e201e26b91"
+study_label: "Byggmästar, Lopes, Fan and Ala-Nissila (2026): nine-element tabGAP and NEP potentials for multiphase refractory alloys"
+scope: |
+  Encoding scope: the tabGAP and the NEP for Ti-Zr-Hf-V-Nb-Ta-Cr-Mo-W
+  trained on the RHEA database (22,477 structures, 694,078 atoms) built
+  with a cross-sampling strategy between the two architectures. Training
+  and test errors appear only as RMSEs inside Fig. 2 parity plots and
+  speeds only in SI Fig. S2, so there are no results.
+materials:
+  rhea: {label: "Refractory alloys of Ti, Zr, Hf, V, Nb, Ta, Cr, Mo and W: pure metals, solid solutions, Laves and other intermetallics, liquids and glasses", class: "refractory high-entropy alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, comment: "PAW 5.4 (pv for Cr and Ta, sv for the others); consistent inputs for all structures."}
+sampling:
+  cross: {label: "Iterative cross-sampling: MD/relaxations half with tabGAP and half with NEP, adding structures where the two MLIPs disagree; plus targeted alloy, defect, liquid and crystal-phase structures"}
+datasets:
+  rhea: {label: "RHEA database (22,477 structures, 694,078 atoms)", materials: [rhea], properties: [Energy, Forces, Virials], provenance: Augmented, n: {v: 22477, loc: "Fig. 1 caption"}, calc: pbe, sampling: [cross]}
+methods:
+  tabGAP:
+    algorithm: "Low-dimensional GAP (2b, 3b, EAM-like descriptors) trained with QUIP and tabulated"
+    impl: {lib: QUIP, comment: "LAMMPS for simulations"}
+    sims: [MolecularDynamics, MonteCarlo, GeometryOptimization]
+  NEP:
+    hp: [cutoffRadius]
+    algorithm: "Single-hidden-layer NN with radial and angular (3-, 4-, 5-body) descriptors; small (nmax 4 4) and large (nmax 8 8) models with lmax 4 2 1 and 80 neurons"
+    impl: {lib: {local: GPUMD}}
+    sims: [MolecularDynamics, MonteCarlo, GeometryOptimization]
+runs:
+  tabgap: {label: "Nine-element RHEA tabGAP (final version)", method: tabGAP, dataset: rhea, model: "RHEA tabGAP (9 elements)"}
+  nep: {label: "Nine-element RHEA NEP (final version)", method: NEP, dataset: rhea, settings: {cutoffRadius: {v: 5, loc: "Methods (NEP)"}}, model: "RHEA NEP (9 elements)"}
+gaps:
+  - "Energy and force RMSEs for the training set and test sets A (MoNbTaVW and W-Mo literature data) and B (UNEP-v1 structures) are printed only inside the Fig. 2 parity plots, which are not read off. Speed benchmarks against EAM and UNEP-v1 are in SI Fig. S2 (the text says 'one order of magnitude slower than EAM')."
+  - "Phase diagrams, pure-metal and alloy properties (SI Tables S1-S5), phase transitions and radiation-damage simulations are property results."

@@ -1,0 +1,57 @@
+id: brugnoli2026
+source:
+  rank: 685
+  year: "2026"
+  first_author: "Luca Brugnoli"
+  title: "Overcoming sampling limitations using machine-learned interatomic potentials: the case of water-in-salt electrolytes"
+  venue: "arXiv (Cornell University)"
+  doi: ""
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2603.22099v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "fd41b95dc41ed94452536bfa4c1838aa5dc9cf0cd943b2360d6daedc912ba645"
+study_label: "Brugnoli et al. (2026): MACE potentials overcoming sampling limitations for water-in-salt electrolytes"
+scope: |
+  Encoding scope: MACE models for the 21 m LiTFSI water-in-salt
+  electrolyte trained on r2SCAN single points of published AIMD
+  configurations: a fine-tuned model (FT, multi-head replay from the
+  MACE-MATPES-r2SCAN-OMAT-FT checkpoint) and a from-scratch model (TfS)
+  with the same architecture, with their stated test RMSEs, plus the other
+  shortlisted variants without results. Foundation checkpoints screened
+  as distributed are compared through properties only. Densities,
+  structure factors, diffusion, conductivity and viscosity are property
+  results.
+authors:
+  - {given: "Luca", family: "Brugnoli"}
+  - {given: "Mathieu", family: "Salanne"}
+  - {given: "A. Marco", family: "Saitta"}
+  - {given: "Alessandra", family: "Serva"}
+  - {given: "Arthur", family: "France-Lanord"}
+materials:
+  wise: {label: "21 m LiTFSI-H2O water-in-salt electrolyte (Li64 and Li128 cells)", class: "concentrated aqueous electrolyte"}
+reference:
+  r2scan: {type: DFT, code: {local: CP2K}, xc: {local: r2SCAN}, pp: {local: GTH}, basis: "TZV2P-GTH-SCAN", comment: "CP2K 9.1; 1200 Ry cutoff (relative 70 Ry); SCF 1e-7 Ha; recomputed on published BLYP-D3 AIMD configurations."}
+sampling:
+  aimd: {label: "Configurations from published Li64 and Li128 BLYP-D3 AIMD trajectories (Goloviznina et al.), filtered for SCF failures and forces above 10 eV/A"}
+datasets:
+  wise: {label: "r2SCAN LiTFSI water-in-salt training data (90/10 split; Li64 and Li128 configurations)", materials: [wise], properties: [Energy, Forces], provenance: Augmented, n: {v: 1245, loc: "Sec. II B"}, calc: r2scan, sampling: [aimd]}
+  wise-s50: {label: "50 Li64 configurations (data-efficiency subset)", materials: [wise], properties: [Energy, Forces], provenance: Augmented, n: {v: 50, loc: "Sec. III"}, calc: r2scan, sampling: [aimd]}
+methods:
+  MACE:
+    loss: "Energy and force loss; force weight 200 for FT and 10 for TfS (SI Tables S2-S3)"
+    algorithm: "FT by multi-head replay; architecture of the OMAT-medium foundation model for FT and TfS"
+    impl: {lib: MACE, comment: "MACE-LAMMPS interface"}
+    sims: [MolecularDynamics]
+runs:
+  matpes-r2scan: {label: "MACE-MATPES-r2SCAN-OMAT-FT checkpoint as distributed (FT starting point)", method: MACE, model: "MACE-MATPES-r2SCAN-OMAT-FT"}
+  ft: {label: "FT_MATPES-R2SCAN: fine-tuned on the full r2SCAN data", method: MACE, dataset: wise, model: "FT_MATPES-R2SCAN (LiTFSI WiSE)", base_model: {run: matpes-r2scan, relation: fine-tuned, location: "Sec. III"}}
+  ft-s50: {label: "FT_MATPES-R2SCAN_S50: fine-tuned on 50 Li64 configurations", method: MACE, dataset: wise-s50, model: "FT_MATPES-R2SCAN_S50 (LiTFSI WiSE)", base_model: {run: matpes-r2scan, relation: fine-tuned, location: "Sec. III"}}
+  tfs: {label: "TfS_C128_LMAX1: trained from scratch with the same architecture", method: MACE, dataset: wise, model: "TfS_C128_LMAX1 (LiTFSI WiSE)"}
+  tfs-c64: {label: "TfS_C64_LMAX3: trained from scratch with 64 channels and lmax = 3", method: MACE, dataset: wise, model: "TfS_C64_LMAX3 (LiTFSI WiSE)"}
+results:
+  - {key: ft-test, model: ft, material: wise, role: test, eval_data: {label: "200 Li64 configurations from an independent trajectory", location: "Sec. III; Fig. 2c,f"}, metrics: [[RMSE, Energy, 1.451, meV/atom, "test energy RMSE on LiTFSI WiSE: FT_MATPES-R2SCAN", "Sec. III"], [RMSE, Force, 33.22, meV/A, "test force RMSE on LiTFSI WiSE: FT_MATPES-R2SCAN", "Sec. III"]]}
+  - {key: tfs-test, model: tfs, material: wise, role: test, eval_data: {label: "200 Li64 configurations from an independent trajectory", location: "Sec. III; Fig. 2a,d"}, metrics: [[RMSE, Energy, 0.308, meV/atom, "test energy RMSE on LiTFSI WiSE: model trained from scratch", "Sec. III"], [RMSE, Force, 30.36, meV/A, "test force RMSE on LiTFSI WiSE: model trained from scratch", "Sec. III"]]}
+gaps:
+  - "No DOI; authors are taken from the paper's front matter. The data-set size is given as '1245 configurations ... comprising 926 configurations from Li64 and 119 configurations from Li128', which do not add up; 1245 is encoded as stated."
+  - "The text compares 'the TfS model' with the same architecture as FT; it is attached to TfS_C128_LMAX1, the variant described as having OMAT/MATPES-like complexity. Learning curves (Fig. 2b,e) and errors of other variants are figure-only or in the SI."
+  - "Foundation checkpoints (MACE-MP-0 releases, MPA-0, OMAT-0, MATPES-PBE/r2SCAN) are compared only through properties; D3 corrections are applied on top in some trajectories."
