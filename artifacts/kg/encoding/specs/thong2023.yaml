@@ -1,0 +1,37 @@
+id: thong2023
+source:
+  rank: 599
+  year: "2023"
+  first_author: "Hao‐Cheng Thong"
+  title: "Machine learning interatomic potential for molecular dynamics simulation of the ferroelectric KNb O 3 perovskite"
+  venue: "Physical review. B./Physical review. B"
+  doi: "10.1103/physrevb.107.014101"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2203.01117v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8502140d6e07527d3245653bdf1ccb66d702d51761f184c64c65b7798b4effaf"
+study_label: "Thong et al. (2023): Deep Potential for molecular dynamics of ferroelectric KNbO3"
+scope: |
+  Encoding scope: the single DeePMD (DeePot-SE) model of KNbO3 trained
+  with DP-GEN concurrent learning over the cubic, tetragonal,
+  orthorhombic and rhombohedral phases. Its training errors are given only
+  as orders of magnitude, so there are no results.
+materials:
+  knbo3: {label: "KNbO3 perovskite (cubic, tetragonal, orthorhombic and rhombohedral phases)", formula: KNbO3, class: "ferroelectric perovskite oxide"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, cutoff: 900, kpoints: "k-point spacing 0.12", comment: "Energy convergence 1e-6 eV, force convergence 0.005 eV/A."}
+sampling:
+  dpgen: {label: "DP-GEN concurrent learning: MD exploration at 0-800 K and 1-10000 kbar, labelling at force model deviation 0.12-0.30 eV/A, started from 20-atom cells of the four phases"}
+datasets:
+  dpgen: {label: "DP-GEN training set of KNbO3 configurations (roughly 10,000)", materials: [knbo3], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [dpgen]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius]
+    algorithm: "DeePot-SE descriptor; embedding net (20, 40, 60), fitting net (120, 120, 120); smoothing cutoff 1.5 A"
+    impl: {lib: DeePMDkit, comment: "DP-GEN"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  dp: {label: "DP model of KNbO3", method: DeePMD, dataset: dpgen, settings: {cutoffRadius: {v: 9, loc: "Sec. II"}}, model: "DP KNbO3"}
+gaps:
+  - "Training errors are stated only as orders of magnitude ('10-3~10-4 eV/atom' energy, '~10-2 eV/A' force, Sec. III A, Fig. 1b-c) and are not encoded. The data-set size is given only as 'roughly 10000'."
+  - "Elastic constants (mean error '~4 GPa', Tables S1-S5), polarization-switching NEB paths, domain-wall motion and phase-transition temperatures are property comparisons and are not encoded."

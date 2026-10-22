@@ -1,0 +1,58 @@
+id: karimitari2026
+source:
+  rank: 593
+  year: "2026"
+  first_author: "Nima Karimitari"
+  title: "Systematic fine-tuning of MACE interatomic potentials for catalysis"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02335-z"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "1013e876b027de216327696511b2276e9949bc367b34afe88fdbf9d2a8da5e41"
+study_label: "Karimitari et al. (2026): systematic fine-tuning of MACE-MH-1 for heterogeneous catalysis"
+scope: |
+  Encoding scope: the three from-scratch MACE models (FS-BMA, FS-BMA+MD,
+  FS-All) and the six MACE models fine-tuned from MACE-MH-1 (OMAT head)
+  with multi-head replay on catalysis training sets assembled from
+  relaxation trajectories, MD and contour-exploration sampling. All
+  accuracy figures in the paper are reaction-energy and activation-energy
+  MAEs on downstream test sets, which are property errors and have no
+  result.
+hyperparameters:
+  lmax: {label: "Maximum equivariance order L of the MACE messages", name: "L", datatype: integer}
+materials:
+  cat-m: {label: "Adsorbates (H, C, N, O, OH and C2+ intermediates) on transition-metal and bimetallic alloy surfaces", class: "metallic heterogeneous catalysts"}
+  cat-mo: {label: "O and OH adsorbates on metal-oxide surfaces", class: "metal-oxide heterogeneous catalysts"}
+reference:
+  beef: {type: DFT, code: QuantumESPRESSO, xc: {local: BEEF-vdW}, pp: Ultrasoft, cutoff: 500, kpoints: "Monkhorst-Pack, 50 k-points per A in-plane", comment: "QE 7.2; GBRV ultrasoft pseudopotentials; charge-density cutoff 5000 eV; 0.15 eV Fermi smearing; at least 12 A vacuum; spin-polarized for partially filled d shells."}
+sampling:
+  relax: {label: "First and last relaxation-trajectory frames of chemisorbed adsorbates on 2035 bimetallic alloy surfaces"}
+  md: {label: "MD sampling started from previously published metallic and metal-oxide catalyst structures"}
+  ce: {label: "Contour exploration (Utarget 150 meV/atom above the MLIP minimum)"}
+datasets:
+  bma: {label: "Bimetallic alloy (BMA) relaxation-trajectory configurations", materials: [cat-m], properties: [Energy, Forces], provenance: Augmented, n: {v: 39983, loc: "Table 1"}, calc: beef, sampling: [relax]}
+  md-m: {label: "Metallic-catalyst MD configurations", materials: [cat-m], properties: [Energy, Forces], provenance: InHouse, n: {v: 4976, loc: "Table 4 (NFT-TS of FT-MD(M))"}, calc: beef, sampling: [md]}
+  md-mo: {label: "Metal-oxide-catalyst MD configurations", materials: [cat-mo], properties: [Energy, Forces], provenance: InHouse, n: {v: 2692, loc: "Table 4 (NFT-TS of FT-MD(MO))"}, calc: beef, sampling: [md]}
+  ce: {label: "Contour-exploration configurations (Cu, Ag, Ir, Pd, Pt and Rh surfaces)", materials: [cat-m], properties: [Energy, Forces], provenance: InHouse, n: {v: 2208, loc: "Table 4 (NFT-TS of FT-CE)"}, calc: beef, sampling: [ce]}
+  all: {label: "Full training set (all five source datasets plus MD and CE sampling)", materials: [cat-m, cat-mo], properties: [Energy, Forces], provenance: Augmented, n: {v: 49860, loc: "Table 1"}, calc: beef, sampling: [relax, md, ce]}
+methods:
+  MACE:
+    hp: [numFeatures, lmax, cutoffRadius, numLayers, learningRate, numEpochs]
+    loss: "Per-atom energy and force MSE; FS weights (E,F) 1000,10 for 400 epochs then 1000,1000 for 100 epochs; FT weights 1,10 for 80 epochs then 10,10"
+    impl: {lib: MACE, comment: "MACE 0.3.16; multi-head replay fine-tuning with 30K OMAT configurations labelled by MACE-MH-1"}
+    sims: [GeometryOptimization, NudgedElasticBand, MolecularDynamics]
+runs:
+  fs-bma: {label: "FS-BMA: MACE trained from scratch on the BMA set", method: MACE, dataset: bma, settings: {numFeatures: {v: 512, loc: "Table 5 (number of chemical channels)"}, lmax: {v: 1, loc: "Table 5"}, cutoffRadius: {v: 6, loc: "Table 5"}, numLayers: {v: 2, loc: "Table 5"}, numEpochs: {v: 500, loc: "Methods, MACE training"}}, model: "FS-BMA"}
+  fs-all: {label: "FS-All: MACE trained from scratch on the full training set", method: MACE, dataset: all, settings: {numFeatures: {v: 512, loc: "Table 5 (number of chemical channels)"}, lmax: {v: 1, loc: "Table 5"}, cutoffRadius: {v: 6, loc: "Table 5"}, numLayers: {v: 2, loc: "Table 5"}, numEpochs: {v: 500, loc: "Methods, MACE training"}}, model: "FS-All"}
+  mh1: {label: "MACE-MH-1 (OMAT head) as distributed", method: MACE, model: "MACE-MH-1 (OMAT head)"}
+  ft-bma: {label: "FT-BMA: MACE-MH-1 fine-tuned on the BMA set", method: MACE, dataset: bma, settings: {learningRate: {v: 0.0001, loc: "Methods, MACE training"}, numEpochs: {v: 120, loc: "Methods, MACE training"}}, model: "FT-BMA", base_model: {run: mh1, relation: fine-tuned, location: "Methods, MACE training"}}
+  ft-md-m: {label: "FT-MD(M): MACE-MH-1 fine-tuned on metallic MD configurations", method: MACE, dataset: md-m, settings: {learningRate: {v: 0.0001, loc: "Methods, MACE training"}, numEpochs: {v: 120, loc: "Methods, MACE training"}}, model: "FT-MD(M)", base_model: {run: mh1, relation: fine-tuned, location: "Methods, MACE training"}}
+  ft-md-mo: {label: "FT-MD(MO): MACE-MH-1 fine-tuned on metal-oxide MD configurations", method: MACE, dataset: md-mo, settings: {learningRate: {v: 0.0001, loc: "Methods, MACE training"}, numEpochs: {v: 120, loc: "Methods, MACE training"}}, model: "FT-MD(MO)", base_model: {run: mh1, relation: fine-tuned, location: "Methods, MACE training"}}
+  ft-ce: {label: "FT-CE: MACE-MH-1 fine-tuned on contour-exploration configurations", method: MACE, dataset: ce, settings: {learningRate: {v: 0.0001, loc: "Methods, MACE training"}, numEpochs: {v: 120, loc: "Methods, MACE training"}}, model: "FT-CE", base_model: {run: mh1, relation: fine-tuned, location: "Methods, MACE training"}}
+  ft-all: {label: "FT-All: MACE-MH-1 fine-tuned on the full training set", method: MACE, dataset: all, settings: {learningRate: {v: 0.0001, loc: "Methods, MACE training"}, numEpochs: {v: 120, loc: "Methods, MACE training"}}, model: "FT-All", base_model: {run: mh1, relation: fine-tuned, location: "Methods, MACE training"}}
+gaps:
+  - "Every accuracy number (Tables 3 and 4, text) is a reaction-energy (Er) or activation-energy (Ea) MAE in eV on downstream catalysis test sets, or a fraction of adsorption energies within 0.2 eV; these are property errors and are not encoded. No energy or force test errors are stated."
+  - "FS-BMA+MD (47,651 configurations) and FT-BMA+MD(M) (44,959) are not encoded as runs: their training sets are combinations not separately described. The FS learning rate is given only relative to the FT one ('two orders of magnitude' larger) and is not encoded."
+  - "MACE-MH-1, UMA (OC20, OMAT heads) and MACE-MP0 are compared only on Er/Ea; MACE-MH-1 has no registry row, so it is a paper-local 'as distributed' run."
+  - "The BMA set (row 1 of Table 1) is a 20,000-structure selection from a published dataset (ref. 32); Table 1 gives 39,983 configurations (first and last frames)."

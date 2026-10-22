@@ -1,0 +1,58 @@
+id: imbalzano2018
+source:
+  rank: 601
+  year: "2018"
+  first_author: "Giulio Imbalzano"
+  title: "Automatic selection of atomic fingerprints and reference configurations for machine-learning potentials"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/1.5024611"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "1804.02150v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5611f96eea2170485038fe559fc1decf15167e09408a526f9488667d78bcaa52"
+study_label: "Imbalzano et al. (2018): automatic selection of atomic fingerprints and reference configurations for ML potentials"
+scope: |
+  Encoding scope: the Behler-Parrinello neural-network potentials (RuNNer)
+  for liquid water and Al-Si-Mg alloys trained with automatically selected
+  (CUR) symmetry functions and with the published hand-chosen sets, with
+  the test RMSEs of Tables I and II and the water MD cost per step. The
+  SOAP-GPR feature-selection study on QM7b atomization energies is a
+  molecular-property regression, not a potential, and is not encoded.
+materials:
+  water: {label: "Liquid water", formula: H2O, class: "molecular liquid"}
+  alsimg: {label: "Al-Si-Mg alloys (Al-6xxx), including beta''-phase precipitates and interfaces", class: "aluminium alloys"}
+reference:
+  water-dft: {type: DFT, comment: "DFT reference data set of Refs. 25 and 45 (settings not restated)."}
+  alsimg-dft: {type: DFT, comment: "DFT settings of Refs. 51 and 52 (Kobayashi et al.); not restated."}
+sampling:
+  fps: {label: "Farthest-point sampling of a published structure pool (1000 water structures; 2000 of 11,160 Al-Si-Mg structures)"}
+datasets:
+  water-fps: {label: "1000 FPS-selected liquid-water structures from the data set of Ref. 25 (3:1 train:test split)", materials: [water], properties: [Energy, Forces], provenance: Published, n: {v: 1000, loc: "Sec. IV A"}, calc: water-dft, sampling: [fps]}
+  alsimg-fps: {label: "2000 FPS-selected Al-Si-Mg structures from the 10,551 structures of Ref. 51 plus 609 precipitate/interface structures of Ref. 52", materials: [alsimg], properties: [Energy, Forces], provenance: Published, n: {v: 2000, loc: "Sec. IV B"}, calc: alsimg-dft, sampling: [fps]}
+methods:
+  HDNNP:
+    hp: [numFeatures]
+    algorithm: "Atomic NNs with two hidden layers of 20 neurons; symmetry functions selected by CUR decomposition from a pool of G2/G3 functions"
+    impl: {lib: RuNNer, comment: "LAMMPS RuNNer plugin for MD"}
+    sims: [MolecularDynamics, NudgedElasticBand]
+runs:
+  w-cur64: {label: "Water HDNNP with 64 CUR-selected SFs per element", method: HDNNP, dataset: water-fps, settings: {numFeatures: {v: 64, loc: "Table I (SFs per element)"}}, model: "Water NNP (CUR, 64+64 SFs)"}
+  w-default: {label: "Water HDNNP with the default SF set (36 SFs per element)", method: HDNNP, dataset: water-fps, settings: {numFeatures: {v: 36, loc: "Table I (SFs per element)"}}, model: "Water NNP (default SF set)"}
+  w-ref45: {label: "Water HDNNP with the SF set of Ref. 45 (30 O, 27 H)", method: HDNNP, dataset: water-fps, model: "Water NNP (SFs of Ref. 45)"}
+  a-cur64: {label: "Al-Si-Mg HDNNP with 64 CUR-selected SFs per species", method: HDNNP, dataset: alsimg-fps, settings: {numFeatures: {v: 64, loc: "Table II (SFs per species)"}}, model: "Al-Si-Mg NNP (CUR, 64 SFs per species)"}
+  a-ref51: {label: "Al-Si-Mg HDNNP with the G2-only SF set of Ref. 51 (40 per species), re-optimized", method: HDNNP, dataset: alsimg-fps, settings: {numFeatures: {v: 40, loc: "Table II (SFs per species)"}}, model: "Al-Si-Mg NNP (SFs of Ref. 51)"}
+results:
+  - {key: w-cur64-test, model: w-cur64, material: water, role: test, eval_data: {label: "Random 25% test split of the 1000 FPS water structures (average of 4 NNs)", location: "Table I"}, metrics: [[RMSE, Energy, 0.99, meV/atom, "test energy RMSE on water: HDNNP CUR 64+64 SFs", "Table I"], [RMSE, Force, 114, meV/A, "test force RMSE on water: HDNNP CUR 64+64 SFs", "Table I (0.114 eV/A)"]]}
+  - {key: w-default-test, model: w-default, material: water, role: test, eval_data: {label: "Random 25% test split of the 1000 FPS water structures (average of 4 NNs)", location: "Table I"}, metrics: [[RMSE, Energy, 1.62, meV/atom, "test energy RMSE on water: HDNNP default SF set", "Table I"], [RMSE, Force, 238, meV/A, "test force RMSE on water: HDNNP default SF set", "Table I (0.238 eV/A)"]]}
+  - {key: w-ref45-test, model: w-ref45, material: water, role: test, eval_data: {label: "Random 25% test split of the 1000 FPS water structures (average of 4 NNs)", location: "Table I"}, metrics: [[RMSE, Energy, 0.98, meV/atom, "test energy RMSE on water: HDNNP SFs of Ref. 45", "Table I"], [RMSE, Force, 115, meV/A, "test force RMSE on water: HDNNP SFs of Ref. 45", "Table I (0.115 eV/A)"]]}
+  - {key: a-cur64-test, model: a-cur64, material: alsimg, role: test, eval_data: {label: "Test split of the 2000 FPS Al-Si-Mg structures", location: "Table II"}, metrics: [[RMSE, Energy, 2.47, meV/atom, "test energy RMSE on alsimg: HDNNP CUR 64 SFs per species", "Table II"], [RMSE, Force, 22, meV/A, "test force RMSE on alsimg: HDNNP CUR 64 SFs per species", "Table II (0.022 eV/A)"]]}
+  - {key: a-ref51-test, model: a-ref51, material: alsimg, role: test, eval_data: {label: "Test split of the 2000 FPS Al-Si-Mg structures", location: "Table II"}, metrics: [[RMSE, Energy, 9.2, meV/atom, "test energy RMSE on alsimg: HDNNP SFs of Ref. 51", "Table II"], [RMSE, Force, 69, meV/A, "test force RMSE on alsimg: HDNNP SFs of Ref. 51", "Table II (0.069 eV/A)"]]}
+timings:
+  - {model: w-cur64, system: "216 water molecules, LAMMPS RuNNer plugin", atoms: 648, value: 0.52, unit: "s per MD step", per_atom_us: 802.47, hardware: "single Intel Xeon 2.60 GHz core", result: w-cur64-test, location: "Table I"}
+  - {model: w-default, system: "216 water molecules, LAMMPS RuNNer plugin", atoms: 648, value: 0.85, unit: "s per MD step", per_atom_us: 1311.73, hardware: "single Intel Xeon 2.60 GHz core", result: w-default-test, location: "Table I"}
+  - {model: w-ref45, system: "216 water molecules, LAMMPS RuNNer plugin", atoms: 648, value: 0.69, unit: "s per MD step", per_atom_us: 1064.81, hardware: "single Intel Xeon 2.60 GHz core", result: w-ref45-test, location: "Table I"}
+gaps:
+  - "Table I also lists CUR (16, 32), CUR k=1, FPS and PC selections with 16, 32 and 64 SFs per element, and Table II CUR with 16 and 32 SFs per species; only the 64-SF CUR models and the published reference sets are encoded as runs."
+  - "Vacancy-migration barriers of Al, Mg and Si (Fig. 2; error 'below 0.1 eV') are property comparisons and are not encoded."
+  - "QM7b atomization-energy GPR with CUR/FPS-reduced SOAP features (Figs. 3-4) is not an interatomic potential; its errors are only in figures."
+  - "The DFT functional for either reference data set is not restated in this paper. The atom count 648 is 216 x 3 atoms for the 216-molecule water box."
