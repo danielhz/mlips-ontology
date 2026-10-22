@@ -1,0 +1,46 @@
+id: nascimento2026
+source:
+  rank: 586
+  year: "2026"
+  first_author: "Gabriel de Miranda Nascimento"
+  title: "Mixture of Experts Framework in Machine Learning Interatomic Potentials for Atomistic Simulations"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2604.26143"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2604.26143v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "dc34adbe83aa55b7e051ae655c31827ec530024e80b0c0249afc0b9b375ecf1c"
+study_label: "de Miranda Nascimento et al. (2026): spatial mixture-of-experts MLIPs with co-trained high- and low-fidelity Allegro models for CO on platinum"
+scope: |
+  Encoding scope: a high-fidelity Allegro (3 layers, l_max 3, 64
+  features, about 539K parameters) and a low-fidelity Allegro (2 layers,
+  l_max 1, 32 features, about 50.7K parameters) trained independently on
+  the full CO/Pt dataset, and co-trained mixtures (surface atoms to the
+  high-fidelity model, bulk Pt to the low-fidelity model) with agreement
+  weights alpha = 1.0, 0.8 and 0.5. Test MAEs are figure-only (Figs.
+  2-3).
+materials:
+  copt: {label: "Pt bulk, Pt(111)/(100) slabs with CO coverage, Pt nanoparticles, clusters and gas-phase CO", class: "Solid-liquid interface"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: {local: optB88-vdW}, comment: "Labels recomputed for the FLARE active-learning configurations of Owen et al."}
+sampling:
+  flare: {label: "Configurations from the Bayesian active-learning workflow of Owen et al. (FLARE); 80/10/10 split"}
+datasets:
+  copt: {label: "CO/Pt dataset (2,446 configurations; 80% training)", materials: [copt], properties: [Energy, Forces], provenance: Augmented, n: {v: 2446, loc: "Sec. III (total)"}, calc: vasp, sampling: [flare]}
+methods:
+  Allegro:
+    hp: [numLayers, numFeatures]
+    loss: "Energies and forces plus (co-training) an agreement loss on bulk atoms weighted by alpha"
+    impl: {lib: Allegro}
+    sims: [MolecularDynamics]
+runs:
+  hifi: {label: "High-fidelity Allegro (independent, full dataset)", method: Allegro, dataset: copt, settings: {numLayers: {v: 3, loc: "Sec. III"}, numFeatures: {v: 64, loc: "Sec. III"}}, model: "Allegro CO/Pt high-fidelity"}
+  lofi: {label: "Low-fidelity Allegro (independent, full dataset)", method: Allegro, dataset: copt, settings: {numLayers: {v: 2, loc: "Sec. III"}, numFeatures: {v: 32, loc: "Sec. III"}}, model: "Allegro CO/Pt low-fidelity"}
+  moe10: {label: "Co-trained mixture, alpha = 1.0 (no agreement constraint)", method: Allegro, dataset: copt, model: "Allegro CO/Pt mixture (alpha = 1.0)"}
+  moe08: {label: "Co-trained mixture, alpha = 0.8", method: Allegro, dataset: copt, model: "Allegro CO/Pt mixture (alpha = 0.8)"}
+  moe05: {label: "Co-trained mixture, alpha = 0.5", method: Allegro, dataset: copt, model: "Allegro CO/Pt mixture (alpha = 0.5)"}
+results: []
+resources: |
+  The low-fidelity model is on average 3.8 times faster than the high-fidelity model on an NVIDIA A100 80GB (Sec. III).
+gaps:
+  - "Validation and test energy/force MAEs and inter-model disagreement are figure-only (Figs. 2-3)."
