@@ -1,0 +1,71 @@
+id: fellman2025
+source:
+  rank: 636
+  year: "2025"
+  first_author: "Aslak Fellman"
+  title: "Fast and accurate machine-learned interatomic potentials for large-scale simulations of Cu, Al, and Ni"
+  venue: "Physical Review Materials"
+  doi: "10.1103/physrevmaterials.9.053807"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2408.15779v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "dbef26647f9ede350c15d1fac64a4b651da99e13e4aa68705613e3994910f658"
+study_label: "Fellman et al. (2025): GAP and tabGAP potentials for large-scale simulations of Cu, Al and Ni"
+scope: |
+  Encoding scope: the six potentials of the paper, a SOAP-GAP and a
+  tabulated GAP (2b + 3b + EAM descriptors, tabGAP) for each of Cu, Al and
+  Ni, with ZBL-type repulsion refitted to all-electron dimer data, their
+  test RMSEs for crystalline and liquid structures (Table II) and the
+  single-core CPU cost (Table III). Material properties, threshold
+  displacement energies and compression simulations are property results.
+materials:
+  cu: {label: "Copper (crystalline, defects, surfaces, liquid, short-range)", formula: Cu, class: "fcc metal"}
+  al: {label: "Aluminium (crystalline, defects, surfaces, liquid, short-range)", formula: Al, class: "fcc metal"}
+  ni: {label: "Nickel (crystalline, defects, surfaces, liquid, short-range; ferromagnetic)", formula: Ni, class: "fcc metal"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Gamma-centred Monkhorst-Pack, spacing at most 0.15 1/A", comment: "PAW Cu_pv, Al, Ni; 0.1 eV Methfessel-Paxton smearing; collinear spin polarisation for Ni only."}
+sampling:
+  mixed: {label: "Distorted cells, finite-temperature FCC/BCC/HCP, vacancy and interstitial clusters, liquids, surfaces, stacking-fault-like slabs, dimers/trimers, short-range insertions and rigid-path trajectories; 5-10% per category held out for testing"}
+datasets:
+  cu: {label: "Cu DFT training set (no trimers)", materials: [cu], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe, sampling: [mixed]}
+  al: {label: "Al DFT training set (no dimers)", materials: [al], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe, sampling: [mixed]}
+  ni: {label: "Ni DFT training set (no trimers)", materials: [ni], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe, sampling: [mixed]}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "Repulsive ZBL-type potential + 2-body + SOAP (nmax = lmax = 8); regularisation 1 meV/atom, 0.04 eV/A, 0.1 eV (10x for liquids, dense and short-range data)"
+    sims: [MolecularDynamics, GeometryOptimization]
+  tabGAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    algorithm: "Repulsion + 2-body + 3-body + EAM-density GAP tabulated on 1D (5000 points) and 3D (80^3) cubic-spline grids"
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  gap-cu: {label: "GAP (SOAP) for Cu", method: GAP, dataset: cu, settings: {cutoffRadius: {v: 4.5, loc: "Table I (SOAP)"}, numSparseConfigs: {v: 2000, loc: "Table I (SOAP)"}}, model: "GAP (SOAP) Cu (Fellman 2025)"}
+  tabgap-cu: {label: "tabGAP for Cu", method: tabGAP, dataset: cu, settings: {cutoffRadius: {v: 5.2, loc: "Table I (2b and EAM; 3b cutoff 4.0 A)"}, numSparseConfigs: {v: 700, loc: "Table I (3b)"}}, model: "tabGAP Cu (Fellman 2025)"}
+  gap-al: {label: "GAP (SOAP) for Al", method: GAP, dataset: al, settings: {cutoffRadius: {v: 4.5, loc: "Table I (SOAP)"}, numSparseConfigs: {v: 2000, loc: "Table I (SOAP)"}}, model: "GAP (SOAP) Al (Fellman 2025)"}
+  tabgap-al: {label: "tabGAP for Al", method: tabGAP, dataset: al, settings: {cutoffRadius: {v: 5.2, loc: "Table I (2b and EAM; 3b cutoff 4.5 A)"}, numSparseConfigs: {v: 700, loc: "Table I (3b)"}}, model: "tabGAP Al (Fellman 2025)"}
+  gap-ni: {label: "GAP (SOAP) for Ni", method: GAP, dataset: ni, settings: {cutoffRadius: {v: 4.5, loc: "Table I (SOAP)"}, numSparseConfigs: {v: 2000, loc: "Table I (SOAP)"}}, model: "GAP (SOAP) Ni (Fellman 2025)"}
+  tabgap-ni: {label: "tabGAP for Ni", method: tabGAP, dataset: ni, settings: {cutoffRadius: {v: 5.2, loc: "Table I (2b and EAM; 3b cutoff 4.0 A)"}, numSparseConfigs: {v: 700, loc: "Table I (3b)"}}, model: "tabGAP Ni (Fellman 2025)"}
+results:
+  - {key: gap-cu-crystalline, model: gap-cu, material: cu, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 0.8, meV/atom, "test energy RMSE on Cu (crystalline): GAP (SOAP)", "Table II"], [RMSE, Force, 15, meV/A, "test force RMSE on Cu (crystalline): GAP (SOAP)", "Table II (0.015 eV/A)"]]}
+  - {key: gap-cu-liquid, model: gap-cu, material: cu, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 3.0, meV/atom, "test energy RMSE on Cu (liquid): GAP (SOAP)", "Table II"], [RMSE, Force, 60, meV/A, "test force RMSE on Cu (liquid): GAP (SOAP)", "Table II (0.06 eV/A)"]]}
+  - {key: tabgap-cu-crystalline, model: tabgap-cu, material: cu, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 1.1, meV/atom, "test energy RMSE on Cu (crystalline): tabGAP", "Table II"], [RMSE, Force, 15, meV/A, "test force RMSE on Cu (crystalline): tabGAP", "Table II (0.015 eV/A)"]]}
+  - {key: tabgap-cu-liquid, model: tabgap-cu, material: cu, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 2.0, meV/atom, "test energy RMSE on Cu (liquid): tabGAP", "Table II"], [RMSE, Force, 30, meV/A, "test force RMSE on Cu (liquid): tabGAP", "Table II (0.03 eV/A)"]]}
+  - {key: gap-al-crystalline, model: gap-al, material: al, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 0.6, meV/atom, "test energy RMSE on Al (crystalline): GAP (SOAP)", "Table II"], [RMSE, Force, 14, meV/A, "test force RMSE on Al (crystalline): GAP (SOAP)", "Table II (0.014 eV/A)"]]}
+  - {key: gap-al-liquid, model: gap-al, material: al, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 2.4, meV/atom, "test energy RMSE on Al (liquid): GAP (SOAP)", "Table II"], [RMSE, Force, 60, meV/A, "test force RMSE on Al (liquid): GAP (SOAP)", "Table II (0.06 eV/A)"]]}
+  - {key: tabgap-al-crystalline, model: tabgap-al, material: al, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 1.1, meV/atom, "test energy RMSE on Al (crystalline): tabGAP", "Table II"], [RMSE, Force, 20, meV/A, "test force RMSE on Al (crystalline): tabGAP", "Table II (0.02 eV/A)"]]}
+  - {key: tabgap-al-liquid, model: tabgap-al, material: al, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 3.0, meV/atom, "test energy RMSE on Al (liquid): tabGAP", "Table II"], [RMSE, Force, 60, meV/A, "test force RMSE on Al (liquid): tabGAP", "Table II (0.06 eV/A)"]]}
+  - {key: gap-ni-crystalline, model: gap-ni, material: ni, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "test energy RMSE on Ni (crystalline): GAP (SOAP)", "Table II"], [RMSE, Force, 12, meV/A, "test force RMSE on Ni (crystalline): GAP (SOAP)", "Table II (0.012 eV/A)"]]}
+  - {key: gap-ni-liquid, model: gap-ni, material: ni, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 1.9, meV/atom, "test energy RMSE on Ni (liquid): GAP (SOAP)", "Table II"], [RMSE, Force, 100, meV/A, "test force RMSE on Ni (liquid): GAP (SOAP)", "Table II (0.1 eV/A)"]]}
+  - {key: tabgap-ni-crystalline, model: tabgap-ni, material: ni, role: test, eval_data: {label: "Held-out crystalline test structures", location: "Table II"}, metrics: [[RMSE, Energy, 1.6, meV/atom, "test energy RMSE on Ni (crystalline): tabGAP", "Table II"], [RMSE, Force, 70, meV/A, "test force RMSE on Ni (crystalline): tabGAP", "Table II (0.07 eV/A)"]]}
+  - {key: tabgap-ni-liquid, model: tabgap-ni, material: ni, role: test, eval_data: {label: "Held-out liquid test structures", location: "Table II"}, metrics: [[RMSE, Energy, 3.9, meV/atom, "test energy RMSE on Ni (liquid): tabGAP", "Table II"], [RMSE, Force, 120, meV/A, "test force RMSE on Ni (liquid): tabGAP", "Table II (0.12 eV/A)"]]}
+timings:
+  - {model: gap-cu, system: "Cu, 32,000 atoms, LAMMPS", atoms: 32000, value: 3.7, unit: "1000 x s per (atom x time step)", per_atom_us: 3700, hardware: "single Xeon Gold 6230 CPU core", result: gap-cu-crystalline, location: "Table III"}
+  - {model: tabgap-cu, system: "Cu, 32,000 atoms, LAMMPS", atoms: 32000, value: 0.029, unit: "1000 x s per (atom x time step)", per_atom_us: 29, hardware: "single Xeon Gold 6230 CPU core", result: tabgap-cu-crystalline, location: "Table III"}
+  - {model: gap-al, system: "Al, 32,000 atoms, LAMMPS", atoms: 32000, value: 2.2, unit: "1000 x s per (atom x time step)", per_atom_us: 2200, hardware: "single Xeon Gold 6230 CPU core", result: gap-al-crystalline, location: "Table III"}
+  - {model: tabgap-al, system: "Al, 32,000 atoms, LAMMPS", atoms: 32000, value: 0.028, unit: "1000 x s per (atom x time step)", per_atom_us: 28, hardware: "single Xeon Gold 6230 CPU core", result: tabgap-al-crystalline, location: "Table III"}
+  - {model: gap-ni, system: "Ni, 32,000 atoms, LAMMPS", atoms: 32000, value: 4.3, unit: "1000 x s per (atom x time step)", per_atom_us: 4300, hardware: "single Xeon Gold 6230 CPU core", result: gap-ni-crystalline, location: "Table III"}
+  - {model: tabgap-ni, system: "Ni, 32,000 atoms, LAMMPS", atoms: 32000, value: 0.029, unit: "1000 x s per (atom x time step)", per_atom_us: 29, hardware: "single Xeon Gold 6230 CPU core", result: tabgap-ni-crystalline, location: "Table III"}
+gaps:
+  - "Table III also lists EAM potentials and a PACE potential (Ref. 4) for comparison; these are literature potentials and are not encoded. The training-code library for the GAPs is not named in the text read."
+  - "Lattice, elastic, defect, stacking-fault (Table V), threshold displacement energies and uniaxial compression results are property comparisons."
