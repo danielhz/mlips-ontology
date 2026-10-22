@@ -1,0 +1,55 @@
+id: liang2026
+source:
+  rank: 661
+  year: "2026"
+  first_author: "Jiuyang Liang"
+  title: "Prolate spheroidal wave functions enable fast and exponent-aware long-range machine learning interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2606.06617"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2606.06617v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "bf100acea0d367715655de67419339a6db0fbf435b2c6e8b87e88f69a9fe8520"
+study_label: "Liang, Lu, Ji and Jiang (2026): prolate spheroidal wave functions for fast, exponent-aware long-range MLIPs (PSWF-LR)"
+scope: |
+  Encoding scope: the PSWF-LR models introduced in the paper (registry
+  method PSWF-LR, origin) on the five nonlocal charge-transfer benchmarks
+  of Table 1 (published data sets), with their test RMSEs. Literature
+  baselines in Table 1 (charge-constrained ACE, 3G/4G-HDNNP, CACE-LR,
+  NequIP-LR) are taken from other papers and are not encoded. Random
+  particle, dimer and dipeptide experiments and PME runtime comparisons are
+  shown in figures.
+materials:
+  nacl: {label: "Na9Cl8+ / Na8Cl8+ ionic clusters", class: "charged ionic clusters"}
+  c10: {label: "Terminally protonated carbon chains C10H2 / C10H3+", class: "charged organic molecules"}
+  au2mgo: {label: "Au2 on MgO(001) with and without Al doping", class: "supported metal cluster on oxide"}
+  cubta: {label: "Dry Cu(111)-benzotriazole interface", class: "metal-organic interface"}
+  cubta-w: {label: "Solvated Cu(111)-benzotriazole interface", class: "metal-organic-water interface"}
+reference:
+  pub: {type: DFT, comment: "Published DFT labels of the charge-transfer benchmarks (Refs. 15, 32, 44); not restated."}
+datasets:
+  nacl: {label: "Na8/9Cl8+ charge-transfer benchmark data (90/10 train/test unless stated)", materials: [nacl], properties: [Energy, Forces], provenance: Published, calc: pub}
+  c10: {label: "C10H2/C10H3+ charge-transfer benchmark data (90/10 train/test unless stated)", materials: [c10], properties: [Energy, Forces], provenance: Published, calc: pub}
+  au2mgo: {label: "Au2-MgO(001) charge-transfer benchmark data (90/10 train/test unless stated)", materials: [au2mgo], properties: [Energy, Forces], provenance: Published, calc: pub}
+  cubta: {label: "Cu-BTA charge-transfer benchmark data (90/10 train/test unless stated)", materials: [cubta], properties: [Energy, Forces], provenance: Published, calc: pub}
+  cubta-w: {label: "Cu-BTA(H2O) charge-transfer benchmark data (90/10 train/test unless stated)", materials: [cubta-w], properties: [Energy, Forces], provenance: Published, calc: pub}
+methods:
+  PSWF-LR:
+    hp: [cutoffRadius]
+    algorithm: "Short-range CACE (or MACE for C10, no message passing) plus long-range channels p = 1..6 on latent atomic variables with PSWF mollifiers (c = 12.024, mesh h = 1.5 A)"
+    impl: {lib: {local: PSWF-LR}, comment: "PyTorch and JAX implementations"}
+runs:
+  pswf-nacl: {label: "CACE + PSWF-LR on Na8/9Cl8+", method: PSWF-LR, dataset: nacl, settings: {cutoffRadius: {v: 5.29, loc: "Table 1"}}, model: "CACE+PSWF-LR (Na8/9Cl8+)"}
+  pswf-c10: {label: "MACE + PSWF-LR on C10H2/C10H3+", method: PSWF-LR, dataset: c10, settings: {cutoffRadius: {v: 4.23, loc: "Table 1"}}, model: "MACE+PSWF-LR (C10H2/C10H3+)"}
+  pswf-au2mgo: {label: "CACE + PSWF-LR on Au2-MgO(001)", method: PSWF-LR, dataset: au2mgo, settings: {cutoffRadius: {v: 5.5, loc: "Table 1"}}, model: "CACE+PSWF-LR (Au2-MgO(001))"}
+  pswf-cubta: {label: "CACE + PSWF-LR on Cu-BTA", method: PSWF-LR, dataset: cubta, settings: {cutoffRadius: {v: 5.0, loc: "Table 1"}}, model: "CACE+PSWF-LR (Cu-BTA)"}
+  pswf-cubta-w: {label: "CACE + PSWF-LR on Cu-BTA(H2O)", method: PSWF-LR, dataset: cubta-w, settings: {cutoffRadius: {v: 5.0, loc: "Table 1"}}, model: "CACE+PSWF-LR (Cu-BTA(H2O))"}
+results:
+  - {key: pswf-nacl-test, model: pswf-nacl, material: nacl, role: test, eval_data: {label: "Na8/9Cl8+ test split", location: "Table 1"}, metrics: [[RMSE, Energy, 0.15, meV/atom, "test energy RMSE on Na8/9Cl8+: CACE+PSWF-LR", "Table 1"], [RMSE, Force, 4.43, meV/A, "test force RMSE on Na8/9Cl8+: CACE+PSWF-LR", "Table 1"]]}
+  - {key: pswf-c10-test, model: pswf-c10, material: c10, role: test, eval_data: {label: "C10H2/C10H3+ test split", location: "Table 1"}, metrics: [[RMSE, Energy, 0.67, meV/atom, "test energy RMSE on C10H2/C10H3+: MACE+PSWF-LR", "Table 1"], [RMSE, Force, 31.62, meV/A, "test force RMSE on C10H2/C10H3+: MACE+PSWF-LR", "Table 1"]]}
+  - {key: pswf-au2mgo-test, model: pswf-au2mgo, material: au2mgo, role: test, eval_data: {label: "Au2-MgO(001) test split", location: "Table 1"}, metrics: [[RMSE, Energy, 0.068, meV/atom, "test energy RMSE on Au2-MgO(001): CACE+PSWF-LR", "Table 1"], [RMSE, Force, 4.93, meV/A, "test force RMSE on Au2-MgO(001): CACE+PSWF-LR", "Table 1"]]}
+  - {key: pswf-cubta-test, model: pswf-cubta, material: cubta, role: test, eval_data: {label: "Cu-BTA test split", location: "Table 1"}, metrics: [[RMSE, Energy, 0.028, meV/atom, "test energy RMSE on Cu-BTA: CACE+PSWF-LR", "Table 1"], [RMSE, Force, 2.25, meV/A, "test force RMSE on Cu-BTA: CACE+PSWF-LR", "Table 1"]]}
+  - {key: pswf-cubta-w-test, model: pswf-cubta-w, material: cubta-w, role: test, eval_data: {label: "Cu-BTA(H2O) test split", location: "Table 1"}, metrics: [[RMSE, Energy, 0.03, meV/atom, "test energy RMSE on Cu-BTA(H2O): CACE+PSWF-LR", "Table 1"], [RMSE, Force, 2.11, meV/A, "test force RMSE on Cu-BTA(H2O): CACE+PSWF-LR", "Table 1"]]}
+gaps:
+  - "Table 1 baselines are cited from Refs. 15, 32 and 44 and not encoded. Same-backbone NequIP/CACE comparisons (Extended Data Fig. 5), fine-tuned CHGNet and MACE-MP-0 on NaCl clusters (Extended Data Fig. 6), dimer, dipeptide and random-particle benchmarks are figure-only."
+  - "Runtime speed-ups over PME (up to 114x) and MD throughput gains (2.4-3.5x for CACE Pt-water) are relative; no absolute timing is encoded."
