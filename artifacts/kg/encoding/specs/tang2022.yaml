@@ -1,0 +1,44 @@
+id: tang2022
+source:
+  rank: 589
+  year: "2022"
+  first_author: "Jialin Tang"
+  title: "Machine Learning Interatomic Potential for Anisotropic Thermal Transport in Bulk Hexagonal Boron Nitride"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2208.10082"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2208.10082v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "5e7899f4ced972326f98f5e77602178aaca44404a3af4adf9a8ef415c6ae102b"
+study_label: "Tang et al. (2022): a GAP for anisotropic thermal transport in bulk hexagonal boron nitride"
+scope: |
+  Encoding scope: the GAP for bulk h-BN (2b, 3b and SOAP descriptors,
+  4.5 A cutoff) trained on 200 LDA AIMD snapshots of a 200-atom
+  supercell, with training and test RMSEs; the published multi-phase
+  h-BN GAP (GAP-Ref, as distributed) evaluated on the same test set; MD
+  cost. Thermal conductivities and phonons are properties.
+materials:
+  hbn: {label: "Bulk hexagonal boron nitride (5x5x2 supercell, 200 atoms)", formula: BN, class: "2D material"}
+reference:
+  lda: {type: DFT, code: VASP, xc: LDA, pp: PAW, cutoff: 600, kpoints: "2x2x2 for labels"}
+sampling:
+  aimd: {label: "NVT AIMD at 300 K, one snapshot every 75 steps, relabelled with SCF calculations"}
+datasets:
+  hbn: {label: "h-BN training database (200 configurations)", materials: [hbn], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III A"}, calc: lda, sampling: [aimd]}
+methods:
+  GAP:
+    hp: [cutoffRadius]
+    loss: "Energies and forces (virials in the GAP-Stress variant)"
+    impl: {lib: QUIP, comment: "2b + 3b + SOAP"}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  gap: {label: "GAP for bulk h-BN", method: GAP, dataset: hbn, settings: {cutoffRadius: {v: 4.5, loc: "Sec. III A"}}, model: "GAP h-BN (Tang 2022)"}
+  gapref: {label: "GAP-Ref: multi-phase h-BN GAP of Ref. 61 (as distributed)", method: GAP, model: "GAP-Ref h-BN (Ref. 61)"}
+results:
+  - {key: gap-train, model: gap, material: hbn, role: training, eval_data: {label: "h-BN training database (200 configurations)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 0.052, meV/atom, "training energy RMSE on h-BN: GAP", "Sec. III A"], [RMSE, Force, 0.01, eV/A, "training force RMSE on B atoms in h-BN: GAP", "Sec. III A"], [RMSE, Force, 0.009, eV/A, "training force RMSE on N atoms in h-BN: GAP", "Sec. III A"]]}
+  - {key: gap-test, model: gap, material: hbn, role: test, eval_data: {label: "h-BN testing database (40 configurations)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 0.051, meV/atom, "test energy RMSE on h-BN: GAP", "Sec. III A"], [RMSE, Force, 0.01, eV/A, "test force RMSE on B atoms in h-BN: GAP", "Sec. III A"], [RMSE, Force, 0.009, eV/A, "test force RMSE on N atoms in h-BN: GAP", "Sec. III A"]]}
+  - {key: gapref-test, model: gapref, material: hbn, role: external, eval_data: {label: "h-BN testing database (40 configurations)", location: "Sec. III A"}, metrics: [[RMSE, Force, 0.096, eV/A, "force RMSE on B atoms in bulk h-BN: GAP-Ref", "Sec. III A"], [RMSE, Force, 0.091, eV/A, "force RMSE on N atoms in bulk h-BN: GAP-Ref", "Sec. III A"]]}
+timings:
+  - {model: gap, system: "Bulk h-BN, 200 atoms, NVT MD at 300 K in LAMMPS", atoms: 200, value: 0.7, unit: "s per MD step", per_atom_us: 3500, hardware: "One Intel Xeon Gold 6254 CPU (18 cores); AIMD 111.2 s (1x1x1 k) and 1742.9 s (2x2x2 k) per step", result: gap-test, location: "Sec. III D"}
+gaps:
+  - "Force RMSEs are per element (B, N). The GAP-Stress variant trained with virials is not encoded separately; convergence curves are figure-only."

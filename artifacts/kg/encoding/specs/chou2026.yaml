@@ -1,0 +1,46 @@
+id: chou2026
+source:
+  rank: 588
+  year: "2026"
+  first_author: "Chang-Ti Chou"
+  title: "Predicting interface structure using the minima hopping method with a machine learning interatomic potential"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02214-7"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "474b80e0b8f3982a8e9e4763f4c9930b67285165b40c9b2537fd2e04bff59d75"
+study_label: "Chou et al. (2026): predicting SrTiO3 grain-boundary structures with minima hopping driven by an Allegro potential trained on DIRECT-selected DFT data"
+scope: |
+  Encoding scope: the Allegro potential (2 layers, 32 features, l_max 3,
+  6 A cutoff) trained on 40,000 LDA configurations of SrTiO3 grain
+  boundaries selected by DIRECT sampling from about 3.5 million M3GNet
+  MD and relaxation configurations; training, validation and test MAEs
+  (Table I). The M3GNet model used for enrichment and the direct M3GNet
+  minima-hopping test are as distributed. Grain-boundary structures and
+  energies are properties.
+materials:
+  sto: {label: "SrTiO3 tilt grain boundaries (Sigma3(112), Sigma5(310) and related structures)", formula: SrTiO3, class: "Oxides"}
+reference:
+  lda: {type: DFT, code: VASP, xc: LDA, pp: PAW, cutoff: 520, kpoints: "Gamma-centred, 0.5 1/A resolution", comment: "Sr_sv and Ti_sv pseudopotentials"}
+sampling:
+  direct: {label: "Grain-boundary candidates enriched by M3GNet MD and relaxation (about 3.5 million configurations), DIRECT selection of 40,000 for DFT"}
+datasets:
+  sto: {label: "SrTiO3 grain-boundary DFT dataset (40,000 configurations; 80/10/10)", materials: [sto], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 40000, loc: "Fig. 6 caption"}, calc: lda, sampling: [direct]}
+methods:
+  Allegro:
+    hp: [numLayers, numFeatures, cutoffRadius, numRadialBasis, learningRate, batchSize]
+    loss: "Equal-weight per-atom energy, force and stress MSE"
+    algorithm: "Adam, ReduceLROnPlateau (patience 20, factor 0.5), EMA 0.99, early stopping after 200 epochs without improvement"
+    impl: {lib: Allegro, comment: "Allegro 0.5.0, float32, NVIDIA H100"}
+    sims: [MolecularDynamics, GeometryOptimization]
+  M3GNet: {sims: [MolecularDynamics, GeometryOptimization]}
+runs:
+  allegro: {label: "Allegro for SrTiO3 grain boundaries", method: Allegro, dataset: sto, settings: {numLayers: {v: 2, loc: "Methods"}, numFeatures: {v: 32, loc: "Methods"}, cutoffRadius: {v: 6.0, loc: "Methods"}, numRadialBasis: {v: 8, loc: "Methods"}, learningRate: {v: 0.002, loc: "Methods"}, batchSize: {v: 5, loc: "Methods"}}, model: "Allegro SrTiO3 grain boundaries"}
+  m3gnet: {label: "M3GNet universal potential (as distributed)", method: M3GNet, model: "M3GNet (uMLIP)"}
+results:
+  - {key: allegro-train, model: allegro, material: sto, role: training, eval_data: {label: "SrTiO3 training split (80%)", location: "Table I"}, metrics: [[MAE, Energy, 0.109, eV, "training total-energy MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Energy, 4.6, meV/atom, "training energy-per-atom MAE on SrTiO3 GBs: Allegro", "Table I (0.0046 eV)"], [MAE, Force, 0.089, eV/A, "training force MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Stress, 0.0019, null, "training stress MAE (eV/A^3) on SrTiO3 GBs: Allegro", "Table I"]]}
+  - {key: allegro-val, model: allegro, material: sto, role: validation, eval_data: {label: "SrTiO3 validation split (10%)", location: "Table I"}, metrics: [[MAE, Energy, 0.106, eV, "validation total-energy MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Energy, 4.6, meV/atom, "validation energy-per-atom MAE on SrTiO3 GBs: Allegro", "Table I (0.0046 eV)"], [MAE, Force, 0.108, eV/A, "validation force MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Stress, 0.0019, null, "validation stress MAE (eV/A^3) on SrTiO3 GBs: Allegro", "Table I"]]}
+  - {key: allegro-test, model: allegro, material: sto, role: test, eval_data: {label: "SrTiO3 test split (10%)", location: "Table I"}, metrics: [[MAE, Energy, 0.111, eV, "test total-energy MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Energy, 4.7, meV/atom, "test energy-per-atom MAE on SrTiO3 GBs: Allegro", "Table I (0.0047 eV)"], [MAE, Force, 0.107, eV/A, "test force MAE on SrTiO3 GBs: Allegro", "Table I"], [MAE, Stress, 0.0019, null, "test stress MAE (eV/A^3) on SrTiO3 GBs: Allegro", "Table I"]]}
+gaps:
+  - "Stress MAEs in eV/A^3 are kept with unit null. The M3GNet checkpoint version is not identified against the registry model."
