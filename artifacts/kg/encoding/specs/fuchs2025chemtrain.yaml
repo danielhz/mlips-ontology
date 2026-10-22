@@ -1,0 +1,66 @@
+id: fuchs2025chemtrain
+source:
+  rank: 677
+  year: "2025"
+  first_author: "Paul Fuchs"
+  title: "chemtrain-deploy: A Parallel and Scalable Framework for Machine Learning Potentials in Million-Atom MD Simulations"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c00996"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2506.04055v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6e214d068d986a6475800b3eb6e67f1ee29cc1562f25042e9d9ea74be0fbcdaf"
+study_label: "Fuchs, Chen, Thaler and Zavadlav (2025): chemtrain-deploy, parallel deployment of MLIPs for million-atom MD"
+scope: |
+  Encoding scope: Allegro, MACE and PaiNN models trained by the authors
+  (chemtrain, JAX) on ANI-AL (aluminium), SPICE and H2O-PBE0TS, with the
+  energy and force errors of Table 1; literature reference values in the
+  same table are not encoded. Scaling, memory and runtime results are
+  system benchmarks shown mostly in figures.
+materials:
+  al: {label: "Aluminium (ANI-AL nonequilibrium supercells up to 250 atoms)", formula: Al, class: "fcc metal"}
+  organics: {label: "Drug-like molecules, dimers, dipeptides and solvated amino acids (SPICE)", class: "organic and biomolecular systems"}
+  water: {label: "Liquid water and ice (H2O-PBE0TS)", formula: H2O, class: "molecular liquid and solid"}
+reference:
+  ani-al: {type: DFT, comment: "ANI-AL published DFT labels."}
+  spice: {type: DFT, xc: {local: wB97M-D3(BJ)}, basis: "def2-TZVPPD", comment: "SPICE labels."}
+  pbe0ts: {type: DFT, xc: {local: PBE0+TS}, comment: "H2O-PBE0TS AIMD labels."}
+datasets:
+  ani-al: {label: "ANI-AL (over 6000 configurations; 7:2:1 split)", materials: [al], properties: [Energy, Forces], provenance: Published, calc: ani-al}
+  spice: {label: "SPICE (over 1.1 million configurations; 7:2:1 split)", materials: [organics], properties: [Energy, Forces], provenance: Published, calc: spice}
+  h2o: {label: "H2O-PBE0TS (7:2:1 split)", materials: [water], properties: [Energy, Forces], provenance: Published, calc: pbe0ts}
+methods:
+  Allegro:
+    loss: "Force-matching energy + force MSE"
+    impl: {lib: {local: chemtrain}, comment: "JAX; deployed in LAMMPS via chemtrain-deploy"}
+    sims: [MolecularDynamics]
+  MACE:
+    loss: "Energy weight 1e-6, force weight 1e-1"
+    impl: {lib: {local: chemtrain}}
+    sims: [MolecularDynamics]
+  PaiNN:
+    impl: {lib: {local: chemtrain}}
+    sims: [MolecularDynamics]
+runs:
+  allegro-ani-al: {label: "Allegro trained on ANI-AL", method: Allegro, dataset: ani-al, model: "Allegro (ANI-AL, chemtrain)"}
+  mace-ani-al: {label: "MACE trained on ANI-AL", method: MACE, dataset: ani-al, model: "MACE (ANI-AL, chemtrain)"}
+  painn-ani-al: {label: "PaiNN trained on ANI-AL", method: PaiNN, dataset: ani-al, model: "PaiNN (ANI-AL, chemtrain)"}
+  allegro-spice: {label: "Allegro trained on SPICE", method: Allegro, dataset: spice, model: "Allegro (SPICE, chemtrain)"}
+  mace-spice: {label: "MACE trained on SPICE", method: MACE, dataset: spice, model: "MACE (SPICE, chemtrain)"}
+  painn-spice: {label: "PaiNN trained on SPICE", method: PaiNN, dataset: spice, model: "PaiNN (SPICE, chemtrain)"}
+  allegro-h2o: {label: "Allegro trained on H2O-PBE0TS", method: Allegro, dataset: h2o, model: "Allegro (H2O-PBE0TS, chemtrain)"}
+  mace-h2o: {label: "MACE trained on H2O-PBE0TS", method: MACE, dataset: h2o, model: "MACE (H2O-PBE0TS, chemtrain)"}
+  painn-h2o: {label: "PaiNN trained on H2O-PBE0TS", method: PaiNN, dataset: h2o, model: "PaiNN (H2O-PBE0TS, chemtrain)"}
+results:
+  - {key: allegro-ani-al-test, model: allegro-ani-al, material: al, role: null, eval_data: {label: "ANI-AL evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 12.9, meV/atom, "energy RMSE on ANI-AL: Allegro", "Table 1"], [RMSE, Force, 109.4, meV/A, "force RMSE on ANI-AL: Allegro", "Table 1"]]}
+  - {key: mace-ani-al-test, model: mace-ani-al, material: al, role: null, eval_data: {label: "ANI-AL evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 9.9, meV/atom, "energy RMSE on ANI-AL: MACE", "Table 1"], [RMSE, Force, 71.8, meV/A, "force RMSE on ANI-AL: MACE", "Table 1"]]}
+  - {key: painn-ani-al-test, model: painn-ani-al, material: al, role: null, eval_data: {label: "ANI-AL evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 7.2, meV/atom, "energy RMSE on ANI-AL: PaiNN", "Table 1"], [RMSE, Force, 62.7, meV/A, "force RMSE on ANI-AL: PaiNN", "Table 1"]]}
+  - {key: allegro-spice-test, model: allegro-spice, material: organics, role: null, eval_data: {label: "SPICE evaluation split (not specified; data split 7:2:1 train-test-validation)", registry: SPICE, location: "Table 1"}, metrics: [[MAE, Energy, 12.4, meV/atom, "energy MAE on SPICE: Allegro", "Table 1"], [MAE, Force, 73.5, meV/A, "force MAE on SPICE: Allegro", "Table 1"]]}
+  - {key: mace-spice-test, model: mace-spice, material: organics, role: null, eval_data: {label: "SPICE evaluation split (not specified; data split 7:2:1 train-test-validation)", registry: SPICE, location: "Table 1"}, metrics: [[MAE, Energy, 46.1, meV/atom, "energy MAE on SPICE: MACE", "Table 1"], [MAE, Force, 47.6, meV/A, "force MAE on SPICE: MACE", "Table 1"]]}
+  - {key: painn-spice-test, model: painn-spice, material: organics, role: null, eval_data: {label: "SPICE evaluation split (not specified; data split 7:2:1 train-test-validation)", registry: SPICE, location: "Table 1"}, metrics: [[MAE, Energy, 27.4, meV/atom, "energy MAE on SPICE: PaiNN", "Table 1"], [MAE, Force, 48.4, meV/A, "force MAE on SPICE: PaiNN", "Table 1"]]}
+  - {key: allegro-h2o-test, model: allegro-h2o, material: water, role: null, eval_data: {label: "H2O-PBE0TS evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 0.7, meV/atom, "energy RMSE on H2O-PBE0TS: Allegro", "Table 1"], [RMSE, Force, 36.2, meV/A, "force RMSE on H2O-PBE0TS: Allegro", "Table 1"]]}
+  - {key: mace-h2o-test, model: mace-h2o, material: water, role: null, eval_data: {label: "H2O-PBE0TS evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "energy RMSE on H2O-PBE0TS: MACE", "Table 1"], [RMSE, Force, 13.3, meV/A, "force RMSE on H2O-PBE0TS: MACE", "Table 1"]]}
+  - {key: painn-h2o-test, model: painn-h2o, material: water, role: null, eval_data: {label: "H2O-PBE0TS evaluation split (not specified; data split 7:2:1 train-test-validation)", location: "Table 1"}, metrics: [[RMSE, Energy, 0.7, meV/atom, "energy RMSE on H2O-PBE0TS: PaiNN", "Table 1"], [RMSE, Force, 17.2, meV/A, "force RMSE on H2O-PBE0TS: PaiNN", "Table 1"]]}
+gaps:
+  - "Table 1 does not say on which split the errors are computed (the data are split 7:2:1 into train, test and validation), so the role is left null."
+  - "Literature values in Table 1 (ANI-AL, MEAM, TorchMD-NET, NequIP, DeepMD) are not encoded. Maximum system sizes (Table 2), strong and weak scaling and runtimes are framework benchmarks (mostly figures)."
