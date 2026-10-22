@@ -1,0 +1,69 @@
+id: xu2026
+source:
+  rank: 237
+  year: "2026"
+  first_author: "Jiayan Xu"
+  title: "Benchmarking universal machine learning interatomic potentials for supported nanoparticles: decoupling energy accuracy from structural exploration"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02043-8"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "e1b165a9576911b4cd512f999ff986eb23da9f35f3ab2cbae4693cb180086c25"
+study_label: "Xu et al. (2026): benchmarking universal MLIPs for Cu nanoparticles supported on Al2O3"
+scope: |
+  Encoding scope: the domain-specific DP-UniAlCu model (from the authors'
+  previous work), MACE-UniAlCu trained here on the same data, and the
+  universal models MACE-OMAT, MatterSim-v1.0.0-1M, MatterSim-v1.0.0-5M and
+  DPA3-OMAT, with their force RMSEs on the three subsystems of the UniAlCu
+  data set (Table 3). Binding-energy deviations (Table 1), ranking metrics
+  (Table 2), MD observables and the MACE-MP and DPA2 models (errors in
+  figures and SI) are not encoded.
+materials:
+  Cu: {label: "Cu structures of the UniAlCu data set (bulk, surfaces, gas-phase nanoparticles)", class: "Supported metal nanoparticle catalyst / oxide surface"}
+  gamma: {label: "gamma-Al2O3 surfaces with and without supported Cu nanoparticles", class: "Supported metal nanoparticle catalyst / oxide surface"}
+  alpha: {label: "alpha-Al2O3(0001) surfaces with and without supported Cu nanoparticles", class: "Supported metal nanoparticle catalyst / oxide surface"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, comment: "UniAlCu data set and binding energies; settings close to the Materials Project MPRelaxSet (Section S2)."}
+datasets:
+  unialcu: {label: "UniAlCu data set (147,464 structures at 0 K and 400-1200 K)", materials: [Cu, gamma, alpha], properties: [Energy, Forces], provenance: Published, n: {v: 147464, loc: "Results"}, calc: pbe, comment: "From the authors' previous work (Ref. 16); Cu bulk, surfaces and gas-phase nanoparticles, Al2O3 surfaces and Al2O3-supported Cu nanoparticles up to Cu21."}
+external_models: [MatterSim-v1]
+methods:
+  DeePMD: {sims: [MolecularDynamics, GeometryOptimization]}
+  MACE: {impl: {lib: MACE}, sims: [MolecularDynamics, GeometryOptimization]}
+  M3GNet: {sims: [MolecularDynamics, GeometryOptimization]}
+  DPA3: {sims: [MolecularDynamics]}
+runs:
+  dp-unialcu: {label: "DP-UniAlCu, the domain-specific Deep Potential of the authors' previous work", method: DeePMD, dataset: unialcu, model: "DP-UniAlCu"}
+  mace-unialcu: {label: "MACE trained on the UniAlCu data set with the MACE-OMAT architecture", method: MACE, dataset: unialcu, model: "MACE-UniAlCu"}
+  mace-omat: {label: "MACE-OMAT as distributed", method: MACE, model: "MACE-OMAT (trained on OMat24)"}
+  mattersim-1m: {label: "MatterSim-v1.0.0-1M as distributed", method: M3GNet, model: "MatterSim-v1.0.0-1M"}
+  dpa3-omat: {label: "DPA3-OMAT as distributed", method: DPA3, model: "DPA3-OMAT"}
+results:
+  - {key: dp-unialcu-cu, model: "dp-unialcu", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.049, eV/A, "Force RMSE on the UniAlCu Cu subsystem: DP-UniAlCu", "Table 3"]]}
+  - {key: dp-unialcu-gamma, model: "dp-unialcu", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.06, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: DP-UniAlCu", "Table 3"]]}
+  - {key: dp-unialcu-alpha, model: "dp-unialcu", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.055, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: DP-UniAlCu", "Table 3"]]}
+  - {key: mace-unialcu-cu, model: "mace-unialcu", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.04, eV/A, "Force RMSE on the UniAlCu Cu subsystem: MACE-UniAlCu", "Table 3"]]}
+  - {key: mace-unialcu-gamma, model: "mace-unialcu", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.041, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: MACE-UniAlCu", "Table 3"]]}
+  - {key: mace-unialcu-alpha, model: "mace-unialcu", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.03, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: MACE-UniAlCu", "Table 3"]]}
+  - {key: mace-omat-cu, model: "mace-omat", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.051, eV/A, "Force RMSE on the UniAlCu Cu subsystem: MACE-OMAT", "Table 3"]]}
+  - {key: mace-omat-gamma, model: "mace-omat", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.135, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: MACE-OMAT", "Table 3"]]}
+  - {key: mace-omat-alpha, model: "mace-omat", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.115, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: MACE-OMAT", "Table 3"]]}
+  - {key: mattersim-1m-cu, model: "mattersim-1m", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.077, eV/A, "Force RMSE on the UniAlCu Cu subsystem: MatterSim-v1.0.0-1M", "Table 3"]]}
+  - {key: mattersim-1m-gamma, model: "mattersim-1m", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.175, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: MatterSim-v1.0.0-1M", "Table 3"]]}
+  - {key: mattersim-1m-alpha, model: "mattersim-1m", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.136, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: MatterSim-v1.0.0-1M", "Table 3"]]}
+  - {key: mattersim-v1-cu, model: "ext:MatterSim-v1", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.079, eV/A, "Force RMSE on the UniAlCu Cu subsystem: MatterSim-v1.0.0-5M", "Table 3"]]}
+  - {key: mattersim-v1-gamma, model: "ext:MatterSim-v1", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.146, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: MatterSim-v1.0.0-5M", "Table 3"]]}
+  - {key: mattersim-v1-alpha, model: "ext:MatterSim-v1", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.118, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: MatterSim-v1.0.0-5M", "Table 3"]]}
+  - {key: dpa3-omat-cu, model: "dpa3-omat", material: Cu, eval_data: {label: "UniAlCu data set, Cu subsystem"}, metrics: [[RMSE, Force, 0.05, eV/A, "Force RMSE on the UniAlCu Cu subsystem: DPA3-OMAT", "Table 3"]]}
+  - {key: dpa3-omat-gamma, model: "dpa3-omat", material: gamma, eval_data: {label: "UniAlCu data set, gamma-Al2O3 subsystem"}, metrics: [[RMSE, Force, 0.14, eV/A, "Force RMSE on the UniAlCu gamma-Al2O3 subsystem: DPA3-OMAT", "Table 3"]]}
+  - {key: dpa3-omat-alpha, model: "dpa3-omat", material: alpha, eval_data: {label: "UniAlCu data set, alpha-Al2O3(0001) subsystem"}, metrics: [[RMSE, Force, 0.088, eV/A, "Force RMSE on the UniAlCu alpha-Al2O3(0001) subsystem: DPA3-OMAT", "Table 3"]]}
+resources: |
+  MD cost is compared on a 2,048-atom fcc Cu bulk for 100 ps on one NVIDIA
+  A100 80 GB GPU (LAMMPS; ASE for MatterSim-v1.0.0-1M), only in Fig. 5d:
+  DP-UniAlCu is roughly two orders of magnitude faster than the universal
+  models.
+gaps:
+  - "Table 3 errors are on the whole UniAlCu data set, which DP-UniAlCu and MACE-UniAlCu were trained on; no role is recorded because the split is not stated."
+  - "DPA3-OMAT is recorded under the new registry method DPA3; the DPA2 heads (MPTrj, OC2M) and MACE-MP have errors only in the SI. MatterSim-v1.0.0-5M is the registry model MatterSim-v1; the 1M variant has no registry row."
+  - "MACE-UniAlCu settings are in Section S3 (SI) and are not encoded."

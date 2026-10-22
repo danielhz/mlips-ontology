@@ -1,0 +1,71 @@
+id: nagare2024
+source:
+  rank: 244
+  year: "2024"
+  first_author: "Balasaheb J. Nagare"
+  title: "Machine-Learned Potential Energy Surfaces for Free Sodium Clusters with Density Functional Accuracy: Applications to Melting"
+  venue: "Physica Scripta"
+  doi: "10.1088/1402-4896/ad37ab"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2309.08937v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f3f88ce7f42a284789129e74c4c0c91c91ddb46ffcd5585d3d7c18e92d8786f0"
+study_label: "Nagare, Chacko and Kanhere (2024): GAP potentials for free sodium clusters and their melting"
+scope: |
+  Encoding scope: the two GAP models (M1 trained on Na55 only, M2 adding
+  configurations of 40- to 200-atom clusters) with their validation errors
+  (Sec. 2.3, Table 3). Heat capacities, melting temperatures and isomer
+  energies/bond lengths (Table 4) are not encoded; the Table 2 maximum
+  percentage errors are not accuracy metrics of the schema.
+materials:
+  Na55: {label: "Free Na55 cluster", formula: "Na55", class: "Metal cluster"}
+  Na70: {label: "Free Na70 cluster", formula: "Na70", class: "Metal cluster"}
+  Na80: {label: "Free Na80 cluster", formula: "Na80", class: "Metal cluster"}
+  Na90: {label: "Free Na90 cluster", formula: "Na90", class: "Metal cluster"}
+  Na92: {label: "Free Na92 cluster", formula: "Na92", class: "Metal cluster"}
+  Na116: {label: "Free Na116 cluster", formula: "Na116", class: "Metal cluster"}
+  Na138: {label: "Free Na138 cluster", formula: "Na138", class: "Metal cluster"}
+  Na147: {label: "Free Na147 cluster", formula: "Na147", class: "Metal cluster"}
+  Na178: {label: "Free Na178 cluster", formula: "Na178", class: "Metal cluster"}
+  Na200: {label: "Free Na200 cluster", formula: "Na200", class: "Metal cluster"}
+  Na-clusters: {label: "Free sodium clusters of 40 to 200 atoms", formula: "Na", class: "Metal clusters"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 102, comment: "Force-consistent energies with entropy; SCF tolerance 1e-5 eV; Born-Oppenheimer MD at 50-400 K for data generation."}
+sampling:
+  bomd: {label: "Born-Oppenheimer MD from solid-like to liquid-like temperatures; configurations selected uniformly over the energy range and refined iteratively at large force errors", comment: "About 100,000 Na55 configurations, deduplicated to about 22,000; 20-50 configurations per larger size for M2."}
+datasets:
+  m1: {label: "Na55 training set of model M1 (1,945 configurations)", materials: [Na55], properties: [Energy, Forces], provenance: InHouse, n: {v: 1945, loc: "Table 2"}, calc: pbe, sampling: [bomd]}
+  m2: {label: "Multi-size training set of model M2 (1,213 configurations of Na40-Na200)", materials: [Na-clusters], properties: [Energy, Forces], provenance: InHouse, n: {v: 1213, loc: "Sec. 2.3"}, calc: pbe, sampling: [bomd]}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    loss: "Energies and forces (no virials for free clusters)"
+    algorithm: "Sparse Gaussian process regression with 2-body, 3-body and SOAP kernels"
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  m1: {label: "GAP model M1 (Na55 data only; M1-3)", method: GAP, dataset: m1, settings: {cutoffRadius: {v: 12.9, loc: "Table 1 (SOAP)"}, numSparseConfigs: {v: 6000, loc: "Table 1 (SOAP)"}}, model: "GAP sodium-cluster model M1", trainingHardware: "About 180 GB of memory across nodes"}
+  m2: {label: "GAP model M2 (Na55 plus 40- to 200-atom clusters)", method: GAP, dataset: m2, settings: {cutoffRadius: {v: 12.9, loc: "Table 1 (SOAP)"}, numSparseConfigs: {v: 6000, loc: "Table 1 (SOAP)"}}, model: "GAP sodium-cluster model M2", trainingHardware: "More than 650 GB of memory"}
+results:
+  - {key: m1-na55, model: m1, material: Na55, role: validation, eval_data: {label: "Na55 validation configurations (4,184)"}, metrics: [[RMSE, Energy, 0.438, meV/atom, "Validation energy RMSE: GAP M1-3, Na55", "Sec. 2.3, Fig. 1c"], [RMSE, Force, 19.197, meV/A, "Validation force RMSE: GAP M1-3, Na55", "Sec. 2.3"]]}
+  - {key: m1-na70, model: m1, material: Na70, role: validation, eval_data: {label: "Na70 validation configurations (2,541)"}, metrics: [[MAE, Energy, 24.563, meV/atom, "Validation energy MAE: GAP M1, Na70", "Table 3"], [RMSE, Energy, 24.614, meV/atom, "Validation energy RMSE: GAP M1, Na70", "Table 3"]]}
+  - {key: m2-na70, model: m2, material: Na70, role: validation, eval_data: {label: "Na70 validation configurations (2,541)"}, metrics: [[MAE, Energy, 0.828, meV/atom, "Validation energy MAE: GAP M2, Na70", "Table 3"], [RMSE, Energy, 1.062, meV/atom, "Validation energy RMSE: GAP M2, Na70", "Table 3"]]}
+  - {key: m1-na80, model: m1, material: Na80, role: validation, eval_data: {label: "Na80 validation configurations (6,178)"}, metrics: [[MAE, Energy, 30.477, meV/atom, "Validation energy MAE: GAP M1, Na80", "Table 3"], [RMSE, Energy, 30.556, meV/atom, "Validation energy RMSE: GAP M1, Na80", "Table 3"]]}
+  - {key: m2-na80, model: m2, material: Na80, role: validation, eval_data: {label: "Na80 validation configurations (6,178)"}, metrics: [[MAE, Energy, 0.833, meV/atom, "Validation energy MAE: GAP M2, Na80", "Table 3"], [RMSE, Energy, 1.092, meV/atom, "Validation energy RMSE: GAP M2, Na80", "Table 3"]]}
+  - {key: m1-na90, model: m1, material: Na90, role: validation, eval_data: {label: "Na90 validation configurations (1,355)"}, metrics: [[MAE, Energy, 44.868, meV/atom, "Validation energy MAE: GAP M1, Na90", "Table 3"], [RMSE, Energy, 44.96, meV/atom, "Validation energy RMSE: GAP M1, Na90", "Table 3"]]}
+  - {key: m2-na90, model: m2, material: Na90, role: validation, eval_data: {label: "Na90 validation configurations (1,355)"}, metrics: [[MAE, Energy, 0.644, meV/atom, "Validation energy MAE: GAP M2, Na90", "Table 3"], [RMSE, Energy, 0.849, meV/atom, "Validation energy RMSE: GAP M2, Na90", "Table 3"]]}
+  - {key: m1-na92, model: m1, material: Na92, role: validation, eval_data: {label: "Na92 validation configurations (2,045)"}, metrics: [[MAE, Energy, 51.5, meV/atom, "Validation energy MAE: GAP M1, Na92", "Table 3"], [RMSE, Energy, 51.621, meV/atom, "Validation energy RMSE: GAP M1, Na92", "Table 3"]]}
+  - {key: m2-na92, model: m2, material: Na92, role: validation, eval_data: {label: "Na92 validation configurations (2,045)"}, metrics: [[MAE, Energy, 0.876, meV/atom, "Validation energy MAE: GAP M2, Na92", "Table 3"], [RMSE, Energy, 1.127, meV/atom, "Validation energy RMSE: GAP M2, Na92", "Table 3"]]}
+  - {key: m1-na116, model: m1, material: Na116, role: validation, eval_data: {label: "Na116 validation configurations (3,556)"}, metrics: [[MAE, Energy, 56.576, meV/atom, "Validation energy MAE: GAP M1, Na116", "Table 3"], [RMSE, Energy, 56.593, meV/atom, "Validation energy RMSE: GAP M1, Na116", "Table 3"]]}
+  - {key: m2-na116, model: m2, material: Na116, role: validation, eval_data: {label: "Na116 validation configurations (3,556)"}, metrics: [[MAE, Energy, 0.391, meV/atom, "Validation energy MAE: GAP M2, Na116", "Table 3"], [RMSE, Energy, 0.488, meV/atom, "Validation energy RMSE: GAP M2, Na116", "Table 3"]]}
+  - {key: m1-na138, model: m1, material: Na138, role: validation, eval_data: {label: "Na138 validation configurations (4,324)"}, metrics: [[MAE, Energy, 87.214, meV/atom, "Validation energy MAE: GAP M1, Na138", "Table 3"], [RMSE, Energy, 87.223, meV/atom, "Validation energy RMSE: GAP M1, Na138", "Table 3"]]}
+  - {key: m2-na138, model: m2, material: Na138, role: validation, eval_data: {label: "Na138 validation configurations (4,324)"}, metrics: [[MAE, Energy, 0.14, meV/atom, "Validation energy MAE: GAP M2, Na138", "Table 3"], [RMSE, Energy, 0.191, meV/atom, "Validation energy RMSE: GAP M2, Na138", "Table 3"]]}
+  - {key: m1-na147, model: m1, material: Na147, role: validation, eval_data: {label: "Na147 validation configurations (3,672)"}, metrics: [[MAE, Energy, 80.778, meV/atom, "Validation energy MAE: GAP M1, Na147", "Table 3"], [RMSE, Energy, 80.784, meV/atom, "Validation energy RMSE: GAP M1, Na147", "Table 3"]]}
+  - {key: m2-na147, model: m2, material: Na147, role: validation, eval_data: {label: "Na147 validation configurations (3,672)"}, metrics: [[MAE, Energy, 0.17, meV/atom, "Validation energy MAE: GAP M2, Na147", "Table 3"], [RMSE, Energy, 0.229, meV/atom, "Validation energy RMSE: GAP M2, Na147", "Table 3"]]}
+  - {key: m1-na178, model: m1, material: Na178, role: validation, eval_data: {label: "Na178 validation configurations (1,372)"}, metrics: [[MAE, Energy, 89.866, meV/atom, "Validation energy MAE: GAP M1, Na178", "Table 3"], [RMSE, Energy, 89.872, meV/atom, "Validation energy RMSE: GAP M1, Na178", "Table 3"]]}
+  - {key: m2-na178, model: m2, material: Na178, role: validation, eval_data: {label: "Na178 validation configurations (1,372)"}, metrics: [[MAE, Energy, 0.236, meV/atom, "Validation energy MAE: GAP M2, Na178", "Table 3"], [RMSE, Energy, 0.346, meV/atom, "Validation energy RMSE: GAP M2, Na178", "Table 3"]]}
+  - {key: m1-na200, model: m1, material: Na200, role: validation, eval_data: {label: "Na200 validation configurations (2,148)"}, metrics: [[MAE, Energy, 95.815, meV/atom, "Validation energy MAE: GAP M1, Na200", "Table 3"], [RMSE, Energy, 95.821, meV/atom, "Validation energy RMSE: GAP M1, Na200", "Table 3"]]}
+  - {key: m2-na200, model: m2, material: Na200, role: validation, eval_data: {label: "Na200 validation configurations (2,148)"}, metrics: [[MAE, Energy, 0.217, meV/atom, "Validation energy MAE: GAP M2, Na200", "Table 3"], [RMSE, Energy, 0.296, meV/atom, "Validation energy RMSE: GAP M2, Na200", "Table 3"]]}
+gaps:
+  - "Table 3's caption gives energies in meV/atom; its Na70-Na200 configurations are validation sets for both models. The 2-body (12.9 A) and 3-body (3.5 A) descriptor cutoffs and sparsifications (20, 100 points) are not encoded; the SOAP values are."
+  - "Isomer energies after DFT re-optimisation (MAE about 7 meV/atom or less) are per-isomer comparisons in Table 4 and are not encoded."

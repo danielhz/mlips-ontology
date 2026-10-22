@@ -1,0 +1,59 @@
+id: han2025
+source:
+  rank: 246
+  year: "2025"
+  first_author: "Bowen Han"
+  title: "Benchmarking universal machine learning interatomic potentials for rapid analysis of inelastic neutron scattering data*"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/adfa68"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2506.01860v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e899efdf55aa3a95f4b37e1d6864d006d4104f5443e98a8ccdfb2c4454348c34"
+study_label: "Han and Cheng (2025): benchmarking universal MLIPs for phonons and inelastic neutron scattering"
+scope: |
+  Encoding scope: the twelve pretrained universal MLIPs of Table S7 and,
+  as the one energy-valued error, the mean over about 5,000 crystals of the
+  MAE of the phonon Helmholtz free energy against DFT (Table S4).
+  Coordinate differences, phonon-frequency MAEs, DOS correlations, entropy
+  and heat-capacity errors and the INS comparisons are not encoded.
+materials:
+  phonondb: {label: "Nearly 5,000 dynamically stable inorganic crystals from the Materials Project (phonon database built here)", class: "Inorganic crystalline materials"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, kpoints: "160 k-points per A^-3", comment: "Cutoff 1.6 x the largest ENMAX, PREC Accurate, 1e-8 eV; finite-displacement phonons with Phonopy, supercells of at least 12 A, Born charges for polar nonmetals (Methods)."}
+datasets:
+  phonondb: {label: "DFT phonon database of about 5,000 inorganic crystals (benchmark only)", materials: [phonondb], properties: [Energy, Forces], provenance: InHouse, calc: pbe}
+external_models: [MatterSim-v1, SevenNet-0, MACE-MP-0-L2-2024.01.07, M3GNet-MPF-2021.2.8]
+methods:
+  CHGNet: {sims: [PhononCalculation, GeometryOptimization]}
+  EquiformerV2: {sims: [PhononCalculation, GeometryOptimization]}
+  GRACE: {sims: [PhononCalculation, GeometryOptimization]}
+  MACE: {sims: [PhononCalculation, GeometryOptimization]}
+  NequIP: {sims: [PhononCalculation, GeometryOptimization]}
+  ORB: {sims: [PhononCalculation, GeometryOptimization]}
+  eSEN: {sims: [PhononCalculation, GeometryOptimization]}
+runs:
+  esen-oam: {label: "eSEN-30M-OAM as distributed (esen 30m oam)", method: eSEN, model: "eSEN-30M-OAM (esen 30m oam)"}
+  orb-v3: {label: "ORB v3 as distributed (orb v3 conservative inf omat)", method: ORB, model: "ORB v3 (orb v3 conservative inf omat)"}
+  sevennet-mf-ompa: {label: "SevenNet-MF-ompa as distributed (7net-mf-ompa)", method: NequIP, model: "SevenNet-MF-ompa (7net-mf-ompa)"}
+  grace-2l-oam: {label: "GRACE-2L-OAM as distributed (GRACE-2L-OAM)", method: GRACE, model: "GRACE-2L-OAM (GRACE-2L-OAM)"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed (mace-mpa-0-medium)", method: MACE, model: "MACE-MPA-0 (mace-mpa-0-medium)"}
+  eqv2-m: {label: "eqV2 M as distributed (eqV2 153M omat mp salex)", method: EquiformerV2, model: "eqV2 M (eqV2 153M omat mp salex)"}
+  orb-v1: {label: "ORB v1 as distributed (orbff-v1-20240827)", method: ORB, model: "ORB v1 (orbff-v1-20240827)"}
+  chgnet: {label: "CHGNet as distributed (CHGNet-MPtrj-2024.2.13-PES-11M)", method: CHGNet, model: "CHGNet (CHGNet-MPtrj-2024.2.13-PES-11M)"}
+results:
+  - {key: esen-oam-free-energy, model: "esen-oam", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 7.903143, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: eSEN-30M-OAM", "Table S4"]]}
+  - {key: orb-v3-free-energy, model: "orb-v3", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 2.897484, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: ORB v3", "Table S4"]]}
+  - {key: sevennet-mf-ompa-free-energy, model: "sevennet-mf-ompa", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 3.493488, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: SevenNet-MF-ompa", "Table S4"]]}
+  - {key: grace-2l-oam-free-energy, model: "grace-2l-oam", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 5.052455, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: GRACE-2L-OAM", "Table S4"]]}
+  - {key: mattersim-v1-free-energy, model: "ext:MatterSim-v1", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 10.314748, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: MatterSim 5M", "Table S4"]]}
+  - {key: mace-mpa-0-free-energy, model: "mace-mpa-0", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 8.98145, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: MACE-MPA-0", "Table S4"]]}
+  - {key: eqv2-m-free-energy, model: "eqv2-m", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 79.327495, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: eqV2 M", "Table S4"]]}
+  - {key: orb-v1-free-energy, model: "orb-v1", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 55.093116, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: ORB v1", "Table S4"]]}
+  - {key: sevennet-0-free-energy, model: "ext:SevenNet-0", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 24.011399, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: SevenNet-0", "Table S4"]]}
+  - {key: mace-mp-0-l2-2024_01_07-free-energy, model: "ext:MACE-MP-0-L2-2024.01.07", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 19.912102, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: MACE-MP-0", "Table S4"]]}
+  - {key: chgnet-free-energy, model: "chgnet", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 38.20652, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: CHGNet", "Table S4"]]}
+  - {key: m3gnet-mpf-2021_2_8-free-energy, model: "ext:M3GNet-MPF-2021.2.8", material: phonondb, role: external, eval_data: {label: "About 5,000 crystals of the DFT phonon database"}, comment: "Mean over materials of the temperature-averaged (0-1000 K) MAE.", metrics: [[MAE, Energy, 55.584096, meV/atom, "MAE of the phonon Helmholtz free energy against DFT, mean over materials: M3GNet", "Table S4"]]}
+gaps:
+  - "The only energy-valued error is the harmonic Helmholtz free energy from phonons (Table S4); it is encoded as an energy MAE in meV/atom. Phonon-frequency MAEs (meV, Table S2) are vibrational energies rather than potential-energy errors and are not encoded."
+  - "Four checkpoints match registry models (MatterSim-v1.0.0-5M, SevenNet-0 11July2024, MACE-MP-0 2024-01-07-mace-128-L2, M3GNet-MP-2021.2.8-PES); the others are recorded as distributed checkpoints. SevenNet-MF-ompa applies NequIP by the registry convention."

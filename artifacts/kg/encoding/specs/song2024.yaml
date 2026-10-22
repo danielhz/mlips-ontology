@@ -1,0 +1,66 @@
+id: song2024
+source:
+  rank: 243
+  year: "2024"
+  first_author: "Keke Song"
+  title: "General-purpose machine-learned potential for 16 elemental metals and their alloys"
+  venue: "Nature Communications"
+  doi: "10.1038/s41467-024-54554-x"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2311.04732v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "16258f262108f916fe311de24e15cf1aafc32db8b140e376bd84046d8f00030a"
+study_label: "Song et al. (2024): UNEP-v1, a general-purpose NEP4 potential for 16 elemental metals and their alloys"
+scope: |
+  Encoding scope: the UNEP-v1 model (NEP4, trained with the multi-loss
+  SNES algorithm introduced here) on 1- and 2-component data of 16 metals,
+  with its training RMSEs, test force RMSEs on three multi-component
+  public data sets and formation-energy MAEs on Materials Project ternaries
+  and GNoME structures (Results), and its MD speed (Table I). Property
+  comparisons with EAM (Fig. 3, Tables S1-S4) and the MPEA applications are
+  not encoded.
+materials:
+  metals16: {label: "16 elemental metals (Ag, Al, Au, Cr, Cu, Mg, Mo, Ni, Pb, Pd, Pt, Ta, Ti, V, W, Zr) and their binary alloys", class: "Metals and alloys"}
+  test1: {label: "Up to 13-component alloys (Ag, Au, Cr, Cu, Mo, Ni, Pd, Pt, Ta, Ti, V, W, Zr) of Lopanitsyna et al.", class: "High-entropy alloys"}
+  test2: {label: "Mo-Ta-V-W alloys of up to four components (Byggmastar et al.)", class: "Refractory alloys"}
+  test3: {label: "Pd-Cu-Ni alloys of up to three components (Zhao et al.)", class: "Ternary alloys"}
+  mp-ternary: {label: "Ternary structures of the 16 metals in the Materials Project", class: "Ternary intermetallics"}
+  gnome: {label: "2- to 5-component GNoME structures of the 16 metals", class: "Predicted intermetallics"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 600, kpoints: "Gamma-centred, spacing 0.2/A", comment: "PREC Accurate, Gaussian smearing 0.02 eV, 1e-6 eV SCF; non-magnetic (Methods)."}
+sampling:
+  eam-md: {label: "EAM MD at 50-5000 K with box scaling and perturbations, strained MD, MP/OQMD defects and surfaces", comment: "Initial set of about 60,000 structures (Methods)."}
+  active: {label: "Iterative active learning with MD and MC-MD driven by the NEP model", comment: "Structures with large NEP-DFT errors added until none were found."}
+datasets:
+  unep: {label: "UNEP-v1 training set (105,464 structures, 6,886,241 atoms; unary and binary only)", materials: [metals16], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 105464, loc: "Results"}, calc: pbe, sampling: [eam-md, active], comment: "About six million CPU hours of DFT."}
+hyperparameters:
+  Nneu: {label: "NEP number of neurons in the single hidden layer N_neu", name: "N_neu", datatype: integer}
+  Ngen: {label: "NEP maximum number of generations of the natural evolution strategy N_gen", name: "N_gen", datatype: integer}
+methods:
+  NEP:
+    hp: [cutoffRadius, angularCutoff, Nneu, Ngen, batchSize]
+    loss: "Per-element energy, force (weight 1) and virial (0.1) losses with L2 regularisation (multi-loss SNES)"
+    algorithm: "Separable natural evolution strategy with multiple loss functions, population 60"
+    impl: {lib: {local: "GPUMD"}, version: "3.9.3"}
+    sims: [MolecularDynamics, MonteCarlo, PhononCalculation]
+runs:
+  unep-v1: {label: "UNEP-v1 (NEP4 with ZBL) trained on the 16-metal unary and binary data", method: NEP, dataset: unep, settings: {cutoffRadius: {v: 6, loc: "Suppl. Note S2"}, angularCutoff: {v: 5, loc: "Suppl. Note S2"}, Nneu: {v: 80, loc: "Suppl. Note S2"}, Ngen: {v: 1000000, loc: "Suppl. Note S2"}, batchSize: {v: 10000, loc: "Suppl. Note S2"}}, model: "UNEP-v1 (70,401 parameters)", trainingHardware: "Four NVIDIA A100 GPUs; about ten days"}
+results:
+  - {key: unep-train, model: unep-v1, material: metals16, role: training, eval_data: {label: "Whole UNEP-v1 training set"}, metrics: [[RMSE, Energy, 17.1, meV/atom, "Training-set energy RMSE: UNEP-v1", "Results, Fig. 2a"], [RMSE, Force, 172, meV/A, "Training-set force RMSE: UNEP-v1", "Results, Fig. 2c"], [RMSE, Stress, 1.16, GPa, "Training-set stress RMSE: UNEP-v1", "Results, Fig. 2b"]]}
+  - {key: unep-test1, model: unep-v1, material: test1, role: external, eval_data: {label: "Test-1: up to 13-component structures of Lopanitsyna et al."}, metrics: [[RMSE, Force, 76, meV/A, "Force RMSE: UNEP-v1 on Test-1 (13 components)", "Results"]]}
+  - {key: unep-test2, model: unep-v1, material: test2, role: external, eval_data: {label: "Test-2: Mo-Ta-V-W structures of Byggmastar et al."}, metrics: [[RMSE, Force, 196, meV/A, "Force RMSE: UNEP-v1 on Test-2 (4 components)", "Results"]]}
+  - {key: unep-test3, model: unep-v1, material: test3, role: external, eval_data: {label: "Test-3: Pd-Cu-Ni structures of Zhao et al."}, metrics: [[RMSE, Force, 269, meV/A, "Force RMSE: UNEP-v1 on Test-3 (3 components)", "Results"]]}
+  - {key: unep-mp, model: unep-v1, material: mp-ternary, role: external, eval_data: {label: "Materials Project ternary structures (formation energies)"}, metrics: [[MAE, Energy, 75, meV/atom, "Formation-energy MAE against DFT: UNEP-v1, MP ternaries", "Results, Fig. 2d"]]}
+  - {key: unep-gnome, model: unep-v1, material: gnome, role: external, eval_data: {label: "GNoME structures (formation energies)"}, metrics: [[MAE, Energy, 60, meV/atom, "Formation-energy MAE against DFT: UNEP-v1, GNoME", "Results, Fig. 2e"]]}
+timings:
+  - {model: unep-v1, system: "Cu, 14 million atoms, MD in GPUMD", atoms: 14000000, value: 23500000, unit: "atom-steps per second on one A100 GPU", per_atom_us: 0.0426, hardware: "One NVIDIA A100 GPU: 2.35e7 atom-steps/s for 14 million Cu atoms; 1.88e7 and 1.72e7 per GPU for 100 million Cu and Ag atoms on 8 GPUs", result: null, location: "Table I"}
+resources: |
+  Training took about ten days on four A100 GPUs; the DFT data about six
+  million CPU hours. MD speed (Table I): 2.35e7 atom-steps per second on one
+  A100 for 14 million Cu atoms, about 1.5e8 atom-steps per second on eight
+  A100s for 100 million atoms; the timing on Cu is held in the encoding
+  input.
+gaps:
+  - "NEP4 is introduced here as a version of NEP (registry method NEP, origin fan2021); no separate method is recorded."
+  - "The formation-energy MAEs of EAM (695, 1122 meV/atom) are not encoded (EAM is not an MLIP); MACE-MP-0 (medium) values are only in Fig. 2d, e."
+  - "Property MAEs (elastic constants, surface and vacancy energies, melting points, phonons; Fig. 3e) are not accuracy metrics of the schema."

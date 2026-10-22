@@ -1,0 +1,51 @@
+id: zhou2026fine
+source:
+  rank: 245
+  year: "2026"
+  first_author: "Chun Zhou"
+  title: "Fine-tuning of universal machine-learning interatomic potentials for high-entropy alloys with application to 2D (Mo,Ta,Nb,W,V)S2"
+  venue: "Computational Materials Today"
+  doi: "10.1016/j.commt.2026.100062"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2603.23029v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "b91eaa3e2fcfd5ba65d071fd2771ecc2fa2fc78ff8a2f16b7e5947db7693d3c5"
+study_label: "Zhou and Komsa (2026): fine-tuning universal MLIPs for 2D high-entropy (Mo,Ta,Nb,W,V)S2 alloys"
+scope: |
+  Encoding scope: the pretrained universal models benchmarked on mixing
+  energies of 2D (Mo,Ta,Nb,W,V)S2 alloys (MACE-small, MACE-small-0b2,
+  MatterSim 1M and 5M, CHGNet) and the MACE-small-0b2 models fine-tuned on
+  enumerated or random alloy structures. Only the mixing-energy MAEs of the
+  two MACE foundation models on Database 2 are stated as numbers in the
+  text; the fine-tuned models' errors are in figures or given only
+  approximately, so they have no result.
+materials:
+  tmdc-hea: {label: "2H-phase (Mo,Ta,Nb,W,V)S2 alloys with 2 to 5 metal components (Database 2: random compositions and configurations)", class: "2D transition-metal dichalcogenide high-entropy alloys"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma-centred 12x12x1 for primitive cells", comment: "Materials Project compatible parameters; pv pseudopotentials for metals."}
+sampling:
+  enum: {label: "Enumerated (ICET, Hart-Forcade) and Monte Carlo annealed alloy supercells with their relaxation trajectories"}
+datasets:
+  enum: {label: "Relaxation trajectories of enumerated (Mo,Ta,Nb,W,V)S2 structures (training sets of 16 fine-tuned models; 80/15/5 split)", materials: [tmdc-hea], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [enum]}
+external_models: [MatterSim-v1]
+methods:
+  MACE:
+    loss: "Energy, force and stress weighted 100:10:1"
+    algorithm: "AMSGrad variant of Adam"
+    impl: {lib: MACE}
+    sims: [MonteCarlo, GeometryOptimization]
+  M3GNet: {}
+  CHGNet: {}
+runs:
+  mace-small: {label: "MACE-small foundation model as distributed", method: MACE, model: "MACE-MP small"}
+  mace-small-0b2: {label: "MACE-small-0b2 foundation model as distributed", method: MACE, model: "MACE-MP small 0b2"}
+  mattersim-1m: {label: "MatterSim-1M as distributed", method: M3GNet, model: "MatterSim-v1.0.0-1M"}
+  chgnet: {label: "CHGNet as distributed (version not stated)", method: CHGNet, model: "CHGNet pretrained"}
+  ft-model16: {label: "MACE-small-0b2 fine-tuned on enumerated (Mo,Ta,Nb,W,V)S2 structures (Model 16, the largest training set)", method: MACE, dataset: enum, model: "Fine-tuned MACE (Mo,Ta,Nb,W,V)S2 Model 16", base_model: {run: mace-small-0b2, relation: fine-tuned, location: "Sec. III C"}}
+results:
+  - {key: mace-small-0b2-db2, model: mace-small-0b2, material: tmdc-hea, role: external, eval_data: {label: "Database 2: 80 random 2- to 5-component supercells"}, metrics: [[MAE, Energy, 25, null, "Mixing-energy MAE (meV per formula unit): MACE-small-0b2 foundation model, Database 2", "Sec. III C"]]}
+  - {key: mace-small-db2, model: mace-small, material: tmdc-hea, role: external, eval_data: {label: "Database 2: 80 random 2- to 5-component supercells"}, metrics: [[MAE, Energy, 16, null, "Mixing-energy MAE (meV per formula unit): MACE-small foundation model, Database 2", "Sec. III C"]]}
+gaps:
+  - "Mixing energies are per formula unit (meV/unit), which has no unit individual. The fine-tuned models reach validation RMSEs of 'about 0.2 meV' and '5.0 meV/A' and mixing-energy MAEs converging to 'approximately 2 meV/unit'; approximate values are not encoded."
+  - "MatterSim-5M is linked to the registry model MatterSim-v1; the other foundation models are distributed checkpoints without registry rows. Their mixing-energy errors on the three databases are only in Fig. 2."
+  - "Only Model 16 of the 16 fine-tuned models is encoded as a run; the others differ in training-set composition (Fig. 4b)."

@@ -1,0 +1,49 @@
+id: tahmasbi2026
+source:
+  rank: 235
+  year: "2026"
+  first_author: "Hossein Tahmasbi"
+  title: "Benchmarking universal machine learning interatomic potentials on elemental systems"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-026-02251-2"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "bba2dd086c014f0366e6bdac531c681e93a00a3112d94a49829227ed72cc7c7a"
+study_label: "Tahmasbi et al. (2026): benchmarking universal MLIPs on elemental systems (EOS and minima hopping), with a MACE model trained on unary data"
+scope: |
+  Encoding scope: the MACE-Unary-PBE-0 model trained here on a new unary
+  data set of 65 elements, with its test MAEs, and the pretrained universal
+  models benchmarked (MACE-MATPES-PBE-0, MACE-OMAT-0, MatterSim-v1.0.0-5M,
+  PET-OMat-M, PET-MAD 1.0.2). The benchmarks themselves (equilibrium
+  volumes, bulk moduli, recovery score, pairwise ordering accuracy,
+  instability) are not energy or force errors and are not encoded.
+materials:
+  unary: {label: "Elemental systems of 65 elements (random bulk structures, compressed bulk, clusters of 30-60 atoms)", class: "Elemental solids and clusters"}
+reference:
+  sirius: {type: DFT, code: {local: "CP2K-SIRIUS"}, xc: PBE, comment: "SSSP PBE Precision 1.3.0 pseudopotentials with recommended cutoffs; AiiDA kpoints_distance 0.2; Fermi-Dirac smearing 0.0022 Ha; single points (Methods, Unary dataset)."}
+sampling:
+  unary-gen: {label: "MatterGen random bulk structures plus compressions to 75% of the equilibrium volume, and clusters of 30-60 atoms", comment: "About 400 configurations per element generated with aiida-datagen (Methods)."}
+datasets:
+  unary: {label: "Unary data set (26,524 configurations of 65 elements; 23,998 for training)", materials: [unary], properties: [Energy, Forces], provenance: InHouse, n: {v: 26524, loc: "Methods"}, calc: sirius, sampling: [unary-gen], comment: "90/5/5 split (23,998 / 1,263 / 1,263); available on the HZDR GitLab (atomistic_foundation_model.datalad)."}
+hyperparameters:
+  max-L: {label: "MACE maximum symmetry order L of the messages", name: "max_L", datatype: integer}
+external_models: [MatterSim-v1]
+methods:
+  MACE:
+    hp: [cutoffRadius, numFeatures, max-L, batchSize, numEpochs]
+    loss: "Weighted energy and force MSE (1:100), then 300:100 with stochastic weight averaging for the last 100 epochs; isolated-atom energies E0"
+    impl: {lib: MACE}
+    sims: [GeometryOptimization, MolecularDynamics]
+  PET: {sims: [GeometryOptimization]}
+runs:
+  mace-unary: {label: "MACE-Unary-PBE-0 trained on the unary data set", method: MACE, dataset: unary, settings: {cutoffRadius: {v: 6.0, loc: "Methods"}, numFeatures: {v: 192, loc: "Methods"}, max-L: {v: 1, loc: "Methods"}, batchSize: {v: 8, loc: "Methods"}, numEpochs: {v: 400, loc: "Methods"}}, model: "MACE-Unary-PBE-0"}
+  mace-matpes: {label: "MACE-MATPES-PBE-0 as distributed", method: MACE, model: "MACE-MATPES-PBE-0 (trained on MatPES-PBE)"}
+  mace-omat: {label: "MACE-OMAT-0 as distributed", method: MACE, model: "MACE-OMAT-0 (trained on OMat24)"}
+  pet-omat: {label: "PET-OMat-M as distributed", method: PET, model: "PET-OMat-M"}
+  pet-mad: {label: "PET-MAD 1.0.2 as distributed", method: PET, model: "PET-MAD version 1.0.2 (PBEsol)"}
+results:
+  - {key: mace-unary, model: mace-unary, material: unary, role: test, eval_data: {label: "Unary data set test split (1,263 configurations)"}, metrics: [[MAE, Energy, 28.0, meV/atom, "Test energy MAE: MACE-Unary-PBE-0", "Methods"], [MAE, Force, 96.3, meV/A, "Test force MAE: MACE-Unary-PBE-0", "Methods"]]}
+gaps:
+  - "The benchmarks compare equilibrium volumes (symmetric relative errors), bulk moduli and minima-hopping metrics against VASP-PBE, PBEsol and Materials Project references; none is an energy or force error."
+  - "MatterSim-v1.0.0-5M is linked to the registry model MatterSim-v1. The other pretrained models are recorded as distributed checkpoints without registry rows. PET-MAD is trained on PBEsol data and was compared with PBEsol references."

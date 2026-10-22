@@ -1,0 +1,42 @@
+id: edwards2026
+source:
+  rank: 240
+  year: "2026"
+  first_author: "Connor Edwards"
+  title: "MLIP-MC: A Framework for Adsorption Simulations using Machine-Learned Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2602.13725"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2602.13725v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "f11b57d4170383b684f22b66a9b87a9010a641c63b7ede878198a6d42e9f08fe"
+study_label: "Edwards et al. (2026): MLIP-MC, grand canonical Monte Carlo with universal MLIPs for CO2 adsorption in MOFs"
+scope: |
+  Encoding scope: the MLIP-MC framework (introduced here) and the
+  pretrained universal models used for Widom insertion and GCMC of CO2 in
+  ZIF-8, ZIF-4 and Mg-MOF-74 (MACE-MP-0a, MACE-MP-0b3, MACE-MPA-0,
+  ORB-v3-inf-consv-omat; the two fairchem ODAC models are graph
+  transformers not named further). The comparison is on heats of
+  adsorption and isotherms against a fine-tuned reference model; no energy
+  or force error is reported, so there is no BenchmarkResult.
+materials:
+  ZIF-8: {label: "ZIF-8 with adsorbed CO2", class: "Zeolitic imidazolate framework"}
+  ZIF-4: {label: "ZIF-4 with adsorbed CO2", class: "Zeolitic imidazolate framework"}
+  Mg-MOF-74: {label: "Mg-MOF-74 with adsorbed CO2", class: "Metal-organic framework with open metal sites"}
+methods:
+  MACE: {sims: [MonteCarlo]}
+  ORB: {sims: [MonteCarlo]}
+runs:
+  mace-mp-0a: {label: "MACE-MP-0a as distributed", method: MACE, model: "MACE-MP-0a"}
+  mace-mp-0b3: {label: "MACE-MP-0b3 as distributed", method: MACE, model: "MACE-MP-0b3"}
+  mace-mpa-0: {label: "MACE-MPA-0 as distributed", method: MACE, model: "MACE-MPA-0"}
+  orb-v3: {label: "ORB-v3-inf-consv-omat as distributed", method: ORB, model: "ORB-v3-inf-consv-omat"}
+resources: |
+  Efficiency on a single NVIDIA A100 (SXM4, 40 GB), in seconds per MC
+  step (Table 1): MACE-MP-0a 0.0081, MACE-MP-0b3 0.0231, MACE-MPA-0 0.0279,
+  ORB-v3 0.0167, fairchem ODAC23 0.0556, ODAC25 0.1431. The system size
+  of the timing is not stated, so no per-atom time is derived.
+gaps:
+  - "Accuracy is assessed through isosteric heats and isotherms relative to a fine-tuned reference model of Goeminne et al., which are not accuracy metrics of the schema."
+  - "The fairchem ODAC23 and ODAC25 models are described only as graph transformers; they are not encoded as runs."
+  - "MLIP-MC (introduced here) is a simulation framework that drives MLIP calculators through ASE; it is not an implementation of an MLIP method and has no node in the schema."
