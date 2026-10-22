@@ -1,0 +1,78 @@
+id: slootman2024
+source:
+  rank: 609
+  year: "2024"
+  first_author: "E. Slootman"
+  title: "Accurate Quantum Monte Carlo Forces for Machine-Learned Force Fields: Ethanol as a Benchmark"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.4c00498"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2404.09755v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8f52e4cd5b39ca0dc6ae40aa3eff0520982f78772bd097010988db23941fcd5d"
+study_label: "Slootman et al. (2024): quantum Monte Carlo forces as reference data for machine-learned force fields, ethanol benchmark"
+scope: |
+  Encoding scope: the eight sGDML models of ethanol trained on the 200
+  configurations of set A (100 train, 100 validation) with forces from
+  VMC, DMC (reweighting, RE-hybrid, variational-drift) with one-determinant
+  Jastrow-Slater wave functions, PBE-TS, PBE0-MBD and CCSD(T) with cc-pVTZ
+  and cc-pVQZ, with their force MADs against CCSD(T) (Table II) on set A
+  (cc-pVQZ reference) and on the independent set C (cc-pVTZ reference).
+  The reference-method force errors (Table I) compare electronic-structure
+  methods, not MLIPs.
+materials:
+  ethanol: {label: "Ethanol molecule at room temperature", formula: C2H5OH, class: "small organic molecule"}
+reference:
+  vmc: {type: WF, wf: {local: VMC}, basis: "cc-pVTZ (pseudopotential)", comment: "One-determinant fully optimised Jastrow-Slater wave function; CHAMP; GAMESS(US) HF orbitals."}
+  dmc-re: {type: WF, wf: {local: "DMC (reweighting estimator)"}, basis: "cc-pVTZ (pseudopotential)", comment: "One determinant; T-moves, time step 0.005 a.u."}
+  dmc-hyb: {type: WF, wf: {local: "DMC (RE-hybrid estimator)"}, basis: "cc-pVTZ (pseudopotential)", comment: "One determinant."}
+  dmc-vd: {type: WF, wf: {local: "DMC (variational-drift estimator)"}, basis: "cc-pVTZ (pseudopotential)", comment: "One determinant; node cutoff 0.05 a.u., khist 900."}
+  pbe-ts: {type: DFT, xc: {local: PBE-TS}, comment: "Also used for the MD trajectory from which sets B and C were drawn."}
+  pbe0-mbd: {type: DFT, xc: {local: PBE0-MBD}}
+  cc-tz: {type: WF, wf: CCSDT, basis: "cc-pVTZ", comment: "All-electron CCSD(T), Psi4."}
+  cc-qz: {type: WF, wf: CCSDT, basis: "cc-pVQZ", comment: "All-electron CCSD(T), Psi4."}
+sampling:
+  cluster: {label: "Set A: 200 configurations clustered (agglomerative by geometry, k-means by energy) from 2000 energy-histogram samples (set B) of a PBE-TS MD trajectory"}
+datasets:
+  a-vmc: {label: "Set A ethanol configurations with VMC energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: vmc, sampling: [cluster]}
+  a-dmc-re: {label: "Set A ethanol configurations with DMC RE energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: dmc-re, sampling: [cluster]}
+  a-dmc-hyb: {label: "Set A ethanol configurations with DMC RE-hybrid energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: dmc-hyb, sampling: [cluster]}
+  a-dmc-vd: {label: "Set A ethanol configurations with DMC VD energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: dmc-vd, sampling: [cluster]}
+  a-pbe-ts: {label: "Set A ethanol configurations with PBE-TS energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: pbe-ts, sampling: [cluster]}
+  a-pbe0-mbd: {label: "Set A ethanol configurations with PBE0-MBD energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: pbe0-mbd, sampling: [cluster]}
+  a-cc-tz: {label: "Set A ethanol configurations with CCSD(T)/cc-pVTZ energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: cc-tz, sampling: [cluster]}
+  a-cc-qz: {label: "Set A ethanol configurations with CCSD(T)/cc-pVQZ energies and forces", materials: [ethanol], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. III"}, calc: cc-qz, sampling: [cluster]}
+methods:
+  sGDML:
+    algorithm: "sGDML trained on 100 configurations with 100 for validation"
+    sims: [MolecularDynamics]
+runs:
+  m-vmc: {label: "sGDML ethanol model trained on VMC forces (set A)", method: sGDML, dataset: a-vmc, model: "sGDML ethanol (VMC)"}
+  m-dmc-re: {label: "sGDML ethanol model trained on DMC RE forces (set A)", method: sGDML, dataset: a-dmc-re, model: "sGDML ethanol (DMC RE)"}
+  m-dmc-hyb: {label: "sGDML ethanol model trained on DMC RE-hybrid forces (set A)", method: sGDML, dataset: a-dmc-hyb, model: "sGDML ethanol (DMC RE-hybrid)"}
+  m-dmc-vd: {label: "sGDML ethanol model trained on DMC VD forces (set A)", method: sGDML, dataset: a-dmc-vd, model: "sGDML ethanol (DMC VD)"}
+  m-pbe-ts: {label: "sGDML ethanol model trained on PBE-TS forces (set A)", method: sGDML, dataset: a-pbe-ts, model: "sGDML ethanol (PBE-TS)"}
+  m-pbe0-mbd: {label: "sGDML ethanol model trained on PBE0-MBD forces (set A)", method: sGDML, dataset: a-pbe0-mbd, model: "sGDML ethanol (PBE0-MBD)"}
+  m-cc-tz: {label: "sGDML ethanol model trained on CCSD(T)/cc-pVTZ forces (set A)", method: sGDML, dataset: a-cc-tz, model: "sGDML ethanol (CCSD(T)/cc-pVTZ)"}
+  m-cc-qz: {label: "sGDML ethanol model trained on CCSD(T)/cc-pVQZ forces (set A)", method: sGDML, dataset: a-cc-qz, model: "sGDML ethanol (CCSD(T)/cc-pVQZ)"}
+results:
+  - {key: m-vmc-a, model: m-vmc, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 3.2, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on VMC", "Table II (column A, Q)"]]}
+  - {key: m-vmc-c, model: m-vmc, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 3.4, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on VMC", "Table II (column C, T)"]]}
+  - {key: m-dmc-re-a, model: m-dmc-re, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 2.2, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on DMC RE", "Table II (column A, Q)"]]}
+  - {key: m-dmc-re-c, model: m-dmc-re, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 2.6, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on DMC RE", "Table II (column C, T)"]]}
+  - {key: m-dmc-hyb-a, model: m-dmc-hyb, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.5, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on DMC RE-hybrid", "Table II (column A, Q)"]]}
+  - {key: m-dmc-hyb-c, model: m-dmc-hyb, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 2.2, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on DMC RE-hybrid", "Table II (column C, T)"]]}
+  - {key: m-dmc-vd-a, model: m-dmc-vd, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.2, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on DMC VD", "Table II (column A, Q)"]]}
+  - {key: m-dmc-vd-c, model: m-dmc-vd, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.8, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on DMC VD", "Table II (column C, T)"]]}
+  - {key: m-pbe-ts-a, model: m-pbe-ts, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 5.3, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on PBE-TS", "Table II (column A, Q)"]]}
+  - {key: m-pbe-ts-c, model: m-pbe-ts, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 5.3, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on PBE-TS", "Table II (column C, T)"]]}
+  - {key: m-pbe0-mbd-a, model: m-pbe0-mbd, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.7, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on PBE0-MBD", "Table II (column A, Q)"]]}
+  - {key: m-pbe0-mbd-c, model: m-pbe0-mbd, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 2.1, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on PBE0-MBD", "Table II (column C, T)"]]}
+  - {key: m-cc-tz-a, model: m-cc-tz, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.0, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on CCSD(T)/cc-pVTZ", "Table II (column A, Q)"]]}
+  - {key: m-cc-tz-c, model: m-cc-tz, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.4, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on CCSD(T)/cc-pVTZ", "Table II (column C, T)"]]}
+  - {key: m-cc-qz-a, model: m-cc-qz, material: ethanol, role: null, eval_data: {label: "Set A (training and validation configurations) against CCSD(T)/cc-pVQZ forces", location: "Table II"}, metrics: [[MAE, Force, 0.7, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVQZ on ethanol set A: sGDML trained on CCSD(T)/cc-pVQZ", "Table II (column A, Q)"]]}
+  - {key: m-cc-qz-c, model: m-cc-qz, material: ethanol, role: test, eval_data: {label: "Set C: 2000 configurations clustered from the PBE-TS MD trajectory, against CCSD(T)/cc-pVTZ forces", location: "Table II"}, metrics: [[MAE, Force, 1.5, kcal/mol/A, "force MAD vs CCSD(T)/cc-pVTZ on ethanol set C: sGDML trained on CCSD(T)/cc-pVQZ", "Table II (column C, T)"]]}
+gaps:
+  - "Table II also gives MADs on set A and set B against CCSD(T)/cc-pVTZ; models trained on the larger set B (SI Section S6) are not encoded. Set A results are evaluated against CCSD(T)/cc-pVQZ rather than each model's own training labels, so their role is left null."
+  - "Validation MAEs of the ML models are given only approximately ('about 1.2-1.3 kcal/mol/A', Table S5 not read)."
+  - "Table I (average force MADs of VMC, DMC, PBE-TS and PBE0-MBD against CCSD(T)/cc-pVQZ) compares reference methods and is not encoded; vibrational spectra (Fig. 3) are property comparisons. The DFT code is not named in the text read."

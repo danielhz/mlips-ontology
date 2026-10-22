@@ -1,0 +1,48 @@
+id: wu2026
+source:
+  rank: 607
+  year: "2026"
+  first_author: "Liang‐Ting Wu"
+  title: "Probing entropic control of stacking phase preference in layered oxide cathodes for sodium-ion batteries via machine-learning potentials"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01954-2"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "aec389d223dbb37d97ddcda3967c48a75e1dfd685444ca5cdaa36ee543cb178b"
+study_label: "Wu et al. (2026): entropic control of O3/P2 stacking preference in Na-ion layered oxide cathodes via fine-tuned CHGNet"
+scope: |
+  Encoding scope: the pre-trained CHGNet and the CHGNet fine-tuned on AIMD
+  data of high-entropy (Na0.8Ni0.2Fe0.2Co0.2Mn0.2Ti0.2O2) and
+  low-entropy (Na0.8Mn0.6Co0.4O2) O3- and P2-type layered oxides, with
+  their energy and force errors on the random test split and on an
+  independent test set from 28 other conformations. Conformation search,
+  Na interaction energies and geometric descriptors are property analyses.
+materials:
+  he: {label: "High-entropy O3- and P2-type Na0.8Ni0.2Fe0.2Co0.2Mn0.2Ti0.2O2", formula: Na0.8Ni0.2Fe0.2Co0.2Mn0.2Ti0.2O2, class: "layered oxide cathode (Na-ion)"}
+  le: {label: "Low-entropy O3- and P2-type Na0.8Mn0.6Co0.4O2", formula: Na0.8Mn0.6Co0.4O2, class: "layered oxide cathode (Na-ion)"}
+reference:
+  pbeu: {type: DFT, code: VASP, xc: {local: PBE-D3+U}, pp: PAW, cutoff: 520, kpoints: "2x3x2 (O3) and 2x3x1 (P2) Monkhorst-Pack; Gamma point for AIMD", comment: "Spin-polarised PBE+U (U = 6.2, 5.3, 3.32, 3.9, 5.10 eV for Ni, Fe, Co, Mn, Ti, Materials Project values) with Grimme D3; _pv pseudopotentials for Na, Ni, Fe, Mn, Ti."}
+sampling:
+  aimd: {label: "First 500 steps of twelve 600 K NVT AIMD runs (2 fs) on three GOAC-screened conformations each of O3-HE, P2-HE, O3-LE and P2-LE"}
+  aimd-indep: {label: "25-step AIMD runs on the 28 remaining GOAC conformations"}
+datasets:
+  ft: {label: "CHGNet fine-tuning data: 6000 AIMD frames (80:10:10 train/validation/test)", materials: [he, le], properties: [Energy, Forces], provenance: InHouse, n: {v: 6000, loc: "Methods, CHGNet"}, calc: pbeu, sampling: [aimd]}
+  indep: {label: "Independent test set: 700 AIMD frames from 28 conformations not used in fine-tuning", materials: [he, le], properties: [Energy, Forces], provenance: InHouse, n: {v: 700, loc: "Results, fine-tuning"}, calc: pbeu, sampling: [aimd-indep]}
+methods:
+  CHGNet:
+    hp: [learningRate, numEpochs]
+    algorithm: "CosineAnnealingLR schedule from 0.01 to 1e-4"
+    sims: [MolecularDynamics, MonteCarlo, GeometryOptimization]
+runs:
+  pre: {label: "Pre-trained CHGNet as distributed (version not stated)", method: CHGNet, model: "CHGNet pretrained"}
+  ft: {label: "CHGNet fine-tuned on HE and LE layered-oxide AIMD data", method: CHGNet, dataset: ft, settings: {learningRate: {v: 0.01, loc: "Methods, CHGNet (initial)"}, numEpochs: {v: 20, loc: "Methods, CHGNet"}}, model: "Fine-tuned CHGNet (Na layered oxides)", base_model: {run: pre, relation: fine-tuned, location: "Methods, CHGNet"}}
+results:
+  - {key: pre-test, model: pre, material: he, role: external, eval_data: {label: "600-frame random test split of the fine-tuning data", location: "Results, fine-tuning"}, metrics: [[MAE, Energy, 616, meV/atom, "test energy MAE on he: pre-trained CHGNet (HE and LE oxides)", "Results, fine-tuning"], [MAE, Force, 222, meV/A, "test force MAE on he: pre-trained CHGNet (HE and LE oxides)", "Results, fine-tuning"]]}
+  - {key: ft-test, model: ft, material: he, role: test, eval_data: {label: "600-frame random test split of the fine-tuning data", location: "Results, fine-tuning"}, metrics: [[MAE, Energy, 0.73, meV/atom, "test energy MAE on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"], [MAE, Force, 67, meV/A, "test force MAE on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"]]}
+  - {key: pre-indep, model: pre, material: he, role: external, eval_data: {label: "Independent test set (700 frames, 28 conformations)", location: "Results, fine-tuning; Fig. 3b-c"}, metrics: [[MAE, Energy, 609, meV/atom, "independent-test energy MAE on he: pre-trained CHGNet (HE and LE oxides)", "Results, fine-tuning"], [MAE, Force, 185, meV/A, "independent-test force MAE on he: pre-trained CHGNet (HE and LE oxides)", "Results, fine-tuning"]]}
+  - {key: ft-indep, model: ft, material: he, role: test, eval_data: {label: "Independent test set (700 frames, 28 conformations)", location: "Results, fine-tuning; Fig. 3d-e"}, metrics: [[MAE, Energy, 1.72, meV/atom, "independent-test energy MAE on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"], [MAE, Force, 61, meV/A, "independent-test force MAE on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"], [R2, Energy, 0.988, null, "independent-test energy R2 on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"], [R2, Force, 0.976, null, "independent-test force R2 on he: fine-tuned CHGNet (HE and LE oxides)", "Results, fine-tuning"]]}
+gaps:
+  - "The test sets mix high- and low-entropy oxides; results are attached to the high-entropy material and the labels say 'HE and LE oxides'. Separate HE/LE errors are not stated."
+  - "Final training and validation losses (0.0732, 0.0734) are unitless loss values and are not encoded. The pre-trained model's fitted-line intercept (-1.456 eV/atom) and slope (0.715) are not error metrics."
+  - "MC conformation search, Na interaction energies, ionic/cationic potentials and conformational entropies (Table 1) are property analyses."
