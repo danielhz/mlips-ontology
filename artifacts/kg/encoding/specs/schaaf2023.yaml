@@ -1,0 +1,45 @@
+id: schaaf2023
+source:
+  rank: 576
+  year: "2023"
+  first_author: "Lars L. Schaaf"
+  title: "Accurate energy barriers for catalytic reaction pathways: an automatic training protocol for machine learning force fields"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-023-01124-2"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "431e3c4c7066c84a4230c109ab5e431367e84374de9c76a25c81d7fc53c6ee12"
+study_label: "Schaaf et al. (2023): automatic active-learning protocol for MLFFs with accurate energy barriers of catalytic CO2 hydrogenation on indium oxide"
+scope: |
+  Encoding scope: the GAP (double turbo-SOAP, 4 and 6 A cutoffs) built
+  by the uncertainty-driven training protocol (MD with 50 meV energy
+  uncertainty threshold, dimers, NEB-based refinement) for CO2
+  hydrogenation to methanol on In2O3, and MACE models (2 layers, 256
+  channels, L = 1) for the dopant study. The reported errors are mean
+  adsorption-energy and barrier errors, which are properties; no
+  energy/force RMSE or MAE is given in the text read.
+materials:
+  in2o3: {label: "In2O3 surfaces with CO2 hydrogenation intermediates and transition states (including Pt-doped surfaces)", class: "Oxides"}
+reference:
+  qe: {type: DFT, code: QuantumESPRESSO, xc: PBE, pp: PAW, cutoff: 884, kpoints: "Maximum spacing 0.25 1/A", comment: "Gaussian smearing 0.1 eV, SCF 1e-7 eV"}
+sampling:
+  al: {label: "Active learning: MD on reaction intermediates stopped when GAP energy uncertainty exceeds 50 meV, dimer configurations, and refinement along NEB minimum-energy paths"}
+datasets:
+  in2o3: {label: "In2O3 CO2-hydrogenation training set from the automatic protocol", materials: [in2o3], properties: [Energy, Forces], provenance: InHouse, calc: qe, sampling: [al]}
+methods:
+  GAP:
+    hp: [cutoffRadius]
+    loss: "Sparse GPR on energies and forces with CUR-selected sparse points; polynomial SOAP kernel"
+    impl: {lib: QUIP, comment: "quippy; double turbo-SOAP"}
+    sims: [MolecularDynamics, NudgedElasticBand, GeometryOptimization]
+  MACE:
+    hp: [numLayers, numFeatures]
+    impl: {lib: MACE}
+    sims: [NudgedElasticBand, GeometryOptimization]
+runs:
+  gap: {label: "GAP for CO2 hydrogenation on In2O3 (automatic protocol)", method: GAP, dataset: in2o3, settings: {cutoffRadius: {v: 6, loc: "Methods (outer SOAP)"}}, model: "GAP In2O3 CO2 hydrogenation"}
+  mace: {label: "MACE trained on the protocol data for the dopant study", method: MACE, dataset: in2o3, settings: {numLayers: {v: 2, loc: "Methods"}, numFeatures: {v: 256, loc: "Methods"}}, model: "MACE In2O3 dopants"}
+results: []
+gaps:
+  - "Accuracy is reported as mean adsorption-energy errors (e.g. 82, 23, 12 and 38 meV at different stages) and energy-barrier errors (within 45 meV), which are property errors; not encoded."
