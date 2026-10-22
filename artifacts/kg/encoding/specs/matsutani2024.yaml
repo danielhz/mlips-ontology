@@ -1,0 +1,40 @@
+id: matsutani2024
+source:
+  rank: 541
+  year: "2024"
+  first_author: "Kenta Matsutani"
+  title: "Comparison of intermediate-range order in GeO2 glass: Molecular dynamics using machine-learning interatomic potential vs reverse Monte Carlo fitting to experimental data"
+  venue: "The Journal of Chemical Physics"
+  doi: "10.1063/5.0240087"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2409.06982v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "147de06ad18a0d6acb437cbcdc83e342bdae096dc4c1b79e7f401ed2ebb92ef6"
+study_label: "Matsutani, Kasamatsu and Usuki (2024): intermediate-range order in GeO2 glass from SIMPLE-NN neural network potential MD versus reverse Monte Carlo"
+scope: |
+  Encoding scope: the Behler-Parrinello NNP (SIMPLE-NN, 70-30-30-1,
+  6.0 A cutoff) for GeO2 trained on 1,870 VASP PBE configurations from
+  crystal, liquid, quench, compressed glass/crystal and off-stoichiometric
+  AIMD, and its test energy RMSE on 200 independent quench structures.
+  Structure factors, rings and persistent homology are properties.
+materials:
+  geo2: {label: "GeO2 crystal, liquid and glass (with small Ge3O and GeO3 sets)", formula: GeO2, class: "Oxide glass"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "2x2x2", comment: "Labels recomputed at 500 eV after Gamma-point AIMD at 289.8 eV"}
+sampling:
+  aimd: {label: "AIMD of crystal (300-3000 K), liquid (3000 K), melt-quench, compressed glass and crystal, and liquid Ge3O/GeO3 in 96-atom cells (Table I)"}
+datasets:
+  geo2: {label: "GeO2 training data (1,870 structures; 9:1 training/validation)", materials: [geo2], properties: [Energy, Forces], provenance: InHouse, n: {v: 1870, loc: "Sec. II A"}, calc: vasp, sampling: [aimd]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, numLayers, learningRate, batchSize]
+    loss: "Sum of RMSEs of total energy and forces"
+    algorithm: "Adam"
+    impl: {lib: {local: SIMPLE-NN}, comment: "16 radial and 54 angular symmetry functions"}
+    sims: [MolecularDynamics]
+runs:
+  nnp: {label: "NNP for GeO2 (70-30-30-1)", method: HDNNP, dataset: geo2, settings: {cutoffRadius: {v: 6.0, loc: "Sec. II A"}, numLayers: {v: 2, loc: "Sec. II A"}, learningRate: {v: 0.001, loc: "Sec. II A"}, batchSize: {v: 10, loc: "Sec. II A"}}, model: "NNP GeO2 glass"}
+results:
+  - {key: nnp-test, model: nnp, material: geo2, role: test, eval_data: {label: "200 structures from an independent AIMD quench (3000 to 300 K)", location: "Sec. III A"}, metrics: [[RMSE, Energy, 7.923, meV/atom, "test energy RMSE on GeO2 quench structures: NNP", "Sec. III A"]]}
+gaps:
+  - "No force error is stated in the text read."

@@ -1,0 +1,90 @@
+id: han2025distmlip
+source:
+  rank: 542
+  year: "2025"
+  first_author: "Kevin Han"
+  title: "DistMLIP: A Distributed Inference Platform for Machine Learning Interatomic Potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2506.02023"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2506.02023v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c295c0ce23d3848dfd4826c56775bb68eb184934807e0efab7746fe569569590"
+study_label: "Han et al. (2025): DistMLIP, graph-partitioned multi-GPU inference for MLIPs, benchmarked with pretrained MACE, TensorNet, CHGNet and eSEN"
+scope: |
+  Encoding scope: the four public pretrained checkpoints run through
+  DistMLIP (MACE-MP-0b-small 3.8M, TensorNet-MatPES 0.8M, CHGNet-MatPES
+  2.7M, eSEN 3.2M) as paper-local runs, with the MD step times of
+  Table 1 (1 and 8 GPUs, maximum-capacity cells of Li3PO4, water, GaN, a
+  MOF and the 2w49 biomolecule). No accuracy metrics are reported;
+  scaling curves are figure-only.
+materials:
+  li3po4: {label: "Li3PO4 battery-electrolyte supercells", formula: Li3PO4, class: "Inorganic crystals"}
+  h2o: {label: "Water supercells", formula: H2O, class: "Molecular liquid"}
+  gan: {label: "GaN semiconductor supercells", formula: GaN, class: "Inorganic crystals"}
+  mof: {label: "Metal-organic framework supercells", class: "Metal-organic frameworks"}
+  bio: {label: "Biomolecule 2w49 (69.3k atoms)", class: "Organic and biochemical molecules (C, N, O, H)"}
+methods:
+  MACE:
+    impl: {lib: MACE, comment: "DistMLIP graph-parallel inference (pure PyTorch) or LAMMPS spatial partitioning"}
+    sims: [MolecularDynamics]
+  TensorNet:
+    impl: {lib: {local: matgl}, comment: "DistMLIP"}
+    sims: [MolecularDynamics]
+  CHGNet:
+    impl: {lib: CHGNet, comment: "DistMLIP"}
+    sims: [MolecularDynamics]
+  eSEN:
+    impl: {lib: {local: fairchem}, comment: "DistMLIP"}
+    sims: [MolecularDynamics]
+runs:
+  mace: {label: "MACE-MP-0b-small (3.8M parameters, as distributed)", method: MACE, model: "MACE-MP-0b-small"}
+  tensornet: {label: "TensorNet-MatPES-0.8M (as distributed)", method: TensorNet, model: "TensorNet-MatPES-0.8M"}
+  chgnet: {label: "CHGNet-MatPES-2.7M (as distributed)", method: CHGNet, model: "CHGNet-MatPES-2.7M"}
+  esen: {label: "eSEN-3.2M (as distributed)", method: eSEN, model: "eSEN-3.2M"}
+results: []
+timings:
+  - {model: mace, system: "Li3PO4 maximum-capacity cell, 5.2k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 82.47, unit: "us/(atom x step)", per_atom_us: 82.47, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "H2O maximum-capacity cell, 10.4k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 33.4, unit: "us/(atom x step)", per_atom_us: 33.4, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "GaN maximum-capacity cell, 9.7k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 19.8, unit: "us/(atom x step)", per_atom_us: 19.8, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "MOF maximum-capacity cell, 8.0k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 53.8, unit: "us/(atom x step)", per_atom_us: 53.8, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "Li3PO4 maximum-capacity cell, 65.9k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 12.3, unit: "us/(atom x step)", per_atom_us: 12.3, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "H2O maximum-capacity cell, 82.9k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 8.5, unit: "us/(atom x step)", per_atom_us: 8.5, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "GaN maximum-capacity cell, 77.8k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 2.7, unit: "us/(atom x step)", per_atom_us: 2.7, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "MOF maximum-capacity cell, 64.0k atoms, MACE-MP-0b-small (LAMMPS spatial partitioning, compiled CUDA kernels)", atoms: null, value: 6.2, unit: "us/(atom x step)", per_atom_us: 6.2, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "Li3PO4 maximum-capacity cell, 21.9k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 44.8, unit: "us/(atom x step)", per_atom_us: 44.8, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "H2O maximum-capacity cell, 20.7k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 45.9, unit: "us/(atom x step)", per_atom_us: 45.9, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "GaN maximum-capacity cell, 43.9k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 39.5, unit: "us/(atom x step)", per_atom_us: 39.5, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "MOF maximum-capacity cell, 16.0k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 41.0, unit: "us/(atom x step)", per_atom_us: 41.0, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "Li3PO4 maximum-capacity cell, 216.0k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 11.0, unit: "us/(atom x step)", per_atom_us: 11.0, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "H2O maximum-capacity cell, 210.1k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 11.6, unit: "us/(atom x step)", per_atom_us: 11.6, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "GaN maximum-capacity cell, 250.0k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 9.6, unit: "us/(atom x step)", per_atom_us: 9.6, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "MOF maximum-capacity cell, 216.0k atoms, MACE-MP-0b-small (DistMLIP, pure PyTorch)", atoms: null, value: 10.9, unit: "us/(atom x step)", per_atom_us: 10.9, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "Li3PO4 maximum-capacity cell, 21.9k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 81.7, unit: "us/(atom x step)", per_atom_us: 81.7, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "H2O maximum-capacity cell, 6.1k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 92.1, unit: "us/(atom x step)", per_atom_us: 92.1, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "GaN maximum-capacity cell, 16.0k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 79.1, unit: "us/(atom x step)", per_atom_us: 79.1, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "MOF maximum-capacity cell, 16.0k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 79.1, unit: "us/(atom x step)", per_atom_us: 79.1, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "Li3PO4 maximum-capacity cell, 140.0k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 16.3, unit: "us/(atom x step)", per_atom_us: 16.3, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "H2O maximum-capacity cell, 82.9k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 18.0, unit: "us/(atom x step)", per_atom_us: 18.0, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "GaN maximum-capacity cell, 123.0k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 15.9, unit: "us/(atom x step)", per_atom_us: 15.9, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "MOF maximum-capacity cell, 125.0k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 15.5, unit: "us/(atom x step)", per_atom_us: 15.5, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "Li3PO4 maximum-capacity cell, 4.1k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 179.7, unit: "us/(atom x step)", per_atom_us: 179.7, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "H2O maximum-capacity cell, 6.1k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 154.8, unit: "us/(atom x step)", per_atom_us: 154.8, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "GaN maximum-capacity cell, 5.5k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 100.0, unit: "us/(atom x step)", per_atom_us: 100.0, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "MOF maximum-capacity cell, 2.0k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 174.6, unit: "us/(atom x step)", per_atom_us: 174.6, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "Li3PO4 maximum-capacity cell, 46.7k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 75.4, unit: "us/(atom x step)", per_atom_us: 75.4, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "H2O maximum-capacity cell, 49.1k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 64.5, unit: "us/(atom x step)", per_atom_us: 64.5, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "GaN maximum-capacity cell, 77.8k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 41.9, unit: "us/(atom x step)", per_atom_us: 41.9, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: chgnet, system: "MOF maximum-capacity cell, 54.0k atoms, CHGNet-MatPES-2.7M (DistMLIP)", atoms: null, value: 67.1, unit: "us/(atom x step)", per_atom_us: 67.1, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "Li3PO4 maximum-capacity cell, 0.9k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 727.3, unit: "us/(atom x step)", per_atom_us: 727.3, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "H2O maximum-capacity cell, 1.3k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 663.2, unit: "us/(atom x step)", per_atom_us: 663.2, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "GaN maximum-capacity cell, 1.0k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 438.9, unit: "us/(atom x step)", per_atom_us: 438.9, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "MOF maximum-capacity cell, 1.0k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 454.3, unit: "us/(atom x step)", per_atom_us: 454.3, hardware: "1 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "Li3PO4 maximum-capacity cell, 8.0k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 241.2, unit: "us/(atom x step)", per_atom_us: 241.2, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "H2O maximum-capacity cell, 6.1k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 249.1, unit: "us/(atom x step)", per_atom_us: 249.1, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "GaN maximum-capacity cell, 8.2k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 198.9, unit: "us/(atom x step)", per_atom_us: 198.9, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: esen, system: "MOF maximum-capacity cell, 6.0k atoms, eSEN-3.2M (DistMLIP)", atoms: null, value: 210.0, unit: "us/(atom x step)", per_atom_us: 210.0, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: mace, system: "Biomolecule 2w49, 69.3k atoms, MACE-MP-0b-small (DistMLIP)", atoms: null, value: 14.0, unit: "us/(atom x step)", per_atom_us: 14.0, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+  - {model: tensornet, system: "Biomolecule 2w49, 69.3k atoms, TensorNet-MatPES-0.8M (DistMLIP)", atoms: null, value: 19.6, unit: "us/(atom x step)", per_atom_us: 19.6, hardware: "8 x NVIDIA A100-80GB-PCIe", result: null, location: "Table 1"}
+gaps:
+  - "Atom counts are printed in thousands with one decimal, so atoms are left null and given in the system text. 4-GPU timings, capacity and scaling curves (Figs. 2-3) and the SevenNet comparison (Appendix G) are not encoded. The checkpoints are not registry models."
