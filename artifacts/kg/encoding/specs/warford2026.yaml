@@ -1,0 +1,51 @@
+id: warford2026
+source:
+  rank: 585
+  year: "2026"
+  first_author: "Thomas Warford"
+  title: "Better without U : impact of selective Hubbard U correction on foundational MLIPs"
+  venue: "Machine Learning Science and Technology"
+  doi: "10.1088/2632-2153/ae6be5"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2601.21056v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "268326df1b20bfaed84f6a84bca65e22a7ca18b18243c359cbef99d2d0d3d4d7"
+study_label: "Warford, Thiemann and Csanyi (2026): impact of selective Hubbard U corrections in training data on foundational MLIPs, and a smoothness-targeted per-element energy shift"
+scope: |
+  Encoding scope: MACE-MP-0b3-architecture models retrained by the
+  authors on MPtrj with differently corrected energy labels (Wang et al.
+  MP2020 shift, refitted Jain et al. shift, and the new per-U-element
+  shift), and the distributed models compared (MACE-MP-0b3, MACE-MPA-0,
+  MACE-OMAT-0, MACE-MATPES-PBE-0 and -r2SCAN-0, MP-0-large, CHGNet,
+  eSEN-OAM-20M). Oxygen-adsorption, adhesion and fluorine-adsorption
+  errors are property errors; no energy/force test errors are given in
+  the text read.
+materials:
+  mp: {label: "Inorganic materials of MPtrj (PBE/PBE+U)", class: "Inorganic crystals"}
+reference:
+  mptrj: {type: DFT, xc: PBE, comment: "MPtrj PBE and PBE+U energies with the stated correction schemes"}
+sampling:
+  pub: {label: "MPtrj configurations as published"}
+datasets:
+  wang: {label: "MPtrj with Wang et al. (MP2020) corrected energies", materials: [mp], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: mptrj, sampling: [pub]}
+  ours: {label: "MPtrj with the per-U-element shift fitted to MatPES-PBE overlaps", materials: [mp], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: mptrj, sampling: [pub]}
+  jain: {label: "MPtrj with a refitted Jain et al. shift", materials: [mp], properties: [Energy, Forces, Stresses], provenance: Augmented, calc: mptrj, sampling: [pub]}
+methods:
+  MACE: {impl: {lib: MACE}, sims: [GeometryOptimization]}
+  CHGNet: {sims: [GeometryOptimization]}
+  eSEN: {sims: [GeometryOptimization]}
+runs:
+  mp0b3: {label: "MACE-MP-0b3 (no shift; as distributed)", method: MACE, model: "MACE-MP-0b3"}
+  wang: {label: "MACE-MP-0b3 architecture trained on Wang et al.-shifted MPtrj", method: MACE, dataset: wang, model: "MACE-MP-0b3 (Wang et al. shift)"}
+  ours: {label: "MACE-MP-0b3 architecture trained on MPtrj with the per-U-element shift", method: MACE, dataset: ours, model: "MACE-MP-0b3 (per-U-element shift)"}
+  jain: {label: "MACE-MP-0b3 architecture trained on refitted Jain et al.-shifted MPtrj", method: MACE, dataset: jain, model: "MACE-MP-0b3 (refitted Jain shift)"}
+  mpa0: {label: "MACE-MPA-0 (as distributed)", method: MACE, model: "MACE-MPA-0"}
+  omat0: {label: "MACE-OMAT-0 (as distributed)", method: MACE, model: "MACE-OMAT-0"}
+  matpes-pbe: {label: "MACE-MATPES-PBE-0 (as distributed)", method: MACE, model: "MACE-MATPES-PBE-0"}
+  matpes-r2: {label: "MACE-MATPES-r2SCAN-0 (as distributed)", method: MACE, model: "MACE-MATPES-r2SCAN-0"}
+  mp0large: {label: "MACE-MP-0 large (as distributed)", method: MACE, model: "MP-0-large"}
+  chgnet: {label: "CHGNet (as distributed)", method: CHGNet, model: "CHGNet"}
+  esen: {label: "eSEN-OAM-20M (as distributed)", method: eSEN, model: "eSEN-OAM-20M"}
+results: []
+gaps:
+  - "Accuracy is assessed through adsorption and adhesion energies against PBE single points (e.g. oxygen-adsorption MAE on U-corrected slabs), which are property errors; not encoded. Distributed checkpoints are paper-local runs (versions not identified against registry models)."

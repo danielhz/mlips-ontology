@@ -1,0 +1,45 @@
+id: lastre2026
+source:
+  rank: 584
+  year: "2026"
+  first_author: "Manuel González Lastre"
+  title: "MAD-SURF: a machine learning interatomic potential for molecular adsorption on coinage metal surfaces"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2601.18852"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2601.18852v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "3494f75e901ef1b11067fb5f89c123683600da839915ccf12f516d52d542753e"
+study_label: "Gonzalez Lastre et al. (2026): MAD-SURF, a MACE potential and dataset for molecular adsorption on coinage-metal surfaces"
+scope: |
+  Encoding scope: the MAD-SURF dataset (38 molecules on Cu, Ag and Au
+  from BOSS adsorption minima, AIMD, normal-mode sampling and AISS
+  dimers; PBE+vdWsurf in FHI-aims) and MACE models trained from scratch
+  (force/energy weight 1 or 10, full, subset or descriptor-filtered
+  data), the MACE-MPA-0 foundation model as distributed, and MACE-MPA-0
+  fine-tuned (multi-head replay) or few-shot adapted. Relaxation-based
+  energy/force MAEs and RMSDs are figure-only (Fig. 2); adsorption-height
+  R2 values are property metrics.
+materials:
+  surf: {label: "Organic molecules (H, C, N, O, S, Cl, Br) in gas phase and adsorbed on Cu, Ag and Au surfaces; bulk and slab metals", class: "Solid-liquid interface"}
+reference:
+  aims: {type: DFT, code: FHIaims, xc: PBE, comment: "Tkatchenko-Scheffler vdWsurf, tight basis, atomic ZORA"}
+sampling:
+  mix: {label: "BOSS adsorption minima on Cu(111) re-relaxed on Ag/Au, AIMD of metals and adsorbates (every tenth frame), normal-mode sampling with SOAP farthest-point selection, GFN2-xTB AISS dimers recomputed with DFT"}
+datasets:
+  madsurf: {label: "MAD-SURF dataset (tens of thousands of configurations; Table 1)", materials: [surf], properties: [Energy, Forces], provenance: InHouse, calc: aims, sampling: [mix]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numLayers, numFeatures, learningRate]
+    loss: "Weighted energy and force loss (force/energy ratio 1 or 10)"
+    algorithm: "Adam, weight decay 5e-7; training from scratch, multi-head replay fine-tuning, or few-shot adaptation"
+    impl: {lib: MACE, comment: "128x0e + 128x1o, correlation order 3"}
+    sims: [GeometryOptimization, MolecularDynamics]
+runs:
+  scratch: {label: "MACE trained from scratch on MAD-SURF (full, subset and filtered variants)", method: MACE, dataset: madsurf, settings: {cutoffRadius: {v: 5.0, loc: "Methods"}, numLayers: {v: 2, loc: "Methods"}, numFeatures: {v: 128, loc: "Methods"}, learningRate: {v: 0.01, loc: "Methods"}}, model: "MACE MAD-SURF from scratch"}
+  mpa0: {label: "MACE-MPA-0 (pretrained, as distributed)", method: MACE, model: "MACE-MPA-0"}
+  ft: {label: "MACE-MPA-0 fine-tuned on MAD-SURF (multi-head replay)", method: MACE, dataset: madsurf, settings: {cutoffRadius: {v: 5.0, loc: "Methods"}, learningRate: {v: 0.0001, loc: "Methods"}}, model: "MAD-SURF (MACE-MPA-0 fine-tuned)", base_model: {run: mpa0, relation: fine-tuned, location: "Results"}}
+  fewshot: {label: "MACE-MPA-0 few-shot adaptation", method: MACE, dataset: madsurf, model: "MAD-SURF (MACE-MPA-0 few-shot)", base_model: {run: mpa0, relation: fine-tuned, location: "Results"}}
+results: []
+gaps:
+  - "Relaxation-based per-atom energy and force MAEs and RMSDs against DFT-relaxed structures are figure-only (Fig. 2a-c). Adsorption-height R2 values (0.54 pretrained, 0.77 fine-tuned, 0.99 few-shot) are property metrics. Table 1 counts per source are not totalled in the text read."
