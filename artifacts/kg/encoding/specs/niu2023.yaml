@@ -1,0 +1,39 @@
+id: niu2023
+source:
+  rank: 657
+  year: "2023"
+  first_author: "Hongwei Niu"
+  title: "Stable Solid Molecular Hydrogen above 900 K from a Machine-Learned Potential Trained with Diffusion Quantum Monte Carlo"
+  venue: "Physical Review Letters"
+  doi: "10.1103/physrevlett.130.076102"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2209.00658v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "848b484b63c58759aab745d5a2b42ecc982eee8c4e1bf8fc5dfc37384814cf64"
+study_label: "Niu et al. (2023): stable solid molecular hydrogen above 900 K from a DMC-trained machine-learned potential"
+scope: |
+  Encoding scope: the hierarchical Delta-learning Deep Potential for dense
+  hydrogen (H2 pair potential + DPMD fit to vdW-DF1 DFT + DPMD fit to the
+  DMC residual), used in PIMD to map the phase diagram. No energy or force
+  errors are stated, so there are no results.
+materials:
+  h: {label: "Dense hydrogen (molecular solid and liquid phases, 60-220 GPa)", formula: H, class: "high-pressure molecular solid"}
+reference:
+  vdwdf1: {type: DFT, xc: {local: vdW-DF1}, comment: "Energies, forces and stresses of all configurations (PBE also computed)."}
+  dmc: {type: WF, wf: {local: DMC}, comment: "Diffusion Monte Carlo energies and forces (CCZ force estimator) for about 20,000 configurations; statistical errors 0.1 meV and 130 meV/A."}
+sampling:
+  md-pimd: {label: "96-proton configurations from classical MD, PIMD and CEIMC simulations over the relevant pressure-temperature range"}
+datasets:
+  dft: {label: "Hydrogen configurations with vdW-DF1 labels (about 1e5)", materials: [h], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: vdwdf1, sampling: [md-pimd]}
+  dmc: {label: "DMC-labelled subset (about 20,000 configurations)", materials: [h], properties: [Energy, Forces], provenance: InHouse, calc: dmc, sampling: [md-pimd]}
+methods:
+  DeePMD:
+    algorithm: "Hierarchical Delta-learning: E = E_pair (repulsive exact H2 BO pair potential) + Delta E_DFT (DPMD fit to DFT minus pair) + Delta E_DMC (smaller DPMD fit to the DMC residual)"
+    sims: [MolecularDynamics]
+runs:
+  dp-dft: {label: "DPMD Delta-DFT model (vdW-DF1 minus pair potential)", method: DeePMD, dataset: dft, model: "DPMD Delta-DFT hydrogen (vdW-DF1)"}
+  dp-dmc: {label: "DMC-trained DPMD: Delta-DMC correction fitted on top of the Delta-DFT model", method: DeePMD, dataset: dmc, model: "DMC-trained DPMD hydrogen", base_model: {run: dp-dft, relation: fine-tuned, location: "Hierarchical Delta-learning"}}
+gaps:
+  - "No training or test errors are stated in the main text; the ML force statistical error ('about 80 meV/A', SM) reflects DMC noise. Hyperparameters are in the SM (not read)."
+  - "The Delta-DMC model is a residual fit on top of Delta-DFT rather than a fine-tune of its weights; base_model relation 'fine-tuned' is the closest available and the label says so."
+  - "Phase diagram, equations of state, melting temperatures and structures are property results."

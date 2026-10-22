@@ -1,0 +1,47 @@
+id: fragapane2026amorphous
+source:
+  rank: 656
+  year: "2026"
+  first_author: "Natascia L. Fragapane"
+  title: "Amorphous materials as a frontier challenge for universal interatomic potentials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2607.11384"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2607.11384v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7aee28ea9b219f883e04f962097945c8aef6db27a9d2a447de958f754e43dc58"
+study_label: "Fragapane and Deringer (2026): amorphous materials as a frontier challenge for universal interatomic potentials (AM26 benchmark)"
+scope: |
+  Encoding scope: the AM26 benchmark data set introduced in the paper, the
+  zero-shot MACE-MP-0b3 used as the fine-tuning case study, and the
+  MACE-MP-0b3 models fine-tuned on new a-SiO2, a-C and a-GST data. The 41
+  pre-trained universal MLIPs are ranked by relative RMSEs shown only in
+  figures; fine-tuning errors are also figure-only or approximate, so
+  there are no results.
+materials:
+  a-c: {label: "Amorphous carbon (1.5-3.5 g/cm3)", formula: C, class: "amorphous elemental solid"}
+  a-si: {label: "Amorphous silicon", formula: Si, class: "amorphous elemental solid"}
+  a-sio2: {label: "Amorphous silica (quench rates 1e11-1e14 K/s)", formula: SiO2, class: "oxide glass"}
+  a-gst: {label: "Amorphous Ge-Sb-Te along the GeTe-Sb2Te3 tie-line", class: "phase-change chalcogenide glass"}
+  a-lips: {label: "Amorphous Li-P-S along the Li2S-P2S5 tie-line", class: "sulfide glass electrolyte"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, comment: "VASP 6.4.3 with MPStaticSet (Materials Project defaults) and PBE 5.4 pseudopotentials; energies converged to 5e-5 eV/atom."}
+sampling:
+  mq: {label: "Melt-quench MD with specialist potentials (C-GAP-17, SiOx-ACE-24, Li-P-S model of Ref. 36) and published a-Si and GST-GAP-22 structures, relabelled with DFT"}
+datasets:
+  am26: {label: "AM26 amorphous benchmark (934 cells, 197,996 atoms: a-C, a-Si, a-SiO2, a-GST, a-LiPS)", materials: [a-c, a-si, a-sio2, a-gst, a-lips], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 934, loc: "Table 1"}, calc: pbe, sampling: [mq]}
+  ft-sio2: {label: "Independent a-SiO2 fine-tuning structures (melt-quench, all quench rates)", materials: [a-sio2], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [mq]}
+  ft-c: {label: "Independent a-C fine-tuning structures", materials: [a-c], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [mq]}
+  ft-gst: {label: "Independent a-GST fine-tuning structures", materials: [a-gst], properties: [Energy, Forces, Stresses], provenance: InHouse, calc: pbe, sampling: [mq]}
+methods:
+  MACE:
+    sims: [MolecularDynamics]
+runs:
+  mp0b3: {label: "MACE-MP-0b3 as distributed (size not stated)", method: MACE, model: "MACE-MP-0b3"}
+  ft-sio2: {label: "MACE-MP-0b3 fine-tuned on a-SiO2 structures", method: MACE, dataset: ft-sio2, model: "MACE-MP-0b3 FT a-SiO2", base_model: {run: mp0b3, relation: fine-tuned, location: "Fine-tuning MLIPs for amorphous materials"}}
+  ft-c: {label: "MACE-MP-0b3 fine-tuned on a-C structures", method: MACE, dataset: ft-c, model: "MACE-MP-0b3 FT a-C", base_model: {run: mp0b3, relation: fine-tuned, location: "Fine-tuning MLIPs for amorphous materials"}}
+  ft-gst: {label: "MACE-MP-0b3 fine-tuned on a-GST structures", method: MACE, dataset: ft-gst, model: "MACE-MP-0b3 FT a-GST", base_model: {run: mp0b3, relation: fine-tuned, location: "Fine-tuning MLIPs for amorphous materials"}}
+gaps:
+  - "Relative RMSEs (RMSE divided by the label standard deviation) of 20 (main text) and 41 (SI) pre-trained MLIPs on AM26 are shown only in Fig. 2 and SI figures; the pre-trained models are not encoded as runs. Fine-tuning learning curves (Fig. 6) are figure-only; the zero-shot energy error is given only approximately ('~4 meV/atom')."
+  - "AM26 is a candidate data-set registry entry (introduced here, openly available, Ref. 48)."
+  - "Structure generation, ring statistics, excess energies and crystallisation simulations are property benchmarks."
