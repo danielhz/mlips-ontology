@@ -1,0 +1,51 @@
+id: hlozny2026
+source:
+  rank: 489
+  year: "2026"
+  first_author: "Adam Hložný"
+  title: "Upscaling DFT-trained machine-learning interatomic potential toward Quantum Monte Carlo accuracy: Sulfur-vacancy migration in monolayer MoS$_2$ as a testbed"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2605.22601"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2605.22601v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e622b111e09b9c31e940ab67f3d994bb1e9dfb2e79fb6b104dd0faf7652a6301"
+study_label: "Hlozny et al. (2026): upscaling a DFT-trained MACE toward FN-DMC accuracy with high-level energies and low-level forces, for sulfur-vacancy migration in monolayer MoS2"
+scope: |
+  Encoding scope: the DFT-PBE MACE of the authors' earlier work (the
+  baseline DFT-MLIP), its readout-only fine-tuning to FN-DMC energies
+  with a thresholded penalty on deviations from DFT forces (FT-MLIP), and
+  the analogous fine-tuning to HSE06 energies as a proxy; the stated
+  force MAE against FN-DMC finite-difference derivatives and the
+  validation energy RMSE. Migration barriers and free-energy barriers
+  are properties.
+materials:
+  mos2: {label: "Monolayer 2H-MoS2 with sulfur vacancies (mono-, bi- and quad-vacancies)", formula: MoS2, class: "2D material"}
+reference:
+  pbe: {type: DFT, xc: PBE, comment: "GPAW labels of the baseline dataset (Ref. 18)"}
+  dmc: {type: WF, wf: {local: FN-DMC}, comment: "Fixed-node DMC with Slater-Jastrow trial functions from PBE orbitals (Quantum ESPRESSO), QMCPACK; moderately converged single-point energies"}
+  hse: {type: DFT, xc: HSE06, comment: "Proxy high-level energies"}
+sampling:
+  md: {label: "Constrained finite-temperature DFT-PBE MD along the vacancy-migration coordinate (50% at 400 K, 50% at 800 K), from the NEB/GP-perturbation pipeline of Ref. 18"}
+datasets:
+  pbe-base: {label: "S-vacancy migration dataset of Ref. 18 (DFT-PBE energies and forces)", materials: [mos2], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [md]}
+  dmc: {label: "FN-DMC energies for O(10^3) configurations, with DFT-PBE forces as anchors", materials: [mos2], properties: [Energy, Forces], provenance: Augmented, calc: dmc, sampling: [md]}
+  hse: {label: "DFT-HSE06 energies with DFT-PBE forces (HSE06 forces withheld)", materials: [mos2], properties: [Energy, Forces], provenance: Augmented, calc: hse, sampling: [md]}
+methods:
+  MACE:
+    hp: [cutoffRadius, learningRate, batchSize]
+    loss: "lambda_E MSE(E, E_QMC) + lambda_F thresholded force penalty against DFT forces (lambda_E 100, lambda_F 5, t = 16)"
+    algorithm: "AdamW with AMSGrad, ReduceLROnPlateau (patience 5), gradient clipping 10; message-passing stack frozen, energy readout trained"
+    impl: {lib: MACE, comment: "hidden irreps 128x0e + 128x1o, float32"}
+    sims: [NudgedElasticBand, MolecularDynamics, ThermodynamicIntegration]
+runs:
+  dft: {label: "DFT-MLIP: PBE-trained MACE for S-vacancy migration (Ref. 18)", method: MACE, dataset: pbe-base, settings: {cutoffRadius: {v: 4.0, loc: "Sec. II B"}}, model: "DFT-MLIP MoS2 S-vacancy MACE"}
+  ft: {label: "FT-MLIP: readout fine-tuned to FN-DMC energies", method: MACE, dataset: dmc, settings: {cutoffRadius: {v: 4.0, loc: "Sec. II B"}, learningRate: {v: 0.001, loc: "Sec. II B"}, batchSize: {v: 32, loc: "Sec. II B"}}, model: "FT-MLIP MoS2 FN-DMC", base_model: {run: dft, relation: fine-tuned, location: "Sec. II B"}}
+  ft-hse: {label: "HSE06 FT-MLIP: readout fine-tuned to HSE06 energies with PBE forces", method: MACE, dataset: hse, settings: {cutoffRadius: {v: 4.0, loc: "Sec. II B"}, learningRate: {v: 0.001, loc: "Sec. II B"}, batchSize: {v: 32, loc: "Sec. II B"}}, model: "FT-MLIP MoS2 HSE06", base_model: {run: dft, relation: fine-tuned, location: "Sec. III"}}
+results:
+  - {key: dft-qmcforce, model: dft, material: mos2, role: external, eval_data: {label: "27 FN-DMC force components from quadratic fits of energy-displacement series (3 atoms, 3 coordinates, 3 trajectory sections)", location: "Sec. III, Appendix B"}, metrics: [[MAE, Force, 220, meV/A, "force MAE against FN-DMC energy derivatives (27 components): DFT-MLIP", "Sec. III"]]}
+  - {key: ft-qmcforce, model: ft, material: mos2, role: external, eval_data: {label: "27 FN-DMC force components from quadratic fits of energy-displacement series (3 atoms, 3 coordinates, 3 trajectory sections)", location: "Sec. III, Appendix B"}, metrics: [[MAE, Force, 160, meV/A, "force MAE against FN-DMC energy derivatives (27 components): FT-MLIP", "Sec. III"]]}
+  - {key: ft-val, model: ft, material: mos2, role: validation, eval_data: {label: "FN-DMC validation configurations (full tuning dataset)", location: "Sec. III, Fig. 3"}, metrics: [[RMSE, Energy, 89, meV, "validation total-energy RMSE against FN-DMC: FT-MLIP (full dataset)", "Sec. III"]]}
+gaps:
+  - "Approximate ablation values (about 290 and 160 meV for 0 and 37 samples; HSE06 energy RMSE about 35 meV and force RMSE about 80 meV/A) are not encoded; the ablation curves are figure-only (Fig. 3). The single-fidelity HSE06 energy-only tuning is mentioned without values and not encoded."
+  - "The FN-DMC dataset size is given only as O(10^3); no n."
