@@ -1,0 +1,56 @@
+id: bilbrey2025
+source:
+  rank: 670
+  year: "2025"
+  first_author: "Jenna A. Bilbrey"
+  title: "Uncertainty quantification for neural network potential foundation models"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01572-y"
+  kg_relevance: "Training/reliability"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "0c6670bc0f05eb82c40b8e6b1ed94c086ac52606a8290c7a2471428c85b2e506"
+study_label: "Bilbrey, Firoz, Lee and Choudhury (2025): uncertainty quantification for neural network potential foundation models"
+scope: |
+  Encoding scope: MACE-MP-0 used as distributed, and MACE-MP-0 with a
+  frozen interaction head and retrained readouts as a 7-member readout
+  ensemble or a two-readout quantile model, on MPtrj and after transfer to
+  HEA25 and H-ZSM-5 water data, with energy MAEs (Tables 1 and 3).
+  Uncertainty, coverage and offset values are UQ metrics and are not
+  encoded.
+materials:
+  inorganic: {label: "Materials Project structures (MPtrj)", class: "inorganic materials"}
+  hea: {label: "HEA25 high-entropy alloy structures (25 elements)", class: "high-entropy alloys"}
+  zsm5: {label: "H-ZSM-5 zeolite with n = 1-16 water molecules", class: "aluminosilicate zeolite"}
+reference:
+  mp: {type: DFT, comment: "MPtrj published labels."}
+  hea-ref: {type: DFT, comment: "HEA25 published labels (Ref. 43)."}
+  zsm-ref: {type: DFT, comment: "H-ZSM-5 water data set labels (not restated in the text read)."}
+datasets:
+  mptrj-sub: {label: "Random 90,000-structure MPtrj subsets per model (80,000 train / 10,000 validation)", materials: [inorganic], properties: [Energy, Forces], provenance: Published, calc: mp}
+  hea25: {label: "HEA25 data set", materials: [hea], properties: [Energy, Forces], provenance: Published, calc: hea-ref}
+  zsm5: {label: "H-ZSM-5 with 1-3 water molecules (training); 8 and 16 held out", materials: [zsm5], properties: [Energy, Forces], provenance: InHouse, calc: zsm-ref}
+methods:
+  MACE:
+    loss: "Huber loss (ensemble readouts); smoothed quantile loss at q = 0.05 and 0.95 (quantile model)"
+    algorithm: "Frozen MACE-MP-0 interaction head; only the final readout module is trained"
+runs:
+  mp0: {label: "MACE-MP-0 as distributed (size not stated)", method: MACE, model: "MACE-MP-0"}
+  ens-mptrj: {label: "Readout ensemble (7 models) of MACE-MP-0 retrained on MPtrj subsets", method: MACE, dataset: mptrj-sub, model: "MACE-MP-0 readout ensemble (MPtrj)", base_model: {run: mp0, relation: fine-tuned, location: "Results; Methods"}, trainingHardware: "single NVIDIA P100 GPU per ensemble member"}
+  q-mptrj: {label: "Quantile-readout MACE-MP-0 trained on an MPtrj subset", method: MACE, dataset: mptrj-sub, model: "MACE-MP-0 quantile model (MPtrj)", base_model: {run: mp0, relation: fine-tuned, location: "Results; Methods"}}
+  ens-hea: {label: "Readout ensemble transferred to HEA25", method: MACE, dataset: hea25, model: "MACE-MP-0 readout ensemble (HEA25)", base_model: {run: mp0, relation: fine-tuned, location: "Results"}}
+  q-hea: {label: "Quantile model transferred to HEA25", method: MACE, dataset: hea25, model: "MACE-MP-0 quantile model (HEA25)", base_model: {run: mp0, relation: fine-tuned, location: "Results"}}
+  ens-zsm: {label: "Readout ensemble transferred to H-ZSM-5 (n = 1-3)", method: MACE, dataset: zsm5, model: "MACE-MP-0 readout ensemble (H-ZSM-5)", base_model: {run: mp0, relation: fine-tuned, location: "Results"}}
+  q-zsm: {label: "Quantile model transferred to H-ZSM-5 (n = 1-3)", method: MACE, dataset: zsm5, model: "MACE-MP-0 quantile model (H-ZSM-5)", base_model: {run: mp0, relation: fine-tuned, location: "Results"}}
+results:
+  - {key: mp0-mptrj, model: mp0, material: inorganic, role: external, eval_data: {label: "Common 10,000-structure MPtrj test set", registry: MPtrj, location: "Results"}, metrics: [[MAE, Energy, 0.739, null, "test energy MAE in meV per electron on MPtrj: MACE-MP-0 pretrained", "Results"]]}
+  - {key: ens-mptrj-test, model: ens-mptrj, material: inorganic, role: test, eval_data: {label: "Common 10,000-structure MPtrj test set", registry: MPtrj, location: "Table 1; Results"}, metrics: [[MAE, Energy, 13, meV/atom, "test energy MAE on MPtrj: MACE-MP-0 readout ensemble", "Results (0.721 meV/e-)"], [MAE, Energy, 0.721, null, "test energy MAE in meV per electron on MPtrj: MACE-MP-0 readout ensemble", "Table 1"]]}
+  - {key: q-mptrj-test, model: q-mptrj, material: inorganic, role: test, eval_data: {label: "Common 10,000-structure MPtrj test set", registry: MPtrj, location: "Table 1; Results"}, metrics: [[MAE, Energy, 16, meV/atom, "test energy MAE on MPtrj: MACE-MP-0 quantile model", "Results (0.890 meV/e-)"], [MAE, Energy, 0.890, null, "test energy MAE in meV per electron on MPtrj: MACE-MP-0 quantile model", "Table 1"]]}
+  - {key: ens-hea-test, model: ens-hea, material: hea, role: test, eval_data: {label: "HEA25 test set", location: "Table 1"}, metrics: [[MAE, Energy, 0.971, null, "test energy MAE in meV per electron on HEA25: readout ensemble", "Table 1"]]}
+  - {key: q-hea-test, model: q-hea, material: hea, role: test, eval_data: {label: "HEA25 test set", location: "Table 1"}, metrics: [[MAE, Energy, 1.013, null, "test energy MAE in meV per electron on HEA25: quantile model", "Table 1"]]}
+  - {key: ens-zsm-n1, model: ens-zsm, material: zsm5, role: test, eval_data: {label: "H-ZSM-5 n = 1 test subset", location: "Table 3"}, metrics: [[MAE, Energy, 0.032, null, "test energy MAE in meV per electron on H-ZSM-5 (n = 1): readout ensemble", "Table 3"]]}
+  - {key: q-zsm-n1, model: q-zsm, material: zsm5, role: test, eval_data: {label: "H-ZSM-5 n = 1 test subset", location: "Table 3"}, metrics: [[MAE, Energy, 0.028, null, "test energy MAE in meV per electron on H-ZSM-5 (n = 1): quantile model", "Table 3"]]}
+  - {key: ens-zsm-n16, model: ens-zsm, material: zsm5, role: external, eval_data: {label: "H-ZSM-5 n = 16 holdout (extrapolation)", location: "Table 3"}, metrics: [[MAE, Energy, 0.323, null, "holdout energy MAE in meV per electron on H-ZSM-5 (n = 16): readout ensemble", "Table 3"]]}
+  - {key: q-zsm-n16, model: q-zsm, material: zsm5, role: external, eval_data: {label: "H-ZSM-5 n = 16 holdout (extrapolation)", location: "Table 3"}, metrics: [[MAE, Energy, 0.301, null, "holdout energy MAE in meV per electron on H-ZSM-5 (n = 16): quantile model", "Table 3"]]}
+gaps:
+  - "Errors are reported per electron (meV/e-), which has no unit individual; the meV/atom equivalents stated in the text (13 and 16 meV/atom) are also encoded for MPtrj. Table 3 rows for n = 2, 3 and 8 are not encoded. Uncertainties, coverages and offsets are UQ metrics."

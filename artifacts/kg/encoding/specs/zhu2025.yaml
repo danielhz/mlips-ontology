@@ -1,0 +1,40 @@
+id: zhu2025
+source:
+  rank: 671
+  year: "2025"
+  first_author: "Jia-Xin Zhu"
+  title: "Machine Learning Potential for Electrochemical Interfaces with Hybrid Representation of Dielectric Response"
+  venue: "Physical Review Letters"
+  doi: "10.1103/48ct-3jxm"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2407.17740v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "400258196530690c9d9f3b4eb76cb9373ac7c2f00ca5db11c8b8303d2ff8aba4"
+study_label: "Zhu and Cheng (2025): machine-learning potential for electrochemical interfaces with a hybrid representation of dielectric response"
+scope: |
+  Encoding scope: the ec-MLP for Pt(111)/KF(aq) interfaces: a DPLR model
+  whose electrolyte charges come from a Deep Wannier model and whose
+  electrode charges follow a Siepmann-Sprik model, trained on CP2K PBE-D3
+  data, with its training and test RMSEs (Table 1). Interfacial water
+  structure and dielectric profiles are property results.
+materials:
+  pt-kf: {label: "Charged Pt(111) electrodes with KF aqueous electrolyte", class: "electrochemical metal-electrolyte interface"}
+reference:
+  pbe-d3: {type: DFT, code: {local: CP2K}, xc: {local: PBE-D3}, pp: {local: GTH}, basis: "DZVP-type Gaussian basis", comment: "800 Ry plane-wave cutoff; maximally localised Wannier centres for the Deep Wannier labels."}
+datasets:
+  pt-kf: {label: "Pt/KF(aq) interface configurations (details in SM Sec. 1)", materials: [pt-kf], properties: [Energy, Forces], provenance: InHouse, calc: pbe-d3}
+methods:
+  DPLR:
+    hp: [cutoffRadius, batchSize, learningRate]
+    loss: "Energy prefactor 0.001 to 1, force prefactor 1000 to 1"
+    algorithm: "Short-range DeepPot-SE (embedding 25-50-100, fitting 240x3) plus PPPM electrostatics from Deep Wannier centroids (electrolyte) and Siepmann-Sprik Gaussian charges (Pt, spread 1.6 A); 5e5 batches"
+    impl: {lib: DeePMDkit}
+    sims: [MolecularDynamics]
+runs:
+  ec-mlp: {label: "ec-MLP (DPLR + Deep Wannier + Siepmann-Sprik electrode) for Pt/KF(aq)", method: DPLR, dataset: pt-kf, settings: {cutoffRadius: {v: 5.5, loc: "Sec. 4.3"}, batchSize: {v: 1, loc: "Sec. 4.3"}, learningRate: {v: 0.001, loc: "Sec. 4.3 (initial)"}}, model: "ec-MLP Pt/KF(aq)"}
+results:
+  - {key: ec-mlp-train, model: ec-mlp, material: pt-kf, role: training, eval_data: {label: "Training set", location: "Table 1"}, metrics: [[RMSE, Energy, 1.305, meV/atom, "train energy RMSE on Pt/KF(aq): ec-MLP", "Table 1"], [RMSE, Force, 75.00, meV/A, "train force RMSE on Pt/KF(aq): ec-MLP", "Table 1"]]}
+  - {key: ec-mlp-test, model: ec-mlp, material: pt-kf, role: test, eval_data: {label: "Testing set", location: "Table 1"}, metrics: [[RMSE, Energy, 0.9638, meV/atom, "test energy RMSE on Pt/KF(aq): ec-MLP", "Table 1"], [RMSE, Force, 57.19, meV/A, "test force RMSE on Pt/KF(aq): ec-MLP", "Table 1"]]}
+gaps:
+  - "Wannier-centre position RMSEs (1.9 and 2.0 mA, Table 1) belong to the Deep Wannier charge model, not the potential. Data-set composition is in the SM (not read)."
+  - "Potential-dependent water structure, dielectric profiles and capacitances are property results."
