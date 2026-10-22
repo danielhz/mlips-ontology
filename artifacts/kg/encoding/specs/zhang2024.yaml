@@ -1,0 +1,59 @@
+id: zhang2024
+source:
+  rank: 407
+  year: "2024"
+  first_author: "Lei Zhang"
+  title: "Efficiency, accuracy, and transferability of machine learning potentials: Application to dislocations and cracks in iron"
+  venue: "Acta Materialia"
+  doi: "10.1016/j.actamat.2024.119788"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2307.10072v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "e5dd184f74ce8b9293c62574a2d1b3f73aa8e870e306b24d98999b252b3b6548"
+study_label: "Zhang et al. (2024): efficiency, accuracy and transferability of GAP, linear and nonlinear ACE, MTP and NNP potentials for dislocations and cracks in iron"
+scope: |
+  Encoding scope: two iron DFT databases (DB-I, 14,476 configurations
+  for thermomechanics, defects and fracture; DB-II, 9,622 pure-Fe
+  configurations from an Fe-H database), the five ML-IAP families trained
+  on DB-I with 9:1 splits (GAP with 2-body and two TurboSOAP descriptors,
+  linear ACE PACE-L, nonlinear ACE PACE-FS, MTP, Behler-Parrinello NNP),
+  and GAP trained on DB-II. Test RMSEs are figure-only or stated only
+  approximately; dislocation, Peierls-barrier and fracture results are
+  properties.
+materials:
+  fe: {label: "Bcc iron (with fcc and hcp cells, point defects, surfaces, gamma surfaces, dislocations, crack tips, grain boundaries and liquid)", formula: "Fe", class: "Metals"}
+reference:
+  dft: {type: DFT, comment: "DFT settings of the source databases (Refs. 11, 14 for DB-I; Ref. 30 for DB-II); not repeated in this paper."}
+datasets:
+  db1: {label: "DB-I iron database (160,280 local atomic environments)", materials: [fe], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 14476, loc: "Sec. 2.1"}, calc: dft}
+  db2: {label: "DB-II pure-iron subset of an Fe-H database (768,986 local atomic environments)", materials: [fe], properties: [Energy, Forces, Virials], provenance: Published, n: {v: 9622, loc: "Sec. 2.1"}, calc: dft}
+methods:
+  GAP:
+    hp: [cutoffRadius, numSparseConfigs]
+    impl: {lib: QUIP}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  ACE:
+    hp: [cutoffRadius]
+    impl: {lib: PACE}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  MTP:
+    hp: [cutoffRadius]
+    impl: {lib: MLIP, comment: "MLIP-2"}
+    sims: [MolecularDynamics]
+  HDNNP:
+    hp: [cutoffRadius]
+    impl: {lib: {local: n2p2}}
+    sims: [MolecularDynamics]
+runs:
+  gap-db1: {label: "GAP-DB-I: 2-body + inner (3 A) and outer (6.5 A) TurboSOAP, M = 4800 sparse points", method: GAP, dataset: db1, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2.1"}, numSparseConfigs: {v: 4800, loc: "Sec. 2.2.1"}}, model: "Fe GAP-DB-I (Zhang 2024)"}
+  gap-db2: {label: "GAP-DB-II trained on the DB-II database", method: GAP, dataset: db2, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2"}}, model: "Fe GAP-DB-II (Zhang 2024)"}
+  pace-l: {label: "Linear ACE (PACE-L) trained on DB-I", method: ACE, dataset: db1, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2"}}, model: "Fe PACE-L (Zhang 2024)"}
+  pace-fs: {label: "Nonlinear ACE with Finnis-Sinclair embedding (PACE-FS) trained on DB-I", method: ACE, dataset: db1, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2"}}, model: "Fe PACE-FS (Zhang 2024)"}
+  mtp: {label: "MTP trained on DB-I", method: MTP, dataset: db1, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2"}}, model: "Fe MTP (Zhang 2024)"}
+  nnp: {label: "Behler-Parrinello NNP (two hidden layers, logistic activation) trained on DB-I", method: HDNNP, dataset: db1, settings: {cutoffRadius: {v: 6.5, loc: "Sec. 2.2"}}, model: "Fe NNP (Zhang 2024)"}
+results: []
+resources: |
+  Computational cost (ms per MD step and atom) was measured for NVE MD of 16,000 atoms on 32 cores of an AMD Rome 7H12 node (Fig. 3b, figure-only).
+gaps:
+  - "Training and test RMSEs are figure-only (Figs. 2-3, S2, S4) and the optimal hyperparameters are in SI Tables S1-S4; the text states only approximate values (all test energy RMSEs below 5 meV/atom, GAP about 2 meV/atom, force RMSEs about 0.04 eV/A, NNP about 0.06 eV/A)."
+  - "The cutoff of 6.5 A is the stated default for all packages ('if not specified otherwise'). Dislocation core structures, Peierls barriers, double-kink energies (Table 2) and fracture behaviour are properties."

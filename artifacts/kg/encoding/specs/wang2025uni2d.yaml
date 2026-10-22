@@ -1,0 +1,75 @@
+id: wang2025uni2d
+source:
+  rank: 406
+  year: "2025"
+  first_author: "Haidi Wang"
+  title: "Uni2D: A Universal Machine Learning Interatomic Potential for Two-Dimensional Materials"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2506.07043"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2506.07043v3"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "cfd32c543e3331a9659138816a31325f3666d13f5e94123338a606935bf76319"
+study_label: "Wang et al. (2025): Uni2D, a universal MatterSim/M3GNet-based MLIP for two-dimensional materials, with an LLM agent interface"
+scope: |
+  Encoding scope: the Uni2D data set (about 20,000 2D materials from
+  C2DB and 2dMatpedia with strain and perturbation augmentation; 327,000
+  structure-energy-force-stress mappings; VASP optB88-vdW(+U); 90/5/5),
+  the Uni2D model (MatterSim framework on the M3GNet architecture; 200
+  epochs) with its stated training-set MAEs, the four seed models on
+  1,685 independent PyXtal structures (Table S2), the E / EF / EFS
+  target ablation (Table S1), and the comparison with pretrained bulk
+  uMLIPs on about 2,000 2D structures (Table 1). Relaxed areas, lattice
+  parameters and screening results are properties.
+materials:
+  twod: {label: "Two-dimensional materials (C2DB and 2dMatpedia derived; 89 elements)", class: "2D material"}
+  pyxtal: {label: "1,685 random 2D structures generated with PyXtal", class: "2D material"}
+reference:
+  optb88: {type: DFT, code: VASP, xc: {local: optB88-vdW}, pp: PAW, cutoff: 520, kpoints: "pymatgen automatic, density 5000, one k-point along vacuum", comment: "Collinear spin, DFT+U with pymatgen defaults, MPStaticSet inputs (DFT Parameters)."}
+datasets:
+  uni2d: {label: "Uni2D training data (strained and perturbed C2DB and 2dMatpedia structures; 90/5/5 split)", materials: [twod], properties: [Energy, Forces, Stresses], provenance: Augmented, n: {v: 327000, loc: "Dataset analysis (about 327,000 mappings)"}, calc: optb88}
+methods:
+  M3GNet:
+    hp: [learningRate, numEpochs, batchSize]
+    loss: "Huber loss (delta 0.01) on energy per atom, forces and stress with weights 1, 1, 0.1"
+    algorithm: "Adam with cosine decay to 1 % after 100 epochs"
+    impl: {lib: {local: MatterSim}}
+    sims: [GeometryOptimization, MolecularDynamics]
+  CHGNet:
+    sims: [GeometryOptimization]
+  MACE:
+    sims: [GeometryOptimization]
+runs:
+  uni2d: {label: "Uni2D (MatterSim framework, M3GNet architecture) trained on energies, forces and stresses", method: M3GNet, dataset: uni2d, settings: {learningRate: {v: 0.001, loc: "Training Process"}, numEpochs: {v: 200, loc: "Training Process"}, batchSize: {v: 64, loc: "Training Process"}}, model: "Uni2D", trainingHardware: "NVIDIA RTX 4090D"}
+  seed1: {label: "Uni2D trained with random seed 1", method: M3GNet, dataset: uni2d, settings: {learningRate: {v: 0.001, loc: "Training Process"}, numEpochs: {v: 200, loc: "Training Process"}, batchSize: {v: 64, loc: "Training Process"}}, model: "Uni2D seed 1"}
+  seed2: {label: "Uni2D trained with random seed 2", method: M3GNet, dataset: uni2d, settings: {learningRate: {v: 0.001, loc: "Training Process"}, numEpochs: {v: 200, loc: "Training Process"}, batchSize: {v: 64, loc: "Training Process"}}, model: "Uni2D seed 2"}
+  seed3: {label: "Uni2D trained with random seed 3", method: M3GNet, dataset: uni2d, settings: {learningRate: {v: 0.001, loc: "Training Process"}, numEpochs: {v: 200, loc: "Training Process"}, batchSize: {v: 64, loc: "Training Process"}}, model: "Uni2D seed 3"}
+  seed4: {label: "Uni2D trained with random seed 4", method: M3GNet, dataset: uni2d, settings: {learningRate: {v: 0.001, loc: "Training Process"}, numEpochs: {v: 200, loc: "Training Process"}, batchSize: {v: 64, loc: "Training Process"}}, model: "Uni2D seed 4"}
+  abl-e: {label: "Uni2D-type model trained on energy only (Table S1 ablation)", method: M3GNet, dataset: uni2d, model: "Uni2D ablation (energy only)"}
+  abl-ef: {label: "Uni2D-type model trained on energy and forces (Table S1 ablation)", method: M3GNet, dataset: uni2d, model: "Uni2D ablation (energy and forces)"}
+  abl-efs: {label: "Uni2D-type model trained on energy, forces and stress (Table S1 ablation)", method: M3GNet, dataset: uni2d, model: "Uni2D ablation (energy, forces and stress)"}
+  mattersim: {label: "MatterSim as distributed (version not stated)", method: M3GNet, model: "MatterSim (version not stated)"}
+  m3gnet: {label: "M3GNet as distributed (version not stated)", method: M3GNet, model: "M3GNet (version not stated)"}
+  chgnet: {label: "CHGNet as distributed (version not stated)", method: CHGNet, model: "CHGNet"}
+  mace-mh1: {label: "MACE-mh-1 as distributed", method: MACE, model: "MACE-mh-1"}
+  mace-mp0a: {label: "MACE-mp-0a as distributed", method: MACE, model: "MACE-mp-0a"}
+results:
+  - {key: uni2d-train, model: uni2d, material: twod, role: training, eval_data: {label: "20,000 randomly selected training structures", location: "Fig. 2"}, metrics: [[MAE, Energy, 5, meV/atom, "train energy MAE on twod: Uni2D", "Model Performance Evaluation (0.005 eV/atom)"], [MAE, Force, 0.052, eV/A, "train force MAE (x component) on twod: Uni2D", "Fig. 2(b)"], [MAE, Force, 0.056, eV/A, "train force MAE (y component) on twod: Uni2D", "Fig. 2(c)"], [MAE, Force, 0.063, eV/A, "train force MAE (z component) on twod: Uni2D", "Fig. 2(d)"]]}
+  - {key: seed1-pyxtal, model: seed1, material: pyxtal, role: external, eval_data: {label: "1,685 independent PyXtal 2D structures (optB88-vdW DFT)", location: "Table S2"}, metrics: [[MAE, Energy, 122.0, meV/atom, "Energy MAE on pyxtal: Uni2D seed 1", "Table S2 (0.122 eV/atom)"], [MAE, Force, 0.113, eV/A, "Force MAE on pyxtal: Uni2D seed 1", "Table S2"], [MAE, Stress, 0.005, GPa, "Stress MAE on pyxtal: Uni2D seed 1", "Table S2"]]}
+  - {key: seed2-pyxtal, model: seed2, material: pyxtal, role: external, eval_data: {label: "1,685 independent PyXtal 2D structures (optB88-vdW DFT)", location: "Table S2"}, metrics: [[MAE, Energy, 95.0, meV/atom, "Energy MAE on pyxtal: Uni2D seed 2", "Table S2 (0.095 eV/atom)"], [MAE, Force, 0.115, eV/A, "Force MAE on pyxtal: Uni2D seed 2", "Table S2"], [MAE, Stress, 0.203, GPa, "Stress MAE on pyxtal: Uni2D seed 2", "Table S2"]]}
+  - {key: seed3-pyxtal, model: seed3, material: pyxtal, role: external, eval_data: {label: "1,685 independent PyXtal 2D structures (optB88-vdW DFT)", location: "Table S2"}, metrics: [[MAE, Energy, 93.0, meV/atom, "Energy MAE on pyxtal: Uni2D seed 3", "Table S2 (0.093 eV/atom)"], [MAE, Force, 0.111, eV/A, "Force MAE on pyxtal: Uni2D seed 3", "Table S2"], [MAE, Stress, 0.199, GPa, "Stress MAE on pyxtal: Uni2D seed 3", "Table S2"]]}
+  - {key: seed4-pyxtal, model: seed4, material: pyxtal, role: external, eval_data: {label: "1,685 independent PyXtal 2D structures (optB88-vdW DFT)", location: "Table S2"}, metrics: [[MAE, Energy, 94.0, meV/atom, "Energy MAE on pyxtal: Uni2D seed 4", "Table S2 (0.094 eV/atom)"], [MAE, Force, 0.108, eV/A, "Force MAE on pyxtal: Uni2D seed 4", "Table S2"], [MAE, Stress, 0.2, GPa, "Stress MAE on pyxtal: Uni2D seed 4", "Table S2"]]}
+  - {key: abl-e, model: abl-e, material: twod, role: null, eval_data: {label: "Evaluation set not stated (Table S1)", location: "Table S1"}, metrics: [[MAE, Energy, 7.0, meV/atom, "Energy MAE on twod: abl-e", "Table S1 (0.007 eV/atom)"], [MAE, Force, 0.19, eV/A, "Force MAE (x) on twod: abl-e", "Table S1"], [MAE, Force, 0.217, eV/A, "Force MAE (y) on twod: abl-e", "Table S1"], [MAE, Force, 0.272, eV/A, "Force MAE (z) on twod: abl-e", "Table S1"], [MAE, Stress, 0.218, GPa, "Stress MAE on twod: abl-e", "Table S1"]]}
+  - {key: abl-ef, model: abl-ef, material: twod, role: null, eval_data: {label: "Evaluation set not stated (Table S1)", location: "Table S1"}, metrics: [[MAE, Energy, 7.0, meV/atom, "Energy MAE on twod: abl-ef", "Table S1 (0.007 eV/atom)"], [MAE, Force, 0.055, eV/A, "Force MAE (x) on twod: abl-ef", "Table S1"], [MAE, Force, 0.061, eV/A, "Force MAE (y) on twod: abl-ef", "Table S1"], [MAE, Force, 0.068, eV/A, "Force MAE (z) on twod: abl-ef", "Table S1"], [MAE, Stress, 0.122, GPa, "Stress MAE on twod: abl-ef", "Table S1"]]}
+  - {key: abl-efs, model: abl-efs, material: twod, role: null, eval_data: {label: "Evaluation set not stated (Table S1)", location: "Table S1"}, metrics: [[MAE, Energy, 6.0, meV/atom, "Energy MAE on twod: abl-efs", "Table S1 (0.006 eV/atom)"], [MAE, Force, 0.055, eV/A, "Force MAE (x) on twod: abl-efs", "Table S1"], [MAE, Force, 0.061, eV/A, "Force MAE (y) on twod: abl-efs", "Table S1"], [MAE, Force, 0.068, eV/A, "Force MAE (z) on twod: abl-efs", "Table S1"], [MAE, Stress, 0.082, GPa, "Stress MAE on twod: abl-efs", "Table S1"]]}
+  - {key: t1-uni2d, model: uni2d, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 5.0, meV/atom, "Initial-structure energy MAE against DFT: Uni2D", "Table 1 (0.005 eV/atom)"], [MAE, Energy, 13.0, meV/atom, "Relaxed-structure energy MAE against DFT: Uni2D", "Table 1 (0.013 eV/atom)"]]}
+  - {key: t1-mattersim, model: mattersim, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 54.0, meV/atom, "Initial-structure energy MAE against DFT: Mattersim", "Table 1 (0.054 eV/atom)"], [MAE, Energy, 62.0, meV/atom, "Relaxed-structure energy MAE against DFT: Mattersim", "Table 1 (0.062 eV/atom)"]]}
+  - {key: t1-chgnet, model: chgnet, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 295.0, meV/atom, "Initial-structure energy MAE against DFT: CHGNet", "Table 1 (0.295 eV/atom)"], [MAE, Energy, 331.0, meV/atom, "Relaxed-structure energy MAE against DFT: CHGNet", "Table 1 (0.331 eV/atom)"]]}
+  - {key: t1-m3gnet, model: m3gnet, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 124.0, meV/atom, "Initial-structure energy MAE against DFT: M3GNet", "Table 1 (0.124 eV/atom)"], [MAE, Energy, 147.0, meV/atom, "Relaxed-structure energy MAE against DFT: M3GNet", "Table 1 (0.147 eV/atom)"]]}
+  - {key: t1-macemh1, model: mace-mh1, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 23.0, meV/atom, "Initial-structure energy MAE against DFT: MACE-mh-1", "Table 1 (0.023 eV/atom)"], [MAE, Energy, 25.0, meV/atom, "Relaxed-structure energy MAE against DFT: MACE-mh-1", "Table 1 (0.025 eV/atom)"]]}
+  - {key: t1-macemp0a, model: mace-mp0a, material: twod, role: external, eval_data: {label: "About 2,000 DFT 2D structures (optB88-vdW+U for Uni2D, PBE(+U) for the other models)", location: "Table 1"}, metrics: [[MAE, Energy, 88.0, meV/atom, "Initial-structure energy MAE against DFT: MACE-mp-0a", "Table 1 (0.088 eV/atom)"], [MAE, Energy, 65.0, meV/atom, "Relaxed-structure energy MAE against DFT: MACE-mp-0a", "Table 1 (0.065 eV/atom)"]]}
+resources: |
+  Training on one NVIDIA RTX 4090D. DFT and Uni2D single-point times were compared on a 48-core Xeon Gold 6248R node (Fig. S3, figure-only).
+gaps:
+  - "Energy MAEs in eV/atom are converted exactly to meV/atom (original values in the locations). Force MAEs are per Cartesian component. Each model in Table 1 is compared with its own DFT level, and the MatterSim, M3GNet and CHGNet versions are not stated, so they are paper-local runs."
+  - "Test-set MAEs on the random 5 % split are figure-only (Fig. S2). Relaxed-area MAEs and R2 values (Table 1), lattice parameters and stability screening are properties or correlation measures. The Table S1 evaluation set is not stated, so its role is null."

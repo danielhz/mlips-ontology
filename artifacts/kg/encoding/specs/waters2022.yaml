@@ -1,0 +1,63 @@
+id: waters2022
+source:
+  rank: 408
+  year: "2022"
+  first_author: "Michael J. Waters"
+  title: "Benchmarking structural evolution methods for training of machine learned interatomic potentials"
+  venue: "Journal of Physics Condensed Matter"
+  doi: "10.1088/1361-648x/ac7f73"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2203.16055v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "7c096eb8c181931448f639b534461d1ee4fb9eeb105c8628b02f0b35088a9cfb"
+study_label: "Waters and Rondinelli (2022): benchmarking structural-evolution methods (MD, contour exploration, dimer method) for generating MLIP training data in Zr-O"
+scope: |
+  Encoding scope: the Zr-O training data generated from polymorph-derived
+  and random structures evolved by MD, contour exploration (CE) or the
+  dimer method (DM) with VASP PBE labels, three Behler-Parrinello neural
+  networks (AMP fork; 136 Gaussian descriptors, 7 A cutoff, one hidden
+  layer of eight nodes per element) trained on the MD, CE and DM data,
+  and their train and cross-test energy and force errors printed in
+  Figs. 11-12. Equations of state, vacuum pair curves, phonons and
+  force-angle errors are properties or figure-only.
+materials:
+  zro: {label: "Zr-O system: Zr metal, ZrO2 polymorphs, suboxides, polymorph-derived and random structures", class: "Oxides"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 500, kpoints: "Monkhorst-Pack, at least 10,000 k-points x A^3", comment: "VASP 5.4.4, Zr_sv and O PAW potentials (Sec. II B)."}
+sampling:
+  s-md: {label: "Structure evolution by molecular dynamics (MD) from 50 polymorph-derived and 50 random starting structures; energies and forces limited by binding-energy-based caps"}
+  s-ce: {label: "Structure evolution by contour exploration (CE) from 50 polymorph-derived and 50 random starting structures; energies and forces limited by binding-energy-based caps"}
+  s-dimer: {label: "Structure evolution by dimer-method search (DM) from 50 polymorph-derived and 50 random starting structures; energies and forces limited by binding-energy-based caps"}
+datasets:
+  d-md: {label: "Zr-O molecular dynamics (MD) training data", materials: [zro], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [s-md]}
+  d-ce: {label: "Zr-O contour exploration (CE) training data", materials: [zro], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [s-ce]}
+  d-dimer: {label: "Zr-O dimer-method search (DM) training data", materials: [zro], properties: [Energy, Forces], provenance: InHouse, calc: pbe, sampling: [s-dimer]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius]
+    loss: "Energy RMSE plus 10 % weighted force RMSE plus an overfit penalty (0.05 for 200 iterations, then 0.001 for 1,500)"
+    algorithm: "BFGS"
+    impl: {lib: {local: "AMP 0.7.0-beta (fork)"}}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  nn-md: {label: "Behler-Parrinello NN trained on the molecular dynamics (MD) data", method: HDNNP, dataset: d-md, settings: {cutoffRadius: {v: 7.0, loc: "Table I"}}, model: "Zr-O NN (MD-trained)"}
+  nn-ce: {label: "Behler-Parrinello NN trained on the contour exploration (CE) data", method: HDNNP, dataset: d-ce, settings: {cutoffRadius: {v: 7.0, loc: "Table I"}}, model: "Zr-O NN (CE-trained)"}
+  nn-dimer: {label: "Behler-Parrinello NN trained on the dimer-method search (DM) data", method: HDNNP, dataset: d-dimer, settings: {cutoffRadius: {v: 7.0, loc: "Table I"}}, model: "Zr-O NN (DIMER-trained)"}
+results:
+  - {key: nn-md-train, model: nn-md, material: zro, role: training, eval_data: {label: "Training set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 17.0, meV/atom, "training energy RMSE on Training set: Zr-O NN (MD-trained)", "Fig. 11"], [MAE, Energy, 13.0, meV/atom, "training energy MAE on Training set: Zr-O NN (MD-trained)", "Fig. 11"], [RMSE, Force, 0.344, eV/A, "training force RMSE on Training set: Zr-O NN (MD-trained)", "Fig. 12"]]}
+  - {key: nn-md-mdtest, model: nn-md, material: zro, role: test, eval_data: {label: "MD test set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 35.3, meV/atom, "test energy RMSE on MD test set: Zr-O NN (MD-trained)", "Fig. 11"], [MAE, Energy, 25.9, meV/atom, "test energy MAE on MD test set: Zr-O NN (MD-trained)", "Fig. 11"], [RMSE, Force, 0.409, eV/A, "test force RMSE on MD test set: Zr-O NN (MD-trained)", "Fig. 12"]]}
+  - {key: nn-md-cetest, model: nn-md, material: zro, role: external, eval_data: {label: "CE test set (contour exploration (CE) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 52.6, meV/atom, "external energy RMSE on CE test set: Zr-O NN (MD-trained)", "Fig. 11"], [MAE, Energy, 38.2, meV/atom, "external energy MAE on CE test set: Zr-O NN (MD-trained)", "Fig. 11"], [RMSE, Force, 0.742, eV/A, "external force RMSE on CE test set: Zr-O NN (MD-trained)", "Fig. 12"]]}
+  - {key: nn-md-dimertest, model: nn-md, material: zro, role: external, eval_data: {label: "Dimer test set (dimer-method search (DM) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 99.8, meV/atom, "external energy RMSE on Dimer test set: Zr-O NN (MD-trained)", "Fig. 11"], [MAE, Energy, 70.7, meV/atom, "external energy MAE on Dimer test set: Zr-O NN (MD-trained)", "Fig. 11"], [RMSE, Force, 0.814, eV/A, "external force RMSE on Dimer test set: Zr-O NN (MD-trained)", "Fig. 12"]]}
+  - {key: nn-ce-train, model: nn-ce, material: zro, role: training, eval_data: {label: "Training set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 28.6, meV/atom, "training energy RMSE on Training set: Zr-O NN (CE-trained)", "Fig. 11"], [MAE, Energy, 21.4, meV/atom, "training energy MAE on Training set: Zr-O NN (CE-trained)", "Fig. 11"], [RMSE, Force, 0.423, eV/A, "training force RMSE on Training set: Zr-O NN (CE-trained)", "Fig. 12"]]}
+  - {key: nn-ce-mdtest, model: nn-ce, material: zro, role: external, eval_data: {label: "MD test set (molecular dynamics (MD) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 36.5, meV/atom, "external energy RMSE on MD test set: Zr-O NN (CE-trained)", "Fig. 11"], [MAE, Energy, 25.0, meV/atom, "external energy MAE on MD test set: Zr-O NN (CE-trained)", "Fig. 11"], [RMSE, Force, 0.502, eV/A, "external force RMSE on MD test set: Zr-O NN (CE-trained)", "Fig. 12"]]}
+  - {key: nn-ce-cetest, model: nn-ce, material: zro, role: test, eval_data: {label: "CE test set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 35.6, meV/atom, "test energy RMSE on CE test set: Zr-O NN (CE-trained)", "Fig. 11"], [MAE, Energy, 25.3, meV/atom, "test energy MAE on CE test set: Zr-O NN (CE-trained)", "Fig. 11"], [RMSE, Force, 0.45, eV/A, "test force RMSE on CE test set: Zr-O NN (CE-trained)", "Fig. 12"]]}
+  - {key: nn-ce-dimertest, model: nn-ce, material: zro, role: external, eval_data: {label: "Dimer test set (dimer-method search (DM) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 66.8, meV/atom, "external energy RMSE on Dimer test set: Zr-O NN (CE-trained)", "Fig. 11"], [MAE, Energy, 46.4, meV/atom, "external energy MAE on Dimer test set: Zr-O NN (CE-trained)", "Fig. 11"], [RMSE, Force, 0.581, eV/A, "external force RMSE on Dimer test set: Zr-O NN (CE-trained)", "Fig. 12"]]}
+  - {key: nn-dimer-train, model: nn-dimer, material: zro, role: training, eval_data: {label: "Training set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 30.9, meV/atom, "training energy RMSE on Training set: Zr-O NN (DIMER-trained)", "Fig. 11"], [MAE, Energy, 22.2, meV/atom, "training energy MAE on Training set: Zr-O NN (DIMER-trained)", "Fig. 11"], [RMSE, Force, 0.399, eV/A, "training force RMSE on Training set: Zr-O NN (DIMER-trained)", "Fig. 12"]]}
+  - {key: nn-dimer-mdtest, model: nn-dimer, material: zro, role: external, eval_data: {label: "MD test set (molecular dynamics (MD) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 47.2, meV/atom, "external energy RMSE on MD test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [MAE, Energy, 37.1, meV/atom, "external energy MAE on MD test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [RMSE, Force, 0.464, eV/A, "external force RMSE on MD test set: Zr-O NN (DIMER-trained)", "Fig. 12"]]}
+  - {key: nn-dimer-cetest, model: nn-dimer, material: zro, role: external, eval_data: {label: "CE test set (contour exploration (CE) data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 66.8, meV/atom, "external energy RMSE on CE test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [MAE, Energy, 50.1, meV/atom, "external energy MAE on CE test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [RMSE, Force, 0.621, eV/A, "external force RMSE on CE test set: Zr-O NN (DIMER-trained)", "Fig. 12"]]}
+  - {key: nn-dimer-dimertest, model: nn-dimer, material: zro, role: test, eval_data: {label: "Dimer test set (own data)", location: "Figs. 11-12"}, metrics: [[RMSE, Energy, 56.0, meV/atom, "test energy RMSE on Dimer test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [MAE, Energy, 38.6, meV/atom, "test energy MAE on Dimer test set: Zr-O NN (DIMER-trained)", "Fig. 11"], [RMSE, Force, 0.588, eV/A, "test force RMSE on Dimer test set: Zr-O NN (DIMER-trained)", "Fig. 12"]]}
+resources: |
+  No timings are given.
+gaps:
+  - "The values are printed in the panels of Figs. 11 and 12 (not read off plots). A model evaluated on another method's test set is recorded as external. Data-set sizes are not stated in the main text."
+  - "Force-angle errors (Fig. 13; about 14-16 degrees for CE and MD sets, 30-33 for dimer sets), equations of state, vacuum pair curves and phonons are figure-only or properties."
