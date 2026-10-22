@@ -1,0 +1,44 @@
+id: ibrahim2024
+source:
+  rank: 532
+  year: "2024"
+  first_author: "Akram Ibrahim"
+  title: "Modeling Chemical Exfoliation of Non-van der Waals Chromium Sulfides by Machine Learning Interatomic Potentials and Monte Carlo Simulations"
+  venue: "The Journal of Physical Chemistry C"
+  doi: "10.1021/acs.jpcc.3c06168"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2308.05163v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c2d3cf6776937b3ebe9480dd13e4f51e4ad92842d25320613fe783e5cc845800"
+study_label: "Ibrahim, Wines and Ataca (2024): Behler-Parrinello NNP and cluster expansion with Monte Carlo for chemical exfoliation of non-van der Waals chromium sulfides"
+scope: |
+  Encoding scope: the n2p2 Behler-Parrinello NNP for Cr_xS (120-24-24-1,
+  radial and angular cutoffs 6.5 and 5.8 A) trained on SQS relaxation
+  trajectories and strained/MD ground-state bulk and slab structures
+  (VASP PBE), with the train/test energy RMSEs and CPU time of Table S3.
+  The cluster expansion is not an MLIP. Configurational optimization,
+  exfoliation energetics and Monte Carlo results are properties.
+materials:
+  crs: {label: "Cr_xS bulk and slabs across Cr/vacancy compositions (x = 0 to 1)", class: "Inorganic crystals"}
+reference:
+  vasp: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 350, kpoints: "4000 k-points per reciprocal atom", comment: "Collinear spin-polarized"}
+sampling:
+  sqs: {label: "Relaxation trajectories of SQS cells across compositions, plus strained and MD ground-state bulk structures and two-unit-cell slabs selected by NNP query by committee"}
+datasets:
+  crs: {label: "Cr_xS dataset (Table S1; 80/20 train/test split)", materials: [crs], properties: [Energy, Forces], provenance: InHouse, calc: vasp, sampling: [sqs]}
+methods:
+  HDNNP:
+    hp: [cutoffRadius, angularCutoff, numLayers]
+    loss: "Energies and a random fraction of force components per epoch"
+    algorithm: "Adaptive Kalman filter (n2p2)"
+    impl: {lib: {local: n2p2}, comment: "120 symmetry functions; n2p2-LAMMPS interface"}
+    sims: [GeometryOptimization, MolecularDynamics, MonteCarlo]
+runs:
+  nnp: {label: "Behler-Parrinello NNP for Cr_xS (120-24-24-1)", method: HDNNP, dataset: crs, settings: {cutoffRadius: {v: 6.5, loc: "Table S3 (2-body)"}, angularCutoff: {v: 5.8, loc: "Table S3 (3-body)"}, numLayers: {v: 2, loc: "Table S3"}}, model: "NNP Cr_xS"}
+results:
+  - {key: nnp-test, model: nnp, material: crs, role: test, eval_data: {label: "Cr_xS test split (20%)", location: "Methods; Table S3"}, metrics: [[RMSE, Energy, 7.5, meV/atom, "test energy RMSE on Cr_xS: NNP", "Table S3 (E_pred)"]]}
+  - {key: nnp-train, model: nnp, material: crs, role: training, eval_data: {label: "Cr_xS training split (80%)", location: "Methods; Table S3"}, metrics: [[RMSE, Energy, 8.7, meV/atom, "training energy RMSE on Cr_xS: NNP", "Table S3 (E_train)"]]}
+timings:
+  - {model: nnp, system: "SQS cells of the dataset", atoms: null, value: 3.95, unit: "ms/step/atom (mean, +/- 0.74)", per_atom_us: 3950, hardware: "Single core of an Intel Xeon Gold 6230 at 2.10 GHz", result: nnp-test, location: "Table S3"}
+gaps:
+  - "Table S3 lists two force RMSEs (0.111 and 0.124 eV/A) both labelled 'F_pred', so which is the training value is not stated; not encoded. Per-composition energy RMSEs of the configurational-optimization panels (Fig. 2) and the CE errors (meV/site) are not encoded."

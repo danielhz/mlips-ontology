@@ -1,0 +1,50 @@
+id: wen2025emff
+source:
+  rank: 529
+  year: "2025"
+  first_author: "Mingjie Wen"
+  title: "EMFF-2025: a general neural network potential for energetic materials with C, H, N, and O elements"
+  venue: "npj Computational Materials"
+  doi: "10.1038/s41524-025-01809-w"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "publisher"
+  pdf_sha256: "8f9412d1ac37c660861b46e6bd4b371621e1d339ca344e94dacc0f06617a1124"
+study_label: "Wen et al. (2025): EMFF-2025, a general Deep Potential for C, H, N, O energetic materials built by DP-GEN transfer learning from DP-CHNO-2024"
+scope: |
+  Encoding scope: the EMFF-2025 DeePMD model for 20 high-energy
+  materials, developed from the authors' pre-trained DP-CHNO-2024 by 45
+  DP-GEN iterations (6,900 new configurations) on top of a 27,000-
+  configuration PBE-D3 base dataset for RDX, HMX and CL-20; the overall
+  and per-material MAEs stated for the training data. Iteration-by-
+  iteration stability/extrapolation MAEs, cell parameters, EOS and
+  decomposition results are not encoded as results.
+materials:
+  hems: {label: "20 C/H/N/O energetic materials (RDX, HMX, CL-20, TNT, ADN, FOX-7, TKX-50, ..., HNS) from 300 to 4000 K", class: "Energetic molecular crystals"}
+  rdx: {label: "RDX crystal", class: "Energetic molecular crystals"}
+  hmx: {label: "HMX crystal", class: "Energetic molecular crystals"}
+  cl20: {label: "CL-20 crystal", class: "Energetic molecular crystals"}
+reference:
+  cp2k: {type: DFT, code: {local: CP2K}, xc: {local: PBE-D3}, pp: {local: GTH}, comment: "DZVP-MOLOPT basis, 60/400 Ry cutoffs"}
+sampling:
+  base: {label: "AIMD of RDX, HMX and CL-20 at 300-4000 K (5,000 snapshots each) and 12,000 earlier DP-GEN configurations, cell scaling 0.92-1.08"}
+  dpgen: {label: "DP-GEN concurrent learning over 45 iterations adding one HEM at a time (force-deviation bounds 0.05-0.15 eV/A), 6,900 configurations"}
+datasets:
+  emff: {label: "EMFF-2025 training data (base RDX/HMX/CL-20 data plus 6,900 DP-GEN configurations for 20 HEMs)", materials: [hems], properties: [Energy, Forces], provenance: InHouse, calc: cp2k, sampling: [base, dpgen]}
+methods:
+  DeePMD:
+    hp: [cutoffRadius, learningRate]
+    loss: "Energy and force MSE, p_e = 0.02, p_f = 1000"
+    algorithm: "Embedding net (25, 50, 100), fitting net (240, 240, 240), 4.0e6 steps with exponential decay (0.98 every 4000 steps)"
+    impl: {lib: DeePMDkit, comment: "DP-GEN for active learning"}
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  emff: {label: "EMFF-2025", method: DeePMD, dataset: emff, settings: {cutoffRadius: {v: 6.0, loc: "Methods"}, learningRate: {v: 0.001, loc: "Methods (initial)"}}, model: "EMFF-2025", base_model: {label: "DP-CHNO-2024 (authors' pre-trained model, Ref. 52)", relation: fine-tuned, location: "Fig. 1; Methods"}}
+results:
+  - {key: emff-all, model: emff, material: hems, role: training, eval_data: {label: "EMFF-2025 training data for 20 HEMs", location: "Fig. 2 caption"}, metrics: [[MAE, Energy, 30, meV/atom, "training energy MAE on 20 HEMs: EMFF-2025", "Fig. 2 caption (0.03 eV/atom)"], [MAE, Force, 0.54, eV/A, "training force MAE on 20 HEMs: EMFF-2025", "Fig. 2 caption"]]}
+  - {key: emff-rdx, model: emff, material: rdx, role: training, eval_data: {label: "RDX crystal data in the training set", location: "Results, Fig. 2c"}, metrics: [[MAE, Energy, 11.3, meV/atom, "energy MAE on RDX: EMFF-2025", "Results (0.0113 eV/atom)"], [MAE, Force, 0.306, eV/A, "force MAE on RDX: EMFF-2025", "Results"]]}
+  - {key: emff-hmx, model: emff, material: hmx, role: training, eval_data: {label: "HMX crystal data in the training set", location: "Results, Fig. 2c"}, metrics: [[MAE, Energy, 42.2, meV/atom, "energy MAE on HMX: EMFF-2025", "Results (0.0422 eV/atom)"], [MAE, Force, 0.588, eV/A, "force MAE on HMX: EMFF-2025", "Results"]]}
+  - {key: emff-cl20, model: emff, material: cl20, role: training, eval_data: {label: "CL-20 crystal data in the training set", location: "Results, Fig. 2c"}, metrics: [[MAE, Energy, 23.7, meV/atom, "energy MAE on CL-20: EMFF-2025", "Results (0.0237 eV/atom)"], [MAE, Force, 0.510, eV/A, "force MAE on CL-20: EMFF-2025", "Results"]]}
+gaps:
+  - "Stability and extrapolation MAEs belong to intermediate DP-GEN iteration models (e.g. TNT 1.08 eV/atom and 0.97 eV/A before inclusion); not encoded. Upper bounds (below 65.2 meV/atom and 0.684 eV/A), DPA-2 and DeePMD-GNN comparisons are figure-only or bounds."
+  - "The Fig. 2 evaluation is described as 'based on the training dataset', so the role is training although a 25% test split is mentioned for the DP-GEN stopping criterion."
