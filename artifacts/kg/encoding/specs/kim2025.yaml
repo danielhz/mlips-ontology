@@ -1,0 +1,54 @@
+id: kim2025
+source:
+  rank: 226
+  year: "2025"
+  first_author: "Dong-Jin Kim"
+  title: "A Universal Augmentation Framework for Long-Range Electrostatics in Machine Learning Interatomic Potentials"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c01400"
+  kg_relevance: "Software/implementation"
+  arxiv_id: "2507.14302v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d63fef9763c6aac9da3c25b02fd04d957c3b8eb91cea7d5a2df13de8c71112eb"
+study_label: "Kim et al. (2025): a universal augmentation framework (LES library) for long-range electrostatics in MLIPs, and MACELES-OFF"
+scope: |
+  Encoding scope: the LES library and its combination with MACE
+  (MACE-LES; MACELES-OFF), trained on SPICE, with its test MAEs and RMSEs
+  on the seven SPICE-derived test subsets (Table III). The baseline and
+  LES-augmented MACE, NequIP, CACE and CHGNet models for bulk water,
+  dipeptides and Au2 on MgO(001) have errors only in figures (Figs. 2-4)
+  and are not encoded; the MACE-OFF23 values of Table III are taken from
+  the MACE-OFF paper.
+materials:
+  pubchem: {label: "PubChem (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  des-mono: {label: "DES370K monomers (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  des-dimers: {label: "DES370K dimers (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  dipeptides: {label: "Dipeptides (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  aa: {label: "Solvated amino acids (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  water: {label: "Water clusters (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+  qmugs: {label: "QMugs (SPICE / MACE-OFF test subset)", class: "Organic molecules and molecular clusters"}
+datasets:
+  spice: {label: "SPICE version 1 (MACE-OFF training split)", materials: [pubchem, des-mono, des-dimers, dipeptides, aa, water, qmugs], properties: [Energy, Forces], provenance: Published}
+hyperparameters:
+  ell: {label: "MACE irrep (rotation) order l of the messages", name: "l", datatype: integer}
+  les-sigma: {label: "LES Ewald smearing factor sigma (A)", name: "sigma", datatype: double}
+methods:
+  MACE-LES:
+    hp: [cutoffRadius, numFeatures, ell, les-sigma]
+    impl: {lib: {local: "LES", comment: "Standalone LES library compatible with MACE, NequIP, CACE and MatGL (CHGNet)"}}
+    sims: [MolecularDynamics]
+runs:
+  maceles-off: {label: "MACELES-OFF trained on SPICE version 1", method: MACE-LES, dataset: spice, settings: {cutoffRadius: {v: 4.5, loc: "Table II"}, numFeatures: {v: 192, loc: "Table II"}, ell: {v: 1, loc: "Table II"}, les-sigma: {v: 1.0, loc: "Sec. Methods B"}}, model: "MACELES-OFF (float32)"}
+results:
+  - {key: maceles-off-pubchem, model: maceles-off, material: pubchem, role: test, eval_data: {label: "MACE-OFF test subset: PubChem", registry: SPICE}, metrics: [[MAE, Energy, 0.71, meV/atom, "Test energy MAE: MACELES-OFF, PubChem", "Table III"], [MAE, Force, 17.24, meV/A, "Test force MAE: MACELES-OFF, PubChem", "Table III"], [RMSE, Energy, 1.45, meV/atom, "Test energy RMSE: MACELES-OFF, PubChem", "Table III"], [RMSE, Force, 35.26, meV/A, "Test force RMSE: MACELES-OFF, PubChem", "Table III"]]}
+  - {key: maceles-off-des-mono, model: maceles-off, material: des-mono, role: test, eval_data: {label: "MACE-OFF test subset: DES370K monomers", registry: SPICE}, metrics: [[MAE, Energy, 0.54, meV/atom, "Test energy MAE: MACELES-OFF, DES370K monomers", "Table III"], [MAE, Force, 7.65, meV/A, "Test force MAE: MACELES-OFF, DES370K monomers", "Table III"], [RMSE, Energy, 0.72, meV/atom, "Test energy RMSE: MACELES-OFF, DES370K monomers", "Table III"], [RMSE, Force, 11.7, meV/A, "Test force RMSE: MACELES-OFF, DES370K monomers", "Table III"]]}
+  - {key: maceles-off-des-dimers, model: maceles-off, material: des-dimers, role: test, eval_data: {label: "MACE-OFF test subset: DES370K dimers", registry: SPICE}, metrics: [[MAE, Energy, 0.47, meV/atom, "Test energy MAE: MACELES-OFF, DES370K dimers", "Table III"], [MAE, Force, 7.48, meV/A, "Test force MAE: MACELES-OFF, DES370K dimers", "Table III"], [RMSE, Energy, 0.72, meV/atom, "Test energy RMSE: MACELES-OFF, DES370K dimers", "Table III"], [RMSE, Force, 14.42, meV/A, "Test force RMSE: MACELES-OFF, DES370K dimers", "Table III"]]}
+  - {key: maceles-off-dipeptides, model: maceles-off, material: dipeptides, role: test, eval_data: {label: "MACE-OFF test subset: Dipeptides", registry: SPICE}, metrics: [[MAE, Energy, 0.52, meV/atom, "Test energy MAE: MACELES-OFF, Dipeptides", "Table III"], [MAE, Force, 11.46, meV/A, "Test force MAE: MACELES-OFF, Dipeptides", "Table III"], [RMSE, Energy, 0.69, meV/atom, "Test energy RMSE: MACELES-OFF, Dipeptides", "Table III"], [RMSE, Force, 17.62, meV/A, "Test force RMSE: MACELES-OFF, Dipeptides", "Table III"]]}
+  - {key: maceles-off-aa, model: maceles-off, material: aa, role: test, eval_data: {label: "MACE-OFF test subset: Solvated amino acids", registry: SPICE}, metrics: [[MAE, Energy, 0.82, meV/atom, "Test energy MAE: MACELES-OFF, Solvated amino acids", "Table III"], [MAE, Force, 18.37, meV/A, "Test force MAE: MACELES-OFF, Solvated amino acids", "Table III"], [RMSE, Energy, 1.01, meV/atom, "Test energy RMSE: MACELES-OFF, Solvated amino acids", "Table III"], [RMSE, Force, 25.31, meV/A, "Test force RMSE: MACELES-OFF, Solvated amino acids", "Table III"]]}
+  - {key: maceles-off-water, model: maceles-off, material: water, role: test, eval_data: {label: "MACE-OFF test subset: Water clusters", registry: SPICE}, metrics: [[MAE, Energy, 0.69, meV/atom, "Test energy MAE: MACELES-OFF, Water clusters", "Table III"], [MAE, Force, 12.54, meV/A, "Test force MAE: MACELES-OFF, Water clusters", "Table III"], [RMSE, Energy, 0.9, meV/atom, "Test energy RMSE: MACELES-OFF, Water clusters", "Table III"], [RMSE, Force, 17.08, meV/A, "Test force RMSE: MACELES-OFF, Water clusters", "Table III"]]}
+  - {key: maceles-off-qmugs, model: maceles-off, material: qmugs, role: test, eval_data: {label: "MACE-OFF test subset: QMugs", registry: SPICE}, metrics: [[MAE, Energy, 0.76, meV/atom, "Test energy MAE: MACELES-OFF, QMugs", "Table III"], [MAE, Force, 20.11, meV/A, "Test force MAE: MACELES-OFF, QMugs", "Table III"], [RMSE, Energy, 0.94, meV/atom, "Test energy RMSE: MACELES-OFF, QMugs", "Table III"], [RMSE, Force, 32.57, meV/A, "Test force RMSE: MACELES-OFF, QMugs", "Table III"]]}
+gaps:
+  - "LES (introduced in cheng2025 with CACE) is released here as a library and combined with MACE as MACELES-OFF; recorded as the new registry method MACE-LES derived from MACE, stated in the Abstract ('compatible with any short-range MLIP ... integration with methods such as MACE'). The LES-augmented NequIP and CHGNet models are not given registry methods because they have no tabulated errors."
+  - "Table III's caption says RMSE but it contains MAE and RMSE blocks; both are encoded. 13 outlier PubChem configurations were removed from the 34,093 test structures as in MACE-OFF."
+  - "The Au2-MgO(001) wetting energy differences (Table I) are not accuracy metrics of the schema. The level of theory of SPICE is not restated (BEC references at wB97M-D3(BJ)/def2-SVP in PySCF)."
+  - "No training or inference timing is given."

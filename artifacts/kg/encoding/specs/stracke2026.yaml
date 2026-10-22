@@ -1,0 +1,46 @@
+id: stracke2026
+source:
+  rank: 232
+  year: "2026"
+  first_author: "Konstantin Stracke"
+  title: "Evaluating mechanical property prediction across material classes using molecular dynamics simulations with universal machine-learned interatomic potentials"
+  venue: "Communications Chemistry"
+  doi: "10.1038/s42004-026-02057-9"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2511.22885v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "104106db4c6306004b3c8dbcf31f4a66ca0162f60fa1d33722738cb9c29d04a8"
+study_label: "Stracke, Edwards and Evans (2025): mechanical and thermal property prediction of MOFs and inorganic compounds with six universal MLIPs"
+scope: |
+  Encoding scope: the six pretrained universal MLIPs used in MD (Orb-v3
+  conservative-inf-omat, MACE-MP-0a, MACE-MPA-0, MACE-MOF, fairchem OMat and
+  ODAC models, the latter two not encoded as runs) and the 13 materials studied. The paper evaluates bulk
+  modulus, thermal expansion and decomposition temperature (percentage
+  errors, Fig. 3); no energy or force error is reported, so there is no
+  BenchmarkResult.
+materials:
+  MOF-5: {label: "MOF-5", formula: "C24H12O13Zn4", class: "Zn carboxylate metal-organic framework"}
+  MOF-10: {label: "MOF-10", formula: "C42H24O13Zn4", class: "Zn carboxylate metal-organic framework"}
+  TRUMOF: {label: "TRUMOF", formula: "C24H12O13Zn4", class: "Zn carboxylate metal-organic framework"}
+  ZIF-8: {label: "ZIF-8", formula: "C6H6N4Zn", class: "Zeolitic imidazolate framework"}
+  CALF-20: {label: "CALF-20", formula: "C3H2N3O2Zn", class: "Zn triazolate-oxalate framework"}
+  UiO-66: {label: "UiO-66", formula: "C24H14O16Zr3", class: "Zr metal-organic framework"}
+  UiO-66-NH2: {label: "UiO-66-NH2", formula: "C24H17N3O16Zr3", class: "Zr metal-organic framework"}
+  UiO-67: {label: "UiO-67", formula: "C42H26O16Zr3", class: "Zr metal-organic framework"}
+  NU-1000: {label: "NU-1000", formula: "C44H30O16Zr3", class: "Zr metal-organic framework"}
+  ZnCN2: {label: "Zn(CN)2", formula: "C2N2Zn", class: "Coordination polymer"}
+  SiO2: {label: "SiO2 (alpha/beta cristobalite)", formula: "SiO2", class: "Inorganic oxide"}
+  ZrW2O8: {label: "Zr(WO4)2", formula: "W2ZrO8", class: "Inorganic oxide (negative thermal expansion)"}
+  CaMn7O12: {label: "CaMn7O12", formula: "CaMn7O12", class: "Perovskite oxide"}
+methods:
+  ORB: {sims: [MolecularDynamics, GeometryOptimization]}
+  MACE: {impl: {lib: MACE, version: "0.3.13"}, sims: [MolecularDynamics, GeometryOptimization]}
+runs:
+  orb-v3: {label: "Orb-v3 (conservative-inf-omat) as distributed", method: ORB, model: "Orb-v3 conservative-inf-omat (trained on OMat)"}
+  mace-1: {label: "MACE-MP-0a as distributed (MACE-1)", method: MACE, model: "MACE-MP-0a (trained on MPtrj)"}
+  mace-2: {label: "MACE-MPA-0 as distributed (MACE-2)", method: MACE, model: "MACE-MPA-0 (trained on MPtrj and sAlex)"}
+  mace-mof: {label: "MACE-MOF as distributed (MACE-MP-0b medium fine-tuned on 127 MOFs)", method: MACE, model: "MACE-MOF", base_model: {label: "MACE-MP-0b medium", relation: fine-tuned, location: "Sec. 2"}}
+gaps:
+  - "Only property errors are reported (bulk modulus MAE 43.8% across models from NVT, CTE 76.2%; per-model errors in Fig. 3), none of which is an energy or force accuracy metric of the schema."
+  - "The two fairchem models (OMat and ODAC; Zenodo 10.5281/zenodo.15587498) are described only as graph transformers ('GT'); their architecture is not named, so they are not encoded as runs."
+  - "MACE-MOF is a third-party fine-tune (Ref. [21]) whose base model is MACE-MP-0b medium."

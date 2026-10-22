@@ -1,0 +1,62 @@
+id: liu2026
+source:
+  rank: 231
+  year: "2026"
+  first_author: "Xiaoqing Liu"
+  title: "Fine-tuning universal machine-learned interatomic potentials: A Tutorial on methods and applications"
+  venue: "Journal of Applied Physics"
+  doi: "10.1063/5.0299305"
+  kg_relevance: "Overview/taxonomy"
+  arxiv_id: "2506.21935v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "d02effddd047957983d924735b1b433def639b20ac5f75f58f977374ce0a3b68"
+study_label: "Liu et al. (2025): tutorial on fine-tuning universal MLIPs (MACE foundation models)"
+scope: |
+  Encoding scope: the fine-tuned MACE models of the tutorial's examples
+  with tabulated errors: LGPS fine-tuned from MACE-MP-0b3, MACE-MPA-0 and
+  MACE-OMAT-0 (Table IV, after stochastic weight averaging), the
+  LiCl(001)/GaF3(001) interface model fine-tuned from MACE-MPA-0
+  (Table VIII), and the graphene-water model with its MD timings
+  (Table VII). The Mo, silicon and Au2-MgO examples report properties or
+  figures only; the review parts (Tables I-III) are not encoded.
+materials:
+  LGPS: {label: "Li10GeP2S12 solid-state electrolyte (LGPS)", formula: "Li10GeP2S12", class: "Lithium thiophosphate solid electrolyte"}
+  LiCl-GaF3: {label: "LiCl(001)/GaF3(001) heterointerface", class: "Solid-solid ionic interface"}
+  graphene-water: {label: "Graphene-water interface (over 372 atoms)", class: "Solid-liquid interface"}
+reference:
+  gw-dft: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 400, comment: "D3 dispersion; 1e-6 eV SCF and 0.02 eV/A force convergence; snapshots from classical MD (Tersoff graphene, rigid three-site water)."}
+datasets:
+  lgps: {label: "LGPS data set published on DPAISquare", materials: [LGPS], properties: [Energy, Forces], provenance: Published}
+  licl-gaf3: {label: "LiCl(001)/GaF3(001) interface data set of Ref. [123]", materials: [LiCl-GaF3], properties: [Energy, Forces], provenance: Published}
+  graphene-water: {label: "Graphene-water interface DFT snapshots", materials: [graphene-water], properties: [Energy, Forces], provenance: InHouse, calc: gw-dft}
+methods:
+  MACE:
+    impl: {lib: MACE}
+    sims: [MolecularDynamics]
+runs:
+  ft-mp0b3-lgps: {label: "MACE-MP-0b3 fine-tuned on LGPS (epoch 148, after SWA)", method: MACE, dataset: lgps, model: "MACE-MP-0b3 fine-tuned on LGPS", trainingHardware: "Single NVIDIA A800 GPU (80 GB)", base_model: {label: "MACE-MP-0b3", relation: fine-tuned, location: "Table IV"}}
+  ft-mpa0-lgps: {label: "MACE-MPA-0 fine-tuned on LGPS (epoch 146, after SWA)", method: MACE, dataset: lgps, model: "MACE-MPA-0 fine-tuned on LGPS", trainingHardware: "Single NVIDIA A800 GPU (80 GB)", base_model: {label: "MACE-MPA-0", relation: fine-tuned, location: "Table IV"}}
+  ft-omat0-lgps: {label: "MACE-OMAT-0 fine-tuned on LGPS (epoch 149, after SWA)", method: MACE, dataset: lgps, model: "MACE-OMAT-0 fine-tuned on LGPS", trainingHardware: "Single NVIDIA A800 GPU (80 GB)", base_model: {label: "MACE-OMAT-0", relation: fine-tuned, location: "Table IV"}}
+  mpa0: {label: "MACE-MPA-0 foundation model as distributed", method: MACE, model: "MACE-MPA-0"}
+  ft-mpa0-licl: {label: "MACE-MPA-0 fine-tuned on the LiCl/GaF3 interface (MACE-FT)", method: MACE, dataset: licl-gaf3, model: "MACE-FT LiCl/GaF3 interface model", base_model: {run: mpa0, relation: fine-tuned, location: "Sec. III F"}}
+  ft-gw: {label: "MACE foundation model fine-tuned on the graphene-water interface (MACE-FT-MD)", method: MACE, dataset: graphene-water, model: "MACE-FT graphene-water model", base_model: {label: "MACE foundation model (MACE-MPA-0 is the comparison model)", relation: fine-tuned, location: "Sec. III D"}}
+results:
+  - {key: ft-mp0b3-lgps, model: ft-mp0b3-lgps, material: LGPS, role: test, eval_data: {label: "LGPS test set"}, metrics: [[RMSE, Energy, 0.28, meV/atom, "Test energy RMSE: MACE-MP-0b3 fine-tuned on LGPS (after SWA)", "Table IV"], [RMSE, Force, 15.84, meV/A, "Test force RMSE: MACE-MP-0b3 fine-tuned on LGPS (after SWA)", "Table IV"]]}
+  - {key: ft-mpa0-lgps, model: ft-mpa0-lgps, material: LGPS, role: test, eval_data: {label: "LGPS test set"}, metrics: [[RMSE, Energy, 0.27, meV/atom, "Test energy RMSE: MACE-MPA-0 fine-tuned on LGPS (after SWA)", "Table IV"], [RMSE, Force, 14.88, meV/A, "Test force RMSE: MACE-MPA-0 fine-tuned on LGPS (after SWA)", "Table IV"]]}
+  - {key: ft-omat0-lgps, model: ft-omat0-lgps, material: LGPS, role: test, eval_data: {label: "LGPS test set"}, metrics: [[RMSE, Energy, 0.27, meV/atom, "Test energy RMSE: MACE-OMAT-0 fine-tuned on LGPS (after SWA)", "Table IV"], [RMSE, Force, 15.32, meV/A, "Test force RMSE: MACE-OMAT-0 fine-tuned on LGPS (after SWA)", "Table IV"]]}
+  - {key: mpa0-licl, model: mpa0, material: LiCl-GaF3, role: external, eval_data: {label: "LiCl/GaF3 interface test set"}, comment: "Step-0 output of the fine-tuning run, i.e. the pretrained model; DFT settings of the data set differ from those of MPA training.", metrics: [[RMSE, Energy, 97.04, meV/atom, "Test energy RMSE: MACE-MPA-0 (not fine-tuned), LiCl/GaF3 interface", "Table VIII"], [RMSE, Force, 179.2, meV/A, "Test force RMSE: MACE-MPA-0 (not fine-tuned), LiCl/GaF3 interface", "Table VIII"]]}
+  - {key: ft-mpa0-licl, model: ft-mpa0-licl, material: LiCl-GaF3, role: test, eval_data: {label: "LiCl/GaF3 interface test set"}, metrics: [[RMSE, Energy, 0.09, meV/atom, "Test energy RMSE: MACE-FT (fine-tuned MACE-MPA-0), LiCl/GaF3 interface", "Table VIII"], [RMSE, Force, 18.23, meV/A, "Test force RMSE: MACE-FT (fine-tuned MACE-MPA-0), LiCl/GaF3 interface", "Table VIII"]]}
+timings:
+  - {model: ft-gw, system: "Graphene-water system, 10,000 MD steps with cuEquivariance", atoms: 2900, value: 2619, unit: "s per 10,000 steps", per_atom_us: 90.3, hardware: "Single NVIDIA A800 GPU: 2,619 s for 10,000 MD steps of 2,900 atoms with the cuEquivariance kernel (5,084 s without)", result: null, location: "Table VII"}
+  - {model: ft-gw, system: "Graphene-water system, 10,000 MD steps without cuEquivariance", atoms: 2900, value: 5084, unit: "s per 10,000 steps", per_atom_us: 175.3, hardware: "Single NVIDIA A800 GPU: 5,084 s for 10,000 MD steps of 2,900 atoms without the cuEquivariance kernel", result: null, location: "Table VII"}
+resources: |
+  Fine-tuning and MD on a single NVIDIA A800 GPU (80 GB). MD wall-clock
+  times for 10,000 steps (Table VII): 128 to 2,900 atoms, 710 to 2,619 s
+  with cuEquivariance and 658 to 5,084 s without; the per-atom times for
+  2,900 atoms are held in the encoding input (no accuracy result for the
+  graphene-water model is tabulated).
+gaps:
+  - "Table IV gives each LGPS model before and after stochastic weight averaging; the final (after-SWA) values are encoded, the epoch-110 values are not. Relative force errors are not encoded."
+  - "The MACE-MP-0b3, MPA-0 and OMAT-0 checkpoints are named without size or release date, so they are not linked to registry models (base models are recorded as labels in the encoding input)."
+  - "The silicon and Au2-MgO comparisons are figures (Figs. 5, 10); Mo results are elastic constants and stacking-fault barrier errors (Tables V, VI). Fine-tuning hyperparameters are discussed in Table III as recommendations, not per run."
+  - "Which foundation model was fine-tuned for the graphene-water interface is not stated explicitly; MACE-MPA-0 is the comparison model in Fig. 9."

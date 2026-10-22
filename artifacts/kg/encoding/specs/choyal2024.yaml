@@ -1,0 +1,55 @@
+id: choyal2024
+source:
+  rank: 233
+  year: "2024"
+  first_author: "Vijay Kumar Choyal"
+  title: "Constructing and Evaluating Machine-Learned Interatomic Potentials for Li-Based Disordered Rocksalts"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.4c00039"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2304.01650v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "53b12911d4fcf65e6c4b5a5050c7da304cdb2b7b2ace9d986ec0cbec03bf6b0f"
+study_label: "Choyal, Sagar and Sai Gautam (2024): MTP, SNAP, qSNAP, GAP and AENET potentials for Li-based disordered rocksalts"
+scope: |
+  Encoding scope: the four MLIPs trained on the full 10,842-structure
+  LiTMO2/TMO2 data set (MTP, SNAP, GAP, AENET) with their training and test
+  RMSEs for energies and forces at the full data-set size (Fig. 3; the
+  training values also in the text). Smaller data-set sizes, qSNAP
+  (dropped by the authors), training times and the voltage predictions are
+  not encoded.
+materials:
+  LDR: {label: "Li-based disordered rocksalts LiTMO2 and delithiated TMO2 (TM = Sc, Ti, V, Cr, Mn, Fe, Co, Ni, Cu; up to nine TMs)", class: "Disordered rocksalt oxide cathode materials"}
+reference:
+  pbe-u: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "Gamma-centred, 1000 per number of atoms", comment: "Hubbard U correction (Materials Project compatible pymatgen settings), VASP 6.1.2; single points for the structures of Artrith et al., full relaxations for the newly enumerated ones."}
+sampling:
+  enumeration: {label: "Enumerated Li/TM orderings on the rocksalt cation sublattice (up to 18 cation sites)", comment: "10,046 structures of Artrith et al., about 400 new multi-TM combinations from pymatgen, and 500 delithiated structures per n-TM combination (Dataset generation)."}
+datasets:
+  ldr: {label: "LiTMO2/TMO2 disordered-rocksalt data set (10,842 structures; 90:10 split)", materials: [LDR], properties: [Energy, Forces], provenance: Augmented, n: {v: 10842, loc: "Dataset generation"}, calc: pbe-u, sampling: [enumeration]}
+methods:
+  MTP: {loss: "Energies, forces and stresses", algorithm: "BFGS", impl: {lib: MLIP}}
+  SNAP: {algorithm: "Linear regression", impl: {lib: {local: "MAML", comment: "materials machine learning package used as the interface for GAP, SNAP, qSNAP and MTP"}}}
+  GAP: {loss: "Energies only (forces not included in training)", algorithm: "Gaussian process regression", impl: {lib: QUIP}}
+  ChebyshevANN: {loss: "Energies only (aenet cannot weight forces)", algorithm: "L-BFGS", impl: {lib: {local: "aenet"}}, hp: [numEpochs]}
+runs:
+  mtp: {label: "MTP trained on the full LDR data set (90% of 10,842)", method: MTP, dataset: ldr, model: "MTP LiTMO2/TMO2 potential", trainingHardware: "Single core of an Intel Xeon Gold 6271 CPU"}
+  snap: {label: "SNAP trained on the full LDR data set (90% of 10,842)", method: SNAP, dataset: ldr, model: "SNAP LiTMO2/TMO2 potential", trainingHardware: "Single core of an Intel Xeon Gold 6271 CPU"}
+  gap: {label: "GAP trained on the full LDR data set (90% of 10,842)", method: GAP, dataset: ldr, model: "GAP LiTMO2/TMO2 potential", trainingHardware: "Single core of an Intel Xeon Gold 6271 CPU"}
+  aenet: {label: "AENET trained on the full LDR data set (90% of 10,842)", method: ChebyshevANN, dataset: ldr, settings: {numEpochs: {v: 3300, loc: "Sec. Ease of training"}}, model: "AENET LiTMO2/TMO2 potential", trainingHardware: "Single core of an Intel Xeon Gold 6271 CPU; about 38 h for 3,300 epochs"}
+results:
+  - {key: mtp-test, model: mtp, material: LDR, role: test, eval_data: {label: "10% random test split of the LDR data set"}, metrics: [[RMSE, Energy, 22.5, meV/atom, "Test energy RMSE: MTP, full data set", "Fig. 3 (annotation)"], [RMSE, Force, 0.22, eV/A, "Test force RMSE: MTP, full data set", "Fig. 3 (annotation)"]]}
+  - {key: mtp-train, model: mtp, material: LDR, role: training, eval_data: {label: "90% training split of the LDR data set"}, metrics: [[RMSE, Energy, 23.04, meV/atom, "Training energy RMSE: MTP, full data set", "Results, text; Fig. 3"]]}
+  - {key: snap-test, model: snap, material: LDR, role: test, eval_data: {label: "10% random test split of the LDR data set"}, metrics: [[RMSE, Energy, 75.8, meV/atom, "Test energy RMSE: SNAP, full data set", "Fig. 3 (annotation)"], [RMSE, Force, 0.24, eV/A, "Test force RMSE: SNAP, full data set", "Fig. 3 (annotation)"]]}
+  - {key: snap-train, model: snap, material: LDR, role: training, eval_data: {label: "90% training split of the LDR data set"}, metrics: [[RMSE, Energy, 82.79, meV/atom, "Training energy RMSE: SNAP, full data set", "Results, text; Fig. 3"]]}
+  - {key: gap-test, model: gap, material: LDR, role: test, eval_data: {label: "10% random test split of the LDR data set"}, metrics: [[RMSE, Energy, 23.6, meV/atom, "Test energy RMSE: GAP, full data set", "Fig. 3 (annotation)"], [RMSE, Force, 0.86, eV/A, "Test force RMSE: GAP, full data set", "Fig. 3 (annotation)"]]}
+  - {key: gap-train, model: gap, material: LDR, role: training, eval_data: {label: "90% training split of the LDR data set"}, metrics: [[RMSE, Energy, 17.11, meV/atom, "Training energy RMSE: GAP, full data set", "Results, text; Fig. 3"], [RMSE, Force, 0.87, eV/A, "Training force RMSE: GAP, full data set", "Results, text"]]}
+  - {key: aenet-test, model: aenet, material: LDR, role: test, eval_data: {label: "10% random test split of the LDR data set"}, metrics: [[RMSE, Energy, 17.2, meV/atom, "Test energy RMSE: AENET, full data set", "Fig. 3 (annotation)"], [RMSE, Force, 1.0, eV/A, "Test force RMSE: AENET, full data set", "Fig. 3 (annotation)"]]}
+  - {key: aenet-train, model: aenet, material: LDR, role: training, eval_data: {label: "90% training split of the LDR data set"}, metrics: [[RMSE, Energy, 7.51, meV/atom, "Training energy RMSE: AENET, full data set", "Results, text; Fig. 3"], [RMSE, Force, 1.1, eV/A, "Training force RMSE: AENET, full data set", "Results, text"]]}
+resources: |
+  Training on a single core of an Intel Xeon Gold 6271 CPU (128 GB RAM):
+  at the full data set about 210 min for AENET at 300 epochs and about 460
+  min for MTP; AENET at 3,300 epochs about 38 h (Figs. 4, 5).
+gaps:
+  - "AENET uses Chebyshev-expanded radial and angular distribution functions, not Behler-Parrinello symmetry functions; recorded under the new registry method ChebyshevANN (decision on its name and scope wanted)."
+  - "Test RMSEs at the full data-set size are read from the numbers printed in the Fig. 3 heat map (upper triangles); training RMSEs are stated in the text. The text gives MTP/SNAP force training errors as 0.22-0.24 eV/A while Fig. 3 prints 0.25 and 0.26, so they are not encoded."
+  - "Hyperparameters are in Table S1 (SI), not encoded. qSNAP was trained only on small subsets and dropped."

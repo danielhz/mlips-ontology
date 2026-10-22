@@ -1,0 +1,55 @@
+id: du2025
+source:
+  rank: 230
+  year: "2025"
+  first_author: "Hongwei Du"
+  title: "Universal Machine Learning Interatomic Potentials are Ready for Solid Ion Conductors"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2502.09970"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2502.09970v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "35f5dddce92c88815a427e202d1001a1c857c27d706474499c5085125429e880"
+study_label: "Du et al. (2025): benchmark of universal MLIPs for solid-state electrolytes"
+scope: |
+  Encoding scope: the six pretrained universal MLIPs evaluated (MatterSim,
+  MACE, SevenNet, ORB, CHGNet, M3GNet; checkpoints not identified), their
+  energy and force MAEs on the non-equilibrium halide-electrolyte test
+  data stated in Sec. 3.2, and the DFT-labelled SSE data set built for the
+  benchmark. Errors per sulfide/oxide system, near-equilibrium ranges,
+  formation-energy, hull-energy, elastic-moduli and diffusivity benchmarks
+  are shown in figures or given as ranges and are not encoded; the
+  MatterSim application studies of Li3YCl6 and Li6PS5Cl are not encoded.
+materials:
+  halides: {label: "Halide solid-state electrolytes (six systems; heated DeePMD trajectories, 100-1100 K)", class: "Lithium halide solid electrolytes"}
+  sse: {label: "Sulfide, halide and oxide solid-state electrolytes (18 systems, 17 elements)", class: "Lithium solid-state electrolytes"}
+reference:
+  sse-dft: {type: DFT, code: VASP, pp: PAW, cutoff: 600, kpoints: "KSPACING = 0.3", comment: "PBE functional consistent with the uMLIP training data (Sec. 3.1); 0.01 eV/A relaxation convergence."}
+sampling:
+  aimd-deepgen: {label: "Randomly perturbed structures sampled by short AIMD, then NPT MD at 100-1100 K and 0-2 GPa (AIMD and DeepGen)"}
+datasets:
+  sse: {label: "SSE energy and force benchmark set (1,980 DFT-labelled snapshots of 18 systems)", materials: [sse, halides], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1980, loc: "Sec. 3.1"}, calc: sse-dft, sampling: [aimd-deepgen]}
+methods:
+  CHGNet: {sims: [MolecularDynamics, GeometryOptimization]}
+  M3GNet: {sims: [MolecularDynamics, GeometryOptimization]}
+  MACE: {sims: [MolecularDynamics, GeometryOptimization]}
+  NequIP: {sims: [MolecularDynamics, GeometryOptimization]}
+  ORB: {sims: [MolecularDynamics, GeometryOptimization]}
+runs:
+  mattersim: {label: "MatterSim universal MLIP as distributed (version not stated)", method: M3GNet, model: "MatterSim pretrained universal model (version not stated)"}
+  mace: {label: "MACE universal MLIP as distributed (version not stated)", method: MACE, model: "MACE pretrained universal model (version not stated)"}
+  sevennet: {label: "SevenNet universal MLIP as distributed (version not stated)", method: NequIP, model: "SevenNet pretrained universal model (version not stated)"}
+  orbff: {label: "ORBFF universal MLIP as distributed (version not stated)", method: ORB, model: "ORBFF pretrained universal model (version not stated)"}
+  chgnet: {label: "CHGNet universal MLIP as distributed (version not stated)", method: CHGNet, model: "CHGNet pretrained universal model (version not stated)"}
+  m3gnet: {label: "M3GNet universal MLIP as distributed (version not stated)", method: M3GNet, model: "M3GNet pretrained universal model (version not stated)"}
+results:
+  - {key: mattersim-halides, model: mattersim, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 10.63, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: MatterSim", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 24.39, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: MatterSim", "Sec. 3.2, Figs. 2-4"]]}
+  - {key: mace-halides, model: mace, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 11.9, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: MACE", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 43.06, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: MACE", "Sec. 3.2, Figs. 2-4"]]}
+  - {key: sevennet-halides, model: sevennet, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 11.7, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: SevenNet", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 35.52, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: SevenNet", "Sec. 3.2, Figs. 2-4"]]}
+  - {key: orbff-halides, model: orbff, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 14.03, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: ORBFF", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 25.06, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: ORBFF", "Sec. 3.2, Figs. 2-4"]]}
+  - {key: chgnet-halides, model: chgnet, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 20.33, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: CHGNet", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 71.01, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: CHGNet", "Sec. 3.2, Figs. 2-4"]]}
+  - {key: m3gnet-halides, model: m3gnet, material: halides, role: external, eval_data: {label: "Non-equilibrium halide-electrolyte snapshots from heated DeePMD trajectories (100-1100 K)"}, metrics: [[MAE, Energy, 11.78, meV/atom, "Energy MAE against DFT, non-equilibrium halide electrolytes: M3GNet", "Sec. 3.2, Figs. 2-4"], [MAE, Force, 70.0, meV/A, "Force MAE against DFT, non-equilibrium halide electrolytes: M3GNet", "Sec. 3.2, Figs. 2-4"]]}
+gaps:
+  - "The model versions (checkpoints) are not identified in the version read, so none is linked to a registry model. MatterSim applies the registry method M3GNet and SevenNet applies NequIP, as in the registry convention; ORBFF is recorded under ORB."
+  - "The halide test snapshots are said to come from heated DeePMD trajectories, while the benchmark data set is described as AIMD/DeepGen snapshots labelled with DFT; the relation between the two is not explicit."
+  - "Formation-energy, E_above_hull, bulk and shear moduli and Li-ion diffusivity errors are in figures (Figs. 8-10, S16-S33); near-equilibrium errors are given only as ranges over models."

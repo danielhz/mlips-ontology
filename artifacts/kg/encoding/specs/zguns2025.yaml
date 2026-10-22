@@ -1,0 +1,56 @@
+id: zguns2025
+source:
+  rank: 228
+  year: "2025"
+  first_author: "Pjotrs Žguns"
+  title: "Benchmarking CHGNet Universal Machine Learning Interatomic Potential against DFT and EXAFS: The Case of Layered WS2 and MoS2"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.5c00955"
+  kg_relevance: "Dataset/benchmark"
+  arxiv_id: "2509.08498v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "dc4e6bf7e59bba7ff8649fd4745f365e92141fce2d01baa8714e4142f4eeeea1"
+study_label: "Žguns, Pudza and Kuzmin (2025): benchmarking and fine-tuning CHGNet for 2Hc-WS2 against PBE-D3 and EXAFS"
+scope: |
+  Encoding scope: the pretrained CHGNet v0.3.0 (registry model) and CHGNet
+  fine-tuned on PBE-D3 relaxation snapshots of 2Hc-WS2 with 7,000, 350, 70
+  and single frames; their energy, force and stress MAEs on the test sets
+  TS1-TS4 as stated in the text (Sec. 3.1). MoS2 results and the
+  learning curve are shown only in figures; EXAFS comparisons are not
+  accuracy metrics of the schema.
+materials:
+  WS2: {label: "Layered 2Hc-WS2 (54-atom 3a x 3a x c supercells)", formula: "WS2", class: "Layered transition-metal dichalcogenide"}
+reference:
+  pbe-d3: {type: DFT, code: VASP, xc: PBE, pp: PAW, cutoff: 520, kpoints: "3x3x2 (54-atom supercell)", comment: "D3 van der Waals correction; Gamma-centred grids converging the total energy to about 0.05 meV/atom (Sec. 2.1)."}
+sampling:
+  strained-relax: {label: "Short relaxations from randomly displaced atoms at seven isotropic strains", comment: "Strains -1.5% to 1.5% in 0.5% steps; 100 trajectories per strain from 0.2 A random displacements, 10 relaxation steps each (Sec. 2.2)."}
+datasets:
+  ws2-7000: {label: "WS2 PBE-D3 relaxation snapshots (7,000 frames; 8:1:1 split)", materials: [WS2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 7000, loc: "Sec. 2.2"}, calc: pbe-d3, sampling: [strained-relax]}
+  ws2-350: {label: "WS2 fine-tuning subset (350 frames)", materials: [WS2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 350, loc: "Sec. 3.1"}, calc: pbe-d3}
+  ws2-70: {label: "WS2 fine-tuning subset (70 frames)", materials: [WS2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 70, loc: "Sec. 3.1"}, calc: pbe-d3}
+  ws2-1: {label: "WS2 fine-tuning subset (one frame)", materials: [WS2], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 1, loc: "Sec. 3.1"}, calc: pbe-d3}
+external_models: [CHGNet-0.3.0]
+methods:
+  CHGNet:
+    hp: [learningRate, batchSize, numEpochs]
+    loss: "Energies, forces and stresses (CHGNet trainer); most layers frozen"
+    algorithm: "Adam"
+    sims: [MolecularDynamics, GeometryOptimization]
+runs:
+  ft-7000: {label: "CHGNet v0.3.0 fine-tuned on 7000 WS2 PBE-D3 frames", method: CHGNet, dataset: ws2-7000, settings: {learningRate: {v: 0.01, loc: "Sec. 2.2"}, batchSize: {v: 4, loc: "Sec. 2.2"}, numEpochs: {v: 5, loc: "Sec. 2.2"}}, model: "CHGNet fine-tuned on 7000 WS2 frames", trainingHardware: "Approximately 4000 s on two 20-core Intel Xeon Gold 6148 processors", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. 2.2"}}
+  ft-350: {label: "CHGNet v0.3.0 fine-tuned on 350 WS2 PBE-D3 frames", method: CHGNet, dataset: ws2-350, settings: {learningRate: {v: 0.01, loc: "Sec. 2.2"}, batchSize: {v: 4, loc: "Sec. 2.2"}, numEpochs: {v: 5, loc: "Sec. 2.2"}}, model: "CHGNet fine-tuned on 350 WS2 frames", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. 2.2"}}
+  ft-70: {label: "CHGNet v0.3.0 fine-tuned on 70 WS2 PBE-D3 frames", method: CHGNet, dataset: ws2-70, settings: {learningRate: {v: 0.01, loc: "Sec. 2.2"}, batchSize: {v: 4, loc: "Sec. 2.2"}, numEpochs: {v: 5, loc: "Sec. 2.2"}}, model: "CHGNet fine-tuned on 70 WS2 frames", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. 2.2"}}
+  ft-1: {label: "CHGNet v0.3.0 fine-tuned on 1 WS2 PBE-D3 frame", method: CHGNet, dataset: ws2-1, settings: {learningRate: {v: 0.01, loc: "Sec. 2.2"}, batchSize: {v: 4, loc: "Sec. 2.2"}, numEpochs: {v: 5, loc: "Sec. 2.2"}}, model: "CHGNet fine-tuned on 1 WS2 frame", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. 2.2"}}
+results:
+  - {key: vanilla, model: "ext:CHGNet-0.3.0", material: WS2, role: external, eval_data: {label: "WS2 PBE-D3 test sets TS1-TS4"}, metrics: [[MAE, Force, 337, meV/A, "Force MAE against PBE-D3: pretrained CHGNet v0.3.0", "Sec. 3.1"], [MAE, Stress, 1.0, GPa, "Stress MAE against PBE-D3: pretrained CHGNet v0.3.0", "Sec. 3.1"]]}
+  - {key: ft-7000, model: ft-7000, material: WS2, role: test, eval_data: {label: "WS2 PBE-D3 test sets TS1-TS4"}, metrics: [[MAE, Energy, 0.3, meV/atom, "Energy MAE (after a constant shift) against PBE-D3: CHGNet fine-tuned on 7000 frame(s)", "Sec. 3.1"], [MAE, Force, 37, meV/A, "Force MAE against PBE-D3: CHGNet fine-tuned on 7000 frame(s)", "Sec. 3.1"], [MAE, Stress, 0.04, GPa, "Stress MAE against PBE-D3: CHGNet fine-tuned on 7000 frame(s)", "Sec. 3.1"]]}
+  - {key: ft-350, model: ft-350, material: WS2, role: test, eval_data: {label: "WS2 PBE-D3 test sets TS1-TS4"}, metrics: [[MAE, Energy, 0.5, meV/atom, "Energy MAE (after a constant shift) against PBE-D3: CHGNet fine-tuned on 350 frame(s)", "Sec. 3.1"], [MAE, Force, 72, meV/A, "Force MAE against PBE-D3: CHGNet fine-tuned on 350 frame(s)", "Sec. 3.1"], [MAE, Stress, 0.08, GPa, "Stress MAE against PBE-D3: CHGNet fine-tuned on 350 frame(s)", "Sec. 3.1"]]}
+  - {key: ft-70, model: ft-70, material: WS2, role: test, eval_data: {label: "WS2 PBE-D3 test sets TS1-TS4"}, metrics: [[MAE, Energy, 0.6, meV/atom, "Energy MAE (after a constant shift) against PBE-D3: CHGNet fine-tuned on 70 frame(s)", "Sec. 3.1"], [MAE, Force, 102, meV/A, "Force MAE against PBE-D3: CHGNet fine-tuned on 70 frame(s)", "Sec. 3.1"], [MAE, Stress, 0.15, GPa, "Stress MAE against PBE-D3: CHGNet fine-tuned on 70 frame(s)", "Sec. 3.1"]]}
+  - {key: ft-1, model: ft-1, material: WS2, role: test, eval_data: {label: "WS2 PBE-D3 test sets TS1-TS4"}, comment: "Mean over fine-tunes on different single structures (0.9 +- 0.1 meV/atom, 178 +- 18 meV/A, 0.7 +- 0.3 GPa).", metrics: [[MAE, Energy, 0.9, meV/atom, "Energy MAE (after a constant shift) against PBE-D3: CHGNet fine-tuned on 1 frame(s)", "Sec. 3.1"], [MAE, Force, 178, meV/A, "Force MAE against PBE-D3: CHGNet fine-tuned on 1 frame(s)", "Sec. 3.1"], [MAE, Stress, 0.7, GPa, "Stress MAE against PBE-D3: CHGNet fine-tuned on 1 frame(s)", "Sec. 3.1"]]}
+resources: |
+  Fine-tuning on 7,000 frames takes about 4,000 s on two 20-core Intel Xeon
+  Gold 6148 processors, proportionally less for smaller sets (Sec. 2.2).
+gaps:
+  - "Energy MAEs are computed after shifting CHGNet energies by a constant (86 meV/atom for the pretrained, 1.5 meV/atom for the fine-tuned model) to align with DFT on an absolute scale (Fig. 2 caption)."
+  - "The pretrained model's energy MAE is only in the Fig. 2 legend; its stress MAE against PBE without D3 (about 0.3 GPa) is not encoded."
+  - "MoS2 fine-tuning results (Figs. S5, S6), elastic constants and phonons are in the SI and not encoded. Which CHGNet layers stay frozen is in Table S3."

@@ -1,0 +1,60 @@
+id: liu2025
+source:
+  rank: 229
+  year: "2025"
+  first_author: "Xiaoqing Liu"
+  title: "A Study on the Fine-Tuning Performance of Universal Machine-Learned Interatomic Potentials (U-MLIPs)"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2506.07401"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2506.07401v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "c4bde4fa4e881177b285a4e05357ff0a702d61ca6de264bfd0985266b8a240a3"
+study_label: "Liu et al. (2025): fine-tuning performance of the MACE-MP-0 and MACE-MP-0b foundation models"
+scope: |
+  Encoding scope: the medium MACE-MP-0 and MACE-MP-0b foundation models,
+  their fine-tuned versions, and MACE and ACE models trained from scratch,
+  with the tabulated test errors for the NbAlMoTiZr high-entropy alloy
+  (Table 5) and the stated final errors of MACE-MP-0b fine-tuned on a
+  filtered silicon subset (Sec. 3.2). Property comparisons for elemental
+  metals, silicon defects, dislocations and molten LiCl (Tables 2-4, 6,
+  figures) are not accuracy metrics of the schema and are not encoded.
+materials:
+  HEA: {label: "NbAlMoTiZr high-entropy alloy (configurations of 1-6 atoms)", class: "Refractory high-entropy alloy"}
+  Si: {label: "Silicon (defects and low-temperature states)", formula: "Si", class: "Elemental semiconductor", wikidata: Q670}
+datasets:
+  hea: {label: "NbAlMoTiZr data set selected by uncertainty filtering (FT-3)", materials: [HEA], properties: [Energy, Forces], provenance: InHouse, comment: "Candidate configurations of 1-5 atoms filtered with an auxiliary ACE model's Bayesian uncertainties; 6-atom configurations used for testing (Sec. 3.4)."}
+  si-subset: {label: "Silicon subset of the Si database of Ref. [66] focused on defects and low-temperature states (FT-2)", materials: [Si], properties: [Energy, Forces, Stresses], provenance: Published, comment: "The full database has 531,710 electronic-structure data points; the subset is manually filtered (Sec. 3.2)."}
+methods:
+  MACE:
+    hp: [learningRate, numEpochs]
+    loss: "MSE on energy, force and stress with a 1-10-100 ratio; multi-head fine-tuning with 400 MPtrj samples"
+    algorithm: "Adam with EMA (0.99), gradient clipping at 10"
+    impl: {lib: MACE}
+    sims: [MolecularDynamics, NudgedElasticBand]
+  ACE: {}
+runs:
+  mace-mp-0: {label: "MACE-MP-0 medium foundation model as distributed (evaluated without fine-tuning)", method: MACE, model: "MACE-MP-0 medium (L = 1)"}
+  mace-mp-0b: {label: "MACE-MP-0b medium foundation model as distributed (evaluated without fine-tuning)", method: MACE, model: "MACE-MP-0b medium (L = 1)"}
+  ft-0-hea: {label: "MACE-MP-0 medium fine-tuned on the NbAlMoTiZr data set", method: MACE, dataset: hea, settings: {learningRate: {v: 0.0005, loc: "Sec. 5.1"}, numEpochs: {v: 200, loc: "Sec. 5.1"}}, model: "Fine-tuning-0 NbAlMoTiZr model", base_model: {run: mace-mp-0, relation: fine-tuned, location: "Sec. 3.4"}}
+  ft-0b-hea: {label: "MACE-MP-0b medium fine-tuned on the NbAlMoTiZr data set", method: MACE, dataset: hea, settings: {learningRate: {v: 0.0005, loc: "Sec. 5.1"}, numEpochs: {v: 200, loc: "Sec. 5.1"}}, model: "Fine-tuning-0b NbAlMoTiZr model", base_model: {run: mace-mp-0b, relation: fine-tuned, location: "Sec. 3.4"}}
+  mace-hea: {label: "MACE trained from scratch on the NbAlMoTiZr data set", method: MACE, dataset: hea, model: "MACE NbAlMoTiZr model (from scratch)"}
+  ace-hea: {label: "ACE trained from scratch on the NbAlMoTiZr data set", method: ACE, dataset: hea, model: "ACE NbAlMoTiZr model (from scratch)"}
+  ft-0b-si: {label: "MACE-MP-0b medium fine-tuned on the filtered silicon subset (FT-2)", method: MACE, dataset: si-subset, settings: {learningRate: {v: 0.0005, loc: "Sec. 5.1"}, numEpochs: {v: 200, loc: "Sec. 5.1"}}, model: "MACE-MP-0b fine-tuned on the silicon subset", base_model: {run: mace-mp-0b, relation: fine-tuned, location: "Sec. 3.2"}}
+results:
+  - {key: mace-mp-0b-hea, model: mace-mp-0b, material: HEA, role: external, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 63.8, meV/atom, "Test energy error: MACE-MP-0b (no fine-tuning), NbAlMoTiZr", "Table 5"], [MAE, Force, 132.5, meV/A, "Test force error: MACE-MP-0b (no fine-tuning), NbAlMoTiZr", "Table 5"]]}
+  - {key: mace-mp-0-hea, model: mace-mp-0, material: HEA, role: external, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 58.6, meV/atom, "Test energy error: MACE-MP-0 (no fine-tuning), NbAlMoTiZr", "Table 5"], [MAE, Force, 102.3, meV/A, "Test force error: MACE-MP-0 (no fine-tuning), NbAlMoTiZr", "Table 5"]]}
+  - {key: ft-0b-hea, model: ft-0b-hea, material: HEA, role: test, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 13.8, meV/atom, "Test energy error: fine-tuned MACE-MP-0b, NbAlMoTiZr", "Table 5"], [MAE, Force, 20.3, meV/A, "Test force error: fine-tuned MACE-MP-0b, NbAlMoTiZr", "Table 5"]]}
+  - {key: ft-0-hea, model: ft-0-hea, material: HEA, role: test, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 13.8, meV/atom, "Test energy error: fine-tuned MACE-MP-0, NbAlMoTiZr", "Table 5"], [MAE, Force, 20.1, meV/A, "Test force error: fine-tuned MACE-MP-0, NbAlMoTiZr", "Table 5"]]}
+  - {key: mace-hea, model: mace-hea, material: HEA, role: test, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 16.4, meV/atom, "Test energy error: MACE from scratch, NbAlMoTiZr", "Table 5"], [MAE, Force, 23.2, meV/A, "Test force error: MACE from scratch, NbAlMoTiZr", "Table 5"]]}
+  - {key: ace-hea, model: ace-hea, material: HEA, role: test, eval_data: {label: "NbAlMoTiZr 6-atom test configurations"}, metrics: [[MAE, Energy, 24.1, meV/atom, "Test energy error: ACE from scratch, NbAlMoTiZr", "Table 5"], [MAE, Force, 86.2, meV/A, "Test force error: ACE from scratch, NbAlMoTiZr", "Table 5"]]}
+  - {key: ft-0b-si, model: ft-0b-si, material: Si, role: test, eval_data: {label: "Silicon test configurations"}, metrics: [[RMSE, Energy, 7, meV/atom, "Final energy RMSE: MACE-MP-0b fine-tuned on the filtered silicon subset", "Sec. 3.2"], [RMSE, Force, 60, meV/A, "Final force RMSE: MACE-MP-0b fine-tuned on the filtered silicon subset", "Sec. 3.2"]]}
+resources: |
+  Wall-clock time for 100,000 MD steps of the NbAlMoTiZr alloy (16 to
+  2,000 atoms) before and after fine-tuning is shown only in Fig. 5;
+  fine-tuning does not change the cost. Hardware is not stated.
+gaps:
+  - "Table 5 is captioned 'Testing RMSE error' while its columns say MAE; the column headers are followed (MAE), which is worth a check."
+  - "The MACE-MP-0 medium and MACE-MP-0b medium checkpoints are not identified by release date, so they are not linked to registry models; they are paper-local runs without training data, as distributed."
+  - "The silicon errors are stated as 'final RMSE values' after fine-tuning (Fig. 1 shows MAE learning curves). The DFT levels of the HEA and silicon data are not described in the version read."
+  - "Settings other than the learning rate and epochs (cutoff, correlation order) are MACE defaults and are not stated."

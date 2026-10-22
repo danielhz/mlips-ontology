@@ -1,0 +1,54 @@
+id: deng2024
+source:
+  rank: 227
+  year: "2024"
+  first_author: "Bowen Deng"
+  title: "Overcoming systematic softening in universal machine learning interatomic potentials by fine-tuning"
+  venue: "arXiv (Cornell University)"
+  doi: "10.48550/arxiv.2405.07105"
+  kg_relevance: "Training/reliability"
+  arxiv_id: "2405.07105v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "6bd7a2743258155359b292a3a47f0de89aa9f798a711dda04f1dff465df6045e"
+study_label: "Deng et al. (2024): systematic softening of universal MLIPs (M3GNet, CHGNet, MACE-MP-0) and its correction by fine-tuning"
+scope: |
+  Encoding scope: the three pretrained universal MLIPs (registry models
+  M3GNet 2021.2.8, CHGNet v0.3.0, MACE-MP-0 2023.12.03) evaluated on out-of-
+  distribution tasks, with the errors stated as numbers in the text: Mg-ion
+  migration barriers, the MACE surface-energy MAE, and force MAEs on
+  high-energy states of Li2B3PO8; and two CHGNet models fine-tuned on
+  Li2B3PO8 (a one-label scalar correction and a 10-structure fine-tune).
+  Errors shown only in figures (defects, solid solutions, phonons, the 1000
+  WBM compounds) are not encoded.
+materials:
+  surfaces: {label: "Surfaces (Miller index up to 2) of 29 elements and binary compounds (147 surfaces)", class: "Inorganic surfaces"}
+  mg-hosts: {label: "Host structures for Mg2+ ion migration (ApproxNEB data of Rutt et al.)", class: "Inorganic ionic conductors"}
+  Li2B3PO8: {label: "Li2B3PO8 (mp-1020015), high-energy MD states", formula: "Li2B3PO8", class: "Lithium borophosphate"}
+reference:
+  mp-dft: {type: DFT, code: VASP, pp: PAW, comment: "pymatgen MPRelaxSet settings for compatibility with Materials Project; 1e-5 eV electronic and 0.02 eV/A ionic convergence (Methods D)."}
+datasets:
+  Li2B3PO8: {label: "Li2B3PO8 ab initio MD structures for fine-tuning (up to 10 training structures; 100 test structures)", materials: [Li2B3PO8], properties: [Energy, Forces, Stresses], calc: mp-dft, comment: "Train/validation ratio 9:1; 100 structures reserved for testing (Methods C)."}
+external_models: [M3GNet-MPF-2021.2.8, CHGNet-0.3.0, MACE-MP-0-2023.12.03]
+methods:
+  CHGNet:
+    hp: [learningRate, numEpochs]
+    loss: "MSE on energy, force and stress with 0.1-100-0.1 weights"
+    algorithm: "Adam, learning rate 1e-3 cosine-decayed to 1e-5 over 100 epochs"
+runs:
+  chgnet-linear: {label: "CHGNet v0.3.0 with a scalar linear correction fitted to one high-energy Li2B3PO8 configuration", method: CHGNet, dataset: Li2B3PO8, settings: {learningRate: {v: 0.001, loc: "Methods C"}, numEpochs: {v: 100, loc: "Methods C"}}, model: "CHGNet with one-label linear correction (Li2B3PO8)", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. H, Methods C"}}
+  chgnet-ft10: {label: "CHGNet v0.3.0 fine-tuned (all parameters) on 10 Li2B3PO8 structures", method: CHGNet, dataset: Li2B3PO8, settings: {learningRate: {v: 0.001, loc: "Methods C"}, numEpochs: {v: 100, loc: "Methods C"}}, model: "CHGNet fine-tuned on 10 Li2B3PO8 structures", base_model: {registry: CHGNet-0.3.0, relation: fine-tuned, location: "Sec. H, Methods C"}}
+results:
+  - {key: m3gnet-barriers, model: "ext:M3GNet-MPF-2021.2.8", material: mg-hosts, role: external, eval_data: {label: "Mg2+ migration barriers of Rutt et al. (ApproxNEB)"}, metrics: [[MAE, Energy, 0.49, eV, "MAE of Mg2+ migration barriers against DFT: M3GNet", "Sec. F"]]}
+  - {key: chgnet-barriers, model: "ext:CHGNet-0.3.0", material: mg-hosts, role: external, eval_data: {label: "Mg2+ migration barriers of Rutt et al. (ApproxNEB)"}, metrics: [[MAE, Energy, 0.39, eV, "MAE of Mg2+ migration barriers against DFT: CHGNet", "Sec. F"]]}
+  - {key: mace-barriers, model: "ext:MACE-MP-0-2023.12.03", material: mg-hosts, role: external, eval_data: {label: "Mg2+ migration barriers of Rutt et al. (ApproxNEB)"}, metrics: [[MAE, Energy, 0.30, eV, "MAE of Mg2+ migration barriers against DFT: MACE-MP-0", "Sec. F"]]}
+  - {key: mace-surfaces, model: "ext:MACE-MP-0-2023.12.03", material: surfaces, role: external, eval_data: {label: "147 surface energies computed with DFT"}, metrics: [[MAE, Energy, 0.032, null, "MAE of surface energies against DFT (printed as eV/A; surface energies are per area): MACE-MP-0", "Sec. B"]]}
+  - {key: m3gnet-li2b3po8, model: "ext:M3GNet-MPF-2021.2.8", material: Li2B3PO8, role: external, eval_data: {label: "High-energy MD states of Li2B3PO8 (mp-1020015)"}, metrics: [[MAE, Force, 0.220, eV/A, "Force MAE on high-energy Li2B3PO8 states: M3GNet", "Sec. H, Fig. 5a"]]}
+  - {key: chgnet-li2b3po8, model: "ext:CHGNet-0.3.0", material: Li2B3PO8, role: external, eval_data: {label: "High-energy MD states of Li2B3PO8 (mp-1020015)"}, metrics: [[MAE, Force, 0.190, eV/A, "Force MAE on high-energy Li2B3PO8 states: CHGNet", "Sec. H, Fig. 5a"]]}
+  - {key: mace-li2b3po8, model: "ext:MACE-MP-0-2023.12.03", material: Li2B3PO8, role: external, eval_data: {label: "High-energy MD states of Li2B3PO8 (mp-1020015)"}, metrics: [[MAE, Force, 0.176, eV/A, "Force MAE on high-energy Li2B3PO8 states: MACE-MP-0", "Sec. H, Fig. 5a"]]}
+  - {key: chgnet-linear, model: chgnet-linear, material: Li2B3PO8, role: test, eval_data: {label: "Li2B3PO8 test structures (100)"}, metrics: [[MAE, Force, 0.166, eV/A, "Test force MAE: CHGNet with one-label linear correction", "Sec. H, Fig. 6a"]]}
+  - {key: chgnet-ft10, model: chgnet-ft10, material: Li2B3PO8, role: test, eval_data: {label: "Li2B3PO8 test structures (100)"}, metrics: [[MAE, Force, 0.125, eV/A, "Test force MAE: CHGNet fine-tuned on 10 structures", "Sec. H, Fig. 6a"]]}
+gaps:
+  - "The surface-energy MAE is printed as '0.032 eV/A'; surface energies are energies per area, so the unit is left out of mlips:hasUnit. CHGNet and M3GNet surface-energy MAEs are shown only in Fig. 2(a)."
+  - "Softening scales (force slopes) and corrected MAEs (cMAE) are not accuracy metrics of the schema; the cMAEs (0.184, 0.162, 0.155 eV/A) are not encoded."
+  - "Whether the Li2B3PO8 high-energy states of Fig. 5(a) are the same configurations as the 100 fine-tuning test structures is implied ('originate from the same set of atomic arrangements') but not stated as identical sets."
+  - "The DFT functional is not named beyond the MPRelaxSet settings."
