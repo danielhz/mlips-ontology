@@ -1,0 +1,51 @@
+id: fernbach2026
+source:
+  rank: 420
+  year: "2026"
+  first_author: "Simon Fernbach"
+  title: "Using Machine-Learned Force Fields for Describing Heat-Transport-Related Quantities in AlGaN and Derived Materials"
+  venue: "Condensed Matter"
+  doi: "10.3390/condmat11020023"
+  kg_relevance: "Application/model instance"
+  arxiv_id: ""
+  pdf_version: "acceptedVersion"
+  pdf_sha256: "2e76126195ba4e8af978630df8a4cfaac85bf73a8d96169eba76938d3725cbed"
+study_label: "Fernbach et al. (2026): passively trained moment tensor potentials for heat-transport quantities in AlN, GaN and AlGaN"
+scope: |
+  Encoding scope: the passive training data (random displacements and
+  triclinic cell deformations of 32-atom wurtzite supercells; set 1 with
+  0.2 A and 2 %, set 2 with 0.05 A and 0.5 %; 300 training and 50
+  validation configurations each; Quantum ESPRESSO PBEsol), MTP ensembles
+  of levels up to 18 with level 10 selected, and the material-specific
+  (AlN, GaN) and alloy MTPs. Validation MAEs are stated only as bounds or
+  approximately (gaps); lattice and elastic constants, phonons, Grueneisen
+  parameters and thermal conductivities are properties.
+materials:
+  aln: {label: "Wurtzite AlN", formula: "AlN", class: "Inorganic crystals"}
+  gan: {label: "Wurtzite GaN", formula: "GaN", class: "Inorganic crystals"}
+  algan: {label: "Wurtzite AlxGa1-xN alloys (x = n/16)", class: "Inorganic crystals"}
+reference:
+  pbesol: {type: DFT, code: QuantumESPRESSO, xc: {local: PBEsol}, comment: "SSSP precision pseudopotentials, 80-90 Ry wavefunction cutoffs (8x for density), 4x4x4 k-points for 2x2x2 supercells, SCF 1e-12 Ry (Sec. 2.5)."}
+sampling:
+  random: {label: "Random atomic displacements (up to Delta_d) and random triclinic cell deformations (up to Delta_c) of 2x2x2 wurtzite supercells"}
+datasets:
+  aln-set1: {label: "AlN set 1 (Delta_d 0.2 A, Delta_c 2 %; 300 training + 50 validation)", materials: [aln], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 300, loc: "Table 1 (training)"}, calc: pbesol, sampling: [random]}
+  gan-set1: {label: "GaN set 1 (Delta_d 0.2 A, Delta_c 2 %; 300 training + 50 validation)", materials: [gan], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 300, loc: "Table 1 (training)"}, calc: pbesol, sampling: [random]}
+  algan-set1: {label: "AlxGa1-xN set 1 (all realisable compositions; 300 training + 50 validation)", materials: [algan], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 300, loc: "Table 1 (training)"}, calc: pbesol, sampling: [random]}
+methods:
+  MTP:
+    hp: [momentLevel]
+    loss: "Weighted energy (1.0), force (0.1) and stress (1.0) squared errors"
+    algorithm: "BFGS, 4,000 steps"
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  mtp-aln: {label: "Level-10 MTP for AlN (selected from an ensemble of 10)", method: MTP, dataset: aln-set1, settings: {momentLevel: {v: 10, loc: "Sec. 3.1"}}, model: "AlN MTP level 10"}
+  mtp-gan: {label: "Level-10 MTP for GaN (selected from an ensemble of 10)", method: MTP, dataset: gan-set1, settings: {momentLevel: {v: 10, loc: "Sec. 3.1"}}, model: "GaN MTP level 10"}
+  mtp-alloy: {label: "Level-10 alloy MTP for AlxGa1-xN (selected from an ensemble of 10)", method: MTP, dataset: algan-set1, settings: {momentLevel: {v: 10, loc: "Sec. 3.1"}}, model: "AlGaN alloy MTP level 10"}
+results: []
+resources: |
+  MD cost per step was measured for 50 ps NPT runs of 10x10x10 supercells for each MTP level (Sec. 2.3; values in figures).
+gaps:
+  - "Validation MAEs are stated only as bounds (all below 40 meV/A, 0.15 GPa and 1.4 meV/atom) or approximately (GaN around 5 meV/A, 0.03 GPa and 0.3 meV/atom); per-model values are figure-only (Fig. 3). Set 2 and the hyperparameter ensembles (Figs. 1-2, S2) are not encoded separately."
+  - "The MTP cutoff radius is not stated in the main text. The performance-cost NRMSE combines properties and is not an energy/force metric. Lattice and elastic constants (Tables 2-3), phonons and thermal conductivities (Table 4) are properties."

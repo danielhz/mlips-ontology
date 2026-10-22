@@ -1,0 +1,53 @@
+id: schonbauer2026
+source:
+  rank: 425
+  year: "2026"
+  first_author: "Sita Schönbauer"
+  title: "Machine-Learned Force Fields for Lattice Dynamics at Coupled-Cluster Level Accuracy"
+  venue: "Journal of Chemical Theory and Computation"
+  doi: "10.1021/acs.jctc.6c00854"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2507.06929v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "a5bee3da0c8e4c1f2f3e9c034e5a8029a53e7eb1e736abb7fe0b1f5b7ffc8ab3"
+study_label: "Schönbauer et al. (2026): Delta-learned MLFFs for lattice dynamics of diamond and LiH at HF, MP2, CCSD and CCSD(T) level"
+scope: |
+  Encoding scope: MACE models trained on DFT energies and forces
+  (ML(DFT_E,F); PBE for diamond, LDA for LiH, VASP MD) and MACE Delta
+  models trained on WFT - DFT energy differences for 200 configurations
+  (HF, MP2, CCSD, CCSD(T) with Cc4s), whose sum gives Delta-ML(WFT), plus
+  QNEP models for LiH. RMSEs are given only in the SI ('meV/atom range');
+  phonon dispersions and densities of states are properties.
+materials:
+  c: {label: "Diamond (32-atom supercells, 0-500 K MD)", formula: "C", class: "Elemental covalent solid"}
+  lih: {label: "Rock-salt LiH (64-atom supercells)", formula: "LiH", class: "Inorganic crystals"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, comment: "Diamond MD (2x2x1 conventional supercell, 32 atoms, 2,000 steps, 0-500 K sweep)."}
+  lda: {type: DFT, code: VASP, xc: LDA, comment: "LiH MD (2x2x2 supercell, 64 atoms, 2,000 steps)."}
+  ccsdt: {type: WF, wf: CCSDT, comment: "Periodic CCSD(T) energies with Cc4s interfaced to VASP (Gamma point, 10 frozen natural orbitals per occupied state, basis-set and finite-size corrections) on 200 MD structures; HF with 3x3x3 k-points and 400 eV (Sec. 4.3.3)."}
+datasets:
+  c-dft: {label: "Diamond DFT MD structures used for ML(DFT_E,F) (the same 200 as the Delta data)", materials: [c], properties: [Energy, Forces], provenance: InHouse, n: {v: 200, loc: "Sec. 4.3.3"}, calc: pbe}
+  c-delta: {label: "Diamond CCSD(T) - PBE energy differences (200 structures)", materials: [c], properties: [Energy], provenance: InHouse, n: {v: 200, loc: "Table 1"}, calc: ccsdt}
+  lih-dft: {label: "LiH LDA MD structures (2,000)", materials: [lih], properties: [Energy, Forces], provenance: InHouse, n: {v: 2000, loc: "Table 1"}, calc: lda}
+  lih-delta: {label: "LiH CCSD(T) - LDA energy differences (200 structures)", materials: [lih], properties: [Energy], provenance: InHouse, n: {v: 200, loc: "Table 1"}, calc: ccsdt}
+methods:
+  MACE:
+    hp: [cutoffRadius, numEpochs]
+    impl: {lib: MACE}
+    sims: [PhononCalculation, MolecularDynamics]
+  QNEP:
+    hp: [cutoffRadius, angularCutoff]
+    impl: {lib: {local: GPUMD}}
+    sims: [PhononCalculation]
+runs:
+  c-ml-dft: {label: "ML(DFT_E,F) MACE for diamond (five seeds)", method: MACE, dataset: c-dft, settings: {cutoffRadius: {v: 3.0, loc: "Table 1"}, numEpochs: {v: 50, loc: "Sec. 4.3.1"}}, model: "diamond ML(DFT_E,F)"}
+  c-ml-delta: {label: "ML(CCSD(T)-DFT) MACE Delta model for diamond (added to ML(DFT_E,F))", method: MACE, dataset: c-delta, settings: {cutoffRadius: {v: 3.0, loc: "Table 1"}, numEpochs: {v: 50, loc: "Sec. 4.3.1"}}, model: "diamond Delta-ML(CCSD(T))"}
+  lih-ml-dft: {label: "ML(DFT_E,F) MACE for LiH (five seeds)", method: MACE, dataset: lih-dft, settings: {cutoffRadius: {v: 9.0, loc: "Table 1"}, numEpochs: {v: 50, loc: "Sec. 4.3.1"}}, model: "LiH ML(DFT_E,F)"}
+  lih-ml-delta: {label: "ML(CCSD(T)-DFT) MACE Delta model for LiH", method: MACE, dataset: lih-delta, settings: {cutoffRadius: {v: 9.0, loc: "Table 1"}, numEpochs: {v: 50, loc: "Sec. 4.3.1"}}, model: "LiH Delta-ML(CCSD(T))"}
+  lih-qnep: {label: "QNEP ML(DFT_E,F) for LiH (charge mode 2, default settings)", method: QNEP, dataset: lih-dft, settings: {cutoffRadius: {v: 8.0, loc: "Sec. 4.3.2"}, angularCutoff: {v: 4.0, loc: "Sec. 4.3.2"}}, model: "LiH QNEP ML(DFT_E,F)"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "RMSEs for all models (including half-set variants with 98 training and 102 test structures) are given only in the SI; the main text says they are in the meV/atom range except ML(DFT_E) for diamond (10 meV/atom range). The HF, MP2 and CCSD Delta models and the energy-only ML(DFT_E) are not encoded separately."
+  - "Phonon dispersions, harmonic and VACF densities of states are properties. QNEP is a new registry method (method papers not in the corpus)."
