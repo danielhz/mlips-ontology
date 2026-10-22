@@ -1,0 +1,73 @@
+id: fransson2023
+source:
+  rank: 395
+  year: "2023"
+  first_author: "Erik Fransson"
+  title: "Phase Transitions in Inorganic Halide Perovskites from Machine-Learned Potentials"
+  venue: "The Journal of Physical Chemistry C"
+  doi: "10.1021/acs.jpcc.3c01542"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2301.03497v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "adb0b5d6379331ccc3d506bcf812367499b47e5803fc97085b5605ce1d22e889"
+study_label: "Fransson et al. (2023): phase transitions in inorganic halide perovskites CsPbX3 from neuroevolution potentials trained on four exchange-correlation functionals"
+scope: |
+  Encoding scope: NEP3 models (gpumd) for CsPbCl3, CsPbBr3 and CsPbI3
+  trained on iteratively generated VASP data (rattled prototype
+  supercells plus NEP-MD snapshots over four generations) with vdW-DF-cx
+  and SCAN (all three halides) and PBEsol and PBE (CsPbI3), and the
+  training RMSEs of the final full-data models (Table II). Transition
+  temperatures, lattice parameters and free energies are properties.
+hyperparameters:
+  Nneu: {label: "Number of neurons in the hidden layer of the NEP network", name: "N_neu", datatype: integer}
+  Ngen: {label: "Number of SNES training generations", name: "N_gen", datatype: integer}
+materials:
+  cl: {label: "CsPbCl3 perovskite and related prototype structures", formula: "CsPbCl3", class: "Inorganic crystals"}
+  br: {label: "CsPbBr3 perovskite and related prototype structures", formula: "CsPbBr3", class: "Inorganic crystals"}
+  i: {label: "CsPbI3 perovskite, delta phase and related prototype structures", formula: "CsPbI3", class: "Inorganic crystals"}
+reference:
+  cx: {type: DFT, code: VASP, xc: {local: vdW-DF-cx}, pp: PAW, kpoints: "Gamma-centred, 0.18 1/A", comment: "Gaussian smearing 0.1 eV (Reference calculations)."}
+  scan: {type: DFT, code: VASP, xc: SCAN, pp: PAW, kpoints: "Gamma-centred, 0.18 1/A"}
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, pp: PAW, kpoints: "Gamma-centred, 0.18 1/A"}
+  pbe: {type: DFT, code: VASP, xc: PBE, pp: PAW, kpoints: "Gamma-centred, 0.18 1/A"}
+sampling:
+  iter: {label: "Monte Carlo rattled prototype supercells (0.04 A, 85-110 % volumes), then NEP-MD at -1 to 10 GPa with 20-620 K ramps, 12 configurations per trajectory, over about four generations; ensemble of five 90/10 models for uncertainty"}
+datasets:
+  cl-cx: {label: "CsPbCl3 training data computed with vdW-DF-cx", materials: [cl], properties: [Energy, Forces, Virials], provenance: InHouse, calc: cx, sampling: [iter]}
+  cl-scan: {label: "CsPbCl3 training data computed with SCAN", materials: [cl], properties: [Energy, Forces, Virials], provenance: InHouse, calc: scan, sampling: [iter]}
+  br-cx: {label: "CsPbBr3 training data computed with vdW-DF-cx", materials: [br], properties: [Energy, Forces, Virials], provenance: InHouse, calc: cx, sampling: [iter]}
+  br-scan: {label: "CsPbBr3 training data computed with SCAN", materials: [br], properties: [Energy, Forces, Virials], provenance: InHouse, calc: scan, sampling: [iter]}
+  i-cx: {label: "CsPbI3 training data computed with vdW-DF-cx", materials: [i], properties: [Energy, Forces, Virials], provenance: InHouse, calc: cx, sampling: [iter]}
+  i-scan: {label: "CsPbI3 training data computed with SCAN", materials: [i], properties: [Energy, Forces, Virials], provenance: InHouse, calc: scan, sampling: [iter]}
+  i-pbesol: {label: "CsPbI3 training data computed with PBEsol", materials: [i], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbesol, sampling: [iter]}
+  i-pbe: {label: "CsPbI3 training data computed with PBE", materials: [i], properties: [Energy, Forces, Virials], provenance: InHouse, calc: pbe, sampling: [iter]}
+methods:
+  NEP:
+    hp: [cutoffRadius, angularCutoff, Nneu, Ngen]
+    loss: "Energy, force and virial weights 1, 5 and 0.2 with l1 and l2 regularisation (0.1)"
+    algorithm: "Separable natural evolution strategy, population 50"
+    impl: {lib: {local: GPUMD}}
+    sims: [MolecularDynamics, ThermodynamicIntegration]
+runs:
+  nep-cl-cx: {label: "NEP3 full model for CsPbCl3 (vdW-DF-cx)", method: NEP, dataset: cl-cx, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbCl3 NEP (vdW-DF-cx)"}
+  nep-cl-scan: {label: "NEP3 full model for CsPbCl3 (SCAN)", method: NEP, dataset: cl-scan, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbCl3 NEP (SCAN)"}
+  nep-br-cx: {label: "NEP3 full model for CsPbBr3 (vdW-DF-cx)", method: NEP, dataset: br-cx, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbBr3 NEP (vdW-DF-cx)"}
+  nep-br-scan: {label: "NEP3 full model for CsPbBr3 (SCAN)", method: NEP, dataset: br-scan, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbBr3 NEP (SCAN)"}
+  nep-i-cx: {label: "NEP3 full model for CsPbI3 (vdW-DF-cx)", method: NEP, dataset: i-cx, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbI3 NEP (vdW-DF-cx)"}
+  nep-i-scan: {label: "NEP3 full model for CsPbI3 (SCAN)", method: NEP, dataset: i-scan, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbI3 NEP (SCAN)"}
+  nep-i-pbesol: {label: "NEP3 full model for CsPbI3 (PBEsol)", method: NEP, dataset: i-pbesol, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbI3 NEP (PBEsol)"}
+  nep-i-pbe: {label: "NEP3 full model for CsPbI3 (PBE)", method: NEP, dataset: i-pbe, settings: {cutoffRadius: {v: 8, loc: "Computational parameters"}, angularCutoff: {v: 4, loc: "Computational parameters"}, Nneu: {v: 50, loc: "Computational parameters"}, Ngen: {v: 200000, loc: "Computational parameters"}}, model: "CsPbI3 NEP (PBE)"}
+results:
+  - {key: nep-cl-cx-train, model: nep-cl-cx, material: cl, role: training, eval_data: {label: "Full CsPbCl3 vdW-DF-cx data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.2, meV/atom, "train energy RMSE on cl: CsPbCl3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Force, 46.4, meV/A, "train force RMSE on cl: CsPbCl3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Stress, 13.0, null, "train virial RMSE on cl in meV/atom: CsPbCl3 NEP (vdW-DF-cx)", "Table II"]]}
+  - {key: nep-cl-scan-train, model: nep-cl-scan, material: cl, role: training, eval_data: {label: "Full CsPbCl3 SCAN data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.1, meV/atom, "train energy RMSE on cl: CsPbCl3 NEP (SCAN)", "Table II"], [RMSE, Force, 47.8, meV/A, "train force RMSE on cl: CsPbCl3 NEP (SCAN)", "Table II"], [RMSE, Stress, 14.0, null, "train virial RMSE on cl in meV/atom: CsPbCl3 NEP (SCAN)", "Table II"]]}
+  - {key: nep-br-cx-train, model: nep-br-cx, material: br, role: training, eval_data: {label: "Full CsPbBr3 vdW-DF-cx data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.1, meV/atom, "train energy RMSE on br: CsPbBr3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Force, 45.1, meV/A, "train force RMSE on br: CsPbBr3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Stress, 11.1, null, "train virial RMSE on br in meV/atom: CsPbBr3 NEP (vdW-DF-cx)", "Table II"]]}
+  - {key: nep-br-scan-train, model: nep-br-scan, material: br, role: training, eval_data: {label: "Full CsPbBr3 SCAN data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.2, meV/atom, "train energy RMSE on br: CsPbBr3 NEP (SCAN)", "Table II"], [RMSE, Force, 47.6, meV/A, "train force RMSE on br: CsPbBr3 NEP (SCAN)", "Table II"], [RMSE, Stress, 15.1, null, "train virial RMSE on br in meV/atom: CsPbBr3 NEP (SCAN)", "Table II"]]}
+  - {key: nep-i-cx-train, model: nep-i-cx, material: i, role: training, eval_data: {label: "Full CsPbI3 vdW-DF-cx data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.8, meV/atom, "train energy RMSE on i: CsPbI3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Force, 47.5, meV/A, "train force RMSE on i: CsPbI3 NEP (vdW-DF-cx)", "Table II"], [RMSE, Stress, 14.5, null, "train virial RMSE on i in meV/atom: CsPbI3 NEP (vdW-DF-cx)", "Table II"]]}
+  - {key: nep-i-scan-train, model: nep-i-scan, material: i, role: training, eval_data: {label: "Full CsPbI3 SCAN data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 2.1, meV/atom, "train energy RMSE on i: CsPbI3 NEP (SCAN)", "Table II"], [RMSE, Force, 51.4, meV/A, "train force RMSE on i: CsPbI3 NEP (SCAN)", "Table II"], [RMSE, Stress, 16.0, null, "train virial RMSE on i in meV/atom: CsPbI3 NEP (SCAN)", "Table II"]]}
+  - {key: nep-i-pbesol-train, model: nep-i-pbesol, material: i, role: training, eval_data: {label: "Full CsPbI3 PBEsol data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.9, meV/atom, "train energy RMSE on i: CsPbI3 NEP (PBEsol)", "Table II"], [RMSE, Force, 50.6, meV/A, "train force RMSE on i: CsPbI3 NEP (PBEsol)", "Table II"], [RMSE, Stress, 15.2, null, "train virial RMSE on i in meV/atom: CsPbI3 NEP (PBEsol)", "Table II"]]}
+  - {key: nep-i-pbe-train, model: nep-i-pbe, material: i, role: training, eval_data: {label: "Full CsPbI3 PBE data set (the final model is trained on all data)", location: "Table II"}, metrics: [[RMSE, Energy, 1.0, meV/atom, "train energy RMSE on i: CsPbI3 NEP (PBE)", "Table II"], [RMSE, Force, 43.1, meV/A, "train force RMSE on i: CsPbI3 NEP (PBE)", "Table II"], [RMSE, Stress, 12.6, null, "train virial RMSE on i in meV/atom: CsPbI3 NEP (PBE)", "Table II"]]}
+resources: |
+  About 2e7 atom-steps per second on one NVIDIA A100 for these NEP models (Methods).
+gaps:
+  - "Virial RMSEs are in meV/atom (recorded as Stress with unit null). Ensemble (90/10 split) training and validation errors are in SI Table S1. The data-set sizes are not given in the main text."
+  - "The throughput (about 2e7 atom-steps per second, 60,000 atoms for about 150 ns per day) is stated for the NEP models generally, not for one model, so it is kept in resources only."

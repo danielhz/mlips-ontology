@@ -1,0 +1,62 @@
+id: dong2024
+source:
+  rank: 389
+  year: "2024"
+  first_author: "Haikuan Dong"
+  title: "Molecular dynamics simulations of heat transport using machine-learned potentials: A mini-review and tutorial on GPUMD with neuroevolution potentials"
+  venue: "Journal of Applied Physics"
+  doi: "10.1063/5.0200833"
+  kg_relevance: "Overview/taxonomy"
+  arxiv_id: "2401.16249v2"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "8e4c83e9bd280204c7134af3db6d2b5a3af1a6ccb0289143eaf9b2fec6e97164"
+study_label: "Dong et al. (2024): mini-review and tutorial on heat-transport MD with machine-learned potentials in GPUMD, with an iteratively trained NEP for crystalline silicon"
+scope: |
+  Encoding scope: the tutorial example, crystalline silicon: the PBE
+  data set built from strained/perturbed unit cells and 1000 K AIMD (150
+  structures), extended by NEP-driven NPT MD snapshots at 100-1000 K
+  (250 structures), the NEP models NEP-iteration-1 and NEP-iteration-2
+  (default nep.in hyperparameters, cutoffs 5 A, 30 hidden neurons,
+  100,000 generations) with their training and test RMSEs, the two
+  reduced-accuracy NEP variants, and the stated MD speed. The review
+  tables of MLP applications (Tables I-II) and the graphene comparison
+  of Fig. 3 are literature summaries or figure-only.
+hyperparameters:
+  Nneu: {label: "Number of neurons in the hidden layer of the NEP network", name: "N_neu", datatype: integer}
+  Ngen: {label: "Number of SNES training generations", name: "N_gen", datatype: integer}
+materials:
+  si: {label: "Crystalline (diamond-cubic) silicon, 100-1000 K", formula: "Si", class: "Elemental semiconductor"}
+reference:
+  pbe: {type: DFT, code: VASP, xc: PBE, cutoff: 600, kpoints: "4x4x4 (64-atom supercells), 12x12x12 (8-atom cells)", comment: "EDIFF 1e-6 eV (Sec. III B 1)."}
+sampling:
+  init: {label: "50 randomly strained (+-3 %) and perturbed (0.1 A) 8-atom cells plus 100 snapshots of a 10 ps 1000 K AIMD of a 64-atom cell"}
+  iter: {label: "NEP-iteration-1 NPT MD at 0 GPa and 100-1000 K (10 ps), 100 snapshots added"}
+datasets:
+  it1: {label: "Initial silicon training set (150 structures, 6,800 atoms)", materials: [si], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 150, loc: "Sec. III B 1"}, calc: pbe, sampling: [init]}
+  it2: {label: "Expanded silicon training set (250 structures)", materials: [si], properties: [Energy, Forces, Virials], provenance: InHouse, n: {v: 250, loc: "Sec. III B 3"}, calc: pbe, sampling: [init, iter]}
+methods:
+  NEP:
+    hp: [cutoffRadius, angularCutoff, Nneu, Ngen, batchSize]
+    loss: "Weighted RMSEs of energy, force and virial (weights 1, 1, 0.1) with l1 and l2 regularisation"
+    algorithm: "Separable natural evolution strategy (SNES), population 50"
+    impl: {lib: {local: GPUMD}}
+    sims: [MolecularDynamics, PhononCalculation]
+runs:
+  nep1: {label: "NEP-iteration-1 for crystalline silicon (default hyperparameters)", method: NEP, dataset: it1, settings: {cutoffRadius: {v: 5, loc: "Sec. III B 2"}, angularCutoff: {v: 5, loc: "Sec. III B 2"}, Nneu: {v: 30, loc: "Sec. III B 2"}, Ngen: {v: 100000, loc: "Sec. III B 2"}, batchSize: {v: 1000, loc: "Sec. III B 2"}}, model: "Si NEP-iteration-1 (Dong 2024)"}
+  nep2: {label: "NEP-iteration-2 for crystalline silicon (the final tutorial NEP)", method: NEP, dataset: it2, settings: {cutoffRadius: {v: 5, loc: "Sec. III B 2"}, angularCutoff: {v: 5, loc: "Sec. III B 2"}, Nneu: {v: 30, loc: "Sec. III B 2"}, Ngen: {v: 100000, loc: "Sec. III B 2"}, batchSize: {v: 1000, loc: "Sec. III B 2"}}, model: "Si NEP-iteration-2 (Dong 2024)"}
+  nep-n1: {label: "Reduced NEP with 1 hidden neuron", method: NEP, settings: {cutoffRadius: {v: 5, loc: "Sec. III C 4"}, angularCutoff: {v: 5, loc: "Sec. III C 4"}, Nneu: {v: 1, loc: "Sec. III C 4"}, Ngen: {v: 100000, loc: "Sec. III C 4"}, batchSize: {v: 1000, loc: "Sec. III C 4"}}, model: "Si NEP, N_neu = 1"}
+  nep-n1b4: {label: "Reduced NEP with 1 hidden neuron and Chebyshev basis sizes (4, 4)", method: NEP, settings: {cutoffRadius: {v: 5, loc: "Sec. III C 4"}, angularCutoff: {v: 5, loc: "Sec. III C 4"}, Nneu: {v: 1, loc: "Sec. III C 4"}, Ngen: {v: 100000, loc: "Sec. III C 4"}, batchSize: {v: 1000, loc: "Sec. III C 4"}}, model: "Si NEP, N_neu = 1, N_bas = (4, 4)"}
+results:
+  - {key: nep1-train, model: nep1, material: si, role: training, eval_data: {label: "Initial training set (150 structures)", location: "Sec. III B 2; Fig. 5"}, metrics: [[RMSE, Energy, 1.0, meV/atom, "train energy RMSE on si: Si NEP-iteration-1", "Sec. III B 2"], [RMSE, Force, 54.6, meV/A, "train force RMSE on si: Si NEP-iteration-1", "Sec. III B 2"], [RMSE, Stress, 21.8, null, "train virial RMSE on si in meV/atom: Si NEP-iteration-1", "Sec. III B 2"]]}
+  - {key: nep1-test, model: nep1, material: si, role: test, eval_data: {label: "100 structures from NEP-iteration-1 NPT MD at 100-1000 K (10 ps)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 1.2, meV/atom, "test energy RMSE on si: Si NEP-iteration-1", "Sec. III B 3"], [RMSE, Force, 41.6, meV/A, "test force RMSE on si: Si NEP-iteration-1", "Sec. III B 3"], [RMSE, Stress, 8.5, null, "test virial RMSE on si in meV/atom: Si NEP-iteration-1", "Sec. III B 3"]]}
+  - {key: nep2-test, model: nep2, material: si, role: test, eval_data: {label: "100 structures from NEP-iteration-2 NPT MD at 100-1000 K (10 ns)", location: "Sec. III B 3"}, metrics: [[RMSE, Energy, 0.5, meV/atom, "test energy RMSE on si: Si NEP-iteration-2", "Sec. III B 3"], [RMSE, Force, 33.5, meV/A, "test force RMSE on si: Si NEP-iteration-2", "Sec. III B 3"], [RMSE, Stress, 8.9, null, "test virial RMSE on si in meV/atom: Si NEP-iteration-2", "Sec. III B 3"]]}
+  - {key: nep2-300k, model: nep2, material: si, role: test, eval_data: {label: "Silicon configurations at 300 K (set not described further)", location: "Sec. III C 4"}, metrics: [[RMSE, Force, 21.2, meV/A, "test force RMSE at 300 K on si: Si NEP-iteration-2", "Sec. III C 4"]]}
+  - {key: nep-n1, model: nep-n1, material: si, role: null, eval_data: {label: "Evaluation set not stated", location: "Sec. III C 4"}, metrics: [[RMSE, Force, 32.4, meV/A, "force RMSE on si: Si NEP, N_neu = 1", "Sec. III C 4"]]}
+  - {key: nep-n1b4, model: nep-n1b4, material: si, role: null, eval_data: {label: "Evaluation set not stated", location: "Sec. III C 4"}, metrics: [[RMSE, Force, 52.9, meV/A, "force RMSE on si: Si NEP, N_neu = 1, N_bas = (4, 4)", "Sec. III C 4"]]}
+timings:
+  - {model: nep2, system: "Crystalline silicon MD (system size not stated)", atoms: null, value: 4.2e-8, unit: "s per atom per step", per_atom_us: 0.042, hardware: "NVIDIA RTX 4090 (24 GB); about 2.4e7 atom-steps per second", result: null, location: "Sec. III B 3"}
+resources: |
+  NEP-iteration-2 runs at about 2.4e7 atom-steps per second on an RTX 4090 GPU (Sec. III B 3).
+gaps:
+  - "Virial RMSEs are in meV/atom (no schema unit for virial; recorded as Stress with unit null). The reduced NEP variants' force RMSEs do not name the evaluation set, so their role is null; the paper does not say which training set they use, so none is linked."
+  - "The graphene NEP, DP and MTP comparison (Fig. 3) and literature results (Fig. 4, Tables I-II) are figure-only or quoted. Phonons, spectral and total thermal conductivities are properties."

@@ -1,0 +1,59 @@
+id: benedini2025
+source:
+  rank: 392
+  year: "2025"
+  first_author: "Giulio Benedini"
+  title: "Universal machine learning potentials for systems with reduced dimensionality"
+  venue: "AI for Science"
+  doi: "10.1088/3050-287x/ae1208"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2508.15614v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "ff537f7aa37f4454f5cb41495d34b41c6a12725d21b76577358782c12f713645"
+study_label: "Benedini et al. (2025): universal MLIPs for systems of reduced dimensionality, benchmarked on the 0123D data set"
+scope: |
+  Encoding scope: the 0123D data set (40,000 PBE-relaxed compounds,
+  10,000 each of 0D, 1D, 2D and 3D, built outside existing training sets
+  and the WBM set; Alexandria settings) and the 11 pretrained universal
+  MLIPs of Table I evaluated on it as distributed (geometry
+  optimisation). Energy errors (Fig. 5), position errors (Fig. 6) and
+  convergence failures (Table II) are figure-only or counts; the text
+  gives only qualitative ranges, so no metrics are encoded.
+materials:
+  d0123: {label: "0123D compounds: molecules and clusters (0D), chains (1D), layers (2D) and bulk crystals (3D) across most of the periodic table", class: "Universal (materials and molecules)"}
+reference:
+  pbe: {type: DFT, xc: PBE, comment: "Alexandria/WBM-consistent settings (Ref. 16); geometry relaxations."}
+datasets:
+  d0123: {label: "0123D benchmark (10,000 relaxed systems per dimensionality)", materials: [d0123], properties: [Energy, Forces, Stresses], provenance: InHouse, n: {v: 40000, loc: "Sec. II C"}, calc: pbe}
+external_models: [MatterSim-v1, M3GNet-MPF-2021.2.8]
+methods:
+  DPA3:
+    sims: [GeometryOptimization]
+  EquiformerV2:
+    sims: [GeometryOptimization]
+  GRACE:
+    sims: [GeometryOptimization]
+  MACE:
+    sims: [GeometryOptimization]
+  NequIP:
+    sims: [GeometryOptimization]
+  ORB:
+    sims: [GeometryOptimization]
+  eSEN:
+    sims: [GeometryOptimization]
+runs:
+  dpa3: {label: "DPA3-v1-openlam as distributed (Table I)", method: DPA3, model: "DPA3-v1-openlam"}
+  eqv2: {label: "eqV2-m-omat-salex-mp as distributed (Table I)", method: EquiformerV2, model: "eqV2-m-omat-salex-mp"}
+  esen: {label: "eSEN-30m-oam as distributed (Table I)", method: eSEN, model: "eSEN-30m-oam"}
+  grace: {label: "GRACE-2l-oam as distributed (Table I)", method: GRACE, model: "GRACE-2l-oam"}
+  mace: {label: "MACE-mpa-0 as distributed (Table I)", method: MACE, model: "MACE-mpa-0"}
+  orb2: {label: "ORB-v2 as distributed (Table I)", method: ORB, model: "ORB-v2"}
+  orb3c: {label: "ORB-v3-conservative-inf-mpa as distributed (Table I)", method: ORB, model: "ORB-v3-conservative-inf-mpa"}
+  orb3d: {label: "ORB-v3-direct-inf-mpa as distributed (Table I)", method: ORB, model: "ORB-v3-direct-inf-mpa"}
+  sevennet: {label: "SevenNet-mf-ompa as distributed (Table I)", method: NequIP, model: "SevenNet-mf-ompa"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "Per-model energy-difference distributions (Fig. 5), position MAEs (Fig. 6) and optimisation-step counts (Fig. 4) are figure-only; the text states only ranges (e.g. most recent uMLIPs below 10 meV/atom on 3D; more than 75 % of eSEN energies within 10 meV/atom), not values per model and subset. Table II counts convergence failures, not errors."
+  - "MatterSim-v1-5m and M3GNet (MPF, 0.19M frames) are linked to the registry models MatterSim-v1 and M3GNet-MPF-2021.2.8; SevenNet-mf-ompa applies NequIP, following the registry convention for SevenNet."

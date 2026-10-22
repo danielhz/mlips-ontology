@@ -1,0 +1,43 @@
+id: rajabpour2025
+source:
+  rank: 394
+  year: "2025"
+  first_author: "Ali Rajabpour"
+  title: "Accurate estimation of interfacial thermal conductance between silicon and diamond enabled by a machine learning interatomic potential"
+  venue: "International Journal of Thermal Sciences"
+  doi: "10.1016/j.ijthermalsci.2025.109876"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2407.15404v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "deae1719299b3dc4d216f555748556c9c18dbb75056ba94ebcf6ef8470c5410a"
+study_label: "Rajabpour et al. (2025): interfacial thermal conductance between silicon and diamond with a passively fitted moment tensor potential"
+scope: |
+  Encoding scope: the PBEsol AIMD data (Si/diamond heterostructure,
+  pure diamond and pure silicon, heated from 1 to 2000 K; 9,000
+  configurations), the two-step passive MTP fit (first MTP on 800
+  configurations; final MTP after adding high-extrapolation-grade
+  configurations; 409 parameters, 4 A cutoff), and the NEMD use. No
+  training or test errors are stated in the main text; interfacial
+  conductances and spectral analyses are properties.
+materials:
+  sic: {label: "Si/diamond (100) interface, pure diamond and pure silicon", class: "Elemental covalent solid"}
+reference:
+  pbesol: {type: DFT, code: VASP, xc: {local: PBEsol}, cutoff: 500, kpoints: "2x2x2 Monkhorst-Pack", comment: "AIMD of 96-atom heterostructure (40 Si, 56 C), 144-atom diamond and 64-atom silicon cells, 3,000 steps each, 1-2000 K (Sec. 2)."}
+sampling:
+  passive: {label: "Two-step passive fitting: 800 configurations from the 9,000-configuration AIMD pool, then the highest-extrapolation-grade configurations added"}
+datasets:
+  aimd: {label: "Si/diamond AIMD pool", materials: [sic], properties: [Energy, Forces], provenance: InHouse, n: {v: 9000, loc: "Sec. 2"}, calc: pbesol}
+  final: {label: "Final MTP training set (800 initial configurations plus high-extrapolation-grade additions)", materials: [sic], properties: [Energy, Forces], provenance: InHouse, calc: pbesol, sampling: [passive]}
+methods:
+  MTP:
+    hp: [cutoffRadius]
+    impl: {lib: MLIP}
+    sims: [MolecularDynamics]
+runs:
+  mtp: {label: "Final MTP for Si/diamond (409 parameters)", method: MTP, dataset: final, settings: {cutoffRadius: {v: 4, loc: "Sec. 2"}}, model: "Si/diamond MTP (Rajabpour 2025)"}
+results: []
+resources: |
+  No timings are given.
+gaps:
+  - "No energy or force errors are stated in the main text; the MTP level is not given (only the 409 parameters). The size of the final training set after adding high-grade configurations is not stated."
+  - "Interfacial thermal conductances, spectral conductance and phonon analyses are properties."

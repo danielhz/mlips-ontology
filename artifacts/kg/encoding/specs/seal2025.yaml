@@ -1,0 +1,45 @@
+id: seal2025
+source:
+  rank: 391
+  year: "2025"
+  first_author: "Aniruddha Seal"
+  title: "Weighted active space protocol for multireference machine-learned potentials"
+  venue: "Proceedings of the National Academy of Sciences"
+  doi: "10.1073/pnas.2513693122"
+  kg_relevance: "Application/model instance"
+  arxiv_id: "2505.10505v1"
+  pdf_version: "arxiv-preprint"
+  pdf_sha256: "bb683c7d37e5105043f4cb8662b6b6e15e9fdbbbb8793d4399979b7b8f76599b"
+study_label: "Seal et al. (2025): weighted active-space protocol (WASP) for a MACE potential trained on MC-PDFT data for TiC+-catalysed methane C-H activation"
+scope: |
+  Encoding scope: the multireference reference (SA-CASSCF(7e,9o) /
+  MC-PDFT with the tPBE on-top functional, def2-TZVP, PySCF), the
+  DEAL/WASP active-learning data set (229 initial configurations from
+  MC-PDFT AIMD, about 150 added per round over four rounds, 831 in the
+  final set), the final MACE model (L = 1, 128 channels, 6 A, 400
+  epochs) and its test MAEs after the last round. Reaction free energies
+  and barriers are properties.
+materials:
+  tic: {label: "TiC+ cation with methane: reactant, transition state and product basins of the C-H activation (doublet)", class: "Small organic molecule (gas phase)"}
+reference:
+  mcpdft: {type: WF, wf: {local: "MC-PDFT (tPBE) on SA-CASSCF(7e,9o)", comment: "State average over the two lowest doublets, def2-TZVP, density fitting, grid 6; PySCF 2.4.0 with PySCF-forge (Materials and Methods)."}, basis: "def2-TZVP"}
+sampling:
+  deal: {label: "DEAL active learning: query-by-committee pre-filtering, then sparse-GP (FLARE ACE-B2 descriptors) selection from equilibrium and biased MD; WASP orbital-guess interpolation and an MLP-consistency check before labelling"}
+datasets:
+  final: {label: "Final MC-PDFT training set after four active-learning rounds", materials: [tic], properties: [Energy, Forces], provenance: InHouse, n: {v: 831, loc: "Results"}, calc: mcpdft, sampling: [deal]}
+methods:
+  MACE:
+    hp: [cutoffRadius, numFeatures, numEpochs, learningRate, batchSize]
+    loss: "Weighted RMSE of energies and forces (1:100, then 1000:100 in a second stage)"
+    algorithm: "AMSGrad"
+    impl: {lib: MACE, comment: "MACE 0.3.7"}
+    sims: [MolecularDynamics]
+runs:
+  mace-final: {label: "MACE (L = 1, 128 channels) trained on the final MC-PDFT data set", method: MACE, dataset: final, settings: {cutoffRadius: {v: 6, loc: "Materials and Methods"}, numFeatures: {v: 128, loc: "Materials and Methods"}, numEpochs: {v: 400, loc: "Materials and Methods (300 + 100)"}, learningRate: {v: 0.01, loc: "Materials and Methods (first stage)"}, batchSize: {v: 8, loc: "Materials and Methods"}}, model: "TiC+/CH4 MC-PDFT MACE (final round)"}
+results:
+  - {key: mace-final-test, model: mace-final, material: tic, role: test, eval_data: {label: "Test set of the last active-learning round (configurations preselected by query-by-committee but not chosen, passing the consistency check)", location: "Fig. 4; Materials and Methods"}, metrics: [[MAE, Force, 0.7, null, "test force MAE in kJ/(mol A) on tic: MC-PDFT MACE final", "Results, Fig. 4"], [MAE, Energy, 0.35, null, "test energy MAE in kJ/mol on tic: MC-PDFT MACE final", "Results, Fig. 4"]]}
+resources: |
+  The MACE model takes about 15 ms per time step on an NVIDIA A100, against about four minutes for one analytical MC-PDFT gradient on two AMD EPYC cores (Fig. 4, Results); the MLP figure is approximate.
+gaps:
+  - "Errors are in kJ/mol and kJ/(mol A), which the schema lacks; recorded with unit null. Errors of the earlier rounds are figure-only (Fig. 4)."
+  - "The energy MAE is not stated as per atom or per configuration. Free-energy profiles and barriers are properties."
