@@ -41,6 +41,46 @@ non-pre-release entry.
 
 ## Releases
 
+### Unreleased (0.2.0-dev)
+
+Development build of the next MINOR release; `owl:versionInfo
+"0.2.0-dev"`, no version IRI (a development build has none), and
+`owl:priorVersion <https://w3id.org/mlips/0.1.2>`. `CITATION.cff` and
+`codemeta.json` still describe the deposited release 0.1.2.
+Breaking changes are marked **[breaking]**.
+
+* **Kinds, disjointness and consistency (#1):**
+  * **[breaking]** `mlips:reportedIn` domain changed from
+    `BenchmarkResult` to `BenchmarkStudy` (range `schema:ScholarlyArticle`);
+    the SHACL constraint moved to `BenchmarkStudyShape`.
+  * New annotation property `mlips:isKind` (true on 24 kind classes) and
+    one `owl:AllDisjointClasses` over the kinds and the four top-level
+    reified relations.
+  * **[breaking]** inference timings (`mlips:inferenceHardware`,
+    `mlips:inferenceTimePerAtom`) moved from `TrainedModel` to the
+    `BenchmarkResult` of the timed model; Q11 and CQ9 read them there.
+  * New gates `make consistency-check` (RDFS closure, disjointness,
+    datatype ranges) and `make reason-kg` (HermiT via ROBOT).
+* **Method derivation (#4):** new object property
+  `mlips:derivedFromMethod` (`MLIPMethod` → `MLIPMethod`, subproperty of
+  `prov:wasDerivedFrom`), recorded only when the introducing paper states
+  it; `mlips:MLIPMethod rdfs:subClassOf prov:Plan`; derivations live in the
+  method registry and are generated into `shared/methods.ttl` (with the
+  type and label of every endpoint); `entity:ACE-lysogorskiy2021ace`
+  renamed to the registry method `entity:ACE`.
+* **Knowledge graph (population run, ranks 201–700):** 334 papers encoded
+  from YAML inputs (`artifacts/kg/encoding/specs/`, regenerated and checked
+  by `make encode` / `make encoding-check`), for 532 paper files in all;
+  the method registry now has 101 methods and 19 models, with 27
+  derivation edges. Article nodes without a DOI use the arXiv abstract URL
+  as `schema:sameAs`.
+* **Upload:** `upload_to_concon.py` now puts the shared registry files
+  (`shared/*.ttl`: method derivations, `entity:ds-*` data-set registry,
+  origin-paper stubs) into the `kg` graph after the paper files, in sorted
+  order.
+* **Build:** the ontology-header guard in `merge_rdfa_into_owl.py`
+  requires `owl:versionInfo` instead of `owl:versionIRI`.
+
 ### 0.1.2 — 2026-07-25
 
 Metadata release (PATCH): no schema, KG, or vocabulary changes.

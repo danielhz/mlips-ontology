@@ -4,7 +4,8 @@ the OWL/TTL files that Saxon's extract-owl.xsl produced.
 
 The XSLT only pulls the embedded <pre class="owl-xml"> CDATA blocks
 (per-term axioms), so the ontology-header metadata that lives as RDFa
-(dcterms:title, dcterms:license, owl:versionIRI, vann:preferredNamespace*,
+(dcterms:title, dcterms:license, owl:versionInfo/versionIRI/priorVersion,
+vann:preferredNamespace*,
 owl:imports, dcterms:creator/contributor, dcterms:publisher, etc.) is
 otherwise lost from the OWL/TTL serialisation.
 
@@ -117,7 +118,9 @@ def main():
     required = {
         "dcterms:title":   URIRef(DCTERMS + "title"),
         "dcterms:license": URIRef(DCTERMS + "license"),
-        "owl:versionIRI":  URIRef(OWL + "versionIRI"),
+        # every build carries owl:versionInfo; owl:versionIRI only a
+        # deposited release (a -dev build has none), so it is not required
+        "owl:versionInfo": URIRef(OWL + "versionInfo"),
     }
     missing = [name for name, p in required.items()
                if (ONTOLOGY_IRI, p, None) not in header]

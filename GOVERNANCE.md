@@ -17,7 +17,7 @@ Contact and issue tracker: <https://github.com/danielhz/mlips-ontology>.
 ## Versioning policy
 
 - The ontology is versioned with **semantic versioning** (`MAJOR.MINOR.PATCH`);
-  the current version is **0.1.2**.
+  the latest release is **0.1.2**; `main` is **0.2.0-dev**.
   - **MAJOR** — incompatible changes to existing term IRIs or semantics
     (renames, removals, domain/range narrowing).
   - **MINOR** — backward-compatible additions (new classes, properties,
