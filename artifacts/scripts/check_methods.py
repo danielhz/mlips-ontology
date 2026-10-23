@@ -18,6 +18,10 @@ legacy files against artifacts/kg/methods-registry.csv:
   6. no paper file asserts mlips:derivedFromMethod (method derivation is
      registry-fixed and generated into shared/methods.ttl).
 
+In shared/methods.ttl, every method at either end of a derivation edge
+must be declared a mlips:MLIPMethod with exactly its registry label, so
+that no endpoint reaches the published graph untyped or unlabelled.
+
 It also checks the registry itself: every key in the derived_from column
 is a registry method, each such row names its derived_from_source, and
 no method derives from itself, directly or not. Checked for all files,
@@ -171,6 +175,19 @@ def main():
         for e in check(path, methods, models):
             bad += 1
             print(f"{pid}: {e}")
+    shared = os.path.join(KG, "shared", "methods.ttl")
+    if os.path.exists(shared):
+        g = rdflib.Graph().parse(shared)
+        ends = {o for t in g.triples((None, MLIPS.derivedFromMethod, None)) for o in (t[0], t[2])}
+        for e in sorted(ends):
+            name = local(e)
+            if (e, RDF.type, MLIPS.MLIPMethod) not in g:
+                bad += 1
+                print(f"shared/methods.ttl: derivation endpoint entity:{name} is not declared a mlips:MLIPMethod")
+            labels = {str(o) for o in g.objects(e, RDFS.label)}
+            if name not in methods or labels != {methods[name]["label"]}:
+                bad += 1
+                print(f"shared/methods.ttl: derivation endpoint entity:{name} lacks its registry label")
     print(f"checked {checked} files against {len(methods)} registry methods "
           f"and {len(models)} registry models: {bad} violations")
     return 1 if bad else 0
