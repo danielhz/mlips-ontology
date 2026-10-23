@@ -28,6 +28,13 @@ Configuration (only CONCON_PASSWORD is required):
   CONCON_DATASET_PATH  Dataset path appended to the origin.
                     Default "/mlips/_ds/mlips" (team mlips, dataset mlips).
 
+What goes into the `kg` graph: every artifacts/kg/papers/*.ttl, followed by
+every artifacts/kg/shared/*.ttl (the generated registry files: method
+derivations and endpoint labels in methods.ttl, the entity:ds-* data-set
+registry in datasets.ttl, the origin-paper stubs in origin-papers.ttl),
+each group in sorted order, so the unit's bytes -- and thus its change
+detection -- are stable.
+
 Flags: --dry-run (show what would be sent, no PUTs), --force/--all
 (ignore the manifest, re-send everything), --dataset-path PATH.
 
@@ -71,6 +78,8 @@ def units():
     onto = REPO / "artifacts" / "ontology"
     kg = REPO / "artifacts" / "kg"
     papers = sorted(glob.glob(str(kg / "papers" / "*.ttl")))
+    # shared registry files after the papers, in a fixed sorted order
+    shared = sorted(glob.glob(str(kg / "shared" / "*.ttl")))
     labels = sorted(glob.glob(str(REPO / "dist" / "artifacts" / "kg" / "papers" / "*-labels.ttl")))
     derived = sorted(glob.glob(str(kg / "datasets" / "derived" / "*.ttl")))
 
@@ -81,7 +90,7 @@ def units():
     spec = [
         ("schema",   "graph", "schema",   file_bytes(onto / "mlips.ttl"),       TTL),
         ("vocab",    "graph", "vocab",    file_bytes(kg / "mlips-vocab.ttl"),   TTL),
-        ("kg",       "graph", "kg",       assemble(papers) if papers else None, TTL),
+        ("kg",       "graph", "kg",       assemble(papers + shared) if papers else None, TTL),
         # concon >= v0.2.0 owns the `computed` graph (it derives the
         # axiom-expressible triples itself), so the *-computed.ttl
         # materialisations are no longer PUT. The templated labels --
